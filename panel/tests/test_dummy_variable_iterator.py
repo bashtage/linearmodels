@@ -1,25 +1,24 @@
-from unittest import TestCase, skip
+from unittest import TestCase
 
 import numpy as np
 import scipy.sparse as sparse
 from nose.tools import assert_is_instance, assert_raises, assert_true
 from numpy.testing import assert_equal
 
-from panel.fixed_effects import DummyVariableIterator
+from panel.dummy_iterator import DummyVariableIterator
 
 
 class TestDummyIterator(TestCase):
     @classmethod
     def setUpClass(cls):
         np.random.seed(1234)
-        cls.n1, cls.t1 = 1000,100
+        cls.n1, cls.t1 = 1000, 100
         cls.n2, cls.t2 = 250, 40
         cls.n3, cls.t3 = 5000, 200
-        cls.groups1 = np.random.randint(0, 2, size=(cls.n1*cls.t1,))
-        cls.groups2 = np.random.randint(0, 100, size=(cls.n2*cls.t2,))
-        cls.groups3 = np.random.randint(0, 1000, size=(cls.n3*cls.t3,))
+        cls.groups1 = np.random.randint(0, 2, size=(cls.n1 * cls.t1,))
+        cls.groups2 = np.random.randint(0, 100, size=(cls.n2 * cls.t2,))
+        cls.groups3 = np.random.randint(0, 1000, size=(cls.n3 * cls.t3,))
 
-    @skip('Skip very large for now')
     def test_very_large(self):
         size = len(self.groups3)
         n = 20000
@@ -65,6 +64,7 @@ class TestDummyIterator(TestCase):
         assert_raises(ValueError, DummyVariableIterator, 200, 50, 2 * group)
         assert_raises(ValueError, DummyVariableIterator, 200, 50, group + 1)
         assert_raises(ValueError, DummyVariableIterator, 200, 50, group[:100])
+        assert_raises(ValueError, DummyVariableIterator, 200, 50, np.array([0, 1, 0, 1]))
 
     def test_drop(self):
         dvi = DummyVariableIterator(self.n1, self.t1, self.groups1)
@@ -81,7 +81,7 @@ class TestDummyIterator(TestCase):
         dvi_drop = DummyVariableIterator(self.n3, self.t3, self.groups3, drop=True)
         count = 0
         for d, d_dropped in zip(dvi, dvi_drop):
-            assert_true(np.all(d*d_dropped == 0))
+            assert_true(np.all(d * d_dropped == 0))
             count += 1
             if count > 2:
                 break

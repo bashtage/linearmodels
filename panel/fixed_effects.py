@@ -1,6 +1,3 @@
-# TODO: Dummies
-# TODO: Dummy iterator
-# TODO: FE Estimation
 # TODO: Ordering?
 """
 Tools for manipulating FixedEffect in Panel models
@@ -12,11 +9,22 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from pandas.core.common import is_numeric_dtype
-from scipy.sparse import csc_matrix
+
+from .data import PanelData
+from .dummy_iterator import DummyVariableIterator
+
+
+class RequiredSubclassingError(Exception):
+    def __init__(self):
+        # Call the base class constructor with the parameters it needs
+        super(RequiredSubclassingError, self).__init__('Subclasses must implement')
 
 
 class SaturatedEffectWarning(Warning):
     pass
+
+
+not_implemented_msg = 'Subclasses must implement'
 
 
 def _get_values(original):
@@ -27,72 +35,21 @@ def _get_values(original):
     return values
 
 
-class DummyVariableIterator(object):
-    """
-    Iterator object that produces dummy variables
-    """
-
-    def __init__(self, n, t, groups, drop=False, max_size=10, sparse=False):
-        self.n = n
-        self.t = t
-        self.groups = groups
-        self.max_size = max_size
-        self.sparse = sparse
-        self.drop = drop
-        self._array_cols = max(1, int(self.max_size * 2.0 ** 20 / 8.0 / (n * t)))
-        groups = groups.astype(np.int64)
-        self._rows = int(n * t)
-        self._index = 0
-        ugroups = np.unique(groups)
-        if np.min(ugroups) != 0 or np.any(np.diff(ugroups) != 1):
-            raise ValueError('groups must contain elements in {0,1,...,max}')
-        if len(groups) != self._rows:
-            raise ValueError('groups must have n * t elements')
-        self._group_index = np.argsort(groups)
-        ordered = self._ordered_groups = groups[self._group_index]
-        locs = np.argwhere(np.diff(ordered) != 0)
-        self._ends = np.concatenate([[[0]], locs + 1, [[len(ordered)]]])
-        self._ends = self._ends.ravel()
-
-    def __iter__(self):
-        self._iter_count = 0
-        self._remaining_cols = self.groups.max() + 1
-        return self
-
-    def __next__(self):
-        if self._remaining_cols <= 0:
-            raise StopIteration
-
-        cols = min(self._remaining_cols, self._array_cols)
-        self._remaining_cols -= cols
-        ends = self._ends
-        rows = self._group_index[ends[self._index]:ends[self._index + cols]]
-        group_ids = self._ordered_groups[ends[self._index]:ends[self._index + cols]]
-        columns = group_ids - self._index
-        self._index += cols
-        if not self.sparse:
-            out = np.zeros((self._rows, cols))
-            out[rows, columns] = 1
-        else:
-            values = np.ones_like(columns)
-            locs = (rows, columns)
-            shape = (self._rows, cols)
-            out = csc_matrix((values, locs), shape=shape, dtype=np.float64)
-
-        if self.drop and np.any(group_ids == 0):
-            out = out[:, 1:]
-            # Ensure never return empty column
-            if out.shape[1] == 0:
-                return self.__next__()
-
-        return out
-
-
 class FixedEffectSet(object):
+    data = None
+    _fixed_effects = None
+    id = None
+
     def __init__(self, *effects):
         self._fixed_effects = OrderedDict()
+        self.data = effects[0].data
+
         for effect in effects:
+            self._check_id(effect)
             self._fixed_effects[str(effect)] = effect
+
+    def __len__(self):
+        return len(self._fixed_effects)
 
     def __str__(self):
         effects_str = ', '.join(list(map(str, self.fixed_effects)))
@@ -109,16 +66,24 @@ class FixedEffectSet(object):
     def fixed_effects(self):
         return list(self._fixed_effects.values())
 
+    def _check_id(self, other):
+        if other.data.id != self.data.id:
+            raise ValueError('Can only add fixed effect to other '
+                             'fixed effects based on the same data.')
+
     def __add__(self, other):
         if isinstance(other, FixedEffectSet):
+            self._check_id(other)
             return FixedEffectSet(*(self.fixed_effects + other.fixed_effects))
         elif issubclass(other.__class__, FixedEffect):
+            self._check_id(other)
             return FixedEffectSet(*(self.fixed_effects + [other]))
         else:
             raise ValueError('Unknown input type')
 
     def __sub__(self, other):
         if isinstance(other, FixedEffectSet):
+            self._check_id(other)
             for fe in other.fixed_effects:
                 key = str(fe)
                 if key not in self._fixed_effects:
@@ -126,17 +91,22 @@ class FixedEffectSet(object):
                 del self._fixed_effects[key]
             return FixedEffectSet(*self.fixed_effects)
         elif issubclass(other.__class__, FixedEffect):
+            self._check_id(other)
             key = str(other)
             if key not in self._fixed_effects:
                 raise ValueError(key + ' is not in fixed effect set')
             del self._fixed_effects[key]
             return FixedEffectSet(*self.fixed_effects)
         else:
-            raise ValueError('Unknown input type')
+            raise ValueError('Cannot subtract unknown types')
 
-    def orthogonalize(self, x):
-        for key in self._fixed_effects:
-            x = self._fixed_effects[key].orthogonalize(x)
+    def orthogonalize(self):
+        for i, key in enumerate(self._fixed_effects):
+            if i == 0:
+                x = self._fixed_effects[key].orthogonalize()
+            else:
+                effect = self._fixed_effects[key].__class__
+                x = effect(x).orthogonalize()
         return x
 
 
@@ -144,44 +114,42 @@ class FixedEffect(object):
     _transform = None
     _groups = None
     _effect_name = ''
+    _data = None
+
+    def __init__(self, data):
+        self.data = PanelData(data)
 
     def _effect_labels(self, first, last):
-        lbls = ['UnnamedEffect.{0:d}'.format(i) for i in range(first, last)]
-        return lbls
+        raise RequiredSubclassingError  # pragma: no cover
 
-    def _select_columns(self, x, exclude):
-        skip = self._skip_columns(x)
+    def _select_columns(self, exclude):
+        skip = self._skip_columns()
         exclude = [] if exclude is None else exclude
         skip_or_exlude = list(set(skip + list(exclude)))
 
-        if isinstance(x, (np.ndarray, xr.DataArray)):
-            original = np.arange(x.shape[2])
-        else:
-            original = x.minor_axis  # pandas
-
+        original = self.data.columns
         self._selected = [c for c in original if c not in skip_or_exlude]
 
-    def _split(self, x):
-        return x[:, :, self._selected]
+    def _split(self):
+        return self.data.as3d[:, :, self._selected]
 
-    def _restore(self, values, orig):
-        restored = orig.copy()
-        if isinstance(orig, pd.Panel):
+    def _restore(self, values):
+        restored = self.data.data.copy()
+        if self.data.is_pandas:
             restored.loc[:, :, self._selected] = values
             return restored
         restored[:, :, self._selected] = values
 
         return restored
 
-    @staticmethod
-    def _skip_columns(x):
+    def _skip_columns(self):
         skip = []
         """Determine columns to skip"""
-        if isinstance(x, (np.ndarray, xr.DataArray)):
+        if self.data.is_numpy or self.data.is_xarray:
             return skip
 
-        for col in x.minor_axis:
-            temp = x[:, :, col]
+        for col in self.data.columns:
+            temp = self.data.data[:, :, col]
             if np.all(list(map(is_numeric_dtype, temp.dtypes))):
                 continue
             try:
@@ -191,21 +159,8 @@ class FixedEffect(object):
 
         return skip
 
-    @staticmethod
-    def _validate_input(x):
-        """Ensures the input is one of the supported types"""
-        if isinstance(x, np.ndarray):
-            if x.ndim != 3:
-                raise ValueError('NumPy array must have 3 dimensions')
-        elif isinstance(x, xr.DataArray):
-            if x.values.ndim != 3:
-                raise ValueError('xarray DataArray must have 3 dimensions')
-        elif isinstance(x, pd.Panel):
-            pass
-        else:
-            raise ValueError('Unknown data type -- subclasses not supported')
-
     def __add__(self, other):
+        # TODO Fix this
         if not issubclass(other.__class__, FixedEffect) or \
                 isinstance(other, FixedEffectSet):
             raise ValueError('Can only add other fixed effects')
@@ -215,38 +170,36 @@ class FixedEffect(object):
         return '<b>' + self.__str__() + '</b>'
 
     def __str__(self):
-        raise NotImplementedError('Subclasses must implement') \
-            # pragma: no cover
+        raise RequiredSubclassingError  # pragma: no cover
 
     def __repr__(self):
         return self.__str__()  # pragma: no cover
 
-    def orthogonalize(self, x, exclude=None):
-        raise NotImplementedError('Subclasses must implement') \
-            # pragma: no cover
+    def orthogonalize(self, exclude=None):
+        raise RequiredSubclassingError  # pragma: no cover
 
-    def groups(self, x):
+    def groups(self):
         if self._groups is None:
-            self._groups = self._construct_groups(x)
+            self._groups = self._construct_groups()
         return self._groups
 
-    def _construct_groups(self, x):
-        raise NotImplementedError('Subclasses must implement') \
-            # pragma: no cover
+    def _construct_groups(self):
+        raise RequiredSubclassingError  # pragma: no cover
 
     def estimate(self, endog, exog=None, drop=False):
-        dummies = self.dummies(endog, drop=drop, iterator=True)
-        n,t,_ = endog.shape
 
-        endog = np.asarray(endog).reshape((n*t,1))
+        dummies = self.dummies(drop=drop, iterator=True)
+        n, t = self.data.n, self.data.t
+
+        endog_col = self.data.column_index(endog)
+        endog = self.data.asnumpy2d[:, endog_col]
 
         if exog is not None:
-            k = exog.shape[2]
-            exog = np.asarray(exog).reshape((n*t,k))
+            exog_col = self.data.column_index(exog)
+            exog = self.data.asnumpy2d[:, exog_col]
 
         effects = []
-        if exog is not None:
-            xpxi = np.linalg.inv(exog.T.dot(exog))
+        xpxi = np.linalg.inv(exog.T.dot(exog)) if exog is not None else None
         for d in dummies:
             if exog is None:
                 effects.append(d.T.dot(endog).ravel() / d.sum(0))
@@ -260,9 +213,9 @@ class FixedEffect(object):
         index = self._effect_labels(int(drop), len(effects) + int(drop))
         return pd.Series(effects, index=index)
 
-    def dummies(self, x, drop=False, iterator=False, max_size=10):
-        n, t, k = x.shape
-        groups = self.groups(x)
+    def dummies(self, drop=False, iterator=False, max_size=10):
+        n, t, k = self.data.n, self.data.t, self.data.k
+        groups = self.groups()
         max_size = max_size if iterator else 2 ** 62
         dummy_iterator = DummyVariableIterator(n, t, groups, max_size=max_size, drop=drop)
         if iterator:
@@ -272,40 +225,42 @@ class FixedEffect(object):
 
 
 class EntityEffect(FixedEffect):
+    def __init__(self, data):
+        super(EntityEffect, self).__init__(data)
+
     def _effect_labels(self, first, last):
-        lbls = ['EntityEffect.{0:d}'.format(i) for i in range(first, last)]
+        index = self.data.entity_index
+        lbls = ['EntityEffect.{0}'.format(index) for i in range(first, last)]
         return lbls
 
     def __str__(self):
         return 'Entity effect'
 
-    def _construct_groups(self, x):
-        n, t, k = x.shape
+    def _construct_groups(self):
+        n, t = self.data.n, self.data.t
         return np.tile(np.arange(n)[:, None], (1, t)).ravel()
 
-    def orthogonalize(self, x, exclude=None):
-        # Validate input
-        self._validate_input(x)
+    def orthogonalize(self, exclude=None):
+        data = self.data
         # Take subset of data to transform
-        self._select_columns(x, exclude)
-        _x = self._split(x)
+        self._select_columns(exclude)
+        _data = self._split()
         # Transform subset
-        _x = _get_values(_x)
-        _x = _x.swapaxes(0, 1)
+        _data = _get_values(_data)
+        _data = _data.swapaxes(0, 1)
         # Check for saturation
-        counts = np.sum(np.isnan(_x), 0)
-        non_zero = _x.shape[0] - counts
+        counts = np.sum(np.isnan(_data), 0)
+        non_zero = _data.shape[0] - counts
         if np.any(non_zero == 1):
             warn('Entity effects have saturated the data for one or more '
                  'series.  All residuals will be 0.', SaturatedEffectWarning)
 
-        _x = (_x - np.nanmean(_x, 0))
-        _x = _x.swapaxes(0, 1)
+        _data = (_data - np.nanmean(_data, 0))
+        _data = _data.swapaxes(0, 1)
         # Restore to original form
-        out = self._restore(_x, x)
+        out = self._restore(_data)
 
         return out
-
 
 
 class TimeEffect(FixedEffect):
@@ -316,38 +271,34 @@ class TimeEffect(FixedEffect):
     def __str__(self):
         return 'Time effect'
 
-    def _construct_groups(self, x):
-        n, t, k = x.shape
+    def _construct_groups(self):
+        n, t = self.data.n, self.data.t
         return np.tile(np.arange(t)[:, None], (n, 1)).ravel()
 
-    def orthogonalize(self, x, exclude=None):
-        # Validate input
-        self._validate_input(x)
+    def orthogonalize(self, exclude=None):
         # Take subset of data to transform
-        self._select_columns(x, exclude)
-        _x = self._split(x)
+        self._select_columns(exclude)
+        _data = self._split()
         # Transform subset
-        _x = _get_values(_x)
+        _data = _get_values(_data)
 
         # Check for saturation
-        counts = np.sum(np.isnan(_x), 0)
-        non_zero = _x.shape[0] - counts
+        counts = np.sum(np.isnan(_data), 0)
+        non_zero = _data.shape[0] - counts
         if np.any(non_zero == 1):
             warn('Time effects have saturated the data for one or more '
                  'series.  All residuals will be 0.', SaturatedEffectWarning)
 
-        _x = _x - np.nanmean(_x, 0)
+        _data = _data - np.nanmean(_data, 0)
         # Restore to original form
-        out = self._restore(_x, x)
-
-        return out
+        return self._restore(_data)
 
 
 class GroupEffect(FixedEffect):
-    def __init__(self, columns, time=False, entity=False, data=None):
+    def __init__(self, data, columns, time=False, entity=False):
+        super(GroupEffect, self).__init__(data)
         if not isinstance(columns, (list, tuple)):
             raise ValueError('columns must be a list or tuple')
-        self.data = data
         self.columns = columns
         self.time = time
         self.entity = entity
@@ -360,32 +311,31 @@ class GroupEffect(FixedEffect):
         lbls = ['{0}.{1:d}'.format(name, i) for i in range(first, last)]
         return lbls
 
-    def _construct_groups(self, x):
-        self._validate_input(x)
-        if isinstance(x, np.ndarray):
-            return _numpy_groups(x, self.columns, self.time, self.entity)
-        elif isinstance(x, pd.Panel):
-            return _pandas_groups(x, self.columns, self.time, self.entity)
+    def _construct_groups(self):
+        if self.data.is_numpy:
+            return _numpy_groups(self.data.data, self.columns, self.time, self.entity)
+        elif self.data.is_pandas:
+            return _pandas_groups(self.data.data, self.columns, self.time, self.entity)
         else:
-            raise NotImplementedError
+            return _numpy_groups(self.data.asnumpy3d, self.columns, self.time, self.entity)
 
-    def orthogonalize(self, x, exclude=None):
+    def orthogonalize(self, exclude=None):
         columns = self.columns
         if len(columns) == 0:
             if self.time:
-                return TimeEffect().orthogonalize(x)
+                return TimeEffect(self.data).orthogonalize()
             elif self.entity:
-                return EntityEffect().orthogonalize(x)
+                return EntityEffect(self.data).orthogonalize()
 
-        self._validate_input(x)
-        if isinstance(x, np.ndarray):
-            return _numpy_groupwise_demean(x, self.columns,
+        data = self.data.data
+        if self.data.is_numpy:
+            return _numpy_groupwise_demean(data, self.columns,
                                            self.time, self.entity)
-        elif isinstance(x, pd.Panel):
-            return _pandas_groupwise_demean(x, self.columns,
+        elif self.data.is_pandas:
+            return _pandas_groupwise_demean(data, self.columns,
                                             self.time, self.entity)
         else:
-            return _xarray_groupwise_demean(x, self.columns,
+            return _xarray_groupwise_demean(data, self.columns,
                                             self.time, self.entity)
 
     def __str__(self):
