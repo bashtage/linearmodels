@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg import pinv
-
+import pandas as pd
 from .data import PanelData
 
 
@@ -8,14 +8,17 @@ class PooledOLS(object):
     """
     Parameters
     ----------
-    endog: {np.ndarray, pd.DataFrame, pd.Panel, xr.DataArray, PanelData}
+    endog: array-like
         Endogenous or left-hand-side variable (entities by time)
-    exog: {np.ndarray, pd.DataFrame, pd.Panel, xr.DataArray, PanelData}
-        Exogenous or right-hand-side variables (entities by time by variable)
-    intercept : bool
+    exog: array-like
+        Exogenous or right-hand-side variables (entities by time by variable). Should not contain 
+        an intercept or have a constant column in the column span.
+    intercept : bool, optional
+        Flag whether to include an intercept in the model
     
     Notes
     -----
+    Simple implementation of a PooledOLS estimator
     """
 
     def __init__(self, endog, exog, *, intercept=True):
