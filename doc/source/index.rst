@@ -10,7 +10,9 @@ Welcome to panel's documentation!
 .. currentmodule:: panel
 
 .. autoclass:: PanelData
-.. autoclass:: PooledOLS
+
+.. automodule:: panel.lm
+   :members:
 
 .. toctree::
    :maxdepth: 2
