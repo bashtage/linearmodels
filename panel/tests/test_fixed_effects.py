@@ -1,11 +1,9 @@
 import string
 import warnings
-from unittest import TestCase
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from nose.tools import assert_true, assert_is_instance
 from numpy.testing import assert_equal, assert_raises, assert_almost_equal
 
 from panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect, \
@@ -32,9 +30,9 @@ def check_groups_pd(groups, data, cols):
             else:
                 temp = df.iloc[locs][[col1]]
             if temp.shape[0] > 1:
-                assert_true((temp[col1] == temp[col1].iloc[0]).all())
+                assert (temp[col1] == temp[col1].iloc[0]).all()
             if col2 is not None:
-                assert_true((temp[col2] == temp[col2].iloc[0]).all())
+                assert (temp[col2] == temp[col2].iloc[0]).all()
 
 
 def demean_1col(x, col):
@@ -52,9 +50,9 @@ def demean_1col(x, col):
     return _x.reshape((n, t, k))
 
 
-class BaseTestClass(TestCase):
+class BaseTestClass(object):
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         cls.np0 = np.random.randn(2, 10, 3).reshape(2, 10, 3)
         cls.np0[0, :, 0] = 0
         cls.np0[1, :, 0] = 1
@@ -82,6 +80,8 @@ class BaseTestClass(TestCase):
         for i in range(4):
             cls.np1[:, :, i] = cls.np1[:, :, i] % modulus[i]
             cls.np2[:, :, i] = cls.np2[:, :, i] % modulus[i]
+        cls.np1 += np.random.random_sample(cls.np1.shape)
+        cls.np2 += np.random.random_sample(cls.np2.shape)
 
         np3 = np.zeros((1000, 17, 4))
         np3 = np3.reshape((17000, 4))
@@ -90,6 +90,7 @@ class BaseTestClass(TestCase):
             np3[np3[:, 0] == i, 1:] = np.random.randn(3)
         np3 = np3.reshape((1000, 17, 4))
         cls.np3 = np3
+        cls.np3 += np.random.random_sample(cls.np3.shape)
 
         cls.np1_missing = cls.np1.copy()
         cls.np1_missing[:, ::3, :] = np.nan
@@ -101,8 +102,14 @@ class BaseTestClass(TestCase):
         cls.pd2 = pd.Panel(cls.np2.copy())
         cls.pd3 = pd.Panel(cls.np3.copy())
 
-        cls.xr1 = xr.DataArray(cls.np1.copy())
-        cls.xr2 = xr.DataArray(cls.np2.copy())
+        cls.xr1 = xr.DataArray(cls.np1.copy(),
+                               coords=[np.arange(cls.np1.shape[0]),
+                                       np.arange(cls.np1.shape[1]),
+                                       np.arange(cls.np1.shape[2])])
+        cls.xr2 = xr.DataArray(cls.np2.copy(),
+                               coords=[np.arange(cls.np2.shape[0]),
+                                       np.arange(cls.np2.shape[1]),
+                                       np.arange(cls.np2.shape[2])])
 
 
 class TestEntityEffect(BaseTestClass):
@@ -130,7 +137,7 @@ class TestEntityEffect(BaseTestClass):
         ee = EntityEffect(self.np1)
         out = ee.orthogonalize(np.arange(10, self.np1.shape[2]))
         for c in range(10):
-            assert_true((self.np1[:, :, c] != out[:, :, c]).any())
+            assert (self.np1[:, :, c] != out[:, :, c]).any()
 
         for c in range(10, self.np1.shape[2]):
             assert_equal(self.np1[:, :, c], out[:, :, c])
@@ -141,7 +148,7 @@ class TestEntityEffect(BaseTestClass):
         for c in list(range(self.np2.shape[2])):
             if c in indices:
                 continue
-            assert_true((self.np2[:, :, c] != out[:, :, c]).any())
+            assert (self.np2[:, :, c] != out[:, :, c]).any()
         for c in indices:
             assert_equal(self.np2[:, :, c], out[:, :, c])
 
@@ -159,8 +166,8 @@ class TestEntityEffect(BaseTestClass):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             ee.orthogonalize()
-            assert_true(len(w) >= 1)
-            assert_true(issubclass(w[0].category, SaturatedEffectWarning))
+            assert len(w) >= 1
+            assert issubclass(w[0].category, SaturatedEffectWarning)
 
     def test_pandas(self):
         ee = EntityEffect(self.pd1)
@@ -214,7 +221,7 @@ class TestEntityEffect(BaseTestClass):
     def test_dummy_iterator(self):
         ee = EntityEffect(self.np1)
         dummies = ee.dummies(iterator=True)
-        assert_is_instance(dummies, DummyVariableIterator)
+        assert isinstance(dummies, DummyVariableIterator)
 
     def test_estimate_numpy(self):
         ee = EntityEffect(self.np1)
@@ -275,8 +282,8 @@ class TestTimeEffect(BaseTestClass):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             te.orthogonalize()
-            assert_true(len(w) >= 1)
-            assert_true(issubclass(w[0].category, SaturatedEffectWarning))
+            assert len(w) >= 1
+            assert issubclass(w[0].category, SaturatedEffectWarning)
 
 
 class TestFixedEffectSet(BaseTestClass):
@@ -357,9 +364,9 @@ class TestFixedEffectSet(BaseTestClass):
         ee = EntityEffect(self.np1)
         te = TimeEffect(self.np1)
         feset = ee + te
-        assert_true('FixedEffectSet' in feset.__str__())
+        assert 'FixedEffectSet' in feset.__str__()
         assert_equal(feset.__str__(), feset.__repr__())
-        assert_true('<b>FixedEffectSet</b>' in feset._repr_html_())
+        assert '<b>FixedEffectSet</b>' in feset._repr_html_()
 
     def test_direct_indirect(self):
         fes = EntityEffect(self.np2) + TimeEffect(self.np2)
@@ -454,41 +461,41 @@ class TestGroupEffects(BaseTestClass):
         out = te.orthogonalize()
         expected = TimeEffect(self.pd1).orthogonalize()
         assert_almost_equal(out.values, expected.values)
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(expected.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(expected.minor_axis)
 
         te = GroupEffect(self.pd2, [], time=True)
         out = te.orthogonalize()
         expected = TimeEffect(self.pd2).orthogonalize()
         assert_almost_equal(out.values, expected.values)
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(expected.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(expected.minor_axis)
 
     def test_pandas_group_effects(self):
         ge = GroupEffect(self.pd1, [], entity=True)
         out = ge.orthogonalize()
         expected = EntityEffect(self.pd1).orthogonalize()
         assert_almost_equal(out.values, expected.values)
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(expected.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(expected.minor_axis)
 
         ge = GroupEffect(self.pd2, [], entity=True)
         out = ge.orthogonalize()
         expected = EntityEffect(self.pd2).orthogonalize()
         assert_almost_equal(out.values, expected.values)
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(expected.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(expected.minor_axis)
 
     def test_group_time_entity_joint(self):
         ge = GroupEffect(self.pd2, [0], entity=True)
         out = ge.orthogonalize()
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(self.pd2.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(self.pd2.minor_axis)
 
         ge = GroupEffect(self.pd2, [0], time=True)
         out = ge.orthogonalize()
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(self.pd2.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(self.pd2.minor_axis)
 
     def test_group_time_entity_joint_existing_name(self):
         pd2 = self.pd2.copy()
@@ -498,13 +505,13 @@ class TestGroupEffects(BaseTestClass):
 
         ge = GroupEffect(pd2, [0], entity=True)
         out = ge.orthogonalize()
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(pd2.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(pd2.minor_axis)
 
         ge = GroupEffect(pd2, [0], time=True)
         out = ge.orthogonalize()
-        assert_is_instance(out, pd.Panel)
-        assert_true(list(out.minor_axis) == list(pd2.minor_axis))
+        assert isinstance(out, pd.Panel)
+        assert list(out.minor_axis) == list(pd2.minor_axis)
 
     def test_xarray_single(self):
         ge = GroupEffect(self.xr1, [0])
@@ -532,16 +539,16 @@ class TestGroupEffects(BaseTestClass):
 
     def test_str(self):
         ge = GroupEffect(self.pd1, ['var0'])
-        assert_true('var0' in ge.__str__())
+        assert 'var0' in ge.__str__()
         ge = GroupEffect(self.pd1, ['var0', 'var1'])
-        assert_true('var0' in ge.__str__())
-        assert_true('var1' in ge.__str__())
+        assert 'var0' in ge.__str__()
+        assert 'var1' in ge.__str__()
         ge = GroupEffect(self.np1, [0, 1])
-        assert_true('0' in ge.__str__())
-        assert_true('1' in ge.__str__())
+        assert '0' in ge.__str__()
+        assert '1' in ge.__str__()
         ge = GroupEffect(self.pd1, ['var0', 1])
-        assert_true('var0' in ge.__str__())
-        assert_true('1' in ge.__str__())
+        assert 'var0' in ge.__str__()
+        assert '1' in ge.__str__()
 
     def test_errors(self):
         assert_raises(ValueError, GroupEffect, self.np1, [], entity=True, time=True)

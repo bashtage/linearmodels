@@ -14,10 +14,10 @@ matrix:
     - PYTHON=2.7
   - python: 2.7
     env:
-    - PYTHON=3.4
+    - PYTHON=3.5
   - python: 2.7
     env:
-    - PYTHON=3.5
+    - PYTHON=3.6
 
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -29,10 +29,9 @@ before_install:
 
 # Install packages
 install:
-  - conda create --yes --quiet -n panel-test python=${PYTHON} nose pip setuptools numpy pandas xarray
+  - conda create --yes --quiet -n panel-test python=${PYTHON} pip setuptools numpy pandas xarray pytest
   - source activate panel-test
-  - python setup.py install
+  - python setup.py develop
 
 script:
-  - cd ~
-  - nosetests -vv panel
+  - pytest -v panel

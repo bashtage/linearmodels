@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 
+
 class DummyVariableIterator(object):
     """
     Iterator object that produces dummy variables
