@@ -4,6 +4,14 @@ import xarray as xr
 
 
 class PanelData(object):
+    """
+    Uniform panel data access
+    
+    Parameters
+    ----------
+    data : {np.ndarray, pd.DataFrame, pd.Panel, xr.DataArray}
+        Input data 
+    """
     n, t, k = 0, 0, 0
     _2d = None
     time_index = None
