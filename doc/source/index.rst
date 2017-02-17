@@ -10,6 +10,7 @@ Estimation and inference in linear panel data models
 
    models
    covariance
+   plan
 
 
 
