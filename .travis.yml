@@ -27,7 +27,7 @@ before_install:
   - export PATH=/home/travis/miniconda2/bin:$PATH
   - conda update --yes --quiet conda
   # Install packages
-  - conda create --yes --quiet -n panel-test python=${PYTHON} numpy pandas xarray pytest sphinx
+  - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray pytest sphinx
   - source activate panel-test
 
 install:
