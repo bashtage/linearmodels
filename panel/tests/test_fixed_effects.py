@@ -3,8 +3,9 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
-from numpy.testing import assert_equal, assert_raises, assert_almost_equal
+from numpy.testing import assert_equal, assert_almost_equal
 
 from panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect, \
     SaturatedEffectWarning, DummyVariableIterator, FixedEffect, RequiredSubclassingError
@@ -114,9 +115,12 @@ class BaseTestClass(object):
 
 class TestEntityEffect(BaseTestClass):
     def test_invalid_data(self):
-        assert_raises(ValueError, EntityEffect, self.np1[0])
-        assert_raises(ValueError, EntityEffect, self.pd1.iloc[0])
-        assert_raises(ValueError, EntityEffect, self.xr1[0])
+        with pytest.raises(ValueError):
+            EntityEffect(self.np1[0])
+        with pytest.raises(ValueError):
+            EntityEffect(self.pd1.iloc[0])
+        with pytest.raises(ValueError):
+            (EntityEffect, self.xr1[0])
 
     def test_numpy(self):
         ee = EntityEffect(self.np1)
@@ -291,12 +295,15 @@ class TestFixedEffectSet(BaseTestClass):
         ee = EntityEffect(self.np1)
         ge = GroupEffect(self.np1, [0])
         te = TimeEffect(self.np2)
-        assert_raises(ValueError, ee.__add__, te)
+        with pytest.raises(ValueError):
+            ee + te
         fes = ee + ge
-        assert_raises(ValueError, fes.__add__, te)
+        with pytest.raises(ValueError):
+            fes + te
 
         fes2 = te + EntityEffect(self.np2)
-        assert_raises(ValueError, fes.__add__, fes2)
+        with pytest.raises(ValueError):
+            fes + fes2
 
     def test_add(self):
         ee = EntityEffect(self.np1)
@@ -310,9 +317,12 @@ class TestFixedEffectSet(BaseTestClass):
         ee = EntityEffect(self.np1)
         te = TimeEffect(self.np1)
         feset = ee + te
-        assert_raises(ValueError, feset.__add__, 5)
-        assert_raises(ValueError, ee.__add__, 'a')
-        assert_raises(ValueError, te.__add__, np.arange(10))
+        with pytest.raises(ValueError):
+            feset + 5
+        with pytest.raises(ValueError):
+            ee + 'a'
+        with pytest.raises(ValueError):
+            te + np.arange(10)
 
     def test_subtract(self):
         ee = EntityEffect(self.np1)
@@ -332,13 +342,16 @@ class TestFixedEffectSet(BaseTestClass):
         te = TimeEffect(self.np1)
         feset = ee + te
         feset = feset - ee
-        assert_raises(ValueError, feset.__sub__, ee)
-        assert_raises(ValueError, feset.__sub__, 'a')
+        with pytest.raises(ValueError):
+            feset - ee
+        with pytest.raises(ValueError):
+            feset - 'a'
         ge = GroupEffect(self.np1, [0, 1])
         ge2 = GroupEffect(self.np1, [0, 2])
         feset = ee + te + ge
         feset2 = ee + ge2
-        assert_raises(ValueError, feset.__sub__, feset2)
+        with pytest.raises(ValueError):
+            feset - feset2
 
     def test_orthogonalize_pandas(self):
         ee = EntityEffect(self.pd1)
@@ -551,8 +564,10 @@ class TestGroupEffects(BaseTestClass):
         assert '1' in ge.__str__()
 
     def test_errors(self):
-        assert_raises(ValueError, GroupEffect, self.np1, [], entity=True, time=True)
-        assert_raises(ValueError, GroupEffect, self.np1, np.arange(2))
+        with pytest.raises(ValueError):
+            GroupEffect(self.np1, [], entity=True, time=True)
+        with pytest.raises(ValueError):
+            GroupEffect(self.np1, np.arange(2))
 
     def test_pandas_categorical(self):
         panel = {}
@@ -708,4 +723,5 @@ class TestGroups(BaseTestClass):
 class TestFixedEffect(BaseTestClass):
     def test_notimplemented(self):
         fe = FixedEffect(self.np1)
-        assert_raises(RequiredSubclassingError, fe.__str__)
+        with pytest.raises(RequiredSubclassingError):
+            str(fe)
