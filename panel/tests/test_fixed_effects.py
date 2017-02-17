@@ -120,7 +120,7 @@ class TestEntityEffect(BaseTestClass):
         with pytest.raises(ValueError):
             EntityEffect(self.pd1.iloc[0])
         with pytest.raises(ValueError):
-            (EntityEffect, self.xr1[0])
+            EntityEffect(self.xr1[0])
 
     def test_numpy(self):
         ee = EntityEffect(self.np1)
