@@ -9,20 +9,17 @@ env:
 matrix:
   fast_finish: true
   include:
-  - python: 2.7
-    env:
-    - PYTHON=2.7
-  - python: 2.7
+  - python: 3.5
     env:
     - PYTHON=3.5
-  - python: 2.7
+  - python: 3.5
     env:
     - PYTHON=3.6
 
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
+  - chmod +x miniconda3.sh
+  - ./miniconda3.sh -b
   - export PATH=/home/travis/miniconda/bin:$PATH
   - export PATH=/home/travis/miniconda2/bin:$PATH
   - conda update --yes --quiet conda
