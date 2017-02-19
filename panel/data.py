@@ -88,13 +88,30 @@ class PanelData(object):
     def _validate_input(self):
         """Ensures the input is one of the supported types"""
         if self.is_numpy:
-            if self.data.ndim != 3:
-                raise ValueError('NumPy array must have 3 dimensions')
+            if self.data.ndim > 3:
+                raise ValueError('NumPy array must have 3 or fewer dimensions')
+            elif self.data.ndim < 3:
+                if self.data.ndim == 1:
+                    self.data = self.data[:, None]
+                else:
+                    self.data = self.data[:, None, None]
         elif self.is_xarray:
-            if self.data.values.ndim != 3:
-                raise ValueError('xarray DataArray must have 3 dimensions')
+
+            if len(self.data.dims) > 3:
+                raise ValueError('xarray DataArray must have 3 or fewer dimensions')
+            if len(self.data.dims) == 1:
+                self.data = xr.concat([self.data], dim='fake_dim1')
+                self.data = self.data.transpose()
+            if len(self.data.dims) == 2:
+                self.data = xr.concat([self.data], dim='fake_dim')
+                self.data = self.data.transpose((*self.data.dims[1:], self.data.dims[0]))
         elif self.is_pandas:
-            pass
+            if self.data.ndim == 1:
+                self.data = pd.DataFrame({0: self.data})
+            if self.data.ndim == 2:
+                self.data = pd.Panel({0: self.data}).swapaxes(0, 1).swapaxes(1, 2)
+            if self.data.ndim > 3:
+                raise ValueError('data must have 3 or fewer dimensions')
         else:
             raise ValueError('Unknown type of data -- must have 3 dimensions '
                              'and subclasses are not supported')
