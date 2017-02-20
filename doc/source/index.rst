@@ -8,6 +8,7 @@ Estimation and inference in linear panel data models
    :maxdepth: 2
    :caption: Contents:
 
+   iv
    models
    covariance
    plan
