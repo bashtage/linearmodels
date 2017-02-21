@@ -1,1 +1,1 @@
-from .iv import IV2SLS, IVGMM
+from .iv import IV2SLS, IVGMM  # noqa

@@ -4,6 +4,24 @@ from numpy import ceil, where, argsort, r_, unique, zeros, arange, pi, sin, cos
 from numpy.linalg import pinv, inv
 
 
+def kernel_weight_bartlett(max_lag):
+    return 1 - arange(max_lag + 1) / (max_lag + 1)
+
+
+def kernel_weight_quadratic_spectral(max_lag):
+    w = 6 * pi * arange(max_lag + 1) / 5
+    w[0] = 1
+    w[1:] = 3 * (sin(w[1:]) / w[1:] - cos(w[1:])) / w[1:] ** 2
+    return w
+
+
+def kernel_weight_parzen(max_lag):
+    z = arange(max_lag + 1) / (max_lag + 1)
+    w = 1 - 6 * z ** 2 + 6 * z ** 3
+    w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
+    return w
+
+
 class IVCovariance(object):
     def __init__(self, x, z, eps, **config):
         self.x = x
@@ -33,7 +51,7 @@ class IVCovariance(object):
 
     @property
     def cov(self):
-        x, z, eps = self.x, self.z, self.eps
+        x, z = self.x, self.z
         nobs, nvar = x.shape
 
         scale = nobs / (nobs - nvar) if self.config.get('debiased', False) else 1
@@ -65,12 +83,12 @@ class HomoskedasticCovariance(IVCovariance):
 class KernelCovariance(HomoskedasticCovariance):
     def __init__(self, x, z, eps, **config):
         super(KernelCovariance, self).__init__(x, z, eps, **config)
-        self._kernels = {'bartlett': self._weight_bartlett,
-                         'newey-west': self._weight_bartlett,
-                         'quadratic-spectral': self._weight_quadratic_spectral,
-                         'andrews': self._weight_quadratic_spectral,
-                         'gallant': self._weight_parzen,
-                         'parzen': self._weight_parzen}
+        self._kernels = {'bartlett': kernel_weight_bartlett,
+                         'newey-west': kernel_weight_bartlett,
+                         'quadratic-spectral': kernel_weight_quadratic_spectral,
+                         'andrews': kernel_weight_quadratic_spectral,
+                         'gallant': kernel_weight_parzen,
+                         'parzen': kernel_weight_parzen}
 
     @property
     def s(self):
@@ -114,24 +132,6 @@ class KernelCovariance(HomoskedasticCovariance):
         return {'bw': None,
                 'kernel': 'bartlett',
                 'debiased': False}
-
-    @staticmethod
-    def _weight_bartlett(max_lag):
-        return 1 - arange(max_lag + 1) / (max_lag + 1)
-
-    @staticmethod
-    def _weight_quadratic_spectral(max_lag):
-        w = 6 * pi * arange(max_lag + 1) / 5
-        w[0] = 1
-        w[1:] = 3 * (sin(w[1:]) / w[1:] - cos(w[1:])) / w[1:] ** 2
-        return w
-
-    @staticmethod
-    def _weight_parzen(max_lag):
-        z = arange(max_lag + 1) / (max_lag + 1)
-        w = 1 - 6 * z ** 2 + 6 * z ** 3
-        w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
-        return w
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):

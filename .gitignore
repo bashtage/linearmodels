@@ -1,7 +1,0 @@
-# Created by .ignore support plugin (hsz.mobi)
-.gitignore
-.idea/
-.cache/
-panel.egg-info/
-*/__pycache__/*
-
