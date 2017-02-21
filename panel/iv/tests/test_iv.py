@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from panel.iv import IV2SLS
+from panel.iv import IV2SLS, IVGMM
 
 
 class TestIV(object):
@@ -20,21 +20,21 @@ class TestIV(object):
     def test_iv2sls_smoke(self):
         mod = IV2SLS(self.y, self.x, self.z)
         res = mod.fit()
-        print('White')
-        print(res.params)
-        print(res.tstats)
+        # print('White')
+        # print(res.params)
+        # print(res.tstats)
 
     def test_iv2sls_smoke_homoskedastic(self):
         mod = IV2SLS(self.y, self.x, self.z)
         res = mod.fit(cov_type='unadjusted')
-        print(res.params)
-        print(res.tstats)
+        # print(res.params)
+        # print(res.tstats)
 
     def test_iv2sls_smoke_cov_config(self):
         mod = IV2SLS(self.y, self.x, self.z)
         res = mod.fit(cov_type='unadjusted', debiased=True)
-        print(res.params)
-        print(res.tstats)
+        # print(res.params)
+        # print(res.tstats)
 
     def test_invalid_cov_config(self):
         mod = IV2SLS(self.y, self.x, self.z)
@@ -44,60 +44,67 @@ class TestIV(object):
     def test_iv2sls_smoke_nw(self):
         mod = IV2SLS(self.y, self.x, self.z)
         res = mod.fit(cov_type='newey-west')
-        print('NW ')
-        print(res.params)
-        print(res.tstats)
+        # print('NW ')
+        # print(res.params)
+        # print(res.tstats)
         res = mod.fit(cov_type='bartlett')
-        print('Bartlett')
-        print(res.params)
-        print(res.tstats)
+        # print('Bartlett')
+        # print(res.params)
+        # print(res.tstats)
         res = mod.fit(cov_type='bartlett', bw=0)
-        print('Bartlett 0 ')
-        print(res.params)
-        print(res.tstats)
+        # print('Bartlett 0 ')
+        # print(res.params)
+        # print(res.tstats)
 
     def test_iv2sls_smoke_cluster(self):
         mod = IV2SLS(self.y, self.x, self.z)
 
         clusters = np.tile(np.arange(2), (self.y.shape[0] // 2,)).ravel()
         res = mod.fit(cov_type='one-way', clusters=clusters)
-        print('Clustered-Two')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered-Two')
+        # print(res.params)
+        # print(res.tstats)
 
         clusters = np.tile(np.arange(5), (self.y.shape[0] // 5,)).ravel()
         res = mod.fit(cov_type='one-way', clusters=clusters)
-        print('Clustered-Few')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered-Few')
+        # print(res.params)
+        # print(res.tstats)
 
 
         clusters = np.tile(np.arange(100),(self.y.shape[0] // 100,)).ravel()
         res = mod.fit(cov_type='one-way',clusters=clusters)
-        print('Clustered')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered')
+        # print(res.params)
+        # print(res.tstats)
 
         clusters = np.tile(np.arange(500),(self.y.shape[0] // 500,)).ravel()
         res = mod.fit(cov_type='one-way',clusters=clusters)
-        print('Clustered - mid')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered - mid')
+        # print(res.params)
+        # print(res.tstats)
 
         clusters = np.tile(np.arange(1000),(self.y.shape[0] // 1000,)).ravel()
         res = mod.fit(cov_type='one-way',clusters=clusters)
-        print('Clustered - mid')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered - mid')
+        # print(res.params)
+        # print(res.tstats)
 
         clusters = np.tile(np.arange(2500),(self.y.shape[0] // 2500,)).ravel()
         res = mod.fit(cov_type='one-way',clusters=clusters)
-        print('Clustered - 2x')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered - 2x')
+        # print(res.params)
+        # print(res.tstats)
 
 
         res = mod.fit(cov_type='one-way')
-        print('Clustered - indiv')
-        print(res.params)
-        print(res.tstats)
+        # print('Clustered - indiv')
+        # print(res.params)
+        # print(res.tstats)
+
+    def test_ivgmm_smoke(self):
+        mod = IVGMM(self.y, self.x, self.z)
+        print(mod.fit())
+
+        mod = IVGMM(self.y, self.x, self.z)
+        print(mod.fit(iter=100))

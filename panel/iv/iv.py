@@ -1,164 +1,12 @@
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from numpy import sqrt, diag, abs, ceil, where, argsort, r_, unique, zeros, \
-    arange
+from numpy import sqrt, diag, abs, eye
 from numpy.linalg import pinv, inv
 
 from panel.utility import has_constant
-
-
-class IVCovariance(object):
-    def __init__(self, x, z, eps, **config):
-        self.x = x
-        self.z = z
-        self.eps = eps
-        self.config = self._check_config(**config)
-        self._pinvz = None
-
-    def _check_config(self, **config):
-        if len(config) == 0:
-            return config
-
-        valid_keys = list(self.defaults.keys())
-        invalid = []
-        for key in config:
-            if key not in valid_keys:
-                invalid.append(key)
-        if invalid:
-            keys = ', '.join(config.keys())
-            raise ValueError('Unexpected keywords in config: {0}'.format(keys))
-
-        return config
-
-    @property
-    def defaults(self):
-        return {}
-
-    @property
-    def cov(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-
-        scale = nobs / (nobs - nvar) if self.config.get('debiased', False) else 1
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
-        v = (x.T @ z) @ (pinvz @ x) / nobs
-        vinv = inv(v)
-
-        return scale * vinv @ self.s @ vinv / nobs
-
-
-class HomoskedasticCovariance(IVCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(HomoskedasticCovariance, self).__init__(x, z, eps, **config)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-        s2 = eps.T @ eps / nobs
-        v = (x.T @ z) @ (pinv(z) @ x) / nobs
-
-        return s2 * v
-
-    @property
-    def defaults(self):
-        return {'debiased': False}
-
-
-class NeweyWestCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(NeweyWestCovariance, self).__init__(x, z, eps, **config)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-        # TODO: Bandwidth selection method
-        bw = self.config.get('bw', ceil(20 * (nobs / 100) ** (2 / 9)))
-        bw = int(bw)
-
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
-        s = xhat_e.T @ xhat_e
-        for i in range(bw):
-            w = (1 - (i + 1) / (bw + 1))
-            s += w * xhat_e[i + 1:].T @ xhat_e[:-(i + 1)]
-        s /= nobs
-
-        return s
-
-    @property
-    def defaults(self):
-        """
-        Default values
-        
-        Returns
-        -------
-        defaults : dict
-            Dictionary containing valid options and their default value
-        
-        Notes
-        -----
-        When ``bw`` is None, automatic bandwidth selection is used.
-        """
-        return {'bw': None,
-                'debiased': False}
-
-
-class HeteroskedasticCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(HeteroskedasticCovariance, self).__init__(x, z, eps, **config)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
-        s = xhat_e.T @ xhat_e / nobs
-        return s
-
-
-class OneWayClusteredCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(OneWayClusteredCovariance, self).__init__(x, z, eps, **config)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
-
-        nobs, nvar = x.shape
-        clusters = self.config.get('clusters', arange(nobs))
-        num_clusters = len(unique(clusters))
-
-        clusters = clusters.squeeze()
-        if num_clusters > 1:
-            sort_args = argsort(clusters)
-        else:
-            sort_args = list(range(nobs))
-
-        clusters = clusters[sort_args]
-        locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
-        xhat_e = xhat_e[sort_args]
-
-        s = zeros((nvar, nvar))
-        for i in range(num_clusters):
-            st, en = locs[i], locs[i + 1]
-            xhat_e_bar = xhat_e[st:en].sum(axis=0)[:, None]
-            s += xhat_e_bar @ xhat_e_bar.T
-
-        s *= num_clusters / (num_clusters - 1) / nobs
-
-        return s
-
-    @property
-    def defaults(self):
-        return {'debiased': False,
-                'clusters': None}
-
+from panel.iv.covariance import HomoskedasticCovariance, HeteroskedasticCovariance, \
+    KernelCovariance, OneWayClusteredCovariance
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -166,8 +14,8 @@ COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'robust': HeteroskedasticCovariance,
                          'heteroskedastic': HeteroskedasticCovariance,
                          'hccm': HeteroskedasticCovariance,
-                         'newey-west': NeweyWestCovariance,
-                         'bartlett': NeweyWestCovariance,
+                         'newey-west': KernelCovariance,
+                         'bartlett': KernelCovariance,
                          'one-way': OneWayClusteredCovariance}
 
 
@@ -315,16 +163,54 @@ class IVGMM(object):
         self.exog = exog
         self.instruments = instruments
 
-    def fit(self):
-        y, x, z = self.endog, self.exog, self.instruments
-        nobs = y.shape[0]
-        params = IV2SLS(y, x, z).fit()
-        e = y - x @ params
-        ze = z @ e
-        s = ze.T @ ze / nobs
-        w = inv(s)
-        omega = z @ w @ z.t
+    @staticmethod
+    def estimate_parameters(x, y, z, w):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Regressor matrix (nobs by nvar)
+        y : ndarray
+            Regressand matrix (nobs by 1)
+        z : ndarray
+            Instrument matrix (nobs by ninstr)
+        w : ndarray
+            GMM weight matrix (ninstr by ninstr)
+
+        Returns
+        -------
+        params : ndarray
+            Estimated parameters (nvar by 1)
+
+        Notes
+        -----
+        Exposed as a static method to facilitate estimation with other data, 
+        e.g., bootstrapped samples.  Performs no error checking.
+        """
+        omega = z @ w @ z.T
         return inv(x.T @ omega @ x) @ (x.T @ omega @ y)
+
+    def fit(self, iter=2, tol=1e-4):
+        y, x, z = self.endog, self.exog, self.instruments
+        nobs, ninstr = y.shape[0], z.shape[1]
+        _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
+        i, norm = 0, 10 * tol
+        while i < (iter - 1) and norm > tol:
+            e = y - x @ params
+            ze = z * e
+            s = ze.T @ ze / nobs
+            w = inv(s)
+            params = self.estimate_parameters(x, y, z, w)
+            delta = params - _params
+            xpz = x.T @ z / nobs
+            if i == 0:
+                v = (xpz @ w @ xpz.T) / nobs
+                vinv = inv(v)
+            _params = params
+            norm = delta.T @ vinv @ delta
+            i += 1
+
+        return params
 
 
 class IVResults(object):
