@@ -107,4 +107,6 @@ class TestIV(object):
         print(mod.fit())
 
         mod = IVGMM(self.y, self.x, self.z)
-        print(mod.fit(iter=100))
+        res = mod.fit(iter=100)
+        print(res.params)
+        print(res.tstats)

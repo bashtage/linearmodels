@@ -6,7 +6,7 @@ from numpy.linalg import pinv, inv
 
 from panel.utility import has_constant
 from panel.iv.covariance import HomoskedasticCovariance, HeteroskedasticCovariance, \
-    KernelCovariance, OneWayClusteredCovariance
+    KernelCovariance, OneWayClusteredCovariance, IVGMMCovariance
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -44,12 +44,11 @@ class IV2SLS(object):
         self.exog = exog
         self.instruments = instruments
 
-        self._validate_inputs()
         self._has_constant = False
+        self._validate_inputs()
 
     def _validate_inputs(self):
         self._has_constant = has_constant(self.exog)
-        pass
 
     @staticmethod
     def estimate_parameters(x, y, z):
@@ -113,12 +112,6 @@ class IV2SLS(object):
 
         return IVResults(params, cov, r2, cov_type, residual_ss, model_ss, self)
 
-    def cov(self, params):
-        estimator = COVARIANCE_ESTIMATORS[self.cov_type]
-        eps = self.resids(params)
-        x, z = self.exog, self.instruments
-        return estimator(x, z, eps, **self.cov_config).cov
-
     def resids(self, params):
         return self.endog - self.exog @ params
 
@@ -126,20 +119,8 @@ class IV2SLS(object):
     def has_constant(self):
         return self._has_constant
 
-    @property
-    def cov_type(self):
-        return self._cov_type
 
-    @property
-    def cov_config(self):
-        return self._cov_config
-
-    def change_cov_estimator(self, cov_type, **cov_config):
-        self._cov_type = cov_type
-        self._cov_config = cov_config
-
-
-class IVGMM(object):
+class IVGMM(IV2SLS):
     """
     Parameters
     ----------
@@ -159,9 +140,7 @@ class IVGMM(object):
     """
 
     def __init__(self, endog, exog, instruments):
-        self.endog = endog
-        self.exog = exog
-        self.instruments = instruments
+        super(IVGMM, self).__init__(endog, exog, instruments)
 
     @staticmethod
     def estimate_parameters(x, y, z, w):
@@ -190,14 +169,14 @@ class IVGMM(object):
         omega = z @ w @ z.T
         return inv(x.T @ omega @ x) @ (x.T @ omega @ y)
 
-    def fit(self, iter=2, tol=1e-4):
+    def fit(self, iter=2, tol=1e-4, cov_type='robust', **cov_config):
         y, x, z = self.endog, self.exog, self.instruments
         nobs, ninstr = y.shape[0], z.shape[1]
         _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
         i, norm = 0, 10 * tol
         while i < (iter - 1) and norm > tol:
-            e = y - x @ params
-            ze = z * e
+            eps = y - x @ params
+            ze = z * eps
             s = ze.T @ ze / nobs
             w = inv(s)
             params = self.estimate_parameters(x, y, z, w)
@@ -210,7 +189,14 @@ class IVGMM(object):
             norm = delta.T @ vinv @ delta
             i += 1
 
-        return params
+        cov = IVGMMCovariance(x, z, eps, w, **cov_config).cov
+
+        mu = self.endog.mean() if self.has_constant else 0
+        residual_ss = (eps.T @ eps)
+        model_ss = ((y - mu).T @ (y - mu))
+        r2 = 1 - residual_ss / model_ss
+
+        return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss, w, self)
 
 
 class IVResults(object):
@@ -310,3 +296,14 @@ class IVResults(object):
     @property
     def resid_ss(self):
         return self._rss
+
+
+class IVGMMResults(IVResults):
+    def __init__(self, params, cov, r2, cov_type, rss, tss, weight_mat, model):
+        super(IVGMMResults, self).__init__(params, cov, r2, cov_type, rss, tss, model)
+        self._weight_mat = weight_mat
+
+    @property
+    def weight_matrix(self):
+        """Weight matrix used in the final-step GMM estimation"""
+        return self._weight_mat

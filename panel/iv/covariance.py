@@ -3,6 +3,7 @@ from __future__ import print_function, absolute_import, division
 from numpy import ceil, where, argsort, r_, unique, zeros, arange, pi, sin, cos
 from numpy.linalg import pinv, inv
 
+
 class IVCovariance(object):
     def __init__(self, x, z, eps, **config):
         self.x = x
@@ -185,3 +186,25 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     def defaults(self):
         return {'debiased': False,
                 'clusters': None}
+
+
+class IVGMMCovariance(IVCovariance):
+    def __init__(self, x, z, eps, w, **config):
+        super(IVGMMCovariance, self).__init__(x, z, eps, **config)
+        self.w = w
+
+    @property
+    def cov(self):
+        x, z, eps, w = self.x, self.z, self.eps, self.w
+        nobs = x.shape[0]
+        xpz = x.T @ z / nobs
+        xpzw = xpz @ w
+        xpzwzpx_inv = inv(xpzw @ xpz.T)
+
+        # TODO: Need to use cov options here
+        # TODO: Simple "robust" s for now
+        # TODO: HAC, "robust" (s=w^-1), cluter, homoskedastic
+        ze = z * eps
+        s = ze.T @ ze / nobs
+
+        return xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
