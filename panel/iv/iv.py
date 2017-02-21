@@ -1,13 +1,13 @@
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from numpy import sqrt, diag, abs, eye, array, all, any, zeros
+from numpy import sqrt, diag, abs, eye, array, all, any
 from numpy.linalg import pinv, inv, matrix_rank
 
-from panel.utility import has_constant
 from panel.iv.covariance import HomoskedasticCovariance, HeteroskedasticCovariance, \
     KernelCovariance, OneWayClusteredCovariance, IVGMMCovariance, \
     kernel_weight_bartlett, kernel_weight_parzen, kernel_weight_quadratic_spectral
+from panel.utility import has_constant
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -25,18 +25,19 @@ class IV2SLS(object):
     Parameters
     ----------
     endog : array-like
-        Endogenous variables
+        Endogenous variables (nobs by 1)
     exog : array-like
-        Exogenous variables
+        Exogenous variables (nobs by nvar)
     instruments : array-like
-        Instrumental variables
+        Instrumental variables (nobs by ninstr)
 
     Notes
     -----
+    
     .. todo::
     
-        * VCV: cluster clustvar, bootstrap, jackknife, or hac kernel
-        * small sample adjustments
+        * VCV: bootstrap
+        * testing
     """
 
     def __init__(self, endog, exog, instruments):
@@ -126,7 +127,7 @@ class IV2SLS(object):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         eps = self.resids(params)
-        cov = cov_estimator(x, z, eps, **cov_config).cov
+        cov = cov_estimator(x, y, z, params, **cov_config).cov
 
         mu = self.endog.mean() if self.has_constant else 0
         residual_ss = (eps.T @ eps)
@@ -156,7 +157,9 @@ class HomoskedasticWeightMatrix(object):
             if key not in self.defaults:
                 raise ValueError('Unknown weighting matrix configuration '
                                  'parameter {0}'.format(key))
-        self._weight_config = weight_config
+        wc = self.defaults
+        wc.update(weight_config)
+        self._config = wc
         self._bandwidth = 0
 
     def weight_matrix(self, x, z, eps):
@@ -166,11 +169,15 @@ class HomoskedasticWeightMatrix(object):
 
     @property
     def defaults(self):
-        return {}
+        return {'center': False}
 
     @property
     def bandwidth(self):
         return self._bandwidth
+
+    @property
+    def config(self):
+        return self._config
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
@@ -179,7 +186,11 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def weight_matrix(self, x, z, eps):
         nobs = x.shape[0]
+        wc = self.config
         ze = z * eps
+        mu = ze.mean(axis=0) if wc['center'] else 0
+        ze -= mu
+
         return ze.T @ ze / nobs
 
 
@@ -196,13 +207,17 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
                          'qs': kernel_weight_quadratic_spectral}
 
     def weight_matrix(self, x, z, eps):
+        wc = self.config
+
         ze = z * eps
+        mu = ze.mean(axis=0) if wc['center'] else 0
+        ze -= mu
         nobs, ninstr = z.shape
 
         # TODO: Fix this to allow optimal bw selection by default
-        wc = self._weight_config
-        bw = wc.get('bw', nobs - 2)
-        kernel = wc.get('kernel', self.defaults['kernel'])
+
+        bw = wc['bw'] if wc['bw'] is not None else nobs - 2
+        kernel = wc['kernel']
         w = self._kernels[kernel](bw)
         s = ze.T @ ze
         for i in range(1, bw + 1):
@@ -216,6 +231,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     @property
     def defaults(self):
         return {'kernel': 'bartlett',
+                'center': False,
                 'bw': None}
 
 
@@ -231,6 +247,7 @@ class IVGMM(IV2SLS):
     Parameters
     ----------
     endog : array-like
+    
     exog : array-like
     instruments : array-like
     weight_type : str
@@ -257,11 +274,9 @@ class IVGMM(IV2SLS):
     def __init__(self, endog, exog, instruments, weight_type='robust', **weight_config):
         super(IVGMM, self).__init__(endog, exog, instruments)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
-        config = weight_matrix_estimator().defaults
-        config.update(weight_config)
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
-        self._weight_config = config
+        self._weight_config = self._weight.config
 
     @staticmethod
     def estimate_parameters(x, y, z, w):
@@ -310,7 +325,7 @@ class IVGMM(IV2SLS):
             norm = delta.T @ vinv @ delta
             i += 1
 
-        cov = IVGMMCovariance(x, z, eps, w, **cov_config).cov
+        cov = IVGMMCovariance(x, y, z, params, w, **cov_config).cov
 
         mu = self.endog.mean() if self.has_constant else 0
         residual_ss = (eps.T @ eps)

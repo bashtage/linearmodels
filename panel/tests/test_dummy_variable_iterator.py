@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 import numpy as np
-import scipy.sparse as sparse
 import pytest
+import scipy.sparse as sparse
 from numpy.testing import assert_equal
 
 from panel.dummy_iterator import DummyVariableIterator

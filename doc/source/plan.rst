@@ -13,8 +13,8 @@ Implemented
 
 Incomplete or Not Implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* 2SLS - :class:`statsmodels.sandbox.regression.gmm.IV2SLS`
-* GMM IV Estimation - :class:`statsmodels.sandbox.regression.gmm.IVGMM`
+* 2SLS - :class:`panel.iv.IV2SLS`
+* GMM IV Estimation - :class:`panel.iv.IVGMM`
 * GMM-CUE Estimation
 
 Panel

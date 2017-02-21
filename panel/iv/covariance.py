@@ -5,10 +5,50 @@ from numpy.linalg import pinv, inv
 
 
 def kernel_weight_bartlett(max_lag):
+    """
+    Kernel weights from a Bartlett kernel 
+    
+    Parameters
+    ----------
+    max_lag : int 
+       Maximum lag to used in kernel
+    
+    Returns
+    -------
+    weights : ndarray
+        Weight array  ordered by lag position (maxlag + 1) 
+
+    Notes
+    -----
+    .. math::
+
+       w_i = 1 - i / (m + 1), \, i < m
+    """
     return 1 - arange(max_lag + 1) / (max_lag + 1)
 
 
 def kernel_weight_quadratic_spectral(max_lag):
+    r"""
+    Kernel weights from a quadratic-spectral kernel 
+
+    Parameters
+    ----------
+    max_lag : int 
+       Maximum lag to used in kernel
+
+    Returns
+    -------
+    weights : ndarray
+        Weight array  ordered by lag position (maxlag + 1)
+    
+    Notes
+    -----
+    .. math::
+    
+       z_i & = 6i\pi / 5                                        \\
+       w_0 &  = 1                                                \\
+       w_i &  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1  
+    """
     w = 6 * pi * arange(max_lag + 1) / 5
     w[0] = 1
     w[1:] = 3 * (sin(w[1:]) / w[1:] - cos(w[1:])) / w[1:] ** 2
@@ -16,6 +56,27 @@ def kernel_weight_quadratic_spectral(max_lag):
 
 
 def kernel_weight_parzen(max_lag):
+    r"""
+    Kernel weights from a Parzen kernel 
+
+    Parameters
+    ----------
+    max_lag : int 
+       Maximum lag to used in kernel
+
+    Returns
+    -------
+    weights : ndarray
+        Weight array  ordered by lag position (maxlag + 1) 
+
+    Notes
+    -----
+    .. math::
+    
+       z_i & = i / (m+1)                    \\
+       w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5  \\
+       w_i &  = 2(1-z_i)^3, z > 0.5    
+    """
     z = arange(max_lag + 1) / (max_lag + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
@@ -23,10 +84,12 @@ def kernel_weight_parzen(max_lag):
 
 
 class IVCovariance(object):
-    def __init__(self, x, z, eps, **config):
+    def __init__(self, x, y, z, params, **config):
         self.x = x
         self.z = z
-        self.eps = eps
+        self.params = params
+        self.y = y
+        self.eps = y - x @ params
         self.config = self._check_config(**config)
         self._pinvz = None
 
@@ -63,8 +126,8 @@ class IVCovariance(object):
 
 
 class HomoskedasticCovariance(IVCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(HomoskedasticCovariance, self).__init__(x, z, eps, **config)
+    def __init__(self, x, y, z, params, **config):
+        super(HomoskedasticCovariance, self).__init__(x, y, z, params, **config)
 
     @property
     def s(self):
@@ -81,8 +144,8 @@ class HomoskedasticCovariance(IVCovariance):
 
 
 class KernelCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(KernelCovariance, self).__init__(x, z, eps, **config)
+    def __init__(self, x, y, z, params, **config):
+        super(KernelCovariance, self).__init__(x, y, z, params, **config)
         self._kernels = {'bartlett': kernel_weight_bartlett,
                          'newey-west': kernel_weight_bartlett,
                          'quadratic-spectral': kernel_weight_quadratic_spectral,
@@ -135,8 +198,8 @@ class KernelCovariance(HomoskedasticCovariance):
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(HeteroskedasticCovariance, self).__init__(x, z, eps, **config)
+    def __init__(self, x, y, z, params, **config):
+        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, **config)
 
     @property
     def s(self):
@@ -149,8 +212,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 
 class OneWayClusteredCovariance(HomoskedasticCovariance):
-    def __init__(self, x, z, eps, **config):
-        super(OneWayClusteredCovariance, self).__init__(x, z, eps, **config)
+    def __init__(self, x, y, z, params, **config):
+        super(OneWayClusteredCovariance, self).__init__(x, y, z, params, **config)
 
     @property
     def s(self):
@@ -189,8 +252,8 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
 
 class IVGMMCovariance(IVCovariance):
-    def __init__(self, x, z, eps, w, **config):
-        super(IVGMMCovariance, self).__init__(x, z, eps, **config)
+    def __init__(self, x, y, z, params, w, **config):
+        super(IVGMMCovariance, self).__init__(x, y, z, params, **config)
         self.w = w
 
     @property

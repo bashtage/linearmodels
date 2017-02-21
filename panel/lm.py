@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.linalg import pinv, inv
+from numpy.linalg import pinv
 
 from .data import PanelData
 from .fixed_effects import EntityEffect, TimeEffect
@@ -161,4 +161,3 @@ class FirstDifferenceOLS(PooledOLS):
         y = y.reshape((n * (t - 1), 1))
         x = x.reshape((n * (t - 1), k))
         return pinv(x) @ y
-

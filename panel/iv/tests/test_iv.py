@@ -67,18 +67,19 @@ class TestIV(object):
         mod = IVGMM(self.y, self.x, self.z)
         mod.fit()
 
+    def test_ivgmm_smoke_iter(self):
         mod = IVGMM(self.y, self.x, self.z)
         res = mod.fit(iter_limit=100)
         print(res.iterations)
 
+    def test_ivgmm_smoke_weights(self):
         mod = IVGMM(self.y, self.x, self.z, weight_type='unadjusted')
         mod.fit()
 
         with pytest.raises(ValueError):
-            mod = IVGMM(self.y, self.x, self.z, bw=20)
+            IVGMM(self.y, self.x, self.z, bw=20)
 
     def test_ivgmm_kernel_smoke(self):
         mod = IVGMM(self.y, self.x, self.z, weight_type='kernel')
-        res = mod.fit()
-        print(res.params)
-        print(res.tstats)
+        mod.fit()
+
