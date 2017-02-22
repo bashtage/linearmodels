@@ -49,39 +49,28 @@ class IV2SLS(object):
         * testing
     """
 
-    def __init__(self, endog, exog, instruments):
+    def __init__(self, endog, exog, instrumented, instruments):
         self.endog = endog
         self.exog = exog
+        self.instrumented = instrumented
         self.instruments = instruments
+        self._x = c_[exog, instrumented]  # model regressors
+        self._z = c_[exog, instruments]  # first-stage regressors
+
 
         self._has_constant = False
-        self._regressor_is_exog = array([True] * exog.shape[1])
+        self._regressor_is_exog = array([True] * exog.shape[1] +
+                                        [False] * instrumented.shape[1])
         self._validate_inputs()
 
     def _validate_inputs(self):
-        x, z = self.exog, self.instruments
+        x, z = self._x, self._z
         self._has_constant = has_constant(x)
 
         if matrix_rank(x) < x.shape[1]:
-            raise ValueError('exogenous data does not have full column rank')
+            raise ValueError('regressors not have full column rank')
         if matrix_rank(z) < z.shape[1]:
-            raise ValueError('exogenous data does not have full column rank')
-
-        for col in range(x.shape[1]):
-            xc = x[:, col]
-            pinvz = pinv(z)
-            if all(xc == 1) or (xc.ptp(axis=0) == 0 and xc[0] != 0):
-                self._regressor_is_exog[col] = True
-                continue
-
-            if any(all(xc[:, None] == z, axis=0)):
-                self._regressor_is_exog[col] = True
-                continue
-
-            params = pinvz @ xc
-            e = xc - z @ params
-
-            self._regressor_is_exog[col] = ((e.T @ e) / (xc.T @ xc)) < 1e-8
+            raise ValueError('instruments do not have full column rank')
 
     @staticmethod
     def estimate_parameters(x, y, z):
@@ -131,7 +120,7 @@ class IV2SLS(object):
         list of supported options.  Defaults are used if no covariance
         configuration is provided.
         """
-        y, x, z = self.endog, self.exog, self.instruments
+        y, x, z = self.endog, self._x, self._z
         params = self.estimate_parameters(x, y, z)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
@@ -151,7 +140,7 @@ class IV2SLS(object):
                          s2, debiased, fstat, self)
 
     def resids(self, params):
-        return self.endog - self.exog @ params
+        return self.endog - self._x @ params
 
     @property
     def has_constant(self):
@@ -159,11 +148,11 @@ class IV2SLS(object):
 
     def _f_statistic(self, params, cov, cov_config):
         debiased = cov_config['debiased']
-        non_const = ~(self.exog.ptp(0) == 0)
+        non_const = ~(self._x.ptp(0) == 0)
         test_params = params[non_const]
         test_cov = cov[non_const][:, non_const]
         test_stat = test_params.T @ inv(test_cov) @ test_params
-        nobs, nvar = self.exog.shape
+        nobs, nvar = self._x.shape
         null = 'All parameters ex. constant not zero'
         df = test_params.shape[0]
         if debiased:
@@ -196,8 +185,8 @@ class IVLIML(IV2SLS):
         * testing
     """
 
-    def __init__(self, endog, exog, instruments, kappa=None):
-        super(IVLIML, self).__init__(endog, exog, instruments)
+    def __init__(self, endog, exog, instrumented, instruments, kappa=None):
+        super(IVLIML, self).__init__(endog, exog, instrumented, instruments)
         self._kappa = kappa
         if kappa is not None and not isscalar(kappa):
             raise ValueError('kappa must be None or a scalar')
@@ -254,7 +243,7 @@ class IVLIML(IV2SLS):
         list of supported options.  Defaults are used if no covariance
         configuration is provided.
         """
-        y, x, z = self.endog, self.exog, self.instruments
+        y, x, z = self.endog, self._x, self._z
         kappa = self._kappa
         if kappa is None:
             is_exog = self._regressor_is_exog
@@ -321,9 +310,9 @@ class IVGMM(IV2SLS):
          * Options for weighting matrix calculation
     """
 
-    def __init__(self, endog, exog, instruments, weight_type='robust',
+    def __init__(self, endog, exog, instrumented, instruments, weight_type='robust',
                  **weight_config):
-        super(IVGMM, self).__init__(endog, exog, instruments)
+        super(IVGMM, self).__init__(endog, exog, instrumented, instruments)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
@@ -358,7 +347,7 @@ class IVGMM(IV2SLS):
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
     def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
-        y, x, z = self.endog, self.exog, self.instruments
+        y, x, z = self.endog, self._x, self._z
         nobs, ninstr = y.shape[0], z.shape[1]
         weight_matrix = self._weight.weight_matrix
         _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
