@@ -532,3 +532,115 @@ class IVGMMResults(IVResults):
     def weight_config(self):
         """Weighting matrix parameters used in estimation"""
         return self._weight_config
+
+class IVContinuousUpdatingGMM(IVGMM):
+    """
+    Estimation of IV models using the generalized method of moments (GMM)
+
+    Parameters
+    ----------
+    endog : array-like
+        Endogenous variables (nobs by 1)
+    exog : array-like
+        Exogenous variables (nobs by nvar)
+    instruments : array-like
+        Instrumental variables (nobs by ninstr)
+    weight_type : str
+        Name of weight function to use.
+    **weight_config
+        Additional keyword arguments to pass to the weight function.
+
+    Notes
+    -----
+    Available weight functions are:
+      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+        homoskedastic
+      * 'robust' - Allows for heterosedasticity by not autocorrelation
+      * 'kernel' - Allows for heteroskedasticity and autocorrelation
+      * 'cluster' - Allows for one-way cluster dependence
+
+    .. todo:
+         * VCV: unadjusted, robust, cluster clustvar, bootstrap, jackknife,
+           or hac kernel
+         * small sample adjustments
+         * Colinearity check
+         * Options for weighting matrix calculation
+    """
+
+    def __init__(self, endog, exog, instruments, weight_type='robust',
+                 **weight_config):
+        super(IVContinuousUpdatingGMM, self).__init__(endog, exog, instruments,
+                                                      weight_type,
+                                                      **weight_config)
+
+    def j(self, params):
+        y, x, z = self.endog, self.exog, self.instruments
+        nobs, ninstr = y.shape[0], z.shape[1]
+        weight_matrix = self._weight.weight_matrix
+        eps = y - x @ params
+        w = inv(weight_matrix(x, z, eps))
+        g_bar = (z * eps).mean(0)
+        return nobs * g_bar.T @ w @ g_bar.T
+
+    def estimate_parameters(self, x, y, z):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Regressor matrix (nobs by nvar)
+        y : ndarray
+            Regressand matrix (nobs by 1)
+        z : ndarray
+            Instrument matrix (nobs by ninstr)
+        w : ndarray
+            GMM weight matrix (ninstr by ninstr)
+
+        Returns
+        -------
+        params : ndarray
+            Estimated parameters (nvar by 1)
+
+        Notes
+        -----
+        Exposed as a static method to facilitate estimation with other data,
+        e.g., bootstrapped samples.  Performs no error checking.
+        """
+        from scipy.optimize import minimize
+        IV2SLS()
+        res = minimize(self.j, sv, options={'disp': True})
+        return
+
+    def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
+        y, x, z = self.endog, self.exog, self.instruments
+        nobs, ninstr = y.shape[0], z.shape[1]
+        weight_matrix = self._weight.weight_matrix
+        _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
+        eps = y - x @ params
+        i, norm = 1, 10 * tol
+        while i < iter_limit and norm > tol:
+            w = inv(weight_matrix(x, z, eps))
+            params = self.estimate_parameters(x, y, z, w)
+            eps = y - x @ params
+            delta = params - _params
+            xpz = x.T @ z / nobs
+            if i == 1:
+                v = (xpz @ w @ xpz.T) / nobs
+                vinv = inv(v)
+            _params = params
+            norm = delta.T @ vinv @ delta
+            i += 1
+
+        cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
+        cov = cov_estimator.cov
+        s2, debiased = cov_estimator.s2, cov_estimator.debiased
+        cov_config = cov_estimator.config
+
+        mu = self.endog.mean() if self.has_constant else 0
+        residual_ss = (eps.T @ eps)
+        model_ss = ((y - mu).T @ (y - mu))
+        r2 = 1 - residual_ss / model_ss
+        fstat = self._f_statistic(params, cov, cov_config)
+
+        return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
+                            s2, debiased, w, self._weight_type,
+                            self._weight_config, i, fstat, self)

@@ -35,11 +35,6 @@ class TestIV(object):
         mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
         mod.fit(cov_type='unadjusted', debiased=True)
 
-    def test_invalid_cov_config(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        with pytest.raises(ValueError):
-            mod.fit(cov_type='unadjusted', large_sample=True)
-
     def test_iv2sls_smoke_nw(self):
         mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
         mod.fit(cov_type='kernel', kernel='newey-west')

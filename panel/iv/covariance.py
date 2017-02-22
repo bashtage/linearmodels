@@ -92,35 +92,45 @@ KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,
                  'gallant': kernel_weight_parzen,
                  'parzen': kernel_weight_parzen}
 
-class IVCovariance(object):
-    def __init__(self, x, y, z, params, **config):
+class HomoskedasticCovariance(object):
+    """
+    Covariance estimation for homoskedastic data
+    
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+    """
+    def __init__(self, x, y, z, params, debiased=False):
         self.x = x
+        self.y = y
         self.z = z
         self.params = params
-        self.y = y
+        self._debiased = debiased
         self.eps = y - x @ params
-        self._config = self._check_config(**config)
         self._pinvz = pinv(z)
 
-    def _check_config(self, **config):
-        if len(config) == 0:
-            return self.defaults
+    @property
+    def s(self):
+        x, z, eps = self.x, self.z, self.eps
+        nobs, nvar = x.shape
+        s2 = eps.T @ eps / nobs
+        v = (x.T @ z) @ (pinv(z) @ x) / nobs
 
-        valid_keys = list(self.defaults.keys())
-        invalid = []
-        for key in config:
-            if key not in valid_keys:
-                invalid.append(key)
-        if invalid:
-            keys = ', '.join(config.keys())
-            raise ValueError('Unexpected keywords in config: {0}'.format(keys))
-
-        c = self.defaults
-        c.update(config)
-        return c
+        return s2 * v
 
     @property
     def cov(self):
+        """Covariance of estimated parameters"""
+
         x, z = self.x, self.z
         nobs, nvar = x.shape
 
@@ -133,41 +143,59 @@ class IVCovariance(object):
 
     @property
     def s2(self):
+        """
+        Estimated variance of residuals. Small-sample adjusted if debiased.
+        """
         nobs, nvar = self.x.shape
         eps = self.eps
         denom = nobs - nvar if self.debiased else nobs
         return eps.T @ eps / denom
 
     @property
-    def defaults(self):
-        return {'debiased': False}
-
-    @property
     def debiased(self):
-        return self.config['debiased']
+        """Flag indicating whether to debias"""
+        return self._debiased
 
     @property
     def config(self):
-        return self._config
+        return {'debiased': self.debiased,
+                'name': self.__class__.__name__}
 
-
-class HomoskedasticCovariance(IVCovariance):
-    def __init__(self, x, y, z, params, **config):
-        super(HomoskedasticCovariance, self).__init__(x, y, z, params, **config)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-        s2 = eps.T @ eps / nobs
-        v = (x.T @ z) @ (pinv(z) @ x) / nobs
-
-        return s2 * v
 
 
 class KernelCovariance(HomoskedasticCovariance):
-    def __init__(self, x, y, z, params, **config):
-        super(KernelCovariance, self).__init__(x, y, z, params, **config)
+    """
+    Kernel weighted (HAC) covariance estimation
+
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+    kernel : str
+        Kernel name. Supported kernels are: 
+
+        * 'bartlett', 'newey-west' - Triangular kernel 
+        * 'qs', 'quadratic-spectral', 'andrews' - Quadratic spectral kernel
+        * 'parzen', 'gallant' - Parzen's kernel;
+          
+    bandwidth : {int, None}
+        Non-negative bandwidth to use with kernel. If None, automatic
+        bandwidth selection is used.
+
+    """
+    def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
+                 bandwidth=None):
+        super(KernelCovariance, self).__init__(x, y, z, params, debiased)
+        self._kernel = kernel
+        self._bandwidth = bandwidth
         self._kernels = KERNEL_LOOKUP
 
     @property
@@ -201,27 +229,33 @@ class KernelCovariance(HomoskedasticCovariance):
         return s
 
     @property
-    def defaults(self):
-        """
-        Default values
-
-        Returns
-        -------
-        defaults : dict
-            Dictionary containing valid options and their default value
-
-        Notes
-        -----
-        When ``bw`` is None, automatic bandwidth selection is used.
-        """
-        return {'bw': None,
-                'kernel': 'bartlett',
-                'debiased': False}
+    def config(self):
+        return {'debiased': self.debiased,
+                'bw': self._bandwidth,
+                'kernel': self._kernel,
+                'name': self.__class__.__name__}
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
-    def __init__(self, x, y, z, params, **config):
-        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, **config)
+    """
+    Covariance estimation for heteroskedastic data
+
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+
+    """
+    def __init__(self, x, y, z, params, debiased=False):
+        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased)
 
     @property
     def s(self):
@@ -234,23 +268,44 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 
 class OneWayClusteredCovariance(HomoskedasticCovariance):
-    def __init__(self, x, y, z, params, **config):
-        super(OneWayClusteredCovariance, self).__init__(x, y, z, params, **config)
+    """
+    Covariance estimation for clustered data
+
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+    clusters : ndarray, optional
+        Cluster group assignment.  If not provided, uses clusters of 1
+    """
+    def __init__(self, x, y, z, params, debiased=False, clusters= None):
+        super(OneWayClusteredCovariance, self).__init__(x, y, z, params,
+                                                        debiased)
+        self._clusters = clusters
 
     @property
     def s(self):
+        """One-wasy clustered estimator of score covariance"""
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
 
         nobs, nvar = x.shape
-        clusters = self.config['clusters']
+        clusters = self._clusters
         clusters = arange(nobs) if clusters is None else clusters
+        self._clusters = clusters
+        clusters = clusters.copy().squeeze()
         num_clusters = len(unique(clusters))
 
-        clusters = clusters.squeeze()
         sort_args = argsort(clusters)
-
         clusters = clusters[sort_args]
         locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
         xhat_e = xhat_e[sort_args]
@@ -266,14 +321,29 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         return s
 
     @property
-    def defaults(self):
-        return {'debiased': False,
-                'clusters': None}
+    def config(self):
+        return {'debiased': self.debiased,
+                'clusters': self._clusters,
+                'name': self.__class__.__name__}
 
 
-class IVGMMCovariance(IVCovariance):
-    def __init__(self, x, y, z, params, w, **config):
-        super(IVGMMCovariance, self).__init__(x, y, z, params, **config)
+class IVGMMCovariance(HomoskedasticCovariance):
+    """
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    w : ndarray
+        Weighting matrix used in GMM estimation
+    """
+    def __init__(self, x, y, z, params, w):
+        super(IVGMMCovariance, self).__init__(x, y, z, params, False)
         self.w = w
 
     @property
@@ -291,3 +361,8 @@ class IVGMMCovariance(IVCovariance):
         s = ze.T @ ze / nobs
 
         return xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
+
+    @property
+    def config(self):
+        return {'debiased': self.debiased,
+                'name': self.__class__.__name__}

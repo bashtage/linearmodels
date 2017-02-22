@@ -1,14 +1,11 @@
 Instrumental Variable Model Estimation
 --------------------------------------
 
-.. module:: panel
-.. currentmodule:: panel
 
-.. automodule:: panel.iv.iv
-   :members:
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-.. automodule:: panel.iv.covariance
-   :members:
-
-.. automodule:: panel.iv.weighting
-   :members:
+   iv/models
+   iv/covariance
+   iv/weighting
