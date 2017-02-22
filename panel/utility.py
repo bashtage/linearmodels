@@ -10,11 +10,11 @@ def has_constant(x):
     ----------
     x: ndarray
         Array to be checked for a constant (n,k)
-     
+
     Returns
     -------
     const : bool
-        Flag indicating whether x contains a constant or has column span with 
+        Flag indicating whether x contains a constant or has column span with
         a constant
     """
     if np.any(np.all(x == 1, axis=0)):
@@ -32,14 +32,14 @@ def has_constant(x):
 def inv_sqrth(x):
     """
     Matrix inverse square root
-    
+
     Parameters
     ----------
     x : ndarray
         Real, symmetric matrix
-    
+
     Returns
-    -------   
+    -------
     invsqrt : ndarray
         Input to the power -1/2
     """

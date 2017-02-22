@@ -4,6 +4,12 @@ import pytest
 from panel.iv import IV2SLS, IVGMM, IVLIML
 
 
+def get_all(v):
+    attr = [d  for d in dir(v) if not d.startswith('_')]
+    for a in attr:
+        print(a)
+        getattr(v, a)
+
 class TestIV(object):
     @classmethod
     def setup_class(cls):
@@ -36,9 +42,10 @@ class TestIV(object):
 
     def test_iv2sls_smoke_nw(self):
         mod = IV2SLS(self.y, self.x, self.z)
-        mod.fit(cov_type='newey-west')
-        mod.fit(cov_type='bartlett')
-        mod.fit(cov_type='bartlett', bw=0)
+        mod.fit(cov_type='kernel', kernel='newey-west')
+        mod.fit(cov_type='kernel', kernel='bartlett')
+        mod.fit(cov_type='kernel', kernel='parzen')
+        mod.fit(cov_type='kernel', kernel='qs')
 
     def test_iv2sls_smoke_cluster(self):
         mod = IV2SLS(self.y, self.x, self.z)
@@ -61,7 +68,8 @@ class TestIV(object):
         clusters = np.tile(np.arange(2500), (self.y.shape[0] // 2500,)).ravel()
         mod.fit(cov_type='one-way', clusters=clusters)
 
-        mod.fit(cov_type='one-way')
+        res = mod.fit(cov_type='one-way')
+        get_all(res)
 
     def test_ivgmm_smoke(self):
         mod = IVGMM(self.y, self.x, self.z)
@@ -83,6 +91,12 @@ class TestIV(object):
         mod = IVGMM(self.y, self.x, self.z, weight_type='kernel')
         mod.fit()
 
+        mod = IVGMM(self.y, self.x, self.z, weight_type='kernel', kernel='parzen')
+        mod.fit()
+
+        mod = IVGMM(self.y, self.x, self.z, weight_type='kernel', kernel='qs')
+        mod.fit()
+
     def test_ivgmm_cluster_smoke(self):
         k = 500
         clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
@@ -96,9 +110,11 @@ class TestIV(object):
         mod.fit()
 
         mod = IVGMM(self.y, self.x, self.z)
-        mod.fit()
+        res = mod.fit()
+        get_all(res)
 
     def test_ivliml_smoke(self):
         mod = IVLIML(self.y, self.x, self.z)
         res = mod.fit()
         print(res.params)
+        get_all(res)

@@ -189,7 +189,6 @@ class FixedEffect(object):
     def estimate(self, endog, exog=None, drop=False):
 
         dummies = self.dummies(drop=drop, iterator=True)
-        n, t = self.data.n, self.data.t
 
         endog_col = self.data.column_index(endog)
         endog = self.data.asnumpy2d[:, endog_col]
@@ -214,7 +213,7 @@ class FixedEffect(object):
         return pd.Series(effects, index=index)
 
     def dummies(self, drop=False, iterator=False, max_size=10):
-        n, t, k = self.data.n, self.data.t, self.data.k
+        n, t = self.data.n, self.data.t
         groups = self.groups()
         max_size = max_size if iterator else 2 ** 62
         dummy_iterator = DummyVariableIterator(n, t, groups, max_size=max_size, drop=drop)
@@ -241,7 +240,6 @@ class EntityEffect(FixedEffect):
         return np.tile(np.arange(n)[:, None], (1, t)).ravel()
 
     def orthogonalize(self, exclude=None):
-        data = self.data
         # Take subset of data to transform
         self._select_columns(exclude)
         _data = self._split()

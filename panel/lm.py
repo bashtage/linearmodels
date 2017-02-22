@@ -8,25 +8,25 @@ from .fixed_effects import EntityEffect, TimeEffect
 class PooledOLS(object):
     r"""
     Estimation of linear model with pooled parameters
-    
+
     Parameters
     ----------
     endog: array-like
         Endogenous or left-hand-side variable (entities by time)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain 
+        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
         an intercept or have a constant column in the column span.
     intercept : bool, optional
         Flag whether to include an intercept in the model
-    
+
     Notes
     -----
-    The model is given by 
-    
+    The model is given by
+
     .. math::
-    
+
         y_{it}=\alpha+\beta^{\prime}x_{it}+\epsilon_{it}
-    
+
     where :math:`\alpha` is omitted if ``intercept`` is ``False``.
     """
 
@@ -50,7 +50,7 @@ class PanelOLS(PooledOLS):
     endog: array-like
         Endogenous or left-hand-side variable (entities by time)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain 
+        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
         an intercept or have a constant column in the column span.
     intercept : bool, optional
         Flag whether to include an intercept in the model
@@ -61,12 +61,12 @@ class PanelOLS(PooledOLS):
 
     Notes
     -----
-    The model is given by 
-    
+    The model is given by
+
     .. math::
-    
+
         y_{it}=\alpha_i + \gamma_t +\beta^{\prime}x_{it}+\epsilon_{it}
-    
+
     where :math:`\alpha_i` is omitted if ``entity_effect`` is ``False`` and
     :math:`\gamma_i` is omitted if ``time_effect`` is ``False``. If both ``entity_effect``  and
     ``time_effect`` are ``False``, the model reduces to :class:`PooledOLS`.
@@ -103,21 +103,21 @@ class BetweenOLS(PooledOLS):
     endog: array-like
         Endogenous or left-hand-side variable (entities by time)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain 
+        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
         an intercept or have a constant column in the column span.
     intercept : bool, optional
         Flag whether to include an intercept in the model
 
     Notes
     -----
-    The model is given by 
-    
+    The model is given by
+
     .. math::
-    
+
         \bar{y}_{i}=\alpha + \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}
-    
-    where :math:`\alpha` is omitted if ``intercept`` is ``False`` and 
-    :math:`\bar{z}` is the time-average. 
+
+    where :math:`\alpha` is omitted if ``intercept`` is ``False`` and
+    :math:`\bar{z}` is the time-average.
     """
 
     def __init__(self, endog, exog, *, intercept=True):
@@ -139,12 +139,12 @@ class FirstDifferenceOLS(PooledOLS):
     endog: array-like
         Endogenous or left-hand-side variable (entities by time)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain 
+        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
         an intercept or have a constant column in the column span.
 
     Notes
     -----
-    The model is given by 
+    The model is given by
 
     .. math::
 

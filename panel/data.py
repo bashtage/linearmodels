@@ -6,11 +6,11 @@ import xarray as xr
 class PanelData(object):
     """
     Uniform panel data access
-    
+
     Parameters
     ----------
     data : {np.ndarray, pd.DataFrame, pd.Panel, xr.DataArray}
-        Input data 
+        Input data
     """
     n, t, k = 0, 0, 0
     _2d = None
@@ -54,10 +54,6 @@ class PanelData(object):
     @property
     def is_numpy(self):
         return isinstance(self.data, np.ndarray)
-
-    @property
-    def is_xarray(self):
-        return isinstance(self.data, xr.DataArray)
 
     @property
     def is_xarray(self):

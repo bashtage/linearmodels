@@ -7,17 +7,17 @@ from numpy.linalg import pinv, inv
 
 def kernel_weight_bartlett(max_lag):
     """
-    Kernel weights from a Bartlett kernel 
-    
+    Kernel weights from a Bartlett kernel
+
     Parameters
     ----------
-    max_lag : int 
+    max_lag : int
        Maximum lag to used in kernel
-    
+
     Returns
     -------
     weights : ndarray
-        Weight array  ordered by lag position (maxlag + 1) 
+        Weight array  ordered by lag position (maxlag + 1)
 
     Notes
     -----
@@ -30,25 +30,25 @@ def kernel_weight_bartlett(max_lag):
 
 def kernel_weight_quadratic_spectral(max_lag):
     r"""
-    Kernel weights from a quadratic-spectral kernel 
+    Kernel weights from a quadratic-spectral kernel
 
     Parameters
     ----------
-    max_lag : int 
+    max_lag : int
        Maximum lag to used in kernel
 
     Returns
     -------
     weights : ndarray
         Weight array  ordered by lag position (maxlag + 1)
-    
+
     Notes
     -----
     .. math::
-    
+
        z_i & = 6i\pi / 5                                        \\
        w_0 &  = 1                                                \\
-       w_i &  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1  
+       w_i &  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1
     """
     w = 6 * pi * arange(max_lag + 1) / 5
     w[0] = 1
@@ -58,31 +58,39 @@ def kernel_weight_quadratic_spectral(max_lag):
 
 def kernel_weight_parzen(max_lag):
     r"""
-    Kernel weights from a Parzen kernel 
+    Kernel weights from a Parzen kernel
 
     Parameters
     ----------
-    max_lag : int 
+    max_lag : int
        Maximum lag to used in kernel
 
     Returns
     -------
     weights : ndarray
-        Weight array  ordered by lag position (maxlag + 1) 
+        Weight array  ordered by lag position (maxlag + 1)
 
     Notes
     -----
     .. math::
-    
+
        z_i & = i / (m+1)                    \\
-       w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5  \\
-       w_i &  = 2(1-z_i)^3, z > 0.5    
+       w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5 \\
+       w_i &  = 2(1-z_i)^3, z > 0.5
     """
     z = arange(max_lag + 1) / (max_lag + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
+
+KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,
+                 'newey-west': kernel_weight_bartlett,
+                 'quadratic-spectral': kernel_weight_quadratic_spectral,
+                 'qs': kernel_weight_quadratic_spectral,
+                 'andrews': kernel_weight_quadratic_spectral,
+                 'gallant': kernel_weight_parzen,
+                 'parzen': kernel_weight_parzen}
 
 class IVCovariance(object):
     def __init__(self, x, y, z, params, **config):
@@ -124,8 +132,19 @@ class IVCovariance(object):
         return scale * vinv @ self.s @ vinv / nobs
 
     @property
+    def s2(self):
+        nobs, nvar = self.x.shape
+        eps = self.eps
+        denom = nobs - nvar if self.debiased else nobs
+        return eps.T @ eps / denom
+
+    @property
     def defaults(self):
         return {'debiased': False}
+
+    @property
+    def debiased(self):
+        return self.config['debiased']
 
     @property
     def config(self):
@@ -149,12 +168,7 @@ class HomoskedasticCovariance(IVCovariance):
 class KernelCovariance(HomoskedasticCovariance):
     def __init__(self, x, y, z, params, **config):
         super(KernelCovariance, self).__init__(x, y, z, params, **config)
-        self._kernels = {'bartlett': kernel_weight_bartlett,
-                         'newey-west': kernel_weight_bartlett,
-                         'quadratic-spectral': kernel_weight_quadratic_spectral,
-                         'andrews': kernel_weight_quadratic_spectral,
-                         'gallant': kernel_weight_parzen,
-                         'parzen': kernel_weight_parzen}
+        self._kernels = KERNEL_LOOKUP
 
     @property
     def s(self):
@@ -167,10 +181,12 @@ class KernelCovariance(HomoskedasticCovariance):
         if bw is None:
             if kernel in ('newey-west', 'bartlett'):
                 bw = ceil(20 * (nobs / 100) ** (2 / 9))
-            if kernel in ('andrews', 'quadratic-spectral'):
+            elif kernel in ('andrews', 'quadratic-spectral', 'qs'):
                 bw = ceil(20 * (nobs / 100) ** (2 / 25))
             elif kernel in ('parzen', 'gallant'):
                 bw = ceil(20 * (nobs / 100) ** (4 / 25))
+            else:
+                raise ValueError('Unknown kernel {0}'.format(kernel))
         bw = int(bw)
         w = self._kernels[kernel](bw)
 
@@ -233,10 +249,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         num_clusters = len(unique(clusters))
 
         clusters = clusters.squeeze()
-        if num_clusters > 1:
-            sort_args = argsort(clusters)
-        else:
-            sort_args = list(range(nobs))
+        sort_args = argsort(clusters)
 
         clusters = clusters[sort_args]
         locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
