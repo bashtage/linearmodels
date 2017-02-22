@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import, division
+from __future__ import print_function, absolute_import, division
 
 from numpy import ceil, where, argsort, r_, unique, zeros, arange, pi, sin, cos
 from numpy.linalg import pinv, inv
@@ -90,12 +91,12 @@ class IVCovariance(object):
         self.params = params
         self.y = y
         self.eps = y - x @ params
-        self.config = self._check_config(**config)
-        self._pinvz = None
+        self._config = self._check_config(**config)
+        self._pinvz = pinv(z)
 
     def _check_config(self, **config):
         if len(config) == 0:
-            return config
+            return self.defaults
 
         valid_keys = list(self.defaults.keys())
         invalid = []
@@ -106,23 +107,29 @@ class IVCovariance(object):
             keys = ', '.join(config.keys())
             raise ValueError('Unexpected keywords in config: {0}'.format(keys))
 
-        return config
-
-    @property
-    def defaults(self):
-        return {}
+        c = self.defaults
+        c.update(config)
+        return c
 
     @property
     def cov(self):
         x, z = self.x, self.z
         nobs, nvar = x.shape
 
-        scale = nobs / (nobs - nvar) if self.config.get('debiased', False) else 1
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
+        scale = nobs / (nobs - nvar) if self.config['debiased'] else 1
+        pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
         vinv = inv(v)
 
         return scale * vinv @ self.s @ vinv / nobs
+
+    @property
+    def defaults(self):
+        return {'debiased': False}
+
+    @property
+    def config(self):
+        return self._config
 
 
 class HomoskedasticCovariance(IVCovariance):
@@ -137,10 +144,6 @@ class HomoskedasticCovariance(IVCovariance):
         v = (x.T @ z) @ (pinv(z) @ x) / nobs
 
         return s2 * v
-
-    @property
-    def defaults(self):
-        return {'debiased': False}
 
 
 class KernelCovariance(HomoskedasticCovariance):
@@ -158,17 +161,20 @@ class KernelCovariance(HomoskedasticCovariance):
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
 
-        kernel = self.config.get('kernel', 'bartlett')
+        kernel = self.config['kernel']
         # TODO: Bandwidth selection method
-        bw = self.config.get('bw', ceil(20 * (nobs / 100) ** (2 / 9)))
-        if kernel in ('andrews', 'quadratic-spectral'):
-            bw = ceil(20 * ((nobs / 100) ** (2 / 25)))
-        elif kernel in ('parzen', 'gallant'):
-            bw = ceil(20 * ((nobs / 100) ** (4 / 25)))
+        bw = self.config['bw']
+        if bw is None:
+            if kernel in ('newey-west', 'bartlett'):
+                bw = ceil(20 * (nobs / 100) ** (2 / 9))
+            if kernel in ('andrews', 'quadratic-spectral'):
+                bw = ceil(20 * (nobs / 100) ** (2 / 25))
+            elif kernel in ('parzen', 'gallant'):
+                bw = ceil(20 * (nobs / 100) ** (4 / 25))
         bw = int(bw)
         w = self._kernels[kernel](bw)
 
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
+        pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e
 
@@ -205,7 +211,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def s(self):
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
+        pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e / nobs
         return s
@@ -218,11 +224,12 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     @property
     def s(self):
         x, z, eps = self.x, self.z, self.eps
-        self._pinvz = pinvz = pinv(z) if self._pinvz is None else self._pinvz
+        pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
 
         nobs, nvar = x.shape
-        clusters = self.config.get('clusters', arange(nobs))
+        clusters = self.config['clusters']
+        clusters = arange(nobs) if clusters is None else clusters
         num_clusters = len(unique(clusters))
 
         clusters = clusters.squeeze()

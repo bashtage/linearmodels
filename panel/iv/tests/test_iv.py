@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from panel.iv import IV2SLS, IVGMM
+from panel.iv import IV2SLS, IVGMM, IVLIML
 
 
 class TestIV(object):
@@ -83,3 +83,22 @@ class TestIV(object):
         mod = IVGMM(self.y, self.x, self.z, weight_type='kernel')
         mod.fit()
 
+    def test_ivgmm_cluster_smoke(self):
+        k = 500
+        clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
+        mod = IVGMM(self.y, self.x, self.z, weight_type='clustered',
+                    clusters=clusters)
+        mod.fit()
+
+    def test_ivgmm_cluster_is(self):
+        mod = IVGMM(self.y, self.x, self.z, weight_type='clustered',
+                    clusters=np.arange(self.y.shape[0]))
+        mod.fit()
+
+        mod = IVGMM(self.y, self.x, self.z)
+        mod.fit()
+
+    def test_ivliml_smoke(self):
+        mod = IVLIML(self.y, self.x, self.z)
+        res = mod.fit()
+        print(res.params)

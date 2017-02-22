@@ -1,5 +1,7 @@
 import numpy as np
-from numpy.linalg import matrix_rank
+
+from numpy import diag, sqrt
+from numpy.linalg import matrix_rank, eigh
 
 
 def has_constant(x):
@@ -25,3 +27,21 @@ def has_constant(x):
     aug_rank = matrix_rank(np.c_[np.ones((n, 1)), x])
     rank = matrix_rank(x)
     return aug_rank == rank
+
+
+def inv_sqrth(x):
+    """
+    Matrix inverse square root
+    
+    Parameters
+    ----------
+    x : ndarray
+        Real, symmetric matrix
+    
+    Returns
+    -------   
+    invsqrt : ndarray
+        Input to the power -1/2
+    """
+    vals, vecs = eigh(x)
+    return vecs @ diag(1 / sqrt(vals)) @ vecs.T

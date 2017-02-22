@@ -1,13 +1,14 @@
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from numpy import sqrt, diag, abs, eye, array, all, any
-from numpy.linalg import pinv, inv, matrix_rank
+from numpy import (sqrt, diag, abs, eye, array, all, any, isscalar, c_,
+                   arange, nonzero, argsort, zeros, r_)
+from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 
 from panel.iv.covariance import HomoskedasticCovariance, HeteroskedasticCovariance, \
     KernelCovariance, OneWayClusteredCovariance, IVGMMCovariance, \
     kernel_weight_bartlett, kernel_weight_parzen, kernel_weight_quadratic_spectral
-from panel.utility import has_constant
+from panel.utility import has_constant, inv_sqrth
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -235,11 +236,135 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
                 'bw': None}
 
 
+class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
+    def __init__(self, **weight_config):
+        super(OneWayClusteredWeightMatrix, self).__init__(**weight_config)
+
+    def weight_matrix(self, x, z, eps):
+        wc = self.config
+        nobs, ninstr = z.shape
+
+        ze = z * eps
+        mu = ze.mean(axis=0) if wc['center'] else 0
+        ze -= mu
+
+        clusters = wc['clusters']
+        clusters = arange(nobs) if clusters is None else clusters
+        ind = argsort(clusters)
+        ze = ze[ind]
+        clusters = clusters[ind]
+
+        locs = nonzero(r_[True, clusters[1:] != clusters[:-1], True])[0]
+        st, en = locs[:-1], locs[1:]
+
+        s = zeros((ninstr, ninstr))
+        for sloc, eloc in zip(st, en):
+            zec = ze[sloc:eloc]
+            s +=  zec.T @ zec
+
+        return s / nobs
+
+    @property
+    def defaults(self):
+        return {'clusters': None,
+                'center': False}
+
+
 WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'homoskedastic': HomoskedasticWeightMatrix,
                    'robust': HeteroskedasticWeightMatrix,
                    'heteroskedastic': HeteroskedasticWeightMatrix,
-                   'kernel': KernelWeightMatrix}
+                   'kernel': KernelWeightMatrix,
+                   'clustered': OneWayClusteredWeightMatrix}
+
+
+class IVLIML(IV2SLS):
+    def __init__(self, endog, exog, instruments, kappa=None):
+        super(IVLIML, self).__init__(endog, exog, instruments)
+        self._kappa = kappa
+        if kappa is not None and not isscalar(kappa):
+            raise ValueError('kappa must be None or a scalar')
+
+    @staticmethod
+    def estimate_parameters(x, y, z, kappa):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Regressor matrix (nobs by nvar)
+        y : ndarray
+            Regressand matrix (nobs by 1)
+        z : ndarray
+            Instrument matrix (nobs by ninstr)
+        kappa : scalar
+            Parameter value for k-class esimtator
+
+        Returns
+        -------
+        params : ndarray
+            Estimated parameters (nvar by 1)
+
+        Notes
+        -----
+        Exposed as a static method to facilitate estimation with other data,
+        e.g., bootstrapped samples.  Performs no error checking.
+        """
+        pinvz = pinv(z)
+        p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
+        p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
+        return inv(p1) @ p2
+
+    def fit(self, cov_type='robust', **cov_config):
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        cov_type : str
+            Name of covariance estimator to use
+        **cov_config
+            Additional parameters to pass to covariance estimator
+
+        Returns
+        -------
+        results : IVResults
+            Results container
+
+        Notes
+        -----
+        Additional covariance parameters depend on specific covariance used.
+        The see default property for a specific covariance estimator for a 
+        list of supported options.  Defaults are used if no covariance 
+        configuration is provided.
+        """
+        y, x, z = self.endog, self.exog, self.instruments
+        nobs = x.shape[0]
+        kappa = self._kappa
+        if kappa is None:
+            is_exog = self._regressor_is_exog
+            e = c_[y, x[:, ~is_exog]]
+            x1 = x[:, is_exog]
+
+            ez = e - z @ (pinv(z) @ e)
+            ex1 = e - x1 @ (pinv(x1) @ e)
+
+            vpmzv_sqinv = inv_sqrth(ez.T @ ez)
+            q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+            kappa = min(eigvalsh(q))
+
+        params = self.estimate_parameters(x, y, z, kappa)
+
+        cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        eps = self.resids(params)
+        cov = cov_estimator(x, y, z, params, **cov_config).cov
+
+        mu = self.endog.mean() if self.has_constant else 0
+        residual_ss = (eps.T @ eps)
+        model_ss = ((y - mu).T @ (y - mu))
+        r2 = 1 - residual_ss / model_ss
+
+        return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
+                         self, kappa=kappa)
 
 
 class IVGMM(IV2SLS):
@@ -302,8 +427,9 @@ class IVGMM(IV2SLS):
         Exposed as a static method to facilitate estimation with other data, 
         e.g., bootstrapped samples.  Performs no error checking.
         """
-        omega = z @ w @ z.T
-        return inv(x.T @ omega @ x) @ (x.T @ omega @ y)
+        xpz = x.T @ z
+        zpy = z.T @ y
+        return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
     def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
         y, x, z = self.endog, self.exog, self.instruments
@@ -353,7 +479,7 @@ class IVResults(object):
 
     """
 
-    def __init__(self, params, cov, r2, cov_type, rss, tss, model):
+    def __init__(self, params, cov, r2, cov_type, rss, tss, model, kappa=1):
         self._params = params
         self._cov = cov
         self._model = model
@@ -361,6 +487,7 @@ class IVResults(object):
         self._cov_type = cov_type
         self._rss = rss
         self._tss = tss
+        self._kappa = kappa
         self._cache = {}
 
     @property
@@ -433,6 +560,10 @@ class IVResults(object):
     @property
     def resid_ss(self):
         return self._rss
+
+    @property
+    def kappa(self):
+        return self._kappa
 
 
 class IVGMMResults(IVResults):
