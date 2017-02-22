@@ -7,7 +7,6 @@ from panel.iv import IV2SLS, IVGMM, IVLIML
 def get_all(v):
     attr = [d  for d in dir(v) if not d.startswith('_')]
     for a in attr:
-        print(a)
         getattr(v, a)
 
 class TestIV(object):

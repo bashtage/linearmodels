@@ -13,9 +13,10 @@ Implemented
 
 Incomplete or Not Implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* 2SLS - :class:`panel.iv.IV2SLS`
-* GMM IV Estimation - :class:`panel.iv.IVGMM`
-* GMM-CUE Estimation
+* 2SLS - :class:`panel.iv.iv.IV2SLS`
+* LIML/k-class - :class:`panel.iv.iv.IVLIML`
+* GMM IV Estimation - :class:`panel.iv.iv.IVGMM`
+* GMM-CUE Estimation - TBD
 
 Panel
 =====

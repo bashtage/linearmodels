@@ -9,3 +9,6 @@ Instrumental Variable Model Estimation
 
 .. automodule:: panel.iv.covariance
    :members:
+
+.. automodule:: panel.iv.weighting
+   :members:

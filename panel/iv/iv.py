@@ -8,7 +8,7 @@ from panel.iv.covariance import HomoskedasticCovariance, IVGMMCovariance, \
     HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance
 from panel.iv.weighting import HomoskedasticWeightMatrix, KernelWeightMatrix, \
     HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix
-from panel.utility import has_constant, inv_sqrth
+from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -29,6 +29,8 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
 
 class IV2SLS(object):
     """
+    Estimation of IV models using two-stage least squares
+    
     Parameters
     ----------
     endog : array-like
@@ -135,6 +137,7 @@ class IV2SLS(object):
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
         cov = cov_estimator.cov
+        cov_config = cov_estimator.config
         s2, debiased = cov_estimator.s2, cov_estimator.debiased
 
         eps = self.resids(params)
@@ -142,9 +145,10 @@ class IV2SLS(object):
         residual_ss = (eps.T @ eps)
         model_ss = ((y - mu).T @ (y - mu))
         r2 = 1 - residual_ss / model_ss
+        fstat = self._f_statistic(params, cov, cov_config)
 
         return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                         s2, debiased, self)
+                         s2, debiased, fstat, self)
 
     def resids(self, params):
         return self.endog - self.exog @ params
@@ -153,8 +157,45 @@ class IV2SLS(object):
     def has_constant(self):
         return self._has_constant
 
+    def _f_statistic(self, params, cov, cov_config):
+        debiased = cov_config['debiased']
+        non_const = ~(self.exog.ptp(0) == 0)
+        test_params = params[non_const]
+        test_cov = cov[non_const][:, non_const]
+        test_stat = test_params.T @ inv(test_cov) @ test_params
+        nobs, nvar = self.exog.shape
+        null = 'All parameters ex. constant not zero'
+        df = test_params.shape[0]
+        if debiased:
+            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar)
+        else:
+            wald = WaldTestStatistic(test_stat, null, df)
+
+        return wald
+
 
 class IVLIML(IV2SLS):
+    """
+    Limited information ML estimation of IV models
+    
+    Parameters
+    ----------
+    endog : array-like
+        Endogenous variables (nobs by 1)
+    exog : array-like
+        Exogenous variables (nobs by nvar)
+    instruments : array-like
+        Instrumental variables (nobs by ninstr)
+
+    Notes
+    -----
+
+    .. todo::
+
+        * VCV: bootstrap
+        * testing
+    """
+
     def __init__(self, endog, exog, instruments, kappa=None):
         super(IVLIML, self).__init__(endog, exog, instruments)
         self._kappa = kappa
@@ -233,25 +274,31 @@ class IVLIML(IV2SLS):
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
         cov = cov_estimator.cov
         s2, debiased = cov_estimator.s2, cov_estimator.debiased
+        cov_config = cov_estimator.config
 
         eps = self.resids(params)
         mu = self.endog.mean() if self.has_constant else 0
         residual_ss = (eps.T @ eps)
         model_ss = ((y - mu).T @ (y - mu))
         r2 = 1 - residual_ss / model_ss
+        fstat = self._f_statistic(params, cov, cov_config)
 
         return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                         s2, debiased, self, kappa=kappa)
+                         s2, debiased, fstat, self, kappa=kappa)
 
 
 class IVGMM(IV2SLS):
     """
+    Estimation of IV models using the generalized method of moments (GMM)
+    
     Parameters
     ----------
     endog : array-like
-
+        Endogenous variables (nobs by 1)
     exog : array-like
+        Exogenous variables (nobs by nvar)
     instruments : array-like
+        Instrumental variables (nobs by ninstr)
     weight_type : str
         Name of weight function to use.
     **weight_config
@@ -315,11 +362,12 @@ class IVGMM(IV2SLS):
         nobs, ninstr = y.shape[0], z.shape[1]
         weight_matrix = self._weight.weight_matrix
         _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
+        eps = y - x @ params
         i, norm = 1, 10 * tol
         while i < iter_limit and norm > tol:
-            eps = y - x @ params
             w = inv(weight_matrix(x, z, eps))
             params = self.estimate_parameters(x, y, z, w)
+            eps = y - x @ params
             delta = params - _params
             xpz = x.T @ z / nobs
             if i == 1:
@@ -332,15 +380,17 @@ class IVGMM(IV2SLS):
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
         cov = cov_estimator.cov
         s2, debiased = cov_estimator.s2, cov_estimator.debiased
+        cov_config = cov_estimator.config
 
         mu = self.endog.mean() if self.has_constant else 0
         residual_ss = (eps.T @ eps)
         model_ss = ((y - mu).T @ (y - mu))
         r2 = 1 - residual_ss / model_ss
+        fstat = self._f_statistic(params, cov, cov_config)
 
         return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
                             s2, debiased, w, self._weight_type,
-                            self._weight_config, i, self)
+                            self._weight_config, i, fstat, self)
 
 
 class IVResults(object):
@@ -351,8 +401,7 @@ class IVResults(object):
     -----
     .. todo::
 
-        * F
-        * chi2 -- what is this?
+        * Information about covariance estimator 
         * J_stat - for GMM
         * Hypothesis testing
         * First stage diagnostics
@@ -360,7 +409,7 @@ class IVResults(object):
     """
 
     def __init__(self, params, cov, r2, cov_type, rss, tss, s2, debiased,
-                 model, kappa=1):
+                 fstat, model, kappa=1):
         self._params = params
         self._cov = cov
         self._model = model
@@ -371,6 +420,7 @@ class IVResults(object):
         self._s2 = s2
         self._debiased = debiased
         self._kappa = kappa
+        self._f_statistic = fstat
         self._cache = {}
 
     @property
@@ -458,12 +508,17 @@ class IVResults(object):
         """Flag indicating whether covariance uses a small-sample adjustment"""
         return self._debiased
 
+    @property
+    def f_statistic(self):
+        return self._f_statistic
+
 
 class IVGMMResults(IVResults):
     def __init__(self, params, cov, r2, cov_type, rss, tss, s2, debiased,
-                 weight_mat, weight_type, weight_config, iterations, model):
+                 weight_mat, weight_type, weight_config, iterations, fstat,
+                 model):
         super(IVGMMResults, self).__init__(params, cov, r2, cov_type, rss,
-                                           tss, s2, debiased, model)
+                                           tss, s2, debiased, fstat, model)
         self._weight_mat = weight_mat
         self._weight_type = weight_type
         self._weight_config = weight_config
