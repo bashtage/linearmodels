@@ -1,5 +1,4 @@
 from __future__ import print_function, absolute_import, division
-from __future__ import print_function, absolute_import, division
 
 from numpy import ceil, where, argsort, r_, unique, zeros, arange, pi, sin, cos
 from numpy.linalg import pinv, inv
@@ -94,7 +93,7 @@ KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,
 
 
 class HomoskedasticCovariance(object):
-    """
+    r"""
     Covariance estimation for homoskedastic data
     
     Parameters
@@ -102,13 +101,36 @@ class HomoskedasticCovariance(object):
     x : ndarray
         Model regressors (nobs by nvar)
     y : ndarray
-        Series ,modeled (nobs by 1)
+        Series modeled (nobs by 1)
     z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
+    
+    Notes
+    -----
+    Covariance is estimated using 
+    
+    .. math ::
+    
+        n^{-1} s^2 V^{-1}   
+    
+    where 
+    
+    .. math:: 
+    
+      s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2
+    
+    If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k).
+    
+    .. math:: 
+    
+      V = n^{-1} X'Z(Z'Z)^{-1}Z'X
+    
+    where :math:`X` is the matrix of variables included in the model and 
+    :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
     def __init__(self, x, y, z, params, debiased=False):
@@ -122,10 +144,12 @@ class HomoskedasticCovariance(object):
 
     @property
     def s(self):
+        """Score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
         s2 = eps.T @ eps / nobs
-        v = (x.T @ z) @ (pinv(z) @ x) / nobs
+        pinvz = self._pinvz
+        v = (x.T @ z) @ (pinvz @ x) / nobs
 
         return s2 * v
 
@@ -136,7 +160,7 @@ class HomoskedasticCovariance(object):
         x, z = self.x, self.z
         nobs, nvar = x.shape
 
-        scale = nobs / (nobs - nvar) if self.config['debiased'] else 1
+        scale = nobs / (nobs - nvar) if self._debiased else 1
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
         vinv = inv(v)
@@ -151,6 +175,7 @@ class HomoskedasticCovariance(object):
         nobs, nvar = self.x.shape
         eps = self.eps
         denom = nobs - nvar if self.debiased else nobs
+
         return eps.T @ eps / denom
 
     @property
@@ -164,8 +189,65 @@ class HomoskedasticCovariance(object):
                 'name': self.__class__.__name__}
 
 
-class KernelCovariance(HomoskedasticCovariance):
+class HeteroskedasticCovariance(HomoskedasticCovariance):
     """
+    Covariance estimation for heteroskedastic data
+
+    Parameters
+    ----------
+    x : ndarray
+        Model regressors (nobs by nvar)
+    y : ndarray
+        Series ,modeled (nobs by 1)
+    z : ndarray
+        Instruments used for endogensou regressors (nobs by ninstr)
+    params : ndarray
+        Estimated model parameters (nvar by 1)
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+
+    Notes
+    -----
+    Covariance is estimated using 
+
+    .. math ::
+
+        n^{-1} V^{-1} \hat{S} V^{-1}  
+
+    where 
+
+    .. math:: 
+
+      \hat{S} = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 \hat{x}_i^{\prime} \hat{x}_i
+
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and 
+    :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then 
+    :math:`S` is scaled by n / (n-k).
+
+    .. math:: 
+
+      V = n^{-1} X'Z(Z'Z)^{-1}Z'X
+
+    where :math:`X` is the matrix of variables included in the model and 
+    :math:`Z` is the matrix of instruments, including exogenous regressors.
+    """
+
+    def __init__(self, x, y, z, params, debiased=False):
+        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased)
+
+    @property
+    def s(self):
+        """Heteroskedasticity-robust score covariance estimate"""
+        x, z, eps = self.x, self.z, self.eps
+        nobs, nvar = x.shape
+        pinvz = self._pinvz
+        xhat_e = z @ (pinvz @ x) * eps
+        s = xhat_e.T @ xhat_e / nobs
+        return s
+
+
+class KernelCovariance(HomoskedasticCovariance):
+    r"""
     Kernel weighted (HAC) covariance estimation
 
     Parameters
@@ -191,6 +273,36 @@ class KernelCovariance(HomoskedasticCovariance):
         Non-negative bandwidth to use with kernel. If None, automatic
         bandwidth selection is used.
 
+    Notes
+    -----
+    Covariance is estimated using 
+    
+    .. math ::
+    
+        n^{-1} V^{-1} \hat{S} V^{-1}  
+    
+    where 
+    
+    .. math:: 
+    
+      \hat{S}_0 & = n^{-1} \sum_{i=1}^{n} \hat{\epsilon}^2_i \hat{x}_i^{\prime}
+           \hat{x}_{i} \\
+      \hat{S}_j & = n^{-1} \sum_{i=1}^{n-j} 
+          \hat{\epsilon}_i\hat{\epsilon}_{i+j} (\hat{x}_i^{\prime} 
+          \hat{x}_{i+j} + \hat{x}_{i+j}^{\prime} \hat{x}_{i}) \\
+      \hat{S}   & = \sum_{i=0}^{bw} K(i, bw) \hat{S}_i 
+    
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,  
+    :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that 
+    depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled 
+    by n / (n-k).
+    
+    .. math:: 
+    
+      V = n^{-1} X'Z(Z'Z)^{-1}Z'X
+    
+    where :math:`X` is the matrix of variables included in the model and 
+    :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
     def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
@@ -202,6 +314,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
     @property
     def s(self):
+        """HAC score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
 
@@ -225,7 +338,8 @@ class KernelCovariance(HomoskedasticCovariance):
         s = xhat_e.T @ xhat_e
 
         for i in range(bw):
-            s += 2 * w[i + 1] * xhat_e[i + 1:].T @ xhat_e[:-(i + 1)]
+            op = xhat_e[i + 1:].T @ xhat_e[:-(i + 1)]
+            s += w[i + 1] * (op + op.T)
         s /= nobs
 
         return s
@@ -238,40 +352,8 @@ class KernelCovariance(HomoskedasticCovariance):
                 'name': self.__class__.__name__}
 
 
-class HeteroskedasticCovariance(HomoskedasticCovariance):
-    """
-    Covariance estimation for heteroskedastic data
-
-    Parameters
-    ----------
-    x : ndarray
-        Model regressors (nobs by nvar)
-    y : ndarray
-        Series ,modeled (nobs by 1)
-    z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
-    params : ndarray
-        Estimated model parameters (nvar by 1)
-    debiased : bool, optional
-        Flag indicating whether to use a small-sample adjustment
-
-    """
-
-    def __init__(self, x, y, z, params, debiased=False):
-        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased)
-
-    @property
-    def s(self):
-        x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
-        pinvz = self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
-        s = xhat_e.T @ xhat_e / nobs
-        return s
-
-
 class OneWayClusteredCovariance(HomoskedasticCovariance):
-    """
+    r"""
     Covariance estimation for clustered data
 
     Parameters
@@ -288,6 +370,33 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     clusters : ndarray, optional
         Cluster group assignment.  If not provided, uses clusters of 1
+
+    Notes
+    -----
+    Covariance is estimated using 
+
+    .. math ::
+
+        n^{-1} V^{-1} \hat{S} V^{-1}  
+
+    where 
+
+    .. math:: 
+
+      \hat{S} & = n^{-1} (G/(G-1)) \sum_{g=1}^G \xi_{g}^\prime \xi_{g} \\
+      \xi_{g} & = \sum_{i\in\mathcal{G}_g} \hat{\epsilon}_i \hat{x}_i \\ 
+
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and 
+    :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the 
+    indices of elements in cluster g. If ``debiased`` is true, then 
+    :math:`S` is scaled by n / (n-k).
+
+    .. math:: 
+
+      V = n^{-1} X'Z(Z'Z)^{-1}Z'X
+
+    where :math:`X` is the matrix of variables included in the model and 
+    :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
     def __init__(self, x, y, z, params, debiased=False, clusters=None):
@@ -297,7 +406,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
     @property
     def s(self):
-        """One-wasy clustered estimator of score covariance"""
+        """One-way clustered estimator of score covariance"""
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
@@ -347,7 +456,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Weighting matrix used in GMM estimation
     """
 
-    def __init__(self, x, y, z, params, w):
+    def __init__(self, x, y, z, params, w, **cov_config):
         super(IVGMMCovariance, self).__init__(x, y, z, params, False)
         self.w = w
 

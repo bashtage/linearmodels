@@ -8,10 +8,14 @@ Instrumental Variable Models
    :members:
    :inherited-members:
 
+.. autoclass:: IVLIML
+   :members:
+   :inherited-members:
+
 .. autoclass:: IVGMM
    :members:
    :inherited-members:
 
-.. autoclass:: IVLIML
+.. autoclass:: IVGMMCUE
    :members:
    :inherited-members:

@@ -54,6 +54,8 @@ extensions = ['sphinx.ext.autodoc',
               'IPython.sphinxext.ipython_directive'
               ]
 
+add_module_names = False
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

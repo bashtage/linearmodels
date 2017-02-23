@@ -1,11 +1,12 @@
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from numpy import sqrt, diag, abs, eye, array, isscalar, c_
+from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 
 from panel.iv.covariance import HomoskedasticCovariance, IVGMMCovariance, \
     HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance
+from panel.iv.data import DataHandler
 from panel.iv.weighting import HomoskedasticWeightMatrix, KernelWeightMatrix, \
     HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix
 from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
@@ -33,15 +34,18 @@ class IV2SLS(object):
     
     Parameters
     ----------
-    endog : array-like
+    dependent : array-like
         Endogenous variables (nobs by 1)
     exog : array-like
-        Exogenous variables (nobs by nvar)
+        Exogenous regressors  (nobs by nexog)
+    endog : array-like
+        Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
 
     Notes
     -----
+    
 
     .. todo::
 
@@ -49,17 +53,22 @@ class IV2SLS(object):
         * testing
     """
 
-    def __init__(self, endog, exog, instrumented, instruments):
-        self.endog = endog
-        self.exog = exog
-        self.instrumented = instrumented
-        self.instruments = instruments
-        self._x = c_[exog, instrumented]  # model regressors
-        self._z = c_[exog, instruments]  # first-stage regressors
+    def __init__(self, dependent, exog, endog, instruments):
+        self.dependent = DataHandler(dependent, var_name='dependent')
+        self.exog = DataHandler(exog, var_name='exog')
+        self.endog = DataHandler(endog, var_name='endog')
+        self.instruments = DataHandler(instruments, var_name='instruments')
+
+        # dependent variable
+        self._y = self.dependent.ndarray
+        # model regressors
+        self._x = c_[self.exog.ndarray, self.endog.ndarray]
+        # first-stage regressors
+        self._z = c_[self.exog.ndarray, self.instruments.ndarray]
 
         self._has_constant = False
-        self._regressor_is_exog = array([True] * exog.shape[1] +
-                                        [False] * instrumented.shape[1])
+        self._regressor_is_exog = array([True] * self.exog.shape[1] +
+                                        [False] * self.endog.shape[1])
         self._validate_inputs()
 
     def _validate_inputs(self):
@@ -74,6 +83,8 @@ class IV2SLS(object):
     @staticmethod
     def estimate_parameters(x, y, z):
         """
+        Parameter estimation without error checking
+        
         Parameters
         ----------
         x : ndarray
@@ -102,7 +113,7 @@ class IV2SLS(object):
 
         Parameters
         ----------
-        cov_type : str
+        cov_type : str, optional
             Name of covariance estimator to use
         **cov_config
             Additional parameters to pass to covariance estimator
@@ -115,35 +126,49 @@ class IV2SLS(object):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see default property for a specific covariance estimator for a
-        list of supported options.  Defaults are used if no covariance
-        configuration is provided.
+        The see the docstring of specific covariance estimator for a list of 
+        supported options. Defaults are used if no covariance configuration 
+        is provided.
         """
-        y, x, z = self.endog, self._x, self._z
+        y, x, z = self._y, self._x, self._z
         params = self.estimate_parameters(x, y, z)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
+        results = {'cov_type': cov_type}
         pe = self._post_estimation(params, cov_estimator)
-        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
+        results.update(pe)
 
-        return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                         s2, debiased, fstat, self)
+        return IVResults(results, self)
 
     def resids(self, params):
-        return self.endog - self._x @ params
+        """
+        Compute model residuals 
+        
+        Parameters
+        ----------
+        params : ndarray
+            Model parameters (nvar by 1)
+         
+        Returns
+        -------
+        resids : ndarray
+            Model residuals
+        """
+        return self._y - self._x @ params
 
     @property
     def has_constant(self):
+        """Flag indicating the model includes a constant or equivalent"""
         return self._has_constant
 
-    def _f_statistic(self, params, cov, cov_config):
-        debiased = cov_config['debiased']
+    def _f_statistic(self, params, cov, debiased):
         non_const = ~(self._x.ptp(0) == 0)
         test_params = params[non_const]
         test_cov = cov[non_const][:, non_const]
         test_stat = test_params.T @ inv(test_cov) @ test_params
+        test_stat = test_stat.squeeze()
         nobs, nvar = self._x.shape
         null = 'All parameters ex. constant not zero'
         df = test_params.shape[0]
@@ -155,17 +180,28 @@ class IV2SLS(object):
         return wald
 
     def _post_estimation(self, params, cov_estimator):
-        y = self.endog
         eps = self.resids(params)
         cov = cov_estimator.cov
-        s2, debiased = cov_estimator.s2, cov_estimator.debiased
-        cov_config = cov_estimator.config
-        mu = self.endog.mean() if self.has_constant else 0
+        debiased = cov_estimator.debiased
+
         residual_ss = (eps.T @ eps)
-        model_ss = ((y - mu).T @ (y - mu))
-        r2 = 1 - residual_ss / model_ss
-        fstat = self._f_statistic(params, cov, cov_config)
-        return eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat
+        y = self._y
+        mu = self._y.mean() if self.has_constant else 0
+        total_ss = ((y - mu).T @ (y - mu))
+        r2 = 1 - residual_ss / total_ss
+
+        fstat = self._f_statistic(params, cov, debiased)
+        out = {'params': params,
+               'eps': eps,
+               'cov': cov,
+               's2': cov_estimator.s2,
+               'debiased': debiased,
+               'residual_ss': residual_ss,
+               'total_ss': total_ss,
+               'r2': r2,
+               'fstat': fstat}
+
+        return out
 
 
 class IVLIML(IV2SLS):
@@ -174,12 +210,17 @@ class IVLIML(IV2SLS):
     
     Parameters
     ----------
-    endog : array-like
+    dependent : array-like
         Endogenous variables (nobs by 1)
     exog : array-like
-        Exogenous variables (nobs by nvar)
+        Exogenous regressors  (nobs by nexog)
+    endog : array-like
+        Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    kappa : float, optional
+        Parameter value for k-class esimtation.  If not provided, computed to 
+        produce LIML parameter estimate.
 
     Notes
     -----
@@ -190,8 +231,8 @@ class IVLIML(IV2SLS):
         * testing
     """
 
-    def __init__(self, endog, exog, instrumented, instruments, kappa=None):
-        super(IVLIML, self).__init__(endog, exog, instrumented, instruments)
+    def __init__(self, dependent, exog, endog, instruments, kappa=None):
+        super(IVLIML, self).__init__(dependent, exog, endog, instruments)
         self._kappa = kappa
         if kappa is not None and not isscalar(kappa):
             raise ValueError('kappa must be None or a scalar')
@@ -199,6 +240,8 @@ class IVLIML(IV2SLS):
     @staticmethod
     def estimate_parameters(x, y, z, kappa):
         """
+        Parameter estimation without error checking
+
         Parameters
         ----------
         x : ndarray
@@ -231,7 +274,7 @@ class IVLIML(IV2SLS):
 
         Parameters
         ----------
-        cov_type : str
+        cov_type : str, optional
             Name of covariance estimator to use
         **cov_config
             Additional parameters to pass to covariance estimator
@@ -244,11 +287,11 @@ class IVLIML(IV2SLS):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see default property for a specific covariance estimator for a
-        list of supported options.  Defaults are used if no covariance
-        configuration is provided.
+        The see the docstring of specific covariance estimator for a list of 
+        supported options. Defaults are used if no covariance configuration 
+        is provided.
         """
-        y, x, z = self.endog, self._x, self._z
+        y, x, z = self._y, self._x, self._z
         kappa = self._kappa
         if kappa is None:
             is_exog = self._regressor_is_exog
@@ -267,11 +310,11 @@ class IVLIML(IV2SLS):
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
+        results = {'cov_type': cov_type}
         pe = self._post_estimation(params, cov_estimator)
-        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
+        results.update(pe)
 
-        return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                         s2, debiased, fstat, self, kappa=kappa)
+        return IVResults(results, self)
 
 
 class IVGMM(IV2SLS):
@@ -280,10 +323,12 @@ class IVGMM(IV2SLS):
     
     Parameters
     ----------
-    endog : array-like
+    dependent : array-like
         Endogenous variables (nobs by 1)
     exog : array-like
-        Exogenous variables (nobs by nvar)
+        Exogenous regressors  (nobs by nexog)
+    endog : array-like
+        Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
     weight_type : str
@@ -308,9 +353,9 @@ class IVGMM(IV2SLS):
          * Options for weighting matrix calculation
     """
 
-    def __init__(self, endog, exog, instrumented, instruments, weight_type='robust',
+    def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
                  **weight_config):
-        super(IVGMM, self).__init__(endog, exog, instrumented, instruments)
+        super(IVGMM, self).__init__(dependent, exog, endog, instruments)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
@@ -345,33 +390,199 @@ class IVGMM(IV2SLS):
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
     def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
-        y, x, z = self.endog, self._x, self._z
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        iter_limit : int, optional
+            Maximum number of iterations.  Default is 2, which produces 
+            two-step efficient GMM estimates.  Larger values can be used
+            to iterate between parameter estimation and optimal weight
+            matrix estimation until convergence.
+        tol : float, optional
+            Convergence criteria.  Measured as covariance normalized change in
+            parameters across iterations where the covariance estimator is 
+            based on the first step parameter estimates.
+        cov_type : str, optional
+            Name of covariance estimator to use
+        **cov_config
+            Additional parameters to pass to covariance estimator
+
+        Returns
+        -------
+        results : IVGMMResults
+            Results container
+
+        Notes
+        -----
+        Additional covariance parameters depend on specific covariance used.
+        The see the docstring of specific covariance estimator for a list of 
+        supported options. Defaults are used if no covariance configuration 
+        is provided.
+        """
+
+        y, x, z = self._y, self._x, self._z
         nobs, ninstr = y.shape[0], z.shape[1]
         weight_matrix = self._weight.weight_matrix
-        _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
+        w = inv(z.T @ z / nobs)
+        _params = params = self.estimate_parameters(x, y, z, w)
         eps = y - x @ params
-        i, norm = 1, 10 * tol
-        while i < iter_limit and norm > tol:
+
+        iters, norm = 1, 10 * tol
+        while iters < iter_limit and norm > tol:
             w = inv(weight_matrix(x, z, eps))
             params = self.estimate_parameters(x, y, z, w)
             eps = y - x @ params
             delta = params - _params
             xpz = x.T @ z / nobs
-            if i == 1:
+            if iters == 1:
                 v = (xpz @ w @ xpz.T) / nobs
                 vinv = inv(v)
             _params = params
             norm = delta.T @ vinv @ delta
-            i += 1
+            iters += 1
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
 
+        results = {'cov_type': cov_type,
+                   'weight_mat': w,
+                   'weight_type': self._weight_type,
+                   'weight_config': self._weight_type,
+                   'iterations': iters,
+                   'j_stat': self._j_statistic(params, w)}
         pe = self._post_estimation(params, cov_estimator)
-        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
+        results.update(pe)
 
-        return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                            s2, debiased, w, self._weight_type,
-                            self._weight_config, i, fstat, self)
+        return IVGMMResults(results, self)
+
+    def _j_statistic(self, params, weight_mat):
+        y, x, z = self._y, self._x, self._z
+        nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
+        eps = y - x @ params
+        g_bar = (z * eps).mean(0)
+        stat = nobs * g_bar.T @ weight_mat @ g_bar.T
+        null = 'Expected moment conditions are equal to 0'
+        return WaldTestStatistic(stat, null, ninstr - nvar)
+
+
+class IVGMMCUE(IVGMM):
+    """
+    Estimation of IV models using continuously updating GMM
+
+    Parameters
+    ----------
+    dependent : array-like
+        Endogenous variables (nobs by 1)
+    exog : array-like
+        Exogenous regressors  (nobs by nexog)
+    endog : array-like
+        Endogenous regressors (nobs by nendog)
+    instruments : array-like
+        Instrumental variables (nobs by ninstr)
+    weight_type : str
+        Name of weight function to use.
+    **weight_config
+        Additional keyword arguments to pass to the weight function.
+
+    Notes
+    -----
+    Available weight functions are:
+      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+        homoskedastic
+      * 'robust' - Allows for heterosedasticity by not autocorrelation
+      * 'kernel' - Allows for heteroskedasticity and autocorrelation
+      * 'cluster' - Allows for one-way cluster dependence
+    """
+
+    def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
+                 **weight_config):
+        super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weight_type,
+                                       **weight_config)
+
+    def j(self, params):
+        y, x, z = self._y, self._x, self._z
+        nobs, ninstr = y.shape[0], z.shape[1]
+        weight_matrix = self._weight.weight_matrix
+        eps = y - x @ params[:, None]
+        w = inv(weight_matrix(x, z, eps))
+        g_bar = (z * eps).mean(0)
+        return nobs * g_bar.T @ w @ g_bar.T
+
+    def estimate_parameters(self, x, y, z):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Regressor matrix (nobs by nvar)
+        y : ndarray
+            Regressand matrix (nobs by 1)
+        z : ndarray
+            Instrument matrix (nobs by ninstr)
+
+        Returns
+        -------
+        params : ndarray
+            Estimated parameters (nvar by 1)
+
+        Notes
+        -----
+        Exposed as a static method to facilitate estimation with other data,
+        e.g., bootstrapped samples.  Performs no error checking.
+        """
+        from scipy.optimize import minimize
+        res = IV2SLS(self.dependent, self.exog, self.endog, self.instruments).fit()
+        sv = res.params
+        res = minimize(self.j, sv, options={'disp': False})
+        return res.x[:, None], res.nit
+
+    def fit(self, cov_type='robust', **cov_config):
+        def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
+            """
+            Estimate model parameters
+
+            Parameters
+            ----------
+            cov_type : str, optional
+                Name of covariance estimator to use
+            **cov_config
+                Additional parameters to pass to covariance estimator
+
+            Returns
+            -------
+            results : IVGMMResults
+                Results container
+
+            Notes
+            -----
+            Additional covariance parameters depend on specific covariance used.
+            The see the docstring of specific covariance estimator for a list of 
+            supported options. Defaults are used if no covariance configuration 
+            is provided.
+            
+            .. todo::
+            
+              * Expose method to pass optimization options
+              
+            """
+
+        y, x, z = self._y, self._x, self._z
+        weight_matrix = self._weight.weight_matrix
+        params, iterations = self.estimate_parameters(x, y, z)
+        eps = y - x @ params
+        w = inv(weight_matrix(x, z, eps))
+
+        cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
+        results = {'cov_type': cov_type,
+                   'weight_mat': w,
+                   'weight_type': self._weight_type,
+                   'weight_config': self._weight_type,
+                   'iterations': iterations,
+                   'j_stat': self._j_statistic(params, w)}
+        pe = self._post_estimation(params, cov_estimator)
+        results.update(pe)
+
+        return IVGMMResults(results, self)
 
 
 class IVResults(object):
@@ -383,25 +594,23 @@ class IVResults(object):
     .. todo::
 
         * Information about covariance estimator 
-        * J_stat - for GMM
         * Hypothesis testing
         * First stage diagnostics
 
     """
 
-    def __init__(self, params, cov, r2, cov_type, rss, tss, s2, debiased,
-                 fstat, model, kappa=1):
-        self._params = params
-        self._cov = cov
+    def __init__(self, results, model):
+        self._params = results['params']
+        self._cov = results['cov']
         self._model = model
-        self._r2 = r2
-        self._cov_type = cov_type
-        self._rss = rss
-        self._tss = tss
-        self._s2 = s2
-        self._debiased = debiased
-        self._kappa = kappa
-        self._f_statistic = fstat
+        self._r2 = results['r2']
+        self._cov_type = results['cov_type']
+        self._rss = results['residual_ss']
+        self._tss = results['total_ss']
+        self._s2 = results['s2']
+        self._debiased = results['debiased']
+        self._kappa = results.get('kappa', 1)
+        self._f_statistic = results['fstat']
         self._cache = {}
 
     @property
@@ -469,14 +678,17 @@ class IVResults(object):
 
     @property
     def total_ss(self):
+        """Total sum of squares"""
         return self._tss
 
     @property
     def resid_ss(self):
+        """Residual sum of squares"""
         return self._rss
 
     @property
     def kappa(self):
+        """k-class estimator value"""
         return self._kappa
 
     @property
@@ -491,19 +703,36 @@ class IVResults(object):
 
     @property
     def f_statistic(self):
+        """Joint test of significance for non-constant regressors"""
         return self._f_statistic
+
+    def conf_int(self, level=0.95):
+        """
+        Confidence interval construction
+
+        Parameters
+        ----------
+        level : float
+            Confidence level for interval
+
+        Returns
+        -------
+        ci : ndarray
+            Confidence interval of the form [lower, upper] for each parameters
+        """
+        q = stats.norm.ppf([(1 - level) / 2, 1 - (1 - level) / 2])
+        q = q[None, :]
+        return self.params + self.std_errors * q
 
 
 class IVGMMResults(IVResults):
-    def __init__(self, params, cov, r2, cov_type, rss, tss, s2, debiased,
-                 weight_mat, weight_type, weight_config, iterations, fstat,
-                 model):
-        super(IVGMMResults, self).__init__(params, cov, r2, cov_type, rss,
-                                           tss, s2, debiased, fstat, model)
-        self._weight_mat = weight_mat
-        self._weight_type = weight_type
-        self._weight_config = weight_config
-        self._iterations = iterations
+    def __init__(self, results, model):
+        super(IVGMMResults, self).__init__(results, model)
+        self._weight_mat = results['weight_mat']
+        self._weight_type = results['weight_type']
+        self._weight_config = results['weight_config']
+        self._iterations = results['iterations']
+        self._j_stat = results['j_stat']
 
     @property
     def weight_matrix(self):
@@ -525,95 +754,7 @@ class IVGMMResults(IVResults):
         """Weighting matrix parameters used in estimation"""
         return self._weight_config
 
-
-class IVGMMCUE(IVGMM):
-    """
-    Estimation of IV models using the generalized method of moments (GMM)
-
-    Parameters
-    ----------
-    endog : array-like
-        Endogenous variables (nobs by 1)
-    exog : array-like
-        Exogenous variables (nobs by nvar)
-    instruments : array-like
-        Instrumental variables (nobs by ninstr)
-    weight_type : str
-        Name of weight function to use.
-    **weight_config
-        Additional keyword arguments to pass to the weight function.
-
-    Notes
-    -----
-    Available weight functions are:
-      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
-        homoskedastic
-      * 'robust' - Allows for heterosedasticity by not autocorrelation
-      * 'kernel' - Allows for heteroskedasticity and autocorrelation
-      * 'cluster' - Allows for one-way cluster dependence
-
-    .. todo:
-         * VCV: unadjusted, robust, cluster clustvar, bootstrap, jackknife,
-           or hac kernel
-         * small sample adjustments
-         * Colinearity check
-         * Options for weighting matrix calculation
-    """
-
-    def __init__(self, endog, exog, instrumented, instruments, weight_type='robust',
-                 **weight_config):
-        super(IVGMMCUE, self).__init__(endog, exog, instrumented, instruments, weight_type,
-                                       **weight_config)
-
-    def j(self, params, x, y, z):
-        y, x, z = self.endog, self._x, self._z
-        nobs, ninstr = y.shape[0], z.shape[1]
-        weight_matrix = self._weight.weight_matrix
-        eps = y - x @ params[:, None]
-        w = inv(weight_matrix(x, z, eps))
-        g_bar = (z * eps).mean(0)
-        return nobs * g_bar.T @ w @ g_bar.T
-
-    def estimate_parameters(self, x, y, z):
-        """
-        Parameters
-        ----------
-        x : ndarray
-            Regressor matrix (nobs by nvar)
-        y : ndarray
-            Regressand matrix (nobs by 1)
-        z : ndarray
-            Instrument matrix (nobs by ninstr)
-
-        Returns
-        -------
-        params : ndarray
-            Estimated parameters (nvar by 1)
-
-        Notes
-        -----
-        Exposed as a static method to facilitate estimation with other data,
-        e.g., bootstrapped samples.  Performs no error checking.
-        """
-        from scipy.optimize import minimize
-        res = IV2SLS(self.endog, self.exog, self.instrumented, self.instruments).fit()
-        sv = res.params
-        args = (x, y, z)
-        res = minimize(self.j, sv, args=args, options={'disp': False})
-        return res.x[:, None], res.nit
-
-    def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
-        y, x, z = self.endog, self._x, self._z
-        weight_matrix = self._weight.weight_matrix
-        params, iterations = self.estimate_parameters(x, y, z)
-        eps = y - x @ params
-        w = inv(weight_matrix(x, z, eps))
-
-        cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
-
-        pe = self._post_estimation(params, cov_estimator)
-        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
-
-        return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
-                            s2, debiased, w, self._weight_type,
-                            self._weight_config, iterations, fstat, self)
+    @property
+    def j_stat(self):
+        """J-test of overidentifying restrictions"""
+        return self._j_stat

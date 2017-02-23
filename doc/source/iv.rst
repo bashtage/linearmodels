@@ -26,6 +26,29 @@ same four required inputs:
   * ``instrumented`` - The endogenous regressors, :math:`x_{2i}` in the model
   * ``instruments`` - The instruments, :math:`z_i` in the model
 
+..
+   from urllib.request import urlopen
+   import statsmodels.api as sm
+   url = 'http://www.stata-press.com/data/r13/hsng.dta'
+   resp = urlopen(url)
+   with open('hsng.dta', 'wb') as dta:
+       dta.write(resp.read())
+   ivregress 2sls rent pcturban (hsngval = faminc i.region) [Equivalent]
+
+.. code-block:: python
+
+   import pandas as pd
+   data = pd.read_stata('hsng.dta')
+   from panel.iv import IV2SLS
+   endog = data.rent
+   exog = sm.add_constant(data.pcturban)
+   instd = data.hsngval
+   instr = data[['faminc','region']]
+
+   mod = IV2SLS(endog, exog, instd, instr)
+   res = mod.fit(cov_type='unadjusted')
+
+
 .. code-block:: python
 
   from panel.iv import IV2SLS
@@ -45,19 +68,21 @@ The estimator will reduce to OLS when ``instruments`` is equal to ``instrumented
 Two stage-least squares
 =======================
 
-Limited Information Maximum Likelihood (LIML)
-=============================================
+Limited Information Maximum Likelihood (LIML) and k-class Estiamtion
+====================================================================
 
 Generalized Method of Moments (GMM) Estimation
 ==============================================
 
-
-
+Continuously Updating GMM Estimation
+====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   :caption: Detailed Description:
 
    iv/models
+   iv/results
    iv/covariance
    iv/weighting
+

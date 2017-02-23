@@ -71,7 +71,7 @@ class WaldTestStatistic(object):
     @property
     def critical_values(self):
         return OrderedDict(zip(['10%', '5%', '1%'],
-                               self.stat.ppf([.9, .95, .99])))
+                               self.dist.ppf([.9, .95, .99])))
 
     @property
     def null(self):
