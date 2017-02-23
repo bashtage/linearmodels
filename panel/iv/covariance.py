@@ -347,7 +347,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Weighting matrix used in GMM estimation
     """
 
-    def __init__(self, x, y, z, params, w):
+    def __init__(self, x, y, z, params, w, **cov_config):
         super(IVGMMCovariance, self).__init__(x, y, z, params, False)
         self.w = w
 
