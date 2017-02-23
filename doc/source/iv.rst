@@ -68,19 +68,21 @@ The estimator will reduce to OLS when ``instruments`` is equal to ``instrumented
 Two stage-least squares
 =======================
 
-Limited Information Maximum Likelihood (LIML)
-=============================================
+Limited Information Maximum Likelihood (LIML) and k-class Estiamtion
+====================================================================
 
 Generalized Method of Moments (GMM) Estimation
 ==============================================
 
-
-
+Continuously Updating GMM Estimation
+====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   :caption: Detailed Description:
 
    iv/models
+   iv/results
    iv/covariance
    iv/weighting
+

@@ -7,7 +7,8 @@ import statsmodels.api as sm
 
 from panel.iv import IV2SLS, IVGMM, IVLIML, IVGMMCUE
 
-CWD = os.path.split(os.path.abspath(__file__ ))[0]
+CWD = os.path.split(os.path.abspath(__file__))[0]
+
 
 def get_all(v):
     attr = [d for d in dir(v) if not d.startswith('_')]
@@ -77,15 +78,17 @@ class TestIV(object):
 
     def test_ivgmm_smoke(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit()
+        res = mod.fit()
 
     def test_ivgmm_smoke_iter(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
         res = mod.fit(iter_limit=100)
+        print(res.j_stat)
 
     def test_ivgmm_smoke_weights(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='unadjusted')
-        mod.fit()
+        res = mod.fit()
+        print(res.j_stat)
 
         with pytest.raises(TypeError):
             IVGMM(self.y, self.x_exog, self.x_endog, self.z, bw=20)
@@ -99,14 +102,16 @@ class TestIV(object):
         mod.fit()
 
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='kernel', kernel='qs')
-        mod.fit()
+        res = mod.fit()
+        print(res.j_stat)
 
     def test_ivgmm_cluster_smoke(self):
         k = 500
         clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
                     clusters=clusters)
-        mod.fit()
+        res = mod.fit()
+        print(res.j_stat)
 
     def test_ivgmm_cluster_size_1(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
@@ -126,6 +131,7 @@ class TestIV(object):
         mod = IVGMMCUE(self.y, self.x_exog, self.x_endog, self.z)
         res = mod.fit()
         get_all(res)
+        print(res.j_stat)
 
     def test_alt_dims_smoke(self):
         mod = IV2SLS(self.y.squeeze(), self.x_exog.squeeze(),
@@ -157,7 +163,7 @@ class TestIV(object):
         endog = data.rent
         exog = sm.add_constant(data.pcturban)
         instd = data.hsngval
-        instr = data[['faminc','region']]
+        instr = data[['faminc', 'region']]
 
         mod = IV2SLS(endog, exog, instd, instr)
         mod.fit(cov_type='unadjusted')
@@ -168,7 +174,7 @@ class TestIV(object):
         endog = data.rent
         exog = sm.add_constant(data.pcturban)
         instd = data.hsngval
-        instr = data[['faminc','region']]
+        instr = data[['faminc', 'region']]
 
         with pytest.raises(ValueError):
             IV2SLS(endog, exog, instd, instr)

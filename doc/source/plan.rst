@@ -10,13 +10,10 @@ Implemented
 *  OLS - :class:`statsmodels.regression.linear_model.OLS`
 *  WLS - :class:`statsmodels.regression.linear_model.WLS`
 *  GLS - :class:`statsmodels.regression.linear_model.GLS`
-
-Incomplete or Not Implemented
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* 2SLS - :class:`panel.iv.iv.IV2SLS`
-* LIML/k-class - :class:`panel.iv.iv.IVLIML`
-* GMM IV Estimation - :class:`panel.iv.iv.IVGMM`
-* GMM-CUE Estimation - TBD
+* 2SLS - :class:`panel.iv.model.IV2SLS`
+* LIML/k-class - :class:`panel.iv.model.IVLIML`
+* GMM IV Estimation - :class:`panel.iv.model.IVGMM`
+* GMM-CUE Estimation - :class:`panel.iv.model.IVGMMCUE`
 
 Panel
 =====

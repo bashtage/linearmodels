@@ -5,7 +5,7 @@ Estimation and inference in linear panel data models
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    iv
