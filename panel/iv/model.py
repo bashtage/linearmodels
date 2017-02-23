@@ -1,7 +1,7 @@
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from numpy import sqrt, diag, abs, eye, array, all, any, isscalar, c_
+from numpy import sqrt, diag, abs, eye, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 
 from panel.iv.covariance import HomoskedasticCovariance, IVGMMCovariance, \
@@ -56,7 +56,6 @@ class IV2SLS(object):
         self.instruments = instruments
         self._x = c_[exog, instrumented]  # model regressors
         self._z = c_[exog, instruments]  # first-stage regressors
-
 
         self._has_constant = False
         self._regressor_is_exog = array([True] * exog.shape[1] +
@@ -125,16 +124,9 @@ class IV2SLS(object):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
-        cov = cov_estimator.cov
-        cov_config = cov_estimator.config
-        s2, debiased = cov_estimator.s2, cov_estimator.debiased
 
-        eps = self.resids(params)
-        mu = self.endog.mean() if self.has_constant else 0
-        residual_ss = (eps.T @ eps)
-        model_ss = ((y - mu).T @ (y - mu))
-        r2 = 1 - residual_ss / model_ss
-        fstat = self._f_statistic(params, cov, cov_config)
+        pe = self._post_estimation(params, cov_estimator)
+        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
 
         return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
                          s2, debiased, fstat, self)
@@ -161,6 +153,19 @@ class IV2SLS(object):
             wald = WaldTestStatistic(test_stat, null, df)
 
         return wald
+
+    def _post_estimation(self, params, cov_estimator):
+        y = self.endog
+        eps = self.resids(params)
+        cov = cov_estimator.cov
+        s2, debiased = cov_estimator.s2, cov_estimator.debiased
+        cov_config = cov_estimator.config
+        mu = self.endog.mean() if self.has_constant else 0
+        residual_ss = (eps.T @ eps)
+        model_ss = ((y - mu).T @ (y - mu))
+        r2 = 1 - residual_ss / model_ss
+        fstat = self._f_statistic(params, cov, cov_config)
+        return eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat
 
 
 class IVLIML(IV2SLS):
@@ -261,16 +266,9 @@ class IVLIML(IV2SLS):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
-        cov = cov_estimator.cov
-        s2, debiased = cov_estimator.s2, cov_estimator.debiased
-        cov_config = cov_estimator.config
 
-        eps = self.resids(params)
-        mu = self.endog.mean() if self.has_constant else 0
-        residual_ss = (eps.T @ eps)
-        model_ss = ((y - mu).T @ (y - mu))
-        r2 = 1 - residual_ss / model_ss
-        fstat = self._f_statistic(params, cov, cov_config)
+        pe = self._post_estimation(params, cov_estimator)
+        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
 
         return IVResults(params, cov, r2, cov_type, residual_ss, model_ss,
                          s2, debiased, fstat, self, kappa=kappa)
@@ -367,15 +365,9 @@ class IVGMM(IV2SLS):
             i += 1
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
-        cov = cov_estimator.cov
-        s2, debiased = cov_estimator.s2, cov_estimator.debiased
-        cov_config = cov_estimator.config
 
-        mu = self.endog.mean() if self.has_constant else 0
-        residual_ss = (eps.T @ eps)
-        model_ss = ((y - mu).T @ (y - mu))
-        r2 = 1 - residual_ss / model_ss
-        fstat = self._f_statistic(params, cov, cov_config)
+        pe = self._post_estimation(params, cov_estimator)
+        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
 
         return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
                             s2, debiased, w, self._weight_type,
@@ -533,7 +525,8 @@ class IVGMMResults(IVResults):
         """Weighting matrix parameters used in estimation"""
         return self._weight_config
 
-class IVContinuousUpdatingGMM(IVGMM):
+
+class IVGMMCUE(IVGMM):
     """
     Estimation of IV models using the generalized method of moments (GMM)
 
@@ -567,17 +560,16 @@ class IVContinuousUpdatingGMM(IVGMM):
          * Options for weighting matrix calculation
     """
 
-    def __init__(self, endog, exog, instruments, weight_type='robust',
+    def __init__(self, endog, exog, instrumented, instruments, weight_type='robust',
                  **weight_config):
-        super(IVContinuousUpdatingGMM, self).__init__(endog, exog, instruments,
-                                                      weight_type,
-                                                      **weight_config)
+        super(IVGMMCUE, self).__init__(endog, exog, instrumented, instruments, weight_type,
+                                       **weight_config)
 
-    def j(self, params):
-        y, x, z = self.endog, self.exog, self.instruments
+    def j(self, params, x, y, z):
+        y, x, z = self.endog, self._x, self._z
         nobs, ninstr = y.shape[0], z.shape[1]
         weight_matrix = self._weight.weight_matrix
-        eps = y - x @ params
+        eps = y - x @ params[:, None]
         w = inv(weight_matrix(x, z, eps))
         g_bar = (z * eps).mean(0)
         return nobs * g_bar.T @ w @ g_bar.T
@@ -592,8 +584,6 @@ class IVContinuousUpdatingGMM(IVGMM):
             Regressand matrix (nobs by 1)
         z : ndarray
             Instrument matrix (nobs by ninstr)
-        w : ndarray
-            GMM weight matrix (ninstr by ninstr)
 
         Returns
         -------
@@ -606,41 +596,24 @@ class IVContinuousUpdatingGMM(IVGMM):
         e.g., bootstrapped samples.  Performs no error checking.
         """
         from scipy.optimize import minimize
-        IV2SLS()
-        res = minimize(self.j, sv, options={'disp': True})
-        return
+        res = IV2SLS(self.endog, self.exog, self.instrumented, self.instruments).fit()
+        sv = res.params
+        args = (x, y, z)
+        res = minimize(self.j, sv, args=args, options={'disp': False})
+        return res.x[:, None], res.nit
 
     def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
-        y, x, z = self.endog, self.exog, self.instruments
-        nobs, ninstr = y.shape[0], z.shape[1]
+        y, x, z = self.endog, self._x, self._z
         weight_matrix = self._weight.weight_matrix
-        _params = params = self.estimate_parameters(x, y, z, eye(ninstr))
+        params, iterations = self.estimate_parameters(x, y, z)
         eps = y - x @ params
-        i, norm = 1, 10 * tol
-        while i < iter_limit and norm > tol:
-            w = inv(weight_matrix(x, z, eps))
-            params = self.estimate_parameters(x, y, z, w)
-            eps = y - x @ params
-            delta = params - _params
-            xpz = x.T @ z / nobs
-            if i == 1:
-                v = (xpz @ w @ xpz.T) / nobs
-                vinv = inv(v)
-            _params = params
-            norm = delta.T @ vinv @ delta
-            i += 1
+        w = inv(weight_matrix(x, z, eps))
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
-        cov = cov_estimator.cov
-        s2, debiased = cov_estimator.s2, cov_estimator.debiased
-        cov_config = cov_estimator.config
 
-        mu = self.endog.mean() if self.has_constant else 0
-        residual_ss = (eps.T @ eps)
-        model_ss = ((y - mu).T @ (y - mu))
-        r2 = 1 - residual_ss / model_ss
-        fstat = self._f_statistic(params, cov, cov_config)
+        pe = self._post_estimation(params, cov_estimator)
+        eps, cov, s2, debiased, residual_ss, model_ss, r2, fstat = pe
 
         return IVGMMResults(params, cov, r2, cov_type, residual_ss, model_ss,
                             s2, debiased, w, self._weight_type,
-                            self._weight_config, i, fstat, self)
+                            self._weight_config, iterations, fstat, self)

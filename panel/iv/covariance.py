@@ -92,6 +92,7 @@ KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,
                  'gallant': kernel_weight_parzen,
                  'parzen': kernel_weight_parzen}
 
+
 class HomoskedasticCovariance(object):
     """
     Covariance estimation for homoskedastic data
@@ -109,6 +110,7 @@ class HomoskedasticCovariance(object):
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
     """
+
     def __init__(self, x, y, z, params, debiased=False):
         self.x = x
         self.y = y
@@ -162,7 +164,6 @@ class HomoskedasticCovariance(object):
                 'name': self.__class__.__name__}
 
 
-
 class KernelCovariance(HomoskedasticCovariance):
     """
     Kernel weighted (HAC) covariance estimation
@@ -191,6 +192,7 @@ class KernelCovariance(HomoskedasticCovariance):
         bandwidth selection is used.
 
     """
+
     def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
                  bandwidth=None):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased)
@@ -254,6 +256,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
 
     """
+
     def __init__(self, x, y, z, params, debiased=False):
         super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased)
 
@@ -286,7 +289,8 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     clusters : ndarray, optional
         Cluster group assignment.  If not provided, uses clusters of 1
     """
-    def __init__(self, x, y, z, params, debiased=False, clusters= None):
+
+    def __init__(self, x, y, z, params, debiased=False, clusters=None):
         super(OneWayClusteredCovariance, self).__init__(x, y, z, params,
                                                         debiased)
         self._clusters = clusters
@@ -342,6 +346,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     w : ndarray
         Weighting matrix used in GMM estimation
     """
+
     def __init__(self, x, y, z, params, w):
         super(IVGMMCovariance, self).__init__(x, y, z, params, False)
         self.w = w
