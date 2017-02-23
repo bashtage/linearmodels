@@ -1,7 +1,7 @@
-Instrumental Variable Models
-----------------------------
+Instrumental Variable GMM Weight Estimation
+-------------------------------------------
 
-.. module:: panel
 
 .. automodule:: panel.iv.weighting
    :members:
+

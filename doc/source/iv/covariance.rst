@@ -21,6 +21,12 @@ Instrumental Variable Covariance Estimation
    :inherited-members:
 
 
+Kernel Weight Generators
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automethod:: panel.iv.covariance.kernel_weight_bartlett
+.. automethod:: panel.iv.covariance.kernel_weight_parzen
+.. automethod:: panel.iv.covariance.kernel_weight_quadratic_spectral
 
 
 
