@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import, division
 
-from numpy import ceil, where, argsort, r_, unique, zeros, arange, pi, sin, cos
+from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
+                   cos, empty, sum)
 from numpy.linalg import pinv, inv
 
 
@@ -81,6 +82,56 @@ def kernel_weight_parzen(max_lag):
     w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
+
+
+def kernel_optimal_bandwidth(x, kernel='bartlett'):
+    """
+    Parameters
+    x : ndarray
+        Array of data to use when computing optimal bandwidth
+    kernel : str, optional
+        Name of kernel to use.  Supported kernels include:
+        
+          * 'bartlett', 'newey-west' : Bartlett's kernel
+          * 'parzen', 'gallane' : Parzen's kernel
+          * 'qs', 'quadratic-spectral', 'andrews : Quadratic spectral kernel
+    
+    Returns
+    -------
+    m : int
+        Optimal bandwidth. Set to nobs - 1 if computed bandwidth is larger.
+    
+    Notes
+    -----
+    
+    .. todo::
+    
+      * Explain mathematics involved
+      * References
+    """
+    t = x.shape[0]
+    x = x.squeeze()
+    if kernel in ('bartlett', 'newey-west'):
+        q, c = 1, 1.1447
+        m_star = int(ceil(4 * (t / 100) ** (2 / 9)))
+    elif kernel in ('qs', 'andrews', 'quadratic-spectral'):
+        q, c = 2, 1.3221
+        m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
+    elif kernel in ('gallant', 'parzen'):
+        q, c = 2, 2.6614
+        m_star = int(ceil(4 * (t / 100) ** (2 / 25)))
+    else:
+        raise ValueError('Unknown kernel: {0}'.format(kernel))
+    sigma = empty(m_star + 1)
+    sigma[0] = x.T @ x / t
+    for i in range(1, m_star + 1):
+        sigma[i] = x[i:].T @ x[:-i] / t
+    s0 = sigma[0] + 2 * sigma[1:].sum()
+    sq = 2 * sum(sigma[1:] * arange(1, m_star + 1) ** q)
+    rate = 1 / (2 * q + 1)
+    gamma = c * ((sq / s0) ** 2) ** rate
+    m = gamma * t ** rate
+    return min(int(ceil(m)), t - 1)
 
 
 KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,

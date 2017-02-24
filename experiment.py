@@ -1,6 +1,12 @@
+from panel.iv.covariance import kernel_optimal_bandwidth
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+x = np.random.standard_normal(1000)
+m = kernel_optimal_bandwidth(x)
+m_qs = kernel_optimal_bandwidth(x, 'qs')
+m_p = kernel_optimal_bandwidth(x, 'parzen')
 
 np.random.seed(12345)
 panel = pd.Panel(np.random.randn(125, 200, 10))
