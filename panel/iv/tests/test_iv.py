@@ -13,7 +13,11 @@ CWD = os.path.split(os.path.abspath(__file__))[0]
 def get_all(v):
     attr = [d for d in dir(v) if not d.startswith('_')]
     for a in attr:
-        getattr(v, a)
+        val = getattr(v, a)
+        if a == 'conf_int':
+            val = val()
+        print(a)
+        print(val)
 
 
 class TestIV(object):
@@ -162,7 +166,8 @@ class TestIV(object):
         instr = data[['faminc', 'region']]
 
         mod = IV2SLS(endog, exog, instd, instr)
-        mod.fit(cov_type='unadjusted')
+        res = mod.fit(cov_type='unadjusted')
+        get_all(res)
 
     def test_invalid_cat(self):
         path = os.path.join(CWD, 'housing.csv')

@@ -3,6 +3,7 @@ from __future__ import print_function, absolute_import, division
 import scipy.stats as stats
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
+from pandas import Series, DataFrame
 
 from panel.iv.covariance import (HomoskedasticCovariance,
                                  HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance)
@@ -69,6 +70,8 @@ class IV2SLS(object):
         self._has_constant = False
         self._regressor_is_exog = array([True] * self.exog.shape[1] +
                                         [False] * self.endog.shape[1])
+        self._columns = self.exog.cols + self.endog.cols
+        self._index = self.endog.rows
         self._validate_inputs()
 
     def _validate_inputs(self):
@@ -168,7 +171,7 @@ class IV2SLS(object):
         test_params = params[non_const]
         test_cov = cov[non_const][:, non_const]
         test_stat = test_params.T @ inv(test_cov) @ test_params
-        test_stat = test_stat.squeeze()
+        test_stat = float(test_stat)
         nobs, nvar = self._x.shape
         null = 'All parameters ex. constant not zero'
         df = test_params.shape[0]
@@ -180,6 +183,8 @@ class IV2SLS(object):
         return wald
 
     def _post_estimation(self, params, cov_estimator):
+        vars = self._columns
+        index = self._index
         eps = self.resids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
@@ -191,15 +196,16 @@ class IV2SLS(object):
         r2 = 1 - residual_ss / total_ss
 
         fstat = self._f_statistic(params, cov, debiased)
-        out = {'params': params,
-               'eps': eps,
-               'cov': cov,
-               's2': cov_estimator.s2,
+        out = {'params': Series(params.squeeze(), vars, name='parameter'),
+               'eps': Series(eps.squeeze(), index=index, name='residual'),
+               'cov': DataFrame(cov, columns=vars, index=vars),
+               's2': float(cov_estimator.s2),
                'debiased': debiased,
-               'residual_ss': residual_ss,
-               'total_ss': total_ss,
-               'r2': r2,
-               'fstat': fstat}
+               'residual_ss': float(residual_ss),
+               'total_ss': float(total_ss),
+               'r2': float(r2),
+               'fstat': fstat,
+               'vars': vars}
 
         return out
 
@@ -462,7 +468,7 @@ class IVGMM(IV2SLS):
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
         eps = y - x @ params
         g_bar = (z * eps).mean(0)
-        stat = nobs * g_bar.T @ weight_mat @ g_bar.T
+        stat = float(nobs * g_bar.T @ weight_mat @ g_bar.T)
         null = 'Expected moment conditions are equal to 0'
         return WaldTestStatistic(stat, null, ninstr - nvar)
 
@@ -601,6 +607,7 @@ class IVResults(object):
     """
 
     def __init__(self, results, model):
+        self._resid = results['eps']
         self._params = results['params']
         self._cov = results['cov']
         self._model = model
@@ -612,6 +619,7 @@ class IVResults(object):
         self._debiased = results['debiased']
         self._kappa = results.get('kappa', 1)
         self._f_statistic = results['fstat']
+        self._vars = results['vars']
         self._cache = {}
 
     @property
@@ -627,7 +635,7 @@ class IVResults(object):
     @property
     def resids(self):
         """Estimated residuals"""
-        return self._model.resids(self._params)
+        return self._resid
 
     @property
     def nobs(self):
@@ -663,7 +671,8 @@ class IVResults(object):
     @property
     def std_errors(self):
         """Estimated parameter standard errors"""
-        return sqrt(diag(self.cov))[:, None]
+        std_errors = sqrt(diag(self.cov))
+        return Series(std_errors, index=self._vars, name='stderr')
 
     @property
     def tstats(self):
@@ -674,7 +683,8 @@ class IVResults(object):
     def pvalues(self):
         """P-values of parameter t-statistics"""
         if 'pvalues' not in self._cache:
-            self._cache['pvalues'] = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            self._cache['pvalues'] = Series(pvals, index=self._vars, name='pvalue')
         return self._cache['pvalues']
 
     @property
@@ -723,7 +733,8 @@ class IVResults(object):
         """
         q = stats.norm.ppf([(1 - level) / 2, 1 - (1 - level) / 2])
         q = q[None, :]
-        return self.params + self.std_errors * q
+        ci = self.params[:, None] + self.std_errors[:, None] * q
+        return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
 
 
 class IVGMMResults(IVResults):
