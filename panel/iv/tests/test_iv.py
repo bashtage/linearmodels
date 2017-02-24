@@ -174,3 +174,23 @@ class TestIV(object):
 
         with pytest.raises(ValueError):
             IV2SLS(endog, exog, instd, instr)
+
+    def test_gmm_homo(self):
+        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
+        mod.fit(cov_type='unadjusted')
+
+    def test_gmm_hetero(self):
+        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
+        mod.fit(cov_type='robust')
+
+    def test_gmm_clustered(self):
+        clusters = np.tile(np.arange(500), (self.y.shape[0] // 500,)).ravel()
+        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
+        mod.fit(cov_type='clustered', clusters=clusters)
+
+    def test_gmm_kernel(self):
+        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
+        mod.fit(cov_type='kernel')
+
+        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
+        mod.fit(cov_type='kernel',kernel='qs', bandwidth=100)

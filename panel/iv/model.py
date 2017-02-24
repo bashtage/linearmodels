@@ -4,11 +4,11 @@ import scipy.stats as stats
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 
-from panel.iv.covariance import HomoskedasticCovariance, IVGMMCovariance, \
-    HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance
+from panel.iv.covariance import (HomoskedasticCovariance,
+                                 HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance)
 from panel.iv.data import DataHandler
-from panel.iv.weighting import HomoskedasticWeightMatrix, KernelWeightMatrix, \
-    HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix
+from panel.iv.weighting import (HomoskedasticWeightMatrix, KernelWeightMatrix,
+                                HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix, IVGMMCovariance)
 from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
@@ -443,7 +443,8 @@ class IVGMM(IV2SLS):
             norm = delta.T @ vinv @ delta
             iters += 1
 
-        cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
+        cov_estimator = IVGMMCovariance(x, y, z, params, w,
+                                        cov_type, **cov_config)
 
         results = {'cov_type': cov_type,
                    'weight_mat': w,
