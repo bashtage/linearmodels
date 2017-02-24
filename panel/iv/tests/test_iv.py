@@ -4,10 +4,16 @@ import numpy as np
 import pandas as pd
 import pytest
 import statsmodels.api as sm
+from numpy.testing import assert_allclose
 
 from panel.iv import IV2SLS, IVGMM, IVLIML, IVGMMCUE
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
+
+HOUSING_DATA = pd.read_csv(os.path.join(CWD, 'housing.csv'), index_col=0)
+HOUSING_DATA.region = HOUSING_DATA.region.astype('category')
+HOUSING_DATA.state = HOUSING_DATA.state.astype('category')
+HOUSING_DATA.division = HOUSING_DATA.division.astype('category')
 
 
 def get_all(v):
@@ -198,4 +204,104 @@ class TestIV(object):
         mod.fit(cov_type='kernel')
 
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='kernel',kernel='qs', bandwidth=100)
+        mod.fit(cov_type='kernel', kernel='qs', bandwidth=100)
+
+
+class CheckIV2SLSAgainstStata(object):
+    @classmethod
+    def setup_class(cls):
+        from panel.iv.tests.results.read_stata_results import read_result
+
+        data = HOUSING_DATA
+        endog = data.rent
+        exog = sm.add_constant(data.pcturban)
+        instd = data.hsngval
+        instr = data[['faminc', 'region']]
+
+        mod = IV2SLS(endog, exog, instd, instr)
+        cls.res = mod.fit(**cls.fit_opts)
+        filepath = os.path.join(CWD, 'results', cls.file)
+        cls.stata = read_result(filepath)
+        print(cls.stata)
+
+    def test_rsquared(self):
+        assert_allclose(self.res.rsquared, self.stata.rsquared)
+
+    def test_rsquared_adj(self):
+        assert_allclose(self.res.rsquared_adj, self.stata.rsquared_adj)
+
+    def test_total_ss(self):
+        assert_allclose(self.res.model_ss, self.stata.model_ss)
+
+    def test_residual_ss(self):
+        assert_allclose(self.res.resid_ss, self.stata.resid_ss)
+
+    def test_fstat(self):
+        assert_allclose(self.res.f_statistic.stat, self.stata.f_statistic)
+
+    def test_params(self):
+        for name in self.res.params.index:
+            assert_allclose(self.res.params[name], self.stata.params[name])
+
+    def test_tstats(self):
+        for name in self.res.tstats.index:
+            assert_allclose(self.res.tstats[name], self.stata.tstats[name])
+
+    def test_cov(self):
+        names = self.res.tstats.index
+        for row in names:
+            for col in names:
+                assert_allclose(self.res.cov[col][row], self.stata.cov[col][row],
+                                rtol=1e-4)
+
+
+class CheckIVGMMAgainstStata(object):
+    @classmethod
+    def setup_class(cls):
+        from panel.iv.tests.results.read_stata_results import read_result
+
+        data = HOUSING_DATA
+        endog = data.rent
+        exog = sm.add_constant(data.pcturban)
+        instd = data.hsngval
+        instr = data[['faminc', 'region']]
+
+        mod = IVGMM(endog, exog, instd, instr, **cls.mod_opts)
+        cls.res = mod.fit(**cls.fit_opts)
+        filepath = os.path.join(CWD, 'results', cls.file)
+        cls.stata = read_result(filepath)
+        print(cls.stata)
+
+
+class TestIV2SLSStataUnadjusted(CheckIV2SLSAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.file = 'stata-iv2sls-unadjusted.txt'
+        cls.fit_opts = {'cov_type': 'unadjusted'}
+        super(TestIV2SLSStataUnadjusted, cls).setup_class()
+
+
+class TestIV2SLSStataRobust(CheckIV2SLSAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.file = 'stata-iv2sls-robust.txt'
+        cls.fit_opts = {'cov_type': 'robust'}
+        super(TestIV2SLSStataRobust, cls).setup_class()
+
+
+class TestIVGMMStataRobust(CheckIVGMMAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.file = 'stata-ivgmm-robust.txt'
+        cls.fit_opts = {'cov_type': 'robust'}
+        cls.mod_opts = {'weight_type': 'robust'}
+        super(TestIVGMMStataRobust, cls).setup_class()
+
+
+class TestIVGMMStataUnadjusted(CheckIVGMMAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.file = 'stata-ivgmm-unadjusted.txt'
+        cls.fit_opts = {'cov_type': 'unadjusted'}
+        cls.mod_opts = {'weight_type': 'unadjusted'}
+        super(TestIVGMMStataUnadjusted, cls).setup_class()

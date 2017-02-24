@@ -55,7 +55,8 @@ class DataHandler(object):
 
             x = expand_categoricals(x)
             if x.ndim == 1:
-                x = pd.DataFrame({var_name: x})
+                name = var_name if not x.name else x.name
+                x = pd.DataFrame({name: x})
 
             self._pandas = x
             self._ndarray = self._pandas.values

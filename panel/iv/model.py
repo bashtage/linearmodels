@@ -650,7 +650,12 @@ class IVResults(object):
     @property
     def df_model(self):
         """Model degree of freedom"""
-        return self._model.exog.shape[1] - self._model.has_constant
+        return self._model._x.shape[1]
+
+    @property
+    def has_constant(self):
+        """Flag indicating the model includes a constant or equivalent"""
+        return self._model.has_constant
 
     @property
     def rsquared(self):
@@ -660,7 +665,7 @@ class IVResults(object):
     @property
     def rsquared_adj(self):
         """Sample-size adjusted coefficient of determination (R**2)"""
-        n, k, c = self.nobs, self.df_model, self._model.has_constant
+        n, k, c = self.nobs, self.df_model, int(self.has_constant)
         return 1 - ((n - c) / (n - k)) * (1 - self._r2)
 
     @property
@@ -691,6 +696,11 @@ class IVResults(object):
     def total_ss(self):
         """Total sum of squares"""
         return self._tss
+
+    @property
+    def model_ss(self):
+        """Residual sum of squares"""
+        return self._tss - self._rss
 
     @property
     def resid_ss(self):
