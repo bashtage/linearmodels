@@ -1,6 +1,5 @@
-import os
-
 import numpy as np
+import os
 import pandas as pd
 import pytest
 import statsmodels.api as sm
@@ -207,7 +206,7 @@ class TestIV(object):
         mod.fit(cov_type='kernel', kernel='qs', bandwidth=100)
 
 
-class CheckIV2SLSAgainstStata(object):
+class CheckIVAgainstStata(object):
     @classmethod
     def setup_class(cls):
         from panel.iv.tests.results.read_stata_results import read_result
@@ -218,7 +217,11 @@ class CheckIV2SLSAgainstStata(object):
         instd = data.hsngval
         instr = data[['faminc', 'region']]
 
-        mod = IV2SLS(endog, exog, instd, instr)
+        if cls.type == '2sls':
+            mod = IV2SLS(endog, exog, instd, instr)
+        elif cls.type == 'gmm':
+            mod = IVGMM(endog, exog, instd, instr, **cls.mod_opts)
+
         cls.res = mod.fit(**cls.fit_opts)
         filepath = os.path.join(CWD, 'results', cls.file)
         cls.stata = read_result(filepath)
@@ -240,68 +243,71 @@ class CheckIV2SLSAgainstStata(object):
         assert_allclose(self.res.f_statistic.stat, self.stata.f_statistic)
 
     def test_params(self):
-        for name in self.res.params.index:
-            assert_allclose(self.res.params[name], self.stata.params[name])
+        stata_params = self.stata.params.reindex_like(self.res.params)
+        assert_allclose(self.res.params, stata_params)
 
     def test_tstats(self):
-        for name in self.res.tstats.index:
-            assert_allclose(self.res.tstats[name], self.stata.tstats[name])
+        stata_tstats = self.stata.tstats.reindex_like(self.res.params)
+        assert_allclose(self.res.tstats, stata_tstats)
 
     def test_cov(self):
-        names = self.res.tstats.index
-        for row in names:
-            for col in names:
-                assert_allclose(self.res.cov[col][row], self.stata.cov[col][row],
-                                rtol=1e-4)
+        stata_cov = self.stata.cov.reindex_like(self.res.cov)
+        stata_cov = stata_cov[self.res.cov.columns]
+        assert_allclose(self.res.cov, stata_cov, rtol=1e-4)
 
 
-class CheckIVGMMAgainstStata(object):
+class TestIV2SLSStataUnadjusted(CheckIVAgainstStata):
     @classmethod
     def setup_class(cls):
-        from panel.iv.tests.results.read_stata_results import read_result
-
-        data = HOUSING_DATA
-        endog = data.rent
-        exog = sm.add_constant(data.pcturban)
-        instd = data.hsngval
-        instr = data[['faminc', 'region']]
-
-        mod = IVGMM(endog, exog, instd, instr, **cls.mod_opts)
-        cls.res = mod.fit(**cls.fit_opts)
-        filepath = os.path.join(CWD, 'results', cls.file)
-        cls.stata = read_result(filepath)
-        print(cls.stata)
-
-
-class TestIV2SLSStataUnadjusted(CheckIV2SLSAgainstStata):
-    @classmethod
-    def setup_class(cls):
+        cls.type = '2sls'
         cls.file = 'stata-iv2sls-unadjusted.txt'
         cls.fit_opts = {'cov_type': 'unadjusted'}
         super(TestIV2SLSStataUnadjusted, cls).setup_class()
 
 
-class TestIV2SLSStataRobust(CheckIV2SLSAgainstStata):
+class TestIV2SLSStataRobust(CheckIVAgainstStata):
     @classmethod
     def setup_class(cls):
+        cls.type = '2sls'
         cls.file = 'stata-iv2sls-robust.txt'
         cls.fit_opts = {'cov_type': 'robust'}
         super(TestIV2SLSStataRobust, cls).setup_class()
 
 
-class TestIVGMMStataRobust(CheckIVGMMAgainstStata):
+class TestIV2SLSStataCluster(CheckIVAgainstStata):
     @classmethod
     def setup_class(cls):
+        cls.type = '2sls'
+        cls.file = 'stata-iv2sls-cluster.txt'
+        cls.fit_opts = {'cov_type': 'clustered', 'clusters': HOUSING_DATA.division}
+        super(TestIV2SLSStataCluster, cls).setup_class()
+
+
+class TestIVGMMStataRobust(CheckIVAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.type = 'gmm'
         cls.file = 'stata-ivgmm-robust.txt'
         cls.fit_opts = {'cov_type': 'robust'}
         cls.mod_opts = {'weight_type': 'robust'}
         super(TestIVGMMStataRobust, cls).setup_class()
 
 
-class TestIVGMMStataUnadjusted(CheckIVGMMAgainstStata):
+class TestIVGMMStataUnadjusted(CheckIVAgainstStata):
     @classmethod
     def setup_class(cls):
+        cls.type = 'gmm'
         cls.file = 'stata-ivgmm-unadjusted.txt'
         cls.fit_opts = {'cov_type': 'unadjusted'}
         cls.mod_opts = {'weight_type': 'unadjusted'}
         super(TestIVGMMStataUnadjusted, cls).setup_class()
+
+
+class TestIVGMMStataCluster(CheckIVAgainstStata):
+    @classmethod
+    def setup_class(cls):
+        cls.type = 'gmm'
+        cls.file = 'stata-ivgmm-cluster.txt'
+        cls.mod_opts = {'weight_type': 'clustered', 'clusters': HOUSING_DATA.division}
+        cls.fit_opts = {'cov_type': 'clustered', 'clusters': HOUSING_DATA.division}
+        super(TestIVGMMStataCluster, cls).setup_class()

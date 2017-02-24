@@ -1,6 +1,6 @@
 from __future__ import print_function, absolute_import, division
 
-from numpy import nonzero, argsort, zeros, r_
+from numpy import nonzero, argsort, zeros, r_, asarray
 from numpy.linalg import inv
 
 from panel.iv.covariance import KERNEL_LOOKUP, HomoskedasticCovariance
@@ -90,6 +90,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         clusters = self._clusters
         if clusters is None:
             raise ValueError('clusters must be provided')
+        clusters = asarray(clusters).copy().squeeze()
         ind = argsort(clusters)
         ze = ze[ind]
         clusters = clusters[ind]
@@ -99,7 +100,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
         s = zeros((ninstr, ninstr))
         for sloc, eloc in zip(st, en):
-            zec = ze[sloc:eloc]
+            zec = ze[sloc:eloc].sum(axis=0)[None, :]
             s += zec.T @ zec
 
         return s / nobs

@@ -1,9 +1,9 @@
 from __future__ import print_function, absolute_import, division
 
 from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
-                   cos, empty, sum)
+                   cos, empty, sum, asarray)
 from numpy.linalg import pinv, inv
-
+from panel.iv.data import DataHandler
 
 def kernel_weight_bartlett(max_lag):
     """
@@ -466,7 +466,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         clusters = self._clusters
         clusters = arange(nobs) if clusters is None else clusters
         self._clusters = clusters
-        clusters = clusters.copy().squeeze()
+        clusters = asarray(clusters).squeeze()
         num_clusters = len(unique(clusters))
 
         sort_args = argsort(clusters)
@@ -480,7 +480,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
             xhat_e_bar = xhat_e[st:en].sum(axis=0)[:, None]
             s += xhat_e_bar @ xhat_e_bar.T
 
-        s *= num_clusters / (num_clusters - 1) / nobs
+        s *= 1 / nobs
 
         return s
 

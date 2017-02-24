@@ -6,10 +6,12 @@ from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
 
 from panel.iv.covariance import (HomoskedasticCovariance,
-                                 HeteroskedasticCovariance, KernelCovariance, OneWayClusteredCovariance)
+                                 HeteroskedasticCovariance, KernelCovariance,
+                                 OneWayClusteredCovariance)
 from panel.iv.data import DataHandler
 from panel.iv.weighting import (HomoskedasticWeightMatrix, KernelWeightMatrix,
-                                HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix, IVGMMCovariance)
+                                HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
+                                IVGMMCovariance)
 from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
@@ -19,14 +21,16 @@ COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'heteroskedastic': HeteroskedasticCovariance,
                          'hccm': HeteroskedasticCovariance,
                          'kernel': KernelCovariance,
-                         'one-way': OneWayClusteredCovariance}
+                         'one-way': OneWayClusteredCovariance,
+                         'clustered': OneWayClusteredCovariance}
 
 WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'homoskedastic': HomoskedasticWeightMatrix,
                    'robust': HeteroskedasticWeightMatrix,
                    'heteroskedastic': HeteroskedasticWeightMatrix,
                    'kernel': KernelWeightMatrix,
-                   'clustered': OneWayClusteredWeightMatrix}
+                   'clustered': OneWayClusteredWeightMatrix,
+                   'one-way': OneWayClusteredWeightMatrix, }
 
 
 class IV2SLS(object):

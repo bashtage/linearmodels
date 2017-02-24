@@ -24,7 +24,7 @@ def expand_categoricals(x):
 
 
 class DataHandler(object):
-    def __init__(self, x, var_name='x'):
+    def __init__(self, x, var_name='x', convert_dummies=True):
 
         if isinstance(x, DataHandler):
             x = x.original
@@ -52,8 +52,8 @@ class DataHandler(object):
                 if not (pd.api.types.is_numeric_dtype(dt)
                         or pd.api.types.is_categorical_dtype(dt)):
                     raise ValueError('Only numeric or categorical data permitted')
-
-            x = expand_categoricals(x)
+            if convert_dummies:
+                x = expand_categoricals(x)
             if x.ndim == 1:
                 name = var_name if not x.name else x.name
                 x = pd.DataFrame({name: x})
