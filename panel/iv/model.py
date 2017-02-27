@@ -209,7 +209,9 @@ class IV2SLS(object):
                'total_ss': float(total_ss),
                'r2': float(r2),
                'fstat': fstat,
-               'vars': vars}
+               'vars': vars,
+               'cov_config': cov_estimator.config,
+               'cov_type': cov_estimator.config['name']}
 
         return out
 
@@ -625,7 +627,20 @@ class IVResults(object):
         self._kappa = results.get('kappa', 1)
         self._f_statistic = results['fstat']
         self._vars = results['vars']
+        self._cov_config = results['cov_config']
+        self._cov_type = results['cov_type']
+
         self._cache = {}
+
+    @property
+    def cov_config(self):
+        """Parameter values from covariance estimator"""
+        return self._cov_config
+
+    @property
+    def cov_estimator(self):
+        """Type of covariance estimator used to compute covariance"""
+        return self._cov_type
 
     @property
     def cov(self):

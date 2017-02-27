@@ -23,7 +23,8 @@ depvar_with_var = list(zip(depvars, variance_options))
 exog_vars = ['x3 x4 x5']
 endog_vars = ['x1', 'x1 x2']
 instr = ['z1', 'z1 z2']
-other_options = ['', 'small', 'noconstant', 'small noconstant', 'small center', 'center']
+other_options = ['', 'small', 'noconstant', 'small noconstant', 'small center',
+                 'center', 'center noconstant', 'small center noconstant']
 inputs = [methods, depvar_with_var, exog_vars, endog_vars, instr, other_options]
 configs = []
 for val in product(*inputs):

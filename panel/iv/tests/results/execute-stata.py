@@ -44,13 +44,15 @@ with open('temp.do', 'w') as stata:
         for method in methods:
             for vo, desc in zip(variance_options, descr):
                 small_text = 'small' if small else 'asymptotic'
-                stata.write(section_header.format(outfile=outfile, method=method, desc=desc, small=small_text))
+                stata.write(section_header.format(outfile=outfile, method=method, desc=desc,
+                                                  small=small_text))
                 desc += '-small' if small else ''
                 vo += ' small' if small else ''
                 of = outfile.format(method=method, descr=desc)
                 extra = ' J ' if method == 'gmm' else ' kappa '
                 extra += ' F p ' if small else ' chi2 p '
-                cmd = iv_tempplate.format(outfile=of, variance_option=vo, method=method, extra=extra)
+                cmd = iv_tempplate.format(outfile=of, variance_option=vo, method=method,
+                                          extra=extra)
                 if 'gmm' in method:
                     cmd = cmd.replace('vce', 'wmatrix')
                 stata.write(cmd)

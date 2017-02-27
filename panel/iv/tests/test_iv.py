@@ -1,9 +1,10 @@
-import numpy as np
 import os
+from copy import deepcopy
+
+import numpy as np
 import pandas as pd
 import pytest
 import statsmodels.api as sm
-from copy import deepcopy
 from numpy.testing import assert_allclose
 
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
@@ -30,7 +31,7 @@ COV_OPTIONS = {'cluster': {'cov_type': 'clustered', 'clusters': HOUSING_DATA.div
                'bartlett_12': {'cov_type': 'kernel', 'kernel': 'bartlett', 'bandwidth': 12}}
 
 
-@pytest.fixture(params=list(HOUSING_RESULTS.keys()))
+@pytest.fixture(params=list(HOUSING_RESULTS.keys()), scope='module')
 def housing(request):
     result = HOUSING_RESULTS[request.param]
     keys = request.param.split('-')
@@ -111,7 +112,7 @@ SIMULATED_COV_OPTIONS = {
 
 def construct_model(key):
     model, nendog, nexog, ninstr, var, other = key.split('-')
-    var = var.replace('wmatrix','vce')
+    var = var.replace('wmatrix', 'vce')
     mod = MODELS[model]
     data = SIMULATED_DATA
     endog = data[['x1', 'x2']] if '2' in nendog else data.x1
@@ -123,11 +124,11 @@ def construct_model(key):
             'vce(hac bartlett 12)': data.y_kernel}
     dep = deps[var]
     if 'noconstant' not in other:
-        exog = sm.add_constant(data[['x2', 'x3', 'x4']])
+        exog = sm.add_constant(data[['x3', 'x4', 'x5']])
 
     cov_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
     cov_opts['debiased'] = 'small' in other
-    if mod == 'gmm':
+    if model == 'gmm':
         weight_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
         weight_opts['weight_type'] = weight_opts['cov_type']
         del weight_opts['cov_type']
@@ -139,7 +140,8 @@ def construct_model(key):
     return model_result
 
 
-@pytest.fixture(params=['gmm-num_endog_1-num_exog_3-num_instr_1-wmatrix(cluster cluster_id)-'])#list(SIMULATED_RESULTS.keys()))
+@pytest.fixture(params=list(SIMULATED_RESULTS.keys()),
+                scope='module')
 def simulated(request):
     result = SIMULATED_RESULTS[request.param]
     model_result = construct_model(request.param)
@@ -147,16 +149,15 @@ def simulated(request):
 
 
 class TestSimulatedResults(object):
-
     def test_rsquared(self, simulated):
         res, stata = simulated
-        if stata is None:
+        if stata.rsquared is None:
             pytest.skip()
         assert_allclose(res.rsquared, stata.rsquared)
 
     def test_rsquared_adj(self, simulated):
         res, stata = simulated
-        if stata is None:
+        if stata.rsquared_adj is None:
             pytest.skip()
         assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
@@ -170,7 +171,7 @@ class TestSimulatedResults(object):
 
     def test_fstat(self, simulated):
         res, stata = simulated
-        if stata is None:
+        if stata.f_statistic is None:
             pytest.skip()
         assert_allclose(res.f_statistic.stat, stata.f_statistic)
 

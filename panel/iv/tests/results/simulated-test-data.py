@@ -17,7 +17,6 @@ import pandas as pd
 import statsmodels.api as sm
 from numpy.random import seed, multivariate_normal
 
-
 seed(12345)
 
 # Layout: e - endog reg, x - exog reg, z - instr
@@ -34,7 +33,7 @@ x = w[:, :k]
 z = w[:, k:k + p]
 e = w[:, -1]
 x = sm.add_constant(x)
-beta = np.arange(k+1) / k
+beta = np.arange(k + 1) / k
 beta[0] = 1
 e_homo = e
 y_unadjusted = x @ beta[:, None] + e[:, None]
@@ -68,10 +67,10 @@ y_kernel = x @ beta[:, None] + e[:, None]
 e_autoc = e
 
 time = np.arange(n)
-data = np.c_[time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero, e_cluster, e_autoc, clusters]
+data = np.c_[
+    time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero, e_cluster, e_autoc, clusters]
 data = pd.DataFrame(data, columns=['time', 'y_unadjusted', 'y_robust', 'y_clustered',
                                    'y_kernel', '_cons', 'x1', 'x2', 'x3',
-                                   'x4', 'x5', 'z1', 'z2', 'e_homo', 'e_hetero', 'e_cluster', 'e_autoc', 'cluster_id'])
+                                   'x4', 'x5', 'z1', 'z2', 'e_homo', 'e_hetero', 'e_cluster',
+                                   'e_autoc', 'cluster_id'])
 data.to_stata('simulated-data.dta')
-
-

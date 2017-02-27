@@ -387,11 +387,11 @@ class KernelCovariance(HomoskedasticCovariance):
         bw = self.config['bw']
         if bw is None:
             if kernel in ('newey-west', 'bartlett'):
-                bw = ceil(20 * (nobs / 100) ** (2 / 9))
+                bw = ceil(4 * (nobs / 100) ** (2 / 9))
             elif kernel in ('andrews', 'quadratic-spectral', 'qs'):
-                bw = ceil(20 * (nobs / 100) ** (2 / 25))
+                bw = ceil(4 * (nobs / 100) ** (2 / 25))
             elif kernel in ('parzen', 'gallant'):
-                bw = ceil(20 * (nobs / 100) ** (4 / 25))
+                bw = ceil(4 * (nobs / 100) ** (4 / 25))
             else:
                 raise ValueError('Unknown kernel {0}'.format(kernel))
         bw = int(bw)

@@ -2,29 +2,27 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-dim_err = '{0} has too many dims.  Maximum is 2, actual is {2}'
+dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
 
 
-def convert_columns(s):
+def convert_columns(s, drop_first):
     if pd.api.types.is_categorical(s):
-        out = pd.get_dummies(s, drop_first=True)
+        out = pd.get_dummies(s, drop_first=drop_first)
         out.columns = [s.name + '.' + c for c in out]
         return out
     return s
 
 
-def expand_categoricals(x):
+def expand_categoricals(x, drop_first):
     if isinstance(x, pd.Series):
-        return convert_columns(x)
+        return convert_columns(x, drop_first)
     if isinstance(x, pd.DataFrame):
-        return pd.concat([convert_columns(x[c]) for c in x.columns], axis=1)
-    elif isinstance(x, pd.Panel):
-        raise NotImplementedError
+        return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
 class DataHandler(object):
-    def __init__(self, x, var_name='x', convert_dummies=True):
+    def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
 
         if isinstance(x, DataHandler):
             x = x.original
@@ -53,7 +51,7 @@ class DataHandler(object):
                         or pd.api.types.is_categorical_dtype(dt)):
                     raise ValueError('Only numeric or categorical data permitted')
             if convert_dummies:
-                x = expand_categoricals(x)
+                x = expand_categoricals(x, drop_first)
             if x.ndim == 1:
                 name = var_name if not x.name else x.name
                 x = pd.DataFrame({name: x})

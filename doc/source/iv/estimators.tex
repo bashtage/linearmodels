@@ -1,0 +1,81 @@
+%% LyX 2.2.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsmath}
+\usepackage{babel}
+\begin{document}
+
+\title{Mathematical Formulas}
+\maketitle
+
+\section*{Notation}
+
+Interest is in recovering the parameter vector from the model 
+\[
+y_{i}=x_{i}\beta+\epsilon_{i}
+\]
+
+The regressors $x_{i}$ are $k$ by 1 and $\beta$ is $k$ by 1. The
+regressors $x_{i}$ can be separated in two types of regressors, $x_{1i}$
+which is $k_{1}$ by $1$ and $x_{2i}$ which is $k_{2}$ by 1. $x_{1i}$
+are exogenous regressors in the sense that $E\left[x_{1i}\epsilon_{i}\right]=0$.
+$x_{2i}$ are endogenous regressors. A set of $p$ instruments is
+available that satisfy the requirements for validity where $p\geq k_{2}$.
+The extended model can be written as 
+\begin{align*}
+y_{i} & =\beta_{1}^{\prime}x_{1i}+\beta_{2}^{\prime}x_{2i}+\epsilon_{i}\\
+x_{2i} & =\gamma_{1}^{\prime}x_{1i}+\gamma_{2}^{\prime}z_{i}+u_{i}
+\end{align*}
+$z_{i}$ is $p$ by 1. There are $n$ observations for all variables.
+$k_{c}=1$ if the model contains a constant (either explicit or implicit,
+i.e., including all dummy variables). The constant, if included, is
+in $x_{1i}$. $X$ is the $n$ by $k$ matrix if regressors where
+row $i$ of $X$ is $x_{i}^{\prime}$. $X$ can be partitioned into
+$\left[X_{1}\;X_{2}\right]$. $Z$ is the $n$ by $p$ matrix of instruments.
+The vector $y$ is $n$ by 1. Projection matrices for $X$ is defined
+$P_{X}=X\left(X^{\prime}X\right)^{-1}X^{\prime}$. The projection
+matrix for $Z$ is similarly defined only using $Z$. The annihilator
+matrix for $X$ is $M_{X}=I-P_{X}$. 
+
+\section*{Parameter Estimation}
+
+\subsection*{Two-stage Least Squares (2SLS)}
+
+The 2SLS estimator is 
+\[
+\hat{\beta}_{2SLS}=\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)
+\]
+
+
+\subsection*{Limited Information Maximum Likelihood and k-class Estimators}
+
+The LIML or other k-class estimator is 
+\[
+\hat{\beta}_{\kappa}=\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)
+\]
+where $\kappa$ is the parameter of the class. When $\kappa=1$ the
+2SLS estimator is recovered. When $\kappa=0$, the OLS estimator is
+recovered. The LIML estimator is recovered for $\kappa$ set to TODO
+
+\subsection*{Generalized Method of Moments (GMM)}
+
+The GMM estimator is defined as 
+\[
+\hat{\beta}_{GMM}=\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)
+\]
+where $W$ is a positive definite weighting matrix. 
+
+\section*{Variance Estimation}
+
+\[
+n^{-1}s^{2}\Sigma_{xx}^{-1}
+\]
+
+or 
+\[
+\left(n-k\right)^{-1}s^{2}\Sigma_{xx}^{-1}
+\]
+
+\end{document}

@@ -21,7 +21,9 @@ class HomoskedasticWeightMatrix(object):
 
     def weight_matrix(self, x, z, eps):
         nobs, nvar = x.shape
-        mu = eps.mean(0) if self._center else 0
+        # TODO: Determine if always remove this
+        # mu = eps.mean(0) if self._center else 0
+        mu = eps.mean(0)
         s2 = (eps - mu).T @ (eps - mu) / nobs
         w = s2 * z.T @ z / nobs
         w *= 1 if not self._debiased else nobs / (nobs - nvar)
