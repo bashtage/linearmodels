@@ -39,7 +39,7 @@ class DataHandler(object):
             if xndim == 1:
                 x.shape = (x.shape[0], -1)
 
-            self._ndarray = x
+            self._ndarray = x.astype(np.float64)
             index = list(range(x.shape[0]))
             cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
             self._pandas = pd.DataFrame(x, index=index, columns=cols)
@@ -59,7 +59,7 @@ class DataHandler(object):
                 x = pd.DataFrame({name: x})
 
             self._pandas = x
-            self._ndarray = self._pandas.values
+            self._ndarray = self._pandas.values.astype(np.float64)
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
 
         elif isinstance(x, xr.DataArray):

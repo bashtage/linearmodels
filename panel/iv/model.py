@@ -4,6 +4,7 @@ import scipy.stats as stats
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
+from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 from panel.iv.covariance import (HomoskedasticCovariance,
                                  HeteroskedasticCovariance, KernelCovariance,
@@ -12,7 +13,6 @@ from panel.iv.data import DataHandler
 from panel.iv.weighting import (HomoskedasticWeightMatrix, KernelWeightMatrix,
                                 HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
                                 IVGMMCovariance)
-from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -318,6 +318,7 @@ class IVLIML(IV2SLS):
         params = self.estimate_parameters(x, y, z, kappa)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        cov_config['kappa'] = kappa
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
         results = {'cov_type': cov_type}

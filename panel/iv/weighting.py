@@ -14,15 +14,18 @@ class HomoskedasticWeightMatrix(object):
         Keywords to pass to weight matrix
     """
 
-    def __init__(self, center=False):
+    def __init__(self, center=False, debiased=False):
         self._center = center
         self._bandwidth = 0
+        self._debiased = debiased
 
     def weight_matrix(self, x, z, eps):
-        nobs = x.shape[0]
+        nobs, nvar = x.shape
         mu = eps.mean(0) if self._center else 0
         s2 = (eps - mu).T @ (eps - mu) / nobs
-        return s2 * z.T @ z / nobs
+        w = s2 * z.T @ z / nobs
+        w *= 1 if not self._debiased else nobs / (nobs - nvar)
+        return w
 
     @property
     def config(self):
@@ -30,37 +33,42 @@ class HomoskedasticWeightMatrix(object):
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
-    def __init__(self, center=False):
-        super(HeteroskedasticWeightMatrix, self).__init__(center)
+    def __init__(self, center=False, debiased=False):
+        super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
     def weight_matrix(self, x, z, eps):
-        nobs = x.shape[0]
+        nobs, nvar = x.shape
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
 
-        return ze.T @ ze / nobs
+        w = ze.T @ ze / nobs
+        w *= 1 if not self._debiased else nobs / (nobs - nvar)
+        return w
 
 
 class KernelWeightMatrix(HomoskedasticWeightMatrix):
-    def __init__(self, center=False, kernel='bartlett', bandwidth=None):
-        super(KernelWeightMatrix, self).__init__(center)
+    def __init__(self, center=False, kernel='bartlett', bandwidth=None, debiased=False):
+        super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
 
     def weight_matrix(self, x, z, eps):
+        nobs, nvar = x.shape
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
-        nobs, ninstr = z.shape
 
         # TODO: Fix this to allow optimal bw selection by default
         bw = self._bandwidth if self._bandwidth is not None else nobs - 2
         w = self._kernels[self._kernel](bw)
         s = ze.T @ ze
         for i in range(1, bw + 1):
-            s += w[i] * ze[i:].T @ ze[:-i]
+            zec = ze[i:].T @ ze[:-i]
+            s += w[i] * (zec + zec.T)
+
+        s *= 1 if not self._debiased else nobs / (nobs - nvar)
         return s / nobs
 
     def _optimal_bandwidth(self, x, z, eps):
@@ -75,21 +83,24 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
 
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
-    def __init__(self, center=False, clusters=None):
-        super(OneWayClusteredWeightMatrix, self).__init__(center)
+    def __init__(self, center=False, clusters=None, debiased=False):
+        super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
+        if clusters is None:
+            raise ValueError('clusters must be provided')
         self._clusters = clusters
 
     def weight_matrix(self, x, z, eps):
-        wc = self.config
-        nobs, ninstr = z.shape
+        nobs, nvar = x.shape
+        ninstr = z.shape[1]
 
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
 
         clusters = self._clusters
-        if clusters is None:
-            raise ValueError('clusters must be provided')
+        if clusters.shape[0] != nobs:
+            raise ValueError('clusters has the wrong nobs. Expected {0}, '
+                             'got {1}'.format(nobs, clusters.shape[0]))
         clusters = asarray(clusters).copy().squeeze()
         ind = argsort(clusters)
         ze = ze[ind]
@@ -97,11 +108,15 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
         locs = nonzero(r_[True, clusters[1:] != clusters[:-1], True])[0]
         st, en = locs[:-1], locs[1:]
+        num_clusters = len(st)
 
         s = zeros((ninstr, ninstr))
         for sloc, eloc in zip(st, en):
             zec = ze[sloc:eloc].sum(axis=0)[None, :]
             s += zec.T @ zec
+
+        scale = (nobs - 1) / (nobs - nvar) * num_clusters / (num_clusters - 1)
+        s *= 1 if not self._debiased else scale
 
         return s / nobs
 
@@ -127,8 +142,9 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Weighting matrix used in GMM estimation
     """
 
-    def __init__(self, x, y, z, params, w, cov_type='robust', **cov_config):
-        super(IVGMMCovariance, self).__init__(x, y, z, params, False)
+    def __init__(self, x, y, z, params, w, cov_type='robust', debiased=False,
+                 **cov_config):
+        super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w
@@ -136,7 +152,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     @property
     def cov(self):
         x, z, eps, w = self.x, self.z, self.eps, self.w
-        nobs = x.shape[0]
+        nobs, nvar = x.shape
         xpz = x.T @ z / nobs
         xpzw = xpz @ w
         xpzwzpx_inv = inv(xpzw @ xpz.T)
@@ -151,7 +167,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
             score_cov_estimator = KernelWeightMatrix
         else:
             raise ValueError('Unknown cov_type')
-        score_cov = score_cov_estimator(**self._cov_config)
+        score_cov = score_cov_estimator(debiased=self.debiased, **self._cov_config)
         s = score_cov.weight_matrix(x, z, eps)
 
         return xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs

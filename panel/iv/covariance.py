@@ -3,7 +3,7 @@ from __future__ import print_function, absolute_import, division
 from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
                    cos, empty, sum, asarray)
 from numpy.linalg import pinv, inv
-from panel.iv.data import DataHandler
+
 
 def kernel_weight_bartlett(max_lag):
     """
@@ -159,6 +159,8 @@ class HomoskedasticCovariance(object):
         Estimated model parameters (nvar by 1)
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
+    kappa : float, optional
+        Value of kappa in k-class estimator
     
     Notes
     -----
@@ -184,14 +186,17 @@ class HomoskedasticCovariance(object):
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
-    def __init__(self, x, y, z, params, debiased=False):
+    def __init__(self, x, y, z, params, debiased=False, kappa=1):
         self.x = x
         self.y = y
         self.z = z
         self.params = params
         self._debiased = debiased
         self.eps = y - x @ params
+        self._kappa = kappa
         self._pinvz = pinv(z)
+        nobs, nvar = x.shape
+        self._scale = nobs / (nobs - nvar) if self._debiased else 1
 
     @property
     def s(self):
@@ -201,8 +206,12 @@ class HomoskedasticCovariance(object):
         s2 = eps.T @ eps / nobs
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
+        if self._kappa != 1:
+            kappa = self._kappa
+            xpx = x.T @ x / nobs
+            v = (1 - kappa) * xpx + kappa * v
 
-        return s2 * v
+        return self._scale * s2 * v
 
     @property
     def cov(self):
@@ -211,12 +220,16 @@ class HomoskedasticCovariance(object):
         x, z = self.x, self.z
         nobs, nvar = x.shape
 
-        scale = nobs / (nobs - nvar) if self._debiased else 1
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
+        if self._kappa != 1:
+            kappa = self._kappa
+            xpx = x.T @ x / nobs
+            v = (1 - kappa) * xpx + kappa * v
+
         vinv = inv(v)
 
-        return scale * vinv @ self.s @ vinv / nobs
+        return vinv @ self.s @ vinv / nobs
 
     @property
     def s2(self):
@@ -225,9 +238,8 @@ class HomoskedasticCovariance(object):
         """
         nobs, nvar = self.x.shape
         eps = self.eps
-        denom = nobs - nvar if self.debiased else nobs
 
-        return eps.T @ eps / denom
+        return self._scale * eps.T @ eps / nobs
 
     @property
     def debiased(self):
@@ -283,8 +295,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
-    def __init__(self, x, y, z, params, debiased=False):
-        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased)
+    def __init__(self, x, y, z, params, debiased=False, kappa=1):
+        super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased, kappa)
 
     @property
     def s(self):
@@ -294,7 +306,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e / nobs
-        return s
+
+        return self._scale * s
 
 
 class KernelCovariance(HomoskedasticCovariance):
@@ -357,8 +370,8 @@ class KernelCovariance(HomoskedasticCovariance):
     """
 
     def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
-                 bandwidth=None):
-        super(KernelCovariance, self).__init__(x, y, z, params, debiased)
+                 bandwidth=None, kappa=1):
+        super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._kernel = kernel
         self._bandwidth = bandwidth
         self._kernels = KERNEL_LOOKUP
@@ -393,7 +406,7 @@ class KernelCovariance(HomoskedasticCovariance):
             s += w[i + 1] * (op + op.T)
         s /= nobs
 
-        return s
+        return self._scale * s
 
     @property
     def config(self):
@@ -450,9 +463,8 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
-    def __init__(self, x, y, z, params, debiased=False, clusters=None):
-        super(OneWayClusteredCovariance, self).__init__(x, y, z, params,
-                                                        debiased)
+    def __init__(self, x, y, z, params, debiased=False, clusters=None, kappa=1):
+        super(OneWayClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._clusters = clusters
 
     @property
@@ -465,6 +477,9 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         nobs, nvar = x.shape
         clusters = self._clusters
         clusters = arange(nobs) if clusters is None else clusters
+        if clusters.shape[0] != nobs:
+            raise ValueError('clusters has the wrong nobs. Expected {0}, '
+                             'got {1}'.format(nobs, clusters.shape[0]))
         self._clusters = clusters
         clusters = asarray(clusters).squeeze()
         num_clusters = len(unique(clusters))
@@ -480,7 +495,12 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
             xhat_e_bar = xhat_e[st:en].sum(axis=0)[:, None]
             s += xhat_e_bar @ xhat_e_bar.T
 
-        s *= 1 / nobs
+        s /= nobs
+
+        if self.debiased:
+            scale = self._scale
+            scale *= (num_clusters / (num_clusters - 1)) * ((nobs - 1) / nobs)
+            s *= scale
 
         return s
 

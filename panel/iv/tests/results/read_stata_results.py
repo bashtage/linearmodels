@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import pandas as pd
 
 
@@ -7,54 +9,107 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-def read_result(name):
-    with open(name, 'r') as stata:
-        lines = stata.readlines()
-
-    lines = [l.strip().split('\t') for l in lines]
-    lines = lines[2:]
-    for i in range(len(lines)):
-        if lines[i][0] == 'r2':
-            param_stop = i
-        if lines[i][0].startswith('***'):
-            stats_stop = i
-            cov_start = i + 1
-    params = lines[:param_stop]
-    stats = lines[param_stop:stats_stop]
-    cov = lines[cov_start:]
-    cov[0].insert(0, '')
-    cov = pd.DataFrame(cov)
-    vars = list(cov.iloc[1:, 0])
-    cov = pd.DataFrame(cov.values[1:, 1:], index=vars, columns=vars)
-    cov = cov.astype('float')
-    stats = pd.Series({s[0]: s[1] for s in stats}, name='stats').astype('float')
-
-    var_name = ''
-    for p in params:
-        if len(p) == 2:
-            var_name = p[0]
-        else:
-            p.insert(0, var_name + '_pval')
-    params = pd.DataFrame(params).set_index(0)
-    tstats = params.iloc[1::2, 0].copy().astype('float')
-    params = params.iloc[::2, 0].copy().astype('float')
-    params.name = 'params'
-    tstats = pd.Series(tstats.values, index=list(params.index), name='tstats', copy=True)
-    params = pd.concat([params, tstats], 1)
-    index = list(params.index)
+def repl_const(df):
+    index = list(df.index)
+    replace_cols = list(df.columns) == index
     for i, v in enumerate(index):
         if v == '_cons':
             index[i] = 'const'
-    params.index = index
-    cov.index = index
-    cov.columns = index
+    df.index = index
+    if replace_cols:
+        df.columns = index
+    for c in df:
+        df[c] = pd.to_numeric(df[c], errors='coerce')
+    return df
+
+
+def parse_file(name):
+    blocks = defaultdict(list)
+    current_key = ''
+    with open(name, 'r') as stata:
+        for line in stata:
+            if line.strip() == '':
+                continue
+            if line.startswith('###'):
+                current_key = line.split(' ')[1]
+                continue
+            blocks[current_key].append(line)
+    return blocks
+
+
+def parse_block(block, key):
+    block = [l.strip().split('\t') for l in block]
+    params = []
+    cov = []
+    weight_mat = []
+    for i, line in enumerate(block):
+        last = i
+        if len(line) == 2:
+            params.append(line)
+        elif len(line) == 1:
+            if line[0].startswith('***'):
+                break
+            try:
+                float(line[0])
+                params[-1].append(line[0])
+            except:
+                pass
+    params = pd.DataFrame(params, columns=['variable', 'params', 'tstats'])
+    params = repl_const(params.set_index('variable'))
+    stats = params.loc[params.tstats.isnull(), 'params']
+    params = params.loc[params.tstats.notnull()]
+
+    for i, line in enumerate(block[last + 2:]):
+        if len(line) == 1 and line[0].startswith('***'):
+            break
+        cov.append(line)
+    cov[0].insert(0, 'variable')
+    last += i + 2
+
+    cov = pd.DataFrame(cov[1:], columns=cov[0])
+    cov = repl_const(cov.set_index('variable'))
+
+    if len(block) > (last + 1):
+        weight_mat = block[last + 2:]
+        weight_mat[0].insert(0, 'variable')
+        weight_mat = pd.DataFrame(weight_mat[1:], columns=weight_mat[0])
+        weight_mat = repl_const(weight_mat.set_index('variable'))
+
+    return AttrDict(params=params, cov=cov, weight_mat=weight_mat, stats=stats)
+
+
+def finalize(params, stats, cov, weight_mat, block_key):
     tstats = params.tstats
     params = params.params
+    out = AttrDict(params=params, tstats=tstats, stats=stats, cov=cov, weight_mat=weight_mat)
+    for key in stats.index:
+        out[key] = stats[key]
+    fixes = {'model_ss': 'mss', 'resid_ss': 'rss', 'rsquared': 'r2', 'rsquared_adj': 'r2_a'}
+    for key in fixes:
+        if fixes[key] in out:
+            out[key] = out[fixes[key]]
+        else:
+            out[key] = None
+    if 'chi2' in out:
+        out['f_statistic'] = out['chi2']
+    elif 'F' in out:
+        out['f_statistic'] = out['F']
+    else:
+        out['f_statistic'] = None
 
-    return AttrDict(params=params, tstats=tstats, stats=stats, cov=cov, rsquared=stats.r2,
-                    rsquared_adj=stats.r2_a, model_ss=stats.mss, resid_ss=stats.rss,
-                    f_statistic=stats.chi2, f_statistic_pval=stats.p)
+    return out
+
+
+def process_results(filename):
+    blocks = parse_file(filename)
+    for key in blocks:
+        out = parse_block(blocks[key])
+        blocks[key] = finalize(out.params, out.stats, out.cov, out.weight_mat)
+    return blocks
 
 
 if __name__ == '__main__':
-    out = read_result('stata-iv2sls-unadjusted.txt')
+    blocks = parse_file(r'C:\git\panel\panel\iv\tests\results\stata-iv-simulated-results.txt')
+    for key in blocks:
+        out = parse_block(blocks[key], key)
+        finalize(out['params'], out['stats'], out['cov'], out['weight_mat'], key).keys()
