@@ -61,7 +61,7 @@ estout matrix(W, fmt(%13.12g)) using {outfile}, append
 
 section_header = """
 file open myfile using {outfile}, write append
-file write myfile  _n _n "########## {method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}-{variance}-{other} ##########" _n
+file write myfile  _n _n "########## !{method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}-{variance}-{other}! ##########" _n
 file close myfile
 """
 

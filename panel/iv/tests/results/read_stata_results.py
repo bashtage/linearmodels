@@ -31,13 +31,13 @@ def parse_file(name):
             if line.strip() == '':
                 continue
             if line.startswith('###'):
-                current_key = line.split(' ')[1]
+                current_key = line.split('!')[1]
                 continue
             blocks[current_key].append(line)
     return blocks
 
 
-def parse_block(block, key):
+def parse_block(block):
     block = [l.strip().split('\t') for l in block]
     params = []
     cov = []
@@ -78,7 +78,7 @@ def parse_block(block, key):
     return AttrDict(params=params, cov=cov, weight_mat=weight_mat, stats=stats)
 
 
-def finalize(params, stats, cov, weight_mat, block_key):
+def finalize(params, stats, cov, weight_mat):
     tstats = params.tstats
     params = params.params
     out = AttrDict(params=params, tstats=tstats, stats=stats, cov=cov, weight_mat=weight_mat)
