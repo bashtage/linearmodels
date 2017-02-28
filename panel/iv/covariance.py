@@ -5,6 +5,71 @@ from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
 from numpy.linalg import pinv, inv
 
 
+def _cov_cluster(z, clusters):
+    """
+    Core cluster covariance estimator
+    
+    Parameters
+    ----------
+    z : ndarray
+        n by k mean zero data array
+    clusters : ndarray
+        n by 1 array
+    
+    Returns
+    -------
+    c : ndarray
+       k by k cluster asymptotic covariance
+    """
+
+    num_clusters = len(unique(clusters))
+
+    sort_args = argsort(clusters)
+    clusters = clusters[sort_args]
+    locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
+    z = z[sort_args]
+    n, k = z.shape
+    s = zeros((k, k))
+
+    for i in range(num_clusters):
+        st, en = locs[i], locs[i + 1]
+        z_bar = z[st:en].sum(axis=0)[:, None]
+        s += z_bar @ z_bar.T
+
+    s /= n
+    return s
+
+
+def _cov_kernel(z, w):
+    """
+    Core kernel covariance estimator
+
+    Parameters
+    ----------
+    z : ndarray
+        n by k mean zero data array
+    w : ndarray
+        m by 1
+
+    Returns
+    -------
+    c : ndarray
+       k by k kernel asymptotic covariance
+    """
+    k = len(w)
+    n = z.shape[0]
+    if k > n:
+        raise ValueError('Length of w ({0}) is larger than the number '
+                         'of elements in z ({1})'.format(k, n))
+    s = z.T @ z
+    for i in range(1, len(w)):
+        op = z[i:].T @ z[:-i]
+        s += w[i] * (op + op.T)
+
+    s /= n
+    return s
+
+
 def kernel_weight_bartlett(bw, *args):
     """
     Kernel weights from a Bartlett kernel
@@ -56,7 +121,7 @@ def kernel_weight_quadratic_spectral(bw, n):
     z = arange(n + 1) / bw
     w = 6 * pi * z / 5
     w[0] = 1
-    w[1:] = 3 / w[1:] **2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
+    w[1:] = 3 / w[1:] ** 2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
 
     return w
 
@@ -192,6 +257,11 @@ class HomoskedasticCovariance(object):
     """
 
     def __init__(self, x, y, z, params, debiased=False, kappa=1):
+        if not (x.shape[0] == y.shape[0] == z.shape[0]):
+            raise ValueError('x, y and z must have the same number of rows')
+        if not x.shape[1] == len(params):
+            raise ValueError('x and params must have compatible dimensions')
+
         self.x = x
         self.y = y
         self.z = z
@@ -233,8 +303,8 @@ class HomoskedasticCovariance(object):
             v = (1 - kappa) * xpx + kappa * v
 
         vinv = inv(v)
-
-        return vinv @ self.s @ vinv / nobs
+        c = vinv @ self.s @ vinv / nobs
+        return (c + c.T) / 2
 
     @property
     def s2(self):
@@ -377,9 +447,13 @@ class KernelCovariance(HomoskedasticCovariance):
     def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
                  bandwidth=None, kappa=1):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        self._kernels = KERNEL_LOOKUP
         self._kernel = kernel
         self._bandwidth = bandwidth
-        self._kernels = KERNEL_LOOKUP
+        self._auto_bandwidth = False
+
+        if kernel not in KERNEL_LOOKUP:
+            raise ValueError('Unknown kernel: {0}'.format(kernel))
 
     @property
     def s(self):
@@ -389,36 +463,31 @@ class KernelCovariance(HomoskedasticCovariance):
 
         kernel = self.config['kernel']
         # TODO: Bandwidth selection method
-        bw = self.config['bw']
+        bw = self.config['bandwidth']
         if bw is None:
+            self._auto_bandwidth = True
             if kernel in ('newey-west', 'bartlett'):
                 bw = ceil(4 * (nobs / 100) ** (2 / 9))
             elif kernel in ('andrews', 'quadratic-spectral', 'qs'):
                 bw = ceil(4 * (nobs / 100) ** (2 / 25))
-            elif kernel in ('parzen', 'gallant'):
-                bw = ceil(4 * (nobs / 100) ** (4 / 25))
             else:
-                raise ValueError('Unknown kernel {0}'.format(kernel))
-        bw = int(bw)
-        w = self._kernels[kernel](bw, nobs)
+                bw = ceil(4 * (nobs / 100) ** (4 / 25))
+        self._bandwidth = bw = int(bw)
+        w = self._kernels[kernel](bw, nobs - 1)
 
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
-        s = xhat_e.T @ xhat_e
-
-        for i in range(1, len(w)):
-            op = xhat_e[i:].T @ xhat_e[:-i]
-            s += w[i] * (op + op.T)
-        s /= nobs
+        s = _cov_kernel(xhat_e, w)
 
         return self._scale * s
 
     @property
     def config(self):
         return {'debiased': self.debiased,
-                'bw': self._bandwidth,
+                'bandwidth': self._bandwidth,
                 'kernel': self._kernel,
-                'name': self.__class__.__name__}
+                'name': self.__class__.__name__,
+                'automatic bandwidth': self._auto_bandwidth}
 
 
 class OneWayClusteredCovariance(HomoskedasticCovariance):
@@ -471,6 +540,10 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     def __init__(self, x, y, z, params, debiased=False, clusters=None, kappa=1):
         super(OneWayClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._clusters = clusters
+        nobs = self.x.shape[0]
+        if clusters is not None and clusters.shape[0] != nobs:
+            raise ValueError('clusters has the wrong nobs. Expected {0}, '
+                             'got {1}'.format(nobs, clusters.shape[0]))
 
     @property
     def s(self):
@@ -482,27 +555,12 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         nobs, nvar = x.shape
         clusters = self._clusters
         clusters = arange(nobs) if clusters is None else clusters
-        if clusters.shape[0] != nobs:
-            raise ValueError('clusters has the wrong nobs. Expected {0}, '
-                             'got {1}'.format(nobs, clusters.shape[0]))
         self._clusters = clusters
         clusters = asarray(clusters).squeeze()
-        num_clusters = len(unique(clusters))
-
-        sort_args = argsort(clusters)
-        clusters = clusters[sort_args]
-        locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
-        xhat_e = xhat_e[sort_args]
-
-        s = zeros((nvar, nvar))
-        for i in range(num_clusters):
-            st, en = locs[i], locs[i + 1]
-            xhat_e_bar = xhat_e[st:en].sum(axis=0)[:, None]
-            s += xhat_e_bar @ xhat_e_bar.T
-
-        s /= nobs
+        s = _cov_cluster(xhat_e, clusters)
 
         if self.debiased:
+            num_clusters = len(unique(clusters))
             scale = self._scale
             scale *= (num_clusters / (num_clusters - 1)) * ((nobs - 1) / nobs)
             s *= scale

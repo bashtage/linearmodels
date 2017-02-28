@@ -17,8 +17,7 @@ def convert_columns(s, drop_first):
 def expand_categoricals(x, drop_first):
     if isinstance(x, pd.Series):
         return convert_columns(x, drop_first)
-    if isinstance(x, pd.DataFrame):
-        return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
 class DataHandler(object):

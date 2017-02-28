@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 import statsmodels.api as sm
 from numpy.testing import assert_allclose
-
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
 from panel.iv.tests.results.read_stata_results import process_results
 
@@ -61,8 +60,6 @@ def get_all(v):
         val = getattr(v, a)
         if a == 'conf_int':
             val = val()
-        print(a)
-        print(val)
 
 
 class TestHousingResults(object):
@@ -309,6 +306,14 @@ class TestIV(object):
     #
     def test_ivliml_smoke(self):
         mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z)
+        res = mod.fit()
+        get_all(res)
+
+        mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z, kappa=0.99)
+        res = mod.fit()
+        get_all(res)
+
+        mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z, fuller=1)
         res = mod.fit()
         get_all(res)
 

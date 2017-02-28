@@ -1,9 +1,9 @@
 from __future__ import print_function, absolute_import, division
 
-from numpy import nonzero, argsort, zeros, r_, asarray
+from numpy import asarray, unique
 from numpy.linalg import inv
-
-from panel.iv.covariance import KERNEL_LOOKUP, HomoskedasticCovariance
+from panel.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
+                                 _cov_cluster, _cov_kernel)
 
 
 class HomoskedasticWeightMatrix(object):
@@ -16,8 +16,8 @@ class HomoskedasticWeightMatrix(object):
 
     def __init__(self, center=False, debiased=False):
         self._center = center
-        self._bandwidth = 0
         self._debiased = debiased
+        self._bandwidth = 0
 
     def weight_matrix(self, x, z, eps):
         nobs, nvar = x.shape
@@ -31,7 +31,8 @@ class HomoskedasticWeightMatrix(object):
 
     @property
     def config(self):
-        return {'center': self._center}
+        return {'center': self._center,
+                'debiased': self._debiased}
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
@@ -64,36 +65,32 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
         # TODO: Fix this to allow optimal bw selection by default
         bw = self._bandwidth if self._bandwidth is not None else nobs - 2
-        w = self._kernels[self._kernel](bw, nobs)
-        s = ze.T @ ze
-        for i in range(1, len(w)):
-            zec = ze[i:].T @ ze[:-i]
-            s += w[i] * (zec + zec.T)
-
+        self._bandwidth = bw
+        w = self._kernels[self._kernel](bw, nobs - 1)
+        s = _cov_kernel(ze, w)
         s *= 1 if not self._debiased else nobs / (nobs - nvar)
-        return s / nobs
+
+        return s
 
     def _optimal_bandwidth(self, x, z, eps):
         # TODO: Implement this
-        pass
+        pass  # pragma: no cover
 
     @property
     def config(self):
         return {'center': self._center,
-                'bw': self._bandwidth,
-                'kernel': self._kernel}
+                'bandwidth': self._bandwidth,
+                'kernel': self._kernel,
+                'debiased': self._debiased}
 
 
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
-    def __init__(self, center=False, clusters=None, debiased=False):
+    def __init__(self, clusters, center=False, debiased=False):
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
-        if clusters is None:
-            raise ValueError('clusters must be provided')
         self._clusters = clusters
 
     def weight_matrix(self, x, z, eps):
         nobs, nvar = x.shape
-        ninstr = z.shape[1]
 
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
@@ -104,28 +101,21 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
             raise ValueError('clusters has the wrong nobs. Expected {0}, '
                              'got {1}'.format(nobs, clusters.shape[0]))
         clusters = asarray(clusters).copy().squeeze()
-        ind = argsort(clusters)
-        ze = ze[ind]
-        clusters = clusters[ind]
 
-        locs = nonzero(r_[True, clusters[1:] != clusters[:-1], True])[0]
-        st, en = locs[:-1], locs[1:]
-        num_clusters = len(st)
+        s = _cov_cluster(ze, clusters)
 
-        s = zeros((ninstr, ninstr))
-        for sloc, eloc in zip(st, en):
-            zec = ze[sloc:eloc].sum(axis=0)[None, :]
-            s += zec.T @ zec
+        if self._debiased:
+            num_clusters = len(unique(clusters))
+            scale = (nobs - 1) / (nobs - nvar) * num_clusters / (num_clusters - 1)
+            s *= scale
 
-        scale = (nobs - 1) / (nobs - nvar) * num_clusters / (num_clusters - 1)
-        s *= 1 if not self._debiased else scale
-
-        return s / nobs
+        return s
 
     @property
     def config(self):
         return {'center': self._center,
-                'clusters': self._clusters}
+                'clusters': self._clusters,
+                'debiased': self._debiased}
 
 
 class IVGMMCovariance(HomoskedasticCovariance):
@@ -150,6 +140,8 @@ class IVGMMCovariance(HomoskedasticCovariance):
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w
+        self._bandwidth = 0
+        self._kernel = ''
 
     @property
     def cov(self):
@@ -171,10 +163,15 @@ class IVGMMCovariance(HomoskedasticCovariance):
             raise ValueError('Unknown cov_type')
         score_cov = score_cov_estimator(debiased=self.debiased, **self._cov_config)
         s = score_cov.weight_matrix(x, z, eps)
+        self._cov_config = score_cov.config
 
-        return xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
+        c = xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
+        return (c + c.T) / 2
 
     @property
     def config(self):
-        return {'debiased': self.debiased,
+        conf = {'type': self._cov_type,
+                'debiased': self.debiased,
                 'name': self.__class__.__name__}
+        conf.update(self._cov_config)
+        return conf

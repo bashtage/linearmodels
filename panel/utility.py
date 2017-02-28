@@ -5,6 +5,13 @@ from numpy import diag, sqrt
 from numpy.linalg import matrix_rank, eigh
 from scipy.stats import chi2, f
 
+class AttrDict(dict):
+    """
+    Dictionary-like object that exposes keys as attributes 
+    """
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
 def has_constant(x):
     """

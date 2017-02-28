@@ -1,12 +1,7 @@
 from collections import defaultdict
 
 import pandas as pd
-
-
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+from panel.utility import AttrDict
 
 
 def repl_const(df):
@@ -42,6 +37,7 @@ def parse_block(block):
     params = []
     cov = []
     weight_mat = []
+    last = 0
     for i, line in enumerate(block):
         last = i
         if len(line) == 2:

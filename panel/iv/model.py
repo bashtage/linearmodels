@@ -4,15 +4,14 @@ import scipy.stats as stats
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
-from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
-
 from panel.iv.covariance import (HomoskedasticCovariance,
                                  HeteroskedasticCovariance, KernelCovariance,
                                  OneWayClusteredCovariance)
 from panel.iv.data import DataHandler
-from panel.iv.weighting import (HomoskedasticWeightMatrix, KernelWeightMatrix,
-                                HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
-                                IVGMMCovariance)
+from panel.iv.gmm import (HomoskedasticWeightMatrix, KernelWeightMatrix,
+                          HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
+                          IVGMMCovariance)
+from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -83,9 +82,11 @@ class IV2SLS(object):
         self._has_constant = has_constant(x)
 
         if matrix_rank(x) < x.shape[1]:
-            raise ValueError('regressors not have full column rank')
+            raise ValueError('regressors [exog endog] not have full '
+                             'column rank')
         if matrix_rank(z) < z.shape[1]:
-            raise ValueError('instruments do not have full column rank')
+            raise ValueError('instruments [exog insruments]  do not have full '
+                             'column rank')
 
     @staticmethod
     def estimate_parameters(x, y, z):
@@ -230,10 +231,13 @@ class IVLIML(IV2SLS):
         Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    fuller : float, optional
+        Fuller's alpha to modify LIML estimator. Default returns unmodified 
+        LIML estimator.
     kappa : float, optional
-        Parameter value for k-class esimtation.  If not provided, computed to 
+        Parameter value for k-class estimation.  If not provided, computed to 
         produce LIML parameter estimate.
-
+    
     Notes
     -----
 
@@ -243,11 +247,19 @@ class IVLIML(IV2SLS):
         * testing
     """
 
-    def __init__(self, dependent, exog, endog, instruments, kappa=None):
+    def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
         super(IVLIML, self).__init__(dependent, exog, endog, instruments)
         self._kappa = kappa
+        self._fuller = fuller
         if kappa is not None and not isscalar(kappa):
             raise ValueError('kappa must be None or a scalar')
+        if not isscalar(fuller):
+            raise ValueError('fuller must be None or a scalar')
+        if kappa is not None and fuller != 0:
+            import warnings
+            warnings.warn('kappa and fuller should not normally be used '
+                          'simulaneously.  Identical results can be computed '
+                          'using kappa only', UserWarning)
 
     @staticmethod
     def estimate_parameters(x, y, z, kappa):
@@ -304,6 +316,7 @@ class IVLIML(IV2SLS):
         is provided.
         """
         y, x, z = self._y, self._x, self._z
+
         kappa = self._kappa
         if kappa is None:
             is_exog = self._regressor_is_exog
@@ -316,6 +329,10 @@ class IVLIML(IV2SLS):
             vpmzv_sqinv = inv_sqrth(ez.T @ ez)
             q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
             kappa = min(eigvalsh(q))
+
+        if self._fuller != 0:
+            nobs, ninstr = z.shape
+            kappa -= self._fuller / (nobs - ninstr)
 
         params = self.estimate_parameters(x, y, z, kappa)
 
@@ -551,34 +568,33 @@ class IVGMMCUE(IVGMM):
         return res.x[:, None], res.nit
 
     def fit(self, cov_type='robust', **cov_config):
-        def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
-            """
-            Estimate model parameters
+        """
+        Estimate model parameters
 
-            Parameters
-            ----------
-            cov_type : str, optional
-                Name of covariance estimator to use
-            **cov_config
-                Additional parameters to pass to covariance estimator
+        Parameters
+        ----------
+        cov_type : str, optional
+            Name of covariance estimator to use
+        **cov_config
+            Additional parameters to pass to covariance estimator
 
-            Returns
-            -------
-            results : IVGMMResults
-                Results container
+        Returns
+        -------
+        results : IVGMMResults
+            Results container
 
-            Notes
-            -----
-            Additional covariance parameters depend on specific covariance used.
-            The see the docstring of specific covariance estimator for a list of 
-            supported options. Defaults are used if no covariance configuration 
-            is provided.
-            
-            .. todo::
-            
-              * Expose method to pass optimization options
-              
-            """
+        Notes
+        -----
+        Additional covariance parameters depend on specific covariance used.
+        The see the docstring of specific covariance estimator for a list of 
+        supported options. Defaults are used if no covariance configuration 
+        is provided.
+        
+        .. todo::
+        
+          * Expose method to pass optimization options
+          
+        """
 
         y, x, z = self._y, self._x, self._z
         weight_matrix = self._weight.weight_matrix

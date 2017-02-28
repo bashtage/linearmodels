@@ -1,0 +1,240 @@
+import numpy as np
+import pytest
+from numpy.testing import assert_equal, assert_allclose
+from panel.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
+    kernel_weight_quadratic_spectral
+from panel.iv.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
+    OneWayClusteredWeightMatrix, KernelWeightMatrix, IVGMMCovariance
+from panel.utility import AttrDict
+
+
+@pytest.fixture(params=[None, 12], scope='module')
+def bandwidth(request):
+    return request.param
+
+
+@pytest.fixture(params=['bartlett', 'qs', 'parzen'], scope='module')
+def kernel(request):
+    kernel_name = request.param
+    if kernel_name == 'bartlett':
+        weight_func = kernel_weight_bartlett
+        alt_names = ['newey-west']
+    elif kernel_name == 'parzen':
+        weight_func = kernel_weight_parzen
+        alt_names = ['gallant']
+    else:
+        weight_func = kernel_weight_quadratic_spectral
+        alt_names = ['quadratic-spectral', 'andrews']
+    return AttrDict(kernel=kernel_name, alt_names=alt_names,
+                    weight=weight_func)
+
+
+@pytest.fixture(scope='module')
+def data():
+    n, k, p = 1000, 5, 3
+    np.random.seed(12345)
+    clusters = np.random.randint(0, 10, n)
+    rho = 0.5
+    r = np.zeros((k + p + 1, k + p + 1))
+    r.fill(rho)
+    r[-1, 2:] = 0
+    r[2:, -1] = 0
+    r[-1, -1] = 0.5
+    r += np.eye(9) * 0.5
+    v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
+    x = v[:, :k]
+    z = v[:, 2:k + p]
+    e = v[:, [-1]]
+    params = np.arange(1, k + 1) / k
+    params = params[:, None]
+    y = x @ params + e
+    nobs, nvar = x.shape
+    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, params=params,
+                    clusters=clusters, nvar=nvar, i=np.eye(k + p - 2))
+
+
+class TestHomoskedasticWeight(object):
+    def test_center(self, data):
+        wm = HomoskedasticWeightMatrix(True)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+        z, e, nobs = data.z, data.e, data.nobs
+        s2 = (e - e.mean()).T @ (e - e.mean()) / nobs
+        assert_allclose(weight, s2 * z.T @ z / nobs)
+
+    def test_debiased(self, data):
+        wm = HomoskedasticWeightMatrix(debiased=True)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+        z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
+        s2 = (e - e.mean()).T @ (e - e.mean()) / nobs
+        scale = nobs / (nobs - nvar)
+        assert_allclose(weight, scale * s2 * z.T @ z / nobs)
+
+    def test_defaults(self, data):
+        wm = HomoskedasticWeightMatrix()
+        z, e, nobs = data.z, data.e, data.nobs
+        weight = wm.weight_matrix(data.x, z, e)
+        s2 = (e - e.mean()).T @ (e - e.mean()) / nobs
+        assert_allclose(weight, s2 * z.T @ z / nobs)
+
+    def test_config(self, data):
+        wm = HomoskedasticWeightMatrix()
+        z, e, nobs = data.z, data.e, data.nobs
+        weight = wm.weight_matrix(data.x, z, e)
+        s2 = (e - e.mean()).T @ (e - e.mean()) / nobs
+        assert_allclose(weight, s2 * z.T @ z / nobs)
+        assert wm.config['center'] is False
+        assert wm.config['debiased'] is False
+
+
+class TestHeteroskedasticWeight(object):
+    def test_center(self, data):
+        wm = HeteroskedasticWeightMatrix(True)
+        z, e, nobs = data.z, data.e, data.nobs
+        weight = wm.weight_matrix(data.x, z, e)
+        ze = z * e
+        ze -= ze.mean(0)
+        assert_allclose(weight, ze.T @ ze / nobs)
+
+    def test_debiased(self, data):
+        wm = HeteroskedasticWeightMatrix(debiased=True)
+        z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
+        weight = wm.weight_matrix(data.x, z, e)
+        ze = z * e
+        scale = nobs / (nobs - nvar)
+        assert_allclose(weight, scale * ze.T @ ze / nobs)
+
+    def test_config(self, data):
+        wm = HeteroskedasticWeightMatrix()
+        z, e, nobs = data.z, data.e, data.nobs
+        weight = wm.weight_matrix(data.x, z, e)
+        ze = z * e
+
+        assert_allclose(weight, ze.T @ ze / nobs)
+        assert wm.config['center'] is False
+        assert wm.config['debiased'] is False
+
+
+class TestKernelWeight(object):
+    def test_center(self, data, kernel, bandwidth):
+        wm = KernelWeightMatrix(True, kernel=kernel.kernel, bandwidth=bandwidth)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+        z, e, nobs = data.z, data.e, data.nobs
+        bw = bandwidth or nobs - 2
+        w = kernel.weight(bw, nobs - 1)
+        ze = z * e
+        ze = ze - ze.mean(0)
+        s = ze.T @ ze
+        for i in range(1, len(w)):
+            op = ze[i:].T @ ze[:-i]
+            s += w[i] * (op + op.T)
+        assert_allclose(weight, s / nobs)
+        assert wm.config['bandwidth'] == bw
+        assert wm.config['kernel'] == kernel.kernel
+        for name in kernel.alt_names:
+            wm = KernelWeightMatrix(True, kernel=name, bandwidth=bandwidth)
+            weight2 = wm.weight_matrix(data.x, data.z, data.e)
+            assert_equal(weight, weight2)
+
+    def test_debiased(self, kernel, data, bandwidth):
+        wm = KernelWeightMatrix(debiased=True, kernel=kernel.kernel, bandwidth=bandwidth)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+        z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
+        bw = bandwidth or nobs - 2
+        w = kernel.weight(bw, nobs - 1)
+        ze = z * e
+        s = ze.T @ ze
+        for i in range(1, len(w)):
+            op = ze[i:].T @ ze[:-i]
+            s += w[i] * (op + op.T)
+        assert_allclose(weight, s / (nobs - nvar))
+        assert wm.config['bandwidth'] == bw
+        assert wm.config['kernel'] == kernel.kernel
+
+    def test_config(self, data, kernel, bandwidth):
+        wm = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+        z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
+        bw = bandwidth or nobs - 2
+        w = kernel.weight(bw, nobs - 1)
+        ze = z * e
+        s = ze.T @ ze
+        for i in range(1, len(w)):
+            op = ze[i:].T @ ze[:-i]
+            s += w[i] * (op + op.T)
+        assert_allclose(weight, s / nobs)
+        assert wm.config['center'] is False
+        assert wm.config['debiased'] is False
+        assert wm.config['bandwidth'] == bw
+        assert wm.config['kernel'] == kernel.kernel
+
+        for name in kernel.alt_names:
+            wm = KernelWeightMatrix(kernel=name, bandwidth=bandwidth)
+            weight2 = wm.weight_matrix(data.x, data.z, data.e)
+            assert_equal(weight, weight2)
+
+
+class TestClusterWeight(object):
+    def test_center(self, data):
+        wm = OneWayClusteredWeightMatrix(data.clusters, True)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+
+    def test_debiased(self, data):
+        wm = OneWayClusteredWeightMatrix(data.clusters, debiased=True)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+
+    def test_defaults(self, data):
+        wm = OneWayClusteredWeightMatrix(data.clusters, debiased=True)
+        weight = wm.weight_matrix(data.x, data.z, data.e)
+
+    def test_config(self, data):
+        wm = OneWayClusteredWeightMatrix(data.clusters)
+        assert wm.config['center'] is False
+        assert wm.config['debiased'] is False
+
+    def test_errors(self, data):
+        wm = OneWayClusteredWeightMatrix(data.clusters[:10])
+        with pytest.raises(ValueError):
+            wm.weight_matrix(data.x, data.z, data.e)
+
+
+class TestGMMCovariance(object):
+    def test_homoskedastic(self, data):
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'unadjusted')
+        c.cov
+        assert c.config['name'] == 'IVGMMCovariance'
+        assert c.config['type'] == 'unadjusted'
+        assert c.config['debiased'] is False
+
+    def test_heteroskedastic(self, data):
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'robust')
+        c.cov
+        assert c.config['name'] == 'IVGMMCovariance'
+        assert c.config['type'] == 'robust'
+        assert c.config['debiased'] is False
+
+    def test_clustered(self, data):
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'clustered',
+                            clusters=data.clusters)
+        c.cov
+        assert c.config['name'] == 'IVGMMCovariance'
+        assert c.config['type'] == 'clustered'
+        assert c.config['debiased'] is False
+        assert_equal(c.config['clusters'], data.clusters)
+
+    def test_kernel(self, data):
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel',
+                            kernel='bartlett')
+        c.cov
+        assert c.config['name'] == 'IVGMMCovariance'
+        assert c.config['type'] == 'kernel'
+        assert c.config['kernel'] == 'bartlett'
+        assert c.config['debiased'] is False
+        assert c.config['bandwidth'] == data.x.shape[0] - 2
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel', kernel='parzen')
+        c.cov
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel', kernel='qs')
+        c.cov
+
+    def test_unknown(self, data):
+        with pytest.raises(ValueError):
+            IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'unknown').cov

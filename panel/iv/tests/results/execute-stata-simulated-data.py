@@ -90,7 +90,7 @@ with open('simulated-results.do', 'w') as stata:
         stata.write(model.format(**config))
 
         small = config['other_option'].find('small') >= 0
-        extra = ' J ' if method == 'gmm' else ' kappa '
+        extra = ' J ' if config['method'] == 'gmm' else ' kappa '
         extra += ' F p ' if small else ' chi2 p '
         stata.write(results.format(outfile=outfile, extra=extra))
 
