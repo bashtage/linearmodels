@@ -64,9 +64,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
         # TODO: Fix this to allow optimal bw selection by default
         bw = self._bandwidth if self._bandwidth is not None else nobs - 2
-        w = self._kernels[self._kernel](bw)
+        w = self._kernels[self._kernel](bw, nobs)
         s = ze.T @ ze
-        for i in range(1, bw + 1):
+        for i in range(1, len(w)):
             zec = ze[i:].T @ ze[:-i]
             s += w[i] * (zec + zec.T)
 

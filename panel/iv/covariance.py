@@ -5,13 +5,13 @@ from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
 from numpy.linalg import pinv, inv
 
 
-def kernel_weight_bartlett(max_lag):
+def kernel_weight_bartlett(bw, *args):
     """
     Kernel weights from a Bartlett kernel
 
     Parameters
     ----------
-    max_lag : int
+    bw: int
        Maximum lag to used in kernel
 
     Returns
@@ -25,17 +25,19 @@ def kernel_weight_bartlett(max_lag):
 
        w_i = 1 - i / (m + 1), \, i < m
     """
-    return 1 - arange(max_lag + 1) / (max_lag + 1)
+    return 1 - arange(bw + 1) / (bw + 1)
 
 
-def kernel_weight_quadratic_spectral(max_lag):
+def kernel_weight_quadratic_spectral(bw, n):
     r"""
     Kernel weights from a quadratic-spectral kernel
 
     Parameters
     ----------
-    max_lag : int
+    bw: {int, float}
        Maximum lag to used in kernel
+    n : int
+        Positive number of weight to return
 
     Returns
     -------
@@ -46,25 +48,28 @@ def kernel_weight_quadratic_spectral(max_lag):
     -----
     .. math::
 
-       z_i & = 6i\pi / 5                                        \\
+       z_i & = 6 \pi (i / bw) / 5                                \\
        w_0 &  = 1                                                \\
        w_i &  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1
     """
-    w = 6 * pi * arange(max_lag + 1) / 5
+
+    z = arange(n + 1) / bw
+    w = 6 * pi * z / 5
     w[0] = 1
-    w[1:] = 3 * (sin(w[1:]) / w[1:] - cos(w[1:])) / w[1:] ** 2
+    w[1:] = 3 / w[1:] **2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
+
     return w
 
 
-def kernel_weight_parzen(max_lag):
+def kernel_weight_parzen(bw, *args):
     r"""
     Kernel weights from a Parzen kernel
 
     Parameters
     ----------
-    max_lag : int
+    bw : int
        Maximum lag to used in kernel
-
+       
     Returns
     -------
     weights : ndarray
@@ -78,9 +83,9 @@ def kernel_weight_parzen(max_lag):
        w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5 \\
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
-    z = arange(max_lag + 1) / (max_lag + 1)
+    z = arange(bw + 1) / (bw + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
-    w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
+    w[z > 0.5] = 2 * (1 - z[z > 0.5] ** 3)
     return w
 
 
@@ -395,15 +400,15 @@ class KernelCovariance(HomoskedasticCovariance):
             else:
                 raise ValueError('Unknown kernel {0}'.format(kernel))
         bw = int(bw)
-        w = self._kernels[kernel](bw)
+        w = self._kernels[kernel](bw, nobs)
 
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e
 
-        for i in range(bw):
-            op = xhat_e[i + 1:].T @ xhat_e[:-(i + 1)]
-            s += w[i + 1] * (op + op.T)
+        for i in range(1, len(w)):
+            op = xhat_e[i:].T @ xhat_e[:-i]
+            s += w[i] * (op + op.T)
         s /= nobs
 
         return self._scale * s
