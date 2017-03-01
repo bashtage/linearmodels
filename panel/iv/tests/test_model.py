@@ -123,7 +123,8 @@ def test_2sls_direct_small(data):
     res = mod.fit()
     res2 = mod.fit(debiased=True)
     assert np.all(res.tstats != res2.tstats)
-    assert np.all(res.pvalues != res2.pvalues)
+    get_all(res2)
+    # Fetch again to test cache
     get_all(res2)
 
 

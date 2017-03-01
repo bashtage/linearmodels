@@ -111,7 +111,7 @@ class TestHomoskedasticCovariance(object):
         assert c._kappa == 1
         assert c.debiased is False
         assert c.config == {'debiased': False, 'name': 'HomoskedasticCovariance'}
-        assert c.s2 == data.s2
+        assert_allclose(c.s2, data.s2)
         assert_allclose(c.cov, data.s2 * inv(xhat.T @ xhat / nobs) / nobs)
         assert_allclose(c.s, s2 * data.v)
         assert_allclose(c.s, s2 * (xhat.T @ xhat / nobs))
@@ -121,7 +121,7 @@ class TestHomoskedasticCovariance(object):
         assert c._kappa == 1
         assert c.debiased is True
         assert c.config == {'debiased': True, 'name': 'HomoskedasticCovariance'}
-        assert c.s2 == data.s2_debiased
+        assert_allclose(c.s2, data.s2_debiased)
         assert_allclose(c.s, data.s2_debiased * data.v)
         assert_allclose(c.cov, data.s2_debiased * data.vinv / data.nobs)
 
@@ -154,7 +154,7 @@ class TestHeteroskedasticCovariance(object):
         assert c._kappa == 1
         assert c.debiased is False
         assert c.config == {'debiased': False, 'name': 'HeteroskedasticCovariance'}
-        assert c.s2 == data.s2
+        assert_allclose(c.s2, data.s2)
         xhat, eps, nobs = data.xhat, data.e, data.nobs
         assert_allclose(c.s, (xhat * eps).T @ (xhat * eps) / nobs)
 
@@ -200,7 +200,7 @@ class TestClusteredCovariance(object):
         assert c.config['debiased'] is False
         assert c.config['name'] == 'OneWayClusteredCovariance'
         assert_equal(c.config['clusters'], data.clusters)
-        assert c.s2 == data.s2
+        assert_allclose(c.s2, data.s2)
         sums = np.zeros((len(np.unique(data.clusters)), data.nvar))
         xe = data.xhat * data.e
         for i in range(len(data.clusters)):
@@ -240,7 +240,7 @@ class TestClusteredCovariance(object):
                                       clusters=data.clusters[:10])
 
 
-class TestKernelBartlettCovariance(object):
+class TestKernelCovariance(object):
     def test_asymptotic(self, data, kernel):
         c = KernelCovariance(data.x, data.y, data.z, data.params,
                              kernel=kernel.kernel)
@@ -254,7 +254,7 @@ class TestKernelBartlettCovariance(object):
         assert c.config['debiased'] is False
         assert c.config['name'] == 'KernelCovariance'
         assert_equal(c.config['kernel'], kernel.kernel)
-        assert c.s2 == data.s2
+        assert_allclose(c.s2, data.s2)
         bw = c.config['bandwidth']
         xe = data.xhat * data.e
         s = xe.T @ xe
@@ -278,7 +278,7 @@ class TestKernelBartlettCovariance(object):
         assert c.config['debiased'] is True
         assert c.config['name'] == 'KernelCovariance'
         assert_equal(c.config['kernel'], kernel.kernel)
-        assert c.s2 == data.s2_debiased
+        assert_allclose(c.s2, data.s2_debiased)
 
         c2 = KernelCovariance(data.x, data.y, data.z, data.params,
                               kernel=kernel.kernel, debiased=False)

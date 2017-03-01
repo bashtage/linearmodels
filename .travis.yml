@@ -23,14 +23,17 @@ before_install:
   - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda update --yes --quiet conda
   # Install packages
-  - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray pytest sphinx
+  - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray pytest sphinx statsmodels
   - source activate panel-test
+  - pip install coverage pytest-cov codecov pytest-xdist
+  - export PYTHONHASHSEED=0
 
 install:
   - python setup.py develop
 
 script:
-  - pytest -v panel
+  - pytest -n 2 panel
 
 after_success:
   - cd doc && make html
+  - if [ ${COVERAGE} = true ]; then codecov; fi
