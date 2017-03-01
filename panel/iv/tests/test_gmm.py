@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_equal, assert_allclose
+from numpy.linalg import inv 
+
 from panel.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
     kernel_weight_quadratic_spectral
 from panel.iv.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
@@ -49,8 +51,11 @@ def data():
     params = params[:, None]
     y = x @ params + e
     nobs, nvar = x.shape
+    xzizx = x.T @ z @ z.T @ x / nobs
+    xzizx_inv = inv(xzizx)
     return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, params=params,
-                    clusters=clusters, nvar=nvar, i=np.eye(k + p - 2))
+                    clusters=clusters, nvar=nvar, i=np.eye(k + p - 2),
+                    xzizx=xzizx, xzizx_inv=xzizx_inv)
 
 
 class TestHomoskedasticWeight(object):
@@ -177,19 +182,36 @@ class TestClusterWeight(object):
     def test_center(self, data):
         wm = OneWayClusteredWeightMatrix(data.clusters, True)
         weight = wm.weight_matrix(data.x, data.z, data.e)
+        ze = data.z * data.e
+        ze -= ze.mean(0)
+        uc = np.unique(data.clusters)
+        s = np.zeros((ze.shape[1], ze.shape[1]))
+        for val in uc:
+            obs = ze[data.clusters == val]
+            sum = obs.sum(0)[:, None]
+            s += sum @ sum.T
+        assert_allclose(weight, s / data.nobs)
 
     def test_debiased(self, data):
         wm = OneWayClusteredWeightMatrix(data.clusters, debiased=True)
         weight = wm.weight_matrix(data.x, data.z, data.e)
-
-    def test_defaults(self, data):
-        wm = OneWayClusteredWeightMatrix(data.clusters, debiased=True)
-        weight = wm.weight_matrix(data.x, data.z, data.e)
+        ze = data.z * data.e
+        uc = np.unique(data.clusters)
+        s = np.zeros((ze.shape[1], ze.shape[1]))
+        for val in uc:
+            obs = ze[data.clusters == val]
+            sum = obs.sum(0)[:, None]
+            s += sum @ sum.T
+        nobs, nvar = data.nobs, data.nvar
+        groups = len(uc)
+        scale = (nobs - 1) / (nobs - nvar) * groups / (groups - 1)
+        assert_allclose(weight, scale * s / data.nobs)
 
     def test_config(self, data):
         wm = OneWayClusteredWeightMatrix(data.clusters)
         assert wm.config['center'] is False
         assert wm.config['debiased'] is False
+        assert_equal(wm.config['clusters'], data.clusters)
 
     def test_errors(self, data):
         wm = OneWayClusteredWeightMatrix(data.clusters[:10])
@@ -200,14 +222,24 @@ class TestClusterWeight(object):
 class TestGMMCovariance(object):
     def test_homoskedastic(self, data):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'unadjusted')
-        c.cov
+        s = HomoskedasticWeightMatrix().weight_matrix(data.x, data.z, data.e)
+        x, z = data.x, data.z
+        xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
+        cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
+        cov = (cov + cov.T) / 2
+        assert_allclose(c.cov, cov)
         assert c.config['name'] == 'IVGMMCovariance'
         assert c.config['type'] == 'unadjusted'
         assert c.config['debiased'] is False
 
     def test_heteroskedastic(self, data):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'robust')
-        c.cov
+        s = HeteroskedasticWeightMatrix().weight_matrix(data.x, data.z, data.e)
+        x, z = data.x, data.z
+        xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
+        cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
+        cov = (cov + cov.T) / 2
+        assert_allclose(c.cov, cov)
         assert c.config['name'] == 'IVGMMCovariance'
         assert c.config['type'] == 'robust'
         assert c.config['debiased'] is False
@@ -215,25 +247,31 @@ class TestGMMCovariance(object):
     def test_clustered(self, data):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'clustered',
                             clusters=data.clusters)
-        c.cov
+        s = OneWayClusteredWeightMatrix(clusters=data.clusters).weight_matrix(data.x, data.z, data.e)
+        x, z = data.x, data.z
+        xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
+        cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
+        cov = (cov + cov.T) / 2
+        assert_allclose(c.cov, cov)
         assert c.config['name'] == 'IVGMMCovariance'
         assert c.config['type'] == 'clustered'
         assert c.config['debiased'] is False
         assert_equal(c.config['clusters'], data.clusters)
 
-    def test_kernel(self, data):
+    def test_kernel(self, data, kernel, bandwidth):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel',
-                            kernel='bartlett')
-        c.cov
+                            kernel=kernel.kernel, bandwidth=bandwidth)
+        s = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth).weight_matrix(data.x, data.z, data.e)
+        x, z, nobs = data.x, data.z, data.nobs
+        xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
+        cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
+        cov = (cov + cov.T) / 2
+        assert_allclose(c.cov, cov)
         assert c.config['name'] == 'IVGMMCovariance'
         assert c.config['type'] == 'kernel'
-        assert c.config['kernel'] == 'bartlett'
+        assert c.config['kernel'] == kernel.kernel
         assert c.config['debiased'] is False
-        assert c.config['bandwidth'] == data.x.shape[0] - 2
-        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel', kernel='parzen')
-        c.cov
-        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel', kernel='qs')
-        c.cov
+        assert c.config['bandwidth'] == bandwidth or nobs - 2
 
     def test_unknown(self, data):
         with pytest.raises(ValueError):
