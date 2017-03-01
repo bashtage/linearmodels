@@ -9,6 +9,7 @@ Estimation and inference in linear panel data models
    :caption: Contents:
 
    iv
+   iv/reference
    models
    covariance
    plan

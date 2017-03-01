@@ -66,7 +66,9 @@ The GMM estimator is defined as
 
 .. math:: \hat{\beta}_{GMM}=\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)
 
- where :math:`W` is a positive definite weighting matrix.
+.. This is a comment
+
+where :math:`W` is a positive definite weighting matrix.
 
 Variance Estimation
 ===================

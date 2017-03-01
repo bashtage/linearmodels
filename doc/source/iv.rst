@@ -77,13 +77,4 @@ Generalized Method of Moments (GMM) Estimation
 Continuously Updating GMM Estimation
 ====================================
 
-.. toctree::
-   :maxdepth: 3
-   :caption: Detailed Description:
-
-   iv/models
-   iv/results
-   iv/covariance
-   iv/weighting
-   iv/estimators
 

@@ -1,8 +1,12 @@
 # .coveragerc to control coverage.py
 [run]
+source = panel
 branch = True
+include =
+    */panel/*
 omit =
     */results/*
+    */_version.py
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -13,6 +17,9 @@ exclude_lines =
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
     raise NotImplementedError
+
+    # Ignore pass
+    pass
 
     # Don't complain if non-runnable code isn't run:
     if 0:

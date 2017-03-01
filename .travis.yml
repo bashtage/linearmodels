@@ -9,7 +9,7 @@ env:
 matrix:
   fast_finish: true
   include:
-  - python: 3.5
+  - python: 2.7
     env:
     - PYTHON=3.5
   - python: 3.5
@@ -25,14 +25,14 @@ before_install:
   # Install packages
   - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray pytest sphinx statsmodels
   - source activate panel-test
-  - pip install coverage pytest-cov codecov pytest-xdist
+  - pip install coverage pytest-cov codecov pytest-xdist guzzle_sphinx_theme sphinx_bootstrap_theme sphinx_rtd_theme
   - export PYTHONHASHSEED=0
 
 install:
   - python setup.py develop
 
 script:
-  - pytest -n 2 panel
+  - pytest -n 2 --cov-config .coveragerc --cov=panel panel
 
 after_success:
   - cd doc && make html

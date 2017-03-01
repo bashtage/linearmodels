@@ -23,8 +23,11 @@
 
 from distutils.version import LooseVersion
 import panel
-import guzzle_sphinx_theme
-import sphinx_bootstrap_theme
+# import guzzle_sphinx_theme
+# import sphinx_bootstrap_theme
+import sphinx_rtd_theme
+
+
 
 # ...
 
@@ -107,19 +110,23 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme_path = guzzle_sphinx_theme.html_theme_path()
-html_theme = 'guzzle_sphinx_theme'
+html_theme = "sphinx_rtd_theme"
+
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+#html_theme_path = guzzle_sphinx_theme.html_theme_path()
+#html_theme = 'guzzle_sphinx_theme'
 #
 #  Register the theme as an extension to generate a sitemap.xml
-extensions.append("guzzle_sphinx_theme")
+#extensions.append("guzzle_sphinx_theme")
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 # Guzzle theme options (see theme.conf for more information)
-html_theme_options = {
-    # Set the name of the project to appear in the sidebar
-    "project_nav_name": project + u" " + version,
-}
+# html_theme_options = {
+#     # Set the name of the project to appear in the sidebar
+#     "project_nav_name": project + u" " + version,
+# }
 
 # Activate the theme.
 # html_theme = 'bootstrap'
