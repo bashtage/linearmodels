@@ -5,12 +5,13 @@ import pandas as pd
 import pytest
 import statsmodels.api as sm
 from numpy.testing import assert_allclose
+
 from panel.iv import IV2SLS, IVLIML, IVGMM
 from panel.iv.tests.results.read_stata_results import process_results
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 
-HOUSING_DATA = pd.read_csv(os.path.join(CWD, 'housing.csv'), index_col=0)
+HOUSING_DATA = pd.read_csv(os.path.join(CWD, 'results', 'housing.csv'), index_col=0)
 HOUSING_DATA.region = HOUSING_DATA.region.astype('category')
 HOUSING_DATA.state = HOUSING_DATA.state.astype('category')
 HOUSING_DATA.division = HOUSING_DATA.division.astype('category')
@@ -140,13 +141,13 @@ class TestSimulatedResults(object):
     def test_rsquared(self, simulated):
         res, stata = simulated
         if stata.rsquared is None:
-            pytest.skip()
+            pytest.skip('Comparrison result not available')
         assert_allclose(res.rsquared, stata.rsquared)
 
     def test_rsquared_adj(self, simulated):
         res, stata = simulated
         if stata.rsquared_adj is None:
-            pytest.skip()
+            pytest.skip('Comparrison result not available')
         assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
     def test_model_ss(self, simulated):
@@ -160,7 +161,7 @@ class TestSimulatedResults(object):
     def test_fstat(self, simulated):
         res, stata = simulated
         if stata.f_statistic is None:
-            pytest.skip()
+            pytest.skip('Comparrison result not available')
         assert_allclose(res.f_statistic.stat, stata.f_statistic)
 
     def test_params(self, simulated):
@@ -178,3 +179,17 @@ class TestSimulatedResults(object):
         stata_cov = stata.cov.reindex_like(res.cov)
         stata_cov = stata_cov[res.cov.columns]
         assert_allclose(res.cov, stata_cov, rtol=1e-4)
+
+    def test_weight_mat(self, simulated):
+        res, stata = simulated
+        if not hasattr(stata, 'weight_mat') or not isinstance(stata.weight_mat, pd.DataFrame):
+            pytest.skip('Comparrison result not available')
+        stata_weight_mat = stata.weight_mat.reindex_like(res.weight_matrix)
+        stata_weight_mat = stata_weight_mat[res.weight_matrix.columns]
+        assert_allclose(res.weight_matrix, stata_weight_mat, rtol=1e-4)
+
+    def test_j_stat(self, simulated):
+        res, stata = simulated
+        if not hasattr(stata, 'J') or stata.J is None:
+            pytest.skip('Comparrison result not available')
+        assert_allclose(res.j_stat.stat, stata.J, atol=1e-6, rtol=1e-4)

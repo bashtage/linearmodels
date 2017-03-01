@@ -4,6 +4,7 @@ import scipy.stats as stats
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
+
 from panel.iv.covariance import (HomoskedasticCovariance,
                                  HeteroskedasticCovariance, KernelCovariance,
                                  OneWayClusteredCovariance)
@@ -35,7 +36,7 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
 class IV2SLS(object):
     """
     Estimation of IV models using two-stage least squares
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -49,7 +50,7 @@ class IV2SLS(object):
 
     Notes
     -----
-    
+
 
     .. todo::
 
@@ -74,8 +75,10 @@ class IV2SLS(object):
         self._regressor_is_exog = array([True] * self.exog.shape[1] +
                                         [False] * self.endog.shape[1])
         self._columns = self.exog.cols + self.endog.cols
+        self._instr_columns = self.exog.cols + self.instruments.cols
         self._index = self.endog.rows
         self._validate_inputs()
+        self._method = '2sls'
 
     def _validate_inputs(self):
         x, z = self._x, self._z
@@ -92,7 +95,7 @@ class IV2SLS(object):
     def estimate_parameters(x, y, z):
         """
         Parameter estimation without error checking
-        
+
         Parameters
         ----------
         x : ndarray
@@ -134,8 +137,8 @@ class IV2SLS(object):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of 
-        supported options. Defaults are used if no covariance configuration 
+        The see the docstring of specific covariance estimator for a list of
+        supported options. Defaults are used if no covariance configuration
         is provided.
         """
         y, x, z = self._y, self._x, self._z
@@ -152,13 +155,13 @@ class IV2SLS(object):
 
     def resids(self, params):
         """
-        Compute model residuals 
-        
+        Compute model residuals
+
         Parameters
         ----------
         params : ndarray
             Model parameters (nvar by 1)
-         
+
         Returns
         -------
         resids : ndarray
@@ -211,8 +214,10 @@ class IV2SLS(object):
                'r2': float(r2),
                'fstat': fstat,
                'vars': vars,
+               'instruments': self._instr_columns,
                'cov_config': cov_estimator.config,
-               'cov_type': cov_estimator.config['name']}
+               'cov_type': cov_estimator.config['name'],
+               'method': self._method}
 
         return out
 
@@ -220,7 +225,7 @@ class IV2SLS(object):
 class IVLIML(IV2SLS):
     """
     Limited information ML estimation of IV models
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -232,12 +237,12 @@ class IVLIML(IV2SLS):
     instruments : array-like
         Instrumental variables (nobs by ninstr)
     fuller : float, optional
-        Fuller's alpha to modify LIML estimator. Default returns unmodified 
+        Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
     kappa : float, optional
-        Parameter value for k-class estimation.  If not provided, computed to 
+        Parameter value for k-class estimation.  If not provided, computed to
         produce LIML parameter estimate.
-    
+
     Notes
     -----
 
@@ -260,6 +265,14 @@ class IVLIML(IV2SLS):
             warnings.warn('kappa and fuller should not normally be used '
                           'simulaneously.  Identical results can be computed '
                           'using kappa only', UserWarning)
+        self._method = 'liml'
+        additional = []
+        if fuller != 0:
+            additional.append('fuller(alpha={0})'.format(fuller))
+        if kappa is not None:
+            additional.append('kappa={0}'.format(fuller))
+        if additional:
+            self._method += '(' + ', '.join(additional) + ')'
 
     @staticmethod
     def estimate_parameters(x, y, z, kappa):
@@ -311,8 +324,8 @@ class IVLIML(IV2SLS):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of 
-        supported options. Defaults are used if no covariance configuration 
+        The see the docstring of specific covariance estimator for a list of
+        supported options. Defaults are used if no covariance configuration
         is provided.
         """
         y, x, z = self._y, self._x, self._z
@@ -350,7 +363,7 @@ class IVLIML(IV2SLS):
 class IVGMM(IV2SLS):
     """
     Estimation of IV models using the generalized method of moments (GMM)
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -390,6 +403,7 @@ class IVGMM(IV2SLS):
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
+        self._method = 'gmm'
 
     @staticmethod
     def estimate_parameters(x, y, z, w):
@@ -426,13 +440,13 @@ class IVGMM(IV2SLS):
         Parameters
         ----------
         iter_limit : int, optional
-            Maximum number of iterations.  Default is 2, which produces 
+            Maximum number of iterations.  Default is 2, which produces
             two-step efficient GMM estimates.  Larger values can be used
             to iterate between parameter estimation and optimal weight
             matrix estimation until convergence.
         tol : float, optional
             Convergence criteria.  Measured as covariance normalized change in
-            parameters across iterations where the covariance estimator is 
+            parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
         cov_type : str, optional
             Name of covariance estimator to use
@@ -447,13 +461,13 @@ class IVGMM(IV2SLS):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of 
-        supported options. Defaults are used if no covariance configuration 
+        The see the docstring of specific covariance estimator for a list of
+        supported options. Defaults are used if no covariance configuration
         is provided.
         """
 
         y, x, z = self._y, self._x, self._z
-        nobs, ninstr = y.shape[0], z.shape[1]
+        nobs = y.shape[0]
         weight_matrix = self._weight.weight_matrix
         w = inv(z.T @ z / nobs)
         _params = params = self.estimate_parameters(x, y, z, w)
@@ -476,16 +490,22 @@ class IVGMM(IV2SLS):
         cov_estimator = IVGMMCovariance(x, y, z, params, w,
                                         cov_type, **cov_config)
 
-        results = {'cov_type': cov_type,
-                   'weight_mat': w,
-                   'weight_type': self._weight_type,
-                   'weight_config': self._weight_type,
-                   'iterations': iters,
-                   'j_stat': self._j_statistic(params, w)}
-        pe = self._post_estimation(params, cov_estimator)
-        results.update(pe)
+        results = self._post_estimation(params, cov_estimator)
+        gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
+        results.update(gmm_pe)
 
         return IVGMMResults(results, self)
+
+    def _gmm_post_estimation(self, params, weight_mat, cov_type, iters):
+        instr = self._instr_columns
+        gmm_specific = {'cov_type': cov_type,
+                        'weight_mat': DataFrame(weight_mat, columns=instr, index=instr),
+                        'weight_type': self._weight_type,
+                        'weight_config': self._weight_type,
+                        'iterations': iters,
+                        'j_stat': self._j_statistic(params, weight_mat)}
+
+        return gmm_specific
 
     def _j_statistic(self, params, weight_mat):
         y, x, z = self._y, self._x, self._z
@@ -530,10 +550,11 @@ class IVGMMCUE(IVGMM):
                  **weight_config):
         super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weight_type,
                                        **weight_config)
+        self._method = 'gmm-cue'
 
     def j(self, params):
         y, x, z = self._y, self._x, self._z
-        nobs, ninstr = y.shape[0], z.shape[1]
+        nobs = y.shape[0]
         weight_matrix = self._weight.weight_matrix
         eps = y - x @ params[:, None]
         w = inv(weight_matrix(x, z, eps))
@@ -586,31 +607,26 @@ class IVGMMCUE(IVGMM):
         Notes
         -----
         Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of 
-        supported options. Defaults are used if no covariance configuration 
+        The see the docstring of specific covariance estimator for a list of
+        supported options. Defaults are used if no covariance configuration
         is provided.
-        
+
         .. todo::
-        
+
           * Expose method to pass optimization options
-          
+
         """
 
         y, x, z = self._y, self._x, self._z
         weight_matrix = self._weight.weight_matrix
-        params, iterations = self.estimate_parameters(x, y, z)
+        params, iters = self.estimate_parameters(x, y, z)
         eps = y - x @ params
         w = inv(weight_matrix(x, z, eps))
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
-        results = {'cov_type': cov_type,
-                   'weight_mat': w,
-                   'weight_type': self._weight_type,
-                   'weight_config': self._weight_type,
-                   'iterations': iterations,
-                   'j_stat': self._j_statistic(params, w)}
-        pe = self._post_estimation(params, cov_estimator)
-        results.update(pe)
+        results = self._post_estimation(params, cov_estimator)
+        gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
+        results.update(gmm_pe)
 
         return IVGMMResults(results, self)
 
@@ -623,7 +639,7 @@ class IVResults(object):
     -----
     .. todo::
 
-        * Information about covariance estimator 
+        * Information about covariance estimator
         * Hypothesis testing
         * First stage diagnostics
 
@@ -645,7 +661,7 @@ class IVResults(object):
         self._vars = results['vars']
         self._cov_config = results['cov_config']
         self._cov_type = results['cov_type']
-
+        self._method = results['method']
         self._cache = {}
 
     @property
@@ -722,10 +738,16 @@ class IVResults(object):
 
     @property
     def pvalues(self):
-        """P-values of parameter t-statistics"""
+        """
+        Parameter p-vals. Uses t(df_resid) if debiased is True, other normal.
+        """
         if 'pvalues' not in self._cache:
-            pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            if self.debiased:
+                pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            else:
+                pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self.df_resid)
             self._cache['pvalues'] = Series(pvals, index=self._vars, name='pvalue')
+
         return self._cache['pvalues']
 
     @property
@@ -762,6 +784,11 @@ class IVResults(object):
     def f_statistic(self):
         """Joint test of significance for non-constant regressors"""
         return self._f_statistic
+
+    @property
+    def method(self):
+        """Method used to estimate model parameters"""
+        return self._method
 
     def conf_int(self, level=0.95):
         """

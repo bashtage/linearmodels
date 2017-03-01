@@ -8,14 +8,14 @@ from numpy.linalg import pinv, inv
 def _cov_cluster(z, clusters):
     """
     Core cluster covariance estimator
-    
+
     Parameters
     ----------
     z : ndarray
         n by k mean zero data array
     clusters : ndarray
         n by 1 array
-    
+
     Returns
     -------
     c : ndarray
@@ -134,7 +134,7 @@ def kernel_weight_parzen(bw, *args):
     ----------
     bw : int
        Maximum lag to used in kernel
-       
+
     Returns
     -------
     weights : ndarray
@@ -161,21 +161,21 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
         Array of data to use when computing optimal bandwidth
     kernel : str, optional
         Name of kernel to use.  Supported kernels include:
-        
+
           * 'bartlett', 'newey-west' : Bartlett's kernel
           * 'parzen', 'gallane' : Parzen's kernel
           * 'qs', 'quadratic-spectral', 'andrews : Quadratic spectral kernel
-    
+
     Returns
     -------
     m : int
         Optimal bandwidth. Set to nobs - 1 if computed bandwidth is larger.
-    
+
     Notes
     -----
-    
+
     .. todo::
-    
+
       * Explain mathematics involved
       * References
     """
@@ -216,7 +216,7 @@ KERNEL_LOOKUP = {'bartlett': kernel_weight_bartlett,
 class HomoskedasticCovariance(object):
     r"""
     Covariance estimation for homoskedastic data
-    
+
     Parameters
     ----------
     x : ndarray
@@ -231,28 +231,28 @@ class HomoskedasticCovariance(object):
         Flag indicating whether to use a small-sample adjustment
     kappa : float, optional
         Value of kappa in k-class estimator
-    
+
     Notes
     -----
-    Covariance is estimated using 
-    
+    Covariance is estimated using
+
     .. math ::
-    
-        n^{-1} s^2 V^{-1}   
-    
-    where 
-    
-    .. math:: 
-    
+
+        n^{-1} s^2 V^{-1}
+
+    where
+
+    .. math::
+
       s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2
-    
+
     If ``debiased`` is true, then :math:`s^2` is scaled by n / (n-k).
-    
-    .. math:: 
-    
+
+    .. math::
+
       V = n^{-1} X'Z(Z'Z)^{-1}Z'X
-    
-    where :math:`X` is the matrix of variables included in the model and 
+
+    where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
@@ -346,27 +346,27 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     Notes
     -----
-    Covariance is estimated using 
+    Covariance is estimated using
 
     .. math ::
 
-        n^{-1} V^{-1} \hat{S} V^{-1}  
+        n^{-1} V^{-1} \hat{S} V^{-1}
 
-    where 
+    where
 
-    .. math:: 
+    .. math::
 
       \hat{S} = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 \hat{x}_i^{\prime} \hat{x}_i
 
-    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and 
-    :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then 
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
+    :math:`\hat{x}_i = z_i\hat{\gamma}`. If ``debiased`` is true, then
     :math:`S` is scaled by n / (n-k).
 
-    .. math:: 
+    .. math::
 
       V = n^{-1} X'Z(Z'Z)^{-1}Z'X
 
-    where :math:`X` is the matrix of variables included in the model and 
+    where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
@@ -402,45 +402,45 @@ class KernelCovariance(HomoskedasticCovariance):
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
     kernel : str
-        Kernel name. Supported kernels are: 
+        Kernel name. Supported kernels are:
 
-        * 'bartlett', 'newey-west' - Triangular kernel 
+        * 'bartlett', 'newey-west' - Triangular kernel
         * 'qs', 'quadratic-spectral', 'andrews' - Quadratic spectral kernel
         * 'parzen', 'gallant' - Parzen's kernel;
-          
+
     bandwidth : {int, None}
         Non-negative bandwidth to use with kernel. If None, automatic
         bandwidth selection is used.
 
     Notes
     -----
-    Covariance is estimated using 
-    
+    Covariance is estimated using
+
     .. math ::
-    
-        n^{-1} V^{-1} \hat{S} V^{-1}  
-    
-    where 
-    
-    .. math:: 
-    
+
+        n^{-1} V^{-1} \hat{S} V^{-1}
+
+    where
+
+    .. math::
+
       \hat{S}_0 & = n^{-1} \sum_{i=1}^{n} \hat{\epsilon}^2_i \hat{x}_i^{\prime}
            \hat{x}_{i} \\
-      \hat{S}_j & = n^{-1} \sum_{i=1}^{n-j} 
-          \hat{\epsilon}_i\hat{\epsilon}_{i+j} (\hat{x}_i^{\prime} 
+      \hat{S}_j & = n^{-1} \sum_{i=1}^{n-j}
+          \hat{\epsilon}_i\hat{\epsilon}_{i+j} (\hat{x}_i^{\prime}
           \hat{x}_{i+j} + \hat{x}_{i+j}^{\prime} \hat{x}_{i}) \\
-      \hat{S}   & = \sum_{i=0}^{bw} K(i, bw) \hat{S}_i 
-    
-    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,  
-    :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that 
-    depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled 
+      \hat{S}   & = \sum_{i=0}^{bw} K(i, bw) \hat{S}_i
+
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)`,
+    :math:`\hat{x}_i = z_i\hat{\gamma}` and :math:`K(i,bw)` is a weight that
+    depends on the kernel. If ``debiased`` is true, then :math:`S` is scaled
     by n / (n-k).
-    
-    .. math:: 
-    
+
+    .. math::
+
       V = n^{-1} X'Z(Z'Z)^{-1}Z'X
-    
-    where :math:`X` is the matrix of variables included in the model and 
+
+    where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
@@ -511,29 +511,29 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
     Notes
     -----
-    Covariance is estimated using 
+    Covariance is estimated using
 
     .. math ::
 
-        n^{-1} V^{-1} \hat{S} V^{-1}  
+        n^{-1} V^{-1} \hat{S} V^{-1}
 
-    where 
+    where
 
-    .. math:: 
+    .. math::
 
       \hat{S} & = n^{-1} (G/(G-1)) \sum_{g=1}^G \xi_{g}^\prime \xi_{g} \\
-      \xi_{g} & = \sum_{i\in\mathcal{G}_g} \hat{\epsilon}_i \hat{x}_i \\ 
+      \xi_{g} & = \sum_{i\in\mathcal{G}_g} \hat{\epsilon}_i \hat{x}_i \\
 
-    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and 
-    :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the 
-    indices of elements in cluster g. If ``debiased`` is true, then 
+    where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
+    :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the
+    indices of elements in cluster g. If ``debiased`` is true, then
     :math:`S` is scaled by n / (n-k).
 
-    .. math:: 
+    .. math::
 
       V = n^{-1} X'Z(Z'Z)^{-1}Z'X
 
-    where :math:`X` is the matrix of variables included in the model and 
+    where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 

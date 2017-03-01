@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import pytest
+
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
 from panel.utility import AttrDict
 
@@ -174,7 +175,7 @@ class TestIV(object):
         clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
                     clusters=clusters)
-        res = mod.fit()
+        mod.fit()
 
     def test_ivgmm_cluster_size_1(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
