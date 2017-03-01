@@ -144,3 +144,7 @@ class TestDataHandler(object):
         assert_equal(dh.pandas['cat.a'].values, (cat == 'a').astype(np.float))
         assert_equal(dh.pandas['cat.b'].values, (cat == 'b').astype(np.float))
         assert_equal(dh.pandas['cat.c'].values, (cat == 'c').astype(np.float))
+
+    def test_nobs_missing_error(self):
+        with pytest.raises(ValueError):
+            DataHandler(None)

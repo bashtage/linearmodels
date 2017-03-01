@@ -60,9 +60,10 @@ class IV2SLS(object):
 
     def __init__(self, dependent, exog, endog, instruments):
         self.dependent = DataHandler(dependent, var_name='dependent')
-        self.exog = DataHandler(exog, var_name='exog')
-        self.endog = DataHandler(endog, var_name='endog')
-        self.instruments = DataHandler(instruments, var_name='instruments')
+        nobs = self.dependent.shape[0]
+        self.exog = DataHandler(exog, var_name='exog', nobs=nobs)
+        self.endog = DataHandler(endog, var_name='endog', nobs=nobs)
+        self.instruments = DataHandler(instruments, var_name='instruments', nobs=nobs)
 
         # dependent variable
         self._y = self.dependent.ndarray
@@ -82,14 +83,20 @@ class IV2SLS(object):
 
     def _validate_inputs(self):
         x, z = self._x, self._z
-        self._has_constant = has_constant(x)
-
+        if x.shape[1] == 0:
+            raise ValueError('Model must contain at least one regressor.')
+        if self.instruments.shape[1] < self.endog.shape[1]:
+            raise ValueError('The number of instruments ({0}) must be at least '
+                             'as large as the number of endogenous regressors'
+                             ' ({1}).'.format(self.instruments.shape[1],
+                                              self.endog.shape[1]))
         if matrix_rank(x) < x.shape[1]:
             raise ValueError('regressors [exog endog] not have full '
                              'column rank')
         if matrix_rank(z) < z.shape[1]:
             raise ValueError('instruments [exog insruments]  do not have full '
                              'column rank')
+        self._has_constant = has_constant(x)
 
     @staticmethod
     def estimate_parameters(x, y, z):
@@ -353,7 +360,8 @@ class IVLIML(IV2SLS):
         cov_config['kappa'] = kappa
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
-        results = {'cov_type': cov_type}
+        results = {'cov_type': cov_type,
+                   'kappa': kappa}
         pe = self._post_estimation(params, cov_estimator)
         results.update(pe)
 

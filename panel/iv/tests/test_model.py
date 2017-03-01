@@ -1,17 +1,19 @@
-import warnings
-
 import numpy as np
 import pandas as pd
 import pytest
+import warnings
+from numpy.linalg import pinv
+from numpy.testing import assert_allclose
+from panel.utility import AttrDict
 
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
-from panel.utility import AttrDict
 
 
 @pytest.fixture(scope='module')
 def data():
     n, k, p = 1000, 5, 3
     np.random.seed(12345)
+    clusters = np.random.randint(0, 10, n)
     rho = 0.5
     r = np.zeros((k + p + 1, k + p + 1))
     r.fill(rho)
@@ -26,8 +28,19 @@ def data():
     params = np.arange(1, k + 1) / k
     params = params[:, None]
     y = x @ params + e
-
-    return AttrDict(dep=y, exog=x[:, 2:], endog=x[:, :2], instr=z[:, 3:])
+    xhat = z @ np.linalg.pinv(z) @ x
+    nobs, nvar = x.shape
+    s2 = e.T @ e / nobs
+    s2_debiased = e.T @ e / (nobs - nvar)
+    v = xhat.T @ xhat / nobs
+    vinv = np.linalg.inv(v)
+    kappa = 0.99
+    vk = (x.T @ x * (1 - kappa) + kappa * xhat.T @ xhat) / nobs
+    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, xhat=xhat,
+                    params=params, s2=s2, s2_debiased=s2_debiased,
+                    clusters=clusters, nvar=nvar, v=v, vinv=vinv, vk=vk,
+                    kappa=kappa, dep=y, exog=x[:, 2:], endog=x[:, :2],
+                    instr=z[:, 3:])
 
 
 def get_all(v):
@@ -83,159 +96,70 @@ class TestErrors(object):
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.endog, instr)
 
+    def test_no_regressors(self, data):
+        with pytest.raises(ValueError):
+            IV2SLS(data.dep, None, None, None)
 
-class TestIV(object):
-    @classmethod
-    def setup_class(cls):
-        np.random.seed(12345)
-        t, k, m = 5000, 3, 3
-        beta = np.arange(1, k + 1)[:, None]
-        cls.x = np.random.standard_normal((t, k))
-        cls.e = np.random.standard_normal((t, 1))
-        cls.z = np.random.standard_normal((t, m))
-        cls.x[:, 0] = cls.x[:, 0] + cls.e[:, 0] + cls.z.sum(axis=1)
-        cls.x_endog = cls.x[:, [0]]
-        cls.x_exog = cls.x[:, 1:]
-        cls.y = cls.x @ beta + cls.e
+    def test_too_few_instruments(self, data):
+        with pytest.raises(ValueError):
+            IV2SLS(data.dep, data.exog, data.endog, None)
 
-    def test_iv2sls_smoke(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit()
 
-    def test_iv2sls_small(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        res = mod.fit(debiased=True)
-        get_all(res)
-        get_all(res)
+def test_2sls_direct(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    x = np.c_[data.exog, data.endog]
+    z = np.c_[data.exog, data.instr]
+    y = data.y
+    xhat = z @ pinv(z) @ x
+    params = pinv(xhat) @ y
+    assert_allclose(res.params, params.ravel())
+    # This is just a quick smoke check of results
+    get_all(res)
 
-    def test_fake_ols_smoke(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit()
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.x_endog)
-        mod.fit()
 
-    def test_iv2sls_smoke_homoskedastic(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='unadjusted')
+def test_2sls_direct_small(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    res2 = mod.fit(debiased=True)
+    assert np.all(res.tstats != res2.tstats)
+    assert np.all(res.pvalues != res2.pvalues)
+    get_all(res2)
 
-    def test_iv2sls_smoke_cov_config(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='unadjusted', debiased=True)
 
-    def test_iv2sls_smoke_nw(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='kernel', kernel='newey-west')
-        mod.fit(cov_type='kernel', kernel='bartlett')
-        mod.fit(cov_type='kernel', kernel='parzen')
-        mod.fit(cov_type='kernel', kernel='qs')
+def test_liml_direct(data):
+    mod = IVLIML(data.dep, data.exog, data.endog, data.instr)
+    nobs = data.dep.shape[0]
+    ninstr = data.exog.shape[1] + data.instr.shape[1]
+    res = mod.fit()
+    get_all(res)
+    mod2 = IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=res.kappa)
+    res2 = mod2.fit()
+    assert_allclose(res.params, res2.params)
+    mod3 = IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=1)
+    res3 = mod3.fit()
+    assert_allclose(res3.kappa, res.kappa - 1 / (nobs - ninstr))
 
-    def test_iv2sls_smoke_cluster(self):
-        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
 
-        clusters = np.tile(np.arange(5), (self.y.shape[0] // 5,)).ravel()
-        mod.fit(cov_type='one-way', clusters=clusters)
+def test_2sls_ols_equiv(data):
+    mod = IV2SLS(data.dep, data.exog, None, None)
+    res = mod.fit()
+    params = pinv(data.exog) @ data.dep
+    assert_allclose(res.params, params.ravel())
 
-        clusters = np.tile(np.arange(100), (self.y.shape[0] // 100,)).ravel()
-        mod.fit(cov_type='one-way', clusters=clusters)
 
-        clusters = np.tile(np.arange(500), (self.y.shape[0] // 500,)).ravel()
-        mod.fit(cov_type='one-way', clusters=clusters)
+def test_gmm_iter(data):
+    mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit(iter_limit=100)
+    assert res.iterations > 2
+    # This is just a quick smoke check of results
+    get_all(res)
 
-        clusters = np.tile(np.arange(1000), (self.y.shape[0] // 1000,)).ravel()
-        mod.fit(cov_type='one-way', clusters=clusters)
 
-        clusters = np.tile(np.arange(2500), (self.y.shape[0] // 2500,)).ravel()
-        mod.fit(cov_type='one-way', clusters=clusters)
-
-        res = mod.fit(cov_type='one-way')
-        get_all(res)
-
-    def test_ivgmm_smoke(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit()
-
-    def test_ivgmm_smoke_iter(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(iter_limit=100)
-
-    def test_ivgmm_smoke_weights(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='unadjusted')
-        mod.fit()
-
-        with pytest.raises(TypeError):
-            IVGMM(self.y, self.x_exog, self.x_endog, self.z, bw=20)
-
-    def test_ivgmm_kernel_smoke(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='kernel')
-        mod.fit()
-
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='kernel',
-                    kernel='parzen')
-        mod.fit()
-
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='kernel', kernel='qs')
-        mod.fit()
-
-    def test_ivgmm_cluster_smoke(self):
-        k = 500
-        clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
-                    clusters=clusters)
-        mod.fit()
-
-    def test_ivgmm_cluster_size_1(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
-                    clusters=np.arange(self.y.shape[0]))
-        mod.fit()
-
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        res = mod.fit()
-        get_all(res)
-
-    def test_ivliml_smoke(self):
-        mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z)
-        res = mod.fit()
-        get_all(res)
-
-        mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z, kappa=0.99)
-        res = mod.fit()
-        get_all(res)
-
-        mod = IVLIML(self.y, self.x_exog, self.x_endog, self.z, fuller=1)
-        res = mod.fit()
-        get_all(res)
-
-    def test_ivgmmcue_smoke(self):
-        mod = IVGMMCUE(self.y, self.x_exog, self.x_endog, self.z)
-        res = mod.fit()
-        get_all(res)
-
-    def test_alt_dims_smoke(self):
-        mod = IV2SLS(self.y.squeeze(), self.x_exog.squeeze(),
-                     self.x_endog.squeeze(), self.z.squeeze())
-        mod.fit()
-
-    def test_pandas_smoke(self):
-        mod = IV2SLS(pd.Series(self.y.squeeze()), pd.DataFrame(self.x_exog.squeeze()),
-                     pd.Series(self.x_endog.squeeze()), pd.DataFrame(self.z.squeeze()))
-        mod.fit()
-
-    def test_gmm_homo(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='unadjusted')
-
-    def test_gmm_hetero(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='robust')
-
-    def test_gmm_clustered(self):
-        clusters = np.tile(np.arange(500), (self.y.shape[0] // 500,)).ravel()
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='clustered', clusters=clusters)
-
-    def test_gmm_kernel(self):
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='kernel')
-
-        mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z)
-        mod.fit(cov_type='kernel', kernel='qs', bandwidth=100)
+def test_gmm_cue(data):
+    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    assert res.iterations > 2
+    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    res2 = mod2.fit()
+    assert res.j_stat.stat <= res2.j_stat.stat
