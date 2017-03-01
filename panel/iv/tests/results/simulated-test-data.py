@@ -1,7 +1,7 @@
 """
 Simulation of test data to compare with Stata
 
-Truth has 2 endog regressors and 2 instruments available. 
+Truth has 2 endog regressors and 2 instruments available.
 
 Simulation designed to allow following models to be estimated:
 

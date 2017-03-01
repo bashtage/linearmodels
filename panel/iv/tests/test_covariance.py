@@ -288,8 +288,8 @@ class TestKernelBartlettCovariance(object):
 
     def test_unknown_kernel(self, data, kernel):
         with pytest.raises(ValueError):
-            c = KernelCovariance(data.x, data.y, data.z, data.params,
-                                 kernel=kernel.kernel + '_unknown')
+            KernelCovariance(data.x, data.y, data.z, data.params,
+                             kernel=kernel.kernel + '_unknown')
 
 
 class TestAutomaticBandwidth(object):

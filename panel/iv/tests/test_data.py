@@ -76,6 +76,7 @@ class TestDataHandler(object):
                 @property
                 def ndim(self):
                     return 2
+
             DataHandler(a())
 
     def test_existing_datahandler(self):
@@ -143,8 +144,3 @@ class TestDataHandler(object):
         assert_equal(dh.pandas['cat.a'].values, (cat == 'a').astype(np.float))
         assert_equal(dh.pandas['cat.b'].values, (cat == 'b').astype(np.float))
         assert_equal(dh.pandas['cat.c'].values, (cat == 'c').astype(np.float))
-
-
-
-class TestCategoricalConversion(object):
-    pass

@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import pytest
+
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
 from panel.utility import AttrDict
 
@@ -101,6 +102,12 @@ class TestIV(object):
         mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
         mod.fit()
 
+    def test_iv2sls_small(self):
+        mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
+        res = mod.fit(debiased=True)
+        get_all(res)
+        get_all(res)
+
     def test_fake_ols_smoke(self):
         mod = IV2SLS(self.y, self.x_exog, self.x_endog, self.z)
         mod.fit()
@@ -174,7 +181,7 @@ class TestIV(object):
         clusters = np.tile(np.arange(k), (self.y.shape[0] // k, 1)).ravel()
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
                     clusters=clusters)
-        res = mod.fit()
+        mod.fit()
 
     def test_ivgmm_cluster_size_1(self):
         mod = IVGMM(self.y, self.x_exog, self.x_endog, self.z, weight_type='clustered',
@@ -202,7 +209,6 @@ class TestIV(object):
         mod = IVGMMCUE(self.y, self.x_exog, self.x_endog, self.z)
         res = mod.fit()
         get_all(res)
-        print(res.j_stat)
 
     def test_alt_dims_smoke(self):
         mod = IV2SLS(self.y.squeeze(), self.x_exog.squeeze(),

@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import, division
 
 from numpy import asarray, unique
 from numpy.linalg import inv
+
 from panel.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
                                  _cov_cluster, _cov_kernel)
 

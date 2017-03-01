@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
+from numpy.linalg import inv
 from numpy.testing import assert_equal, assert_allclose
-from numpy.linalg import inv 
 
 from panel.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
     kernel_weight_quadratic_spectral
@@ -158,7 +158,7 @@ class TestKernelWeight(object):
     def test_config(self, data, kernel, bandwidth):
         wm = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth)
         weight = wm.weight_matrix(data.x, data.z, data.e)
-        z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
+        z, e, nobs = data.z, data.e, data.nobs
         bw = bandwidth or nobs - 2
         w = kernel.weight(bw, nobs - 1)
         ze = z * e
@@ -247,7 +247,8 @@ class TestGMMCovariance(object):
     def test_clustered(self, data):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'clustered',
                             clusters=data.clusters)
-        s = OneWayClusteredWeightMatrix(clusters=data.clusters).weight_matrix(data.x, data.z, data.e)
+        s = OneWayClusteredWeightMatrix(clusters=data.clusters).weight_matrix(data.x, data.z,
+                                                                              data.e)
         x, z = data.x, data.z
         xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
@@ -261,7 +262,9 @@ class TestGMMCovariance(object):
     def test_kernel(self, data, kernel, bandwidth):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel',
                             kernel=kernel.kernel, bandwidth=bandwidth)
-        s = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth).weight_matrix(data.x, data.z, data.e)
+        s = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth).weight_matrix(data.x,
+                                                                                        data.z,
+                                                                                        data.e)
         x, z, nobs = data.x, data.z, data.nobs
         xzwswzx = x.T @ z @ s @ z.T @ x / data.nobs
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
