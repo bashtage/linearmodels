@@ -743,9 +743,9 @@ class IVResults(object):
         """
         if 'pvalues' not in self._cache:
             if self.debiased:
-                pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
-            else:
                 pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self.df_resid)
+            else:
+                pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
             self._cache['pvalues'] = Series(pvals, index=self._vars, name='pvalue')
 
         return self._cache['pvalues']
