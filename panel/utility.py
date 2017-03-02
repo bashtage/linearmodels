@@ -60,6 +60,8 @@ class WaldTestStatistic(object):
     def __init__(self, stat, null, df, df_denom=None):
         self._stat = stat
         self._null = null
+        self.df = df
+        self.df_denom = df_denom
         if df_denom is None:
             self.dist = chi2(df)
             self.dist_name = 'chi2({0})'.format(df)

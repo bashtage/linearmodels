@@ -338,7 +338,7 @@ class HomoskedasticCovariance(object):
     @property
     def config(self):
         return {'debiased': self.debiased,
-                'name': self.__class__.__name__}
+                'kappa': self._kappa}
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
@@ -507,8 +507,7 @@ class KernelCovariance(HomoskedasticCovariance):
         return {'debiased': self.debiased,
                 'bandwidth': self._bandwidth,
                 'kernel': self._kernel,
-                'name': self.__class__.__name__,
-                'automatic bandwidth': self._auto_bandwidth}
+                'kappa': self._kappa}
 
 
 class OneWayClusteredCovariance(HomoskedasticCovariance):
@@ -593,4 +592,4 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     def config(self):
         return {'debiased': self.debiased,
                 'clusters': self._clusters,
-                'name': self.__class__.__name__}
+                'kappa': self._kappa}

@@ -4,6 +4,7 @@ Instrumental variable estimators
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
+from collections import OrderedDict
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
@@ -20,13 +21,17 @@ from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
+                         'HomoskedasticCovariance': HomoskedasticCovariance,
                          'homo': HomoskedasticCovariance,
                          'robust': HeteroskedasticCovariance,
                          'heteroskedastic': HeteroskedasticCovariance,
+                         'HeteroskedasticCovariance': HeteroskedasticCovariance,
                          'hccm': HeteroskedasticCovariance,
                          'kernel': KernelCovariance,
+                         'KernelCovariance': KernelCovariance,
                          'one-way': OneWayClusteredCovariance,
-                         'clustered': OneWayClusteredCovariance}
+                         'clustered': OneWayClusteredCovariance,
+                         'OneWayClusteredCovariance': OneWayClusteredCovariance}
 
 WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'homoskedastic': HomoskedasticWeightMatrix,
@@ -110,7 +115,8 @@ class IVLIML(object):
         self._instr_columns = self.exog.cols + self.instruments.cols
         self._index = self.endog.rows
         self._validate_inputs()
-        self._method = '2sls'
+        self._method = 'liml'
+        self._result_container = IVResults
 
         self._kappa = kappa
         self._fuller = fuller
@@ -230,10 +236,10 @@ class IVLIML(object):
 
         results = {'cov_type': cov_type,
                    'kappa': kappa}
-        pe = self._post_estimation(params, cov_estimator)
+        pe = self._post_estimation(params, cov_estimator, cov_type)
         results.update(pe)
 
-        return IVResults(results, self)
+        return self._result_container(results, self)
 
     def resids(self, params):
         """
@@ -272,7 +278,7 @@ class IVLIML(object):
 
         return wald
 
-    def _post_estimation(self, params, cov_estimator):
+    def _post_estimation(self, params, cov_estimator, cov_type):
         vars = self._columns
         index = self._index
         eps = self.resids(params)
@@ -298,7 +304,7 @@ class IVLIML(object):
                'vars': vars,
                'instruments': self._instr_columns,
                'cov_config': cov_estimator.config,
-               'cov_type': cov_estimator.config['name'],
+               'cov_type': cov_type,
                'method': self._method}
 
         return out
@@ -338,9 +344,11 @@ class IV2SLS(IVLIML):
         * Mathematical notation
     
     """
+
     def __init__(self, dependent, exog, endog, instruments):
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
                                      fuller=0, kappa=1)
+        self._method = '2sls'
 
 
 class IVGMM(IVLIML):
@@ -396,6 +404,7 @@ class IVGMM(IVLIML):
         self._weight_type = weight_type
         self._weight_config = self._weight.config
         self._method = 'gmm'
+        self._result_container = IVGMMResults
 
     @staticmethod
     def estimate_parameters(x, y, z, w):
@@ -491,11 +500,11 @@ class IVGMM(IVLIML):
         cov_estimator = IVGMMCovariance(x, y, z, params, w,
                                         cov_type, **cov_config)
 
-        results = self._post_estimation(params, cov_estimator)
+        results = self._post_estimation(params, cov_estimator, cov_type)
         gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
         results.update(gmm_pe)
 
-        return IVGMMResults(results, self)
+        return self._result_container(results, self)
 
     def _gmm_post_estimation(self, params, weight_mat, cov_type, iters):
         """GMM-specific post-estimation results"""
@@ -689,25 +698,14 @@ class IVGMMCUE(IVGMM):
         w = inv(weight_matrix(x, z, eps))
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
-        results = self._post_estimation(params, cov_estimator)
+        results = self._post_estimation(params, cov_estimator, cov_type)
         gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
         results.update(gmm_pe)
 
-        return IVGMMResults(results, self)
+        return self._result_container(results, self)
 
 
-class IVResults(object):
-    """
-    Results from IV estimation
-
-    Notes
-    -----
-    .. todo::
-
-        * Hypothesis testing
-        * First stage diagnostics
-        * Model diagnostics
-    """
+class OLSResults(object):
 
     def __init__(self, results, model):
         self._resid = results['eps']
@@ -720,7 +718,6 @@ class IVResults(object):
         self._tss = results['total_ss']
         self._s2 = results['s2']
         self._debiased = results['debiased']
-        self._kappa = results.get('kappa', 1)
         self._f_statistic = results['fstat']
         self._vars = results['vars']
         self._cov_config = results['cov_config']
@@ -830,11 +827,6 @@ class IVResults(object):
         return self._rss
 
     @property
-    def kappa(self):
-        """k-class estimator value"""
-        return self._kappa
-
-    @property
     def s2(self):
         """Residual variance estimator"""
         return self._s2
@@ -872,6 +864,102 @@ class IVResults(object):
         q = q[None, :]
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
+
+
+class IVResults(OLSResults):
+    """
+    Results from IV estimation
+
+    Notes
+    -----
+    .. todo::
+
+        * Hypothesis testing
+        * First stage diagnostics
+        * Model diagnostics
+    """
+
+    def __init__(self, results, model):
+        super(IVResults, self).__init__(results, model)
+        self._kappa = results.get('kappa', 1)
+
+    @property
+    def kappa(self):
+        """k-class estimator value"""
+        return self._kappa
+
+    @property
+    def first_stage(self):
+        """
+        First stage regression results
+        
+        Returns
+        -------
+        first : OrderedDict
+            Dictionary containing estimation results for fitting each 
+            endogenous regressor using the set of variables consisting 
+            of the exogenous and instruments.
+        
+        """
+        # TODO: cache shoudl be like sm
+        if 'first_stage' in self._cache:
+            return self._cache['first_stage']
+        if self.__class__ is IVGMMResults:
+            return  # TODO: This needs a reorg since only for 2SLS-type estimators
+        od = OrderedDict()
+        endog = self._model.endog.pandas
+        exog = DataFrame(self._model._z, index=self._model.dependent.rows,
+                         columns=self._model._instr_columns)
+        for col in endog:
+            mod = IV2SLS(endog[[col]], exog, None, None)
+            od[col] = mod.fit(self.cov_type, **self.cov_config)
+        self._cache['first_stage'] = od
+        return od
+
+    @property
+    def sargan(self):
+        """
+        Sargan test of overidentifying restrictions
+        """
+        if 'sargan' in self._cache:
+            return self._cache['sargan']
+        z = self._model.instruments.ndarray
+        nobs, ninstr = z.shape
+        nendog = self._model.endog.shape[1]
+        if ninstr - nendog == 0:
+            import warnings
+            warnings.warn('Sargan test requires more instruments than '
+                          'endogenous variables',
+                          UserWarning)
+            return WaldTestStatistic(0, 'Test is not feasible.', 1)
+
+        eps = self.resids.values[:, None]
+        u = eps - z @ (pinv(z) @ eps)
+        stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
+        null = 'The model is not overidentified.'
+        self._cache['sargan'] = WaldTestStatistic(stat, null, ninstr - nendog)
+        return self._cache['sargan']
+
+    @property
+    def basmann(self):
+        """
+        Basmann's test of overidentifying restrictions
+        """
+        mod = self._model
+        nobs, ninstr = mod.instruments.shape
+        nendog = mod.endog.shape[1]
+        nvar = mod.exog.shape[1] + nendog
+        if ninstr - nendog == 0:
+            import warnings
+            warnings.warn('Basmann test requires more instruments than '
+                          'endogenous variables',
+                          UserWarning)
+            return WaldTestStatistic(0, 'Test is not feasible.', 1)
+
+        sargan_test = self.sargan
+        s = sargan_test.stat
+        stat = s * (nobs - ninstr)/(nobs - nvar)
+        return WaldTestStatistic(stat, sargan_test.null, sargan_test.df)
 
 
 class IVGMMResults(IVResults):
@@ -919,8 +1007,3 @@ class IVGMMResults(IVResults):
     def j_stat(self):
         """J-test of overidentifying restrictions"""
         return self._j_stat
-
-    @property
-    def iterations(self):
-        """Number of iterations used in estimator"""
-        return self._iterations

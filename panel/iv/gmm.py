@@ -170,6 +170,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     panel.iv.covariance.kernel_weight_parzen, 
     panel.iv.covariance.kernel_weight_quadratic_spectral
     """
+
     def __init__(self, kernel='bartlett', bandwidth=None, center=False, debiased=False):
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
@@ -240,6 +241,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
     """
+
     def __init__(self, clusters, center=False, debiased=False):
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
@@ -348,8 +350,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     @property
     def config(self):
-        conf = {'type': self._cov_type,
-                'debiased': self.debiased,
-                'name': self.__class__.__name__}
+        conf = {'cov_type': self._cov_type,
+                'debiased': self.debiased}
         conf.update(self._cov_config)
         return conf
