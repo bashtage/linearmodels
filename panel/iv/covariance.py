@@ -1,3 +1,6 @@
+"""
+Covariance estimation for 2SLS and LIML IV estimators
+"""
 from __future__ import print_function, absolute_import, division
 
 from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
@@ -247,7 +250,7 @@ class HomoskedasticCovariance(object):
     -----
     Covariance is estimated using
 
-    .. math ::
+    .. math::
 
         n^{-1} s^2 V^{-1}
 
@@ -359,7 +362,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     -----
     Covariance is estimated using
 
-    .. math ::
+    .. math::
 
         n^{-1} V^{-1} \hat{S} V^{-1}
 
@@ -427,7 +430,7 @@ class KernelCovariance(HomoskedasticCovariance):
     -----
     Covariance is estimated using
 
-    .. math ::
+    .. math::
 
         n^{-1} V^{-1} \hat{S} V^{-1}
 
@@ -531,7 +534,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     -----
     Covariance is estimated using
 
-    .. math ::
+    .. math::
 
         n^{-1} V^{-1} \hat{S} V^{-1}
 

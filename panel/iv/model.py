@@ -1,3 +1,6 @@
+"""
+Instrumental variable estimators
+"""
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
@@ -35,7 +38,7 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
 
 
 class IVLIML(object):
-    """
+    r"""
     Limited information ML estimation of IV models
 
     Parameters
@@ -62,6 +65,23 @@ class IVLIML(object):
     computed using only ``kappa``. Fuller's alpha is used to adjust the 
     LIML estimate of :math:`\kappa`, which is computed whenever ``kappa``
     is not provided.
+    
+    The LIML estimator is defined as 
+    
+    .. math::
+    
+      \hat{\beta}_{\kappa} & =(X(I-\kappa M_{z})X)^{-1}X(I-\kappa M_{z})Y\\
+      M_{z} & =I-P_{z}\\
+      P_{z} & =Z(Z'Z)^{-1}Z'
+    
+    where :math:`Z` contains both the exogenous regressors and the instruments.
+    :math:`\kappa` is estimated as part of the LIML estimator.
+    
+    When using Fuller's :math:`\alpha`, the value used is modified to 
+    
+    .. math::
+    
+      \kappa-\alpha/(n-n_{instr})  
 
     .. todo::
 
@@ -285,7 +305,7 @@ class IVLIML(object):
 
 
 class IV2SLS(IVLIML):
-    """
+    r"""
     Estimation of IV models using two-stage least squares
 
     Parameters
@@ -301,20 +321,30 @@ class IV2SLS(IVLIML):
 
     Notes
     -----
-
+    The 2SLS estimator is defined
+    
+    .. math::
+    
+      \hat{\beta}_{2SLS} & =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
+                         & =(\hat{X}'\hat{X})^{-1}\hat{X}Y\\
+                 \hat{X} & =Z(Z'Z)^{-1}Z'X
+    
+    The 2SLS estimator is a special case of a k-class estimator with
+    :math:`\kappa=1`,
+    
     .. todo::
 
         * VCV: bootstrap
         * Mathematical notation
+    
     """
-
     def __init__(self, dependent, exog, endog, instruments):
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
                                      fuller=0, kappa=1)
 
 
 class IVGMM(IVLIML):
-    """
+    r"""
     Estimation of IV models using the generalized method of moments (GMM)
 
     Parameters
@@ -342,6 +372,15 @@ class IVGMM(IVLIML):
         autocorrelation
       * 'kernel' - Allows for heteroskedasticity and autocorrelation
       * 'cluster' - Allows for one-way cluster dependence
+    
+    The estimator is defined as 
+    
+    .. math::
+    
+      \hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y
+    
+    where :math:`W` is a positive definite weight matrix and :math:`Z` 
+    contains both the exogenous regressors and the instruments.
 
     .. todo:
 
@@ -514,7 +553,15 @@ class IVGMMCUE(IVGMM):
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence.
     
-    .. todo:: 
+    .. math::
+     
+      \hat{\beta}_{cue} & =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
+      g(\beta) & =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)
+    
+    where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
+    through :math:`\epsilon_i = y_i - x_i\beta`.
+    
+    .. todo ::
     
       * Mathematical notation
     """
@@ -554,7 +601,7 @@ class IVGMMCUE(IVGMM):
         
         .. math::
         
-          J(\beta) = \bar{g}(\beta)'w(\beta)^{-1}\bar{g}(\beta)
+          J(\beta) = \bar{g}(\beta)'W(\beta)^{-1}\bar{g}(\beta)
         
         where :math:`\bar{g}(\beta)` is the average of the moment 
         conditions, :math:`z_i \hat{\epsilon}_i`, where 

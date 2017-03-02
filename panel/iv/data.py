@@ -1,3 +1,6 @@
+"""
+A data abstraction that allow multiple input data formats
+"""
 import numpy as np
 import pandas as pd
 import xarray as xr

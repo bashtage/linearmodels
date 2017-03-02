@@ -1,3 +1,6 @@
+"""
+Covariance and weight estiamtion for GMM IV estimators
+"""
 from __future__ import print_function, absolute_import, division
 
 from numpy import asarray, unique
@@ -8,7 +11,7 @@ from panel.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
 
 
 class HomoskedasticWeightMatrix(object):
-    """
+    r"""
     Homoskedastic (unadjusted) weight estimation
     
     Parameters
@@ -18,6 +21,19 @@ class HomoskedasticWeightMatrix(object):
         the mean before computing the weight matrix.
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
+    
+    Notes
+    -----
+    The weight matrix estimator is
+    
+    .. math::
+    
+      s^{2} & =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{epsilon})^2 \\
+      W & =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i
+    
+    where :math:`z_i` contains both the exogensou regressors and instruments.
+    
+    ``center`` has no effect on this estimator since it is always centered.
     """
 
     def __init__(self, center=False, debiased=False):
@@ -63,7 +79,7 @@ class HomoskedasticWeightMatrix(object):
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
-    """
+    r"""
     Heteroskedasticity robust weight estimation
 
     Parameters
@@ -73,6 +89,17 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         the mean before computing the weight matrix.
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
+    
+    Notes
+    -----
+    The weight matrix estimator is 
+    
+    .. math::
+    
+      g_i & =z_i\epsilon_i\\
+      W & =n^{-1}\sum_{i=1}^{n}g'_ig_i
+    
+    where :math:`z_i` contains both the exogenous regressors and instruments.
     """
 
     def __init__(self, center=False, debiased=False):
@@ -105,7 +132,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 
 class KernelWeightMatrix(HomoskedasticWeightMatrix):
-    """
+    r"""
     Heteroskedasticity, autocorrelation robust weight estimation
 
     Parameters
@@ -127,6 +154,15 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
       * 'bartlett', 'newey-west' - Bartlett's kernel
       * 'parzen', 'gallant' - Parzen's kernel
       * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
+    
+    .. math::
+    
+      g_i & =z_i \epsilon_i \\
+      W & =n^{-1}(\Gamma_0+\sum_{j=1}^{n-1}k(j)(\Gamma_j+\Gamma_j')) \\
+      \Gamma_j & =\sum_{i=j+1}^n g'_i g_{j-j}
+    
+    where :math:`k(j)` is the kernel weight for lag j and :math:`z_i` 
+    contains both the exogensou regressors and instruments..
       
     See Also
     --------

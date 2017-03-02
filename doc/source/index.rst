@@ -1,6 +1,10 @@
 Linear Model Estimation
 =======================
 
+.. warning::
+
+  This package is substantially unfinished and may radically change.
+
 Estimation and inference in some linear models (IV, panel and panel IV).
 
 

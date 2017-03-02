@@ -27,13 +27,13 @@ def homoskedastic_covariance(x, epsilon, *, debiased=False):
 
     where
 
-    .. math ::
+    .. math::
 
         \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
 
     and
 
-    .. math ::
+    .. math::
 
         s^2 = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T \hat{\epsilon}_{it}^2
 
@@ -77,13 +77,13 @@ def heteroskedastic_covariance(x, epsilon, *, debiased=False):
 
     where
 
-    .. math ::
+    .. math::
 
         \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
 
     and
 
-    .. math ::
+    .. math::
 
         \widehat{Cov}(x_it\epsilon_{it}) = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T
                                            \hat{\epsilon}_{it}^2 x_{it}x_{it}^{\prime}
@@ -133,13 +133,13 @@ def oneway_clustered_covariance(x, epsilon, cluster, *, debiased=False):
 
     where
 
-    .. math ::
+    .. math::
 
         \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
 
     and
 
-    .. math ::
+    .. math::
 
         \widehat{Cov}(x_it\epsilon_{it}) = (NT)^{-1}\sum_{j=1}^G xe_j^{\prime}xe_j
 
