@@ -5,7 +5,7 @@ Instrumental Variable Module Reference
    :maxdepth: 3
    :caption: Contents:
 
-   models
+   methods
    results
    covariance
    gmm

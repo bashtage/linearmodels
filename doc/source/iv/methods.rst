@@ -1,5 +1,5 @@
-Instrumental Variable Models
-----------------------------
+Estimation Methods
+------------------
 
 .. module:: panel.iv.model
    :synopsis: Instrumental variable estimation

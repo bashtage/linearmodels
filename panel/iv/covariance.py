@@ -111,6 +111,10 @@ def kernel_weight_quadratic_spectral(bw, n):
 
     Notes
     -----
+    Unlink the Barrlett or Parzen kernels, the QS kernel is not truncated at
+    a specific lag, and so weights are computed for all available lags in 
+    the sample.  
+    
     .. math::
 
        z_i & = 6 \pi (i / bw) / 5                                \\
@@ -178,6 +182,13 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
 
       * Explain mathematics involved
       * References
+    
+    See Also
+    --------
+    panel.iv.covariance.kernel_weight_bartlett, 
+    panel.iv.covariance.kernel_weight_parzen, 
+    panel.iv.covariance.kernel_weight_quadratic_spectral
+
     """
     t = x.shape[0]
     x = x.squeeze()
@@ -442,6 +453,13 @@ class KernelCovariance(HomoskedasticCovariance):
 
     where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
+    
+    See Also
+    --------
+    panel.iv.covariance.kernel_weight_bartlett, 
+    panel.iv.covariance.kernel_weight_parzen, 
+    panel.iv.covariance.kernel_weight_quadratic_spectral
+
     """
 
     def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
@@ -527,7 +545,8 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     where :math:`\hat{\gamma}=(Z'Z)^{-1}(Z'X)` and
     :math:`\hat{x}_i = z_i\hat{\gamma}`.  :math:`\mathcal{G}_g` contains the
     indices of elements in cluster g. If ``debiased`` is true, then
-    :math:`S` is scaled by n / (n-k).
+    :math:`S` is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number
+    of groups..
 
     .. math::
 

@@ -9,10 +9,15 @@ from panel.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
 
 class HomoskedasticWeightMatrix(object):
     """
+    Homoskedastic (unadjusted) weight estimation
+    
     Parameters
     ----------
-    **weight_config
-        Keywords to pass to weight matrix
+    center : bool, optional
+        Flag indicating whether to center the moment conditions by subtracting
+        the mean before computing the weight matrix.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments
     """
 
     def __init__(self, center=False, debiased=False):
@@ -21,9 +26,22 @@ class HomoskedasticWeightMatrix(object):
         self._bandwidth = 0
 
     def weight_matrix(self, x, z, eps):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        weight : ndarray
+            Covariance of GMM moment conditions.
+        """
         nobs, nvar = x.shape
-        # TODO: Determine if always remove this
-        # mu = eps.mean(0) if self._center else 0
         mu = eps.mean(0)
         s2 = (eps - mu).T @ (eps - mu) / nobs
         w = s2 * z.T @ z / nobs
@@ -32,15 +50,50 @@ class HomoskedasticWeightMatrix(object):
 
     @property
     def config(self):
+        """
+        Weight estimator configuration
+        
+        Returns
+        -------
+        config : dict
+            Dictionary containing weight estimator configuration information
+        """
         return {'center': self._center,
                 'debiased': self._debiased}
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
+    """
+    Heteroskedasticity robust weight estimation
+
+    Parameters
+    ----------
+    center : bool, optional
+        Flag indicating whether to center the moment conditions by subtracting
+        the mean before computing the weight matrix.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments
+    """
+
     def __init__(self, center=False, debiased=False):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
     def weight_matrix(self, x, z, eps):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        weight : ndarray
+            Covariance of GMM moment conditions.
+        """
         nobs, nvar = x.shape
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
@@ -52,13 +105,57 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 
 class KernelWeightMatrix(HomoskedasticWeightMatrix):
-    def __init__(self, center=False, kernel='bartlett', bandwidth=None, debiased=False):
+    """
+    Heteroskedasticity, autocorrelation robust weight estimation
+
+    Parameters
+    ----------
+    kernel : str, optional
+        Name of kernel weighting function to use
+    bandwidth : {int, None}, optional
+        Bandwidth to use when computing kernel weights
+    center : bool, optional
+        Flag indicating whether to center the moment conditions by subtracting
+        the mean before computing the weight matrix.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments
+
+    Notes
+    -----
+    Supported kernels:
+    
+      * 'bartlett', 'newey-west' - Bartlett's kernel
+      * 'parzen', 'gallant' - Parzen's kernel
+      * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
+      
+    See Also
+    --------
+    panel.iv.covariance.kernel_weight_bartlett, 
+    panel.iv.covariance.kernel_weight_parzen, 
+    panel.iv.covariance.kernel_weight_quadratic_spectral
+    """
+    def __init__(self, kernel='bartlett', bandwidth=None, center=False, debiased=False):
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
 
     def weight_matrix(self, x, z, eps):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        weight : ndarray
+            Covariance of GMM moment conditions.
+        """
         nobs, nvar = x.shape
         ze = z * eps
         mu = ze.mean(axis=0) if self._center else 0
@@ -79,6 +176,14 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     @property
     def config(self):
+        """
+        Weight estimator configuration
+
+        Returns
+        -------
+        config : dict
+            Dictionary containing weight estimator configuration information
+        """
         return {'center': self._center,
                 'bandwidth': self._bandwidth,
                 'kernel': self._kernel,
@@ -86,11 +191,39 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
 
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
+    """
+    Clustered (one-way) weight estimation
+
+    Parameters
+    ----------
+    clusters : ndarray
+        Array indicating cluster membership
+    center : bool, optional
+        Flag indicating whether to center the moment conditions by subtracting
+        the mean before computing the weight matrix.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments
+    """
     def __init__(self, clusters, center=False, debiased=False):
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(self, x, z, eps):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        weight : ndarray
+            Covariance of GMM moment conditions.
+        """
         nobs, nvar = x.shape
 
         ze = z * eps
@@ -114,6 +247,14 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
     @property
     def config(self):
+        """
+        Weight estimator configuration
+
+        Returns
+        -------
+        config : dict
+            Dictionary containing weight estimator configuration information
+        """
         return {'center': self._center,
                 'clusters': self._clusters,
                 'debiased': self._debiased}

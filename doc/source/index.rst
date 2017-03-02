@@ -1,17 +1,16 @@
-Panel Data Model Estimation
-===========================
+Linear Model Estimation
+=======================
 
-Estimation and inference in linear panel data models
+Estimation and inference in some linear models (IV, panel and panel IV).
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :caption: Contents:
 
-   iv
+   iv/iv
    iv/reference
-   models
-   covariance
+   panel/panel
    plan
 
 

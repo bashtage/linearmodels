@@ -4,9 +4,6 @@ Module Plans
 Univariate
 ==========
 
-Implemented
-~~~~~~~~~~~
-
 *  OLS - :class:`statsmodels.regression.linear_model.OLS`
 *  WLS - :class:`statsmodels.regression.linear_model.WLS`
 *  GLS - :class:`statsmodels.regression.linear_model.GLS`
@@ -21,8 +18,8 @@ Panel
 Not Implemented
 ~~~~~~~~~~~~~~~
 
-Estimators
-**********
+Least Squares Estimators
+************************
 
 * Pooled
 * Between

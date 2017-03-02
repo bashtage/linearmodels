@@ -1,5 +1,5 @@
-Instrumental Variable Model Estimation Results
-----------------------------------------------
+Estimation Results
+------------------
 
 .. currentmodule:: panel.iv.model
 
