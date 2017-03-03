@@ -124,6 +124,8 @@ def test_2sls_direct_small(data):
     res2 = mod.fit(debiased=True)
     assert np.all(res.tstats != res2.tstats)
     get_all(res2)
+    fs = res.first_stage
+    stats = fs.rsquared
     # Fetch again to test cache
     get_all(res2)
 

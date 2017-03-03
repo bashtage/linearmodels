@@ -4,20 +4,19 @@ Instrumental variable estimators
 from __future__ import print_function, absolute_import, division
 
 import scipy.stats as stats
-from collections import OrderedDict
 from numpy import sqrt, diag, abs, array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
-from scipy.optimize import minimize
-
 from panel.iv.covariance import (HomoskedasticCovariance,
                                  HeteroskedasticCovariance, KernelCovariance,
                                  OneWayClusteredCovariance)
 from panel.iv.data import DataHandler
+from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
+from scipy.optimize import minimize
+
 from panel.iv.gmm import (HomoskedasticWeightMatrix, KernelWeightMatrix,
                           HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
                           IVGMMCovariance)
-from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -40,6 +39,44 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'kernel': KernelWeightMatrix,
                    'clustered': OneWayClusteredWeightMatrix,
                    'one-way': OneWayClusteredWeightMatrix, }
+
+
+def _proj(y, x):
+    """
+    Projection of y on x from y
+    
+    Parameters
+    ----------
+    x : ndarray
+        Array to project onto (nobs by nvar)
+    y : ndarray
+        Array to project (nobs by nseries)
+        
+    Returns
+    -------
+    yhat : ndarray
+        Projected values of y (nobs by nseries)
+    """
+    return x @ pinv(x) @ y
+
+
+def _annihilate(y, x):
+    """
+    Remove projection of y on x from y
+    
+    Parameters
+    ----------
+    x : ndarray
+        Array to project onto (nobs by nvar)
+    y : ndarray
+        Array to project (nobs by nseries)
+
+    Returns
+    -------
+    eps : ndarray
+        Residuals values of y minus y projected on x (nobs by nseries)
+    """
+    return y - _proj(y, x)
 
 
 class IVLIML(object):
@@ -234,8 +271,7 @@ class IVLIML(object):
         cov_config['kappa'] = kappa
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
-        results = {'cov_type': cov_type,
-                   'kappa': kappa}
+        results = {'kappa': kappa}
         pe = self._post_estimation(params, cov_estimator, cov_type)
         results.update(pe)
 
@@ -501,16 +537,16 @@ class IVGMM(IVLIML):
                                         cov_type, **cov_config)
 
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
+        gmm_pe = self._gmm_post_estimation(params, w, iters)
+
         results.update(gmm_pe)
 
         return self._result_container(results, self)
 
-    def _gmm_post_estimation(self, params, weight_mat, cov_type, iters):
+    def _gmm_post_estimation(self, params, weight_mat, iters):
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
-        gmm_specific = {'cov_type': cov_type,
-                        'weight_mat': DataFrame(weight_mat, columns=instr, index=instr),
+        gmm_specific = {'weight_mat': DataFrame(weight_mat, columns=instr, index=instr),
                         'weight_type': self._weight_type,
                         'weight_config': self._weight_type,
                         'iterations': iters,
@@ -699,14 +735,13 @@ class IVGMMCUE(IVGMM):
 
         cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, w, cov_type, iters)
+        gmm_pe = self._gmm_post_estimation(params, w, iters)
         results.update(gmm_pe)
 
         return self._result_container(results, self)
 
 
 class OLSResults(object):
-
     def __init__(self, results, model):
         self._resid = results['eps']
         self._params = results['params']
@@ -721,8 +756,8 @@ class OLSResults(object):
         self._f_statistic = results['fstat']
         self._vars = results['vars']
         self._cov_config = results['cov_config']
-        self._cov_type = results['cov_type']
         self._method = results['method']
+        self._kappa = results.get('kappa', None)
         self._cache = {}
 
     @property
@@ -769,6 +804,11 @@ class OLSResults(object):
     def has_constant(self):
         """Flag indicating the model includes a constant or equivalent"""
         return self._model.has_constant
+
+    @property
+    def kappa(self):
+        """k-class estimator value"""
+        return self._kappa
 
     @property
     def rsquared(self):
@@ -866,7 +906,42 @@ class OLSResults(object):
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
 
 
-class IVResults(OLSResults):
+class _IVResults(OLSResults):
+    """
+    Results from IV estimation
+
+    Notes
+    -----
+    .. todo::
+
+        * Hypothesis testing
+        * First stage diagnostics
+        * Model diagnostics
+    """
+
+    def __init__(self, results, model):
+        super(_IVResults, self).__init__(results, model)
+        self._kappa = results.get('kappa', 1)
+
+    @property
+    def first_stage(self):
+        """
+        First stage regression results
+        
+        Returns
+        -------
+        first : FirstStageResults
+            Object containing results for diagnosing instrument relevance issues.
+        """
+        # TODO: Need to have a custom object here!
+        # TODO: cache shoudl be like sm
+
+        return FirstStageResults(self._model.dependent, self._model.exog,
+                                 self._model.endog, self._model.instruments,
+                                 self._cov_type, self._cov_config)
+
+
+class IVResults(_IVResults):
     """
     Results from IV estimation
 
@@ -882,39 +957,6 @@ class IVResults(OLSResults):
     def __init__(self, results, model):
         super(IVResults, self).__init__(results, model)
         self._kappa = results.get('kappa', 1)
-
-    @property
-    def kappa(self):
-        """k-class estimator value"""
-        return self._kappa
-
-    @property
-    def first_stage(self):
-        """
-        First stage regression results
-        
-        Returns
-        -------
-        first : OrderedDict
-            Dictionary containing estimation results for fitting each 
-            endogenous regressor using the set of variables consisting 
-            of the exogenous and instruments.
-        
-        """
-        # TODO: cache shoudl be like sm
-        if 'first_stage' in self._cache:
-            return self._cache['first_stage']
-        if self.__class__ is IVGMMResults:
-            return  # TODO: This needs a reorg since only for 2SLS-type estimators
-        od = OrderedDict()
-        endog = self._model.endog.pandas
-        exog = DataFrame(self._model._z, index=self._model.dependent.rows,
-                         columns=self._model._instr_columns)
-        for col in endog:
-            mod = IV2SLS(endog[[col]], exog, None, None)
-            od[col] = mod.fit(self.cov_type, **self.cov_config)
-        self._cache['first_stage'] = od
-        return od
 
     @property
     def sargan(self):
@@ -958,8 +1000,30 @@ class IVResults(OLSResults):
 
         sargan_test = self.sargan
         s = sargan_test.stat
-        stat = s * (nobs - ninstr)/(nobs - nvar)
+        stat = s * (nobs - ninstr) / (nobs - nvar)
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df)
+
+    @property
+    def durbin(self):
+        exog_endog = c_[self._model.exog.ndarray, self._model.endog.ndarray]
+        nendog = self._model.endog.shape[1]
+        e_ols = _annihilate(self._model.dependent.ndarray, exog_endog)
+        nobs = e_ols.shape[0]
+        e_2sls = self.resids
+        e_ols_pz = _proj(e_ols, self._model.instruments.ndarray)
+        e_2sls_pz = _proj(e_2sls, self._model.instruments.ndarray)
+        stat = e_ols_pz.T @ e_ols_pz - e_2sls_pz.T @ e_2sls_pz
+        stat /= (e_ols.T @ e_ols) / nobs
+        null = 'Endogenous variables are endogenous'
+        return WaldTestStatistic(stat.squeeze(), null, nendog)
+
+    def wu_hausman(self):
+        # TODO
+        pass
+
+    def wooldridge(self):
+        # TODO
+        pass
 
 
 class IVGMMResults(IVResults):
@@ -1007,3 +1071,80 @@ class IVGMMResults(IVResults):
     def j_stat(self):
         """J-test of overidentifying restrictions"""
         return self._j_stat
+
+    def c_stat(self):
+        """C-test of endogeneity"""
+        # TODO
+        pass
+
+
+class FirstStageResults(object):
+    """
+    .. todo ::
+    
+      * Docstrings
+      * Summary
+    """
+
+    def __init__(self, dep, exog, endog, instr, cov_type, cov_config):
+        self.dep = dep
+        self.exog = exog
+        self.endog = endog
+        self.instr = instr
+        reg = c_[self.exog.ndarray, self.endog.ndarray]
+        self._reg = DataFrame(reg, columns=self.exog.cols + self.endog.cols)
+        self._cov_type = cov_type
+        self._cov_config = cov_config
+        self._fitted = {}
+
+    @property
+    def rsquared(self):
+        """
+        Partial R2 - endog on instr, controlling for exog
+        F-stat exog only, same reg
+        F-pval exog only, same
+        Shea's partial R2 -- 2SLS rsquare and homosk cov, OLS rsquare and homosk cov
+        :return: 
+        """
+        endog, exog, instr = self.endog, self.exog, self.instr
+        z = instr.ndarray
+        x = exog.ndarray
+        px = x @ pinv(x)
+        ez = z - px @ z
+        out = {}
+        for col in endog.pandas:
+            inner = {}
+            inner['rsquared'] = self._fitted[col].rsquared
+            y = endog.pandas[[col]].values
+            ey = y - px @ y
+            mod = IV2SLS(ey, ez, None, None)
+            res = mod.fit(self._cov_type, **self._cov_config)
+            inner['partial.rsquared'] = res.rsquared
+            params = res.params.values
+            params = params[:, None]
+            stat = params.T @ inv(res.cov) @ params
+            stat = stat.squeeze()
+            w = WaldTestStatistic(stat, null='', df=params.shape[0])
+            inner['f.stat'] = w.stat
+            inner['f.pval'] = w.pval
+            out[col] = Series(inner)
+        out = DataFrame(out).T
+
+        dep = self.dep
+        r2sls = IV2SLS(dep, exog, endog, instr).fit('unadjusted')
+        rols = IV2SLS(dep, self._reg, None, None).fit('unadjusted')
+        shea = (rols.std_errors / r2sls.std_errors) ** 2
+        shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
+        out['shea'] = shea[out.index]
+
+        return out
+
+    @property
+    def individual(self):
+        exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
+        if not self._fitted:
+            for col in self.endog.pandas:
+                mod = IV2SLS(self.endog.pandas[col], exog_instr, None, None)
+                self._fitted[col] = mod.fit(self._cov_type, **self._cov_config)
+
+        return self._fitted
