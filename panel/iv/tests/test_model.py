@@ -126,7 +126,7 @@ def test_2sls_direct_small(data):
     assert np.all(res.tstats != res2.tstats)
     get_all(res2)
     fs = res.first_stage
-    stats = fs.rsquared
+    stats = fs.diagnostics
     # Fetch again to test cache
     get_all(res2)
 
@@ -190,6 +190,6 @@ def test_2sls_just_identified(data):
     res = mod.fit()
     get_all(res)
     fs = res.first_stage
-    stats = fs.rsquared
+    stats = fs.diagnostics
     # Fetch again to test cache
     get_all(res)

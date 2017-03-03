@@ -1,10 +1,10 @@
 import scipy.stats as stats
-from numpy import sqrt, c_, diag, ones, log
-from numpy.linalg import pinv, inv
-from pandas import Series, DataFrame
+from numpy import c_, diag, log, ones, sqrt
+from numpy.linalg import inv, pinv
+from pandas import DataFrame, Series
 
-from panel.utility import WaldTestStatistic, _annihilate, _proj, \
-    cached_property, InvalidTestStatistic
+from panel.utility import (InvalidTestStatistic, WaldTestStatistic,
+                           _annihilate, _proj, cached_property)
 
 
 class OLSResults(object):
@@ -464,29 +464,29 @@ class FirstStageResults(object):
     def diagnostics(self):
         """
         Post estimation diagnostics of first-stage fit
-        
+
         Returns
         -------
         res : DataFrame
             DataFrame where each endogenous variable appears as a row and
             the columns contain alternative measures.  The columns are:
-            
-            * rsquared - Rsquared from regression of endogenous on exogenous 
+
+            * rsquared - Rsquared from regression of endogenous on exogenous
               and instruments
-            * partial.rsquared - Rsquared from regression of the exogenous 
-              variable on instruments where both the exogenous variable and 
-              the instrument have been orthogonalized to the exogenous 
+            * partial.rsquared - Rsquared from regression of the exogenous
+              variable on instruments where both the exogenous variable and
+              the instrument have been orthogonalized to the exogenous
               regressors in the model.   
-            * f.stat - Test that all coefficients are zero in the model 
+            * f.stat - Test that all coefficients are zero in the model
               used to estimate the partial rsquared. Uses a standard F-test
               when the covariance estimtor is unadjusted - otherwise uses a
               Wald test statistic with a chi2 distribution.
-            * f.pval - P-value of the test that all coefficients are zero 
+            * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial rsquared
-            * shea.rsquared - Shea's r-squared which measures the correlation 
-              between the projected and orthogonalized instrument on the 
-              orthogonoalized endogenous regressor where the orthogonalization 
-              is with respect to the other included variables in the model.  
+            * shea.rsquared - Shea's r-squared which measures the correlation
+              between the projected and orthogonalized instrument on the
+              orthogonoalized endogenous regressor where the orthogonalization
+              is with respect to the other included variables in the model.
         """
         from panel.iv.model import IV2SLS
         endog, exog, instr = self.endog, self.exog, self.instr
@@ -528,11 +528,11 @@ class FirstStageResults(object):
     def individual(self):
         """
         Individual model results from first-stage regressions
-        
+
         Returns
         -------
         res : dict
-            Dictionary containing first stage estimation results. Keys are 
+            Dictionary containing first stage estimation results. Keys are
             the variable names of the endogenous regressors.
         """
         from panel.iv.model import IV2SLS

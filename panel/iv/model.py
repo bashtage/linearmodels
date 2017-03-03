@@ -1,22 +1,22 @@
 """
 Instrumental variable estimators
 """
-from __future__ import print_function, absolute_import, division
+from __future__ import absolute_import, division, print_function
 
-from numpy import array, isscalar, c_, asarray
-from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
-from pandas import Series, DataFrame
+from numpy import array, asarray, c_, isscalar
+from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+from pandas import DataFrame, Series
 from scipy.optimize import minimize
 
-from panel.iv.covariance import (HomoskedasticCovariance,
-                                 HeteroskedasticCovariance, KernelCovariance,
+from panel.iv.covariance import (HeteroskedasticCovariance,
+                                 HomoskedasticCovariance, KernelCovariance,
                                  OneWayClusteredCovariance)
 from panel.iv.data import DataHandler
-from panel.iv.gmm import (HomoskedasticWeightMatrix, KernelWeightMatrix,
-                          HeteroskedasticWeightMatrix, OneWayClusteredWeightMatrix,
-                          IVGMMCovariance)
-from panel.iv.results import OLSResults, IVResults, IVGMMResults
-from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
+from panel.iv.gmm import (HeteroskedasticWeightMatrix,
+                          HomoskedasticWeightMatrix, IVGMMCovariance,
+                          KernelWeightMatrix, OneWayClusteredWeightMatrix)
+from panel.iv.results import IVGMMResults, IVResults, OLSResults
+from panel.utility import WaldTestStatistic, has_constant, inv_sqrth
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
