@@ -4,7 +4,7 @@ from numpy.linalg import pinv, inv
 from pandas import Series, DataFrame
 
 from panel.utility import WaldTestStatistic, _annihilate, _proj, \
-    cached_property
+    cached_property, InvalidTestStatistic
 
 
 class OLSResults(object):
@@ -226,19 +226,16 @@ class IVResults(_CommonIVResults):
         z = self._model.instruments.ndarray
         nobs, ninstr = z.shape
         nendog = self._model.endog.shape[1]
-
+        name = 'Sargan\'s test of overidentification'
         if ninstr - nendog == 0:
-            import warnings
-            warnings.warn('Test requires more instruments than '
-                          'endogenous variables',
-                          UserWarning)
-            return WaldTestStatistic(0, 'Test is not feasible.', 1, name='Infeasible test.')
+            return InvalidTestStatistic('Test requires more instruments than '
+                                        'endogenous variables.', name=name)
 
         eps = self.resids.values[:, None]
         u = eps - z @ (pinv(z) @ eps)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = 'The model is not overidentified.'
-        name = 'Sargan\'s test of overidentification'
+
         return WaldTestStatistic(stat, null, ninstr - nendog, name=name)
 
     @cached_property
@@ -250,17 +247,13 @@ class IVResults(_CommonIVResults):
         nobs, ninstr = mod.instruments.shape
         nendog = mod.endog.shape[1]
         nvar = mod.exog.shape[1] + nendog
+        name = 'Basmann\'s test of overidentification'
         if ninstr - nendog == 0:
-            import warnings
-            warnings.warn('Test requires more instruments than '
-                          'endogenous variables',
-                          UserWarning)
-            return WaldTestStatistic(0, 'Test is not feasible.', 1)
-
+            return InvalidTestStatistic('Test requires more instruments than '
+                                        'endogenous variables.', name=name)
         sargan_test = self.sargan
         s = sargan_test.stat
         stat = s * (nobs - ninstr) / (nobs - nvar)
-        name = 'Basmann\'s test of overidentification'
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
     @cached_property
@@ -352,7 +345,7 @@ class IVResults(_CommonIVResults):
                           UserWarning)
             return WaldTestStatistic(0, 'Test is not feasible.', 1, name='Infeasible test.')
 
-        q = instruments.ndarray[:,:(ninstr - nendog)]
+        q = instruments.ndarray[:, :(ninstr - nendog)]
         q_proj = _proj(q, proj_reg)
         resids = self.resids.values
         test_functions = q_proj * resids[:, None]
@@ -485,9 +478,9 @@ class FirstStageResults(object):
         """Individual model results"""
         from panel.iv.model import IV2SLS
         exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
-        if not self._fitted:
-            for col in self.endog.pandas:
-                mod = IV2SLS(self.endog.pandas[col], exog_instr, None, None)
-                self._fitted[col] = mod.fit(self._cov_type, **self._cov_config)
+        res = {}
+        for col in self.endog.pandas:
+            mod = IV2SLS(self.endog.pandas[col], exog_instr, None, None)
+            res[col] = mod.fit(self._cov_type, **self._cov_config)
 
-        return self._fitted
+        return res

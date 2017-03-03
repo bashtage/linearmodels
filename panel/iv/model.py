@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import print_function, absolute_import, division
 
-from numpy import sqrt, diag, abs, array, isscalar, c_
+from numpy import array, isscalar, c_
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
 from scipy.optimize import minimize
@@ -17,7 +17,6 @@ from panel.iv.gmm import (HomoskedasticWeightMatrix, KernelWeightMatrix,
                           IVGMMCovariance)
 from panel.iv.results import OLSResults, IVResults, IVGMMResults
 from panel.utility import has_constant, inv_sqrth, WaldTestStatistic
-
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,

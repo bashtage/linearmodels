@@ -1,12 +1,13 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
-import warnings
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose
-from panel.utility import AttrDict
 
 from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
+from panel.utility import AttrDict
 
 
 @pytest.fixture(scope='module')
@@ -166,3 +167,19 @@ def test_gmm_cue(data):
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
+
+    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr, center=False)
+    res = mod.fit()
+    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr, center=False)
+    res2 = mod2.fit()
+    assert res.j_stat.stat <= res2.j_stat.stat
+
+
+def test_2sls_just_identified(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr[:, :2])
+    res = mod.fit()
+    get_all(res)
+    fs = res.first_stage
+    stats = fs.rsquared
+    # Fetch again to test cache
+    get_all(res)

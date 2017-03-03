@@ -25,7 +25,7 @@ before_install:
   # Install packages
   - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray statsmodels ipython
   - source activate panel-test
-  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme
+  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme -q
   - export PYTHONHASHSEED=0
 
 install:

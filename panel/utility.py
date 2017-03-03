@@ -2,7 +2,7 @@ import functools
 from collections import OrderedDict
 
 import numpy as np
-from numpy import diag, sqrt
+from numpy import diag, sqrt, NaN
 from numpy.linalg import matrix_rank, eigh
 from scipy.stats import chi2, f
 
@@ -138,6 +138,32 @@ def _annihilate(y, x):
         Residuals values of y minus y projected on x (nobs by nseries)
     """
     return y - _proj(y, x)
+
+
+class InvalidTestWarning(UserWarning):
+    pass
+
+
+class InvalidTestStatistic(WaldTestStatistic):
+    def __init__(self, reason, name=None):
+        self._reason = reason
+        super(InvalidTestStatistic, self).__init__('', NaN, df=1, df_denom=1, name=name)
+        self.dist_name = 'None'
+        import warnings
+        warnings.warn(reason, InvalidTestWarning)
+
+    @property
+    def pval(self):
+        return NaN
+
+    @property
+    def critical_values(self):
+        return None
+
+    def __str__(self):
+        msg = "Invalid test statistic\n{reason}\n{name}"
+        name = '' if self._name is None else self._name
+        return msg.format(name=name, reason=self._reason)
 
 
 # cahced_property taken from bottle.py

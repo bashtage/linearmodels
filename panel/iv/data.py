@@ -29,9 +29,9 @@ class DataHandler(object):
         if isinstance(x, DataHandler):
             x = x.original
         if x is None and nobs is not None:
-                x = np.empty((nobs,0))
+            x = np.empty((nobs, 0))
         elif x is None:
-                raise ValueError('nobs requred when x is None')
+            raise ValueError('nobs requred when x is None')
 
         self.original = x
         xndim = x.ndim
