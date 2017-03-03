@@ -145,7 +145,7 @@ class InvalidTestWarning(UserWarning):
 
 
 class InvalidTestStatistic(WaldTestStatistic):
-    def __init__(self, reason, name=None):
+    def __init__(self, reason, *, name=None):
         self._reason = reason
         super(InvalidTestStatistic, self).__init__('', NaN, df=1, df_denom=1, name=name)
         self.dist_name = 'None'

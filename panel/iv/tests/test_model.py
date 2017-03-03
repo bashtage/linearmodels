@@ -175,6 +175,16 @@ def test_gmm_cue(data):
     assert res.j_stat.stat <= res2.j_stat.stat
 
 
+def test_gmm_cue_starting_vals(data):
+    mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    sv = mod.fit().params
+    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
+    mod.fit(starting=sv, display=True)
+
+    with pytest.raises(ValueError):
+        mod.fit(starting=sv[:-1], display=True)
+
+
 def test_2sls_just_identified(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr[:, :2])
     res = mod.fit()

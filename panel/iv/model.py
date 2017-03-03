@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import print_function, absolute_import, division
 
-from numpy import array, isscalar, c_
+from numpy import array, isscalar, c_, asarray
 from numpy.linalg import pinv, inv, matrix_rank, eigvalsh
 from pandas import Series, DataFrame
 from scipy.optimize import minimize
@@ -189,6 +189,19 @@ class IVLIML(object):
         p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
         return inv(p1) @ p2
 
+    def _estimate_kappa(self):
+        y, x, z = self._y, self._x, self._z
+        is_exog = self._regressor_is_exog
+        e = c_[y, x[:, ~is_exog]]
+        x1 = x[:, is_exog]
+
+        ez = e - z @ (pinv(z) @ e)
+        ex1 = e - x1 @ (pinv(x1) @ e)
+
+        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
+        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+        return min(eigvalsh(q))
+
     def fit(self, cov_type='robust', **cov_config):
         """
         Estimate model parameters
@@ -213,19 +226,12 @@ class IVLIML(object):
         is provided.
         """
         y, x, z = self._y, self._x, self._z
-
+        liml_kappa = self._estimate_kappa()
         kappa = self._kappa
         if kappa is None:
-            is_exog = self._regressor_is_exog
-            e = c_[y, x[:, ~is_exog]]
-            x1 = x[:, is_exog]
+            kappa = liml_kappa
 
-            ez = e - z @ (pinv(z) @ e)
-            ex1 = e - x1 @ (pinv(x1) @ e)
 
-            vpmzv_sqinv = inv_sqrth(ez.T @ ez)
-            q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
-            kappa = min(eigvalsh(q))
 
         if self._fuller != 0:
             nobs, ninstr = z.shape
@@ -237,7 +243,8 @@ class IVLIML(object):
         cov_config['kappa'] = kappa
         cov_estimator = cov_estimator(x, y, z, params, **cov_config)
 
-        results = {'kappa': kappa}
+        results = {'kappa': kappa,
+                   'liml_kappa': liml_kappa}
         pe = self._post_estimation(params, cov_estimator, cov_type)
         results.update(pe)
 
@@ -343,8 +350,6 @@ class IV2SLS(IVLIML):
     .. todo::
 
         * VCV: bootstrap
-        * Mathematical notation
-    
     """
 
     def __init__(self, dependent, exog, endog, instruments):
@@ -571,10 +576,6 @@ class IVGMMCUE(IVGMM):
     
     where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
     through :math:`\epsilon_i = y_i - x_i\beta`.
-    
-    .. todo ::
-    
-      * Mathematical notation
     """
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
@@ -630,10 +631,12 @@ class IVGMMCUE(IVGMM):
         g_bar = (z * eps).mean(0)
         return nobs * g_bar.T @ w @ g_bar.T
 
-    def estimate_parameters(self, x, y, z):
+    def estimate_parameters(self, starting, x, y, z, display=False):
         r"""
         Parameters
         ----------
+        starting : ndarray
+            Starting values for the optimization
         x : ndarray
             Regressor matrix (nobs by nvar)
         y : ndarray
@@ -655,19 +658,22 @@ class IVGMMCUE(IVGMM):
         --------
         scipy.optimize.minimize
         """
-        res = IV2SLS(self.dependent, self.exog, self.endog, self.instruments).fit()
-        sv = res.params
         args = (x, y, z)
-        res = minimize(self.j, sv, args=args, options={'disp': False})
+        res = minimize(self.j, starting, args=args, options={'disp': display})
 
         return res.x[:, None], res.nit
 
-    def fit(self, cov_type='robust', **cov_config):
+    def fit(self, starting=None, display=False, cov_type='robust', **cov_config):
         r"""
         Estimate model parameters
 
         Parameters
         ----------
+        starting : ndarray, optional
+            Starting values to use in optimization.  If not provided, 2SLS 
+            estimates are used.
+        display : bool, optional
+            Flag indicating whether to display optimization output
         cov_type : str, optional
             Name of covariance estimator to use
         **cov_config
@@ -690,12 +696,20 @@ class IVGMMCUE(IVGMM):
         .. todo::
 
           * Expose method to pass optimization options
-          * Allow starting values to be passed
         """
 
         y, x, z = self._y, self._x, self._z
         weight_matrix = self._weight.weight_matrix
-        params, iters = self.estimate_parameters(x, y, z)
+        if starting is None:
+            res = IV2SLS(self.dependent, self.exog,
+                         self.endog, self.instruments).fit()
+            starting = res.params.values
+        else:
+            starting = asarray(starting)
+            if len(starting) != self.exog.shape[1] + self.endog.shape[1]:
+                raise ValueError('starting does not have the correct number '
+                                 'of values')
+        params, iters = self.estimate_parameters(starting, x, y, z, display)
         eps = y - x @ params
         w = inv(weight_matrix(x, z, eps))
 

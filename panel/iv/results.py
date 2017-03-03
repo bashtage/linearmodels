@@ -1,5 +1,5 @@
 import scipy.stats as stats
-from numpy import sqrt, c_, diag, ones
+from numpy import sqrt, c_, diag, ones, log
 from numpy.linalg import pinv, inv
 from pandas import Series, DataFrame
 
@@ -24,6 +24,7 @@ class OLSResults(object):
         self._cov_config = results['cov_config']
         self._method = results['method']
         self._kappa = results.get('kappa', None)
+        self._liml_kappa = results.get('liml_kappa', None)
 
     @property
     def cov_config(self):
@@ -357,6 +358,35 @@ class IVResults(_CommonIVResults):
         name = 'Wooldridge\'s score test of overidentification'
         return WaldTestStatistic(stat, null, df, name=name)
 
+    @cached_property
+    def anderson_rubin(self):
+        """Anderson-Rubin test of overidentifying restrictions"""
+        nobs, ninstr = self._model.instruments.shape
+        nendog = self._model.endog.shape[1]
+        name = 'Anderson-Rubin test of overidentification'
+        if ninstr - nendog == 0:
+            return InvalidTestStatistic('Test requires more instruments than '
+                                        'endogenous variables.', name=name)
+        stat = nobs * log(self._liml_kappa)
+        df = ninstr - nendog
+        null = 'The model is not overidentified.'
+        return WaldTestStatistic(stat, null, df, name=name)
+
+    @cached_property
+    def basmann_f(self):
+        """Basmann's F test of overidentifying restrictions"""
+        nobs, ninstr = self._model.instruments.shape
+        nendog = self._model.endog.shape[1]
+        name = 'Basmann\' F  test of overidentification'
+        if ninstr - nendog == 0:
+            return InvalidTestStatistic('Test requires more instruments than '
+                                        'endogenous variables.', name=name)
+        stat = (self._liml_kappa - 1) * (nobs - ninstr) / (ninstr - nendog)
+        df = ninstr - nendog
+        df_denom = nobs - ninstr
+        null = 'The model is not overidentified.'
+        return WaldTestStatistic(stat, null, df, df_denom=df_denom, name=name)
+
 
 class IVGMMResults(_CommonIVResults):
     """
@@ -412,9 +442,10 @@ class IVGMMResults(_CommonIVResults):
 
 class FirstStageResults(object):
     """
+    First stage estimation results and diagnostics
+    
     .. todo ::
 
-      * Docstrings
       * Summary
     """
 
@@ -430,13 +461,32 @@ class FirstStageResults(object):
         self._fitted = {}
 
     @cached_property
-    def rsquared(self):
+    def diagnostics(self):
         """
-        Partial R2 - endog on instr, controlling for exog
-        F-stat exog only, same reg
-        F-pval exog only, same
-        Shea's partial R2 -- 2SLS rsquare and homosk cov, OLS rsquare and homosk cov
-        :return: 
+        Post estimation diagnostics of first-stage fit
+        
+        Returns
+        -------
+        res : DataFrame
+            DataFrame where each endogenous variable appears as a row and
+            the columns contain alternative measures.  The columns are:
+            
+            * rsquared - Rsquared from regression of endogenous on exogenous 
+              and instruments
+            * partial.rsquared - Rsquared from regression of the exogenous 
+              variable on instruments where both the exogenous variable and 
+              the instrument have been orthogonalized to the exogenous 
+              regressors in the model.   
+            * f.stat - Test that all coefficients are zero in the model 
+              used to estimate the partial rsquared. Uses a standard F-test
+              when the covariance estimtor is unadjusted - otherwise uses a
+              Wald test statistic with a chi2 distribution.
+            * f.pval - P-value of the test that all coefficients are zero 
+              in the model used to estimate the partial rsquared
+            * shea.rsquared - Shea's r-squared which measures the correlation 
+              between the projected and orthogonalized instrument on the 
+              orthogonoalized endogenous regressor where the orthogonalization 
+              is with respect to the other included variables in the model.  
         """
         from panel.iv.model import IV2SLS
         endog, exog, instr = self.endog, self.exog, self.instr
@@ -470,12 +520,21 @@ class FirstStageResults(object):
         shea = (rols.std_errors / r2sls.std_errors) ** 2
         shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
         out['shea.rsquared'] = shea[out.index]
-
+        cols = ['rsquared', 'partial.rsquared', 'shea.rsquared', 'f.stat', 'f.pval']
+        out = out[cols]
         return out
 
     @cached_property
     def individual(self):
-        """Individual model results"""
+        """
+        Individual model results from first-stage regressions
+        
+        Returns
+        -------
+        res : dict
+            Dictionary containing first stage estimation results. Keys are 
+            the variable names of the endogenous regressors.
+        """
         from panel.iv.model import IV2SLS
         exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
         res = {}
