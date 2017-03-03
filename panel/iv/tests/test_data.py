@@ -148,3 +148,8 @@ class TestDataHandler(object):
     def test_nobs_missing_error(self):
         with pytest.raises(ValueError):
             DataHandler(None)
+
+    def test_incorrect_nobs(self):
+        x = np.empty((10, 1))
+        with pytest.raises(ValueError):
+            DataHandler(x, nobs=100)

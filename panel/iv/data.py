@@ -73,8 +73,8 @@ class DataHandler(object):
 
         if nobs is not None:
             if self._ndarray.shape[0] != nobs:
-                msg = 'Array required to have {nobs} obs, ' \
-                      'has {act}'.format(nobs, self._ndarray.shape[0])
+                msg = 'Array required to have {nobs} obs, has ' \
+                      '{act}'.format(nobs=nobs, act=self._ndarray.shape[0])
                 raise ValueError(msg)
 
     @property
