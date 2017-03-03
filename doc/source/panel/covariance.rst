@@ -4,5 +4,5 @@ Covariance Estimators
 .. module:: panel
 .. currentmodule:: panel
 
-.. automodule:: panel.covariance
+.. automodule:: panel.panel.covariance
    :members:

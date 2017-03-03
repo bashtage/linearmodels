@@ -1,8 +1,7 @@
-from panel.data import PanelData
-from panel.dummy_iterator import DummyVariableIterator
-from panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect
-from panel.lm import PooledOLS
-from . import lm
+from panel.panel.data import PanelData
+from panel.panel.dummy_iterator import DummyVariableIterator
+from panel.panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect
+from panel.panel.lm import PooledOLS
 from ._version import get_versions
 
 __all__ = ['EntityEffect', 'DummyVariableIterator', 'TimeEffect',

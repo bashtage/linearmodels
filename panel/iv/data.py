@@ -28,10 +28,9 @@ class DataHandler(object):
 
         if isinstance(x, DataHandler):
             x = x.original
-        if x is None:
-            if nobs is not None:
+        if x is None and nobs is not None:
                 x = np.empty((nobs,0))
-            else:
+        elif x is None:
                 raise ValueError('nobs requred when x is None')
 
         self.original = x
@@ -71,6 +70,12 @@ class DataHandler(object):
             raise NotImplementedError('Not implemented yet.')
         else:
             raise TypeError(type_err)
+
+        if nobs is not None:
+            if self._ndarray.shape[0] != nobs:
+                msg = 'Array required to have {nobs} obs, ' \
+                      'has {act}'.format(nobs, self._ndarray.shape[0])
+                raise ValueError(msg)
 
     @property
     def pandas(self):

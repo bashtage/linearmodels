@@ -121,7 +121,7 @@ class TestHeteroskedasticWeight(object):
 
 class TestKernelWeight(object):
     def test_center(self, data, kernel, bandwidth):
-        wm = KernelWeightMatrix(True, kernel=kernel.kernel, bandwidth=bandwidth)
+        wm = KernelWeightMatrix(kernel.kernel, bandwidth, True)
         weight = wm.weight_matrix(data.x, data.z, data.e)
         z, e, nobs = data.z, data.e, data.nobs
         bw = bandwidth or nobs - 2
@@ -136,7 +136,7 @@ class TestKernelWeight(object):
         assert wm.config['bandwidth'] == bw
         assert wm.config['kernel'] == kernel.kernel
         for name in kernel.alt_names:
-            wm = KernelWeightMatrix(True, kernel=name, bandwidth=bandwidth)
+            wm = KernelWeightMatrix(name, bandwidth, True)
             weight2 = wm.weight_matrix(data.x, data.z, data.e)
             assert_equal(weight, weight2)
 
@@ -228,8 +228,7 @@ class TestGMMCovariance(object):
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
         cov = (cov + cov.T) / 2
         assert_allclose(c.cov, cov)
-        assert c.config['name'] == 'IVGMMCovariance'
-        assert c.config['type'] == 'unadjusted'
+        assert c.config['cov_type'] == 'unadjusted'
         assert c.config['debiased'] is False
 
     def test_heteroskedastic(self, data):
@@ -240,8 +239,7 @@ class TestGMMCovariance(object):
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
         cov = (cov + cov.T) / 2
         assert_allclose(c.cov, cov)
-        assert c.config['name'] == 'IVGMMCovariance'
-        assert c.config['type'] == 'robust'
+        assert c.config['cov_type'] == 'robust'
         assert c.config['debiased'] is False
 
     def test_clustered(self, data):
@@ -254,8 +252,7 @@ class TestGMMCovariance(object):
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
         cov = (cov + cov.T) / 2
         assert_allclose(c.cov, cov)
-        assert c.config['name'] == 'IVGMMCovariance'
-        assert c.config['type'] == 'clustered'
+        assert c.config['cov_type'] == 'clustered'
         assert c.config['debiased'] is False
         assert_equal(c.config['clusters'], data.clusters)
 
@@ -270,8 +267,7 @@ class TestGMMCovariance(object):
         cov = data.xzizx_inv @ xzwswzx @ data.xzizx_inv
         cov = (cov + cov.T) / 2
         assert_allclose(c.cov, cov)
-        assert c.config['name'] == 'IVGMMCovariance'
-        assert c.config['type'] == 'kernel'
+        assert c.config['cov_type'] == 'kernel'
         assert c.config['kernel'] == kernel.kernel
         assert c.config['debiased'] is False
         assert c.config['bandwidth'] == bandwidth or nobs - 2

@@ -4,5 +4,5 @@ Models for Panel Data
 .. module:: panel
 .. currentmodule:: panel
 
-.. automodule:: panel.lm
+.. automodule:: panel.panel.lm
    :members:

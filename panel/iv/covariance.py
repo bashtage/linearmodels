@@ -357,6 +357,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Estimated model parameters (nvar by 1)
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
+    kappa : float, optional
+        Value of kappa in k-class estimator
 
     Notes
     -----
@@ -413,8 +415,6 @@ class KernelCovariance(HomoskedasticCovariance):
         Instruments used for endogensou regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
-    debiased : bool, optional
-        Flag indicating whether to use a small-sample adjustment
     kernel : str
         Kernel name. Supported kernels are:
 
@@ -425,6 +425,10 @@ class KernelCovariance(HomoskedasticCovariance):
     bandwidth : {int, None}
         Non-negative bandwidth to use with kernel. If None, automatic
         bandwidth selection is used.
+    debiased : bool, optional
+        Flag indicating whether to use a small-sample adjustment
+    kappa : float, optional
+        Value of kappa in k-class estimator
 
     Notes
     -----
@@ -465,8 +469,8 @@ class KernelCovariance(HomoskedasticCovariance):
 
     """
 
-    def __init__(self, x, y, z, params, debiased=False, kernel='bartlett',
-                 bandwidth=None, kappa=1):
+    def __init__(self, x, y, z, params, kernel='bartlett',
+                 bandwidth=None, debiased=False, kappa=1):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
         self._kernel = kernel
@@ -528,6 +532,9 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         Flag indicating whether to use a small-sample adjustment
     clusters : ndarray, optional
         Cluster group assignment.  If not provided, uses clusters of 1
+    kappa : float, optional
+        Value of kappa in k-class estimator
+
 
     Notes
     -----
@@ -558,7 +565,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     :math:`Z` is the matrix of instruments, including exogenous regressors.
     """
 
-    def __init__(self, x, y, z, params, debiased=False, clusters=None, kappa=1):
+    def __init__(self, x, y, z, params, clusters=None, debiased=False, kappa=1):
         super(OneWayClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._clusters = clusters
         nobs = self.x.shape[0]

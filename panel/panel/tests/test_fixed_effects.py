@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 from numpy.testing import assert_equal, assert_almost_equal
 
-from panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect, \
+from panel.panel.fixed_effects import EntityEffect, TimeEffect, GroupEffect, \
     SaturatedEffectWarning, DummyVariableIterator, FixedEffect, RequiredSubclassingError
 
 

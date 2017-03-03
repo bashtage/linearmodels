@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 from numpy.random import random_sample
 
-from panel.lm import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS
+from panel.panel.lm import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS
 
 
 class TestPooledOLS(object):
