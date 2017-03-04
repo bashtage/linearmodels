@@ -6,8 +6,8 @@ import pytest
 import statsmodels.api as sm
 from numpy.testing import assert_allclose
 
-from panel.iv import IV2SLS, IVLIML, IVGMM
-from panel.iv.tests.results.read_stata_results import process_results
+from linearmodels.iv import IV2SLS, IVLIML, IVGMM
+from linearmodels.iv.tests.results.read_stata_results import process_results
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 

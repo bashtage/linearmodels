@@ -1,6 +1,24 @@
 GMM Weight and Covariance Estimation
 ------------------------------------
 
-.. automodule:: panel.iv.gmm
-   :members:
+.. module:: linearmodels.iv.gmm
 
+.. autoclass:: IVGMMCovariance
+   :members:
+   :inherited-members:
+
+.. autoclass:: HomoskedasticWeightMatrix
+   :members:
+   :inherited-members:
+
+.. autoclass:: HeteroskedasticWeightMatrix
+   :members:
+   :inherited-members:
+
+.. autoclass:: KernelWeightMatrix
+   :members:
+   :inherited-members:
+
+.. autoclass:: OneWayClusteredWeightMatrix
+   :members:
+   :inherited-members:

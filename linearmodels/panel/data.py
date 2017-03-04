@@ -5,7 +5,7 @@ import xarray as xr
 
 class PanelData(object):
     """
-    Uniform panel data access
+    Uniform linearmodels data access
 
     Parameters
     ----------

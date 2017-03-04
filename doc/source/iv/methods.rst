@@ -1,7 +1,7 @@
 Estimation Methods
 ------------------
 
-.. module:: panel.iv.model
+.. module:: linearmodels.iv.model
    :synopsis: Instrumental variable estimation
 
 .. autoclass:: IV2SLS

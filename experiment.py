@@ -1,6 +1,6 @@
 import numpy as np
 
-from panel.iv import IVGMM
+from linearmodels.iv import IVGMM
 
 n, k, p = 1000, 5, 3
 np.random.seed(12345)

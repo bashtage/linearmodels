@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import pandas as pd
 
-from panel.utility import AttrDict
+from linearmodels.utility import AttrDict
 
 
 def repl_const(df):

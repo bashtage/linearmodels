@@ -4,10 +4,10 @@ from numpy import sin, cos, pi
 from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
 
-from panel.iv.covariance import HomoskedasticCovariance, kernel_weight_bartlett, \
+from linearmodels.iv.covariance import HomoskedasticCovariance, kernel_weight_bartlett, \
     kernel_weight_parzen, kernel_weight_quadratic_spectral, HeteroskedasticCovariance, \
     OneWayClusteredCovariance, KernelCovariance, kernel_optimal_bandwidth, _cov_kernel
-from panel.utility import AttrDict
+from linearmodels.utility import AttrDict
 
 
 @pytest.fixture(params=['bartlett', 'qs', 'parzen'], scope='module')

@@ -8,15 +8,15 @@ from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series
 from scipy.optimize import minimize
 
-from panel.iv.covariance import (HeteroskedasticCovariance,
-                                 HomoskedasticCovariance, KernelCovariance,
-                                 OneWayClusteredCovariance)
-from panel.iv.data import DataHandler
-from panel.iv.gmm import (HeteroskedasticWeightMatrix,
-                          HomoskedasticWeightMatrix, IVGMMCovariance,
-                          KernelWeightMatrix, OneWayClusteredWeightMatrix)
-from panel.iv.results import IVGMMResults, IVResults, OLSResults
-from panel.utility import WaldTestStatistic, has_constant, inv_sqrth
+from linearmodels.iv.covariance import (HeteroskedasticCovariance,
+                                        HomoskedasticCovariance, KernelCovariance,
+                                        OneWayClusteredCovariance)
+from linearmodels.iv.data import DataHandler
+from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
+                                 HomoskedasticWeightMatrix, IVGMMCovariance,
+                                 KernelWeightMatrix, OneWayClusteredWeightMatrix)
+from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
+from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -43,7 +43,7 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
 
 class IVLIML(object):
     r"""
-    Limited information ML estimation of IV models
+    Limited information ML and k-class estimation of IV models
 
     Parameters
     ----------
@@ -90,7 +90,6 @@ class IVLIML(object):
     .. todo::
 
         * VCV: bootstrap
-        * testing
     """
 
     def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):

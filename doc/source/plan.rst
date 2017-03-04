@@ -7,10 +7,10 @@ Univariate
 *  OLS - :class:`statsmodels.regression.linear_model.OLS`
 *  WLS - :class:`statsmodels.regression.linear_model.WLS`
 *  GLS - :class:`statsmodels.regression.linear_model.GLS`
-* 2SLS - :class:`panel.iv.model.IV2SLS`
-* LIML/k-class - :class:`panel.iv.model.IVLIML`
-* GMM IV Estimation - :class:`panel.iv.model.IVGMM`
-* GMM-CUE Estimation - :class:`panel.iv.model.IVGMMCUE`
+* 2SLS - :class:`linearmodels.iv.model.IV2SLS`
+* LIML/k-class - :class:`linearmodels.iv.model.IVLIML`
+* GMM IV Estimation - :class:`linearmodels.iv.model.IVGMM`
+* GMM-CUE Estimation - :class:`linearmodels.iv.model.IVGMMCUE`
 
 Panel
 =====

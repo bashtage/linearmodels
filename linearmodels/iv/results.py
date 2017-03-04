@@ -3,8 +3,8 @@ from numpy import c_, diag, log, ones, sqrt
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series
 
-from panel.utility import (InvalidTestStatistic, WaldTestStatistic,
-                           _annihilate, _proj, cached_property)
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
+                                  _annihilate, _proj, cached_property)
 
 
 class OLSResults(object):
@@ -300,7 +300,7 @@ class IVResults(_CommonIVResults):
         """
         Wooldridge's score test of exogeneity 
         """
-        from panel.iv.model import IV2SLS
+        from linearmodels.iv.model import IV2SLS
         e = _annihilate(self._model.dependent.ndarray, self._model._x)
         r = _annihilate(self._model.endog.ndarray, self._model._z)
         res = IV2SLS(e, r, None, None).fit('unadjusted')
@@ -315,7 +315,7 @@ class IVResults(_CommonIVResults):
         """
         Wooldridge's regression test of exogeneity 
         """
-        from panel.iv.model import IV2SLS
+        from linearmodels.iv.model import IV2SLS
         r = _annihilate(self._model.endog.ndarray, self._model._z)
         augx = c_[self._model._x, r]
         mod = IV2SLS(self._model.dependent, augx, None, None)
@@ -334,7 +334,7 @@ class IVResults(_CommonIVResults):
         """
         Wooldridge's score test of overidentification 
         """
-        from panel.iv.model import IV2SLS
+        from linearmodels.iv.model import IV2SLS
         endog, instruments = self._model.endog, self._model.instruments
         proj_reg = _proj(self._model._z, self._model._z)
         nobs, nendog = endog.shape
@@ -488,7 +488,7 @@ class FirstStageResults(object):
               orthogonoalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
         """
-        from panel.iv.model import IV2SLS
+        from linearmodels.iv.model import IV2SLS
         endog, exog, instr = self.endog, self.exog, self.instr
         z = instr.ndarray
         x = exog.ndarray
@@ -535,7 +535,7 @@ class FirstStageResults(object):
             Dictionary containing first stage estimation results. Keys are
             the variable names of the endogenous regressors.
         """
-        from panel.iv.model import IV2SLS
+        from linearmodels.iv.model import IV2SLS
         exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
         res = {}
         for col in self.endog.pandas:

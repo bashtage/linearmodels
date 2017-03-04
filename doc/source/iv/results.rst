@@ -1,7 +1,7 @@
 Estimation Results
 ------------------
 
-.. currentmodule:: panel.iv.results
+.. currentmodule:: linearmodels.iv.results
 
 .. autoclass:: IVResults
    :members:

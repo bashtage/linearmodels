@@ -188,9 +188,9 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
     
     See Also
     --------
-    panel.iv.covariance.kernel_weight_bartlett, 
-    panel.iv.covariance.kernel_weight_parzen, 
-    panel.iv.covariance.kernel_weight_quadratic_spectral
+    linearmodels.iv.covariance.kernel_weight_bartlett, 
+    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
 
     """
     t = x.shape[0]
@@ -463,9 +463,9 @@ class KernelCovariance(HomoskedasticCovariance):
     
     See Also
     --------
-    panel.iv.covariance.kernel_weight_bartlett, 
-    panel.iv.covariance.kernel_weight_parzen, 
-    panel.iv.covariance.kernel_weight_quadratic_spectral
+    linearmodels.iv.covariance.kernel_weight_bartlett, 
+    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
 
     """
 

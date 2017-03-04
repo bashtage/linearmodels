@@ -41,8 +41,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "panel-"
-    cfg.versionfile_source = "panel/_version.py"
+    cfg.parentdir_prefix = "linearmodels-"
+    cfg.versionfile_source = "linearmodels/_version.py"
     cfg.verbose = False
     return cfg
 

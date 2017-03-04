@@ -39,7 +39,7 @@ same four required inputs:
 
    import pandas as pd
    data = pd.read_stata('hsng.dta')
-   from panel.iv import IV2SLS
+   from linearmodels.iv import IV2SLS
    endog = data.rent
    exog = sm.add_constant(data.pcturban)
    instd = data.hsngval
@@ -51,7 +51,7 @@ same four required inputs:
 
 .. code-block:: python
 
-  from panel.iv import IV2SLS
+  from linearmodels.iv import IV2SLS
   mod = IV2SLS(endog, exog, instrumented, instruments)
   res = mod.fit()
 
@@ -60,7 +60,7 @@ The estimator will reduce to OLS when ``instruments`` is equal to ``instrumented
 
 .. code-block:: python
 
-  from panel.iv import IV2SLS
+  from linearmodels.iv import IV2SLS
   ols_mod = IV2SLS(endog, exog, instrumented, instrumented)
   res = ols_mod.fit()
 

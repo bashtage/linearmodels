@@ -5,7 +5,7 @@ import pytest
 import scipy.sparse as sparse
 from numpy.testing import assert_equal
 
-from panel.panel.dummy_iterator import DummyVariableIterator
+from linearmodels.panel.dummy_iterator import DummyVariableIterator
 
 
 class TestDummyIterator(TestCase):

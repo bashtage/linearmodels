@@ -7,7 +7,7 @@ import xarray as xr
 from numpy.testing import assert_equal
 from pandas.util.testing import assert_frame_equal
 
-from panel.iv.data import DataHandler
+from linearmodels.iv.data import DataHandler
 
 
 class TestDataHandler(object):

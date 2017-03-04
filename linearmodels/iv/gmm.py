@@ -6,8 +6,8 @@ from __future__ import absolute_import, division, print_function
 from numpy import asarray, unique
 from numpy.linalg import inv
 
-from panel.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                 _cov_cluster, _cov_kernel)
+from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
+                                        _cov_cluster, _cov_kernel)
 
 
 class HomoskedasticWeightMatrix(object):
@@ -28,7 +28,7 @@ class HomoskedasticWeightMatrix(object):
     
     .. math::
     
-      s^{2} & =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{epsilon})^2 \\
+      s^{2} & =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{\epsilon})^2 \\
       W & =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i
     
     where :math:`z_i` contains both the exogensou regressors and instruments.
@@ -166,9 +166,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
       
     See Also
     --------
-    panel.iv.covariance.kernel_weight_bartlett, 
-    panel.iv.covariance.kernel_weight_parzen, 
-    panel.iv.covariance.kernel_weight_quadratic_spectral
+    linearmodels.iv.covariance.kernel_weight_bartlett, 
+    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(self, kernel='bartlett', bandwidth=None, center=False, debiased=False):
@@ -300,6 +300,8 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
 class IVGMMCovariance(HomoskedasticCovariance):
     """
+    Covariance estimation for GMM models
+    
     Parameters
     ----------
     x : ndarray
@@ -312,6 +314,44 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Estimated model parameters (nvar by 1)
     w : ndarray
         Weighting matrix used in GMM estimation
+    cov_type : str, optional
+        Covariance estimator to use  Valid choices are 
+
+        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
+          homoskedastic
+        * 'robust', 'heteroskedastic' - Allows for heterosedasticity by not 
+          autocorrelation
+        * 'kernel' - Allows for heteroskedasticity and autocorrelation
+        * 'cluster' - Allows for one-way cluster dependence
+        
+    debiased : bool, optional
+        Flag indicating whether to debias the covariance estimator
+    cov_config
+        Optional keyword arguments that are specific to a particular cov_type
+    
+    Notes
+    -----
+    Optional keyword argument for specific covariance estimators:
+    
+    **kernel**
+    
+      * ``kernel``: Name of kernel to use.  See 
+        linearmodel.covariance.KernelCovariance for details on available 
+        kernels 
+      * ``bandwidth``: Bandwidth to use when computing the weight.  If not 
+        provided, nobs - 2 is used.
+         
+    **cluster**
+    
+      * ``clusters``: Array containing the cluster indices.  See 
+        linearmodel.covariance.OneWayClusteredCovariance
+    
+    See also
+    --------
+    linearmodels.iv.covariance.HomoskedasticCovariance,
+    linearmodels.iv.covariance.HeteroskedasticCovariance,
+    linearmodels.iv.covariance.KernelCovariance,
+    linearmodels.iv.covariance.OneWayClusteredCovariance
     """
 
     def __init__(self, x, y, z, params, w, cov_type='robust', debiased=False,
@@ -341,7 +381,8 @@ class IVGMMCovariance(HomoskedasticCovariance):
             score_cov_estimator = KernelWeightMatrix
         else:
             raise ValueError('Unknown cov_type')
-        score_cov = score_cov_estimator(debiased=self.debiased, **self._cov_config)
+        score_cov = score_cov_estimator(debiased=self.debiased,
+                                        **self._cov_config)
         s = score_cov.weight_matrix(x, z, eps)
         self._cov_config = score_cov.config
 

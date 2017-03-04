@@ -6,8 +6,8 @@ import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose
 
-from panel.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
-from panel.utility import AttrDict
+from linearmodels.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
+from linearmodels.utility import AttrDict
 
 
 @pytest.fixture(scope='module')

@@ -3,11 +3,11 @@ import pytest
 from numpy.linalg import inv
 from numpy.testing import assert_equal, assert_allclose
 
-from panel.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
+from linearmodels.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
     kernel_weight_quadratic_spectral
-from panel.iv.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
+from linearmodels.iv.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
     OneWayClusteredWeightMatrix, KernelWeightMatrix, IVGMMCovariance
-from panel.utility import AttrDict
+from linearmodels.utility import AttrDict
 
 
 @pytest.fixture(params=[None, 12], scope='module')

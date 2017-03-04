@@ -1,7 +1,7 @@
 Instrumental Variable Covariance Estimation
 -------------------------------------------
 
-.. module:: panel.iv.covariance
+.. module:: linearmodels.iv.covariance
 
 
 .. autoclass:: HomoskedasticCovariance
@@ -24,9 +24,9 @@ Instrumental Variable Covariance Estimation
 Kernel Weight Generators
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automethod:: panel.iv.covariance.kernel_weight_bartlett
-.. automethod:: panel.iv.covariance.kernel_weight_parzen
-.. automethod:: panel.iv.covariance.kernel_weight_quadratic_spectral
+.. automethod:: linearmodels.iv.covariance.kernel_weight_bartlett
+.. automethod:: linearmodels.iv.covariance.kernel_weight_parzen
+.. automethod:: linearmodels.iv.covariance.kernel_weight_quadratic_spectral
 
 
 

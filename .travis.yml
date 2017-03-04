@@ -23,8 +23,8 @@ before_install:
   - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda update --yes --quiet conda
   # Install packages
-  - conda create --yes --quiet -n panel-test python=${PYTHON} numpy scipy pandas xarray statsmodels ipython
-  - source activate panel-test
+  - conda create --yes --quiet -n linearmodels-test python=${PYTHON} numpy scipy pandas xarray statsmodels ipython
+  - source activate linearmodels-test
   - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme -q
   - export PYTHONHASHSEED=0
 
@@ -32,7 +32,7 @@ install:
   - python setup.py develop
 
 script:
-  - pytest -n 2 --cov-config .coveragerc --cov=panel panel
+  - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels
   - set -e
   - cd doc && make html && cd ..
 
