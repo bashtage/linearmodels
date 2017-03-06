@@ -5,6 +5,7 @@ sudo: false
 env:
   global:
     - COVERAGE=true
+    - secure: "aCm98s/mNxRSoTEhpIgfvRKzzJKdDkm/9TufIvgWvnkeiyDQqZwoqRVDIikZ+v6mkFeu7dr7BBojyPXnhkhji+SkNFz5ArtEqahJTvIZhP2nWgktlQSWkaC2Q5GyCWPhdQag/ImYbM4RK1WvtIVcSL7GPL0jLTgFDXY6/Hdl0eQY7kfWtojxIZUJShxn9IPfXE3gGQeWHEOL7SkZ3+8KxBJAUzrdd9J32PiHWZb5BcUupTQcW29ajoco4q1fdL/xPu3GZnys8EClorHxnPptQWfGGlnoJ79Q6H7Jhw6BGIj2fDCG9qX4boEH2zvH8ZKlbuTvMeVcBiLxPE8BpRmx2drX2kDyUo5ywVwA0W/7zsZ2YUYEyHEYL+cr4WVFdoDpwwPKaHOTp8F4Q+lQgkvxZbSlO6dUEMLNxnltgujAAdiaRJKLd2CwA85RjqYGLkMzTqBgYhH+p+7wB6jK8EJgoqxU3k98LfaeqyhsPrdWsxVLleLVAvzhXpNilQfX4NBPf+DYsn9NeyXYzp85H9p+J8DGJMJ42kBdP1r/cz1Y44SrGZhlk1MhLhb+uX7kV7nnmcW87NYoGSr52S5vNVL9iSU980SzJ08wOZwxwkKXOqgEJtMqdHsEuqY9jSQ2m/xAdarpxBsDD+Pw2gPfar+R8Lcptep50pMPFMgddDWV2f4="
 
 matrix:
   fast_finish: true
@@ -25,7 +26,7 @@ before_install:
   # Install packages
   - conda create --yes --quiet -n linearmodels-test python=${PYTHON} numpy scipy pandas xarray statsmodels ipython
   - source activate linearmodels-test
-  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme -q
+  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr -q
   - export PYTHONHASHSEED=0
 
 install:
@@ -35,6 +36,7 @@ script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels
   - set -e
   - cd doc && make html && cd ..
+  - doctr deploy
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi
