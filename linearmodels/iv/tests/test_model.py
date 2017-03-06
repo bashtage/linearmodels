@@ -12,7 +12,7 @@ from linearmodels.utility import AttrDict
 
 @pytest.fixture(scope='module')
 def data():
-    n, k, p = 1000, 5, 3
+    n, q, k, p = 1000, 2, 5, 3
     np.random.seed(12345)
     clusters = np.random.randint(0, 10, n)
     rho = 0.5
@@ -24,7 +24,7 @@ def data():
     r += np.eye(9) * 0.5
     v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
     x = v[:, :k]
-    z = v[:, 2:k + p]
+    z = v[:, k:k + p]
     e = v[:, [-1]]
     params = np.arange(1, k + 1) / k
     params = params[:, None]
@@ -40,15 +40,15 @@ def data():
     return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, xhat=xhat,
                     params=params, s2=s2, s2_debiased=s2_debiased,
                     clusters=clusters, nvar=nvar, v=v, vinv=vinv, vk=vk,
-                    kappa=kappa, dep=y, exog=x[:, 2:], endog=x[:, :2],
-                    instr=z[:, 3:])
+                    kappa=kappa, dep=y, exog=x[:, q:], endog=x[:, :q],
+                    instr=z)
 
 
 def get_all(v):
     attr = [d for d in dir(v) if not d.startswith('_')]
     for a in attr:
         val = getattr(v, a)
-        if a == 'conf_int':
+        if a in ('conf_int', 'durbin', 'wu_hausman'):
             val = val()
 
 
@@ -193,3 +193,27 @@ def test_2sls_just_identified(data):
     stats = fs.diagnostics
     # Fetch again to test cache
     get_all(res)
+
+
+def test_durbin_smoke(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    durb = res.durbin()
+    durb2 = res.durbin([mod.endog.cols[1]])
+
+def test_wuhausman_smoke(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    wh = res.wu_hausman()
+    wh = res.wu_hausman([mod.endog.cols[1]])
+
+
+def test_wooldridge_smoke(data):
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
+    wr = res.wooldridge_regression
+
+    ws = res.wooldridge_score
+    print(wr)
+    print(ws)
+

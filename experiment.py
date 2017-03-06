@@ -1,32 +1,25 @@
-import numpy as np
+import statsmodels.api as sm
+from linearmodels.iv import *
+import pandas as pd
+data = pd.read_stata(r'C:\git\linearmodels\linearmodels\iv\tests\results\simulated-data.dta')
+exog = sm.add_constant(data[['x3','x4','x5']])
+res = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit()
+res.durbin()
+print(res.durbin())
+print(res.durbin(['x1']))
+print(res.durbin(['x2']))
 
-from linearmodels.iv import IVGMM
+print(res.wu_hausman())
+print(res.wu_hausman(['x1']))
+print(res.wu_hausman(['x2']))
 
-n, k, p = 1000, 5, 3
-np.random.seed(12345)
-clusters = np.random.randint(0, 10, n)
-rho = 0.5
-r = np.zeros((k + p + 1, k + p + 1))
-r.fill(rho)
-r[-1, 2:] = 0
-r[2:, -1] = 0
-r[-1, -1] = 0.5
-r += np.eye(9) * 0.5
-v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
-x = v[:, :k]
-z = v[:, 2:k + p]
-e = v[:, [-1]]
-params = np.arange(1, k + 1) / k
-params = params[:, None]
-y = x @ params + e
+res = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit('robust')
+print(res.wooldridge_score)
+print(res.wooldridge_regression)
 
-mod = IVGMM(y, x[:, 2:], x[:, :2], z[:, 3:])
-res = mod.fit()
-print(res.cov)
 
-mod = IVGMM(np.tile(y, (2, 1)),
-            np.tile(x[:, 2:], (2, 1)),
-            np.tile(x[:, :2], (2, 1)),
-            np.tile(z[:, 3:], (2, 1))g)
-res = mod.fit()
-print(res.cov)
+res = IV2SLS(data.y_robust,exog,data[['x1']],data[['z1','z2']]).fit()
+res.durbin()
+print(res.sargan)
+print(res.basmann)
+

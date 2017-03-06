@@ -1,9 +1,9 @@
 # .coveragerc to control coverage.py
 [run]
-source = panel
+source = linearmodels
 branch = True
 include =
-    */panel/*
+    */linearmodels/*
 omit =
     */results/*
     */_version.py

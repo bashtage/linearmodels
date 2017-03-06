@@ -1,2 +1,2 @@
 include versioneer.py
-include panel/_version.py
+include linearmodels/_version.py

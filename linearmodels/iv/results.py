@@ -1,5 +1,5 @@
 import scipy.stats as stats
-from numpy import c_, diag, log, ones, sqrt
+from numpy import c_, diag, log, ones, sqrt, empty
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series
 
@@ -24,7 +24,6 @@ class OLSResults(object):
         self._cov_config = results['cov_config']
         self._method = results['method']
         self._kappa = results.get('kappa', None)
-        self._liml_kappa = results.get('liml_kappa', None)
 
     @property
     def cov_config(self):
@@ -185,7 +184,7 @@ class _CommonIVResults(OLSResults):
 
     def __init__(self, results, model):
         super(_CommonIVResults, self).__init__(results, model)
-        self._kappa = results.get('kappa', 1)
+        self._liml_kappa = results.get('liml_kappa', None)
 
     @property
     def first_stage(self):
@@ -223,6 +222,31 @@ class IVResults(_CommonIVResults):
     def sargan(self):
         """
         Sargan test of overidentifying restrictions
+        
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+        
+        Notes
+        -----
+        Requires more instruments than endogenous variables
+        
+        Tests the ratio of re-projected IV regression residual variance to 
+        variance of the IV residuals.
+        
+        .. math ::
+        
+          n (1- \epsilon'M_{z}\epsilon/\epsilon'\epsilon) \sim \chi^2_{v}
+        
+        where :math:`M_{z}` is the annihilator matrix where z is the set of 
+        instruments and :math:`\hat{\epsilon}` are the residuals from the IV 
+        estimator.  The degree of freedom is the difference between the number
+        of instruments and the number of endogenous regressors.
+
+        .. math :: 
+        
+          v = n_{instr} - n_{exog} 
         """
         z = self._model.instruments.ndarray
         nobs, ninstr = z.shape
@@ -233,7 +257,7 @@ class IVResults(_CommonIVResults):
                                         'endogenous variables.', name=name)
 
         eps = self.resids.values[:, None]
-        u = eps - z @ (pinv(z) @ eps)
+        u = _annihilate(eps, self._model._z)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = 'The model is not overidentified.'
 
@@ -243,68 +267,191 @@ class IVResults(_CommonIVResults):
     def basmann(self):
         """
         Basmann's test of overidentifying restrictions
+        
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+        
+        Notes
+        -----
+        Requires more instruments than endogenous variables
+        
+        Tests is a small-sample version of Sargan's test that has the same 
+        distribution.
+        
+        .. math ::
+        
+          s (n - n_{instr}) / (n - s) \sim \chi^2_{v} 
+        
+        where :math:`n_{instr}` is the number of instruments, :math:`n_{exog}`
+        is the number of exogenous regressors and :math:`n_{endog}` is the 
+        number of endogenous regressors.  The degree of freedom is the 
+        difference between the number of instruments and the number of 
+        endogenous regressors.
+        
+        .. math :: 
+        
+          v = n_{instr} - n_{exog} 
         """
         mod = self._model
-        nobs, ninstr = mod.instruments.shape
-        nendog = mod.endog.shape[1]
-        nvar = mod.exog.shape[1] + nendog
+        ninstr = mod.instruments.shape[1]
+        nobs, nendog = mod.endog.shape
+        nz = mod._z.shape[1]
         name = 'Basmann\'s test of overidentification'
         if ninstr - nendog == 0:
             return InvalidTestStatistic('Test requires more instruments than '
                                         'endogenous variables.', name=name)
         sargan_test = self.sargan
         s = sargan_test.stat
-        stat = s * (nobs - ninstr) / (nobs - nvar)
+        stat = s * (nobs - nz) / (nobs - s)
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
-    @cached_property
-    def durbin(self):
-        """
-        Durbin's test of exogeneity
-        """
-        exog_endog = c_[self._model.exog.ndarray, self._model.endog.ndarray]
-        nendog = self._model.endog.shape[1]
-        e_ols = _annihilate(self._model.dependent.ndarray, exog_endog)
-        nobs = e_ols.shape[0]
-        e_2sls = self.resids.values
-        e_ols_pz = _proj(e_ols, self._model.instruments.ndarray)
-        e_2sls_pz = _proj(e_2sls, self._model.instruments.ndarray)
-        stat = e_ols_pz.T @ e_ols_pz - e_2sls_pz.T @ e_2sls_pz
-        stat /= (e_ols.T @ e_ols) / nobs
-        null = 'Endogenous variables are exogenous'
-        name = 'Durbin test of exogeneity'
-        return WaldTestStatistic(stat.squeeze(), null, nendog, name=name)
-
-    @cached_property
-    def wu_hausman(self):
-        """
-        Wu-Hausman test of exogeneity
-        """
-        durb = self.durbin
-        exog_endog = c_[self._model.exog.ndarray, self._model.endog.ndarray]
-        e_ols = _annihilate(self._model.dependent.ndarray, exog_endog)
-        nobs = e_ols.shape[0]
+    def _endogeneity_setup(self, vars=None):
+        nobs = self._model.dependent.shape[0]
+        e2 = self.resids.values
         nendog, nexog = self._model.endog.shape[1], self._model.exog.shape[1]
-        rss_ols = (e_ols ** 2).sum()
-        delta = durb.stat * (rss_ols / nobs)
-        df = nexog
-        wh_num = delta / df
-        df_denom = nobs - nexog - nendog - nendog
-        wh_denom = (rss_ols - delta) / df_denom
-        stat = wh_num / wh_denom
+        if vars is None:
+            assumed_exog = self._model.endog.ndarray
+            aug_exog = c_[self._model.exog.ndarray, assumed_exog]
+            still_endog = empty((nobs, 0))
+        else:
+            assumed_exog = self._model.endog.pandas[vars].values
+            ex = [c for c in self._model.endog.cols if c not in vars]
+            still_endog = self._model.endog.pandas[ex].values
+            aug_exog = c_[self._model.exog.ndarray, assumed_exog]
+            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+        ntested = assumed_exog.shape[1]
+
+        from linearmodels.iv import IV2SLS
+        mod = IV2SLS(self._model.dependent, aug_exog, still_endog,
+                     self._model.instruments)
+        e0 = mod.fit().resids.values[:,None]
+
+        z2 = c_[self._model.exog.ndarray, self._model.instruments.ndarray]
+        z1 = c_[z2, assumed_exog]
+
+        e1 = _proj(e0, z1)
+        e2 = _proj(e2, self._model.instruments.ndarray)
+        return e0, e1, e2, nobs, nexog, nendog, ntested
+
+
+    def durbin(self, vars=None):
+        r"""
+        Durbin's test of exogeneity
+        
+        Parameters
+        ----------
+        vars : list(str), optional
+            List of variables to test for exogeneity.  If None, all variables 
+            are jointly tested. 
+
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+        
+        Notes
+        -----
+        
+        Test statistic is difference between sum of squared OLS and sum of 
+        squared IV residuals where each set of residuals has been projected 
+        onto the set of instruments in teh IV model.  
+        
+        .. math ::
+        
+          TODO 
+
+        """
+        null = 'All endogenous variables are exogenous'
+        if vars is not None:
+            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+
+        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(vars)
+        stat = e1.T @ e1 - e2.T @ e2
+        stat /= (e0.T @ e0) / nobs
+
+        name = 'Durbin test of exogeneity'
+        df = ntested
+        return WaldTestStatistic(stat.squeeze(), null, df, name=name)
+
+    def wu_hausman(self, vars=None):
+        r"""
+        Wu-Hausman test of exogeneity
+
+        Parameters
+        ----------
+        vars : list(str), optional
+            List of variables to test for exogeneity.  If None, all variables 
+            are jointly tested. 
+
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+        
+        Notes
+        -----
+        
+        Test statistic is based on the difference between ...
+        
+        .. math ::
+        
+          TODO 
+
+        """
+        null = 'All endogenous variables are exogenous'
+        if vars is not None:
+            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+
+        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(vars)
+
+        df = ntested
+        df_denom = nobs - nexog - nendog - ntested
+        delta = (e1.T @ e1 - e2.T @ e2)
+        stat = delta / df
+        stat /= (e0.T@e0 - delta)/df_denom
+        stat = stat.squeeze()
+
         name = 'Wu-Hausman test of exogeneity'
-        return WaldTestStatistic(stat, durb.null, df, df_denom, name=name)
+        return WaldTestStatistic(stat, null, df, df_denom, name=name)
 
     @cached_property
     def wooldridge_score(self):
+        r"""
+        Wooldridge's score test of exogeneity
+         
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+
+        Notes
+        -----
+        Wooldridge's test examines whether there is correlation between the
+        errors produced when the endogenous variable are treated as 
+        exogenous so that the model can be fit by OLS, and the component of 
+        the endogenous variables that cannot be explained by the instruments.
+        
+        The test is implemented using a regression,
+         
+        .. math ::
+        
+          1 = \gamma_1 \hat{\epsilon}_1 \hat{v}_{1,i} + \ldots 
+            + \gamma_p \hat{\epsilon}_1 \hat{v}_{p,i} + \eta_i
+        
+        where :math:`\hat{v}_{j,i}` is the residual from regressing endogenous
+        variable :math:`x_j` on the exogenous variables and instruments.
+        
+        The test is a :math:`n\times R^2 \sim \chi^2_{p}`.
         """
-        Wooldridge's score test of exogeneity 
-        """
-        from linearmodels.iv.model import IV2SLS
+        from linearmodels.iv.model import _OLS
+
         e = _annihilate(self._model.dependent.ndarray, self._model._x)
         r = _annihilate(self._model.endog.ndarray, self._model._z)
-        res = IV2SLS(e, r, None, None).fit('unadjusted')
-        stat = res.nobs * res.rsquared
+        nobs = e.shape[0]
+        res = _OLS(ones((nobs,1)), r * e).fit('unadjusted')
+        stat = res.nobs - res.resid_ss
         df = self._model.endog.shape[1]
         null = 'Endogenous variables are exogenous'
         name = 'Wooldridge\'s score test of exogeneity'
@@ -312,13 +459,37 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def wooldridge_regression(self):
-        """
+        r"""
         Wooldridge's regression test of exogeneity 
+
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+
+        Notes
+        -----
+        Wooldridge's test examines whether there is correlation between the
+        components of the endogenous variables that cannot be explained by
+        the instruments and the OLS regression residusls.
+         
+        The test is implemented as an OLS where 
+
+        .. math ::
+
+          y_i = x_{1i}\beta_i + x_{2i}\beta_2 + \hat{e}_i\gamma + \epsilon_i
+        
+        where :math:`x_{1i}` are the exogenous regressors, :math:`x_{2i}` are 
+        the  endogenous regressors and :math:`\hat{e}_{i}` are the residuals 
+        from regressing the endogenous variables on the exogenous variables 
+        and instruments. The null is :math:`\gamma=0` and is implemented
+        using a Wald test.  The covariance estimator used in the test is
+        identical to the covariance estimator used with ``fit``. 
         """
-        from linearmodels.iv.model import IV2SLS
+        from linearmodels.iv.model import _OLS
         r = _annihilate(self._model.endog.ndarray, self._model._z)
         augx = c_[self._model._x, r]
-        mod = IV2SLS(self._model.dependent, augx, None, None)
+        mod = _OLS(self._model.dependent, augx)
         res = mod.fit(self.cov_type, **self.cov_config)
         norig = self._model._x.shape[1]
         test_params = res.params.values[norig:]
@@ -334,7 +505,7 @@ class IVResults(_CommonIVResults):
         """
         Wooldridge's score test of overidentification 
         """
-        from linearmodels.iv.model import IV2SLS
+        from linearmodels.iv.model import _OLS
         endog, instruments = self._model.endog, self._model.instruments
         proj_reg = _proj(self._model._z, self._model._z)
         nobs, nendog = endog.shape
@@ -350,7 +521,7 @@ class IVResults(_CommonIVResults):
         q_proj = _proj(q, proj_reg)
         resids = self.resids.values
         test_functions = q_proj * resids[:, None]
-        mod = IV2SLS(ones((nobs, 1)), test_functions, None, None)
+        mod = _OLS(ones((nobs, 1)), test_functions)
         res = mod.fit('unadjusted')
         stat = res.nobs * res.rsquared
         df = q.shape[1]
@@ -397,8 +568,7 @@ class IVGMMResults(_CommonIVResults):
     .. todo::
 
         * Hypothesis testing
-        * First stage diagnostics
-        * Model diagnostics
+        * C test
     """
 
     def __init__(self, results, model):
@@ -426,16 +596,30 @@ class IVGMMResults(_CommonIVResults):
 
     @property
     def weight_config(self):
-        """Weighting matrix parameters used in estimation"""
+        """Weighting matrix configuration used in estimation"""
         return self._weight_config
 
     @property
     def j_stat(self):
-        """J-test of overidentifying restrictions"""
+        """
+        J-test of overidentifying restrictions
+        
+        Returns
+        -------
+        j : WaldTestStatistic
+            J-statistic test of overidentifying restrictions
+        """
         return self._j_stat
 
     def c_stat(self):
-        """C-test of endogeneity"""
+        """
+        C-test of endogeneity
+        
+        Returns
+        -------
+        c` : WaldTestStatistic
+            C-statistic test of regressor endogeneity
+        """
         # TODO
         pass
 
@@ -488,7 +672,7 @@ class FirstStageResults(object):
               orthogonoalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
         """
-        from linearmodels.iv.model import IV2SLS
+        from linearmodels.iv.model import _OLS, IV2SLS
         endog, exog, instr = self.endog, self.exog, self.instr
         z = instr.ndarray
         x = exog.ndarray
@@ -501,7 +685,7 @@ class FirstStageResults(object):
             inner['rsquared'] = individal_results[col].rsquared
             y = endog.pandas[[col]].values
             ey = y - px @ y
-            mod = IV2SLS(ey, ez, None, None)
+            mod = _OLS(ey, ez)
             res = mod.fit(self._cov_type, **self._cov_config)
             inner['partial.rsquared'] = res.rsquared
             params = res.params.values
@@ -516,7 +700,7 @@ class FirstStageResults(object):
 
         dep = self.dep
         r2sls = IV2SLS(dep, exog, endog, instr).fit('unadjusted')
-        rols = IV2SLS(dep, self._reg, None, None).fit('unadjusted')
+        rols = _OLS(dep, self._reg).fit('unadjusted')
         shea = (rols.std_errors / r2sls.std_errors) ** 2
         shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
         out['shea.rsquared'] = shea[out.index]
@@ -535,11 +719,11 @@ class FirstStageResults(object):
             Dictionary containing first stage estimation results. Keys are
             the variable names of the endogenous regressors.
         """
-        from linearmodels.iv.model import IV2SLS
+        from linearmodels.iv.model import _OLS
         exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
         res = {}
         for col in self.endog.pandas:
-            mod = IV2SLS(self.endog.pandas[col], exog_instr, None, None)
+            mod = _OLS(self.endog.pandas[col], exog_instr)
             res[col] = mod.fit(self._cov_type, **self._cov_config)
 
         return res

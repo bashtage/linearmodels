@@ -718,3 +718,21 @@ class IVGMMCUE(IVGMM):
         results.update(gmm_pe)
 
         return self._result_container(results, self)
+
+
+class _OLS(IVLIML):
+    """
+    Computes OLS estimated when required
+    
+    Notes
+    -----
+    Uses IV2SLS internaly by setting endog and instruments to None
+    
+    See Also
+    --------
+    statsmodels.regression.linear_model.OLS,
+    statsmodels.regression.linear_model.GLS
+    """
+    def __init__(self, dependent, exog):
+        super(_OLS, self).__init__(dependent, exog, None, None, kappa=0.0)
+        self._result_container = OLSResults
