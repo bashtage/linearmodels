@@ -391,7 +391,6 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     @property
     def config(self):
-        conf = {'cov_type': self._cov_type,
-                'debiased': self.debiased}
+        conf = {'debiased': self.debiased}
         conf.update(self._cov_config)
         return conf

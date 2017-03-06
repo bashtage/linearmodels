@@ -48,7 +48,7 @@ def get_all(v):
     attr = [d for d in dir(v) if not d.startswith('_')]
     for a in attr:
         val = getattr(v, a)
-        if a in ('conf_int', 'durbin', 'wu_hausman'):
+        if a in ('conf_int', 'durbin', 'wu_hausman', 'c_stat'):
             val = val()
 
 

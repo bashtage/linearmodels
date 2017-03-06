@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_allclose
 from statsmodels.api import add_constant
 
-from linearmodels.iv import IV2SLS
+from linearmodels.iv import IV2SLS, IVGMM
 from linearmodels.utility import AttrDict
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
@@ -90,3 +90,9 @@ def test_basmann_f(data):
     res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('unadjusted')
     assert_allclose(res.basmann_f.stat, .174821, rtol=1e-4)
     assert_allclose(res.basmann_f.pval, 0.6760, rtol=1e-3)
+
+def test_c_stat_smoke(data):
+    res = IVGMM(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
+    res.c_stat()
+    res.c_stat('x1')
+    res.c_stat(['x1'])

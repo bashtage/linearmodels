@@ -688,17 +688,55 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._j_stat
 
-    def c_stat(self):
+    def c_stat(self, vars=None):
         """
         C-test of endogeneity
         
+        Parameters
+        ----------
+        vars : list(str), optional
+            List of variables to test for exogeneity.  If None, all variables 
+            are jointly tested. 
+
         Returns
         -------
-        c` : WaldTestStatistic
-            C-statistic test of regressor endogeneity
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+        
+        Notes
+        -----
+        ToDo
         """
-        # TODO
-        pass
+        dependent, instruments = self._model.dependent, self._model.instruments
+        exog, endog = self._model.exog, self._model.endog
+        if vars is None:
+            exog_e = c_[exog.ndarray, endog.ndarray]
+            nobs = exog_e.shape[0]
+            endog_e = empty((nobs, 0))
+            null = 'All endogenous variables are exogenous'
+        else:
+            if not isinstance(vars, list):
+                vars = [vars]
+            exog_e = c_[exog.ndarray, endog.pandas[vars].values]
+            ex = [c for c in endog.pandas if c not in vars]
+            endog_e = endog.pandas[ex].values
+            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+        from linearmodels.iv import IVGMM
+        mod = IVGMM(dependent, exog_e, endog_e, instruments)
+        res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        j_e = res_e.j_stat.stat
+
+        x = self._model._x
+        y = self._model._y
+        z = self._model._z
+        nz = z.shape[1]
+        weight_mat_c = res_e.weight_matrix.values[:nz, :nz]
+        params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
+        j_c = self._model._j_statistic(params_c, weight_mat_c).stat
+
+        stat = j_e - j_c
+        df = exog_e.shape[1] - exog.shape[1]
+        return WaldTestStatistic(stat, null, df, name='C-statistic')
 
 
 class FirstStageResults(object):
