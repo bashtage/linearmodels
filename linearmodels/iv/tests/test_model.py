@@ -201,6 +201,7 @@ def test_durbin_smoke(data):
     durb = res.durbin()
     durb2 = res.durbin([mod.endog.cols[1]])
 
+
 def test_wuhausman_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
@@ -216,4 +217,3 @@ def test_wooldridge_smoke(data):
     ws = res.wooldridge_score
     print(wr)
     print(ws)
-

@@ -230,8 +230,6 @@ class IVLIML(object):
         if kappa is None:
             kappa = liml_kappa
 
-
-
         if self._fuller != 0:
             nobs, ninstr = z.shape
             kappa -= self._fuller / (nobs - ninstr)
@@ -399,7 +397,6 @@ class IVGMM(IVLIML):
     .. todo:
 
          * VCV: bootstrap
-         * Post-estimation results
     """
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
@@ -733,6 +730,7 @@ class _OLS(IVLIML):
     statsmodels.regression.linear_model.OLS,
     statsmodels.regression.linear_model.GLS
     """
+
     def __init__(self, dependent, exog):
         super(_OLS, self).__init__(dependent, exog, None, None, kappa=0.0)
         self._result_container = OLSResults

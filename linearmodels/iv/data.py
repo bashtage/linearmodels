@@ -47,8 +47,7 @@ class DataHandler(object):
             index = list(range(x.shape[0]))
             cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
             self._pandas = pd.DataFrame(x, index=index, columns=cols)
-            self._labels = {0: index,
-                            1: cols}
+            self._labels = {0: index, 1: cols}
 
         elif isinstance(x, (pd.Series, pd.DataFrame)):
             dts = [x.dtype] if xndim == 1 else x.dtypes
@@ -67,7 +66,19 @@ class DataHandler(object):
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
 
         elif isinstance(x, xr.DataArray):
-            raise NotImplementedError('Not implemented yet.')
+            if x.ndim == 1:
+                x = xr.concat([x], dim=var_name).transpose()
+
+            index = list(x.coords[x.dims[0]].values)
+            cols = x.coords[x.dims[1]].values
+            if pd.api.types.is_numeric_dtype(cols.dtype):
+                cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
+            cols = list(cols)
+
+            self._pandas = pd.DataFrame(x.values, columns=cols, index=index)
+            self._ndarray = x.values
+            self._labels = {0: index, 1: cols}
+
         else:
             raise TypeError(type_err)
 

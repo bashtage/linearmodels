@@ -1,11 +1,10 @@
-from collections import OrderedDict
-
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from collections import OrderedDict
 from numpy.testing import assert_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.util.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.iv.data import DataHandler
 
@@ -60,6 +59,47 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 1)
 
+    def test_xarray_1d(self):
+        x_np = np.random.randn(10)
+        x = xr.DataArray(x_np)
+        dh = DataHandler(x, 'some_variable')
+        assert_equal(dh.ndarray, x_np[:, None])
+        assert dh.rows == list(np.arange(10))
+        assert dh.cols == ['some_variable.0']
+        expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
+        assert_frame_equal(expected, dh.pandas)
+
+        index = pd.date_range('2017-01-01', periods=10)
+        x = xr.DataArray(x_np,
+                         [('time', index)])
+        dh = DataHandler(x, 'some_variable')
+        assert_equal(dh.ndarray, x_np[:, None])
+        assert_series_equal(pd.Series(dh.rows), pd.Series(list(index)))
+        assert dh.cols == ['some_variable.0']
+        expected = pd.DataFrame(x_np[:, None], columns=dh.cols, index=dh.rows)
+        assert_frame_equal(expected, dh.pandas)
+
+    def test_xarray_2d(self):
+        x_np = np.random.randn(10, 2)
+        x = xr.DataArray(x_np)
+        dh = DataHandler(x)
+        assert_equal(dh.ndarray, x_np)
+        assert dh.rows == list(np.arange(10))
+        assert dh.cols == ['x.0', 'x.1']
+        expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
+        assert_frame_equal(expected, dh.pandas)
+
+        index = pd.date_range('2017-01-01', periods=10)
+        x = xr.DataArray(x_np,
+                         [('time', index),
+                          ('variables', ['apple', 'banana'])])
+        dh = DataHandler(x)
+        assert_equal(dh.ndarray, x_np)
+        assert_series_equal(pd.Series(dh.rows), pd.Series(list(index)))
+        assert dh.cols == ['apple', 'banana']
+        expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
+        assert_frame_equal(expected, dh.pandas)
+
     def test_invalid_types(self):
         with pytest.raises(ValueError):
             DataHandler(np.empty((1, 1, 1)))
@@ -67,8 +107,6 @@ class TestDataHandler(object):
             DataHandler(np.empty((10, 2, 2)))
         with pytest.raises(ValueError):
             DataHandler(pd.Panel(np.empty((10, 2, 2))))
-        with pytest.raises(NotImplementedError):
-            DataHandler(xr.DataArray(np.empty(10)))
         with pytest.raises(ValueError):
             DataHandler(pd.Series(['apple', 'banana', 'cherry']))
         with pytest.raises(TypeError):

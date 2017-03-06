@@ -1,3 +1,10 @@
+from linearmodels.iv.data import DataHandler
+import xarray as xr
+import numpy as np
+o = xr.DataArray(np.random.randn(10))
+t = xr.DataArray(np.random.randn(10,2))
+DataHandler(o)
+
 import statsmodels.api as sm
 from linearmodels.iv import *
 import pandas as pd

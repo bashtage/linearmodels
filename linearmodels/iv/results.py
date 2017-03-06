@@ -160,7 +160,7 @@ class OLSResults(object):
 
         Returns
         -------
-        ci : ndarray
+        ci : DataFrame
             Confidence interval of the form [lower, upper] for each parameters
         """
         q = stats.norm.ppf([(1 - level) / 2, 1 - (1 - level) / 2])
@@ -178,8 +178,6 @@ class _CommonIVResults(OLSResults):
     .. todo::
 
         * Hypothesis testing
-        * First stage diagnostics
-        * Model diagnostics
     """
 
     def __init__(self, results, model):
@@ -210,8 +208,6 @@ class IVResults(_CommonIVResults):
     .. todo::
 
         * Hypothesis testing
-        * First stage diagnostics
-        * Model diagnostics
     """
 
     def __init__(self, results, model):
@@ -308,6 +304,9 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
     def _endogeneity_setup(self, vars=None):
+        """Setup function for some endogeneity tests"""
+        if vars is not None and not isinstance(vars, list):
+            vars = [vars]
         nobs = self._model.dependent.shape[0]
         e2 = self.resids.values
         nendog, nexog = self._model.endog.shape[1], self._model.exog.shape[1]
@@ -326,7 +325,7 @@ class IVResults(_CommonIVResults):
         from linearmodels.iv import IV2SLS
         mod = IV2SLS(self._model.dependent, aug_exog, still_endog,
                      self._model.instruments)
-        e0 = mod.fit().resids.values[:,None]
+        e0 = mod.fit().resids.values[:, None]
 
         z2 = c_[self._model.exog.ndarray, self._model.instruments.ndarray]
         z1 = c_[z2, assumed_exog]
@@ -334,7 +333,6 @@ class IVResults(_CommonIVResults):
         e1 = _proj(e0, z1)
         e2 = _proj(e2, self._model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
-
 
     def durbin(self, vars=None):
         r"""
@@ -410,7 +408,7 @@ class IVResults(_CommonIVResults):
         df_denom = nobs - nexog - nendog - ntested
         delta = (e1.T @ e1 - e2.T @ e2)
         stat = delta / df
-        stat /= (e0.T@e0 - delta)/df_denom
+        stat /= (e0.T @ e0 - delta) / df_denom
         stat = stat.squeeze()
 
         name = 'Wu-Hausman test of exogeneity'
@@ -450,7 +448,7 @@ class IVResults(_CommonIVResults):
         e = _annihilate(self._model.dependent.ndarray, self._model._x)
         r = _annihilate(self._model.endog.ndarray, self._model._z)
         nobs = e.shape[0]
-        res = _OLS(ones((nobs,1)), r * e).fit('unadjusted')
+        res = _OLS(ones((nobs, 1)), r * e).fit('unadjusted')
         stat = res.nobs - res.resid_ss
         df = self._model.endog.shape[1]
         null = 'Endogenous variables are exogenous'
@@ -471,7 +469,7 @@ class IVResults(_CommonIVResults):
         -----
         Wooldridge's test examines whether there is correlation between the
         components of the endogenous variables that cannot be explained by
-        the instruments and the OLS regression residusls.
+        the instruments and the OLS regression residuals.
          
         The test is implemented as an OLS where 
 
@@ -502,12 +500,36 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def wooldridge_overid(self):
-        """
+        r"""
         Wooldridge's score test of overidentification 
+
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+
+        Notes
+        -----
+        Wooldridge's test examines whether there is correlation between the
+        model residuals and the component of the instruments that is 
+        orthogonal to the endogenous variables. Define :math:`\tilde{z}`
+        to be the residuals of the instruments regressed on the exogenous
+        variables and the first-stage fitted values of the endogenous 
+        variables.  The test is computed as a regression
+        
+        .. math ::
+        
+          1 = \gamma_1 \hat{\epsilon}_i \tilde{z}_{i,1} + \ldots + 
+              \gamma_q \hat{\epsilon}_i \tilde{z}_{i,q}
+        
+        where :math:`q = n_{instr} - n_{endog}`.  The test is a 
+        :math:`n\times R^2 \sim \chi^2_{q}`.
+        
+        The order of the instruments does not affect this test.
         """
         from linearmodels.iv.model import _OLS
-        endog, instruments = self._model.endog, self._model.instruments
-        proj_reg = _proj(self._model._z, self._model._z)
+        exog, endog = self._model.exog, self._model.endog
+        instruments = self._model.instruments
         nobs, nendog = endog.shape
         ninstr = instruments.shape[1]
         if ninstr - nendog == 0:
@@ -517,21 +539,40 @@ class IVResults(_CommonIVResults):
                           UserWarning)
             return WaldTestStatistic(0, 'Test is not feasible.', 1, name='Infeasible test.')
 
+        endog_hat = _proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
         q = instruments.ndarray[:, :(ninstr - nendog)]
-        q_proj = _proj(q, proj_reg)
-        resids = self.resids.values
-        test_functions = q_proj * resids[:, None]
-        mod = _OLS(ones((nobs, 1)), test_functions)
-        res = mod.fit('unadjusted')
+        q_res = _annihilate(q, c_[self._model.exog.ndarray, endog_hat])
+        test_functions = q_res * self.resids.values[:, None]
+        res = _OLS(ones((nobs, 1)), test_functions).fit('unadjusted')
+
         stat = res.nobs * res.rsquared
-        df = q.shape[1]
+        df = ninstr - nendog
         null = 'Model is not overidentified.'
         name = 'Wooldridge\'s score test of overidentification'
         return WaldTestStatistic(stat, null, df, name=name)
 
     @cached_property
     def anderson_rubin(self):
-        """Anderson-Rubin test of overidentifying restrictions"""
+        """
+        Anderson-Rubin test of overidentifying restrictions
+        
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+
+        Notes
+        -----
+        The Anderson-Rubin test examines whether the value of :math:`\kappa`
+        computed for the LIML estimator is sufficiently close to one to 
+        indicate the model is not overidentified. The test statistic is
+        
+        .. math ::
+        
+          n \ln(\hat{\kappa}) \sim \chi^2_{q}
+        
+        where :math:`q = n_{instr} - n_{endog}`.
+        """
         nobs, ninstr = self._model.instruments.shape
         nendog = self._model.endog.shape[1]
         name = 'Anderson-Rubin test of overidentification'
@@ -545,16 +586,35 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def basmann_f(self):
-        """Basmann's F test of overidentifying restrictions"""
+        """
+        Basmann's F test of overidentifying restrictions
+        
+        Returns
+        -------
+        t : WaldTestStatistic
+            Object containing test statistic, pvalue, distribution and null
+
+        Notes
+        -----
+        Banmann's F test examines whether the value of :math:`\kappa`
+        computed for the LIML estimator is sufficiently close to one to 
+        indicate the model is not overidentified. The test statistic is
+        
+        .. math ::
+        
+          \hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}
+        
+        where :math:`q = n_{instr} - n_{endog}`.
+        """
         nobs, ninstr = self._model.instruments.shape
-        nendog = self._model.endog.shape[1]
+        nendog, nexog = self._model.endog.shape[1], self._model.exog.shape[1]
         name = 'Basmann\' F  test of overidentification'
         if ninstr - nendog == 0:
             return InvalidTestStatistic('Test requires more instruments than '
                                         'endogenous variables.', name=name)
-        stat = (self._liml_kappa - 1) * (nobs - ninstr) / (ninstr - nendog)
         df = ninstr - nendog
-        df_denom = nobs - ninstr
+        df_denom = nobs - (nexog + ninstr)
+        stat = (self._liml_kappa - 1) * df_denom / df
         null = 'The model is not overidentified.'
         return WaldTestStatistic(stat, null, df, df_denom=df_denom, name=name)
 
@@ -569,6 +629,7 @@ class IVGMMResults(_CommonIVResults):
 
         * Hypothesis testing
         * C test
+        * Summary
     """
 
     def __init__(self, results, model):
@@ -601,13 +662,29 @@ class IVGMMResults(_CommonIVResults):
 
     @property
     def j_stat(self):
-        """
+        r"""
         J-test of overidentifying restrictions
         
         Returns
         -------
         j : WaldTestStatistic
             J-statistic test of overidentifying restrictions
+        
+        Notes
+        -----
+        The J-statistic tests whether the moment conditions are sufficiently 
+        close to zero to indicate that the model is not overidentified. The
+        statistic is defined as 
+        
+        .. math ::
+          
+          n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q
+        
+        where :math:`\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i` where 
+        :math:`z_i` includes both the exogensou variables and instruments and
+        :math:`\hat{\epsilon}_i` are the model residuals. :math:`W` is a consistent
+        estimator of the variance of :math:`\sqrt{n}\bar{g}`. The degree of 
+        freedom is :math:`q = n_{instr} - n_{endog}`. 
         """
         return self._j_stat
 

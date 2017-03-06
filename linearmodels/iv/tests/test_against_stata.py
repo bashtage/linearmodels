@@ -1,6 +1,6 @@
-import os
 from copy import deepcopy
 
+import os
 import pandas as pd
 import pytest
 import statsmodels.api as sm
