@@ -1,11 +1,16 @@
+"""
+Results containers and post-estimation diagnostics for IV models
+"""
 import datetime as dt
-
 import scipy.stats as stats
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
-                                  _annihilate, _proj, cached_property)
 from numpy import c_, diag, log, ones, sqrt, empty
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series
+from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
+    fmt_params
+
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
+                                  _annihilate, _proj, cached_property)
 
 
 class OLSResults(object):
@@ -116,7 +121,7 @@ class OLSResults(object):
     @cached_property
     def pvalues(self):
         """
-        Parameter p-vals. Uses t(df_resid) if debiased is True, other normal.
+        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
         if self.debiased:
             pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self.df_resid)
@@ -173,8 +178,16 @@ class OLSResults(object):
         -------
         ci : DataFrame
             Confidence interval of the form [lower, upper] for each parameters
+        
+        Notes
+        ----- 
+        Uses a t(df_resid) if ``debiased`` is True, else normal.
         """
-        q = stats.norm.ppf([(1 - level) / 2, 1 - (1 - level) / 2])
+        ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+        if self._debiased:
+            q = stats.t.ppf(ci_quantiles, self.df_resid)
+        else:
+            q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
@@ -194,7 +207,8 @@ class OLSResults(object):
         -----
         Despite name, always implemented using a quadratic-form test based on 
         estimated parameter covariance. Default is to use a chi2 distribution 
-        to compute p-values. If ``debiased`` is True, uses an F-distribution.
+        to compute p-values. If ``debiased`` is True, divides statistic by 
+        number of parameters tested and uses an F-distribution.
         """
         p = self.params.values[:, None]
         c = self.cov.values
@@ -205,16 +219,17 @@ class OLSResults(object):
             c = c[ex][:, ex]
         stat = p.T @ inv(c) @ p
         df = p.shape[0]
+        null = 'All coefficients ex. const are 0'
+        name = 'Model F-statistic'
         if self.cov_config['debiased']:
             df_denom = self.nobs - p.shape[0]
-            return WaldTestStatistic(stat, 'All coefficients ex. const are 0',
-                                     df, df_denom, name='Model F-statistic')
-        return WaldTestStatistic(stat, 'All coefficients ex. const are 0',
-                                 df, name='Model F-statistic')
+            return WaldTestStatistic(stat, null, df, df_denom, name=name)
+        return WaldTestStatistic(stat, null, df, name=name)
 
     @property
     def summary(self):
         """Summary table of model estimation results"""
+
         def float4(v):
             out = '{0:5.5g}'.format(v)
             if len(out) < 6 and '.' in out:
@@ -224,8 +239,6 @@ class OLSResults(object):
         def pval_format(v):
             return '{0:4.4f}'.format(v)
 
-        from statsmodels.iolib.summary import Summary, fmt_2cols, \
-            SimpleTable, fmt_params
         title = self._method + ' Estimation Summary'
         mod = self.model
         top_left = [('Dep. Variable:', mod.dependent.cols[0]),
@@ -357,7 +370,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
         
         Notes
         -----
@@ -402,7 +415,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
         
         Notes
         -----
@@ -482,19 +495,35 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
         
         Notes
         -----
-        
         Test statistic is difference between sum of squared OLS and sum of 
         squared IV residuals where each set of residuals has been projected 
         onto the set of instruments in teh IV model.  
         
+        Start by defining 
+        
         .. math ::
         
-          TODO 
-
+          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e 
+                   - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c \\
+        
+        where :math:`\hat{\epsilon}_e` are the regression residuals from a 
+        model where ``vars`` are treated as exogenous, 
+        :math:`\hat{\epsilon}_c` are the regression residuals from the model 
+        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection 
+        matrix onto the exogenous variables and instruments (`z`) as well as 
+        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.
+        
+        The test statistic is then 
+        
+        .. math ::
+        
+            \delta / (\hat{\epsilon}'_e\hat{\epsilon}_e) / n \sim \chi^2_{q}
+        
+        where :math:`q` is the number of variables tested.
         """
         null = 'All endogenous variables are exogenous'
         if vars is not None:
@@ -521,17 +550,37 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
         
         Notes
         -----
+        Test statistic is difference between sum of squared OLS and sum of 
+        squared IV residuals where each set of residuals has been projected 
+        onto the set of instruments in teh IV model.  
         
-        Test statistic is based on the difference between ...
+        Start by defining 
         
         .. math ::
         
-          TODO 
-
+          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e 
+                   - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c \\
+        
+        where :math:`\hat{\epsilon}_e` are the regression residuals from a 
+        model where ``vars`` are treated as exogenous, 
+        :math:`\hat{\epsilon}_c` are the regression residuals from the model 
+        leaving ``vars`` as endogenous, :math:`P_{[z,w]}` is a projection 
+        matrix onto the exogenous variables and instruments (`z`) as well as 
+        ``vars``, and :math:`P_{z}` is a projection matrix only onto `z`.
+        
+        The test statistic is then 
+        
+        .. math ::
+        
+            \frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}
+        
+        where :math:`q` is the number of variables tests, 
+        :math:`v = n - n_{endog} - n_{exog} - q`. The test statistic has a 
+        :math:`F_{q, v}` distribution.
         """
         null = 'All endogenous variables are exogenous'
         if vars is not None:
@@ -557,7 +606,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
 
         Notes
         -----
@@ -598,7 +647,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
 
         Notes
         -----
@@ -641,7 +690,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
 
         Notes
         -----
@@ -694,7 +743,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
 
         Notes
         -----
@@ -727,7 +776,7 @@ class IVResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
 
         Notes
         -----
@@ -814,7 +863,7 @@ class IVGMMResults(_CommonIVResults):
           n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q
         
         where :math:`\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i` where 
-        :math:`z_i` includes both the exogensou variables and instruments and
+        :math:`z_i` includes both the exogenous variables and instruments and
         :math:`\hat{\epsilon}_i` are the model residuals. :math:`W` is a consistent
         estimator of the variance of :math:`\sqrt{n}\bar{g}`. The degree of 
         freedom is :math:`q = n_{instr} - n_{endog}`. 
@@ -834,7 +883,7 @@ class IVGMMResults(_CommonIVResults):
         Returns
         -------
         t : WaldTestStatistic
-            Object containing test statistic, pvalue, distribution and null
+            Object containing test statistic, p-value, distribution and null
         
         Notes
         -----
@@ -930,21 +979,21 @@ class FirstStageResults(object):
             DataFrame where each endogenous variable appears as a row and
             the columns contain alternative measures.  The columns are:
 
-            * rsquared - Rsquared from regression of endogenous on exogenous
+            * rsquared - R-squared from regression of endogenous on exogenous
               and instruments
-            * partial.rsquared - Rsquared from regression of the exogenous
+            * partial.rsquared - R-squared from regression of the exogenous
               variable on instruments where both the exogenous variable and
               the instrument have been orthogonalized to the exogenous
               regressors in the model.   
             * f.stat - Test that all coefficients are zero in the model
-              used to estimate the partial rsquared. Uses a standard F-test
-              when the covariance estimtor is unadjusted - otherwise uses a
+              used to estimate the partial R-squared. Uses a standard F-test
+              when the covariance estimator is unadjusted - otherwise uses a
               Wald test statistic with a chi2 distribution.
             * f.pval - P-value of the test that all coefficients are zero
-              in the model used to estimate the partial rsquared
+              in the model used to estimate the partial R-squared
             * shea.rsquared - Shea's r-squared which measures the correlation
               between the projected and orthogonalized instrument on the
-              orthogonoalized endogenous regressor where the orthogonalization
+              orthogonalized endogenous regressor where the orthogonalization
               is with respect to the other included variables in the model.
         """
         from linearmodels.iv.model import _OLS, IV2SLS
@@ -954,10 +1003,10 @@ class FirstStageResults(object):
         px = x @ pinv(x)
         ez = z - px @ z
         out = {}
-        individal_results = self.individual
+        individual_results = self.individual
         for col in endog.pandas:
             inner = {}
-            inner['rsquared'] = individal_results[col].rsquared
+            inner['rsquared'] = individual_results[col].rsquared
             y = endog.pandas[[col]].values
             ey = y - px @ y
             mod = _OLS(ey, ez)

@@ -10,6 +10,7 @@ if "%SPHINXBUILD%" == "" (
 set SOURCEDIR=source
 set BUILDDIR=build
 set SPHINXPROJ=linearmodels
+set SPHINXOPTS=-j 2
 
 if "%1" == "" goto help
 

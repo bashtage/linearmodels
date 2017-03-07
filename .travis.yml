@@ -36,7 +36,7 @@ script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels
   - set -e
   - cd doc && make html && cd ..
-  - doctr deploy
+  - if [ ${PYTHON} = 3.5 ]; then doctr deploy; fi
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi

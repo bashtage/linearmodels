@@ -89,6 +89,10 @@ class IVLIML(object):
     .. todo::
 
         * VCV: bootstrap
+    
+    See Also
+    --------
+    IV2SLS, IVGMM, IVGMMCUE
     """
 
     def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
@@ -152,7 +156,7 @@ class IVLIML(object):
             raise ValueError('regressors [exog endog] not have full '
                              'column rank')
         if matrix_rank(z) < z.shape[1]:
-            raise ValueError('instruments [exog insruments]  do not have full '
+            raise ValueError('instruments [exog instruments]  do not have full '
                              'column rank')
         self._has_constant, self._const_loc = has_constant(x)
 
@@ -170,7 +174,7 @@ class IVLIML(object):
         z : ndarray
             Instrument matrix (nobs by ninstr)
         kappa : scalar
-            Parameter value for k-class esimtator
+            Parameter value for k-class estimator
 
         Returns
         -------
@@ -339,7 +343,7 @@ class IV2SLS(IVLIML):
     .. math::
     
       \hat{\beta}_{2SLS} & =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
-                         & =(\hat{X}'\hat{X})^{-1}\hat{X}Y\\
+                         & =(\hat{X}'\hat{X})^{-1}\hat{X}'Y\\
                  \hat{X} & =Z(Z'Z)^{-1}Z'X
     
     The 2SLS estimator is a special case of a k-class estimator with
@@ -348,6 +352,10 @@ class IV2SLS(IVLIML):
     .. todo::
 
         * VCV: bootstrap
+    
+    See Also
+    --------
+    IVLIML, IVGMM, IVGMMCUE        
     """
 
     def __init__(self, dependent, exog, endog, instruments):
@@ -381,7 +389,7 @@ class IVGMM(IVLIML):
 
       * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
         homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heterosedasticity by not 
+      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
         autocorrelation
       * 'kernel' - Allows for heteroskedasticity and autocorrelation
       * 'cluster' - Allows for one-way cluster dependence
@@ -398,6 +406,10 @@ class IVGMM(IVLIML):
     .. todo:
 
          * VCV: bootstrap
+    
+    See Also
+    --------
+    IV2SLS, IVLIML, IVGMMCUE
     """
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
@@ -438,7 +450,8 @@ class IVGMM(IVLIML):
         zpy = z.T @ y
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
-    def fit(self, iter_limit=2, tol=1e-4, cov_type='robust', **cov_config):
+    def fit(self, iter_limit=2, tol=1e-4, initial_weight=None,
+            cov_type='robust', **cov_config):
         """
         Estimate model parameters
 
@@ -453,6 +466,10 @@ class IVGMM(IVLIML):
             Convergence criteria.  Measured as covariance normalized change in
             parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
+        initial_weight : ndarray, optional
+            Initial weighting matrix to use in the first step.  If not 
+            specified, uses the average outer-product of the set containing
+            the exogenous variables and instruments.
         cov_type : str, optional
                 Name of covariance estimator to use
         **cov_config
@@ -474,7 +491,7 @@ class IVGMM(IVLIML):
     
           * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
             homoskedastic
-          * 'robust', 'heteroskedastic' - Allows for heterosedasticity by not 
+          * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
             autocorrelation
           * 'kernel' - Allows for heteroskedasticity and autocorrelation
           * 'cluster' - Allows for one-way cluster dependence
@@ -483,7 +500,7 @@ class IVGMM(IVLIML):
         y, x, z = self._y, self._x, self._z
         nobs = y.shape[0]
         weight_matrix = self._weight.weight_matrix
-        w = inv(z.T @ z / nobs)
+        w = inv(z.T @ z / nobs) if initial_weight is None else initial_weight
         _params = params = self.estimate_parameters(x, y, z, w)
         eps = y - x @ params
 
@@ -558,7 +575,7 @@ class IVGMMCUE(IVGMM):
 
       * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
         homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heterosedasticity by not 
+      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
         autocorrelation
       * 'kernel' - Allows for heteroskedasticity and autocorrelation
       * 'cluster' - Allows for one-way cluster dependence
@@ -573,6 +590,10 @@ class IVGMMCUE(IVGMM):
     
     where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
     through :math:`\epsilon_i = y_i - x_i\beta`.
+    
+    See Also
+    --------
+    IV2SLS, IVLIML, IVGMM
     """
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
@@ -590,7 +611,7 @@ class IVGMMCUE(IVGMM):
         Parameters
         ----------
         params : ndarray
-            Parameter vector (nvar,)
+            Parameter vector (nvar)
         x : ndarray
             Regressor matrix (nobs by nvar)
         y : ndarray
@@ -617,7 +638,7 @@ class IVGMMCUE(IVGMM):
         :math:`\hat{\epsilon}_i = y_i - x_i\beta`.  The weighting matrix
         is some estimator of the long-run variance of the moment conditions.
         
-        Unlike tradition GMM, the weighting matrix is simulteneously computed 
+        Unlike tradition GMM, the weighting matrix is simultaneously computed 
         with the moment conditions, and so has explicit dependence on 
         :math:`\beta`.
         """
@@ -688,7 +709,7 @@ class IVGMMCUE(IVGMM):
         supported options. Defaults are used if no covariance configuration
         is provided.
         
-        Starting values are computed by IV2SLS.
+        Starting values are computed by IVGMM.
 
         .. todo::
 
@@ -698,8 +719,9 @@ class IVGMMCUE(IVGMM):
         y, x, z = self._y, self._x, self._z
         weight_matrix = self._weight.weight_matrix
         if starting is None:
-            res = IV2SLS(self.dependent, self.exog,
-                         self.endog, self.instruments).fit()
+            res = IVGMM(self.dependent, self.exog, self.endog,
+                        self.instruments, weight_type=self._weight_type,
+                        **self._weight_config).fit()
             starting = res.params.values
         else:
             starting = asarray(starting)
@@ -724,7 +746,8 @@ class _OLS(IVLIML):
     
     Notes
     -----
-    Uses IV2SLS internaly by setting endog and instruments to None
+    Uses IV2SLS internally by setting endog and instruments to None.  
+    Uses IVLIML with kappa=0 to estimate OLS models. 
     
     See Also
     --------

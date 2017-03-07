@@ -114,7 +114,7 @@ def kernel_weight_quadratic_spectral(bw, n):
 
     Notes
     -----
-    Unlink the Barrlett or Parzen kernels, the QS kernel is not truncated at
+    Unlike the Barrlett or Parzen kernels, the QS kernel is not truncated at
     a specific lag, and so weights are computed for all available lags in 
     the sample.  
     
@@ -332,7 +332,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def debiased(self):
-        """Flag indicating whether to debias"""
+        """Flag indicating if covariance is debiased"""
         return self._debiased
 
     @property
@@ -352,7 +352,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     y : ndarray
         Series ,modeled (nobs by 1)
     z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
     debiased : bool, optional
@@ -412,7 +412,7 @@ class KernelCovariance(HomoskedasticCovariance):
     y : ndarray
         Series ,modeled (nobs by 1)
     z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
     kernel : str
@@ -525,7 +525,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     y : ndarray
         Series ,modeled (nobs by 1)
     z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
     debiased : bool, optional

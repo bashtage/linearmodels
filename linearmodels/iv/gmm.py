@@ -1,5 +1,5 @@
 """
-Covariance and weight estiamtion for GMM IV estimators
+Covariance and weight estimation for GMM IV estimators
 """
 from __future__ import absolute_import, division, print_function
 
@@ -31,7 +31,7 @@ class HomoskedasticWeightMatrix(object):
       s^{2} & =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{\epsilon})^2 \\
       W & =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i
     
-    where :math:`z_i` contains both the exogensou regressors and instruments.
+    where :math:`z_i` contains both the exogenous regressors and instruments.
     
     ``center`` has no effect on this estimator since it is always centered.
     """
@@ -162,7 +162,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
       \Gamma_j & =\sum_{i=j+1}^n g'_i g_{j-j}
     
     where :math:`k(j)` is the kernel weight for lag j and :math:`z_i` 
-    contains both the exogensou regressors and instruments..
+    contains both the exogenous regressors and instruments..
       
     See Also
     --------
@@ -309,7 +309,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     y : ndarray
         Series ,modeled (nobs by 1)
     z : ndarray
-        Instruments used for endogensou regressors (nobs by ninstr)
+        Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
     w : ndarray
@@ -319,7 +319,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
         * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
           homoskedastic
-        * 'robust', 'heteroskedastic' - Allows for heterosedasticity by not 
+        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
           autocorrelation
         * 'kernel' - Allows for heteroskedasticity and autocorrelation
         * 'cluster' - Allows for one-way cluster dependence
@@ -336,7 +336,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     **kernel**
     
       * ``kernel``: Name of kernel to use.  See 
-        linearmodel.covariance.KernelCovariance for details on available 
+        linearmodels.covariance.KernelCovariance for details on available 
         kernels 
       * ``bandwidth``: Bandwidth to use when computing the weight.  If not 
         provided, nobs - 2 is used.
@@ -344,7 +344,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     **cluster**
     
       * ``clusters``: Array containing the cluster indices.  See 
-        linearmodel.covariance.OneWayClusteredCovariance
+        linearmodels.covariance.OneWayClusteredCovariance
     
     See also
     --------

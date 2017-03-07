@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
+SPHINXOPTS    = -j 2
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = linearmodels
 SOURCEDIR     = source
