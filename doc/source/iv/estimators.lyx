@@ -70,20 +70,20 @@
 
 \begin_body
 
-\begin_layout Title
+\begin_layout Section*
 Mathematical Formulas
 \end_layout
 
-\begin_layout Section*
+\begin_layout Subsection*
 Notation
 \end_layout
 
 \begin_layout Standard
 Interest is in recovering the parameter vector from the model 
 \begin_inset Formula 
-\[
-y_{i}=x_{i}\beta+\epsilon_{i}
-\]
+\begin{align*}
+y_{i} & =\beta^{\prime}x_{i}+\epsilon_{i}
+\end{align*}
 
 \end_inset
 
@@ -91,15 +91,8 @@ y_{i}=x_{i}\beta+\epsilon_{i}
 \end_layout
 
 \begin_layout Standard
-The regressors 
-\begin_inset Formula $x_{i}$
-\end_inset
-
- are 
-\begin_inset Formula $k$
-\end_inset
-
- by 1 and 
+\noindent
+where 
 \begin_inset Formula $\beta$
 \end_inset
 
@@ -107,33 +100,29 @@ The regressors
 \begin_inset Formula $k$
 \end_inset
 
- by 1.
- The regressors 
+ by 1, 
 \begin_inset Formula $x_{i}$
 \end_inset
 
- can be separated in two types of regressors, 
-\begin_inset Formula $x_{1i}$
+ is a 
+\begin_inset Formula $k$
 \end_inset
 
- which is 
+ by 1 vector of observable variables and 
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+ is a scalar error.
+ 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ can be separated in two types of variables.
+ The 
 \begin_inset Formula $k_{1}$
 \end_inset
 
- by 
-\begin_inset Formula $1$
-\end_inset
-
- and 
-\begin_inset Formula $x_{2i}$
-\end_inset
-
- which is 
-\begin_inset Formula $k_{2}$
-\end_inset
-
- by 1.
- 
+ by 1 set of variables 
 \begin_inset Formula $x_{1i}$
 \end_inset
 
@@ -142,11 +131,15 @@ The regressors
 \end_inset
 
 .
- 
+ The 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ by 1 variables 
 \begin_inset Formula $x_{2i}$
 \end_inset
 
- are endogenous regressors.
+ are endogenous.
  A set of 
 \begin_inset Formula $p$
 \end_inset
@@ -183,6 +176,7 @@ X_{2} & =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u
 \end_layout
 
 \begin_layout Standard
+\noindent
 The vector of instruments 
 \begin_inset Formula $z_{i}$
 \end_inset
@@ -202,7 +196,7 @@ The vector of instruments
 \end_inset
 
  if the model contains a constant (either explicit or implicit, i.e., including
- all dummy variables).
+ all categories of a dummy variable).
  The constant, if included, is in 
 \begin_inset Formula $x_{1i}$
 \end_inset
@@ -291,115 +285,46 @@ The vector of instruments
 \end_inset
 
 .
- 
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $k$
-\end_inset
-
- dimension of 
-\begin_inset Formula $x$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $k_{1}$
-\end_inset
-
-, 
-\begin_inset Formula $k_{2}$
-\end_inset
-
- dimensions of 
-\begin_inset Formula $x_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $x_{2}$
-\end_inset
-
-, respectively
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $k_{z}$
-\end_inset
-
- dimension of 
-\begin_inset Formula $z$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $k_{z_{1}}$
-\end_inset
-
-, 
-\begin_inset Formula $k_{z_{2}}$
-\end_inset
-
- dimensions of 
-\begin_inset Formula $z_{1}$
-\end_inset
-
- and 
-\begin_inset Formula $z_{2}$
-\end_inset
-
-, respectively.
- Note that 
-\begin_inset Formula $k_{1}=k_{z_{1}}$
-\end_inset
-
- since this set of variables is the same same.
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $k_{c}$
-\end_inset
-
- is 1 if the model contains a constant (or equivalent, e.g., all possibilities
- for a dummy variable)
-\end_layout
-
-\begin_layout Section*
-Parameter Estimation
 \end_layout
 
 \begin_layout Subsection*
+Parameter Estimation
+\end_layout
+
+\begin_layout Subsubsection*
 Two-stage Least Squares (2SLS)
 \end_layout
 
 \begin_layout Standard
 The 2SLS estimator is 
 \begin_inset Formula 
-\[
-\hat{\beta}_{2SLS}=\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)
-\]
+\begin{align*}
+\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)
+\end{align*}
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsubsection*
 Limited Information Maximum Likelihood and k-class Estimators
 \end_layout
 
 \begin_layout Standard
 The LIML or other k-class estimator is 
 \begin_inset Formula 
-\[
-\hat{\beta}_{\kappa}=\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)
-\]
+\begin{align*}
+\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)
+\end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $\kappa$
 \end_inset
@@ -419,22 +344,51 @@ where
 \begin_inset Formula $\kappa$
 \end_inset
 
- set to TODO
+ set to 
+\begin_inset Formula 
+\[
+\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+\]
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $W=\left[y\:X_{2}\right]$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathrm{eig}$
+\end_inset
+
+ returns the eigenvalues.
+ 
+\series bold
+TODO: Check this
+\end_layout
+
+\begin_layout Subsubsection*
 Generalized Method of Moments (GMM)
 \end_layout
 
 \begin_layout Standard
 The GMM estimator is defined as 
 \begin_inset Formula 
-\[
-\hat{\beta}_{GMM}=\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)
-\]
+\begin{align*}
+\hat{\beta}_{GMM} & =\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)
+\end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $W$
 \end_inset
@@ -443,15 +397,46 @@ where
  
 \end_layout
 
-\begin_layout Section*
-Variance Estimation
+\begin_layout Subsection*
+Basic Statistics
 \end_layout
 
 \begin_layout Standard
+Let 
+\begin_inset Formula $\hat{\epsilon}=y-X\hat{\beta}$
+\end_inset
+
+.
+ The residual sum of squares (RSS) is 
+\begin_inset Formula $\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\end_inset
+
+, the model sum of squares (MSS) is 
+\begin_inset Formula $\hat{\beta}^{\prime}X^{\prime}X\hat{\beta}$
+\end_inset
+
+ and the total sum of squares (TSS) is 
+\begin_inset Formula $\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}$
+\end_inset
+
+where 
+\begin_inset Formula $\bar{y}$
+\end_inset
+
+ is the sample average of 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ The model 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+is defined
 \begin_inset Formula 
-\[
-n^{-1}s^{2}\Sigma_{xx}^{-1}
-\]
+\begin{align*}
+R^{2} & =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}}=1-\frac{RSS}{TSS}
+\end{align*}
 
 \end_inset
 
@@ -459,11 +444,249 @@ n^{-1}s^{2}\Sigma_{xx}^{-1}
 \end_layout
 
 \begin_layout Standard
-or 
+\noindent
+and the adjusted 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is defined 
 \begin_inset Formula 
-\[
-\left(n-k\right)^{-1}s^{2}\Sigma_{xx}^{-1}
-\]
+\begin{align*}
+\bar{R}^{2} & =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The residual variance is 
+\begin_inset Formula $s^{2}=n\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\end_inset
+
+ unless the debiased flag is used, in which case a small sample adjusted
+ version is estimated 
+\begin_inset Formula $s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The model F-statistic is defined 
+\begin_inset Formula 
+\begin{align*}
+F & =\dot{\hat{\beta}}^{\prime}\hat{V}^{-1}\dot{\hat{\beta}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where the notation 
+\begin_inset Formula $\dot{\hat{\beta}}$
+\end_inset
+
+ indicates that the constant is excluded from 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{\hat{V}}$
+\end_inset
+
+ indicates that the row and column corresponding to a constant are excluded.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+If the model contains an implicit constant, e.g., all categories of a dummy,
+ one of the categories is excluded when computing the test statistic.
+ The choice of category to drop has no effect and is equivalent to reparameteriz
+ing the model with a constant and excluding one category of dummy.
+\end_layout
+
+\end_inset
+
+ The test statistic is distributed as 
+\begin_inset Formula $\chi_{k-k_{c}}^{2}.$
+\end_inset
+
+ If the debiased flag is set, then the test statistic is transformed as
+ 
+\begin_inset Formula $F/\left(k-k_{c}\right)$
+\end_inset
+
+ and a 
+\begin_inset Formula $F_{k-k_{c},n-k}$
+\end_inset
+
+ distribution is used.
+ 
+\end_layout
+
+\begin_layout Subsection*
+Parameter Covariance Estimation
+\end_layout
+
+\begin_layout Subsubsection*
+Two-stage LS, LIML and k-class estimators
+\end_layout
+
+\begin_layout Standard
+Four covariance estimators are available.
+ The first is the standard homoskedastic covariance, defined as 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that this estimator can be expressed as 
+\begin_inset Formula 
+\begin{align*}
+n^{-1}\hat{\hat{A}^{-1}}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+All estimator take this form and only differ in how the asymptotic covariance
+ of the scores, 
+\begin_inset Formula $B$
+\end_inset
+
+, is estimated.
+ For the homoskedastic covariance estimator, 
+\begin_inset Formula $\hat{B}=s^{2}\hat{A}.$
+\end_inset
+
+ The score covariance in the heteroskedasticity robust covariance estimator
+ is 
+\begin_inset Formula 
+\begin{align*}
+\hat{B} & =n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}\hat{x}_{i}\hat{x}_{i}^{\prime}=n^{-1}\sum_{i=1}^{n}\hat{\xi}_{i}\hat{\xi}_{i}^{\prime}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{x_{i}}$
+\end_inset
+
+ is row 
+\begin_inset Formula $i$
+\end_inset
+
+ of 
+\begin_inset Formula $\hat{X}=P_{Z}X$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\xi}_{i}=\hat{\epsilon}_{i}\hat{x}_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The kernel covariance estimator is robust to both heteroskedasticity and
+ autocorrelation and is defined as 
+\begin_inset Formula 
+\begin{align*}
+\hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\xi}_{i-j}\hat{\xi}_{i}^{\prime}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $k\left(i/h\right)$
+\end_inset
+
+ is a kernel weighting function where 
+\begin_inset Formula $h$
+\end_inset
+
+ is the kernel bandwidth.
+ 
+\end_layout
+
+\begin_layout Standard
+The one-way clustered covariance estimator is defined as 
+\begin_inset Formula 
+\begin{align*}
+n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)^{\prime}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}$
+\end_inset
+
+ is the sum of the scores for all members in group 
+\begin_inset Formula $\mathcal{G}_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $g$
+\end_inset
+
+ is the number of groups.
+ 
+\end_layout
+
+\begin_layout Standard
+If the debiased flag is used to perform a small-sample adjustment, all estimator
+s except the clustered covariance are rescaled by 
+\begin_inset Formula $\left(n-k\right)/n$
+\end_inset
+
+.
+ The clustered covariance is rescaled by 
+\begin_inset Formula $\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)$
+\end_inset
+
+.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This somewhat non-obvious choice is drive by Stata compatibility.
+\end_layout
 
 \end_inset
 
