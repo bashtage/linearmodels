@@ -3,11 +3,6 @@ Instrumental variable estimators
 """
 from __future__ import absolute_import, division, print_function
 
-from numpy import array, asarray, c_, isscalar
-from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
-from pandas import DataFrame, Series
-from scipy.optimize import minimize
-
 from linearmodels.iv.covariance import (HeteroskedasticCovariance,
                                         HomoskedasticCovariance, KernelCovariance,
                                         OneWayClusteredCovariance)
@@ -17,6 +12,10 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  KernelWeightMatrix, OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth
+from numpy import array, asarray, c_, isscalar
+from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+from pandas import DataFrame, Series
+from scipy.optimize import minimize
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -95,8 +94,6 @@ class IVLIML(object):
     def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
 
         self._result_container = IVResults
-        if endog is None or instruments is None:
-            self._result_container = OLSResults
 
         self.dependent = DataHandler(dependent, var_name='dependent')
         nobs = self.dependent.shape[0]
@@ -118,7 +115,7 @@ class IVLIML(object):
         self._instr_columns = self.exog.cols + self.instruments.cols
         self._index = self.endog.rows
         self._validate_inputs()
-        self._method = 'liml'
+        self._method = 'IV-LIML'
 
         self._kappa = kappa
         self._fuller = fuller
@@ -129,9 +126,8 @@ class IVLIML(object):
         if kappa is not None and fuller != 0:
             import warnings
             warnings.warn('kappa and fuller should not normally be used '
-                          'simulaneously.  Identical results can be computed '
+                          'simultaneously.  Identical results can be computed '
                           'using kappa only', UserWarning)
-        self._method = 'liml'
         additional = []
         if fuller != 0:
             additional.append('fuller(alpha={0})'.format(fuller))
@@ -139,6 +135,9 @@ class IVLIML(object):
             additional.append('kappa={0}'.format(fuller))
         if additional:
             self._method += '(' + ', '.join(additional) + ')'
+        if endog is None or instruments is None:
+            self._result_container = OLSResults
+            self._method = 'OLS'
 
     def _validate_inputs(self):
         x, z = self._x, self._z
@@ -155,7 +154,7 @@ class IVLIML(object):
         if matrix_rank(z) < z.shape[1]:
             raise ValueError('instruments [exog insruments]  do not have full '
                              'column rank')
-        self._has_constant = has_constant(x)
+        self._has_constant, self._const_loc = has_constant(x)
 
     @staticmethod
     def estimate_parameters(x, y, z, kappa):
@@ -276,11 +275,13 @@ class IVLIML(object):
         test_stat = float(test_stat)
         nobs, nvar = self._x.shape
         null = 'All parameters ex. constant not zero'
+        name = 'Model F-statistic'
         df = test_params.shape[0]
         if debiased:
-            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar)
+            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar,
+                                     name=name)
         else:
-            wald = WaldTestStatistic(test_stat, null, df)
+            wald = WaldTestStatistic(test_stat, null, df, name=name)
 
         return wald
 
@@ -352,7 +353,7 @@ class IV2SLS(IVLIML):
     def __init__(self, dependent, exog, endog, instruments):
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
                                      fuller=0, kappa=1)
-        self._method = '2sls'
+        self._method = 'IV-2SLS'
 
 
 class IVGMM(IVLIML):
@@ -406,7 +407,7 @@ class IVGMM(IVLIML):
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
-        self._method = 'gmm'
+        self._method = 'IV-GMM'
         self._result_container = IVGMMResults
 
     @staticmethod
@@ -580,7 +581,7 @@ class IVGMMCUE(IVGMM):
                                        **weight_config)
         if 'center' not in weight_config:
             weight_config['center'] = True
-        self._method = 'gmm-cue'
+        self._method = 'IV-GMM-CUE'
 
     def j(self, params, x, y, z):
         r"""

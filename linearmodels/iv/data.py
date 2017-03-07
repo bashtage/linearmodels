@@ -39,7 +39,7 @@ class DataHandler(object):
             raise ValueError(dim_err.format(var_name, xndim))
 
         if isinstance(x, np.ndarray):
-            x = x.view()
+            x = x.view(np.float64)
             if xndim == 1:
                 x.shape = (x.shape[0], -1)
 
@@ -74,9 +74,9 @@ class DataHandler(object):
             if pd.api.types.is_numeric_dtype(cols.dtype):
                 cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
             cols = list(cols)
-
-            self._pandas = pd.DataFrame(x.values, columns=cols, index=index)
-            self._ndarray = x.values
+            self._ndarray = x.values.astype(np.float64)
+            self._pandas = pd.DataFrame(self._ndarray, columns=cols,
+                                        index=index)
             self._labels = {0: index, 1: cols}
 
         else:

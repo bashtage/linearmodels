@@ -5,8 +5,10 @@ import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose
+from statsmodels.api import add_constant
 
 from linearmodels.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
+from linearmodels.iv.model import _OLS
 from linearmodels.utility import AttrDict
 
 
@@ -107,10 +109,10 @@ class TestErrors(object):
 
 
 def test_2sls_direct(data):
-    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    mod = IV2SLS(data.dep, add_constant(data.exog), data.endog, data.instr)
     res = mod.fit()
-    x = np.c_[data.exog, data.endog]
-    z = np.c_[data.exog, data.instr]
+    x = np.c_[add_constant(data.exog), data.endog]
+    z = np.c_[add_constant(data.exog), data.instr]
     y = data.y
     xhat = z @ pinv(z) @ x
     params = pinv(xhat) @ y
@@ -217,3 +219,17 @@ def test_wooldridge_smoke(data):
     ws = res.wooldridge_score
     print(wr)
     print(ws)
+
+
+def test_model_summary_smoke(data):
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    res.__repr__()
+    res.__str__()
+    res._repr_html_()
+    res.summary
+
+    res = _OLS(data.dep, data.exog).fit()
+    res.__repr__()
+    res.__str__()
+    res._repr_html_()
+    res.summary

@@ -1,10 +1,11 @@
+import datetime as dt
+
 import scipy.stats as stats
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
+                                  _annihilate, _proj, cached_property)
 from numpy import c_, diag, log, ones, sqrt, empty
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series
-
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
-                                  _annihilate, _proj, cached_property)
 
 
 class OLSResults(object):
@@ -12,7 +13,7 @@ class OLSResults(object):
         self._resid = results['eps']
         self._params = results['params']
         self._cov = results['cov']
-        self._model = model
+        self.model = model
         self._r2 = results['r2']
         self._cov_type = results['cov_type']
         self._rss = results['residual_ss']
@@ -24,6 +25,16 @@ class OLSResults(object):
         self._cov_config = results['cov_config']
         self._method = results['method']
         self._kappa = results.get('kappa', None)
+        self._datetime = dt.datetime.now()
+
+    def __str__(self):
+        return self.summary
+
+    def __repr__(self):
+        return self.__str__().as_text() + '\nid: {0}'.format(hex(id(self)))
+
+    def _repr_html_(self):
+        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
 
     @property
     def cov_config(self):
@@ -53,22 +64,22 @@ class OLSResults(object):
     @property
     def nobs(self):
         """Number of observations"""
-        return self._model.endog.shape[0]
+        return self.model.endog.shape[0]
 
     @property
     def df_resid(self):
         """Residual degree of freedom"""
-        return self.nobs - self._model.exog.shape[1]
+        return self.nobs - self.model.exog.shape[1]
 
     @property
     def df_model(self):
         """Model degree of freedom"""
-        return self._model._x.shape[1]
+        return self.model._x.shape[1]
 
     @property
     def has_constant(self):
         """Flag indicating the model includes a constant or equivalent"""
-        return self._model.has_constant
+        return self.model.has_constant
 
     @property
     def kappa(self):
@@ -168,6 +179,130 @@ class OLSResults(object):
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
 
+    @property
+    def f_stat(self):
+        """
+        Model F-statistic
+        
+        Returns
+        -------
+        f : WaldTestStatistic
+            Test statistic for null all coefficients excluding constant terms 
+            are zero.
+        
+        Notes
+        -----
+        Despite name, always implemented using a quadratic-form test based on 
+        estimated parameter covariance. Default is to use a chi2 distribution 
+        to compute p-values. If ``debiased`` is True, uses an F-distribution.
+        """
+        p = self.params.values[:, None]
+        c = self.cov.values
+        if self.has_constant:
+            loc = self.model._const_loc
+            ex = [i for i in range(len(p)) if i != loc]
+            p = p[ex]
+            c = c[ex][:, ex]
+        stat = p.T @ inv(c) @ p
+        df = p.shape[0]
+        if self.cov_config['debiased']:
+            df_denom = self.nobs - p.shape[0]
+            return WaldTestStatistic(stat, 'All coefficients ex. const are 0',
+                                     df, df_denom, name='Model F-statistic')
+        return WaldTestStatistic(stat, 'All coefficients ex. const are 0',
+                                 df, name='Model F-statistic')
+
+    @property
+    def summary(self):
+        """Summary table of model estimation results"""
+        def float4(v):
+            out = '{0:5.5g}'.format(v)
+            if len(out) < 6 and '.' in out:
+                out += '0' * (6 - len(out))
+            return out
+
+        def pval_format(v):
+            return '{0:4.4f}'.format(v)
+
+        from statsmodels.iolib.summary import Summary, fmt_2cols, \
+            SimpleTable, fmt_params
+        title = self._method + ' Estimation Summary'
+        mod = self.model
+        top_left = [('Dep. Variable:', mod.dependent.cols[0]),
+                    ('No. Observations:', self.nobs),
+                    ('Date:', self._datetime.strftime('%a, %b %d %Y')),
+                    ('Time:', self._datetime.strftime('%H:%M:%S')),
+                    ('', ''),
+                    ('', '')]
+
+        top_right = [('R-squared:', float4(self.rsquared)),
+                     ('Adj. R-squared:', float4(self.rsquared_adj)),
+                     ('F-statistic:', float4(self.f_statistic.stat)),
+                     ('F-stat dist:', str(self.f_statistic.dist_name)),
+                     ('F-stat p-value:', pval_format(self.f_statistic.pval)),
+                     ('', '')]
+
+        stubs = []
+        vals = []
+        for stub, val in top_left:
+            stubs.append(stub)
+            vals.append([val])
+        table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
+
+        # create summary table instance
+        smry = Summary()
+        # Top Table
+        # Parameter table
+        fmt = fmt_2cols
+        fmt['data_fmts'][1] = '%18s'
+
+        top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
+        stubs = []
+        vals = []
+        for stub, val in top_right:
+            stubs.append(stub)
+            vals.append([val])
+        table.extend_right(SimpleTable(vals, stubs=stubs))
+        smry.tables.append(table)
+
+        param_data = c_[self.params.values[:, None],
+                        self.std_errors.values[:, None],
+                        self.tstats.values[:, None],
+                        self.pvalues.values[:, None],
+                        self.conf_int()]
+        data = []
+        for row in param_data:
+            txt_row = []
+            for i, v in enumerate(row):
+                f = float4
+                if i == 3:
+                    f = pval_format
+                txt_row.append(f(v))
+            data.append(txt_row)
+        for row in data:
+            row[4] = '[' + row[4]
+            row[5] += ']'
+        title = 'Parameter Estimates'
+        table_stubs = list(self.params.index)
+        header = ['Parameters', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+        table = SimpleTable(data,
+                            stubs=table_stubs,
+                            txt_fmt=fmt_params,
+                            headers=header,
+                            title=title)
+        smry.tables.append(table)
+
+        instruments = self.model.instruments
+        extra_text = []
+        if instruments.shape[1] > 0:
+            endog = self.model.endog
+            extra_text.append('Instrumented: ' + ', '.join(endog.cols))
+            extra_text.append('Instruments: ' + ', '.join(instruments.cols))
+        extra_text.append('Covariance estimator: {0}'.format(self.cov_type))
+        smry.add_extra_txt(extra_text)
+
+        return smry
+
 
 class _CommonIVResults(OLSResults):
     """
@@ -194,8 +329,8 @@ class _CommonIVResults(OLSResults):
         first : FirstStageResults
             Object containing results for diagnosing instrument relevance issues.
         """
-        return FirstStageResults(self._model.dependent, self._model.exog,
-                                 self._model.endog, self._model.instruments,
+        return FirstStageResults(self.model.dependent, self.model.exog,
+                                 self.model.endog, self.model.instruments,
                                  self._cov_type, self._cov_config)
 
 
@@ -244,16 +379,16 @@ class IVResults(_CommonIVResults):
         
           v = n_{instr} - n_{exog} 
         """
-        z = self._model.instruments.ndarray
+        z = self.model.instruments.ndarray
         nobs, ninstr = z.shape
-        nendog = self._model.endog.shape[1]
+        nendog = self.model.endog.shape[1]
         name = 'Sargan\'s test of overidentification'
         if ninstr - nendog == 0:
             return InvalidTestStatistic('Test requires more instruments than '
                                         'endogenous variables.', name=name)
 
         eps = self.resids.values[:, None]
-        u = _annihilate(eps, self._model._z)
+        u = _annihilate(eps, self.model._z)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = 'The model is not overidentified.'
 
@@ -290,7 +425,7 @@ class IVResults(_CommonIVResults):
         
           v = n_{instr} - n_{exog} 
         """
-        mod = self._model
+        mod = self.model
         ninstr = mod.instruments.shape[1]
         nobs, nendog = mod.endog.shape
         nz = mod._z.shape[1]
@@ -307,31 +442,31 @@ class IVResults(_CommonIVResults):
         """Setup function for some endogeneity tests"""
         if vars is not None and not isinstance(vars, list):
             vars = [vars]
-        nobs = self._model.dependent.shape[0]
+        nobs = self.model.dependent.shape[0]
         e2 = self.resids.values
-        nendog, nexog = self._model.endog.shape[1], self._model.exog.shape[1]
+        nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         if vars is None:
-            assumed_exog = self._model.endog.ndarray
-            aug_exog = c_[self._model.exog.ndarray, assumed_exog]
+            assumed_exog = self.model.endog.ndarray
+            aug_exog = c_[self.model.exog.ndarray, assumed_exog]
             still_endog = empty((nobs, 0))
         else:
-            assumed_exog = self._model.endog.pandas[vars].values
-            ex = [c for c in self._model.endog.cols if c not in vars]
-            still_endog = self._model.endog.pandas[ex].values
-            aug_exog = c_[self._model.exog.ndarray, assumed_exog]
+            assumed_exog = self.model.endog.pandas[vars].values
+            ex = [c for c in self.model.endog.cols if c not in vars]
+            still_endog = self.model.endog.pandas[ex].values
+            aug_exog = c_[self.model.exog.ndarray, assumed_exog]
             null = 'Variables {0} are exogenous'.format(', '.join(vars))
         ntested = assumed_exog.shape[1]
 
         from linearmodels.iv import IV2SLS
-        mod = IV2SLS(self._model.dependent, aug_exog, still_endog,
-                     self._model.instruments)
+        mod = IV2SLS(self.model.dependent, aug_exog, still_endog,
+                     self.model.instruments)
         e0 = mod.fit().resids.values[:, None]
 
-        z2 = c_[self._model.exog.ndarray, self._model.instruments.ndarray]
+        z2 = c_[self.model.exog.ndarray, self.model.instruments.ndarray]
         z1 = c_[z2, assumed_exog]
 
         e1 = _proj(e0, z1)
-        e2 = _proj(e2, self._model.instruments.ndarray)
+        e2 = _proj(e2, self.model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
     def durbin(self, vars=None):
@@ -445,12 +580,12 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        e = _annihilate(self._model.dependent.ndarray, self._model._x)
-        r = _annihilate(self._model.endog.ndarray, self._model._z)
+        e = _annihilate(self.model.dependent.ndarray, self.model._x)
+        r = _annihilate(self.model.endog.ndarray, self.model._z)
         nobs = e.shape[0]
         res = _OLS(ones((nobs, 1)), r * e).fit('unadjusted')
         stat = res.nobs - res.resid_ss
-        df = self._model.endog.shape[1]
+        df = self.model.endog.shape[1]
         null = 'Endogenous variables are exogenous'
         name = 'Wooldridge\'s score test of exogeneity'
         return WaldTestStatistic(stat, null, df, name=name)
@@ -485,11 +620,11 @@ class IVResults(_CommonIVResults):
         identical to the covariance estimator used with ``fit``. 
         """
         from linearmodels.iv.model import _OLS
-        r = _annihilate(self._model.endog.ndarray, self._model._z)
-        augx = c_[self._model._x, r]
-        mod = _OLS(self._model.dependent, augx)
+        r = _annihilate(self.model.endog.ndarray, self.model._z)
+        augx = c_[self.model._x, r]
+        mod = _OLS(self.model.dependent, augx)
         res = mod.fit(self.cov_type, **self.cov_config)
-        norig = self._model._x.shape[1]
+        norig = self.model._x.shape[1]
         test_params = res.params.values[norig:]
         test_cov = res.cov.values[norig:, norig:]
         stat = test_params.T @ inv(test_cov) @ test_params
@@ -528,8 +663,8 @@ class IVResults(_CommonIVResults):
         The order of the instruments does not affect this test.
         """
         from linearmodels.iv.model import _OLS
-        exog, endog = self._model.exog, self._model.endog
-        instruments = self._model.instruments
+        exog, endog = self.model.exog, self.model.endog
+        instruments = self.model.instruments
         nobs, nendog = endog.shape
         ninstr = instruments.shape[1]
         if ninstr - nendog == 0:
@@ -541,7 +676,7 @@ class IVResults(_CommonIVResults):
 
         endog_hat = _proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
         q = instruments.ndarray[:, :(ninstr - nendog)]
-        q_res = _annihilate(q, c_[self._model.exog.ndarray, endog_hat])
+        q_res = _annihilate(q, c_[self.model.exog.ndarray, endog_hat])
         test_functions = q_res * self.resids.values[:, None]
         res = _OLS(ones((nobs, 1)), test_functions).fit('unadjusted')
 
@@ -573,8 +708,8 @@ class IVResults(_CommonIVResults):
         
         where :math:`q = n_{instr} - n_{endog}`.
         """
-        nobs, ninstr = self._model.instruments.shape
-        nendog = self._model.endog.shape[1]
+        nobs, ninstr = self.model.instruments.shape
+        nendog = self.model.endog.shape[1]
         name = 'Anderson-Rubin test of overidentification'
         if ninstr - nendog == 0:
             return InvalidTestStatistic('Test requires more instruments than '
@@ -606,8 +741,8 @@ class IVResults(_CommonIVResults):
         
         where :math:`q = n_{instr} - n_{endog}`.
         """
-        nobs, ninstr = self._model.instruments.shape
-        nendog, nexog = self._model.endog.shape[1], self._model.exog.shape[1]
+        nobs, ninstr = self.model.instruments.shape
+        nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
         name = 'Basmann\' F  test of overidentification'
         if ninstr - nendog == 0:
             return InvalidTestStatistic('Test requires more instruments than '
@@ -628,8 +763,6 @@ class IVGMMResults(_CommonIVResults):
     .. todo::
 
         * Hypothesis testing
-        * C test
-        * Summary
     """
 
     def __init__(self, results, model):
@@ -689,7 +822,7 @@ class IVGMMResults(_CommonIVResults):
         return self._j_stat
 
     def c_stat(self, vars=None):
-        """
+        r"""
         C-test of endogeneity
         
         Parameters
@@ -705,10 +838,37 @@ class IVGMMResults(_CommonIVResults):
         
         Notes
         -----
-        ToDo
+        The C statistic tests the difference between the model estimated by 
+        assuming one or more of the endogenous variables is actually 
+        exogenous.  The test is implemented as the difference between the 
+        J-statistics of two GMM estimations where both use the same weighting
+        matrix.  The use of a common weighting matrix is required for the C
+        statistic to be positive.  
+        
+        The first model is a estimated uses GMM estimation where one or more
+        of the endogenous variables are assumed to be endogenous.  The model
+        would be relatively efficient if the assumption were true, and two 
+        quantities are computed, the J statistic, :math:`J_e`, and the 
+        moment weighting matrix, :math:`W_e`. 
+        
+        WLOG assume the q variables tested are in the final q positions so that
+        the first :math:`n_{exog} + n_{instr}` rows and columns correspond to 
+        the moment conditions in the original model. The second J statistic is 
+        computed using parameters estimated using the original moment 
+        conditions along with the upper left block of :math:`W_e`.  Denote this
+        values as :math:`J_c` where the c is used to indicate consistent. 
+        
+        The test statistic is then 
+        
+        .. math ::
+        
+          J_e - J_c \sim \chi^2_{m}
+          
+        where :math:`m` is the number of variables whose exogeneity is being 
+        tested.
         """
-        dependent, instruments = self._model.dependent, self._model.instruments
-        exog, endog = self._model.exog, self._model.endog
+        dependent, instruments = self.model.dependent, self.model.instruments
+        exog, endog = self.model.exog, self.model.endog
         if vars is None:
             exog_e = c_[exog.ndarray, endog.ndarray]
             nobs = exog_e.shape[0]
@@ -726,13 +886,13 @@ class IVGMMResults(_CommonIVResults):
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
         j_e = res_e.j_stat.stat
 
-        x = self._model._x
-        y = self._model._y
-        z = self._model._z
+        x = self.model._x
+        y = self.model._y
+        z = self.model._z
         nz = z.shape[1]
         weight_mat_c = res_e.weight_matrix.values[:nz, :nz]
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
-        j_c = self._model._j_statistic(params_c, weight_mat_c).stat
+        j_c = self.model._j_statistic(params_c, weight_mat_c).stat
 
         stat = j_e - j_c
         df = exog_e.shape[1] - exog.shape[1]

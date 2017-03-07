@@ -31,15 +31,23 @@ def has_constant(x):
         a constant
     """
     if np.any(np.all(x == 1, axis=0)):
-        return True
+        loc = np.argwhere(np.any(np.all(x == 1, axis=0)))
+        return True, int(loc)
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
-        return True
+        loc = np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0))
+        loc = np.argwhere(loc)
+        return True, int(loc)
 
     n = x.shape[0]
     aug_rank = matrix_rank(np.c_[np.ones((n, 1)), x])
     rank = matrix_rank(x)
-    return aug_rank == rank
+    has_const = aug_rank == rank
+    loc = None
+    if has_const:
+        out = np.linalg.lstsq(x, np.ones((n,1)))
+        loc = np.argmax(np.abs(out[0]) * x.var(0))
+    return has_const, loc
 
 
 def inv_sqrth(x):
@@ -61,6 +69,27 @@ def inv_sqrth(x):
 
 
 class WaldTestStatistic(object):
+    """
+    Test statistic holder for Wald-type tests
+    
+    Parameters
+    ----------
+    stat : float
+        The test statistic
+    null : str
+        A statement of the test's null hypothesis
+    df : int
+        Degree of freedom.  
+    df_denom : int, optional
+        Numerator degree of freedome.  If provided, uses an 
+        F(df, df_denom) distribution.
+    name : str, optional
+        Name of test
+    
+    See Also
+    --------
+    InvalidTestStatistic
+    """
     def __init__(self, stat, null, df, df_denom=None, name=None):
         self._stat = stat
         self._null = null
@@ -76,19 +105,23 @@ class WaldTestStatistic(object):
 
     @property
     def stat(self):
+        """Test statistic"""
         return self._stat
 
     @property
     def pval(self):
+        """P-value of test statistic"""
         return 1 - self.dist.cdf(self.stat)
 
     @property
     def critical_values(self):
+        """Critical values test for common test sizes"""
         return OrderedDict(zip(['10%', '5%', '1%'],
                                self.dist.ppf([.9, .95, .99])))
 
     @property
     def null(self):
+        """Null hypothesis"""
         return self._null
 
     def __str__(self):
@@ -108,10 +141,10 @@ def _proj(y, x):
 
     Parameters
     ----------
-    x : ndarray
-        Array to project onto (nobs by nvar)
     y : ndarray
         Array to project (nobs by nseries)
+    x : ndarray
+        Array to project onto (nobs by nvar)
 
     Returns
     -------
@@ -127,10 +160,10 @@ def _annihilate(y, x):
 
     Parameters
     ----------
-    x : ndarray
-        Array to project onto (nobs by nvar)
     y : ndarray
         Array to project (nobs by nseries)
+    x : ndarray
+        Array to project onto (nobs by nvar)
 
     Returns
     -------
@@ -145,6 +178,20 @@ class InvalidTestWarning(UserWarning):
 
 
 class InvalidTestStatistic(WaldTestStatistic):
+    """
+    Class returned if a requested test is not valid for a model
+    
+    Parameters
+    ----------
+    reason : str
+        Explanation why test is invalid
+    name : str, optional
+        Name of test
+    
+    See Also
+    --------
+    WaldTestStatistic
+    """
     def __init__(self, reason, *, name=None):
         self._reason = reason
         super(InvalidTestStatistic, self).__init__('', NaN, df=1, df_denom=1, name=name)
@@ -154,10 +201,12 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     @property
     def pval(self):
+        """Always returns NaN"""
         return NaN
 
     @property
     def critical_values(self):
+        """Always returns None"""
         return None
 
     def __str__(self):

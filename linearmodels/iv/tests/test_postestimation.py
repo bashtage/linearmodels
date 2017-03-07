@@ -93,6 +93,13 @@ def test_basmann_f(data):
 
 def test_c_stat_smoke(data):
     res = IVGMM(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
-    res.c_stat()
-    res.c_stat('x1')
-    res.c_stat(['x1'])
+    c_stat = res.c_stat()
+    assert_allclose(c_stat.stat, 22.684, rtol=1e-4)
+    assert_allclose(c_stat.pval, 0.00, atol=1e-3)
+    c_stat = res.c_stat(['x1'])
+    assert_allclose(c_stat.stat, .158525, rtol=1e-3)
+    assert_allclose(c_stat.pval, 0.6905, rtol=1e-3)
+    # Final test
+    c_stat2 = res.c_stat('x1')
+    assert_allclose(c_stat.stat, c_stat2.stat)
+
