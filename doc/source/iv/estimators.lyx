@@ -160,12 +160,29 @@ The regressors
  The extended model can be written as 
 \begin_inset Formula 
 \begin{align*}
-y_{i} & =\beta_{1}^{\prime}x_{1i}+\beta_{2}^{\prime}x_{2i}+\epsilon_{i}\\
-x_{2i} & =\gamma_{1}^{\prime}x_{1i}+\gamma_{2}^{\prime}z_{i}+u_{i}
+y_{i} & =\underset{\textrm{exogenous}}{\underbrace{\beta_{1}^{\prime}x_{1i}}}+\underset{\textrm{endogenous}}{\underbrace{\beta_{2}^{\prime}x_{2i}}}+\epsilon_{i}\\
+x_{2i} & =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+\underset{\textrm{instruments}}{\underbrace{\gamma_{2}^{\prime}z_{2i}}}+u_{i}
 \end{align*}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+The model can be expressed compactly 
+\begin_inset Formula 
+\begin{align*}
+Y & =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\
+X_{2} & =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The vector of instruments 
 \begin_inset Formula $z_{i}$
 \end_inset
@@ -275,6 +292,79 @@ The vector of instruments
 
 .
  
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $k$
+\end_inset
+
+ dimension of 
+\begin_inset Formula $x$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $k_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $k_{2}$
+\end_inset
+
+ dimensions of 
+\begin_inset Formula $x_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{2}$
+\end_inset
+
+, respectively
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $k_{z}$
+\end_inset
+
+ dimension of 
+\begin_inset Formula $z$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $k_{z_{1}}$
+\end_inset
+
+, 
+\begin_inset Formula $k_{z_{2}}$
+\end_inset
+
+ dimensions of 
+\begin_inset Formula $z_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $z_{2}$
+\end_inset
+
+, respectively.
+ Note that 
+\begin_inset Formula $k_{1}=k_{z_{1}}$
+\end_inset
+
+ since this set of variables is the same same.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $k_{c}$
+\end_inset
+
+ is 1 if the model contains a constant (or equivalent, e.g., all possibilities
+ for a dummy variable)
 \end_layout
 
 \begin_layout Section*
