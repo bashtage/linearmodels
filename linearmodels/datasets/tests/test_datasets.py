@@ -1,13 +1,16 @@
 import pandas as pd
+import pytest
 
-from linearmodels.datasets import meps, wage
+from linearmodels.datasets import meps, wage, mroz, card, fertility, jobtraining
 
-
-def test_meps_load():
-    data = meps.load()
-    assert isinstance(data, pd.DataFrame)
+DATASETS = [meps, wage, mroz, card, fertility, jobtraining]
 
 
-def test_wage_load():
-    data = wage.load()
+@pytest.fixture(params=DATASETS, scope='module')
+def module(request):
+    return request.param
+
+
+def test_dataset(module):
+    data = module.load()
     assert isinstance(data, pd.DataFrame)

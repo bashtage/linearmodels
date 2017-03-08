@@ -1,5 +1,3 @@
-from os import path
-
 DESCR = """
 age               Age   
 age2              Age-squared   
@@ -32,7 +30,7 @@ vegood            V-good health
 vgh               vg or good health
 """
 
+
 def load():
     from linearmodels import datasets
-    DATA_FILE = path.join(datasets.get_path(__file__), 'meps.csv.bz2')
-    return datasets.load(DATA_FILE)
+    return datasets.load(__file__, 'meps.csv.bz2')
