@@ -136,3 +136,14 @@ class DataHandler(object):
     def labels(self):
         """Dictionary containing row and column labels keyed by axis"""
         return self._labels
+
+    @property
+    def isnull(self):
+        return np.any(self._pandas.isnull(), axis = 1)
+
+    def drop(self, locs):
+        self._pandas = self.pandas.loc[~locs]
+        self._ndarray = self._ndarray[~locs]
+        self._labels[0] = list(pd.Series(self._labels[0]).loc[~locs])
+
+

@@ -233,3 +233,21 @@ def test_model_summary_smoke(data):
     res.__str__()
     res._repr_html_()
     res.summary
+
+
+def test_model_missing(data):
+    import copy
+    data2 = AttrDict()
+    for key in data:
+        data2[key] = copy.deepcopy(data[key])
+    data = data2
+    data.dep[::7,:] = np.nan
+    data.exog[::13,:] = np.nan
+    data.endog[::23,:] = np.nan
+    data.instr[::29, :] = np.nan
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+
+    missing = list(map(lambda x: np.any(np.isnan(x),1), [data.dep, data.exog, data.endog, data.instr]))
+    missing = np.any(np.c_[missing],0)
+    not_missing = missing.shape[0] - missing.sum()
+    assert res.nobs == not_missing
