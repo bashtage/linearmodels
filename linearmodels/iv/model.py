@@ -104,7 +104,7 @@ class IVLIML(object):
         self.exog = DataHandler(exog, var_name='exog', nobs=nobs)
         self.endog = DataHandler(endog, var_name='endog', nobs=nobs)
         self.instruments = DataHandler(instruments, var_name='instruments', nobs=nobs)
-        self._drop_missing()
+        self._drop_locs = self._drop_missing()
         # dependent variable
         self._y = self.dependent.ndarray
         # model regressors
@@ -174,6 +174,8 @@ class IVLIML(object):
             self.exog.drop(missing)
             self.endog.drop(missing)
             self.instruments.drop(missing)
+
+        return missing
 
 
     @staticmethod
