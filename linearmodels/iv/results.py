@@ -3,7 +3,7 @@ Results containers and post-estimation diagnostics for IV models
 """
 import datetime as dt
 import scipy.stats as stats
-from numpy import c_, diag, log, ones, sqrt, empty
+from numpy import c_, diag, log, ones, sqrt, empty, ceil, log10, floor
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series
 from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
@@ -230,11 +230,19 @@ class OLSResults(object):
     def summary(self):
         """Summary table of model estimation results"""
 
-        def float4(v):
-            out = '{0:5.5g}'.format(v)
-            if len(out) < 6 and '.' in out:
-                out += '0' * (6 - len(out))
-            return out
+        def _str(v):
+            av = abs(v)
+            digits = ceil(log10(av))
+            if digits > 4 or digits <= -4:
+                return '{0:8.4g}'.format(v)
+
+            if digits > 0:
+                d = int(5 - digits)
+            else:
+                d = int(4)
+
+            format_str = '{0:' + '0.{0}f'.format(d) + '}'
+            return format_str.format(v)
 
         def pval_format(v):
             return '{0:4.4f}'.format(v)
@@ -242,17 +250,19 @@ class OLSResults(object):
         title = self._method + ' Estimation Summary'
         mod = self.model
         top_left = [('Dep. Variable:', mod.dependent.cols[0]),
+                    ('Estimator:', self._method),
                     ('No. Observations:', self.nobs),
                     ('Date:', self._datetime.strftime('%a, %b %d %Y')),
                     ('Time:', self._datetime.strftime('%H:%M:%S')),
-                    ('', ''),
+                    ('Cov. Estimator:', self._cov_type),
                     ('', '')]
 
-        top_right = [('R-squared:', float4(self.rsquared)),
-                     ('Adj. R-squared:', float4(self.rsquared_adj)),
-                     ('F-statistic:', float4(self.f_statistic.stat)),
-                     ('F-stat dist:', str(self.f_statistic.dist_name)),
-                     ('F-stat p-value:', pval_format(self.f_statistic.pval)),
+        top_right = [('R-squared:', _str(self.rsquared)),
+                     ('Adj. R-squared:', _str(self.rsquared_adj)),
+                     ('F-statistic:', _str(self.f_statistic.stat)),
+                     ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
+                     ('Distribution:',  str(self.f_statistic.dist_name)),
+                     ('', ''),
                      ('', '')]
 
         stubs = []
@@ -287,14 +297,11 @@ class OLSResults(object):
         for row in param_data:
             txt_row = []
             for i, v in enumerate(row):
-                f = float4
+                f = _str
                 if i == 3:
                     f = pval_format
                 txt_row.append(f(v))
             data.append(txt_row)
-        for row in data:
-            row[4] = '[' + row[4]
-            row[5] += ']'
         title = 'Parameter Estimates'
         table_stubs = list(self.params.index)
         header = ['Parameters', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
@@ -306,13 +313,12 @@ class OLSResults(object):
         smry.tables.append(table)
 
         instruments = self.model.instruments
-        extra_text = []
         if instruments.shape[1] > 0:
+            extra_text = []
             endog = self.model.endog
             extra_text.append('Instrumented: ' + ', '.join(endog.cols))
             extra_text.append('Instruments: ' + ', '.join(instruments.cols))
-        extra_text.append('Covariance estimator: {0}'.format(self.cov_type))
-        smry.add_extra_txt(extra_text)
+            smry.add_extra_txt(extra_text)
 
         return smry
 

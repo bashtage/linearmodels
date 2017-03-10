@@ -1,17 +1,18 @@
-from setuptools import setup, find_packages
-import versioneer
 import glob
 import os
 
+from setuptools import setup, find_packages
+
+import versioneer
+
+# Copy over notebooks from examples to docs for build
 notebooks = glob.glob('examples/*.ipynb')
 for nb in notebooks:
     fname = os.path.split(nb)[-1]
     folder, nbname = fname.split('_')
-    outfile = os.path.join('doc','source', folder, nbname)
+    outfile = os.path.join('doc', 'source', folder, nbname)
     with open(outfile, 'w') as nbout:
         with open(nb, 'r') as nbin:
-            print(nb)
-            print(outfile)
             nbout.write(nbin.read())
 
 setup(

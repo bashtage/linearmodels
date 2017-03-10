@@ -15,10 +15,7 @@ Estimation and inference in some linear models (IV, panel and panel IV).
    :caption: Contents:
    :glob:
 
-   iv/iv
-   iv/reference
-   iv/instrumental-variable-estimation.ipynb
-   iv/wooldridge-iv-estimation.ipynb
+   iv/index
    panel/panel
    utility
    plan
