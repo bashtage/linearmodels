@@ -13,11 +13,12 @@ Estimation and inference in some linear models (IV, panel and panel IV).
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
+   :glob:
 
    iv/iv
    iv/reference
-   iv\
-   iv\
+   iv/instrumental-variable-estimation.ipynb
+   iv/wooldridge-iv-estimation.ipynb
    panel/panel
    utility
    plan
