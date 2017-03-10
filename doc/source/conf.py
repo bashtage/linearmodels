@@ -54,7 +54,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.extlinks',
               'sphinx.ext.doctest',
               'IPython.sphinxext.ipython_console_highlighting',
-              'IPython.sphinxext.ipython_directive'
+              'IPython.sphinxext.ipython_directive',
+              'nbsphinx'
               ]
 
 add_module_names = False

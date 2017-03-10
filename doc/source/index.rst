@@ -16,6 +16,8 @@ Estimation and inference in some linear models (IV, panel and panel IV).
 
    iv/iv
    iv/reference
+   iv\
+   iv\
    panel/panel
    utility
    plan
