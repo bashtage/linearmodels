@@ -1,8 +1,9 @@
+from collections import OrderedDict
+
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from collections import OrderedDict
 from numpy.testing import assert_equal
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 

@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
@@ -91,6 +92,7 @@ def test_basmann_f(data):
     assert_allclose(res.basmann_f.stat, .174821, rtol=1e-4)
     assert_allclose(res.basmann_f.pval, 0.6760, rtol=1e-3)
 
+
 def test_c_stat_smoke(data):
     res = IVGMM(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
     c_stat = res.c_stat()
@@ -102,4 +104,3 @@ def test_c_stat_smoke(data):
     # Final test
     c_stat2 = res.c_stat('x1')
     assert_allclose(c_stat.stat, c_stat2.stat)
-

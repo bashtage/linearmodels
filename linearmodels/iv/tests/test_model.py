@@ -128,7 +128,7 @@ def test_2sls_direct_small(data):
     assert np.all(res.tstats != res2.tstats)
     get_all(res2)
     fs = res.first_stage
-    stats = fs.diagnostics
+    fs.diagnostics
     # Fetch again to test cache
     get_all(res2)
 
@@ -192,7 +192,7 @@ def test_2sls_just_identified(data):
     res = mod.fit()
     get_all(res)
     fs = res.first_stage
-    stats = fs.diagnostics
+    fs.diagnostics
     # Fetch again to test cache
     get_all(res)
 
@@ -200,15 +200,15 @@ def test_2sls_just_identified(data):
 def test_durbin_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    durb = res.durbin()
-    durb2 = res.durbin([mod.endog.cols[1]])
+    res.durbin()
+    res.durbin([mod.endog.cols[1]])
 
 
 def test_wuhausman_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    wh = res.wu_hausman()
-    wh = res.wu_hausman([mod.endog.cols[1]])
+    res.wu_hausman()
+    res.wu_hausman([mod.endog.cols[1]])
 
 
 def test_wooldridge_smoke(data):
@@ -241,13 +241,14 @@ def test_model_missing(data):
     for key in data:
         data2[key] = copy.deepcopy(data[key])
     data = data2
-    data.dep[::7,:] = np.nan
-    data.exog[::13,:] = np.nan
-    data.endog[::23,:] = np.nan
+    data.dep[::7, :] = np.nan
+    data.exog[::13, :] = np.nan
+    data.endog[::23, :] = np.nan
     data.instr[::29, :] = np.nan
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
 
-    missing = list(map(lambda x: np.any(np.isnan(x),1), [data.dep, data.exog, data.endog, data.instr]))
-    missing = np.any(np.c_[missing],0)
+    vars = [data.dep, data.exog, data.endog, data.instr]
+    missing = list(map(lambda x: np.any(np.isnan(x), 1), vars))
+    missing = np.any(np.c_[missing], 0)
     not_missing = missing.shape[0] - missing.sum()
     assert res.nobs == not_missing

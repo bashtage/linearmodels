@@ -7,6 +7,13 @@ from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
                    cos, empty, sum, asarray)
 from numpy.linalg import pinv, inv
 
+CLUSTER_ERR = """
+clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
+in the regression variables have have been dropped.  When using a clustered
+covariance estimator, drop missing data before estimating the model. The model
+property `notnull` contains the locations of the observations that have no 
+missing values."""
+
 
 def _cov_cluster(z, clusters):
     """
@@ -115,9 +122,9 @@ def kernel_weight_quadratic_spectral(bw, n):
     Notes
     -----
     Unlike the Barrlett or Parzen kernels, the QS kernel is not truncated at
-    a specific lag, and so weights are computed for all available lags in 
-    the sample.  
-    
+    a specific lag, and so weights are computed for all available lags in
+    the sample.
+
     .. math::
 
        z_i & = 6 \pi (i / bw) / 5                                \\
@@ -185,11 +192,11 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
 
       * Explain mathematics involved
       * References
-    
+
     See Also
     --------
-    linearmodels.iv.covariance.kernel_weight_bartlett, 
-    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_bartlett,
+    linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
 
     """
@@ -460,11 +467,11 @@ class KernelCovariance(HomoskedasticCovariance):
 
     where :math:`X` is the matrix of variables included in the model and
     :math:`Z` is the matrix of instruments, including exogenous regressors.
-    
+
     See Also
     --------
-    linearmodels.iv.covariance.kernel_weight_bartlett, 
-    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_bartlett,
+    linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
 
     """
@@ -570,8 +577,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         self._clusters = clusters
         nobs = self.x.shape[0]
         if clusters is not None and clusters.shape[0] != nobs:
-            raise ValueError('clusters has the wrong nobs. Expected {0}, '
-                             'got {1}'.format(nobs, clusters.shape[0]))
+            raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
 
     @property
     def s(self):

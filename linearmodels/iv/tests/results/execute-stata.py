@@ -1,6 +1,5 @@
-import subprocess
-
 import os
+import subprocess
 from os.path import join
 
 STATA_PATH = join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.exe')
@@ -10,7 +9,9 @@ use http://www.stata-press.com/data/r13/hsng, clear \n
 """
 iv_tempplate = """
 ivregress {method} rent pcturban (hsngval = faminc i.region){variance_option}
-estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) stats(r2 r2_a p mss rss rmse {extra}, fmt(%13.12g)) unstack append
+estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
+
+iv_tempplate += """stats(r2 r2_a p mss rss rmse {extra}, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
 file write myfile  "********* Variance *************" _n
 file close myfile

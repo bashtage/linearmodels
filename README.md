@@ -35,3 +35,4 @@ very unpolished.
 
 * sphinx
 * sphinx_rtd_theme
+* nbsphinx

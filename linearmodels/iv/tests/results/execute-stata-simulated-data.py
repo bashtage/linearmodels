@@ -1,7 +1,6 @@
+import os
 import subprocess
 from itertools import product
-
-import os
 from os.path import join
 
 STATA_PATH = join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.exe')
@@ -45,7 +44,9 @@ for val in product(*inputs):
                     'other_option': other_opt})
 
 results = """
-estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) stats(r2 r2_a mss rss rmse {extra}, fmt(%13.12g)) unstack append
+estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
+
+results += """stats(r2 r2_a mss rss rmse {extra}, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
 file write myfile  "********* Variance *************" _n
 file close myfile
@@ -61,9 +62,12 @@ matrix W = e(W)
 estout matrix(W, fmt(%13.12g)) using {outfile}, append
 """
 
+m = '{method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}-{variance}-{other}'
 section_header = """
 file open myfile using {outfile}, write append
-file write myfile  _n _n "########## !{method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}-{variance}-{other}! ##########" _n
+file write myfile  _n _n "########## !"""
+section_header += m
+section_header += """! ##########" _n
 file close myfile
 """
 

@@ -1,5 +1,5 @@
-Instrumental Variable Model Estimation
---------------------------------------
+Instrumental Variable Model Specification
+-----------------------------------------
 
 Instrumental variable models are used when regressors are endogenous
 or there is measurement error on the variable.  These models make use of

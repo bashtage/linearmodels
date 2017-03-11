@@ -3,6 +3,11 @@ Instrumental variable estimators
 """
 from __future__ import absolute_import, division, print_function
 
+from numpy import array, asarray, c_, isscalar, any, logical_not
+from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+from pandas import DataFrame, Series
+from scipy.optimize import minimize
+
 from linearmodels.iv.covariance import (HeteroskedasticCovariance,
                                         HomoskedasticCovariance, KernelCovariance,
                                         OneWayClusteredCovariance)
@@ -12,10 +17,6 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  KernelWeightMatrix, OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth
-from numpy import array, asarray, c_, isscalar, any
-from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
-from pandas import DataFrame, Series
-from scipy.optimize import minimize
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -65,31 +66,31 @@ class IVLIML(object):
     -----
     ``kappa`` and ``fuller`` should not be used simultaneously since Fuller's
     alpha applies an adjustment to ``kappa``, and so the same result can be
-    computed using only ``kappa``. Fuller's alpha is used to adjust the 
+    computed using only ``kappa``. Fuller's alpha is used to adjust the
     LIML estimate of :math:`\kappa`, which is computed whenever ``kappa``
     is not provided.
-    
-    The LIML estimator is defined as 
-    
+
+    The LIML estimator is defined as
+
     .. math::
-    
+
       \hat{\beta}_{\kappa} & =(X(I-\kappa M_{z})X)^{-1}X(I-\kappa M_{z})Y\\
       M_{z} & =I-P_{z}\\
       P_{z} & =Z(Z'Z)^{-1}Z'
-    
+
     where :math:`Z` contains both the exogenous regressors and the instruments.
     :math:`\kappa` is estimated as part of the LIML estimator.
-    
-    When using Fuller's :math:`\alpha`, the value used is modified to 
-    
+
+    When using Fuller's :math:`\alpha`, the value used is modified to
+
     .. math::
-    
-      \kappa-\alpha/(n-n_{instr})  
+
+      \kappa-\alpha/(n-n_{instr})
 
     .. todo::
 
         * VCV: bootstrap
-    
+
     See Also
     --------
     IV2SLS, IVGMM, IVGMMCUE
@@ -162,8 +163,8 @@ class IVLIML(object):
         self._has_constant, self._const_loc = has_constant(x)
 
     def _drop_missing(self):
-        data = (self.dependent,self.exog,self.endog,self.instruments)
-        missing = any(c_[[dh.isnull for dh in data]],0)
+        data = (self.dependent, self.exog, self.endog, self.instruments)
+        missing = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
@@ -176,7 +177,6 @@ class IVLIML(object):
             self.instruments.drop(missing)
 
         return missing
-
 
     @staticmethod
     def estimate_parameters(x, y, z, kappa):
@@ -289,6 +289,16 @@ class IVLIML(object):
         """Flag indicating the model includes a constant or equivalent"""
         return self._has_constant
 
+    @property
+    def isnull(self):
+        """Locations of observations with missing values"""
+        return self._drop_locs
+
+    @property
+    def notnull(self):
+        """Locations of observations included in estimation"""
+        return logical_not(self._drop_locs)
+
     def _f_statistic(self, params, cov, debiased):
         non_const = ~(self._x.ptp(0) == 0)
         test_params = params[non_const]
@@ -357,23 +367,23 @@ class IV2SLS(IVLIML):
     Notes
     -----
     The 2SLS estimator is defined
-    
+
     .. math::
-    
+
       \hat{\beta}_{2SLS} & =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
                          & =(\hat{X}'\hat{X})^{-1}\hat{X}'Y\\
                  \hat{X} & =Z(Z'Z)^{-1}Z'X
-    
+
     The 2SLS estimator is a special case of a k-class estimator with
     :math:`\kappa=1`,
-    
+
     .. todo::
 
         * VCV: bootstrap
-    
+
     See Also
     --------
-    IVLIML, IVGMM, IVGMMCUE        
+    IVLIML, IVGMM, IVGMMCUE
     """
 
     def __init__(self, dependent, exog, endog, instruments):
@@ -405,26 +415,26 @@ class IVGMM(IVLIML):
     -----
     Available weight functions are:
 
-      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
+      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
         homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
+      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
         autocorrelation
       * 'kernel' - Allows for heteroskedasticity and autocorrelation
       * 'cluster' - Allows for one-way cluster dependence
-    
-    The estimator is defined as 
-    
+
+    The estimator is defined as
+
     .. math::
-    
+
       \hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y
-    
-    where :math:`W` is a positive definite weight matrix and :math:`Z` 
+
+    where :math:`W` is a positive definite weight matrix and :math:`Z`
     contains both the exogenous regressors and the instruments.
 
     .. todo:
 
          * VCV: bootstrap
-    
+
     See Also
     --------
     IV2SLS, IVLIML, IVGMMCUE
@@ -485,7 +495,7 @@ class IVGMM(IVLIML):
             parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
         initial_weight : ndarray, optional
-            Initial weighting matrix to use in the first step.  If not 
+            Initial weighting matrix to use in the first step.  If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
         cov_type : str, optional
@@ -504,12 +514,12 @@ class IVGMM(IVLIML):
         The see the docstring of specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
-        
+
         Available covariance functions are:
-    
-          * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
+
+          * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
             homoskedastic
-          * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
+          * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
             autocorrelation
           * 'kernel' - Allows for heteroskedasticity and autocorrelation
           * 'cluster' - Allows for one-way cluster dependence
@@ -591,24 +601,24 @@ class IVGMMCUE(IVGMM):
     -----
     Available weight functions are:
 
-      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
+      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
         homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
+      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
         autocorrelation
       * 'kernel' - Allows for heteroskedasticity and autocorrelation
       * 'cluster' - Allows for one-way cluster dependence
-    
+
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence.
-    
+
     .. math::
-     
+
       \hat{\beta}_{cue} & =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
       g(\beta) & =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)
-    
+
     where :math:`W(\beta)` is a weight matrix that depends on :math:`\beta`
     through :math:`\epsilon_i = y_i - x_i\beta`.
-    
+
     See Also
     --------
     IV2SLS, IVLIML, IVGMM
@@ -624,8 +634,8 @@ class IVGMMCUE(IVGMM):
 
     def j(self, params, x, y, z):
         r"""
-        Optimization target 
-        
+        Optimization target
+
         Parameters
         ----------
         params : ndarray
@@ -636,28 +646,28 @@ class IVGMMCUE(IVGMM):
             Regressand matrix (nobs by 1)
         z : ndarray
             Instrument matrix (nobs by ninstr)
-        
+
         Returns
         -------
         j : float
             GMM objective function, also known as the J-statistic
-        
+
         Notes
         -----
-        
+
         The GMM objective function is defined as
-        
+
         .. math::
-        
+
           J(\beta) = \bar{g}(\beta)'W(\beta)^{-1}\bar{g}(\beta)
-        
-        where :math:`\bar{g}(\beta)` is the average of the moment 
-        conditions, :math:`z_i \hat{\epsilon}_i`, where 
+
+        where :math:`\bar{g}(\beta)` is the average of the moment
+        conditions, :math:`z_i \hat{\epsilon}_i`, where
         :math:`\hat{\epsilon}_i = y_i - x_i\beta`.  The weighting matrix
         is some estimator of the long-run variance of the moment conditions.
-        
-        Unlike tradition GMM, the weighting matrix is simultaneously computed 
-        with the moment conditions, and so has explicit dependence on 
+
+        Unlike tradition GMM, the weighting matrix is simultaneously computed
+        with the moment conditions, and so has explicit dependence on
         :math:`\beta`.
         """
         nobs = y.shape[0]
@@ -689,7 +699,7 @@ class IVGMMCUE(IVGMM):
         -----
         Exposed to facilitate estimation with other data, e.g., bootstrapped
         samples.  Performs no error checking.
-        
+
         See Also
         --------
         scipy.optimize.minimize
@@ -706,7 +716,7 @@ class IVGMMCUE(IVGMM):
         Parameters
         ----------
         starting : ndarray, optional
-            Starting values to use in optimization.  If not provided, 2SLS 
+            Starting values to use in optimization.  If not provided, 2SLS
             estimates are used.
         display : bool, optional
             Flag indicating whether to display optimization output
@@ -726,7 +736,7 @@ class IVGMMCUE(IVGMM):
         The see the docstring of specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
-        
+
         Starting values are computed by IVGMM.
 
         .. todo::
@@ -761,12 +771,12 @@ class IVGMMCUE(IVGMM):
 class _OLS(IVLIML):
     """
     Computes OLS estimated when required
-    
+
     Notes
     -----
-    Uses IV2SLS internally by setting endog and instruments to None.  
-    Uses IVLIML with kappa=0 to estimate OLS models. 
-    
+    Uses IV2SLS internally by setting endog and instruments to None.
+    Uses IVLIML with kappa=0 to estimate OLS models.
+
     See Also
     --------
     statsmodels.regression.linear_model.OLS,

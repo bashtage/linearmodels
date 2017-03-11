@@ -24,15 +24,15 @@ def expand_categoricals(x, drop_first):
 
 class DataHandler(object):
     """Simple class to abstract different input data formats
-    
+
     Parameters
     ----------
     x : {ndarray, Series, DataFrame, DataArray}
     var_name : str, optional
-        Variable name to use when naming variables in NumPy arrays or 
-        xarray DataArrays 
+        Variable name to use when naming variables in NumPy arrays or
+        xarray DataArrays
     convert_dummies : bool, optional
-        Flat indicating whether pandas categoricals should be converted to 
+        Flat indicating whether pandas categoricals should be converted to
         dummy variables
     drop_first : bool, optional
         Flag indicating to drop first dummy category
@@ -52,7 +52,7 @@ class DataHandler(object):
             raise ValueError(dim_err.format(var_name, xndim))
 
         if isinstance(x, np.ndarray):
-            x = x.view(np.float64)
+            x = x.astype(np.float64)
             if xndim == 1:
                 x.shape = (x.shape[0], -1)
 
@@ -65,8 +65,8 @@ class DataHandler(object):
         elif isinstance(x, (pd.Series, pd.DataFrame)):
             dts = [x.dtype] if xndim == 1 else x.dtypes
             for dt in dts:
-                if not (pd.api.types.is_numeric_dtype(dt)
-                        or pd.api.types.is_categorical_dtype(dt)):
+                if not (pd.api.types.is_numeric_dtype(dt) or
+                        pd.api.types.is_categorical_dtype(dt)):
                     raise ValueError('Only numeric or categorical data permitted')
             if convert_dummies:
                 x = expand_categoricals(x, drop_first)
@@ -139,11 +139,9 @@ class DataHandler(object):
 
     @property
     def isnull(self):
-        return np.any(self._pandas.isnull(), axis = 1)
+        return np.any(self._pandas.isnull(), axis=1)
 
     def drop(self, locs):
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
         self._labels[0] = list(pd.Series(self._labels[0]).loc[~locs])
-
-

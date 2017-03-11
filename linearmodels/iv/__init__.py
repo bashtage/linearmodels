@@ -1,1 +1,1 @@
-from .model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from .model import IV2SLS, IVGMM, IVGMMCUE, IVLIML # flake8: noqa

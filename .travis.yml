@@ -2,6 +2,10 @@ language: python
 
 sudo: false
 
+addons:
+  apt_packages:
+    - pandoc
+
 env:
   global:
     - COVERAGE=true
@@ -24,9 +28,10 @@ before_install:
   - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda update --yes --quiet conda
   # Install packages
-  - conda create --yes --quiet -n linearmodels-test python=${PYTHON} numpy scipy pandas xarray statsmodels ipython
+  - conda create --yes --quiet -n linearmodels-test python=${PYTHON} numpy scipy pandas xarray statsmodels matplotlib seaborn
   - source activate linearmodels-test
-  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr -q
+  - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
+  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr nbsphinx -q
   - export PYTHONHASHSEED=0
 
 install:

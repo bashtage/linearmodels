@@ -1,5 +1,6 @@
-import pandas as pd
 from collections import defaultdict
+
+import pandas as pd
 
 from linearmodels.utility import AttrDict
 

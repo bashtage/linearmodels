@@ -116,7 +116,8 @@ class TestHomoskedasticCovariance(object):
         assert_allclose(c.s, s2 * (xhat.T @ xhat / nobs))
 
     def test_debiased(self, data):
-        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, True)
+        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params,
+                                    debiased=True)
         assert c.debiased is True
         assert c.config == {'debiased': True, 'kappa': 1}
         assert_allclose(c.s2, data.s2_debiased)
@@ -131,7 +132,8 @@ class TestHomoskedasticCovariance(object):
         assert_allclose(c.cov, data.s2 * inv(data.vk) / data.nobs)
 
     def test_kappa_debiased(self, data):
-        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, True, data.kappa)
+        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params,
+                                    debiased=True, kappa=data.kappa)
         assert c.debiased is True
         assert c.config == {'debiased': True, 'kappa': data.kappa}
         assert_allclose(c.s, data.s2_debiased * data.vk)
@@ -154,7 +156,8 @@ class TestHeteroskedasticCovariance(object):
         assert_allclose(c.s, (xhat * eps).T @ (xhat * eps) / nobs)
 
     def test_debiased(self, data):
-        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, True)
+        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params,
+                                      debiased=True)
         xhat, eps, nobs, nvar = data.xhat, data.e, data.nobs, data.nvar
         assert c.debiased is True
         assert c.config == {'debiased': True, 'kappa': 1}
@@ -163,17 +166,20 @@ class TestHeteroskedasticCovariance(object):
         assert_allclose(c.cov, data.vinv @ s @ data.vinv / nobs)
 
     def test_kappa_debiased(self, data):
-        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, True, .99)
+        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params,
+                                      debiased=True, kappa=.99)
         assert c.debiased is True
         assert c.config == {'debiased': True, 'kappa': 0.99}
-        c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, True)
+        c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params,
+                                       debiased=True)
         assert_allclose(c.s, c2.s)
         assert c.s2 == c2.s2
         vk_inv = inv(data.vk)
         assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
 
     def test_kappa(self, data):
-        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, False, .99)
+        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params,
+                                      debiased=False, kappa=.99)
         assert c.debiased is False
         assert c.config == {'debiased': False, 'kappa': 0.99}
         c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)

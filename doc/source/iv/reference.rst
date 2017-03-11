@@ -9,4 +9,3 @@ Instrumental Variable Module Reference
    results
    covariance
    gmm
-   estimators

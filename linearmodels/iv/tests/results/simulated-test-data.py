@@ -67,8 +67,8 @@ y_kernel = x @ beta[:, None] + e[:, None]
 e_autoc = e
 
 time = np.arange(n)
-data = np.c_[
-    time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero, e_cluster, e_autoc, clusters]
+data = np.c_[time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero,
+             e_cluster, e_autoc, clusters]
 data = pd.DataFrame(data, columns=['time', 'y_unadjusted', 'y_robust', 'y_clustered',
                                    'y_kernel', '_cons', 'x1', 'x2', 'x3',
                                    'x4', 'x5', 'z1', 'z2', 'e_homo', 'e_hetero', 'e_cluster',

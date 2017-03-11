@@ -13,7 +13,7 @@ from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
 class HomoskedasticWeightMatrix(object):
     r"""
     Homoskedastic (unadjusted) weight estimation
-    
+
     Parameters
     ----------
     center : bool, optional
@@ -21,18 +21,18 @@ class HomoskedasticWeightMatrix(object):
         the mean before computing the weight matrix.
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
-    
+
     Notes
     -----
     The weight matrix estimator is
-    
+
     .. math::
-    
+
       s^{2} & =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{\epsilon})^2 \\
       W & =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i
-    
+
     where :math:`z_i` contains both the exogenous regressors and instruments.
-    
+
     ``center`` has no effect on this estimator since it is always centered.
     """
 
@@ -68,7 +68,7 @@ class HomoskedasticWeightMatrix(object):
     def config(self):
         """
         Weight estimator configuration
-        
+
         Returns
         -------
         config : dict
@@ -89,16 +89,16 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         the mean before computing the weight matrix.
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
-    
+
     Notes
     -----
-    The weight matrix estimator is 
-    
+    The weight matrix estimator is
+
     .. math::
-    
+
       g_i & =z_i\epsilon_i\\
       W & =n^{-1}\sum_{i=1}^{n}g'_ig_i
-    
+
     where :math:`z_i` contains both the exogenous regressors and instruments.
     """
 
@@ -150,24 +150,24 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     Notes
     -----
     Supported kernels:
-    
+
       * 'bartlett', 'newey-west' - Bartlett's kernel
       * 'parzen', 'gallant' - Parzen's kernel
       * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
-    
+
     .. math::
-    
+
       g_i & =z_i \epsilon_i \\
       W & =n^{-1}(\Gamma_0+\sum_{j=1}^{n-1}k(j)(\Gamma_j+\Gamma_j')) \\
       \Gamma_j & =\sum_{i=j+1}^n g'_i g_{j-j}
-    
-    where :math:`k(j)` is the kernel weight for lag j and :math:`z_i` 
+
+    where :math:`k(j)` is the kernel weight for lag j and :math:`z_i`
     contains both the exogenous regressors and instruments..
-      
+
     See Also
     --------
-    linearmodels.iv.covariance.kernel_weight_bartlett, 
-    linearmodels.iv.covariance.kernel_weight_parzen, 
+    linearmodels.iv.covariance.kernel_weight_bartlett,
+    linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
@@ -301,7 +301,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 class IVGMMCovariance(HomoskedasticCovariance):
     """
     Covariance estimation for GMM models
-    
+
     Parameters
     ----------
     x : ndarray
@@ -315,37 +315,37 @@ class IVGMMCovariance(HomoskedasticCovariance):
     w : ndarray
         Weighting matrix used in GMM estimation
     cov_type : str, optional
-        Covariance estimator to use  Valid choices are 
+        Covariance estimator to use  Valid choices are
 
-        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are 
+        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
           homoskedastic
-        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not 
+        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
           autocorrelation
         * 'kernel' - Allows for heteroskedasticity and autocorrelation
         * 'cluster' - Allows for one-way cluster dependence
-        
+
     debiased : bool, optional
         Flag indicating whether to debias the covariance estimator
     cov_config
         Optional keyword arguments that are specific to a particular cov_type
-    
+
     Notes
     -----
     Optional keyword argument for specific covariance estimators:
-    
+
     **kernel**
-    
-      * ``kernel``: Name of kernel to use.  See 
-        linearmodels.covariance.KernelCovariance for details on available 
-        kernels 
-      * ``bandwidth``: Bandwidth to use when computing the weight.  If not 
+
+      * ``kernel``: Name of kernel to use.  See
+        linearmodels.covariance.KernelCovariance for details on available
+        kernels
+      * ``bandwidth``: Bandwidth to use when computing the weight.  If not
         provided, nobs - 2 is used.
-         
+
     **cluster**
-    
-      * ``clusters``: Array containing the cluster indices.  See 
+
+      * ``clusters``: Array containing the cluster indices.  See
         linearmodels.covariance.OneWayClusteredCovariance
-    
+
     See also
     --------
     linearmodels.iv.covariance.HomoskedasticCovariance,
