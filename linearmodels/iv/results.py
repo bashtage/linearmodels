@@ -35,10 +35,12 @@ class OLSResults(object):
         self._cov_estimator = results['cov_estimator']
 
     def __str__(self):
-        return self.summary
+        return self.summary.as_text()
 
     def __repr__(self):
-        return self.__str__().as_text() + '\nid: {0}'.format(hex(id(self)))
+        return self.__str__() + '\n' + \
+               self.__class__.__name__ + \
+               ', id: {0}'.format(hex(id(self)))
 
     def _repr_html_(self):
         return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
