@@ -60,7 +60,7 @@ same four required inputs:
     Estimator:                    IV-2SLS   Adj. R-squared:                 0.0438
     No. Observations:                 934   F-statistic:                    23.872
     Date:                Mon, Mar 13 2017   P-value (F-stat)                0.0000
-    Time:                        12:10:47   Distribution:                  chi2(2)
+    Time:                        14:52:30   Distribution:                  chi2(2)
     Cov. Estimator:            unadjusted
 
                                  Parameter Estimates
@@ -74,7 +74,8 @@ same four required inputs:
 
     Endogenous: educ
     Instruments: sibs
-
+    Unadjusted Covariance (Homoskedastic)
+    Debiased: False
 
 Estimators
 ==========

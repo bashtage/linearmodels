@@ -32,6 +32,7 @@ class OLSResults(object):
         self._method = results['method']
         self._kappa = results.get('kappa', None)
         self._datetime = dt.datetime.now()
+        self._cov_estimator = results['cov_estimator']
 
     def __str__(self):
         return self.summary
@@ -319,6 +320,9 @@ class OLSResults(object):
             endog = self.model.endog
             extra_text.append('Endogenous: ' + ', '.join(endog.cols))
             extra_text.append('Instruments: ' + ', '.join(instruments.cols))
+            cov_descr = str(self._cov_estimator)
+            for line in cov_descr.split('\n'):
+                extra_text.append(line)
             smry.add_extra_txt(extra_text)
 
         return smry

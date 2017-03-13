@@ -693,5 +693,93 @@ This somewhat non-obvious choice is drive by Stata compatibility.
 
 \end_layout
 
+\begin_layout Section
+To Do
+\end_layout
+
+\begin_layout Standard
+GMM CUE
+\end_layout
+
+\begin_layout Standard
+Gmm Covariance
+\end_layout
+
+\begin_layout Standard
+Constant detection
+\end_layout
+
+\begin_layout Standard
+k-class special cases
+\end_layout
+
+\begin_layout Standard
+J-stat
+\end_layout
+
+\begin_layout Standard
+C-stat
+\end_layout
+
+\begin_layout Standard
+Kernel weights
+\end_layout
+
+\begin_layout Standard
+Optimal BW selection
+\end_layout
+
+\begin_layout Standard
+Std err, T-stats, p-values, Confidence intervalus
+\end_layout
+
+\begin_layout Standard
+All df's
+\end_layout
+
+\begin_layout Standard
+s2??
+\end_layout
+
+\begin_layout Standard
+Linear hypothesis testing
+\end_layout
+
+\begin_layout Standard
+sargan
+\end_layout
+
+\begin_layout Standard
+basman
+\end_layout
+
+\begin_layout Standard
+wu haussman
+\end_layout
+
+\begin_layout Standard
+wooldridge score
+\end_layout
+
+\begin_layout Standard
+wooldridge regression
+\end_layout
+
+\begin_layout Standard
+wooldridge overid
+\end_layout
+
+\begin_layout Standard
+anderson rubin
+\end_layout
+
+\begin_layout Standard
+basmann f
+\end_layout
+
+\begin_layout Standard
+First Stage Results -> partial r2, shea r2, f-stat
+\end_layout
+
 \end_body
 \end_document

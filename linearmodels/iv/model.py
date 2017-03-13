@@ -344,7 +344,8 @@ class IVLIML(object):
                'instruments': self._instr_columns,
                'cov_config': cov_estimator.config,
                'cov_type': cov_type,
-               'method': self._method}
+               'method': self._method,
+               'cov_estimator': cov_estimator}
 
         return out
 

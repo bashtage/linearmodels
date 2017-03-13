@@ -293,6 +293,17 @@ class HomoskedasticCovariance(object):
         self._pinvz = pinv(z)
         nobs, nvar = x.shape
         self._scale = nobs / (nobs - nvar) if self._debiased else 1
+        self._name = 'Unadjusted Covariance (Homoskedastic)'
+
+    def __str__(self):
+        out = self._name
+        out += '\nDebiased: {0}'.format(self._debiased)
+        if self._kappa != 1:
+            out += '\nKappa: {0:0.3f}'.format(self._kappa)
+        return out
+
+    def __repr__(self):
+        return self.__str__() + '\nid: {0}'.format(hex(id(self)))
 
     @property
     def s(self):
@@ -395,6 +406,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(self, x, y, z, params, debiased=False, kappa=1):
         super(HeteroskedasticCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        self._name = 'Robust Covariance (Heteroskedastic)'
 
     @property
     def s(self):
@@ -483,9 +495,18 @@ class KernelCovariance(HomoskedasticCovariance):
         self._kernel = kernel
         self._bandwidth = bandwidth
         self._auto_bandwidth = False
+        self._name = 'Kernel Covariance (HAC)'
 
         if kernel not in KERNEL_LOOKUP:
             raise ValueError('Unknown kernel: {0}'.format(kernel))
+
+    def __str__(self):
+        out = super(KernelCovariance, self).__str__()
+        out += '\nKernel: {0}'.format(self._kernel)
+        out += '\nAutomatic Bandwidth: {0}'.format(self._auto_bandwidth)
+        if self._bandwidth:
+            out += '\nBandwidth: {0}'.format(self._bandwidth)
+        return out
 
     @property
     def s(self):
@@ -574,10 +595,20 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(self, x, y, z, params, clusters=None, debiased=False, kappa=1):
         super(OneWayClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
+
+        nobs = x.shape[0]
+        clusters = arange(nobs) if clusters is None else clusters
+        clusters = asarray(clusters).squeeze()
         self._clusters = clusters
-        nobs = self.x.shape[0]
+        self._num_clusters = len(unique(clusters))
         if clusters is not None and clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
+        self._name = 'Clustered Covariance (One-Way)'
+
+    def __str__(self):
+        out = super(OneWayClusteredCovariance, self).__str__()
+        out += '\nNum Clusters: {0}'.format(self._num_clusters)
+        return out
 
     @property
     def s(self):
@@ -588,13 +619,10 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
         nobs, nvar = x.shape
         clusters = self._clusters
-        clusters = arange(nobs) if clusters is None else clusters
-        self._clusters = clusters
-        clusters = asarray(clusters).squeeze()
         s = _cov_cluster(xhat_e, clusters)
 
         if self.debiased:
-            num_clusters = len(unique(clusters))
+            num_clusters = self._num_clusters
             scale = self._scale
             scale *= (num_clusters / (num_clusters - 1)) * ((nobs - 1) / nobs)
             s *= scale

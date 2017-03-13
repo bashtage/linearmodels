@@ -123,6 +123,9 @@ class TestHomoskedasticCovariance(object):
         assert_allclose(c.s2, data.s2_debiased)
         assert_allclose(c.s, data.s2_debiased * data.v)
         assert_allclose(c.cov, data.s2_debiased * data.vinv / data.nobs)
+        s = str(c)
+        assert 'Kappa' not in s
+        assert 'Debiased: True' in s
 
     def test_kappa(self, data):
         c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, kappa=data.kappa)
@@ -130,6 +133,9 @@ class TestHomoskedasticCovariance(object):
         assert c.config == {'debiased': False, 'kappa': .99}
         assert_allclose(c.s, data.s2 * data.vk)
         assert_allclose(c.cov, data.s2 * inv(data.vk) / data.nobs)
+        s = str(c)
+        assert 'Debiased: False' in s
+        assert 'Kappa' in s
 
     def test_kappa_debiased(self, data):
         c = HomoskedasticCovariance(data.x, data.y, data.z, data.params,
@@ -138,6 +144,8 @@ class TestHomoskedasticCovariance(object):
         assert c.config == {'debiased': True, 'kappa': data.kappa}
         assert_allclose(c.s, data.s2_debiased * data.vk)
         assert_allclose(c.cov, data.s2_debiased * inv(data.vk) / data.nobs)
+        s = str(c)
+        assert 'Debiased: True' in s
 
     def test_errors(self, data):
         with pytest.raises(ValueError):
@@ -208,6 +216,9 @@ class TestClusteredCovariance(object):
         s = op / data.nobs
         assert_allclose(c.s, s)
         assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
+        cs = str(c)
+        assert 'Debiased: False' in cs
+        assert 'Num Clusters: {0}'.format(len(sums)) in cs
 
     def test_debiased(self, data):
         c = OneWayClusteredCovariance(data.x, data.y, data.z, data.params,
@@ -229,6 +240,10 @@ class TestClusteredCovariance(object):
         assert_allclose(c.s, s)
         assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
 
+        cs = str(c)
+        assert 'Debiased: True' in cs
+        assert 'Num Clusters: {0}'.format(len(sums)) in cs
+
     def test_errors(self, data):
         with pytest.raises(ValueError):
             OneWayClusteredCovariance(data.x, data.y, data.z, data.params,
@@ -239,6 +254,9 @@ class TestKernelCovariance(object):
     def test_asymptotic(self, data, kernel):
         c = KernelCovariance(data.x, data.y, data.z, data.params,
                              kernel=kernel.kernel)
+        cs = str(c)
+        assert '\nBandwidth' not in cs
+
         for name in kernel.alt_names:
             c2 = KernelCovariance(data.x, data.y, data.z, data.params,
                                   kernel=name)
@@ -257,6 +275,12 @@ class TestKernelCovariance(object):
         s /= data.nobs
         assert_allclose(c.s, s)
         assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
+
+        cs = str(c)
+        assert 'Kappa' not in cs
+        assert 'Kernel: {0}'.format(kernel.kernel) in cs
+        assert 'Bandwidth: {0}'.format(bw) in cs
+
 
     def test_debiased(self, data, kernel):
         c = KernelCovariance(data.x, data.y, data.z, data.params,
@@ -277,6 +301,10 @@ class TestKernelCovariance(object):
         scale = data.nobs / (data.nobs - data.nvar)
         assert_allclose(c.s, scale * c2.s)
         assert_allclose(c.cov, scale * c2.cov)
+        cs = str(c)
+        assert 'Debiased: True' in cs
+        assert 'Kernel: {0}'.format(kernel.kernel) in cs
+        assert 'Bandwidth: {0}'.format(c.config['bandwidth']) in cs
 
     def test_unknown_kernel(self, data, kernel):
         with pytest.raises(ValueError):

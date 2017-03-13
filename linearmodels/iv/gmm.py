@@ -360,8 +360,43 @@ class IVGMMCovariance(HomoskedasticCovariance):
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w
-        self._bandwidth = 0
-        self._kernel = ''
+        self._bandwidth = cov_config.get('bandwidth', None)
+        self._kernel = cov_config.get('kernel', '')
+        self._name = 'GMM Covariance'
+        if cov_type in ('robust', 'heteroskedastic'):
+            score_cov_estimator = HeteroskedasticWeightMatrix
+        elif cov_type in ('unadjusted', 'homoskedastic'):
+            score_cov_estimator = HomoskedasticWeightMatrix
+        elif cov_type == 'clustered':
+            score_cov_estimator = OneWayClusteredWeightMatrix
+        elif cov_type == 'kernel':
+            score_cov_estimator = KernelWeightMatrix
+        else:
+            raise ValueError('Unknown cov_type')
+        self._score_cov_estimator = score_cov_estimator
+
+    def __str__(self):
+        out = super(IVGMMCovariance, self).__str__()
+        cov_type = self._cov_type
+        # TODO: This coudl be simpler and more useful
+        if cov_type in ('robust', 'heteroskedastic'):
+            out += '\nRobust (Heteroskedastic)'
+        elif cov_type in ('unadjusted', 'homoskedastic'):
+            out += '\nUnadjusted (Homoskedastic)'
+        elif cov_type == 'clustered':
+            out += '\nClustered (One-way)'
+            clusters = self._cov_config.get('clusters', None)
+            if clusters is not None:
+                nclusters = len(unique(asarray(clusters)))
+                out += '\nNum Clusters: {0}'.format(nclusters)
+                # TODO: Add more information here
+        elif cov_type == 'kernel':
+            out += '\nKernel (HAC)'
+            if self._cov_config.get('kernel', False):
+                out += '\nKernel: {0}'.format(self._cov_config['kernel'])
+            if self._cov_config.get('bandwidth', False):
+                out += '\nBandwidth: {0}'.format(self._cov_config['bandwidth'])
+        return out
 
     @property
     def cov(self):
@@ -371,18 +406,8 @@ class IVGMMCovariance(HomoskedasticCovariance):
         xpzw = xpz @ w
         xpzwzpx_inv = inv(xpzw @ xpz.T)
 
-        if self._cov_type in ('robust', 'heteroskedastic'):
-            score_cov_estimator = HeteroskedasticWeightMatrix
-        elif self._cov_type in ('unadjusted', 'homoskedastic'):
-            score_cov_estimator = HomoskedasticWeightMatrix
-        elif self._cov_type == 'clustered':
-            score_cov_estimator = OneWayClusteredWeightMatrix
-        elif self._cov_type == 'kernel':
-            score_cov_estimator = KernelWeightMatrix
-        else:
-            raise ValueError('Unknown cov_type')
-        score_cov = score_cov_estimator(debiased=self.debiased,
-                                        **self._cov_config)
+        score_cov = self._score_cov_estimator(debiased=self.debiased,
+                                              **self._cov_config)
         s = score_cov.weight_matrix(x, z, eps)
         self._cov_config = score_cov.config
 

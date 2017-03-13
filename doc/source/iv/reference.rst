@@ -1,7 +1,7 @@
 .. _iv-module-reference:
 
-Instrumental Variable Module Reference
---------------------------------------
+Module Reference
+----------------
 
 .. toctree::
    :maxdepth: 3
