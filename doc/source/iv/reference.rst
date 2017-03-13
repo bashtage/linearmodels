@@ -1,3 +1,5 @@
+.. _iv-module-reference:
+
 Instrumental Variable Module Reference
 --------------------------------------
 

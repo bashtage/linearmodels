@@ -1,3 +1,5 @@
+.. _iv-module-reference-models:
+
 Estimation Methods
 ------------------
 

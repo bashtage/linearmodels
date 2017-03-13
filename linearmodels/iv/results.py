@@ -317,7 +317,7 @@ class OLSResults(object):
         if instruments.shape[1] > 0:
             extra_text = []
             endog = self.model.endog
-            extra_text.append('Instrumented: ' + ', '.join(endog.cols))
+            extra_text.append('Endogenous: ' + ', '.join(endog.cols))
             extra_text.append('Instruments: ' + ', '.join(instruments.cols))
             smry.add_extra_txt(extra_text)
 

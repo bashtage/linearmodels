@@ -1,3 +1,5 @@
+.. _iv-module-reference-results:
+
 Estimation Results
 ------------------
 

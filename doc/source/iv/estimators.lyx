@@ -478,7 +478,7 @@ The residual variance is
 The model F-statistic is defined 
 \begin_inset Formula 
 \begin{align*}
-F & =\dot{\hat{\beta}}^{\prime}\hat{V}^{-1}\dot{\hat{\beta}}
+F & =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}
 \end{align*}
 
 \end_inset
@@ -489,7 +489,7 @@ F & =\dot{\hat{\beta}}^{\prime}\hat{V}^{-1}\dot{\hat{\beta}}
 \begin_layout Standard
 \noindent
 where the notation 
-\begin_inset Formula $\dot{\hat{\beta}}$
+\begin_inset Formula $\hat{\beta}_{-}$
 \end_inset
 
  indicates that the constant is excluded from 
@@ -497,7 +497,7 @@ where the notation
 \end_inset
 
  and 
-\begin_inset Formula $\dot{\hat{V}}$
+\begin_inset Formula $\hat{V}_{-}$
 \end_inset
 
  indicates that the row and column corresponding to a constant are excluded.
@@ -558,7 +558,7 @@ n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & 
 Note that this estimator can be expressed as 
 \begin_inset Formula 
 \begin{align*}
-n^{-1}\hat{\hat{A}^{-1}}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
+n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
 \end{align*}
 
 \end_inset
@@ -568,7 +568,7 @@ n^{-1}\hat{\hat{A}^{-1}}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{
 
 \begin_layout Standard
 \noindent
-All estimator take this form and only differ in how the asymptotic covariance
+All estimators take this form and only differ in how the asymptotic covariance
  of the scores, 
 \begin_inset Formula $B$
 \end_inset
@@ -682,7 +682,7 @@ s except the clustered covariance are rescaled by
 
 .
 \begin_inset Foot
-status open
+status collapsed
 
 \begin_layout Plain Layout
 This somewhat non-obvious choice is drive by Stata compatibility.

@@ -10,7 +10,10 @@ notebooks = glob.glob('examples/*.ipynb')
 for nb in notebooks:
     fname = os.path.split(nb)[-1]
     folder, nbname = fname.split('_')
-    outfile = os.path.join('doc', 'source', folder, nbname)
+    outdir = outfile = os.path.join('doc', 'source', folder, 'examples')
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    outfile = os.path.join(outdir, nbname)
     with open(outfile, 'w') as nbout:
         with open(nb, 'r') as nbin:
             nbout.write(nbin.read())
