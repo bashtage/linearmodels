@@ -30,9 +30,15 @@ very unpolished.
 ### Testing
 
 * py.test
+* xarray
 
 ### Documentation
 
 * sphinx
 * sphinx_rtd_theme
 * nbsphinx
+* nbconvert
+* nbformat
+* ipython
+* jupyter
+* matplotlib
