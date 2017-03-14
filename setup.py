@@ -5,6 +5,9 @@ from setuptools import setup, find_packages
 
 import versioneer
 
+with open('requirements.txt', 'r') as req:
+    requirements = req.read().split('\n')
+
 # Copy over notebooks from examples to docs for build
 notebooks = glob.glob('examples/*.ipynb')
 for nb in notebooks:
@@ -27,5 +30,6 @@ setup(
     license='TBD/No License',
     author='Kevin Sheppard',
     url='https://gitlab.com/bashtage/linearmodels',
-    long_description=open('README.md').read()
+    long_description=open('README.md').read(),
+    install_requires=requirements
 )

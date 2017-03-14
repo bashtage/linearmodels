@@ -1,3 +1,5 @@
+:ref:`iv-mathematical-notation`
+
 Mathematical Formulas
 =====================
 

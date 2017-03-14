@@ -135,44 +135,6 @@ class WaldTestStatistic(object):
         return self.__str__() + '\nid={id}'.format(id=hex(id(self)))
 
 
-def _proj(y, x):
-    """
-    Projection of y on x from y
-
-    Parameters
-    ----------
-    y : ndarray
-        Array to project (nobs by nseries)
-    x : ndarray
-        Array to project onto (nobs by nvar)
-
-    Returns
-    -------
-    yhat : ndarray
-        Projected values of y (nobs by nseries)
-    """
-    return x @ np.linalg.pinv(x) @ y
-
-
-def _annihilate(y, x):
-    """
-    Remove projection of y on x from y
-
-    Parameters
-    ----------
-    y : ndarray
-        Array to project (nobs by nseries)
-    x : ndarray
-        Array to project onto (nobs by nvar)
-
-    Returns
-    -------
-    eps : ndarray
-        Residuals values of y minus y projected on x (nobs by nseries)
-    """
-    return y - _proj(y, x)
-
-
 class InvalidTestWarning(UserWarning):
     pass
 

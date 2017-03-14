@@ -1,6 +1,6 @@
 DESCR = """
-J. Mullahy (1997), “Instrumental-Variable Estimation of Count Data Models: 
-Applications to Models of Cigarette Smoking Behavior,” Review of Economics 
+J. Mullahy (1997), "Instrumental-Variable Estimation of Count Data Models: 
+Applications to Models of Cigarette Smoking Behavior," Review of Economics 
 and Statistics 79, 596-593.
 
 faminc                   1988 family income, $1000s

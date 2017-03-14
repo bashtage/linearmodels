@@ -7,13 +7,13 @@ from collections import OrderedDict
 import scipy.stats as stats
 from numpy import c_, diag, log, ones, sqrt, empty, ceil, log10, asarray, isnan, array
 from numpy.linalg import inv, pinv
-from pandas import DataFrame, Series, concat
+from pandas import DataFrame, Series, concat, to_numeric
 from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
     fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
-                                  _annihilate, _proj, cached_property)
+from linearmodels.iv._utility import annihilate, proj
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, cached_property)
 
 
 def stub_concat(lists, sep='='):
@@ -151,7 +151,8 @@ class OLSResults(object):
         n, k, c = self.nobs, self.df_model, int(self.has_constant)
         return 1 - ((n - c) / (n - k)) * (1 - self._r2)
 
-        out_df
+    @property
+    def cov_type(self):
         """Covariance estimator used"""
         return self._cov_type
 
@@ -471,7 +472,7 @@ class IVResults(_CommonIVResults):
                                         'endogenous variables.', name=name)
 
         eps = self.resids.values[:, None]
-        u = _annihilate(eps, self.model._z)
+        u = annihilate(eps, self.model._z)
         stat = nobs * (1 - (u.T @ u) / (eps.T @ eps)).squeeze()
         null = 'The model is not overidentified.'
 
@@ -547,8 +548,8 @@ class IVResults(_CommonIVResults):
         z2 = c_[self.model.exog.ndarray, self.model.instruments.ndarray]
         z1 = c_[z2, assumed_exog]
 
-        e1 = _proj(e0, z1)
-        e2 = _proj(e2, self.model.instruments.ndarray)
+        e1 = proj(e0, z1)
+        e2 = proj(e2, self.model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
     def durbin(self, vars=None):
@@ -698,8 +699,8 @@ class IVResults(_CommonIVResults):
         """
         from linearmodels.iv.model import _OLS
 
-        e = _annihilate(self.model.dependent.ndarray, self.model._x)
-        r = _annihilate(self.model.endog.ndarray, self.model._z)
+        e = annihilate(self.model.dependent.ndarray, self.model._x)
+        r = annihilate(self.model.endog.ndarray, self.model._z)
         nobs = e.shape[0]
         res = _OLS(ones((nobs, 1)), r * e).fit('unadjusted')
         stat = res.nobs - res.resid_ss
@@ -738,7 +739,7 @@ class IVResults(_CommonIVResults):
         identical to the covariance estimator used with ``fit``.
         """
         from linearmodels.iv.model import _OLS
-        r = _annihilate(self.model.endog.ndarray, self.model._z)
+        r = annihilate(self.model.endog.ndarray, self.model._z)
         augx = c_[self.model._x, r]
         mod = _OLS(self.model.dependent, augx)
         res = mod.fit(self.cov_type, **self.cov_config)
@@ -792,9 +793,9 @@ class IVResults(_CommonIVResults):
                           UserWarning)
             return WaldTestStatistic(0, 'Test is not feasible.', 1, name='Infeasible test.')
 
-        endog_hat = _proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
+        endog_hat = proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
         q = instruments.ndarray[:, :(ninstr - nendog)]
-        q_res = _annihilate(q, c_[self.model.exog.ndarray, endog_hat])
+        q_res = annihilate(q, c_[self.model.exog.ndarray, endog_hat])
         test_functions = q_res * self.resids.values[:, None]
         res = _OLS(ones((nobs, 1)), test_functions).fit('unadjusted')
 
@@ -1014,10 +1015,6 @@ class IVGMMResults(_CommonIVResults):
 class FirstStageResults(object):
     """
     First stage estimation results and diagnostics
-
-    .. todo ::
-
-      * Summary
     """
 
     def __init__(self, dep, exog, endog, instr, cov_type, cov_config):
@@ -1078,7 +1075,7 @@ class FirstStageResults(object):
             params = res.params.values
             params = params[:, None]
             stat = params.T @ inv(res.cov) @ params
-            stat = stat.squeeze()
+            stat = float(stat.squeeze())
             w = WaldTestStatistic(stat, null='', df=params.shape[0])
             inner['f.stat'] = w.stat
             inner['f.pval'] = w.pval
@@ -1093,6 +1090,9 @@ class FirstStageResults(object):
         out['shea.rsquared'] = shea[out.index]
         cols = ['rsquared', 'partial.rsquared', 'shea.rsquared', 'f.stat', 'f.pval']
         out = out[cols]
+        for c in out:
+            out[c] = to_numeric(out[c])
+
         return out
 
     @cached_property
@@ -1108,6 +1108,7 @@ class FirstStageResults(object):
         """
         from linearmodels.iv.model import _OLS
         exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
+        exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
         res = {}
         for col in self.endog.pandas:
             mod = _OLS(self.endog.pandas[col], exog_instr)
@@ -1115,15 +1116,58 @@ class FirstStageResults(object):
 
         return res
 
+    @property
+    def summary(self):
+        """Summary table of first-stage estimation results"""
+        stubs_lookup = {'rsquared': 'R-squared',
+                        'partial.rsquared': 'Partial R-squared',
+                        'shea.rsquared': 'Shea\'s R-squared',
+                        'f.stat': 'F-statistic',
+                        'f.pval': 'P-value (F-stat)'}
+        smry = Summary()
+        diagnostics = self.diagnostics
+        vals = [[_str(v) for v in diagnostics[c]] for c in diagnostics]
+        stubs = [stubs_lookup[s] for s in list(diagnostics.columns)]
+        header = list(diagnostics.index)
+
+        params = []
+        for var in header:
+            res = self.individual[var]
+            v = c_[res.params.values, res.tstats.values]
+            params.append(v.ravel())
+        params_fmt = [[_str(val) for val in row] for row in array(params).T]
+        for i in range(1, len(params_fmt)):
+            for j in range(2):
+                params_fmt[i][j] = '({0})'.format(params_fmt[i][j])
+
+        params_stub = []
+        for var in res.params.index:
+            params_stub.extend([var, ''])
+
+        title = 'First Stage Estimation Results'
+
+        vals = table_concat((vals, params_fmt))
+        stubs = stub_concat((stubs, params_stub))
+
+        txt_fmt = default_txt_fmt.copy()
+        txt_fmt['data_aligns'] = 'r'
+        txt_fmt['header_align'] = 'r'
+        table = SimpleTable(vals, headers=header, title=title, stubs=stubs, txt_fmt=txt_fmt)
+        smry.tables.append(table)
+        extra_txt = ['T-stats reported in parentheses',
+                     'T-stats use same covariance type as original model']
+        smry.add_extra_txt(extra_txt)
+        return smry
+
 
 def compare(results):
     """
     Parameters
     ----------
     results : {list, dict, OrderedDict}
-        Set of results to compare.  If a dict, the keys will be used as model 
+        Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
-    
+
     Returns
     -------
     comparison : IVModelComparison
@@ -1166,26 +1210,32 @@ class IVModelComparison(object):
 
     @property
     def params(self):
+        """Parameters for all models"""
         return self._get_series_property('params')
 
     @property
     def tstats(self):
+        """Parameter t-stats for all models"""
         return self._get_series_property('tstats')
 
     @property
     def pvalues(self):
+        """Parameter p-vals for all models"""
         return self._get_series_property('pvalues')
 
     @property
     def rsquared(self):
+        """Coefficients of determination (R**2)"""
         return self._get_property('rsquared')
 
     @property
     def rsquared_adj(self):
+        """Sample-size adjusted coefficients of determination (R**2)"""
         return self._get_property('rsquared_adj')
 
     @property
     def f_statistic(self):
+        """F-statistics and P-values"""
         out = self._get_property('f_statistic')
         out_df = DataFrame(empty((len(out), 2)), columns=['F stat', 'P-value'], index=out.index)
         for loc in out.index:
@@ -1194,14 +1244,17 @@ class IVModelComparison(object):
 
     @property
     def estimator_method(self):
+        """Estimation methods"""
         return self._get_property('_method')
 
     @property
     def cov_estimator(self):
+        """Covariance estimator descriptions"""
         return self._get_property('cov_estimator')
 
     @property
     def summary(self):
+        """Summary table of model comparison"""
         smry = Summary()
         models = list(self._results.keys())
         title = 'Model Comparison'

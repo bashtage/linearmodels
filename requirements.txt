@@ -1,12 +1,5 @@
 numpy
 pandas
 xarray
-sphinx
 scipy
-pytest
-nbsphinx
-sphinx_rtd_theme
-ipython
-jupyter
-nbconvert
-nbformat
+patsy

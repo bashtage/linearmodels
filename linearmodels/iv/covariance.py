@@ -11,7 +11,7 @@ CLUSTER_ERR = """
 clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation
 in the regression variables have have been dropped.  When using a clustered
 covariance estimator, drop missing data before estimating the model. The model
-property `notnull` contains the locations of the observations that have no 
+property `notnull` contains the locations of the observations that have no
 missing values."""
 
 

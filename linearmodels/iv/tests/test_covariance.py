@@ -281,7 +281,6 @@ class TestKernelCovariance(object):
         assert 'Kernel: {0}'.format(kernel.kernel) in cs
         assert 'Bandwidth: {0}'.format(bw) in cs
 
-
     def test_debiased(self, data, kernel):
         c = KernelCovariance(data.x, data.y, data.z, data.params,
                              kernel=kernel.kernel, debiased=True)

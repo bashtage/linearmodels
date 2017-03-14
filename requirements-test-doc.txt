@@ -1,0 +1,8 @@
+pytest>=3
+sphinx
+sphinx_rtd_theme
+ipython
+nbsphinx
+jupyter
+nbconvert
+nbformat

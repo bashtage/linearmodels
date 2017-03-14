@@ -52,6 +52,14 @@ def data():
                     clusters=clusters, clusters_clean=clusters_clean)
 
 
+def get_all(v):
+    attr = [d for d in dir(v) if not d.startswith('_')]
+    for a in attr:
+        val = getattr(v, a)
+        if a in ('conf_int', 'durbin', 'wu_hausman', 'c_stat'):
+            val()
+
+
 def test_missing(data, model):
     mod = model(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
@@ -60,6 +68,7 @@ def test_missing(data, model):
     res2 = mod.fit()
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
+    get_all(res)
 
 
 def test_missing_clustered(data, model):
@@ -72,3 +81,4 @@ def test_missing_clustered(data, model):
     res2 = mod.fit(cov_type='clustered', clusters=data.clusters_clean)
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
+    get_all(res)

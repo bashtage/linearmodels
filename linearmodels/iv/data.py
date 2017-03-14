@@ -40,7 +40,7 @@ class DataHandler(object):
     def __init__(self, x, var_name='x', nobs=None, convert_dummies=True, drop_first=True):
 
         if isinstance(x, DataHandler):
-            x = x.original
+            x = x.pandas
         if x is None and nobs is not None:
             x = np.empty((nobs, 0))
         elif x is None:

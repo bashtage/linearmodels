@@ -14,6 +14,10 @@ through examples from Wooldridge's introductior text book and
 advanced examples following the examples in Cameron and Trivedi's Stata
 introduction.
 
+:ref:`iv-mathematical-notation` contains a concise explanation of teh formulas
+used in estimating parameters, estimating covariances and conducting hypothesis
+tests.
+
 .. toctree::
    :maxdepth: 1
    :glob:
