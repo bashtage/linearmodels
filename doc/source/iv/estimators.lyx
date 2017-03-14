@@ -397,6 +397,40 @@ where
  
 \end_layout
 
+\begin_layout Subsubsection*
+Continuously Updating Generalized Method of Moments (GMM-CUE)
+\end_layout
+
+\begin_layout Standard
+The continuously updating GMM estimator solves the minimization problem
+\begin_inset Formula 
+\[
+\min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\epsilon}_{i}=y_{i}-x_{i}\beta$
+\end_inset
+
+.
+ Unlike standard GMM, the weight matrix, 
+\begin_inset Formula $W$
+\end_inset
+
+ directly depends on the model parameters 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and so it is not possibly to use a closed form estimator.
+ 
+\end_layout
+
 \begin_layout Subsection*
 Basic Statistics
 \end_layout
@@ -693,12 +727,69 @@ This somewhat non-obvious choice is drive by Stata compatibility.
 
 \end_layout
 
-\begin_layout Section
-To Do
+\begin_layout Subsubsection*
+P-values
 \end_layout
 
 \begin_layout Standard
-GMM CUE
+P-values are computes using 2-sided tests, 
+\begin_inset Formula 
+\[
+Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+\]
+
+\end_inset
+
+If the covariance estimator was debiased, a Student's t distribution with
+ 
+\begin_inset Formula $n-k$
+\end_inset
+
+ degrees of freedom is used, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $t_{n-k}\left(\cdot\right)$
+\end_inset
+
+ is the CDF of a Student's T distribution.
+\end_layout
+
+\begin_layout Subsubsection*
+Confidence Intervals 
+\end_layout
+
+\begin_layout Standard
+Confidence intervals are constructed as 
+\begin_inset Formula 
+\[
+CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $q_{\alpha/2}$
+\end_inset
+
+ is the 
+\begin_inset Formula $\alpha/2$
+\end_inset
+
+ quantile of a standard Normal distribution or a Student's t.
+ The Student's t is uses when a debiased covariance estimator is used.
+\end_layout
+
+\begin_layout Section
+To Do
 \end_layout
 
 \begin_layout Standard
@@ -730,7 +821,7 @@ Optimal BW selection
 \end_layout
 
 \begin_layout Standard
-Std err, T-stats, p-values, Confidence intervalus
+Std err, T-stats
 \end_layout
 
 \begin_layout Standard
