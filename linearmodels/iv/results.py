@@ -59,7 +59,20 @@ def _str(v):
     return format_str.format(v)
 
 
-class OLSResults(object):
+class _SummaryStr(object):
+    def __str__(self):
+        return self.summary.as_text()
+
+    def __repr__(self):
+        return self.__str__() + '\n' + \
+               self.__class__.__name__ + \
+               ', id: {0}'.format(hex(id(self)))
+
+    def _repr_html_(self):
+        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
+
+
+class OLSResults(_SummaryStr):
     def __init__(self, results, model):
         self._resid = results['eps']
         self._params = results['params']
@@ -78,17 +91,6 @@ class OLSResults(object):
         self._kappa = results.get('kappa', None)
         self._datetime = dt.datetime.now()
         self._cov_estimator = results['cov_estimator']
-
-    def __str__(self):
-        return self.summary.as_text()
-
-    def __repr__(self):
-        return self.__str__() + '\n' + \
-               self.__class__.__name__ + \
-               ', id: {0}'.format(hex(id(self)))
-
-    def _repr_html_(self):
-        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
 
     @property
     def cov_config(self):
@@ -385,9 +387,9 @@ class OLSResults(object):
         """
         restriction = asarray(restriction)
         value = asarray(value)[:, None]
-        diff = restriction @ self.params.values[:, None] - value[:, None]
+        diff = restriction @ self.params.values[:, None] - value
         rcov = restriction @ self.cov @ restriction.T
-        stat = diff.T @ rcov @ diff
+        stat = float(diff.T @ inv(rcov) @ diff)
         df = restriction.shape[0]
         null = 'Linear equality constraint is valid'
         name = 'Linear Equality Hypothesis Test'
@@ -1012,7 +1014,7 @@ class IVGMMResults(_CommonIVResults):
         return WaldTestStatistic(stat, null, df, name='C-statistic')
 
 
-class FirstStageResults(object):
+class FirstStageResults(_SummaryStr):
     """
     First stage estimation results and diagnostics
     """
@@ -1175,7 +1177,7 @@ def compare(results):
     return IVModelComparison(results)
 
 
-class IVModelComparison(object):
+class IVModelComparison(_SummaryStr):
     def __init__(self, results):
 
         if not isinstance(results, (dict, OrderedDict)):

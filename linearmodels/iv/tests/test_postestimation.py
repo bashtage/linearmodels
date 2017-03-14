@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
@@ -104,3 +105,15 @@ def test_c_stat_smoke(data):
     # Final test
     c_stat2 = res.c_stat('x1')
     assert_allclose(c_stat.stat, c_stat2.stat)
+
+
+def test_linear_restriction(data):
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
+    nvar = len((res.params))
+    q = np.eye(nvar)
+    ts = res.test_linear_constraint(q, np.zeros(nvar))
+    p = res.params.values[:, None]
+    c = res.cov.values
+    stat = float(p.T @ np.linalg.inv(c) @ p)
+    assert_allclose(stat, ts.stat)
+    assert ts.df == nvar

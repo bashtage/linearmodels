@@ -798,8 +798,12 @@ class IVGMMCUE(IVGMM):
         y, x, z = self._y, self._x, self._z
         weight_matrix = self._weight.weight_matrix
         if starting is None:
-            res = IVGMM(self.dependent, self.exog, self.endog,
-                        self.instruments, weight_type=self._weight_type,
+            endog = None if self.endog.shape[1] == 0 else self.endog
+            instr = None if self.instruments.shape[1] == 0 else \
+                self.instruments
+
+            res = IVGMM(self.dependent, self.exog, endog, instr,
+                        weight_type=self._weight_type,
                         **self._weight_config).fit()
             starting = res.params.values
         else:

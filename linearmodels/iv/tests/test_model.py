@@ -1,14 +1,16 @@
 import warnings
+from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
 import pytest
 from numpy.linalg import pinv
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 from statsmodels.api import add_constant
 
 from linearmodels.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
 from linearmodels.iv.model import _OLS
+from linearmodels.iv.results import compare
 from linearmodels.utility import AttrDict
 
 
@@ -245,10 +247,46 @@ def test_model_missing(data):
     data.exog[::13, :] = np.nan
     data.endog[::23, :] = np.nan
     data.instr[::29, :] = np.nan
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit()
 
     vars = [data.dep, data.exog, data.endog, data.instr]
     missing = list(map(lambda x: np.any(np.isnan(x), 1), vars))
     missing = np.any(np.c_[missing], 0)
     not_missing = missing.shape[0] - missing.sum()
     assert res.nobs == not_missing
+    assert_equal(mod.isnull, missing)
+    assert_equal(mod.notnull, ~missing)
+
+
+def test_compare(data):
+    res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    res2 = IVGMM(data.dep, data.exog[:, :2], data.endog, data.instr).fit()
+    res3 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    c = compare([res1, res2, res3])
+    assert len(c.rsquared) == 3
+    c.summary
+    c = compare({'Model A': res1,
+                 'Model B': res2,
+                 'Model c': res3})
+    c.summary
+    res = OrderedDict()
+    res['Model A'] = res1
+    res['Model B'] = res2
+    res['Model C'] = res3
+    c = compare(res)
+    c.summary
+    c.pvalues
+
+
+def test_first_stage_summary(data):
+    res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    res1.first_stage.summary
+
+
+def test_gmm_str(data):
+    mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    str(mod.fit(cov_type='unadjusted'))
+    str(mod.fit(cov_type='robust'))
+    str(mod.fit(cov_type='clustered', clusters=data.clusters))
+    str(mod.fit(cov_type='kernel'))
