@@ -2,16 +2,61 @@
 Results containers and post-estimation diagnostics for IV models
 """
 import datetime as dt
+from collections import OrderedDict
 
 import scipy.stats as stats
-from numpy import c_, diag, log, ones, sqrt, empty, ceil, log10, asarray
+from numpy import c_, diag, log, ones, sqrt, empty, ceil, log10, asarray, isnan, array
 from numpy.linalg import inv, pinv
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, concat
 from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
     fmt_params
+from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
                                   _annihilate, _proj, cached_property)
+
+
+def stub_concat(lists, sep='='):
+    col_size = max([max(map(lambda s: len(s), l)) for l in lists])
+    out = []
+    for l in lists:
+        out.extend(l)
+        out.append(sep * (col_size + 2))
+    return out[:-1]
+
+
+def table_concat(lists, sep='='):
+    col_sizes = []
+    for l in lists:
+        size = list(map(lambda r: list(map(lambda v: len(v), r)), l))
+        col_sizes.append(list(array(size).max(0)))
+    col_size = array(col_sizes).max(axis=0)
+    sep_cols = [sep * (cs + 2) for cs in col_size]
+    out = []
+    for l in lists:
+        out.extend(l)
+        out.append(sep_cols)
+    return out[:-1]
+
+
+def _str(v):
+    """Preferred basic formatter"""
+    if isnan(v):
+        return '        '
+    av = abs(v)
+    digits = 0
+    if av != 0:
+        digits = ceil(log10(av))
+    if digits > 4 or digits <= -4:
+        return '{0:8.4g}'.format(v)
+
+    if digits > 0:
+        d = int(5 - digits)
+    else:
+        d = int(4)
+
+    format_str = '{0:' + '0.{0}f'.format(d) + '}'
+    return format_str.format(v)
 
 
 class OLSResults(object):
@@ -106,8 +151,7 @@ class OLSResults(object):
         n, k, c = self.nobs, self.df_model, int(self.has_constant)
         return 1 - ((n - c) / (n - k)) * (1 - self._r2)
 
-    @property
-    def cov_type(self):
+        out_df
         """Covariance estimator used"""
         return self._cov_type
 
@@ -233,20 +277,6 @@ class OLSResults(object):
     @property
     def summary(self):
         """Summary table of model estimation results"""
-
-        def _str(v):
-            av = abs(v)
-            digits = ceil(log10(av))
-            if digits > 4 or digits <= -4:
-                return '{0:8.4g}'.format(v)
-
-            if digits > 0:
-                d = int(5 - digits)
-            else:
-                d = int(4)
-
-            format_str = '{0:' + '0.{0}f'.format(d) + '}'
-            return format_str.format(v)
 
         def pval_format(v):
             return '{0:4.4f}'.format(v)
@@ -1084,3 +1114,128 @@ class FirstStageResults(object):
             res[col] = mod.fit(self._cov_type, **self._cov_config)
 
         return res
+
+
+def compare(results):
+    """
+    Parameters
+    ----------
+    results : {list, dict, OrderedDict}
+        Set of results to compare.  If a dict, the keys will be used as model 
+        names.  An OrderedDict will preserve the model order the comparisons.
+    
+    Returns
+    -------
+    comparison : IVModelComparison
+    """
+    return IVModelComparison(results)
+
+
+class IVModelComparison(object):
+    def __init__(self, results):
+
+        if not isinstance(results, (dict, OrderedDict)):
+            _results = OrderedDict()
+            for i, res in enumerate(results):
+                _results['Model ' + str(i)] = results[i]
+            results = _results
+        elif isinstance(results, dict):
+            _results = OrderedDict()
+            for key in sorted(results.keys()):
+                _results[key] = results[key]
+            results = _results
+        self._results = results
+
+    def estimator_type(self):
+        pass
+
+    def _get_series_property(self, name):
+        out = ([(k, getattr(v, name)) for k, v in self._results.items()])
+        cols = [v[0] for v in out]
+        values = concat([v[1] for v in out], 1)
+        values.columns = cols
+        return values
+
+    def _get_property(self, name):
+        out = OrderedDict()
+        items = []
+        for k, v in self._results.items():
+            items.append(k)
+            out[k] = getattr(v, name)
+        return Series(out, name=name).loc[items]
+
+    @property
+    def params(self):
+        return self._get_series_property('params')
+
+    @property
+    def tstats(self):
+        return self._get_series_property('tstats')
+
+    @property
+    def pvalues(self):
+        return self._get_series_property('pvalues')
+
+    @property
+    def rsquared(self):
+        return self._get_property('rsquared')
+
+    @property
+    def rsquared_adj(self):
+        return self._get_property('rsquared_adj')
+
+    @property
+    def f_statistic(self):
+        out = self._get_property('f_statistic')
+        out_df = DataFrame(empty((len(out), 2)), columns=['F stat', 'P-value'], index=out.index)
+        for loc in out.index:
+            out_df.loc[loc] = out[loc].stat, out[loc].pval
+        return out_df
+
+    @property
+    def estimator_method(self):
+        return self._get_property('_method')
+
+    @property
+    def cov_estimator(self):
+        return self._get_property('cov_estimator')
+
+    @property
+    def summary(self):
+        smry = Summary()
+        models = list(self._results.keys())
+        title = 'Model Comparison'
+        stubs = ['Estimator', 'Cov. Est.', 'R-squared', 'Adj. R-squared', 'F-statistic',
+                 'P-value (F-stat)']
+
+        vals = concat([self.estimator_method, self.cov_estimator, self.rsquared,
+                       self.rsquared_adj, self.f_statistic], 1)
+        vals = [[i for i in v] for v in vals.T.values]
+        for i in range(2, len(vals)):
+            vals[i] = [_str(v) for v in vals[i]]
+
+        params = self.params
+        tstats = self.tstats
+        params_fmt = []
+        params_stub = []
+        for i in range(len(params)):
+            params_fmt.append([_str(v) for v in params.values[i]])
+            tstats_fmt = []
+            for v in tstats.values[i]:
+                v_str = _str(v)
+                v_str = '({0})'.format(v_str) if v_str.strip() else v_str
+                tstats_fmt.append(v_str)
+            params_fmt.append(tstats_fmt)
+            params_stub.append(params.index[i])
+            params_stub.append(' ')
+
+        vals = table_concat((vals, params_fmt))
+        stubs = stub_concat((stubs, params_stub))
+
+        txt_fmt = default_txt_fmt.copy()
+        txt_fmt['data_aligns'] = 'r'
+        txt_fmt['header_align'] = 'r'
+        table = SimpleTable(vals, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt)
+        smry.tables.append(table)
+        smry.add_extra_txt(['T-stats reported in parentheses'])
+        return smry

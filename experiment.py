@@ -1,4 +1,5 @@
 from linearmodels.iv.data import DataHandler
+from linearmodels.iv.results import compare
 import xarray as xr
 import numpy as np
 
@@ -26,20 +27,17 @@ exog = sm.add_constant(data[['x3','x4','x5']])
 res = _OLS(data.y_robust,exog).fit()
 print(res.summary)
 
-res = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit()
-res.durbin()
-print('\n'*4)
-print(res.summary)
+res1 = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit()
+res2 = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit('robust')
+res3 = IV2SLS(data.y_robust,exog,data[['x1']],data[['z1','z2']]).fit(debiased=True)
+res4 = IVGMM(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit()
 
-res = IV2SLS(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit('robust')
-print('\n'*4)
-print(res.summary)
-
-res = IV2SLS(data.y_robust,exog,data[['x1']],data[['z1','z2']]).fit(debiased=True)
-print('\n'*4)
-print(res.summary)
-
-
-res = IVGMM(data.y_robust,exog,data[['x1','x2']],data[['z1','z2']]).fit()
-print('\n'*4)
-print(res.summary)
+comp = compare([res1,res2,res3,res4])
+comp.tstats
+comp.params
+print(comp.pvalues)
+print(comp.rsquared_adj)
+print(comp.rsquared)
+print(comp.f_statistic)
+print(comp.cov_estimator)
+print(comp.summary)
