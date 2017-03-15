@@ -99,8 +99,6 @@ class IVLIML(object):
 
     def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
 
-        self._result_container = IVResults
-
         self.dependent = DataHandler(dependent, var_name='dependent')
         nobs = self.dependent.shape[0]
         self.exog = DataHandler(exog, var_name='exog', nobs=nobs)
@@ -122,7 +120,17 @@ class IVLIML(object):
         self._index = self.endog.rows
 
         self._validate_inputs()
-        self._method = 'IV-LIML'
+        if not hasattr(self, '_method'):
+            self._method = 'IV-LIML'
+            additional = []
+            if fuller != 0:
+                additional.append('fuller(alpha={0})'.format(fuller))
+            if kappa is not None:
+                additional.append('kappa={0}'.format(fuller))
+            if additional:
+                self._method += '(' + ', '.join(additional) + ')'
+        if not hasattr(self, '_result_container'):
+            self._result_container = IVResults
 
         self._kappa = kappa
         self._fuller = fuller
@@ -135,13 +143,6 @@ class IVLIML(object):
             warnings.warn('kappa and fuller should not normally be used '
                           'simultaneously.  Identical results can be computed '
                           'using kappa only', UserWarning)
-        additional = []
-        if fuller != 0:
-            additional.append('fuller(alpha={0})'.format(fuller))
-        if kappa is not None:
-            additional.append('kappa={0}'.format(fuller))
-        if additional:
-            self._method += '(' + ', '.join(additional) + ')'
         if endog is None or instruments is None:
             self._result_container = OLSResults
             self._method = 'OLS'
@@ -448,9 +449,9 @@ class IV2SLS(IVLIML):
     """
 
     def __init__(self, dependent, exog, endog, instruments):
+        self._method = 'IV-2SLS'
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
                                      fuller=0, kappa=1)
-        self._method = 'IV-2SLS'
 
     @staticmethod
     def from_formula(formula, data):
@@ -545,13 +546,13 @@ class IVGMM(IVLIML):
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
                  **weight_config):
+        self._method = 'IV-GMM'
+        self._result_container = IVGMMResults
         super(IVGMM, self).__init__(dependent, exog, endog, instruments)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
-        self._method = 'IV-GMM'
-        self._result_container = IVGMMResults
 
     @staticmethod
     def from_formula(formula, data, weight_type='robust', **weight_config):
@@ -775,11 +776,12 @@ class IVGMMCUE(IVGMM):
 
     def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
                  **weight_config):
+        self._method = 'IV-GMM-CUE'
         super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weight_type,
                                        **weight_config)
         if 'center' not in weight_config:
             weight_config['center'] = True
-        self._method = 'IV-GMM-CUE'
+
 
     @staticmethod
     def from_formula(formula, data, weight_type='robust', **weight_config):

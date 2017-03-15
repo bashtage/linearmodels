@@ -25,5 +25,6 @@ tests.
    introduction
    examples/wooldridge-iv-estimation.ipynb
    examples/instrumental-variable-estimation.ipynb
+   examples/using-formulas.ipynb
    reference
    estimators

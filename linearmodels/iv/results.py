@@ -1222,6 +1222,11 @@ class IVModelComparison(_SummaryStr):
         return Series(out, name=name).loc[items]
 
     @property
+    def nobs(self):
+        """Parameters for all models"""
+        return self._get_property('nobs')
+
+    @property
     def params(self):
         """Parameters for all models"""
         return self._get_series_property('params')
@@ -1271,13 +1276,14 @@ class IVModelComparison(_SummaryStr):
         smry = Summary()
         models = list(self._results.keys())
         title = 'Model Comparison'
-        stubs = ['Estimator', 'Cov. Est.', 'R-squared', 'Adj. R-squared', 'F-statistic',
-                 'P-value (F-stat)']
+        stubs = ['Estimator', 'No. Observations', 'Cov. Est.', 'R-squared',
+                 'Adj. R-squared', 'F-statistic', 'P-value (F-stat)']
 
-        vals = concat([self.estimator_method, self.cov_estimator, self.rsquared,
-                       self.rsquared_adj, self.f_statistic], 1)
+        vals = concat([self.estimator_method, self.nobs, self.cov_estimator,
+                       self.rsquared, self.rsquared_adj, self.f_statistic], 1)
         vals = [[i for i in v] for v in vals.T.values]
-        for i in range(2, len(vals)):
+        vals[1] = [str(v) for v in vals[1]]
+        for i in range(3, len(vals)):
             vals[i] = [_str(v) for v in vals[i]]
 
         params = self.params
@@ -1297,6 +1303,28 @@ class IVModelComparison(_SummaryStr):
 
         vals = table_concat((vals, params_fmt))
         stubs = stub_concat((stubs, params_stub))
+
+        all_instr = []
+        for key in self._results:
+            res = self._results[key]
+            all_instr.append(res.model.instruments.cols)
+        ninstr = max(map(lambda l : len(l), all_instr))
+        instruments = []
+        instrument_stub = ['Instruments']
+        for i in range(ninstr):
+            if i > 0:
+                instrument_stub.append('')
+            row = []
+            for j in range(len(self._results)):
+                instr = all_instr[j]
+                if len(instr) > i:
+                    row.append(instr[i])
+                else:
+                    row.append('')
+            instruments.append(row)
+        if instruments:
+            vals = table_concat((vals, instruments))
+            stubs = stub_concat((stubs, instrument_stub))
 
         txt_fmt = default_txt_fmt.copy()
         txt_fmt['data_aligns'] = 'r'
