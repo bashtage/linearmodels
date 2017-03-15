@@ -1185,7 +1185,7 @@ class IVModelComparison(_SummaryStr):
             for i, res in enumerate(results):
                 _results['Model ' + str(i)] = results[i]
             results = _results
-        elif isinstance(results, dict):
+        elif not isinstance(results, OrderedDict):
             _results = OrderedDict()
             for key in sorted(results.keys()):
                 _results[key] = results[key]

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+# from patsy import SyntaxError
 
 from linearmodels.iv import IV2SLS, IVGMMCUE, IVGMM, IVLIML
 
@@ -10,8 +11,8 @@ def model(request):
     return request.param
 
 
-formulas = ['y ~ 1 + x3 + x4 + x5 + (x1 x2 ~ z1 + z2 + z3)',
-            'y ~ 1 + x3 + x4 + (x1 x2 ~ z1 + z2 + z3) + x5']
+formulas = ['y ~ 1 + x3 + x4 + x5 + [x1 + x2 ~ z1 + z2 + z3]',
+            'y ~ 1 + x3 + x4 + [x1 + x2 ~ z1 + z2 + z3] + x5']
 
 
 @pytest.fixture(scope='module', params=formulas)
@@ -46,12 +47,14 @@ def data():
 
 
 def test_formula(data, model, formula):
-    res = model.from_formula(formula, data).fit()
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
     exog = data[['Intercept', 'x3', 'x4', 'x5']]
     endog = data[['x1', 'x2']]
     instr = data[['z1', 'z2', 'z3']]
     res2 = model(data.y, exog, endog, instr).fit()
     assert res.rsquared == res2.rsquared
+    assert mod.formula == formula
 
 
 def test_formula_ols(data, model):
@@ -65,9 +68,18 @@ def test_formula_ols(data, model):
 
 
 def test_invalid_formula(data, model):
-    formula = 'y ~ 1 + x1 + x2 ~ x3 + (x4  x5 ~ z1 z2)'
+    formula = 'y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]'
     with pytest.raises(ValueError):
         model.from_formula(formula, data).fit()
-    formula = 'y ~ 1 + x1 + x2 + x3 + x4  x5 ~ z1 z2'
+    formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2'
     with pytest.raises(ValueError):
+        model.from_formula(formula, data).fit()
+    formula = 'y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ + z1 + z2]'
+    with pytest.raises(ValueError):
+        model.from_formula(formula, data).fit()
+    formula = 'y y2 ~ 1 + x1 + x2 + x3 [ + x4 + x5 ~ z1 + z2]'
+    with pytest.raises(ValueError):
+        model.from_formula(formula, data).fit()
+    formula = 'y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]'
+    with pytest.raises(SyntaxError):
         model.from_formula(formula, data).fit()

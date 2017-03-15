@@ -126,6 +126,7 @@ class TestHomoskedasticCovariance(object):
         s = str(c)
         assert 'Kappa' not in s
         assert 'Debiased: True' in s
+        assert 'id' in c.__repr__()
 
     def test_kappa(self, data):
         c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, kappa=data.kappa)
@@ -243,6 +244,7 @@ class TestClusteredCovariance(object):
         cs = str(c)
         assert 'Debiased: True' in cs
         assert 'Num Clusters: {0}'.format(len(sums)) in cs
+        assert 'id' in c.__repr__()
 
     def test_errors(self, data):
         with pytest.raises(ValueError):
@@ -304,6 +306,7 @@ class TestKernelCovariance(object):
         assert 'Debiased: True' in cs
         assert 'Kernel: {0}'.format(kernel.kernel) in cs
         assert 'Bandwidth: {0}'.format(c.config['bandwidth']) in cs
+        assert 'id' in c.__repr__()
 
     def test_unknown_kernel(self, data, kernel):
         with pytest.raises(ValueError):

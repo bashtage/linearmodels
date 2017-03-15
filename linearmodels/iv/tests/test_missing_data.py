@@ -82,3 +82,8 @@ def test_missing_clustered(data, model):
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
     get_all(res)
+
+
+def test_all_missing(data, model):
+    with pytest.raises(ValueError):
+        mod = model(data.dep * np.nan, data.exog, data.endog, data.instr)

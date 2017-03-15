@@ -1,3 +1,10 @@
+formula = 'y ~ x1 + x2 + log(x3) + [ x4 + x5 ~ z1 + z4 + exp(z6)] + x9'
+formula = 'y ~ x1 + x2 + log(x3) + [ x4 + x5 ~ z1 + z4 + exp(z6)]'
+
+
+
+raise ValueError
+
 from linearmodels.iv.data import DataHandler
 from linearmodels.iv.results import compare
 import xarray as xr

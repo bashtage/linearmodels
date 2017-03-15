@@ -145,6 +145,7 @@ class IVLIML(object):
         if endog is None or instruments is None:
             self._result_container = OLSResults
             self._method = 'OLS'
+        self._formula = None
 
     @staticmethod
     def from_formula(formula, data, fuller=0, kappa=None):
@@ -168,17 +169,41 @@ class IVLIML(object):
         model : IVLIML
             Model instance
 
+        Notes
+        -----
+        The IV formula modifies the standard Patsy formula to include a 
+        block of the form [endog ~ instruments] which is used to indicate 
+        the list of endogenous variables and instruments.  The general 
+        structure is `dependent ~ exog [endog ~ instruments]` and it must 
+        be the case that the formula expressions constructed from blocks 
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        valid Patsy formulas.
+          
+        A constant must be explicitly included using '1 +' if required.
+
         Examples
         --------
         >>> import numpy as np
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVLIML
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + (educ ~ sibs)'
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
         >>> mod = IVLIML.from_formula(formula, data)
         """
         dep, exog, endog, instr = parse_formula(formula, data)
-        return IVLIML(dep, exog, endog, instr, fuller, kappa)
+        mod = IVLIML(dep, exog, endog, instr, fuller, kappa)
+        mod.formula = formula
+        return mod
+
+    @property
+    def formula(self):
+        """Formula used to create the model"""
+        return self._formula
+
+    @formula.setter
+    def formula(self, value):
+        """Formula used to create the model"""
+        self._formula = value
 
     def _validate_inputs(self):
         x, z = self._x, self._z
@@ -429,8 +454,45 @@ class IV2SLS(IVLIML):
 
     @staticmethod
     def from_formula(formula, data):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the IV syntax described in the notes
+            section
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+
+        Returns
+        -------
+        model : IV2SLS
+            Model instance
+
+        Notes
+        -----
+        The IV formula modifies the standard Patsy formula to include a 
+        block of the form [endog ~ instruments] which is used to indicate 
+        the list of endogenous variables and instruments.  The general 
+        structure is `dependent ~ exog [endog ~ instruments]` and it must 
+        be the case that the formula expressions constructed from blocks 
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        valid Patsy formulas.
+          
+        A constant must be explicitly included using '1 +' if required.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IV2SLS
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> mod = IV2SLS.from_formula(formula, data)
+        """
         dep, exog, endog, instr = parse_formula(formula, data)
-        return IV2SLS(dep, exog, endog, instr)
+        mod = IV2SLS(dep, exog, endog, instr)
+        mod.formula = formula
+        return mod
 
 
 class IVGMM(IVLIML):
@@ -493,8 +555,49 @@ class IVGMM(IVLIML):
 
     @staticmethod
     def from_formula(formula, data, weight_type='robust', **weight_config):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the IV syntax described in the notes
+            section
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        weight_type : str
+            Name of weight function to use.
+        **weight_config
+            Additional keyword arguments to pass to the weight function.
+
+        Notes
+        -----
+        The IV formula modifies the standard Patsy formula to include a 
+        block of the form [endog ~ instruments] which is used to indicate 
+        the list of endogenous variables and instruments.  The general 
+        structure is `dependent ~ exog [endog ~ instruments]` and it must 
+        be the case that the formula expressions constructed from blocks 
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        valid Patsy formulas.
+          
+        A constant must be explicitly included using '1 +' if required.
+
+        Returns
+        -------
+        model : IVGMM
+            Model instance
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IVGMM
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> mod = IVGMM.from_formula(formula, data)
+        """
         dep, exog, endog, instr = parse_formula(formula, data)
-        return IVGMM(dep, exog, endog, instr, weight_type, **weight_config)
+        mod = IVGMM(dep, exog, endog, instr, weight_type, **weight_config)
+        mod.formula = formula
+        return mod
 
     @staticmethod
     def estimate_parameters(x, y, z, w):
@@ -680,8 +783,49 @@ class IVGMMCUE(IVGMM):
 
     @staticmethod
     def from_formula(formula, data, weight_type='robust', **weight_config):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the IV syntax described in the notes
+            section
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        weight_type : str
+            Name of weight function to use.
+        **weight_config
+            Additional keyword arguments to pass to the weight function.
+
+        Returns
+        -------
+        model : IVGMMCUE
+            Model instance
+        
+        Notes
+        -----
+        The IV formula modifies the standard Patsy formula to include a 
+        block of the form [endog ~ instruments] which is used to indicate 
+        the list of endogenous variables and instruments.  The general 
+        structure is `dependent ~ exog [endog ~ instruments]` and it must 
+        be the case that the formula expressions constructed from blocks 
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        valid Patsy formulas.
+          
+        A constant must be explicitly included using '1 +' if required. 
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IVGMMCUE
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> mod = IVGMMCUE.from_formula(formula, data)
+        """
         dep, exog, endog, instr = parse_formula(formula, data)
-        return IVGMMCUE(dep, exog, endog, instr, weight_type, **weight_config)
+        mod = IVGMMCUE(dep, exog, endog, instr, weight_type, **weight_config)
+        mod.formula = formula
+        return mod
 
     def j(self, params, x, y, z):
         r"""
