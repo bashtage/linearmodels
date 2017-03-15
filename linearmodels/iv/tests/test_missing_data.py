@@ -86,4 +86,4 @@ def test_missing_clustered(data, model):
 
 def test_all_missing(data, model):
     with pytest.raises(ValueError):
-        mod = model(data.dep * np.nan, data.exog, data.endog, data.instr)
+        model(data.dep * np.nan, data.exog, data.endog, data.instr)

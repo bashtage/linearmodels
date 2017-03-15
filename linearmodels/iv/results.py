@@ -1164,6 +1164,8 @@ class FirstStageResults(_SummaryStr):
 
 def compare(results):
     """
+    Compare the results of multiple models
+
     Parameters
     ----------
     results : {list, dict, OrderedDict}
@@ -1178,6 +1180,15 @@ def compare(results):
 
 
 class IVModelComparison(_SummaryStr):
+    """
+    Comparison of multiple models
+
+    Parameters
+    ----------
+    results : {list, dict, OrderedDict}
+        Set of results to compare.  If a dict, the keys will be used as model
+        names.  An OrderedDict will preserve the model order the comparisons.
+    """
     def __init__(self, results):
 
         if not isinstance(results, (dict, OrderedDict)):

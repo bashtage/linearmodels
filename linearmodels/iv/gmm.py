@@ -378,7 +378,6 @@ class IVGMMCovariance(HomoskedasticCovariance):
     def __str__(self):
         out = super(IVGMMCovariance, self).__str__()
         cov_type = self._cov_type
-        # TODO: This could be simpler and more useful
         if cov_type in ('robust', 'heteroskedastic'):
             out += '\nRobust (Heteroskedastic)'
         elif cov_type in ('unadjusted', 'homoskedastic'):

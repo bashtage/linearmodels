@@ -10,8 +10,8 @@ dependent: {0}
 exogenous: {1}
 endogenous: {2}
 instruments: {3}
- 
-The original Patsy error was: 
+
+The original Patsy error was:
 """
 
 

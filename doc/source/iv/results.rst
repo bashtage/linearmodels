@@ -17,7 +17,7 @@ Estimation Results
    :members:
    :inherited-members:
 
-.. automethod:: compare
+.. autofunction:: compare
 
 .. autoclass:: IVModelComparison
    :members:

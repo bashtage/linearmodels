@@ -171,14 +171,14 @@ class IVLIML(object):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a 
-        block of the form [endog ~ instruments] which is used to indicate 
-        the list of endogenous variables and instruments.  The general 
-        structure is `dependent ~ exog [endog ~ instruments]` and it must 
-        be the case that the formula expressions constructed from blocks 
-        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        The IV formula modifies the standard Patsy formula to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure is `dependent ~ exog [endog ~ instruments]` and it must
+        be the case that the formula expressions constructed from blocks
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid Patsy formulas.
-          
+
         A constant must be explicitly included using '1 +' if required.
 
         Examples
@@ -470,14 +470,14 @@ class IV2SLS(IVLIML):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a 
-        block of the form [endog ~ instruments] which is used to indicate 
-        the list of endogenous variables and instruments.  The general 
-        structure is `dependent ~ exog [endog ~ instruments]` and it must 
-        be the case that the formula expressions constructed from blocks 
-        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        The IV formula modifies the standard Patsy formula to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure is `dependent ~ exog [endog ~ instruments]` and it must
+        be the case that the formula expressions constructed from blocks
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid Patsy formulas.
-          
+
         A constant must be explicitly included using '1 +' if required.
 
         Examples
@@ -570,14 +570,14 @@ class IVGMM(IVLIML):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a 
-        block of the form [endog ~ instruments] which is used to indicate 
-        the list of endogenous variables and instruments.  The general 
-        structure is `dependent ~ exog [endog ~ instruments]` and it must 
-        be the case that the formula expressions constructed from blocks 
-        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        The IV formula modifies the standard Patsy formula to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure is `dependent ~ exog [endog ~ instruments]` and it must
+        be the case that the formula expressions constructed from blocks
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid Patsy formulas.
-          
+
         A constant must be explicitly included using '1 +' if required.
 
         Returns
@@ -800,18 +800,18 @@ class IVGMMCUE(IVGMM):
         -------
         model : IVGMMCUE
             Model instance
-        
+
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a 
-        block of the form [endog ~ instruments] which is used to indicate 
-        the list of endogenous variables and instruments.  The general 
-        structure is `dependent ~ exog [endog ~ instruments]` and it must 
-        be the case that the formula expressions constructed from blocks 
-        `dependent ~ exog endog` and `dependent ~ exog instruments` are both 
+        The IV formula modifies the standard Patsy formula to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure is `dependent ~ exog [endog ~ instruments]` and it must
+        be the case that the formula expressions constructed from blocks
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid Patsy formulas.
-          
-        A constant must be explicitly included using '1 +' if required. 
+
+        A constant must be explicitly included using '1 +' if required.
 
         Examples
         --------
