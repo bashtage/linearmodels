@@ -1,4 +1,4 @@
-:ref:`iv-mathematical-notation`
+[iv-mathematical-notation]
 
 Mathematical Formulas
 =====================
@@ -81,7 +81,7 @@ the OLS estimator is recovered. The LIML estimator is recovered for
 .. math:: \min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
 
 where :math:`W=\left[y\:X_{2}\right]` and :math:`\mathrm{eig}` returns
-the eigenvalues. **TODO: Check this**
+the eigenvalues.
 
 Generalized Method of Moments (GMM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,6 +94,19 @@ The GMM estimator is defined as
    \hat{\beta}_{GMM} & =\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)\end{aligned}
 
 where :math:`W` is a positive definite weighting matrix.
+
+Continuously Updating Generalized Method of Moments (GMM-CUE)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The continuously updating GMM estimator solves the minimization problem
+
+.. math:: \min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
+
+ where
+:math:`\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}`
+and :math:`\hat{\epsilon}_{i}=y_{i}-x_{i}\beta`. Unlike standard GMM,
+the weight matrix, :math:`W` directly depends on the model parameters
+:math:`\beta` and so it is not possibly to use a closed form estimator.
 
 Basic Statistics
 ----------------
@@ -128,10 +141,10 @@ The model F-statistic is defined
 .. math::
 
    \begin{aligned}
-   F & =\dot{\hat{\beta}}^{\prime}\hat{V}^{-1}\dot{\hat{\beta}}\end{aligned}
+   F & =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}\end{aligned}
 
-where the notation :math:`\dot{\hat{\beta}}` indicates that the constant
-is excluded from :math:`\hat{\beta}` and :math:`\dot{\hat{V}}` indicates
+where the notation :math:`\hat{\beta}_{-}` indicates that the constant
+is excluded from :math:`\hat{\beta}` and :math:`\hat{V}_{-}` indicates
 that the row and column corresponding to a constant are excluded. [1]_
 The test statistic is distributed as :math:`\chi_{k-k_{c}}^{2}.` If the
 debiased flag is set, then the test statistic is transformed as
@@ -157,9 +170,9 @@ Note that this estimator can be expressed as
 .. math::
 
    \begin{aligned}
-   n^{-1}\hat{\hat{A}^{-1}}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}
+   n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}
 
-All estimator take this form and only differ in how the asymptotic
+All estimators take this form and only differ in how the asymptotic
 covariance of the scores, :math:`B`, is estimated. For the homoskedastic
 covariance estimator, :math:`\hat{B}=s^{2}\hat{A}.` The score covariance
 in the heteroskedasticity robust covariance estimator is
@@ -199,6 +212,78 @@ If the debiased flag is used to perform a small-sample adjustment, all
 estimators except the clustered covariance are rescaled by
 :math:`\left(n-k\right)/n`. The clustered covariance is rescaled by
 :math:`\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)`. [2]_
+
+P-values
+~~~~~~~~
+
+P-values are computes using 2-sided tests,
+
+.. math:: Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+
+ If the covariance estimator was debiased, a Student’s t distribution
+with :math:`n-k` degrees of freedom is used,
+
+.. math::
+
+   \begin{aligned}
+   Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}
+
+where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
+distribution.
+
+Confidence Intervals 
+~~~~~~~~~~~~~~~~~~~~~
+
+Confidence intervals are constructed as
+
+.. math:: CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
+
+ where :math:`q_{\alpha/2}` is the :math:`\alpha/2` quantile of a
+standard Normal distribution or a Student’s t. The Student’s t is uses
+when a debiased covariance estimator is used.
+
+To Do
+=====
+
+Gmm Covariance
+
+Constant detection
+
+k-class special cases
+
+J-stat
+
+C-stat
+
+Kernel weights
+
+Optimal BW selection
+
+Std err, T-stats
+
+All df’s
+
+s2??
+
+Linear hypothesis testing
+
+sargan
+
+basman
+
+wu haussman
+
+wooldridge score
+
+wooldridge regression
+
+wooldridge overid
+
+anderson rubin
+
+basmann f
+
+First Stage Results -> partial r2, shea r2, f-stat
 
 .. [1]
    If the model contains an implicit constant, e.g., all categories of a

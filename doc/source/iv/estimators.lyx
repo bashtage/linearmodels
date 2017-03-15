@@ -505,7 +505,7 @@ and the adjusted
 \begin_layout Standard
 \noindent
 The residual variance is 
-\begin_inset Formula $s^{2}=n\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\begin_inset Formula $s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
 \end_inset
 
  unless the debiased flag is used, in which case a small sample adjusted
@@ -559,8 +559,11 @@ ing the model with a constant and excluding one category of dummy.
 \begin_inset Formula $\chi_{k-k_{c}}^{2}.$
 \end_inset
 
- If the debiased flag is set, then the test statistic is transformed as
- 
+ If the debiased flag is set, then the test statistic 
+\begin_inset Formula $F$
+\end_inset
+
+ is transformed as 
 \begin_inset Formula $F/\left(k-k_{c}\right)$
 \end_inset
 
@@ -743,11 +746,16 @@ P-values
 P-values are computes using 2-sided tests, 
 \begin_inset Formula 
 \[
-Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+Pr\left(\left|z\right|>Z\right)=2-2\Phi\left(\left|z\right|\right)
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 If the covariance estimator was debiased, a Student's t distribution with
  
 \begin_inset Formula $n-k$
@@ -759,7 +767,7 @@ If the covariance estimator was debiased, a Student's t distribution with
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
+Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
 \end{align*}
 
 \end_inset
@@ -784,6 +792,11 @@ CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $q_{\alpha/2}$
 \end_inset
@@ -793,10 +806,10 @@ where
 \end_inset
 
  quantile of a standard Normal distribution or a Student's t.
- The Student's t is uses when a debiased covariance estimator is used.
+ The Student's t is used when a debiased covariance estimator is used.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection*
 To Do
 \end_layout
 

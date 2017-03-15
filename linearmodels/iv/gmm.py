@@ -198,7 +198,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
 
-        # TODO: Fix this to allow optimal bw selection by default
+        # TODO: Consider using optimal bandwidth here
         bw = self._bandwidth if self._bandwidth is not None else nobs - 2
         self._bandwidth = bw
         w = self._kernels[self._kernel](bw, nobs - 1)

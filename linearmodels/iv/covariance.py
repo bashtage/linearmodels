@@ -4,7 +4,7 @@ Covariance estimation for 2SLS and LIML IV estimators
 from __future__ import print_function, absolute_import, division
 
 from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
-                   cos, empty, sum, asarray)
+                   cos, empty, sum, asarray, ones)
 from numpy.linalg import pinv, inv
 
 CLUSTER_ERR = """
@@ -516,22 +516,25 @@ class KernelCovariance(HomoskedasticCovariance):
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
 
+        pinvz = self._pinvz
+        xhat = z @ (pinvz @ x)
+        xhat_e = xhat * eps
+
         kernel = self.config['kernel']
-        # TODO: Bandwidth selection method
         bw = self.config['bandwidth']
         if bw is None:
             self._auto_bandwidth = True
-            if kernel in ('newey-west', 'bartlett'):
-                bw = ceil(4 * (nobs / 100) ** (2 / 9))
-            elif kernel in ('andrews', 'quadratic-spectral', 'qs'):
-                bw = ceil(4 * (nobs / 100) ** (2 / 25))
-            else:
-                bw = ceil(4 * (nobs / 100) ** (4 / 25))
+            from linearmodels.utility import has_constant
+            const, loc = has_constant(xhat)
+            sel = ones((xhat.shape[1], 1))
+            if const:
+                sel[loc] = 0
+            scores = xhat_e @ sel
+            bw = kernel_optimal_bandwidth(scores, kernel)
+
         self._bandwidth = bw = int(bw)
         w = self._kernels[kernel](bw, nobs - 1)
 
-        pinvz = self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
         s = _cov_kernel(xhat_e, w)
 
         return self._scale * s

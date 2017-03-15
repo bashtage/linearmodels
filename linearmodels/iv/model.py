@@ -89,8 +89,8 @@ class IVLIML(object):
       \kappa-\alpha/(n-n_{instr})
 
     .. todo::
-
-        * VCV: bootstrap
+    
+      * VCV: bootstrap
 
     See Also
     --------
@@ -440,8 +440,8 @@ class IV2SLS(IVLIML):
     :math:`\kappa=1`,
 
     .. todo::
-
-        * VCV: bootstrap
+    
+      * VCV: bootstrap
 
     See Also
     --------
@@ -535,9 +535,9 @@ class IVGMM(IVLIML):
     where :math:`W` is a positive definite weight matrix and :math:`Z`
     contains both the exogenous regressors and the instruments.
 
-    .. todo:
-
-         * VCV: bootstrap
+    .. todo::
+    
+      * VCV: bootstrap
 
     See Also
     --------

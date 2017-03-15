@@ -399,12 +399,6 @@ class OLSResults(_SummaryStr):
 class _CommonIVResults(OLSResults):
     """
     Results from IV estimation
-
-    Notes
-    -----
-    .. todo::
-
-        * Hypothesis testing
     """
 
     def __init__(self, results, model):

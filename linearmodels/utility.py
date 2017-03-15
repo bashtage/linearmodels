@@ -45,7 +45,7 @@ def has_constant(x):
     has_const = aug_rank == rank
     loc = None
     if has_const:
-        out = np.linalg.lstsq(x, np.ones((n,1)))
+        out = np.linalg.lstsq(x, np.ones((n, 1)))
         loc = np.argmax(np.abs(out[0]) * x.var(0))
     return has_const, loc
 
@@ -90,6 +90,7 @@ class WaldTestStatistic(object):
     --------
     InvalidTestStatistic
     """
+
     def __init__(self, stat, null, df, df_denom=None, name=None):
         self._stat = stat
         self._null = null
@@ -126,13 +127,15 @@ class WaldTestStatistic(object):
 
     def __str__(self):
         name = '' if not self._name else self._name + '\n'
-        msg = '{name}H0: {null}\nWaldTestStatistic(stat={stat}, ' \
-              'pval={pval:0.3f}, dist={dist})'
+        msg = '{name}H0: {null}\nStatistic: {stat:0.4f}\n' \
+              'P-value: {pval:0.4f}\nDistributed: {dist}'
         return msg.format(name=name, null=self.null, stat=self.stat,
                           pval=self.pval, dist=self.dist_name)
 
     def __repr__(self):
-        return self.__str__() + '\nid={id}'.format(id=hex(id(self)))
+        return self.__str__() + '\n' + \
+               self.__class__.__name__ + \
+               ', id: {0}'.format(hex(id(self)))
 
 
 class InvalidTestWarning(UserWarning):
@@ -154,6 +157,7 @@ class InvalidTestStatistic(WaldTestStatistic):
     --------
     WaldTestStatistic
     """
+
     def __init__(self, reason, *, name=None):
         self._reason = reason
         super(InvalidTestStatistic, self).__init__('', NaN, df=1, df_denom=1, name=name)
@@ -217,5 +221,6 @@ class CachedProperty(object):
         if obj is None: return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value
+
 
 cached_property = CachedProperty

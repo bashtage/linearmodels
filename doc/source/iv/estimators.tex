@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{babel}
 \begin{document}
+\label{iv-mathematical-notation}
 
 \section*{Mathematical Formulas}
 
@@ -71,7 +72,7 @@ is recovered. The LIML estimator is recovered for $\kappa$ set to
 \]
 
 \noindent where $W=\left[y\:X_{2}\right]$ and $\mathrm{eig}$ returns
-the eigenvalues. \textbf{TODO: Check this}
+the eigenvalues. 
 
 \subsubsection*{Generalized Method of Moments (GMM)}
 
@@ -81,6 +82,17 @@ The GMM estimator is defined as
 \end{align*}
 
 \noindent where $W$ is a positive definite weighting matrix. 
+
+\subsubsection*{Continuously Updating Generalized Method of Moments (GMM-CUE)}
+
+The continuously updating GMM estimator solves the minimization problem
+\[
+\min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
+\]
+where $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
+and $\hat{\epsilon}_{i}=y_{i}-x_{i}\beta$. Unlike standard GMM, the
+weight matrix, $W$ directly depends on the model parameters $\beta$
+and so it is not possibly to use a closed form estimator. 
 
 \subsection*{Basic Statistics}
 
@@ -104,11 +116,11 @@ version is estimated $s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\ep
 
 The model F-statistic is defined 
 \begin{align*}
-F & =\dot{\hat{\beta}}^{\prime}\hat{V}^{-1}\dot{\hat{\beta}}
+F & =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}
 \end{align*}
 
-\noindent where the notation $\dot{\hat{\beta}}$ indicates that the
-constant is excluded from $\hat{\beta}$ and $\dot{\hat{V}}$ indicates
+\noindent where the notation $\hat{\beta}_{-}$ indicates that the
+constant is excluded from $\hat{\beta}$ and $\hat{V}_{-}$ indicates
 that the row and column corresponding to a constant are excluded.\footnote{If the model contains an implicit constant, e.g., all categories of
 a dummy, one of the categories is excluded when computing the test
 statistic. The choice of category to drop has no effect and is equivalent
@@ -130,10 +142,10 @@ n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & 
 
 Note that this estimator can be expressed as 
 \begin{align*}
-n^{-1}\hat{\hat{A}^{-1}}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
+n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
 \end{align*}
 
-\noindent All estimator take this form and only differ in how the
+\noindent All estimators take this form and only differ in how the
 asymptotic covariance of the scores, $B$, is estimated. For the homoskedastic
 covariance estimator, $\hat{B}=s^{2}\hat{A}.$ The score covariance
 in the heteroskedasticity robust covariance estimator is 
@@ -166,4 +178,70 @@ $g$ is the number of groups.
 If the debiased flag is used to perform a small-sample adjustment,
 all estimators except the clustered covariance are rescaled by $\left(n-k\right)/n$.
 The clustered covariance is rescaled by $\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)$.\footnote{This somewhat non-obvious choice is drive by Stata compatibility.}
+
+\subsubsection*{P-values}
+
+P-values are computes using 2-sided tests, 
+\[
+Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+\]
+If the covariance estimator was debiased, a Student's t distribution
+with $n-k$ degrees of freedom is used, 
+
+\begin{align*}
+Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
+\end{align*}
+where $t_{n-k}\left(\cdot\right)$ is the CDF of a Student's T distribution.
+
+\subsubsection*{Confidence Intervals }
+
+Confidence intervals are constructed as 
+\[
+CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
+\]
+where $q_{\alpha/2}$ is the $\alpha/2$ quantile of a standard Normal
+distribution or a Student's t. The Student's t is uses when a debiased
+covariance estimator is used.
+
+\section{To Do}
+
+Gmm Covariance
+
+Constant detection
+
+k-class special cases
+
+J-stat
+
+C-stat
+
+Kernel weights
+
+Optimal BW selection
+
+Std err, T-stats
+
+All df's
+
+s2??
+
+Linear hypothesis testing
+
+sargan
+
+basman
+
+wu haussman
+
+wooldridge score
+
+wooldridge regression
+
+wooldridge overid
+
+anderson rubin
+
+basmann f
+
+First Stage Results -> partial r2, shea r2, f-stat
 \end{document}
