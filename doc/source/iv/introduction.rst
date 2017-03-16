@@ -158,13 +158,8 @@ perform inference. Four classes of covariance estimators are available:
   * 'qs', 'quadratic-spectral' - The quadratic spectral kernel studied by
     Andrews.
 
-  The ``bandwidth`` can also be specified.  If not provided, a default value
-  is used.
-
-  .. warning::
-
-    This behavior will change in the future to use an automatic bandwidth
-    selection procedure.
+  The ``bandwidth`` can also be specified.  If not provided, an estimate of
+  the optimal value is used.
 
   See :class:`~linearmodels.iv.covariance.KernelCovariance`.
 

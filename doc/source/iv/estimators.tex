@@ -110,7 +110,7 @@ R^{2} & =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\rig
 \bar{R}^{2} & =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.
 \end{align*}
 
-\noindent The residual variance is $s^{2}=n\hat{\epsilon}^{\prime}\hat{\epsilon}$
+\noindent The residual variance is $s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
 unless the debiased flag is used, in which case a small sample adjusted
 version is estimated $s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$.
 
@@ -126,8 +126,9 @@ a dummy, one of the categories is excluded when computing the test
 statistic. The choice of category to drop has no effect and is equivalent
 to reparameterizing the model with a constant and excluding one category
 of dummy.} The test statistic is distributed as $\chi_{k-k_{c}}^{2}.$ If the
-debiased flag is set, then the test statistic is transformed as $F/\left(k-k_{c}\right)$
-and a $F_{k-k_{c},n-k}$ distribution is used. 
+debiased flag is set, then the test statistic $F$ is transformed
+as $F/\left(k-k_{c}\right)$ and a $F_{k-k_{c},n-k}$ distribution
+is used. 
 
 \subsection*{Parameter Covariance Estimation}
 
@@ -183,13 +184,14 @@ The clustered covariance is rescaled by $\left(\left(n-k\right)\left(n-1\right)/
 
 P-values are computes using 2-sided tests, 
 \[
-Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+Pr\left(\left|z\right|>Z\right)=2-2\Phi\left(\left|z\right|\right)
 \]
-If the covariance estimator was debiased, a Student's t distribution
-with $n-k$ degrees of freedom is used, 
+
+\noindent If the covariance estimator was debiased, a Student's t
+distribution with $n-k$ degrees of freedom is used, 
 
 \begin{align*}
-Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
+Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
 \end{align*}
 where $t_{n-k}\left(\cdot\right)$ is the CDF of a Student's T distribution.
 
@@ -199,11 +201,12 @@ Confidence intervals are constructed as
 \[
 CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 \]
-where $q_{\alpha/2}$ is the $\alpha/2$ quantile of a standard Normal
-distribution or a Student's t. The Student's t is uses when a debiased
-covariance estimator is used.
 
-\section{To Do}
+\noindent where $q_{\alpha/2}$ is the $\alpha/2$ quantile of a standard
+Normal distribution or a Student's t. The Student's t is used when
+a debiased covariance estimator is used.
+
+\subsection*{To Do}
 
 Gmm Covariance
 

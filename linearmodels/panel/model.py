@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import pinv
 
-from .data import PanelData
+from .data import PanelDataHandler
 from .fixed_effects import EntityEffect, TimeEffect
 
 
@@ -31,13 +31,13 @@ class PooledOLS(object):
     """
 
     def __init__(self, endog, exog, *, intercept=True):
-        self.endog = PanelData(endog)
-        self.exog = PanelData(exog)
+        self.endog = PanelDataHandler(endog)
+        self.exog = PanelDataHandler(exog)
         self.intercept = intercept
 
     def fit(self):
-        y = self.endog.asnumpy2d
-        x = self.exog.asnumpy2d
+        y = self.endog.a2d
+        x = self.exog.a2d
         if self.intercept:
             x = np.c_[np.ones((x.shape[0], 1)), x]
         return pinv(x) @ y
@@ -82,8 +82,8 @@ class PanelOLS(PooledOLS):
         self.time_effect = time_effect
 
     def fit(self):
-        y = self.endog.asnumpy2d
-        x = self.exog.asnumpy2d
+        y = self.endog.a2d
+        x = self.exog.a2d
         if self.intercept:
             x = np.c_[np.ones((x.shape[0], 1)), x]
         if self.entity_effect:
@@ -124,8 +124,8 @@ class BetweenOLS(PooledOLS):
         super(BetweenOLS, self).__init__(endog, exog, intercept=intercept)
 
     def fit(self):
-        y = self.endog.asnumpy3d.mean(axis=1)
-        x = self.exog.asnumpy3d.mean(axis=1)
+        y = self.endog.a3d.mean(axis=1)
+        x = self.exog.a3d.mean(axis=1)
         if self.intercept:
             x = np.c_[np.ones((x.shape[0], 1)), x]
 
@@ -155,9 +155,9 @@ class FirstDifferenceOLS(PooledOLS):
         super(FirstDifferenceOLS, self).__init__(endog, exog, intercept=intercept)
 
     def fit(self):
-        y = np.diff(self.endog.asnumpy3d, axis=1)
-        x = np.diff(self.exog.asnumpy3d, axis=1)
-        n, t, k = self.exog.n, self.exog.t, self.exog.k
+        y = np.diff(self.endog.a3d, axis=1)
+        x = np.diff(self.exog.a3d, axis=1)
+        n, t, k = self.exog.nitems, self.exog.nobs, self.exog.nvar
         y = y.reshape((n * (t - 1), 1))
         x = x.reshape((n * (t - 1), k))
         return pinv(x) @ y

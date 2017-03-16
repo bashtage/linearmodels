@@ -40,8 +40,8 @@ install:
 script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels
   - set -e
-  - cd doc && make html && cd ..
-  - if [ ${PYTHON} = 3.5 ]; then doctr deploy; fi
+  - cd doc && make html && make html && cd ..
+  - if [ ${PYTHON} = 3.5 ]; then doctr deploy doc; fi
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi

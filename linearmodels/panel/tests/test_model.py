@@ -27,24 +27,18 @@ class TestPooledOLS(object):
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         params = pols.fit()
-        print(params)
         pols = self.mod(self.y, self.x, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_pd, self.x_pd)
         params = pols.fit()
-        print(params)
         pols = self.mod(self.y_pd, self.x_pd, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_xr, self.x_xr)
         params = pols.fit()
-        print(params)
         pols = self.mod(self.y_xr, self.x_xr, intercept=False)
         params = pols.fit()
-        print(params)
 
 
 class TestPanelOLS(TestPooledOLS):
@@ -56,24 +50,21 @@ class TestPanelOLS(TestPooledOLS):
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y, self.x, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_pd, self.x_pd)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_pd, self.x_pd, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_xr, self.x_xr)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_xr, self.x_xr, intercept=False)
         params = pols.fit()
-        print(params)
 
 
 class TestBetweenOLS(TestPooledOLS):
@@ -85,24 +76,21 @@ class TestBetweenOLS(TestPooledOLS):
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y, self.x, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_pd, self.x_pd)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_pd, self.x_pd, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_xr, self.x_xr)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_xr, self.x_xr, intercept=False)
         params = pols.fit()
-        print(params)
 
 
 class TestFirstDifferenceOLS(TestPooledOLS):
@@ -114,21 +102,18 @@ class TestFirstDifferenceOLS(TestPooledOLS):
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y, self.x, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_pd, self.x_pd)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_pd, self.x_pd, intercept=False)
         params = pols.fit()
-        print(params)
 
         pols = self.mod(self.y_xr, self.x_xr)
         params = pols.fit()
-        print(params)
+
         pols = self.mod(self.y_xr, self.x_xr, intercept=False)
         params = pols.fit()
-        print(params)

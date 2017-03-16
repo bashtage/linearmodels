@@ -309,7 +309,7 @@ Two-stage Least Squares (2SLS)
 The 2SLS estimator is 
 \begin_inset Formula 
 \begin{align*}
-\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)
+\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)
 \end{align*}
 
 \end_inset
@@ -325,7 +325,7 @@ Limited Information Maximum Likelihood and k-class Estimators
 The LIML or other k-class estimator is 
 \begin_inset Formula 
 \begin{align*}
-\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)
+\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)
 \end{align*}
 
 \end_inset
@@ -350,14 +350,14 @@ where
 \end_inset
 
 , the OLS estimator is recovered.
- The LIML estimator is recovered for 
+ The LIML estimator is recovered when 
 \begin_inset Formula $\kappa$
 \end_inset
 
  set to 
 \begin_inset Formula 
 \[
-\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
 \]
 
 \end_inset
@@ -435,7 +435,7 @@ where
 \begin_inset Formula $\beta$
 \end_inset
 
- and so it is not possibly to use a closed form estimator.
+ and so it is not possible to use a closed form estimator.
  
 \end_layout
 
@@ -809,36 +809,16 @@ where
  The Student's t is used when a debiased covariance estimator is used.
 \end_layout
 
-\begin_layout Subsection*
-To Do
+\begin_layout Subsubsection*
+GMM estimators
 \end_layout
 
 \begin_layout Standard
 Gmm Covariance
 \end_layout
 
-\begin_layout Standard
-Constant detection
-\end_layout
-
-\begin_layout Standard
-k-class special cases
-\end_layout
-
-\begin_layout Standard
-J-stat
-\end_layout
-
-\begin_layout Standard
-C-stat
-\end_layout
-
-\begin_layout Standard
-Kernel weights
-\end_layout
-
-\begin_layout Standard
-Optimal BW selection
+\begin_layout Subsection*
+To Do
 \end_layout
 
 \begin_layout Standard
@@ -850,11 +830,15 @@ All df's
 \end_layout
 
 \begin_layout Standard
-s2??
+Linear hypothesis testing
 \end_layout
 
-\begin_layout Standard
-Linear hypothesis testing
+\begin_layout Subsection*
+Post-estimation
+\end_layout
+
+\begin_layout Subsubsection*
+2SLS and LIML Post-estimation Results
 \end_layout
 
 \begin_layout Standard
@@ -889,8 +873,44 @@ anderson rubin
 basmann f
 \end_layout
 
+\begin_layout Subsubsection*
+GMM Post-estimation Results
+\end_layout
+
+\begin_layout Standard
+J-stat
+\end_layout
+
+\begin_layout Standard
+C-stat
+\end_layout
+
+\begin_layout Subsection*
+First-stage Estimation Analysis
+\end_layout
+
 \begin_layout Standard
 First Stage Results -> partial r2, shea r2, f-stat
+\end_layout
+
+\begin_layout Subsection*
+Kernel Weights and Bandwidth Selection
+\end_layout
+
+\begin_layout Standard
+Kernel weights
+\end_layout
+
+\begin_layout Standard
+Optimal BW selection
+\end_layout
+
+\begin_layout Subsection*
+Constant Detection
+\end_layout
+
+\begin_layout Standard
+Constant detection
 \end_layout
 
 \end_body

@@ -118,12 +118,11 @@ class PanelData(object):
             index = [index]
         return [i for i, c in enumerate(self.columns) if c in index]
 
-# Panel -> entity, time, vars
-# df 2x -> (entity,time), vars
-# a2s -> df.values
-# a3d -> panel.values
-
 class PanelDataHandler(object):
+    # Panel -> entity, time, vars
+    # df 2x -> (entity,time), vars
+    # a2s -> df.values
+    # a3d -> panel.values
     def __init__(self, x, var_name='x'):
         if isinstance(x, np.ndarray):
             if x.ndim > 3:
@@ -141,7 +140,11 @@ class PanelDataHandler(object):
                                    minor_axis=minor)
             panel = panel.swapaxes(0,1).swapaxes(0,2)
             self._dataframe = panel.to_frame(filter_observations=False)
-        elif isinstance(x, (pd.DataFrame, pd.Panel)):
+        elif isinstance(x, (pd.DataFrame, pd.Panel, xr.DataArray)):
+            if isinstance(x, xr.DataArray):
+                if x.ndim not in (2,3):
+                    raise ValueError('Only 2-d or 3-d DataArrays are supported')
+                x = x.to_pandas()
             if isinstance(x, pd.DataFrame):
                 if isinstance(x.index, pd.MultiIndex):
                     if len(x.index.levels) != 2:
@@ -154,12 +157,8 @@ class PanelDataHandler(object):
             panel = x.swapaxes(0,1).swapaxes(0,2)
             self._dataframe = panel.to_frame(filter_observations=False)
         else:
-            import xarray as xr
-            if isinstance(x, xr.DataArray):
-                raise NotImplementedError('No support for xarray yet')
-            else:
-                raise TypeError('Only ndarrays, DataFrames, Panels or '
-                                'DataArrays supported.')
+            raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
+                            'supported.')
         self._n, self._t, self._k = self.panel.shape
 
     @property

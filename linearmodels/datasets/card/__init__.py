@@ -1,8 +1,8 @@
 DESCR = """
-:  D. Card (1995), "Using Geographic Variation in College Proximity to 
-Estimate the Return to Schooling," in Aspects of Labour Market Behavior: 
-Essays in Honour of John Vanderkamp.  Ed. L.N. Christophides, E.K. Grant, 
-and R. Swidinsky, 201-222.  Toronto: University of Toronto Press.
+D. Card (1995), "Using Geographic Variation in College Proximity to Estimate 
+the Return to Schooling," in Aspects of Labour Market Behavior:  Essays in 
+Honour of John Vanderkamp.  Ed. L.N. Christophides, E.K. Grant, and R. 
+Swidinsky, 201-222.  Toronto: University of Toronto Press.
 
 id                       person identifier
 nearc2                   =1 if near 2 yr college, 1966
@@ -37,7 +37,7 @@ married                  =1 if married, 1976
 libcrd14                 =1 if lib. card in home at 14
 exper                    age - educ - 6
 lwage                    log(wage)
-xpersq                  exper^2
+xpersq                   exper**2
 """
 
 

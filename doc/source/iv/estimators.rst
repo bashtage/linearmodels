@@ -1,4 +1,4 @@
-[iv-mathematical-notation]
+.. _iv-mathematical-notation:
 
 Mathematical Formulas
 =====================
@@ -132,8 +132,9 @@ and the adjusted :math:`R^{2}` is defined
    \bar{R}^{2} & =1-\left(1-R^{2}\right)\frac{N-k_{c}}{N-k}.\end{aligned}
 
 The residual variance is
-:math:`s^{2}=n\hat{\epsilon}^{\prime}\hat{\epsilon}` unless the debiased
-flag is used, in which case a small sample adjusted version is estimated
+:math:`s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}` unless the
+debiased flag is used, in which case a small sample adjusted version is
+estimated
 :math:`s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}`.
 
 The model F-statistic is defined
@@ -147,8 +148,8 @@ where the notation :math:`\hat{\beta}_{-}` indicates that the constant
 is excluded from :math:`\hat{\beta}` and :math:`\hat{V}_{-}` indicates
 that the row and column corresponding to a constant are excluded. [1]_
 The test statistic is distributed as :math:`\chi_{k-k_{c}}^{2}.` If the
-debiased flag is set, then the test statistic is transformed as
-:math:`F/\left(k-k_{c}\right)` and a :math:`F_{k-k_{c},n-k}`
+debiased flag is set, then the test statistic :math:`F` is transformed
+as :math:`F/\left(k-k_{c}\right)` and a :math:`F_{k-k_{c},n-k}`
 distribution is used.
 
 Parameter Covariance Estimation
@@ -218,15 +219,15 @@ P-values
 
 P-values are computes using 2-sided tests,
 
-.. math:: Pr\left(z>Z\right)=2-2\Phi\left(\left|z\right|\right)
+.. math:: Pr\left(\left|z\right|>Z\right)=2-2\Phi\left(\left|z\right|\right)
 
- If the covariance estimator was debiased, a Student’s t distribution
+If the covariance estimator was debiased, a Student’s t distribution
 with :math:`n-k` degrees of freedom is used,
 
 .. math::
 
    \begin{aligned}
-   Pr\left(z>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}
+   Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}
 
 where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
 distribution.
@@ -238,12 +239,12 @@ Confidence intervals are constructed as
 
 .. math:: CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 
- where :math:`q_{\alpha/2}` is the :math:`\alpha/2` quantile of a
-standard Normal distribution or a Student’s t. The Student’s t is uses
+where :math:`q_{\alpha/2}` is the :math:`\alpha/2` quantile of a
+standard Normal distribution or a Student’s t. The Student’s t is used
 when a debiased covariance estimator is used.
 
 To Do
-=====
+-----
 
 Gmm Covariance
 

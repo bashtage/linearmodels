@@ -1,3 +1,48 @@
+import numpy as np
+from statsmodels.api import add_constant
+from linearmodels.datasets import mroz
+from linearmodels.datasets import card
+from linearmodels.iv import IV2SLS, compare
+
+print(card.DESCR)
+data = card.load()
+data = add_constant(data)
+data.dtypes
+dep = ['wage']
+endog = ['educ']
+exog = ['const', 'exper', 'expersq', 'black', 'smsa', 'south', 'smsa66', 'reg662',
+        'reg663', 'reg664', 'reg665', 'reg666', 'reg667', 'reg668', 'reg669']
+instr = ['nearc4']
+data = data[dep + exog + endog + instr].dropna()
+
+res = IV2SLS(data.educ, data[instr + exog], None, None).fit()
+print(res.summary)
+
+res_ols = IV2SLS(np.log(data.wage), data[exog+endog],None,None).fit()
+res_2sls = IV2SLS(np.log(data.wage), data[exog], data[endog], data[instr]).fit()
+print(compare({'OLS':res_ols,'2SLS':res_2sls}))
+print(res_2sls.first_stage)
+
+raise ValueError
+import numpy as np
+from statsmodels.api import add_constant
+from linearmodels.datasets import mroz
+
+data = mroz.load()
+print(mroz.DESCR)
+data = data.dropna()
+data = add_constant(data, has_constant='add')
+
+from linearmodels.iv import IV2SLS
+res = IV2SLS(np.log(data.wage), data[['const','educ']], None, None).fit('unadjusted')
+print(res.summary)
+res_first = IV2SLS(data.educ, data[['const','fatheduc']], None, None).fit('unadjusted')
+data['educ_hat'] = data.educ - res_first.resids
+print(res_first.summary)
+res_second = IV2SLS(np.log(data.wage), data[['const']], data.educ, data.fatheduc).fit('unadjusted')
+print(res_second.summary)
+
+
 formula = 'y ~ x1 + x2 + log(x3) + [ x4 + x5 ~ z1 + z4 + exp(z6)] + x9'
 formula = 'y ~ x1 + x2 + log(x3) + [ x4 + x5 ~ z1 + z4 + exp(z6)]'
 

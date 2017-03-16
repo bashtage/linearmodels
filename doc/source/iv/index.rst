@@ -10,7 +10,7 @@ estimators, GMM weighting estimators and the results are presented in
 
 :ref:`Basic Examples <iv/examples/basic-examples.ipynb>` shows basic usage
 through examples from Wooldridge's introductior text book and
-:ref:`Advanced Examples <iv/examples/instrumental-variable-estimation.ipynb>` shows more
+:ref:`Advanced Examples <iv/examples/advanced-examples.ipynb>` shows more
 advanced examples following the examples in Cameron and Trivedi's Stata
 introduction.
 
@@ -24,7 +24,7 @@ tests.
 
    introduction
    examples/basic-examples.ipynb
-   examples/instrumental-variable-estimation.ipynb
+   examples/advanced-examples.ipynb
    examples/using-formulas.ipynb
    reference
    estimators

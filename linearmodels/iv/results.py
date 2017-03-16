@@ -1126,14 +1126,18 @@ class FirstStageResults(_SummaryStr):
         stubs = [stubs_lookup[s] for s in list(diagnostics.columns)]
         header = list(diagnostics.index)
 
+
         params = []
         for var in header:
             res = self.individual[var]
             v = c_[res.params.values, res.tstats.values]
             params.append(v.ravel())
-        params_fmt = [[_str(val) for val in row] for row in array(params).T]
-        for i in range(1, len(params_fmt)):
-            for j in range(2):
+        params = array(params)
+        if params.ndim == 1:
+            params = params[:,None]
+        params_fmt = [[_str(val) for val in row] for row in params.T]
+        for i in range(1, len(params_fmt), 2):
+            for j in range(len(params_fmt[i])):
                 params_fmt[i][j] = '({0})'.format(params_fmt[i][j])
 
         params_stub = []
@@ -1270,14 +1274,18 @@ class IVModelComparison(_SummaryStr):
         smry = Summary()
         models = list(self._results.keys())
         title = 'Model Comparison'
-        stubs = ['Estimator', 'No. Observations', 'Cov. Est.', 'R-squared',
+        stubs = ['Dep. Variable', 'Estimator', 'No. Observations', 'Cov. Est.', 'R-squared',
                  'Adj. R-squared', 'F-statistic', 'P-value (F-stat)']
+        dep_name = {}
+        for key in self._results:
+            dep_name[key] = self._results[key].model.dependent.cols[0]
+        dep_name = Series(dep_name)
 
-        vals = concat([self.estimator_method, self.nobs, self.cov_estimator,
+        vals = concat([dep_name, self.estimator_method, self.nobs, self.cov_estimator,
                        self.rsquared, self.rsquared_adj, self.f_statistic], 1)
         vals = [[i for i in v] for v in vals.T.values]
-        vals[1] = [str(v) for v in vals[1]]
-        for i in range(3, len(vals)):
+        vals[2] = [str(v) for v in vals[2]]
+        for i in range(4, len(vals)):
             vals[i] = [_str(v) for v in vals[i]]
 
         params = self.params
