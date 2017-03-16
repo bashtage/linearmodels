@@ -1,4 +1,8 @@
-.. _iv-mathematical-notation:
+.. role:: math(raw)
+   :format: html latex
+..
+
+[iv-mathematical-notation]
 
 Mathematical Formulas
 =====================
@@ -61,7 +65,7 @@ The 2SLS estimator is
 .. math::
 
    \begin{aligned}
-   \hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)\end{aligned}
+   \hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)\end{aligned}
 
 Limited Information Maximum Likelihood and k-class Estimators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,14 +75,14 @@ The LIML or other k-class estimator is
 .. math::
 
    \begin{aligned}
-   \hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)\end{aligned}
+   \hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)\end{aligned}
 
 where :math:`\kappa` is the parameter of the class. When
 :math:`\kappa=1` the 2SLS estimator is recovered. When :math:`\kappa=0`,
-the OLS estimator is recovered. The LIML estimator is recovered for
+the OLS estimator is recovered. The LIML estimator is recovered when
 :math:`\kappa` set to
 
-.. math:: \min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+.. math:: \hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
 
 where :math:`W=\left[y\:X_{2}\right]` and :math:`\mathrm{eig}` returns
 the eigenvalues.
@@ -106,7 +110,7 @@ The continuously updating GMM estimator solves the minimization problem
 :math:`\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}`
 and :math:`\hat{\epsilon}_{i}=y_{i}-x_{i}\beta`. Unlike standard GMM,
 the weight matrix, :math:`W` directly depends on the model parameters
-:math:`\beta` and so it is not possibly to use a closed form estimator.
+:math:`\beta` and so it is not possible to use a closed form estimator.
 
 Basic Statistics
 ----------------
@@ -243,30 +247,25 @@ where :math:`q_{\alpha/2}` is the :math:`\alpha/2` quantile of a
 standard Normal distribution or a Student’s t. The Student’s t is used
 when a debiased covariance estimator is used.
 
-To Do
------
+GMM estimators
+~~~~~~~~~~~~~~
 
 Gmm Covariance
 
-Constant detection
-
-k-class special cases
-
-J-stat
-
-C-stat
-
-Kernel weights
-
-Optimal BW selection
+To Do
+-----
 
 Std err, T-stats
 
 All df’s
 
-s2??
-
 Linear hypothesis testing
+
+Post-estimation
+---------------
+
+2SLS and LIML Post-estimation Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sargan
 
@@ -284,7 +283,29 @@ anderson rubin
 
 basmann f
 
+GMM Post-estimation Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+J-stat
+
+C-stat
+
+First-stage Estimation Analysis
+-------------------------------
+
 First Stage Results -> partial r2, shea r2, f-stat
+
+Kernel Weights and Bandwidth Selection
+--------------------------------------
+
+Kernel weights
+
+Optimal BW selection
+
+Constant Detection
+------------------
+
+Constant detection
 
 .. [1]
    If the model contains an implicit constant, e.g., all categories of a

@@ -53,7 +53,7 @@ The annihilator matrix for $X$ is $M_{X}=I-P_{X}$.
 
 The 2SLS estimator is 
 \begin{align*}
-\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X^{\prime}\right)\left(X^{\prime}P_{Z}y^{\prime}\right)
+\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)
 \end{align*}
 
 
@@ -61,14 +61,14 @@ The 2SLS estimator is
 
 The LIML or other k-class estimator is 
 \begin{align*}
-\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X^{\prime}\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y^{\prime}\right)
+\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)
 \end{align*}
 
 \noindent where $\kappa$ is the parameter of the class. When $\kappa=1$
 the 2SLS estimator is recovered. When $\kappa=0$, the OLS estimator
-is recovered. The LIML estimator is recovered for $\kappa$ set to
+is recovered. The LIML estimator is recovered when $\kappa$ set to
 \[
-\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
 \]
 
 \noindent where $W=\left[y\:X_{2}\right]$ and $\mathrm{eig}$ returns
@@ -92,7 +92,7 @@ The continuously updating GMM estimator solves the minimization problem
 where $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
 and $\hat{\epsilon}_{i}=y_{i}-x_{i}\beta$. Unlike standard GMM, the
 weight matrix, $W$ directly depends on the model parameters $\beta$
-and so it is not possibly to use a closed form estimator. 
+and so it is not possible to use a closed form estimator. 
 
 \subsection*{Basic Statistics}
 
@@ -206,29 +206,21 @@ CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 Normal distribution or a Student's t. The Student's t is used when
 a debiased covariance estimator is used.
 
-\subsection*{To Do}
+\subsubsection*{GMM estimators}
 
 Gmm Covariance
 
-Constant detection
-
-k-class special cases
-
-J-stat
-
-C-stat
-
-Kernel weights
-
-Optimal BW selection
+\subsection*{To Do}
 
 Std err, T-stats
 
 All df's
 
-s2??
-
 Linear hypothesis testing
+
+\subsection*{Post-estimation}
+
+\subsubsection*{2SLS and LIML Post-estimation Results}
 
 sargan
 
@@ -246,5 +238,23 @@ anderson rubin
 
 basmann f
 
+\subsubsection*{GMM Post-estimation Results}
+
+J-stat
+
+C-stat
+
+\subsection*{First-stage Estimation Analysis}
+
 First Stage Results -> partial r2, shea r2, f-stat
+
+\subsection*{Kernel Weights and Bandwidth Selection}
+
+Kernel weights
+
+Optimal BW selection
+
+\subsection*{Constant Detection}
+
+Constant detection
 \end{document}
