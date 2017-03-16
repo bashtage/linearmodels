@@ -1,19 +1,48 @@
+|Build Status|
+
 Linear Models
 =============
 
-|Build Status|
+Linear (regression) models for Python. Extends
+`statsmdoels <http://www.statsmodels.org>`__ to include instrumental
+variable estimators:
 
-.. code:: diff
+-  Two-stage Least Squares
+-  Limited Information Maximum Likelihood
+-  k-class Estimators
+-  Generalized Method of Moments, also with continuously updating
 
-    + The instrumental variable code is complete and tested
-    - This package is still under heavy development and should not be considered stable
+Designed to work equally well with NumPy, Pandas or xarray data.
+
+Like `statsmdoels <http://www.statsmodels.org>`__ to include, supports
+`patsy <https://patsy.readthedocs.io/en/latest/>`__ formulas for
+specifying models. For example,
+
+.. code:: python
+
+    import numpy as np
+    from linearmodels.iv import IV2SLS
+    from linearmodels.datasets import mroz
+    data = mroz.load()
+    mod = IV2SLS.from_formula('np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ motheduc + fatheduc]', data)
+
+The expressions in the ``[ ]`` indicate endogenous regressors (before
+``~``) and the instruments.
+
+Documentation
+-------------
+
+`Documentation <https://bashtage.github.io/linearmodels/doc>`__ is
+automatically built using `doctr <https://github.com/drdoctr/doctr>`__
+on every successful build of master. The documentation is still rough
+but should improve quickly.
 
 Plan and status
-~~~~~~~~~~~~~~~
+---------------
 
-Should eventually add some useful linear model estimators such as
-instrumental variable estimators and panel regression. Currently very
-unpolished.
+Should eventually add some useful linear model estimators such as panel
+regression. Currently only the single variable IV estimators are
+polished.
 
 -  Linear Instrumental variable estimation - *complete*
 -  Linear Panel model estimation - *incomplete*
@@ -21,20 +50,22 @@ unpolished.
 -  System regression - *not started*
 
 Requirements
-~~~~~~~~~~~~
+------------
 
--  Python 3.5+: extensive use of ``@`` operator
+Running
+~~~~~~~
+
+-  **Python 3.5+**: extensive use of ``@`` operator
 -  NumPy
 -  SciPy
 -  Pandas
--  xarray (optional)
+-  xarray
 -  Statsmodels
 
 Testing
 ~~~~~~~
 
 -  py.test
--  xarray
 
 Documentation
 ~~~~~~~~~~~~~
@@ -46,7 +77,6 @@ Documentation
 -  nbformat
 -  ipython
 -  jupyter
--  matplotlib
 
 .. |Build Status| image:: https://travis-ci.org/bashtage/linearmodels.svg?branch=master
    :target: https://travis-ci.org/bashtage/linearmodels

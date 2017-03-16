@@ -6,13 +6,13 @@
 \usepackage{amsmath}
 \usepackage{babel}
 \begin{document}
-\label{iv-mathematical-notation}
 
 \section*{Mathematical Formulas}
 
 \subsection*{Notation}
 
-Interest is in recovering the parameter vector from the model 
+\noindent Interest is in recovering the parameter vector from the
+model 
 \begin{align*}
 y_{i} & =\beta^{\prime}x_{i}+\epsilon_{i}
 \end{align*}
@@ -30,7 +30,7 @@ y_{i} & =\underset{\textrm{exogenous}}{\underbrace{\beta_{1}^{\prime}x_{1i}}}+\u
 x_{2i} & =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+\underset{\textrm{instruments}}{\underbrace{\gamma_{2}^{\prime}z_{2i}}}+u_{i}
 \end{align*}
 
-The model can be expressed compactly 
+\noindent The model can be expressed compactly 
 \begin{align*}
 Y & =X_{1}\beta_{1}+X_{2}\beta_{1}+\epsilon=X\beta+\epsilon\\
 X_{2} & =Z_{1}\gamma_{1}+Z_{2}\gamma_{2}+u=Z\gamma+u
@@ -51,7 +51,7 @@ The annihilator matrix for $X$ is $M_{X}=I-P_{X}$.
 
 \subsubsection*{Two-stage Least Squares (2SLS)}
 
-The 2SLS estimator is 
+\noindent The 2SLS estimator is 
 \begin{align*}
 \hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)
 \end{align*}
@@ -59,7 +59,7 @@ The 2SLS estimator is
 
 \subsubsection*{Limited Information Maximum Likelihood and k-class Estimators}
 
-The LIML or other k-class estimator is 
+\noindent The LIML or other k-class estimator is 
 \begin{align*}
 \hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)
 \end{align*}
@@ -76,7 +76,7 @@ the eigenvalues.
 
 \subsubsection*{Generalized Method of Moments (GMM)}
 
-The GMM estimator is defined as 
+\noindent The GMM estimator is defined as 
 \begin{align*}
 \hat{\beta}_{GMM} & =\left(X^{\prime}ZWZ^{\prime}X\right)^{-1}\left(X^{\prime}ZWZ^{\prime}y\right)
 \end{align*}
@@ -85,7 +85,8 @@ The GMM estimator is defined as
 
 \subsubsection*{Continuously Updating Generalized Method of Moments (GMM-CUE)}
 
-The continuously updating GMM estimator solves the minimization problem
+\noindent The continuously updating GMM estimator solves the minimization
+problem
 \[
 \min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
 \]
@@ -96,10 +97,10 @@ and so it is not possible to use a closed form estimator.
 
 \subsection*{Basic Statistics}
 
-Let $\hat{\epsilon}=y-X\hat{\beta}$. The residual sum of squares
-(RSS) is $\hat{\epsilon}^{\prime}\hat{\epsilon}$, the model sum of
-squares (MSS) is $\hat{\beta}^{\prime}X^{\prime}X\hat{\beta}$ and
-the total sum of squares (TSS) is $\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}$where
+\noindent Let $\hat{\epsilon}=y-X\hat{\beta}$. The residual sum of
+squares (RSS) is $\hat{\epsilon}^{\prime}\hat{\epsilon}$, the model
+sum of squares (MSS) is $\hat{\beta}^{\prime}X^{\prime}X\hat{\beta}$
+and the total sum of squares (TSS) is $\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}$where
 $\bar{y}$ is the sample average of $y$. The model $R^{2}$is defined
 \begin{align*}
 R^{2} & =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\right)^{\prime}\left(y-k_{c}\bar{y}\right)^{\prime}}=1-\frac{RSS}{TSS}
@@ -113,8 +114,10 @@ R^{2} & =1-\frac{\hat{\epsilon}^{\prime}\hat{\epsilon}}{\left(y-k_{c}\bar{y}\rig
 \noindent The residual variance is $s^{2}=n^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$
 unless the debiased flag is used, in which case a small sample adjusted
 version is estimated $s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}$.
+The model degree of freedom is $k$ and the residual degree of freedom
+is $n-k$. 
 
-The model F-statistic is defined 
+\noindent The model F-statistic is defined 
 \begin{align*}
 F & =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}
 \end{align*}
@@ -134,16 +137,17 @@ is used.
 
 \subsubsection*{Two-stage LS, LIML and k-class estimators}
 
-Four covariance estimators are available. The first is the standard
-homoskedastic covariance, defined as 
+\noindent Four covariance estimators are available. The first is the
+standard homoskedastic covariance, defined as 
 
+\noindent 
 \begin{align*}
-n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.
+\hat{\Sigma}=n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.
 \end{align*}
 
-Note that this estimator can be expressed as 
+\noindent Note that this estimator can be expressed as 
 \begin{align*}
-n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
+\hat{\Sigma}=n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
 \end{align*}
 
 \noindent All estimators take this form and only differ in how the
@@ -157,7 +161,7 @@ in the heteroskedasticity robust covariance estimator is
 \noindent where $\hat{x_{i}}$ is row $i$ of $\hat{X}=P_{Z}X$ and
 $\hat{\xi}_{i}=\hat{\epsilon}_{i}\hat{x}_{i}$.
 
-The kernel covariance estimator is robust to both heteroskedasticity
+\noindent The kernel covariance estimator is robust to both heteroskedasticity
 and autocorrelation and is defined as 
 \begin{align*}
 \hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
@@ -167,7 +171,7 @@ and autocorrelation and is defined as
 \noindent where $k\left(i/h\right)$ is a kernel weighting function
 where $h$ is the kernel bandwidth. 
 
-The one-way clustered covariance estimator is defined as 
+\noindent The one-way clustered covariance estimator is defined as
 \begin{align*}
 n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)^{\prime}
 \end{align*}
@@ -176,13 +180,31 @@ n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\xi}_{i}\right)\left(\s
 sum of the scores for all members in group $\mathcal{G}_{j}$ and
 $g$ is the number of groups. 
 
-If the debiased flag is used to perform a small-sample adjustment,
+\noindent If the debiased flag is used to perform a small-sample adjustment,
 all estimators except the clustered covariance are rescaled by $\left(n-k\right)/n$.
 The clustered covariance is rescaled by $\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)$.\footnote{This somewhat non-obvious choice is drive by Stata compatibility.}
 
+\subsubsection*{Standard Errors}
+
+\noindent Standard errors are defined as 
+\[
+s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
+\]
+where $e_{j}$ is a vector of 0s except in location $j$ which is
+1.
+
+\subsubsection*{T-statistics}
+
+\noindent T-statistics test the null $H_{0}:\beta_{j}=0$ against
+a 2-sided alternative and are defined as 
+\[
+z=\frac{\hat{\beta}_{j}}{s.e.\left(\hat{\beta}_{j}\right)}.
+\]
+
+
 \subsubsection*{P-values}
 
-P-values are computes using 2-sided tests, 
+\noindent P-values are computes using 2-sided tests, 
 \[
 Pr\left(\left|z\right|>Z\right)=2-2\Phi\left(\left|z\right|\right)
 \]
@@ -190,6 +212,7 @@ Pr\left(\left|z\right|>Z\right)=2-2\Phi\left(\left|z\right|\right)
 \noindent If the covariance estimator was debiased, a Student's t
 distribution with $n-k$ degrees of freedom is used, 
 
+\noindent 
 \begin{align*}
 Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
 \end{align*}
@@ -197,7 +220,7 @@ where $t_{n-k}\left(\cdot\right)$ is the CDF of a Student's T distribution.
 
 \subsubsection*{Confidence Intervals }
 
-Confidence intervals are constructed as 
+\noindent Confidence intervals are constructed as 
 \[
 CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 \]
@@ -206,55 +229,115 @@ CI_{i,1-\alpha}=\hat{\beta}_{i}\pm q_{\alpha/2}\times\hat{\sigma}_{\beta_{i}}
 Normal distribution or a Student's t. The Student's t is used when
 a debiased covariance estimator is used.
 
-\subsubsection*{GMM estimators}
+\subsubsection*{Linear Hypothesis Tests}
 
-Gmm Covariance
+\noindent Linear hypothesis tests examine the validity of nulls of
+the form $H_{0}:R\beta-r=0$ and are implemented using a Wald test
+statistic
+\[
+W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}
+\]
+where $q$ is the $rank\left(R\right)$ which is usually the number
+of rows in $R$ . If the debiased flag is used, then $W/q$ is reported
+and critical and p-values are taken from a $F_{q,n-k}$ distribution. 
 
-\subsection*{To Do}
+\subsubsection*{GMM Covariance estimators}
 
-Std err, T-stats
+\noindent GMM covariance depends on the weighting matrix used in estimation
+and the assumed covariance of the scores. In most applications these
+are the same and so the inefficient form, 
+\[
+\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\]
+will collapse to the simpler form 
+\[
+\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\]
+when $W=S$. When an unadjusted (homoskedastic) covariance is used,
+\[
+\hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
+\]
+where $\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}$
+subtracts the mean which may be non-zero if the model is overidentified.
+Like previous covariance estimators, if the debiased flag is used,
+$n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. When a robust (heteroskedastic)
+covariance is used, the estimator of $S$ is modified to 
 
-All df's
+\noindent 
+\[
+\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.
+\]
+If the debiased flag is used, $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. 
 
-Linear hypothesis testing
+\noindent Kernel covariance estimators of $S$ take the form 
+\begin{align*}
+\hat{S} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}
+\end{align*}
+and $k\left(\cdot\right)$ is a kernel weighting function with bandwidth
+$h$. If the debiased flag is used, $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. 
+
+\noindent The one-way clustered covariance estimator is defined as
+\[
+\hat{S}=n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)^{\prime}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)
+\]
+
+\noindent where $\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}$
+is the sum of the moment conditional for all members in group $\mathcal{G}_{j}$
+and $g$ is the number of groups. If the debiased flag is used, the
+$n^{-1}$ term is replaced by 
+\[
+\left(n-k\right)^{-1}\frac{n-1}{n}\frac{g}{g-1}.
+\]
+
+
+\subsubsection*{GMM Weight Estimators}
+
+\noindent The GMM optimal weight estimators are identical to the the
+estimators of $S$ with two notable exceptions. First, they are never
+debiased and so always use $n^{-1}$. Second, if the center flag is
+true, the demeaned moment conditions defined as $\tilde{g}_{i}=z_{i}\hat{\epsilon}_{i}-\overline{z\epsilon}$
+are used in-place of $g_{i}$ in the robust, kernel and clustered
+estimators. The unadjusted estimator is always centered, and so this
+option has no effect. 
 
 \subsection*{Post-estimation}
 
 \subsubsection*{2SLS and LIML Post-estimation Results}
 
-sargan
+\noindent sargan
 
-basman
+\noindent basman
 
-wu haussman
+\noindent wu haussman
 
-wooldridge score
+\noindent wooldridge score
 
-wooldridge regression
+\noindent wooldridge regression
 
-wooldridge overid
+\noindent wooldridge overid
 
-anderson rubin
+\noindent anderson rubin
 
-basmann f
+\noindent basmann f
 
 \subsubsection*{GMM Post-estimation Results}
 
-J-stat
+\noindent J-stat
 
-C-stat
+\noindent C-stat
 
 \subsection*{First-stage Estimation Analysis}
 
-First Stage Results -> partial r2, shea r2, f-stat
+\noindent First Stage Results -> partial r2, shea r2, f-stat
 
 \subsection*{Kernel Weights and Bandwidth Selection}
 
-Kernel weights
+\noindent Kernel weights
 
-Optimal BW selection
+\noindent Optimal BW selection
 
 \subsection*{Constant Detection}
 
-Constant detection
+\noindent Constant detection
 \end{document}

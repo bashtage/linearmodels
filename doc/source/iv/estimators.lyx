@@ -70,25 +70,18 @@
 
 \begin_body
 
-\begin_layout Standard
-\begin_inset CommandInset label
-LatexCommand label
-name "iv-mathematical-notation"
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section*
+\noindent
 Mathematical Formulas
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Notation
 \end_layout
 
 \begin_layout Standard
+\noindent
 Interest is in recovering the parameter vector from the model 
 \begin_inset Formula 
 \begin{align*}
@@ -173,6 +166,7 @@ x_{2i} & =\underset{\textrm{exogenous}}{\underbrace{\gamma_{1}^{\prime}z_{1i}}}+
 \end_layout
 
 \begin_layout Standard
+\noindent
 The model can be expressed compactly 
 \begin_inset Formula 
 \begin{align*}
@@ -298,14 +292,17 @@ The vector of instruments
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Parameter Estimation
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 Two-stage Least Squares (2SLS)
 \end_layout
 
 \begin_layout Standard
+\noindent
 The 2SLS estimator is 
 \begin_inset Formula 
 \begin{align*}
@@ -318,10 +315,12 @@ The 2SLS estimator is
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 Limited Information Maximum Likelihood and k-class Estimators
 \end_layout
 
 \begin_layout Standard
+\noindent
 The LIML or other k-class estimator is 
 \begin_inset Formula 
 \begin{align*}
@@ -380,10 +379,12 @@ where
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 Generalized Method of Moments (GMM)
 \end_layout
 
 \begin_layout Standard
+\noindent
 The GMM estimator is defined as 
 \begin_inset Formula 
 \begin{align*}
@@ -406,10 +407,12 @@ where
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 Continuously Updating Generalized Method of Moments (GMM-CUE)
 \end_layout
 
 \begin_layout Standard
+\noindent
 The continuously updating GMM estimator solves the minimization problem
 \begin_inset Formula 
 \[
@@ -440,10 +443,12 @@ where
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Basic Statistics
 \end_layout
 
 \begin_layout Standard
+\noindent
 Let 
 \begin_inset Formula $\hat{\epsilon}=y-X\hat{\beta}$
 \end_inset
@@ -514,9 +519,20 @@ The residual variance is
 \end_inset
 
 .
+ The model degree of freedom is 
+\begin_inset Formula $k$
+\end_inset
+
+ and the residual degree of freedom is 
+\begin_inset Formula $n-k$
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
+\noindent
 The model F-statistic is defined 
 \begin_inset Formula 
 \begin{align*}
@@ -576,22 +592,26 @@ ing the model with a constant and excluding one category of dummy.
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Parameter Covariance Estimation
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 Two-stage LS, LIML and k-class estimators
 \end_layout
 
 \begin_layout Standard
+\noindent
 Four covariance estimators are available.
  The first is the standard homoskedastic covariance, defined as 
 \end_layout
 
 \begin_layout Standard
+\noindent
 \begin_inset Formula 
 \begin{align*}
-n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.
+\hat{\Sigma}=n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.
 \end{align*}
 
 \end_inset
@@ -600,10 +620,11 @@ n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & 
 \end_layout
 
 \begin_layout Standard
+\noindent
 Note that this estimator can be expressed as 
 \begin_inset Formula 
 \begin{align*}
-n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
+\hat{\Sigma}=n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.
 \end{align*}
 
 \end_inset
@@ -657,6 +678,7 @@ where
 \end_layout
 
 \begin_layout Standard
+\noindent
 The kernel covariance estimator is robust to both heteroskedasticity and
  autocorrelation and is defined as 
 \begin_inset Formula 
@@ -685,6 +707,7 @@ where
 \end_layout
 
 \begin_layout Standard
+\noindent
 The one-way clustered covariance estimator is defined as 
 \begin_inset Formula 
 \begin{align*}
@@ -715,6 +738,7 @@ where
 \end_layout
 
 \begin_layout Standard
+\noindent
 If the debiased flag is used to perform a small-sample adjustment, all estimator
 s except the clustered covariance are rescaled by 
 \begin_inset Formula $\left(n-k\right)/n$
@@ -739,10 +763,60 @@ This somewhat non-obvious choice is drive by Stata compatibility.
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
+Standard Errors
+\end_layout
+
+\begin_layout Standard
+\noindent
+Standard errors are defined as 
+\begin_inset Formula 
+\[
+s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $e_{j}$
+\end_inset
+
+ is a vector of 0s except in location 
+\begin_inset Formula $j$
+\end_inset
+
+ which is 1.
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+T-statistics
+\end_layout
+
+\begin_layout Standard
+\noindent
+T-statistics test the null 
+\begin_inset Formula $H_{0}:\beta_{j}=0$
+\end_inset
+
+ against a 2-sided alternative and are defined as 
+\begin_inset Formula 
+\[
+z=\frac{\hat{\beta}_{j}}{s.e.\left(\hat{\beta}_{j}\right)}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
 P-values
 \end_layout
 
 \begin_layout Standard
+\noindent
 P-values are computes using 2-sided tests, 
 \begin_inset Formula 
 \[
@@ -765,6 +839,7 @@ If the covariance estimator was debiased, a Student's t distribution with
 \end_layout
 
 \begin_layout Standard
+\noindent
 \begin_inset Formula 
 \begin{align*}
 Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
@@ -780,10 +855,12 @@ where
 \end_layout
 
 \begin_layout Subsubsection*
-Confidence Intervals 
+\noindent
+Confidence Intervals
 \end_layout
 
 \begin_layout Standard
+\noindent
 Confidence intervals are constructed as 
 \begin_inset Formula 
 \[
@@ -810,106 +887,338 @@ where
 \end_layout
 
 \begin_layout Subsubsection*
-GMM estimators
+\noindent
+Linear Hypothesis Tests
 \end_layout
 
 \begin_layout Standard
-Gmm Covariance
+\noindent
+Linear hypothesis tests examine the validity of nulls of the form 
+\begin_inset Formula $H_{0}:R\beta-r=0$
+\end_inset
+
+ and are implemented using a Wald test statistic
+\begin_inset Formula 
+\[
+W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $q$
+\end_inset
+
+ is the 
+\begin_inset Formula $rank\left(R\right)$
+\end_inset
+
+ which is usually the number of rows in 
+\begin_inset Formula $R$
+\end_inset
+
+ .
+ If the debiased flag is used, then 
+\begin_inset Formula $W/q$
+\end_inset
+
+ is reported and critical and p-values are taken from a 
+\begin_inset Formula $F_{q,n-k}$
+\end_inset
+
+ distribution.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+GMM Covariance estimators
+\end_layout
+
+\begin_layout Standard
+\noindent
+GMM covariance depends on the weighting matrix used in estimation and the
+ assumed covariance of the scores.
+ In most applications these are the same and so the inefficient form, 
+\begin_inset Formula 
+\[
+\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\]
+
+\end_inset
+
+will collapse to the simpler form 
+\begin_inset Formula 
+\[
+\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\]
+
+\end_inset
+
+when 
+\begin_inset Formula $W=S$
+\end_inset
+
+.
+ When an unadjusted (homoskedastic) covariance is used, 
+\begin_inset Formula 
+\[
+\hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}$
+\end_inset
+
+ subtracts the mean which may be non-zero if the model is overidentified.
+ Like previous covariance estimators, if the debiased flag is used, 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+ is replaced by 
+\begin_inset Formula $\left(n-k\right)^{-1}$
+\end_inset
+
+.
+ When a robust (heteroskedastic) covariance is used, the estimator of 
+\begin_inset Formula $S$
+\end_inset
+
+ is modified to 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+\hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.
+\]
+
+\end_inset
+
+If the debiased flag is used, 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+ is replaced by 
+\begin_inset Formula $\left(n-k\right)^{-1}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+Kernel covariance estimators of 
+\begin_inset Formula $S$
+\end_inset
+
+ take the form 
+\begin_inset Formula 
+\begin{align*}
+\hat{S} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}
+\end{align*}
+
+\end_inset
+
+and 
+\begin_inset Formula $k\left(\cdot\right)$
+\end_inset
+
+ is a kernel weighting function with bandwidth 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ If the debiased flag is used, 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+ is replaced by 
+\begin_inset Formula $\left(n-k\right)^{-1}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+The one-way clustered covariance estimator is defined as 
+\begin_inset Formula 
+\[
+\hat{S}=n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)^{\prime}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}$
+\end_inset
+
+ is the sum of the moment conditional for all members in group 
+\begin_inset Formula $\mathcal{G}_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $g$
+\end_inset
+
+ is the number of groups.
+ If the debiased flag is used, the 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+ term is replaced by 
+\begin_inset Formula 
+\[
+\left(n-k\right)^{-1}\frac{n-1}{n}\frac{g}{g-1}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+GMM Weight Estimators
+\end_layout
+
+\begin_layout Standard
+\noindent
+The GMM optimal weight estimators are identical to the the estimators of
+ 
+\begin_inset Formula $S$
+\end_inset
+
+ with two notable exceptions.
+ First, they are never debiased and so always use 
+\begin_inset Formula $n^{-1}$
+\end_inset
+
+.
+ Second, if the center flag is true, the demeaned moment conditions defined
+ as 
+\begin_inset Formula $\tilde{g}_{i}=z_{i}\hat{\epsilon}_{i}-\overline{z\epsilon}$
+\end_inset
+
+ are used in-place of 
+\begin_inset Formula $g_{i}$
+\end_inset
+
+ in the robust, kernel and clustered estimators.
+ The unadjusted estimator is always centered, and so this option has no
+ effect.
+ 
 \end_layout
 
 \begin_layout Subsection*
-To Do
-\end_layout
-
-\begin_layout Standard
-Std err, T-stats
-\end_layout
-
-\begin_layout Standard
-All df's
-\end_layout
-
-\begin_layout Standard
-Linear hypothesis testing
-\end_layout
-
-\begin_layout Subsection*
+\noindent
 Post-estimation
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 2SLS and LIML Post-estimation Results
 \end_layout
 
 \begin_layout Standard
+\noindent
 sargan
 \end_layout
 
 \begin_layout Standard
+\noindent
 basman
 \end_layout
 
 \begin_layout Standard
+\noindent
 wu haussman
 \end_layout
 
 \begin_layout Standard
+\noindent
 wooldridge score
 \end_layout
 
 \begin_layout Standard
+\noindent
 wooldridge regression
 \end_layout
 
 \begin_layout Standard
+\noindent
 wooldridge overid
 \end_layout
 
 \begin_layout Standard
+\noindent
 anderson rubin
 \end_layout
 
 \begin_layout Standard
+\noindent
 basmann f
 \end_layout
 
 \begin_layout Subsubsection*
+\noindent
 GMM Post-estimation Results
 \end_layout
 
 \begin_layout Standard
+\noindent
 J-stat
 \end_layout
 
 \begin_layout Standard
+\noindent
 C-stat
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 First-stage Estimation Analysis
 \end_layout
 
 \begin_layout Standard
+\noindent
 First Stage Results -> partial r2, shea r2, f-stat
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Kernel Weights and Bandwidth Selection
 \end_layout
 
 \begin_layout Standard
+\noindent
 Kernel weights
 \end_layout
 
 \begin_layout Standard
+\noindent
 Optimal BW selection
 \end_layout
 
 \begin_layout Subsection*
+\noindent
 Constant Detection
 \end_layout
 
 \begin_layout Standard
+\noindent
 Constant detection
 \end_layout
 

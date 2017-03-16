@@ -1,8 +1,4 @@
-.. role:: math(raw)
-   :format: html latex
-..
-
-[iv-mathematical-notation]
+.. _iv-mathematical-notation:
 
 Mathematical Formulas
 =====================
@@ -140,6 +136,8 @@ The residual variance is
 debiased flag is used, in which case a small sample adjusted version is
 estimated
 :math:`s^{2}=\left(n-k\right)^{-1}\hat{\epsilon}^{\prime}\hat{\epsilon}`.
+The model degree of freedom is :math:`k` and the residual degree of
+freedom is :math:`n-k`.
 
 The model F-statistic is defined
 
@@ -168,14 +166,14 @@ homoskedastic covariance, defined as
 .. math::
 
    \begin{aligned}
-   n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.\end{aligned}
+   \hat{\Sigma}=n^{-1}s^{2}\left(\frac{X^{\prime}\left(I-\kappa M_{z}\right)X}{n}\right)^{-1} & =n^{-1}s^{2}\hat{A}.\end{aligned}
 
 Note that this estimator can be expressed as
 
 .. math::
 
    \begin{aligned}
-   n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}
+   \hat{\Sigma}=n^{-1}\hat{A}^{-1}\left\{ s^{2}\hat{A}\right\} \hat{A}^{-1} & =n^{-1}\hat{A}^{-1}\hat{B}\hat{A}^{-1}.\end{aligned}
 
 All estimators take this form and only differ in how the asymptotic
 covariance of the scores, :math:`B`, is estimated. For the homoskedastic
@@ -218,6 +216,24 @@ estimators except the clustered covariance are rescaled by
 :math:`\left(n-k\right)/n`. The clustered covariance is rescaled by
 :math:`\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)`. [2]_
 
+Standard Errors
+~~~~~~~~~~~~~~~
+
+Standard errors are defined as
+
+.. math:: s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
+
+ where :math:`e_{j}` is a vector of 0s except in location :math:`j`
+which is 1.
+
+T-statistics
+~~~~~~~~~~~~
+
+T-statistics test the null :math:`H_{0}:\beta_{j}=0` against a 2-sided
+alternative and are defined as
+
+.. math:: z=\frac{\hat{\beta}_{j}}{s.e.\left(\hat{\beta}_{j}\right)}.
+
 P-values
 ~~~~~~~~
 
@@ -233,11 +249,11 @@ with :math:`n-k` degrees of freedom is used,
    \begin{aligned}
    Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}
 
-where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
+ where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
 distribution.
 
 Confidence Intervals 
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Confidence intervals are constructed as
 
@@ -247,19 +263,84 @@ where :math:`q_{\alpha/2}` is the :math:`\alpha/2` quantile of a
 standard Normal distribution or a Student’s t. The Student’s t is used
 when a debiased covariance estimator is used.
 
-GMM estimators
-~~~~~~~~~~~~~~
+Linear Hypothesis Tests
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Gmm Covariance
+Linear hypothesis tests examine the validity of nulls of the form
+:math:`H_{0}:R\beta-r=0` and are implemented using a Wald test statistic
 
-To Do
------
+.. math:: W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}
 
-Std err, T-stats
+ where :math:`q` is the :math:`rank\left(R\right)` which is usually the
+number of rows in :math:`R` . If the debiased flag is used, then
+:math:`W/q` is reported and critical and p-values are taken from a
+:math:`F_{q,n-k}` distribution.
 
-All df’s
+GMM Covariance estimators
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Linear hypothesis testing
+GMM covariance depends on the weighting matrix used in estimation and
+the assumed covariance of the scores. In most applications these are the
+same and so the inefficient form,
+
+.. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+
+ will collapse to the simpler form
+
+.. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+
+ when :math:`W=S`. When an unadjusted (homoskedastic) covariance is
+used,
+
+.. math:: \hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
+
+ where
+:math:`\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}`
+subtracts the mean which may be non-zero if the model is overidentified.
+Like previous covariance estimators, if the debiased flag is used,
+:math:`n^{-1}` is replaced by :math:`\left(n-k\right)^{-1}`. When a
+robust (heteroskedastic) covariance is used, the estimator of :math:`S`
+is modified to
+
+.. math:: \hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.
+
+ If the debiased flag is used, :math:`n^{-1}` is replaced by
+:math:`\left(n-k\right)^{-1}`.
+
+Kernel covariance estimators of :math:`S` take the form
+
+.. math::
+
+   \begin{aligned}
+   \hat{S} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+   \hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}\end{aligned}
+
+ and :math:`k\left(\cdot\right)` is a kernel weighting function with
+bandwidth :math:`h`. If the debiased flag is used, :math:`n^{-1}` is
+replaced by :math:`\left(n-k\right)^{-1}`.
+
+The one-way clustered covariance estimator is defined as
+
+.. math:: \hat{S}=n^{-1}\sum_{j=1}^{g}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)^{\prime}\left(\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}\right)
+
+where :math:`\sum_{i\in\mathcal{G}_{j}}\hat{\epsilon}_{i}z_{i}` is the
+sum of the moment conditional for all members in group
+:math:`\mathcal{G}_{j}` and :math:`g` is the number of groups. If the
+debiased flag is used, the :math:`n^{-1}` term is replaced by
+
+.. math:: \left(n-k\right)^{-1}\frac{n-1}{n}\frac{g}{g-1}.
+
+GMM Weight Estimators
+~~~~~~~~~~~~~~~~~~~~~
+
+The GMM optimal weight estimators are identical to the the estimators of
+:math:`S` with two notable exceptions. First, they are never debiased
+and so always use :math:`n^{-1}`. Second, if the center flag is true,
+the demeaned moment conditions defined as
+:math:`\tilde{g}_{i}=z_{i}\hat{\epsilon}_{i}-\overline{z\epsilon}` are
+used in-place of :math:`g_{i}` in the robust, kernel and clustered
+estimators. The unadjusted estimator is always centered, and so this
+option has no effect.
 
 Post-estimation
 ---------------
