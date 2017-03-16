@@ -117,3 +117,104 @@ class PanelData(object):
         if not isinstance(index, list):
             index = [index]
         return [i for i, c in enumerate(self.columns) if c in index]
+
+# Panel -> entity, time, vars
+# df 2x -> (entity,time), vars
+# a2s -> df.values
+# a3d -> panel.values
+
+class PanelDataHandler(object):
+    def __init__(self, x, var_name='x'):
+        if isinstance(x, np.ndarray):
+            if x.ndim > 3:
+                raise ValueError('1, 2 or 3-d array required for numpy input')
+            if x.ndim == 1:
+                x = x[:, None]
+            if x.ndim == 2:
+                x = x[:, :, None]
+
+            n, t, k = x.shape
+            x = x.astype(np.float64)
+            minor = [var_name + '.{0}'.format(i) for i in range(k)]
+            panel = pd.Panel(x, items=['entity.{0}'.format(i) for i in range(n)],
+                                   major_axis=list(range(t)),
+                                   minor_axis=minor)
+            panel = panel.swapaxes(0,1).swapaxes(0,2)
+            self._dataframe = panel.to_frame(filter_observations=False)
+        elif isinstance(x, (pd.DataFrame, pd.Panel)):
+            if isinstance(x, pd.DataFrame):
+                if isinstance(x.index, pd.MultiIndex):
+                    if len(x.index.levels) != 2:
+                        raise ValueError('DataFrame input must have a '
+                                         'MultiIndex with 2 levels')
+                    x = x.to_panel()
+                else:
+                    x = pd.Panel({var_name + '.0': x})
+                    x = x.swapaxes(0, 1).swapaxes(1, 2)
+            panel = x.swapaxes(0,1).swapaxes(0,2)
+            self._dataframe = panel.to_frame(filter_observations=False)
+        else:
+            import xarray as xr
+            if isinstance(x, xr.DataArray):
+                raise NotImplementedError('No support for xarray yet')
+            else:
+                raise TypeError('Only ndarrays, DataFrames, Panels or '
+                                'DataArrays supported.')
+        self._n, self._t, self._k = self.panel.shape
+
+    @property
+    def panel(self):
+        return self._dataframe.to_panel().swapaxes(0,2).swapaxes(0,1)
+
+    @property
+    def dataframe(self):
+        return self._dataframe
+
+    @property
+    def a2d(self):
+        return self._dataframe.values
+
+    @property
+    def a3d(self):
+        return self.panel.values
+
+    def drop(self, locs):
+        locs = locs.ravel()
+        self._dataframe = self._dataframe.loc[~locs]
+        self._n, self._t, self._k = self.shape
+
+    @property
+    def shape(self):
+        return self.panel.shape
+
+    @property
+    def ndim(self):
+        return 3
+
+    @property
+    def isnull(self):
+        return np.any(self._dataframe.isnull(), axis=1)
+
+    @property
+    def nobs(self):
+        return self._t
+
+    @property
+    def nvar(self):
+        return self._k
+
+    @property
+    def nitems(self):
+        return self._n
+
+    @property
+    def items(self):
+        return list(self.panel.items)
+
+    @property
+    def index(self):
+        return list(self.panel.major_axis)
+
+    @property
+    def vars(self):
+        return list(self.panel.minor_axis)
