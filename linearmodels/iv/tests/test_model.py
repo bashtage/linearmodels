@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
+from pandas.util.testing import assert_series_equal
 from statsmodels.api import add_constant
 
 from linearmodels.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
@@ -92,14 +93,16 @@ class TestErrors(object):
             IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=0.99, fuller=1)
         assert len(w) == 1
 
-    def test_invalid_cat(self, data):
+    def test_string_cat(self, data):
         instr = data.instr.copy()
         n = data.instr.shape[0]
         cat = pd.Series(['a'] * (n // 2) + ['b'] * (n // 2))
         instr = pd.DataFrame(instr)
         instr['cat'] = cat
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.endog, instr)
+        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit('unadjusted')
+        instr['cat'] = cat.astype('category')
+        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit('unadjusted')
+        assert_series_equal(res.params, res_cat.params)
 
     def test_no_regressors(self, data):
         with pytest.raises(ValueError):

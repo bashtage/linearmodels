@@ -1,8 +1,11 @@
 """
 A data abstraction that allow multiple input data formats
 """
+import copy
+
 import numpy as np
 import pandas as pd
+from pandas.api import types
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
@@ -22,7 +25,7 @@ def expand_categoricals(x, drop_first):
     return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
-class DataHandler(object):
+class IVData(object):
     """Simple class to abstract different input data formats
 
     Parameters
@@ -39,8 +42,9 @@ class DataHandler(object):
     """
     def __init__(self, x, var_name='x', nobs=None, convert_dummies=True, drop_first=True):
 
-        if isinstance(x, DataHandler):
-            x = x.pandas
+        if isinstance(x, IVData):
+            self.__dict__.update(copy.deepcopy(x.__dict__))
+            return
         if x is None and nobs is not None:
             x = np.empty((nobs, 0))
         elif x is None:
@@ -63,16 +67,24 @@ class DataHandler(object):
             self._labels = {0: index, 1: cols}
 
         elif isinstance(x, (pd.Series, pd.DataFrame)):
-            dts = [x.dtype] if xndim == 1 else x.dtypes
-            for dt in dts:
-                if not (pd.api.types.is_numeric_dtype(dt) or
-                        pd.api.types.is_categorical_dtype(dt)):
-                    raise ValueError('Only numeric or categorical data permitted')
-            if convert_dummies:
-                x = expand_categoricals(x, drop_first)
-            if x.ndim == 1:
+            if isinstance(x, pd.Series):
                 name = var_name if not x.name else x.name
                 x = pd.DataFrame({name: x})
+            copied = False
+            for col in x:
+                c = x[col]
+                if types.is_string_dtype(c.dtype):
+                    c = c.astype('category')
+                    if not copied:
+                        x = x.copy()
+                    x[col] = c
+                dt = c.dtype
+                if not (types.is_numeric_dtype(dt) or
+                        types.is_categorical_dtype(dt)):
+                    raise ValueError('Only numeric or categorical data permitted')
+
+            if convert_dummies:
+                x = expand_categoricals(x, drop_first)
 
             self._pandas = x
             self._ndarray = self._pandas.values.astype(np.float64)
