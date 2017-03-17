@@ -29,6 +29,23 @@ mod = IV2SLS.from_formula('np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ mothe
 
 The expressions in the `[ ]` indicate endogenous regressors (before `~`) and the instruments.  
 
+
+## Installing
+
+The latest release can be installed using pip
+
+```bash
+pip install linearmodels
+```
+
+The master branch can be installed by cloning the repo and running setup
+
+```bash
+git clone https://github.com/bashtage/linearmodels
+cd linearmodels
+python setup.py install
+```
+
 ## Documentation
 
 [Documentation](https://bashtage.github.io/linearmodels/doc) is automatically built using 

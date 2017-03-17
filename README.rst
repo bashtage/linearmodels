@@ -32,6 +32,23 @@ specifying models. For example,
 The expressions in the ``[ ]`` indicate endogenous regressors (before
 ``~``) and the instruments.
 
+Installing
+----------
+
+The latest release can be installed using pip
+
+.. code:: bash
+
+    pip install linearmodels
+
+The master branch can be installed by cloning the repo and running setup
+
+.. code:: bash
+
+    git clone https://github.com/bashtage/linearmodels
+    cd linearmodels
+    python setup.py install
+
 Documentation
 -------------
 
@@ -64,7 +81,7 @@ is possible that older versions work.
 
 -  **Python 3.5+**: extensive use of ``@`` operator
 -  NumPy (1.11+)
--  SciPy (0.18+)
+-  SciPy (0.17+)
 -  Pandas (0.19+)
 -  xarray (0.9+)
 -  Statsmodels (0.8+)
