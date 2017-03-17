@@ -1,4 +1,6 @@
-.. _iv-mathematical-notation:
+.. role:: math(raw)
+   :format: html latex
+..
 
 Mathematical Formulas
 =====================
@@ -252,7 +254,7 @@ with :math:`n-k` degrees of freedom is used,
  where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
 distribution.
 
-Confidence Intervals 
+Confidence Intervals
 ~~~~~~~~~~~~~~~~~~~~
 
 Confidence intervals are constructed as
