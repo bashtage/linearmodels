@@ -12,7 +12,7 @@ from linearmodels.iv._utility import parse_formula
 from linearmodels.iv.covariance import (HeteroskedasticCovariance,
                                         HomoskedasticCovariance, KernelCovariance,
                                         OneWayClusteredCovariance)
-from linearmodels.iv.data import DataHandler
+from linearmodels.iv.data import IVData
 from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  HomoskedasticWeightMatrix, IVGMMCovariance,
                                  KernelWeightMatrix, OneWayClusteredWeightMatrix)
@@ -99,11 +99,11 @@ class IVLIML(object):
 
     def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
 
-        self.dependent = DataHandler(dependent, var_name='dependent')
+        self.dependent = IVData(dependent, var_name='dependent')
         nobs = self.dependent.shape[0]
-        self.exog = DataHandler(exog, var_name='exog', nobs=nobs)
-        self.endog = DataHandler(endog, var_name='endog', nobs=nobs)
-        self.instruments = DataHandler(instruments, var_name='instruments', nobs=nobs)
+        self.exog = IVData(exog, var_name='exog', nobs=nobs)
+        self.endog = IVData(endog, var_name='endog', nobs=nobs)
+        self.instruments = IVData(instruments, var_name='instruments', nobs=nobs)
         self._drop_locs = self._drop_missing()
         # dependent variable
         self._y = self.dependent.ndarray

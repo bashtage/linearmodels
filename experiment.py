@@ -50,7 +50,7 @@ formula = 'y ~ x1 + x2 + log(x3) + [ x4 + x5 ~ z1 + z4 + exp(z6)]'
 
 raise ValueError
 
-from linearmodels.iv.data import DataHandler
+from linearmodels.iv.data import IVData
 from linearmodels.iv.results import compare
 import xarray as xr
 import numpy as np
@@ -81,7 +81,7 @@ has_constant(x)
 
 o = xr.DataArray(np.random.randn(10))
 t = xr.DataArray(np.random.randn(10,2))
-DataHandler(o)
+IVData(o)
 
 exog = sm.add_constant(data[['x3','x4','x5']])
 res = _OLS(data.y_robust,exog).fit()
