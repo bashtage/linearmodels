@@ -1,9 +1,13 @@
-[![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels)
+# One
+
+[![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels) 
+[![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)
+
 
 # Linear Models
 
-Linear (regression) models for Python.  Extends [statsmdoels](http://www.statsmodels.org) to include
- instrumental variable estimators:
+Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmodels.org) to 
+include instrumental variable estimators:
  
   * Two-stage Least Squares
   * Limited Information Maximum Likelihood
@@ -12,7 +16,7 @@ Linear (regression) models for Python.  Extends [statsmdoels](http://www.statsmo
   
 Designed to work equally well with NumPy, Pandas or xarray data.
 
-Like [statsmdoels](http://www.statsmodels.org) to include, supports 
+Like [statsmodels](http://www.statsmodels.org) to include, supports 
 [patsy](https://patsy.readthedocs.io/en/latest/) formulas for specifying models. For example, 
 
 ```python
@@ -45,12 +49,15 @@ only the single variable IV estimators are polished.
 
 ### Running
 
+With the exception of Python 3.5+, which is a hard requirement, the others are the version 
+that are being used in the test environment.  It is possible that older versions work.
+
 * **Python 3.5+**: extensive use of `@` operator
-* NumPy
-* SciPy
-* Pandas
-* xarray
-* Statsmodels
+* NumPy (1.11+)
+* SciPy (0.17+)
+* Pandas (0.19+)
+* xarray (0.9+)
+* Statsmodels (0.8+)
 
 ### Testing
 

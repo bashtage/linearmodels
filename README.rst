@@ -1,10 +1,13 @@
-|Build Status|
+One
+===
+
+|Build Status| |codecov|
 
 Linear Models
 =============
 
 Linear (regression) models for Python. Extends
-`statsmdoels <http://www.statsmodels.org>`__ to include instrumental
+`statsmodels <http://www.statsmodels.org>`__ to include instrumental
 variable estimators:
 
 -  Two-stage Least Squares
@@ -14,7 +17,7 @@ variable estimators:
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 
-Like `statsmdoels <http://www.statsmodels.org>`__ to include, supports
+Like `statsmodels <http://www.statsmodels.org>`__ to include, supports
 `patsy <https://patsy.readthedocs.io/en/latest/>`__ formulas for
 specifying models. For example,
 
@@ -55,12 +58,16 @@ Requirements
 Running
 ~~~~~~~
 
+With the exception of Python 3.5+, which is a hard requirement, the
+others are the version that are being used in the test environment. It
+is possible that older versions work.
+
 -  **Python 3.5+**: extensive use of ``@`` operator
--  NumPy
--  SciPy
--  Pandas
--  xarray
--  Statsmodels
+-  NumPy (1.11+)
+-  SciPy (0.18+)
+-  Pandas (0.19+)
+-  xarray (0.9+)
+-  Statsmodels (0.8+)
 
 Testing
 ~~~~~~~
@@ -80,3 +87,5 @@ Documentation
 
 .. |Build Status| image:: https://travis-ci.org/bashtage/linearmodels.svg?branch=master
    :target: https://travis-ci.org/bashtage/linearmodels
+.. |codecov| image:: https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/bashtage/linearmodels

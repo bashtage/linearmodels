@@ -83,7 +83,7 @@ def test_pandas_panel(seed):
     assert_equal(dh.a2d, np.reshape(x.values, (n * t, k)))
     assert_panel_equal(x, dh.panel)
     expected_frame = x.swapaxes(0, 1).swapaxes(0, 2).to_frame()
-    assert_frame_equal(dh.dlataframe, expected_frame)
+    assert_frame_equal(dh.dataframe, expected_frame)
 
 
 def test_pandas_multiindex_dataframe(seed):

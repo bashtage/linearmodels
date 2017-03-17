@@ -17,18 +17,29 @@ matrix:
   - python: 2.7
     env:
     - PYTHON=3.5
+    - NUMPY=1.11
+    - SCIPY=0.17
+  - python: 3.5
+    env:
+    - PYTHON=3.5
+    - NUMPY=1.12
+    - SCIPY=0.19
   - python: 3.5
     env:
     - PYTHON=3.6
+    - NUMPY=1.12
+    - SCIPY=0.19
 
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
   - chmod +x miniconda3.sh
   - ./miniconda3.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
-  - conda update --yes --quiet conda
+  - conda config --set always_yes true
+  - conda update conda
   # Install packages
-  - conda create --yes --quiet -n linearmodels-test python=${PYTHON} numpy scipy pandas xarray statsmodels matplotlib seaborn
+  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas xarray statsmodels matplotlib seaborn
+  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas xarray statsmodels matplotlib seaborn
   - source activate linearmodels-test
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
   - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr nbsphinx -q
