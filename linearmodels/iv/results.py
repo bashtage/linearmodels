@@ -1126,7 +1126,6 @@ class FirstStageResults(_SummaryStr):
         stubs = [stubs_lookup[s] for s in list(diagnostics.columns)]
         header = list(diagnostics.index)
 
-
         params = []
         for var in header:
             res = self.individual[var]
@@ -1134,7 +1133,7 @@ class FirstStageResults(_SummaryStr):
             params.append(v.ravel())
         params = array(params)
         if params.ndim == 1:
-            params = params[:,None]
+            params = params[:, None]
         params_fmt = [[_str(val) for val in row] for row in params.T]
         for i in range(1, len(params_fmt), 2):
             for j in range(len(params_fmt[i])):
@@ -1187,6 +1186,7 @@ class IVModelComparison(_SummaryStr):
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
     """
+
     def __init__(self, results):
 
         if not isinstance(results, (dict, OrderedDict)):
@@ -1310,7 +1310,7 @@ class IVModelComparison(_SummaryStr):
         for key in self._results:
             res = self._results[key]
             all_instr.append(res.model.instruments.cols)
-        ninstr = max(map(lambda l : len(l), all_instr))
+        ninstr = max(map(lambda l: len(l), all_instr))
         instruments = []
         instrument_stub = ['Instruments']
         for i in range(ninstr):

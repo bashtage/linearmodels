@@ -1,5 +1,5 @@
 DESCR = """
-M. Blackburn and D. Neumark (1992), "Unobserved Ability, Efficiency Wages, and 
+M. Blackburn and D. Neumark (1992), "Unobserved Ability, Efficiency Wages, and
 Interindustry Wage Differentials," Quarterly Journal of Economics 107, 1421-1436.
 
 wage                     monthly earnings

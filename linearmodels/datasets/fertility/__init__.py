@@ -1,5 +1,5 @@
 DESCR = """
-W. Sander, "The Effect of Women’s Schooling on Fertility," Economics Letters 
+W. Sander, "The Effect of Women’s Schooling on Fertility," Economics Letters
 40, 229-233.
 
 ear                     72 to 84, even
@@ -17,18 +17,18 @@ othrural                 = 1 if other rural at 16
 town                     = 1 if lived in town at 16
 smcity                   = 1 if in small city at 16
 y74                      = 1 if year = 74
-y76                      
-y78                      
-y80                      
-y82                      
-y84                      
+y76
+y78
+y80
+y82
+y84
 agesq                    age^2
 y74educ                  y74*educ
-y76educ                  
-y78educ                  
-y80educ                  
-y82educ                  
-y84educ                  
+y76educ
+y78educ
+y80educ
+y82educ
+y84educ
 """
 
 

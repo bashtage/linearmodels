@@ -118,6 +118,7 @@ class PanelData(object):
             index = [index]
         return [i for i, c in enumerate(self.columns) if c in index]
 
+
 class PanelDataHandler(object):
     # Panel -> entity, time, vars
     # df 2x -> (entity,time), vars
@@ -136,13 +137,13 @@ class PanelDataHandler(object):
             x = x.astype(np.float64)
             minor = [var_name + '.{0}'.format(i) for i in range(k)]
             panel = pd.Panel(x, items=['entity.{0}'.format(i) for i in range(n)],
-                                   major_axis=list(range(t)),
-                                   minor_axis=minor)
-            panel = panel.swapaxes(0,1).swapaxes(0,2)
+                             major_axis=list(range(t)),
+                             minor_axis=minor)
+            panel = panel.swapaxes(0, 1).swapaxes(0, 2)
             self._dataframe = panel.to_frame(filter_observations=False)
         elif isinstance(x, (pd.DataFrame, pd.Panel, xr.DataArray)):
             if isinstance(x, xr.DataArray):
-                if x.ndim not in (2,3):
+                if x.ndim not in (2, 3):
                     raise ValueError('Only 2-d or 3-d DataArrays are supported')
                 x = x.to_pandas()
             if isinstance(x, pd.DataFrame):
@@ -154,7 +155,7 @@ class PanelDataHandler(object):
                 else:
                     x = pd.Panel({var_name + '.0': x})
                     x = x.swapaxes(0, 1).swapaxes(1, 2)
-            panel = x.swapaxes(0,1).swapaxes(0,2)
+            panel = x.swapaxes(0, 1).swapaxes(0, 2)
             self._dataframe = panel.to_frame(filter_observations=False)
         else:
             raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
@@ -163,7 +164,7 @@ class PanelDataHandler(object):
 
     @property
     def panel(self):
-        return self._dataframe.to_panel().swapaxes(0,2).swapaxes(0,1)
+        return self._dataframe.to_panel().swapaxes(0, 2).swapaxes(0, 1)
 
     @property
     def dataframe(self):

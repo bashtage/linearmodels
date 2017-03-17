@@ -1,7 +1,7 @@
 DESCR = """
-D. Card (1995), "Using Geographic Variation in College Proximity to Estimate 
-the Return to Schooling," in Aspects of Labour Market Behavior:  Essays in 
-Honour of John Vanderkamp.  Ed. L.N. Christophides, E.K. Grant, and R. 
+D. Card (1995), "Using Geographic Variation in College Proximity to Estimate
+the Return to Schooling," in Aspects of Labour Market Behavior:  Essays in
+Honour of John Vanderkamp.  Ed. L.N. Christophides, E.K. Grant, and R.
 Swidinsky, 201-222.  Toronto: University of Toronto Press.
 
 id                       person identifier

@@ -1,6 +1,6 @@
 DESCR = """
-H. Holzer, R. Block, M. Cheatham, and J. Knott (1993), "Are Training Subsidies 
-Effective? The Michigan Experience," Industrial and Labor Relations Review 46, 
+H. Holzer, R. Block, M. Cheatham, and J. Knott (1993), "Are Training Subsidies
+Effective? The Michigan Experience," Industrial and Labor Relations Review 46,
 625-636.
 
 year                     1987, 1988, or 1989

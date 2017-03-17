@@ -9,7 +9,7 @@ from scipy.stats import chi2, f
 
 class AttrDict(dict):
     """
-    Dictionary-like object that exposes keys as attributes 
+    Dictionary-like object that exposes keys as attributes
     """
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +71,7 @@ def inv_sqrth(x):
 class WaldTestStatistic(object):
     """
     Test statistic holder for Wald-type tests
-    
+
     Parameters
     ----------
     stat : float
@@ -79,13 +79,13 @@ class WaldTestStatistic(object):
     null : str
         A statement of the test's null hypothesis
     df : int
-        Degree of freedom.  
+        Degree of freedom.
     df_denom : int, optional
-        Numerator degree of freedome.  If provided, uses an 
+        Numerator degree of freedome.  If provided, uses an
         F(df, df_denom) distribution.
     name : str, optional
         Name of test
-    
+
     See Also
     --------
     InvalidTestStatistic
@@ -145,14 +145,14 @@ class InvalidTestWarning(UserWarning):
 class InvalidTestStatistic(WaldTestStatistic):
     """
     Class returned if a requested test is not valid for a model
-    
+
     Parameters
     ----------
     reason : str
         Explanation why test is invalid
     name : str, optional
         Name of test
-    
+
     See Also
     --------
     WaldTestStatistic
@@ -218,7 +218,8 @@ class CachedProperty(object):
         self.func = func
 
     def __get__(self, obj, cls):
-        if obj is None: return self
+        if obj is None:
+            return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value
 

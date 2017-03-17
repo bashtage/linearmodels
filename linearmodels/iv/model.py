@@ -89,7 +89,7 @@ class IVLIML(object):
       \kappa-\alpha/(n-n_{instr})
 
     .. todo::
-    
+
       * VCV: bootstrap
 
     See Also
@@ -440,7 +440,7 @@ class IV2SLS(IVLIML):
     :math:`\kappa=1`,
 
     .. todo::
-    
+
       * VCV: bootstrap
 
     See Also
@@ -536,7 +536,7 @@ class IVGMM(IVLIML):
     contains both the exogenous regressors and the instruments.
 
     .. todo::
-    
+
       * VCV: bootstrap
 
     See Also
@@ -781,7 +781,6 @@ class IVGMMCUE(IVGMM):
                                        **weight_config)
         if 'center' not in weight_config:
             weight_config['center'] = True
-
 
     @staticmethod
     def from_formula(formula, data, weight_type='robust', **weight_config):

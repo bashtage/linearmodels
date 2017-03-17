@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-# from patsy import SyntaxError
 
+# from patsy import SyntaxError
 from linearmodels.iv import IV2SLS, IVGMMCUE, IVGMM, IVLIML
 
 
@@ -56,9 +56,11 @@ def test_formula(data, model, formula):
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
 
+
 def test_formula_kernel(data, model, formula):
     mod = model.from_formula(formula, data)
     mod.fit(cov_type='kernel')
+
 
 def test_formula_ols(data, model):
     formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5'
