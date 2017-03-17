@@ -90,7 +90,8 @@ problem
 \[
 \min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
 \]
-where $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
+
+\noindent where $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
 and $\hat{\epsilon}_{i}=y_{i}-x_{i}\beta$. Unlike standard GMM, the
 weight matrix, $W$ directly depends on the model parameters $\beta$
 and so it is not possible to use a closed form estimator. 
@@ -190,8 +191,9 @@ The clustered covariance is rescaled by $\left(\left(n-k\right)\left(n-1\right)/
 \[
 s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
 \]
-where $e_{j}$ is a vector of 0s except in location $j$ which is
-1.
+
+\noindent where $e_{j}$ is a vector of 0s except in location $j$
+which is 1.
 
 \subsubsection*{T-statistics}
 
@@ -216,7 +218,9 @@ distribution with $n-k$ degrees of freedom is used,
 \begin{align*}
 Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
 \end{align*}
-where $t_{n-k}\left(\cdot\right)$ is the CDF of a Student's T distribution.
+
+\noindent where $t_{n-k}\left(\cdot\right)$ is the CDF of a Student's
+T distribution.
 
 \subsubsection*{Confidence Intervals}
 
@@ -237,9 +241,11 @@ statistic
 \[
 W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}
 \]
-where $q$ is the $rank\left(R\right)$ which is usually the number
-of rows in $R$ . If the debiased flag is used, then $W/q$ is reported
-and critical and p-values are taken from a $F_{q,n-k}$ distribution. 
+
+\noindent where $q$ is the $rank\left(R\right)$ which is usually
+the number of rows in $R$ . If the debiased flag is used, then $W/q$
+is reported and critical and p-values are taken from a $F_{q,n-k}$
+distribution. 
 
 \subsubsection*{GMM Covariance estimators}
 
@@ -249,15 +255,19 @@ are the same and so the inefficient form,
 \[
 \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
 \]
-will collapse to the simpler form 
+
+\noindent will collapse to the simpler form 
 \[
 \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
 \]
-when $W=S$. When an unadjusted (homoskedastic) covariance is used,
+
+\noindent when $W=S$. When an unadjusted (homoskedastic) covariance
+is used, 
 \[
 \hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
 \]
-where $\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}$
+
+\noindent where $\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}$
 subtracts the mean which may be non-zero if the model is overidentified.
 Like previous covariance estimators, if the debiased flag is used,
 $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. When a robust (heteroskedastic)
@@ -267,15 +277,18 @@ covariance is used, the estimator of $S$ is modified to
 \[
 \hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.
 \]
-If the debiased flag is used, $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. 
 
-\noindent Kernel covariance estimators of $S$ take the form 
+\noindent If the debiased flag is used, $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. 
+
+Kernel covariance estimators of $S$ take the form 
 \begin{align*}
 \hat{S} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
 \hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}
 \end{align*}
-and $k\left(\cdot\right)$ is a kernel weighting function with bandwidth
-$h$. If the debiased flag is used, $n^{-1}$ is replaced by $\left(n-k\right)^{-1}$. 
+
+\noindent and $k\left(\cdot\right)$ is a kernel weighting function
+with bandwidth $h$. If the debiased flag is used, $n^{-1}$ is replaced
+by $\left(n-k\right)^{-1}$. 
 
 \noindent The one-way clustered covariance estimator is defined as
 \[

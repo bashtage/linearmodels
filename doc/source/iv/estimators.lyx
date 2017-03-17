@@ -421,6 +421,11 @@ The continuously updating GMM estimator solves the minimization problem
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}$
 \end_inset
@@ -777,6 +782,11 @@ s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $e_{j}$
 \end_inset
@@ -847,6 +857,11 @@ Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $t_{n-k}\left(\cdot\right)$
 \end_inset
@@ -905,6 +920,11 @@ W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $q$
 \end_inset
@@ -947,6 +967,11 @@ GMM covariance depends on the weighting matrix used in estimation and the
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 will collapse to the simpler form 
 \begin_inset Formula 
 \[
@@ -955,6 +980,11 @@ will collapse to the simpler form
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 when 
 \begin_inset Formula $W=S$
 \end_inset
@@ -968,6 +998,11 @@ when
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}$
 \end_inset
@@ -998,6 +1033,11 @@ where
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 If the debiased flag is used, 
 \begin_inset Formula $n^{-1}$
 \end_inset
@@ -1011,7 +1051,6 @@ If the debiased flag is used,
 \end_layout
 
 \begin_layout Standard
-\noindent
 Kernel covariance estimators of 
 \begin_inset Formula $S$
 \end_inset
@@ -1025,6 +1064,11 @@ Kernel covariance estimators of
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 and 
 \begin_inset Formula $k\left(\cdot\right)$
 \end_inset

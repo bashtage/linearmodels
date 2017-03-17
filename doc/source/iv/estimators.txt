@@ -1,6 +1,3 @@
-.. role:: math(raw)
-   :format: html latex
-..
 
 Mathematical Formulas
 =====================
@@ -104,7 +101,7 @@ The continuously updating GMM estimator solves the minimization problem
 
 .. math:: \min_{\beta}n\bar{g}\left(\beta\right)^{\prime}W\left(\beta\right)^{-1}\bar{g}\left(\beta\right)
 
- where
+where
 :math:`\bar{g}\left(\beta\right)=n^{-1}\sum_{i=1}^{n}z_{i}\hat{\epsilon}_{i}`
 and :math:`\hat{\epsilon}_{i}=y_{i}-x_{i}\beta`. Unlike standard GMM,
 the weight matrix, :math:`W` directly depends on the model parameters
@@ -225,8 +222,8 @@ Standard errors are defined as
 
 .. math:: s.e.\left(\hat{\beta}_{j}\right)=\sqrt{e_{j}^{\prime}\hat{\Sigma}e_{j}}
 
- where :math:`e_{j}` is a vector of 0s except in location :math:`j`
-which is 1.
+where :math:`e_{j}` is a vector of 0s except in location :math:`j` which
+is 1.
 
 T-statistics
 ~~~~~~~~~~~~
@@ -251,7 +248,7 @@ with :math:`n-k` degrees of freedom is used,
    \begin{aligned}
    Pr\left(\left|z\right|>Z\right) & =2-2t_{n-k}\left(\left|z\right|\right)\end{aligned}
 
- where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
+where :math:`t_{n-k}\left(\cdot\right)` is the CDF of a Student’s T
 distribution.
 
 Confidence Intervals
@@ -273,7 +270,7 @@ Linear hypothesis tests examine the validity of nulls of the form
 
 .. math:: W=\left(R\hat{\beta}-r\right)^{\prime}\left[R^{\prime}\hat{\Sigma}R\right]^{-1}\left(R\hat{\beta}-r\right)\sim\chi_{q}^{2}
 
- where :math:`q` is the :math:`rank\left(R\right)` which is usually the
+where :math:`q` is the :math:`rank\left(R\right)` which is usually the
 number of rows in :math:`R` . If the debiased flag is used, then
 :math:`W/q` is reported and critical and p-values are taken from a
 :math:`F_{q,n-k}` distribution.
@@ -287,16 +284,15 @@ same and so the inefficient form,
 
 .. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
 
- will collapse to the simpler form
+will collapse to the simpler form
 
 .. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
 
- when :math:`W=S`. When an unadjusted (homoskedastic) covariance is
-used,
+when :math:`W=S`. When an unadjusted (homoskedastic) covariance is used,
 
 .. math:: \hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
 
- where
+where
 :math:`\tilde{s}^{2}=n^{-1}\sum_{i=1}^{n}\left(\epsilon_{i}-\bar{\epsilon}\right)^{2}`
 subtracts the mean which may be non-zero if the model is overidentified.
 Like previous covariance estimators, if the debiased flag is used,
@@ -306,7 +302,7 @@ is modified to
 
 .. math:: \hat{S}=n^{-1}\sum_{i=1}^{n}\hat{\epsilon}_{i}^{2}z_{i}^{\prime}z_{i}.
 
- If the debiased flag is used, :math:`n^{-1}` is replaced by
+If the debiased flag is used, :math:`n^{-1}` is replaced by
 :math:`\left(n-k\right)^{-1}`.
 
 Kernel covariance estimators of :math:`S` take the form
@@ -317,7 +313,7 @@ Kernel covariance estimators of :math:`S` take the form
    \hat{S} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
    \hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\epsilon}_{i-j}\hat{\epsilon}_{i}z_{i-j}^{\prime}z_{i}\end{aligned}
 
- and :math:`k\left(\cdot\right)` is a kernel weighting function with
+and :math:`k\left(\cdot\right)` is a kernel weighting function with
 bandwidth :math:`h`. If the debiased flag is used, :math:`n^{-1}` is
 replaced by :math:`\left(n-k\right)^{-1}`.
 

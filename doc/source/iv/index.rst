@@ -27,4 +27,4 @@ tests.
    examples/advanced-examples.ipynb
    examples/using-formulas.ipynb
    reference
-   estimators
+   mathematical-formula
