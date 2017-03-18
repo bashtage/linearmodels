@@ -200,3 +200,8 @@ class TestDataHandler(object):
         x = np.empty((10, 1))
         with pytest.raises(ValueError):
             IVData(x, nobs=100)
+
+    def test_mixed_data(self):
+        s = pd.Series([1,2,'a',-3.0])
+        with pytest.raises(ValueError):
+            IVData(s)
