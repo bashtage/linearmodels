@@ -6,6 +6,7 @@ import copy
 import numpy as np
 import pandas as pd
 from pandas.api import types
+from pandas.core.strings import is_string_like
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
@@ -40,6 +41,7 @@ class IVData(object):
     drop_first : bool, optional
         Flag indicating to drop first dummy category
     """
+
     def __init__(self, x, var_name='x', nobs=None, convert_dummies=True, drop_first=True):
 
         if isinstance(x, IVData):
@@ -73,15 +75,18 @@ class IVData(object):
             copied = False
             for col in x:
                 c = x[col]
-                if types.is_string_dtype(c.dtype):
+                if types.is_string_dtype(c.dtype) and \
+                        c.map(lambda v: is_string_like(v)).all():
+
                     c = c.astype('category')
                     if not copied:
                         x = x.copy()
+                        copied = True
                     x[col] = c
                 dt = c.dtype
                 if not (types.is_numeric_dtype(dt) or
-                        types.is_categorical_dtype(dt)):
-                    raise ValueError('Only numeric or categorical data permitted')
+                            types.is_categorical_dtype(dt)):
+                    raise ValueError('Only numeric, string  or categorical data permitted')
 
             if convert_dummies:
                 x = expand_categoricals(x, drop_first)

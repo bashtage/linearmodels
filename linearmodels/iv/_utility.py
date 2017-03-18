@@ -54,8 +54,9 @@ def annihilate(y, x):
 
 
 def parse_formula(formula, data):
+    na_action = NAAction(on_NA='raise', NA_types=[])
     if formula.count('~') == 1:
-        dep, exog = dmatrices(formula, data, return_type='dataframe')
+        dep, exog = dmatrices(formula, data, return_type='dataframe', NA_action=na_action)
         endog = instr = None
         return dep, exog, endog, instr
 
@@ -82,7 +83,6 @@ def parse_formula(formula, data):
         exog += exog2
     exog = exog[:-1].strip() if exog[-1] == '+' else exog
 
-    na_action = NAAction(on_NA='raise', NA_types=[])
     try:
         dep = dmatrix('0 + ' + dep, data, eval_env=2,
                       return_type='dataframe', NA_action=na_action)
