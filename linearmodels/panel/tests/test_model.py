@@ -11,12 +11,11 @@ class TestPooledOLS(object):
     def setup_class(cls):
         np.random.seed(12345)
         n, t, k = 100000, 4, 5
-        cls.x = random_sample((n, t, k))
-        beta = np.tile(np.arange(1, k + 1), (n, t, 1))
-        cls.y = (cls.x * beta).sum(axis=2) + random_sample((n, t))
-        cls.y.shape = (n, t, -1)
+        cls.x = random_sample((k, t, n))
+        beta = np.arange(1, k + 1)[:, None, None]
+        cls.y =(cls.x * beta).sum(0) + random_sample((t, n))
 
-        cls.y_pd = pd.Panel(cls.y)
+        cls.y_pd = pd.DataFrame(cls.y)
         cls.x_pd = pd.Panel(cls.x)
 
         cls.y_xr = xr.DataArray(cls.y)

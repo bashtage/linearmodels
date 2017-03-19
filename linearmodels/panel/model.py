@@ -124,10 +124,8 @@ class BetweenOLS(PooledOLS):
         super(BetweenOLS, self).__init__(endog, exog, intercept=intercept)
 
     def fit(self):
-        y = self.endog.a3d.mean(axis=1)
-        x = self.exog.a3d.mean(axis=1)
-        if self.intercept:
-            x = np.c_[np.ones((x.shape[0], 1)), x]
+        y = self.endog.a3d.mean(axis=1).T
+        x = self.exog.a3d.mean(axis=1).T
 
         return pinv(x) @ y
 
@@ -157,7 +155,7 @@ class FirstDifferenceOLS(PooledOLS):
     def fit(self):
         y = np.diff(self.endog.a3d, axis=1)
         x = np.diff(self.exog.a3d, axis=1)
-        n, t, k = self.exog.nitems, self.exog.nobs, self.exog.nvar
+        n, t, k = self.exog.nentity, self.exog.nobs, self.exog.nvar
         y = y.reshape((n * (t - 1), 1))
         x = x.reshape((n * (t - 1), k))
         return pinv(x) @ y
