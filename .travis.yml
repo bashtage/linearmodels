@@ -18,9 +18,9 @@ matrix:
   - python: 2.7
     env:
     - PYTHON=3.5
-    - NUMPY=1.10
+    - NUMPY=1.11
     - SCIPY=0.17
-    - PANDAS=0.17
+    - PANDAS=0.18
   - python: 3.5
     env:
     - PYTHON=3.5
