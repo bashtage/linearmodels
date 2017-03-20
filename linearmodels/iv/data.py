@@ -1,19 +1,21 @@
 """
 A data abstraction that allow multiple input data formats
 """
+from linearmodels.compat.pandas import (is_string_like, is_categorical,
+                                        is_numeric_dtype, is_string_dtype,
+                                        is_categorical_dtype)
+
 import copy
 
 import numpy as np
 import pandas as pd
-from pandas.api import types
-from pandas.core.strings import is_string_like
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
 
 
 def convert_columns(s, drop_first):
-    if pd.api.types.is_categorical(s):
+    if is_categorical(s):
         out = pd.get_dummies(s, drop_first=drop_first)
         out.columns = [s.name + '.' + c for c in out]
         return out
@@ -75,7 +77,7 @@ class IVData(object):
             copied = False
             for col in x:
                 c = x[col]
-                if types.is_string_dtype(c.dtype) and \
+                if is_string_dtype(c.dtype) and \
                         c.map(lambda v: is_string_like(v)).all():
 
                     c = c.astype('category')
@@ -84,8 +86,8 @@ class IVData(object):
                         copied = True
                     x[col] = c
                 dt = c.dtype
-                if not (types.is_numeric_dtype(dt) or
-                            types.is_categorical_dtype(dt)):
+                if not (is_numeric_dtype(dt) or
+                            is_categorical_dtype(dt)):
                     raise ValueError('Only numeric, string  or categorical data permitted')
 
             if convert_dummies:
@@ -103,7 +105,7 @@ class IVData(object):
 
                 index = list(x.coords[x.dims[0]].values)
                 cols = x.coords[x.dims[1]].values
-                if pd.api.types.is_numeric_dtype(cols.dtype):
+                if is_numeric_dtype(cols.dtype):
                     cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
                 cols = list(cols)
                 self._ndarray = x.values.astype(np.float64)
