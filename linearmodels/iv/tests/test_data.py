@@ -119,7 +119,9 @@ class TestDataHandler(object):
     def test_string_cat_equiv(self):
         s1 = pd.Series(['a', 'b', 'a', 'b', 'c', 'd', 'a', 'b'])
         s2 = pd.Series(np.arange(8.0))
-        df = pd.DataFrame({'string': s1, 'number': s2})
+        s3 = pd.Series(['apple', 'banana', 'apple', 'banana',
+                        'cherry', 'date', 'apple', 'banana'])
+        df = pd.DataFrame({'string': s1, 'number': s2, 'other_string': s3})
         dh = IVData(df)
         df_cat = df.copy()
         df_cat['string'] = df_cat['string'].astype('category')
