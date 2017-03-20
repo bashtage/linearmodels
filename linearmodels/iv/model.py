@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import absolute_import, division, print_function
 
-from numpy import array, asarray, c_, isscalar, any, logical_not
+from numpy import array, asarray, c_, isscalar, any, logical_not, ones, sqrt, average
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series
 from scipy.optimize import minimize
@@ -56,6 +56,8 @@ class IVLIML(object):
         Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    weights : array-like, optional
+        Observation weights used in estimation
     fuller : float, optional
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
@@ -97,20 +99,33 @@ class IVLIML(object):
     IV2SLS, IVGMM, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments, fuller=0, kappa=None):
+    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
+                 fuller=0, kappa=None):
 
         self.dependent = IVData(dependent, var_name='dependent')
         nobs = self.dependent.shape[0]
         self.exog = IVData(exog, var_name='exog', nobs=nobs)
         self.endog = IVData(endog, var_name='endog', nobs=nobs)
         self.instruments = IVData(instruments, var_name='instruments', nobs=nobs)
+        if weights is None:
+            weights = ones(self.dependent.shape)
+        weights = IVData(weights).ndarray
+        if any(weights <= 0):
+            raise ValueError('weights must be strictly positive.')
+        weights = weights / weights.mean()
+        self.weights = IVData(weights, var_name='weights', nobs=nobs)
+
         self._drop_locs = self._drop_missing()
         # dependent variable
+        w = sqrt(self.weights.ndarray)
         self._y = self.dependent.ndarray
+        self._wy = self._y * w
         # model regressors
         self._x = c_[self.exog.ndarray, self.endog.ndarray]
+        self._wx = self._x * w
         # first-stage regressors
         self._z = c_[self.exog.ndarray, self.instruments.ndarray]
+        self._wz = self._z * w
 
         self._has_constant = False
         self._regressor_is_exog = array([True] * self.exog.shape[1] +
@@ -149,7 +164,7 @@ class IVLIML(object):
         self._formula = None
 
     @staticmethod
-    def from_formula(formula, data, fuller=0, kappa=None):
+    def from_formula(formula, data, *, weights=None, fuller=0, kappa=None):
         """
         Parameters
         ----------
@@ -158,6 +173,8 @@ class IVLIML(object):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
+        weights : array-like, optional
+            Observation weights used in estimation
         fuller : float, optional
             Fuller's alpha to modify LIML estimator. Default returns unmodified
             LIML estimator.
@@ -192,7 +209,8 @@ class IVLIML(object):
         >>> mod = IVLIML.from_formula(formula, data)
         """
         dep, exog, endog, instr = parse_formula(formula, data)
-        mod = IVLIML(dep, exog, endog, instr, fuller, kappa)
+        mod = IVLIML(dep, exog, endog, instr, weights=weights,
+                     fuller=fuller, kappa=kappa)
         mod.formula = formula
         return mod
 
@@ -224,7 +242,7 @@ class IVLIML(object):
         self._has_constant, self._const_loc = has_constant(x)
 
     def _drop_missing(self):
-        data = (self.dependent, self.exog, self.endog, self.instruments)
+        data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
         missing = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
             if all(missing):
@@ -236,6 +254,7 @@ class IVLIML(object):
             self.exog.drop(missing)
             self.endog.drop(missing)
             self.instruments.drop(missing)
+            self.weights.drop(missing)
 
         return missing
 
@@ -271,7 +290,7 @@ class IVLIML(object):
         return inv(p1) @ p2
 
     def _estimate_kappa(self):
-        y, x, z = self._y, self._x, self._z
+        y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
         e = c_[y, x[:, ~is_exog]]
         x1 = x[:, is_exog]
@@ -306,21 +325,21 @@ class IVLIML(object):
         supported options. Defaults are used if no covariance configuration
         is provided.
         """
-        y, x, z = self._y, self._x, self._z
+        wy, wx, wz = self._wy, self._wx, self._wz
         liml_kappa = self._estimate_kappa()
         kappa = self._kappa
         if kappa is None:
             kappa = liml_kappa
 
         if self._fuller != 0:
-            nobs, ninstr = z.shape
+            nobs, ninstr = wz.shape
             kappa -= self._fuller / (nobs - ninstr)
 
-        params = self.estimate_parameters(x, y, z, kappa)
+        params = self.estimate_parameters(wx, wy, wz, kappa)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['kappa'] = kappa
-        cov_estimator = cov_estimator(x, y, z, params, **cov_config)
+        cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config)
 
         results = {'kappa': kappa,
                    'liml_kappa': liml_kappa}
@@ -328,6 +347,27 @@ class IVLIML(object):
         results.update(pe)
 
         return self._result_container(results, self)
+
+    def wresids(self, params):
+        """
+        Compute weighted model residuals
+
+        Parameters
+        ----------
+        params : ndarray
+            Model parameters (nvar by 1)
+
+        Returns
+        -------
+        wresids : ndarray
+            Weighted model residuals
+        
+        Notes
+        -----
+        Uses weighted versions of data instead of raw data.  Identical to 
+        resids if all weights are unity. 
+        """
+        return self._wy - self._wx @ params
 
     def resids(self, params):
         """
@@ -382,18 +422,24 @@ class IVLIML(object):
         vars = self._columns
         index = self._index
         eps = self.resids(params)
+        weps = self.wresids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
 
-        residual_ss = (eps.T @ eps)
-        y = self._y
-        mu = self._y.mean() if self.has_constant else 0
-        total_ss = ((y - mu).T @ (y - mu))
+        residual_ss = (weps.T @ weps)
+        # TODO: Explain this formula
+        w = self.weights.ndarray
+        e = self._y
+        if self.has_constant:
+            e = e - average(self._y, weights=w)
+
+        total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {'params': Series(params.squeeze(), vars, name='parameter'),
                'eps': Series(eps.squeeze(), index=index, name='residual'),
+               'weps': Series(weps.squeeze(), index=index, name='residual'),
                'cov': DataFrame(cov, columns=vars, index=vars),
                's2': float(cov_estimator.s2),
                'debiased': debiased,
@@ -425,6 +471,8 @@ class IV2SLS(IVLIML):
         Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    weights : array-like, optional
+        Observation weights used in estimation
 
     Notes
     -----
@@ -448,13 +496,13 @@ class IV2SLS(IVLIML):
     IVLIML, IVGMM, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments):
+    def __init__(self, dependent, exog, endog, instruments, *, weights=None):
         self._method = 'IV-2SLS'
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
-                                     fuller=0, kappa=1)
+                                     weights=weights, fuller=0, kappa=1)
 
     @staticmethod
-    def from_formula(formula, data):
+    def from_formula(formula, data, *, weights=None):
         """
         Parameters
         ----------
@@ -463,6 +511,8 @@ class IV2SLS(IVLIML):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
+        weights : array-like, optional
+            Observation weights used in estimation
 
         Returns
         -------
@@ -491,7 +541,7 @@ class IV2SLS(IVLIML):
         >>> mod = IV2SLS.from_formula(formula, data)
         """
         dep, exog, endog, instr = parse_formula(formula, data)
-        mod = IV2SLS(dep, exog, endog, instr)
+        mod = IV2SLS(dep, exog, endog, instr, weights=weights)
         mod.formula = formula
         return mod
 
@@ -510,14 +560,17 @@ class IVGMM(IVLIML):
         Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    weights : array-like, optional
+        Observation weights used in estimation
     weight_type : str
-        Name of weight function to use.
+        Name of moment condition weight function to use in the GMM estimation
     **weight_config
-        Additional keyword arguments to pass to the weight function.
+        Additional keyword arguments to pass to the moment condition weight 
+        function
 
     Notes
     -----
-    Available weight functions are:
+    Available GMM weight functions are:
 
       * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
         homoskedastic
@@ -544,18 +597,18 @@ class IVGMM(IVLIML):
     IV2SLS, IVLIML, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
-                 **weight_config):
+    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
+                 weight_type='robust', **weight_config):
         self._method = 'IV-GMM'
         self._result_container = IVGMMResults
-        super(IVGMM, self).__init__(dependent, exog, endog, instruments)
+        super(IVGMM, self).__init__(dependent, exog, endog, instruments, weights=weights)
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
         self._weight_config = self._weight.config
 
     @staticmethod
-    def from_formula(formula, data, weight_type='robust', **weight_config):
+    def from_formula(formula, data, *, weights=None, weight_type='robust', **weight_config):
         """
         Parameters
         ----------
@@ -564,10 +617,13 @@ class IVGMM(IVLIML):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
+        weights : array-like, optional
+            Observation weights used in estimation
         weight_type : str
-            Name of weight function to use.
+            Name of moment condition weight function to use in the GMM estimation
         **weight_config
-            Additional keyword arguments to pass to the weight function.
+            Additional keyword arguments to pass to the moment condition weight 
+            function
 
         Notes
         -----
@@ -596,7 +652,8 @@ class IVGMM(IVLIML):
         >>> mod = IVGMM.from_formula(formula, data)
         """
         dep, exog, endog, instr = parse_formula(formula, data)
-        mod = IVGMM(dep, exog, endog, instr, weight_type, **weight_config)
+        mod = IVGMM(dep, exog, endog, instr, weights=weights, weight_type=weight_type,
+                    **weight_config)
         mod.formula = formula
         return mod
 
@@ -674,33 +731,34 @@ class IVGMM(IVLIML):
           * 'kernel' - Allows for heteroskedasticity and autocorrelation
           * 'cluster' - Allows for one-way cluster dependence
         """
-
-        y, x, z = self._y, self._x, self._z
-        nobs = y.shape[0]
+        wy, wx, wz = self._wy, self._wx, self._wz
+        nobs = wy.shape[0]
         weight_matrix = self._weight.weight_matrix
-        w = inv(z.T @ z / nobs) if initial_weight is None else initial_weight
-        _params = params = self.estimate_parameters(x, y, z, w)
-        eps = y - x @ params
+        wmat = inv(wz.T @ wz / nobs) if initial_weight is None else initial_weight
+        sv = IV2SLS(self.dependent, self.exog, self.endog, self.instruments,
+                    weights=self.weights)
+        _params = params = sv.fit().params.values[:, None]
+        # _params = params = self.estimate_parameters(wx, wy, wz, wmat)
 
         iters, norm = 1, 10 * tol
         while iters < iter_limit and norm > tol:
-            w = inv(weight_matrix(x, z, eps))
-            params = self.estimate_parameters(x, y, z, w)
-            eps = y - x @ params
+            eps = wy - wx @ params
+            wmat = inv(weight_matrix(wx, wz, eps))
+            params = self.estimate_parameters(wx, wy, wz, wmat)
             delta = params - _params
-            xpz = x.T @ z / nobs
             if iters == 1:
-                v = (xpz @ w @ xpz.T) / nobs
+                xpz = wx.T @ wz / nobs
+                v = (xpz @ wmat @ xpz.T) / nobs
                 vinv = inv(v)
             _params = params
             norm = delta.T @ vinv @ delta
             iters += 1
 
-        cov_estimator = IVGMMCovariance(x, y, z, params, w,
+        cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat,
                                         cov_type, **cov_config)
 
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, w, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
 
         results.update(gmm_pe)
 
@@ -719,7 +777,7 @@ class IVGMM(IVLIML):
 
     def _j_statistic(self, params, weight_mat):
         """J-stat and test"""
-        y, x, z = self._y, self._x, self._z
+        y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
         eps = y - x @ params
         g_bar = (z * eps).mean(0)
@@ -742,10 +800,13 @@ class IVGMMCUE(IVGMM):
         Endogenous regressors (nobs by nendog)
     instruments : array-like
         Instrumental variables (nobs by ninstr)
+    weights : array-like, optional
+        Observation weights used in estimation
     weight_type : str
-        Name of weight function to use.
+        Name of moment condition weight function to use in the GMM estimation
     **weight_config
-        Additional keyword arguments to pass to the weight function.
+        Additional keyword arguments to pass to the moment condition weight 
+        function
 
     Notes
     -----
@@ -774,16 +835,16 @@ class IVGMMCUE(IVGMM):
     IV2SLS, IVLIML, IVGMM
     """
 
-    def __init__(self, dependent, exog, endog, instruments, weight_type='robust',
-                 **weight_config):
+    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
+                 weight_type='robust', **weight_config):
         self._method = 'IV-GMM-CUE'
-        super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weight_type,
-                                       **weight_config)
+        super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weights=weights,
+                                       weight_type=weight_type, **weight_config)
         if 'center' not in weight_config:
             weight_config['center'] = True
 
     @staticmethod
-    def from_formula(formula, data, weight_type='robust', **weight_config):
+    def from_formula(formula, data, *, weights=None, weight_type='robust', **weight_config):
         """
         Parameters
         ----------
@@ -792,10 +853,13 @@ class IVGMMCUE(IVGMM):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
+        weights : array-like, optional
+            Observation weights used in estimation
         weight_type : str
-            Name of weight function to use.
+            Name of moment condition weight function to use in the GMM estimation
         **weight_config
-            Additional keyword arguments to pass to the weight function.
+            Additional keyword arguments to pass to the moment condition weight 
+            function
 
         Returns
         -------
@@ -824,7 +888,8 @@ class IVGMMCUE(IVGMM):
         >>> mod = IVGMMCUE.from_formula(formula, data)
         """
         dep, exog, endog, instr = parse_formula(formula, data)
-        mod = IVGMMCUE(dep, exog, endog, instr, weight_type, **weight_config)
+        mod = IVGMMCUE(dep, exog, endog, instr, weights=weights, weight_type=weight_type,
+                       **weight_config)
         mod.formula = formula
         return mod
 
@@ -940,7 +1005,7 @@ class IVGMMCUE(IVGMM):
           * Expose method to pass optimization options
         """
 
-        y, x, z = self._y, self._x, self._z
+        wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         if starting is None:
             endog = None if self.endog.shape[1] == 0 else self.endog
@@ -948,7 +1013,7 @@ class IVGMMCUE(IVGMM):
                 self.instruments
 
             res = IVGMM(self.dependent, self.exog, endog, instr,
-                        weight_type=self._weight_type,
+                        weights=self.weights, weight_type=self._weight_type,
                         **self._weight_config).fit()
             starting = res.params.values
         else:
@@ -956,13 +1021,13 @@ class IVGMMCUE(IVGMM):
             if len(starting) != self.exog.shape[1] + self.endog.shape[1]:
                 raise ValueError('starting does not have the correct number '
                                  'of values')
-        params, iters = self.estimate_parameters(starting, x, y, z, display)
-        eps = y - x @ params
-        w = inv(weight_matrix(x, z, eps))
+        params, iters = self.estimate_parameters(starting, wx, wy, wz, display)
+        eps = wy - wx @ params
+        wmat = inv(weight_matrix(wx, wz, eps))
 
-        cov_estimator = IVGMMCovariance(x, y, z, params, w, **cov_config)
+        cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat, **cov_config)
         results = self._post_estimation(params, cov_estimator, cov_type)
-        gmm_pe = self._gmm_post_estimation(params, w, iters)
+        gmm_pe = self._gmm_post_estimation(params, wmat, iters)
         results.update(gmm_pe)
 
         return self._result_container(results, self)
@@ -971,6 +1036,15 @@ class IVGMMCUE(IVGMM):
 class _OLS(IVLIML):
     """
     Computes OLS estimated when required
+
+    Parameters
+    ----------
+    dependent : array-like
+        Endogenous variables (nobs by 1)
+    exog : array-like
+        Exogenous regressors  (nobs by nexog)
+    weights : array-like, optional
+        Observation weights used in estimation
 
     Notes
     -----
@@ -983,6 +1057,6 @@ class _OLS(IVLIML):
     statsmodels.regression.linear_model.GLS
     """
 
-    def __init__(self, dependent, exog):
-        super(_OLS, self).__init__(dependent, exog, None, None, kappa=0.0)
+    def __init__(self, dependent, exog, *, weights=None):
+        super(_OLS, self).__init__(dependent, exog, None, None, weights=weights, kappa=0.0)
         self._result_container = OLSResults

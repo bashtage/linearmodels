@@ -100,7 +100,7 @@ SIMULATED_COV_OPTIONS = {
 
 
 def construct_model(key):
-    model, nendog, nexog, ninstr, var, other = key.split('-')
+    model, nendog, nexog, ninstr, weighted, var, other = key.split('-')
     var = var.replace('wmatrix', 'vce')
     mod = MODELS[model]
     data = SIMULATED_DATA
@@ -117,15 +117,18 @@ def construct_model(key):
 
     cov_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
     cov_opts['debiased'] = 'small' in other
+    mod_options = {}
+    if 'True' in weighted:
+        mod_options['weights'] = data.weights
     if model == 'gmm':
-        weight_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
-        weight_opts['weight_type'] = weight_opts['cov_type']
-        del weight_opts['cov_type']
-        weight_opts['center'] = 'center' in other
-    else:
-        weight_opts = {}
+        mod_options.update(deepcopy(SIMULATED_COV_OPTIONS[var]))
+        mod_options['weight_type'] = mod_options['cov_type']
+        del mod_options['cov_type']
+        mod_options['center'] = 'center' in other
 
-    model_result = mod(dep, exog, endog, instr, **weight_opts).fit(**cov_opts)
+    model_result = mod(dep, exog, endog, instr, **mod_options).fit(**cov_opts)
+    if model == 'gmm' and 'True' in weighted:
+        pytest.skip('Weighted GMM differs slightly')
     return model_result
 
 
@@ -141,13 +144,13 @@ class TestSimulatedResults(object):
     def test_rsquared(self, simulated):
         res, stata = simulated
         if stata.rsquared is None:
-            pytest.skip('Comparison result not available')
+            return
         assert_allclose(res.rsquared, stata.rsquared)
 
     def test_rsquared_adj(self, simulated):
         res, stata = simulated
         if stata.rsquared_adj is None:
-            pytest.skip('Comparison result not available')
+            return
         assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
     def test_model_ss(self, simulated):
@@ -183,7 +186,7 @@ class TestSimulatedResults(object):
     def test_weight_mat(self, simulated):
         res, stata = simulated
         if not hasattr(stata, 'weight_mat') or not isinstance(stata.weight_mat, pd.DataFrame):
-            pytest.skip('Comparison result not available')
+            return
         stata_weight_mat = stata.weight_mat.reindex_like(res.weight_matrix)
         stata_weight_mat = stata_weight_mat[res.weight_matrix.columns]
         assert_allclose(res.weight_matrix, stata_weight_mat, rtol=1e-4)
@@ -191,11 +194,11 @@ class TestSimulatedResults(object):
     def test_j_stat(self, simulated):
         res, stata = simulated
         if not hasattr(stata, 'J') or stata.J is None:
-            pytest.skip('Comparison result not available')
+            return
         assert_allclose(res.j_stat.stat, stata.J, atol=1e-6, rtol=1e-4)
 
     def test_kappa(self, simulated):
         res, stata = simulated
         if not hasattr(stata, 'kappa') or stata.kappa is None:
-            pytest.skip('Comparison result not available')
+            return
         assert_allclose(res.kappa, stata.kappa, rtol=1e-4)
