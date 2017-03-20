@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from linearmodels.panel.data import PanelDataHandler
+from linearmodels.panel.data import PanelData
 
 np.random.seed(12345)
 n, t, k = 1000, 3, 6
@@ -27,8 +27,8 @@ y = pd.Panel({'y': y})
 y.major_axis.name = 'time'
 y.minor_axis.name = 'firm'
 
-x = PanelDataHandler(x)
-y = PanelDataHandler(y)
+x = PanelData(x)
+y = PanelData(y)
 z = pd.concat([x.dataframe, y.dataframe], 1)
 z = z.reset_index()
 z['firm_id'] = z.firm.astype('category')

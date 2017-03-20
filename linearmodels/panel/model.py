@@ -1,8 +1,7 @@
 import numpy as np
 from numpy.linalg import pinv
 
-from .data import PanelDataHandler
-from .fixed_effects import EntityEffect, TimeEffect
+from .data import PanelData
 
 
 class PooledOLS(object):
@@ -31,8 +30,8 @@ class PooledOLS(object):
     """
 
     def __init__(self, endog, exog, *, intercept=True):
-        self.endog = PanelDataHandler(endog)
-        self.exog = PanelDataHandler(exog)
+        self.endog = PanelData(endog)
+        self.exog = PanelData(exog)
         self.intercept = intercept
 
     def fit(self):
@@ -87,11 +86,9 @@ class PanelOLS(PooledOLS):
         if self.intercept:
             x = np.c_[np.ones((x.shape[0], 1)), x]
         if self.entity_effect:
-            y = EntityEffect(y).orthogonalize()
-            x = EntityEffect(x).orthogonalize()
+            raise NotImplementedError
         if self.time_effect:
-            y = TimeEffect(y).orthogonalize()
-            x = TimeEffect(x).orthogonalize()
+            raise NotImplementedError
 
         return pinv(x) @ y
 
