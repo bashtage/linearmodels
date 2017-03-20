@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+
 class PanelData(object):
     # Panel -> entity, time, vars
     # df 2x -> (entity,time), vars
@@ -30,11 +31,11 @@ class PanelData(object):
                                          'MultiIndex with 2 levels')
                     self._frame = x
                 else:
-                    self._frame = pd.DataFrame({var_name + '.0' : x.T.stack()})
+                    self._frame = pd.DataFrame({var_name + '.0': x.T.stack()})
             else:
                 self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
         elif isinstance(x, np.ndarray):
-            if not 2<= x.ndim <= 3:
+            if not 2 <= x.ndim <= 3:
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:
                 x = x[None, :, :]
