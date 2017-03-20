@@ -72,6 +72,12 @@ class TestErrors(object):
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
+    def test_invalid_weights(self, data):
+        weights = np.zeros_like(data.dep)
+        with pytest.raises(ValueError):
+            IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+
+
     def test_rank_deficient_instr(self, data):
         instr = data.instr.copy()
         instr[:, :2] = 1

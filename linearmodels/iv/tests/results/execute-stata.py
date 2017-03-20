@@ -34,7 +34,7 @@ file close myfile
 """
 
 methods = ['2sls', 'liml', 'gmm']
-outfile = r'c:\git\panel\panel\iv\tests\results\stata-iv-housing-results.txt'
+outfile = os.path.join(os.getcwd(), 'stata-iv-housing-results.txt')
 if os.path.exists(outfile):
     os.unlink(outfile)
 variance_options = [', vce(unadjusted)', ', vce(robust)', ', vce(cluster division)']

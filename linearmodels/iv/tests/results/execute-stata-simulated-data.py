@@ -12,7 +12,7 @@ tsset time \n
 """.format(dtafile=dtafile)
 
 model = """
-ivregress {method} {depvar} {exog_var} ({endog_var} = {instr}), {variance_option} {other_option}
+ivregress {method} {depvar} {exog_var} ({endog_var} = {instr}) {weight_opt}, {variance_option} {other_option}
 """
 
 methods = ['2sls', 'liml', 'gmm']
@@ -25,10 +25,11 @@ endog_vars = ['x1', 'x1 x2']
 instr = ['z1', 'z1 z2']
 other_options = ['', 'small', 'noconstant', 'small noconstant', 'small center',
                  'center', 'center noconstant', 'small center noconstant']
-inputs = [methods, depvar_with_var, exog_vars, endog_vars, instr, other_options]
+weight_options = [' ', ' [aweight=weights] ']
+inputs = [methods, depvar_with_var, exog_vars, endog_vars, instr, other_options, weight_options ]
 configs = []
 for val in product(*inputs):
-    method, dvo, exog, endog, instr, other_opt = val
+    method, dvo, exog, endog, instr, other_opt, weight_opt = val
     depvar, var_opt = dvo
     if (len(endog) > len(instr)) or (other_opt.find('center') >= 0 and method != 'gmm'):
         continue
@@ -41,7 +42,8 @@ for val in product(*inputs):
                     'endog_var': endog,
                     'instr': instr,
                     'variance_option': var_opt,
-                    'other_option': other_opt})
+                    'other_option': other_opt,
+                    'weight_opt': weight_opt})
 
 results = """
 estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
@@ -62,7 +64,8 @@ matrix W = e(W)
 estout matrix(W, fmt(%13.12g)) using {outfile}, append
 """
 
-m = '{method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}-{variance}-{other}'
+m = '{method}-num_endog_{num_endog}-num_exog_{num_exog}-num_instr_{num_instr}'
+m = m + '-weighted_{weighted}-{variance}-{other}'
 section_header = """
 file open myfile using {outfile}, write append
 file write myfile  _n _n "########## !"""
@@ -71,7 +74,7 @@ section_header += """! ##########" _n
 file close myfile
 """
 
-outfile = r'c:\git\panel\panel\iv\tests\results\stata-iv-simulated-results.txt'
+outfile = os.path.join(os.getcwd(), 'stata-iv-simulated-results.txt')
 
 if os.path.exists(outfile):
     os.unlink(outfile)
@@ -90,7 +93,8 @@ with open('simulated-results.do', 'w') as stata:
                       'num_instr': count_vars(config['instr']),
                       'variance': config['variance_option'],
                       'other': config['other_option'].replace(' ', '_'),
-                      'outfile': outfile}
+                      'outfile': outfile,
+                      'weighted': 'aweight' in config['weight_opt']}
         stata.write(section_header.format(**sec_header))
         stata.write(model.format(**config))
 

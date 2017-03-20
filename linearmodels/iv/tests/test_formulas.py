@@ -43,6 +43,7 @@ def data():
     cols += ['z' + str(i) for i in range(1, 4)]
     data = pd.DataFrame(np.c_[y, x, z], columns=cols)
     data['Intercept'] = 1.0
+    data['weights'] = np.random.chisquare(10, size=data.shape[0]) / 10
     return data
 
 
@@ -53,6 +54,17 @@ def test_formula(data, model, formula):
     endog = data[['x1', 'x2']]
     instr = data[['z1', 'z2', 'z3']]
     res2 = model(data.y, exog, endog, instr).fit()
+    assert res.rsquared == res2.rsquared
+    assert mod.formula == formula
+
+
+def test_formula_weights(data, model, formula):
+    mod = model.from_formula(formula, data, weights=data.weights)
+    res = mod.fit()
+    exog = data[['Intercept', 'x3', 'x4', 'x5']]
+    endog = data[['x1', 'x2']]
+    instr = data[['z1', 'z2', 'z3']]
+    res2 = model(data.y, exog, endog, instr, weights=data.weights).fit()
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
 
@@ -68,6 +80,16 @@ def test_formula_ols(data, model):
     res2 = model(data.y, exog, None, None)
     res2 = res2.fit()
     res = model.from_formula(formula, data).fit()
+
+    assert res.rsquared == res2.rsquared
+
+
+def test_formula_ols_weights(data, model):
+    formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5'
+    exog = data[['Intercept', 'x1', 'x2', 'x3', 'x4', 'x5']]
+    res2 = model(data.y, exog, None, None, weights=data.weights)
+    res2 = res2.fit()
+    res = model.from_formula(formula, data, weights=data.weights).fit()
 
     assert res.rsquared == res2.rsquared
 

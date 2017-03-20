@@ -106,7 +106,8 @@ def process_results(filename):
 
 
 if __name__ == '__main__':
-    blocks = parse_file(r'C:\git\panel\panel\iv\tests\results\stata-iv-simulated-results.txt')
+    import os
+    blocks = parse_file(os.path.join(os.getcwd(), 'stata-iv-simulated-results.txt'))
     for key in blocks:
         out = parse_block(blocks[key])
         finalize(out['params'], out['stats'], out['cov'], out['weight_mat']).keys()

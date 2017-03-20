@@ -417,7 +417,8 @@ class _CommonIVResults(OLSResults):
         """
         return FirstStageResults(self.model.dependent, self.model.exog,
                                  self.model.endog, self.model.instruments,
-                                 self._cov_type, self._cov_config)
+                                 self.model.weights, self._cov_type,
+                                 self._cov_config)
 
 
 class IVResults(_CommonIVResults):
@@ -659,7 +660,7 @@ class IVResults(_CommonIVResults):
         delta = (e1.T @ e1 - e2.T @ e2)
         stat = delta / df
         stat /= (e0.T @ e0 - delta) / df_denom
-        stat = stat.squeeze()
+        stat = float(stat)
 
         name = 'Wu-Hausman test of exogeneity'
         return WaldTestStatistic(stat, null, df, df_denom, name=name)
@@ -1013,11 +1014,12 @@ class FirstStageResults(_SummaryStr):
     First stage estimation results and diagnostics
     """
 
-    def __init__(self, dep, exog, endog, instr, cov_type, cov_config):
+    def __init__(self, dep, exog, endog, instr, weights, cov_type, cov_config):
         self.dep = dep
         self.exog = exog
         self.endog = endog
         self.instr = instr
+        self.weights = weights
         reg = c_[self.exog.ndarray, self.endog.ndarray]
         self._reg = DataFrame(reg, columns=self.exog.cols + self.endog.cols)
         self._cov_type = cov_type
@@ -1053,9 +1055,10 @@ class FirstStageResults(_SummaryStr):
               is with respect to the other included variables in the model.
         """
         from linearmodels.iv.model import _OLS, IV2SLS
-        endog, exog, instr = self.endog, self.exog, self.instr
-        z = instr.ndarray
-        x = exog.ndarray
+        endog, exog, instr, weights = self.endog, self.exog, self.instr, self.weights
+        w = sqrt(weights.ndarray)
+        z = w * instr.ndarray
+        x = w * exog.ndarray
         px = x @ pinv(x)
         ez = z - px @ z
         out = {}
@@ -1063,7 +1066,7 @@ class FirstStageResults(_SummaryStr):
         for col in endog.pandas:
             inner = {}
             inner['rsquared'] = individual_results[col].rsquared
-            y = endog.pandas[[col]].values
+            y = w * endog.pandas[[col]].values
             ey = y - px @ y
             mod = _OLS(ey, ez)
             res = mod.fit(self._cov_type, **self._cov_config)
@@ -1072,15 +1075,15 @@ class FirstStageResults(_SummaryStr):
             params = params[:, None]
             stat = params.T @ inv(res.cov) @ params
             stat = float(stat.squeeze())
-            w = WaldTestStatistic(stat, null='', df=params.shape[0])
-            inner['f.stat'] = w.stat
-            inner['f.pval'] = w.pval
+            w_test = WaldTestStatistic(stat, null='', df=params.shape[0])
+            inner['f.stat'] = w_test.stat
+            inner['f.pval'] = w_test.pval
             out[col] = Series(inner)
         out = DataFrame(out).T
 
         dep = self.dep
-        r2sls = IV2SLS(dep, exog, endog, instr).fit('unadjusted')
-        rols = _OLS(dep, self._reg).fit('unadjusted')
+        r2sls = IV2SLS(dep, exog, endog, instr, weights=weights).fit('unadjusted')
+        rols = _OLS(dep, self._reg, weights=weights).fit('unadjusted')
         shea = (rols.std_errors / r2sls.std_errors) ** 2
         shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
         out['shea.rsquared'] = shea[out.index]
@@ -1103,11 +1106,13 @@ class FirstStageResults(_SummaryStr):
             the variable names of the endogenous regressors.
         """
         from linearmodels.iv.model import _OLS
-        exog_instr = c_[self.exog.ndarray, self.instr.ndarray]
+        w = sqrt(self.weights.ndarray)
+        exog_instr = w * c_[self.exog.ndarray, self.instr.ndarray]
         exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
         res = {}
         for col in self.endog.pandas:
-            mod = _OLS(self.endog.pandas[col], exog_instr)
+            dep = w.squeeze() * self.endog.pandas[col]
+            mod = _OLS(dep, exog_instr)
             res[col] = mod.fit(self._cov_type, **self._cov_config)
 
         return res

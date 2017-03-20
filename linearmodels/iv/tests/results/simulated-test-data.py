@@ -66,11 +66,14 @@ for i in range(2, n):
 y_kernel = x @ beta[:, None] + e[:, None]
 e_autoc = e
 
+weights = np.random.chisquare(10, size=y_kernel.shape) / 10
+weights = weights / weights.mean()
+
 time = np.arange(n)
 data = np.c_[time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero,
-             e_cluster, e_autoc, clusters]
+             e_cluster, e_autoc, clusters, weights]
 data = pd.DataFrame(data, columns=['time', 'y_unadjusted', 'y_robust', 'y_clustered',
                                    'y_kernel', '_cons', 'x1', 'x2', 'x3',
                                    'x4', 'x5', 'z1', 'z2', 'e_homo', 'e_hetero', 'e_cluster',
-                                   'e_autoc', 'cluster_id'])
+                                   'e_autoc', 'cluster_id', 'weights'])
 data.to_stata('simulated-data.dta')
