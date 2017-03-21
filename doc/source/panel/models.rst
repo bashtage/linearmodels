@@ -1,8 +1,7 @@
 Models for Panel Data
 ---------------------
 
-.. module:: panel
-.. currentmodule:: panel
+.. module:: linearmodels.panel.model
 
 .. automodule:: linearmodels.panel.model
    :members:
