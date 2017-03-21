@@ -7,3 +7,4 @@ Panel Module Reference
 
    models
    covariance
+   data
