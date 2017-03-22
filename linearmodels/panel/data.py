@@ -66,7 +66,7 @@ class PanelData(object):
                                          'MultiIndex with 2 levels')
                     self._frame = x
                 else:
-                    self._frame = pd.DataFrame({var_name + '.0': x.T.stack()})
+                    self._frame = pd.DataFrame({var_name + '.0': x.T.stack(dropna=False)})
             else:
                 self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
         elif isinstance(x, np.ndarray):
@@ -107,8 +107,8 @@ class PanelData(object):
         return self.panel.values
 
     def drop(self, locs):
-        locs = locs.ravel()
-        self._frame = self._frame.loc[~locs]
+        self._frame = self._frame.loc[~locs.ravel()]
+        self._frame = self._minimize_multiindex(self._frame)
         self._n, self._t, self._k = self.shape
 
     @property
@@ -201,3 +201,46 @@ class PanelData(object):
 
     def __repr__(self):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
+
+    def mean(self, group='entity'):
+        """
+        Compute data mean by either entity or time group
+
+        Parameters
+        ----------
+        group : {'entity', 'time'}
+            Group to use in demeaning
+
+        Returns
+        -------
+        mean : DataFrame
+            Data mean according to type. Either (entity by var) or (time by var)
+        """
+        v = self.panel.values
+        axis = 1 if group == 'time' else 2
+        mu = np.nanmean(v, axis=axis)
+        index = self.entities if group == 'time' else self.time
+        return pd.DataFrame(mu.T, index=index, columns=self.vars)
+
+    def first_difference(self):
+        """
+        Compute first differences of variables
+        
+        Returns
+        -------
+        diffs : PanelData
+            Differenced values
+        """
+        diffs = self._frame.diff(1).iloc[1:]
+        elabels = self._frame.index.labels[0]
+        same = elabels[1:] == elabels[:-1]
+        diffs = diffs.loc[same]
+        diffs = self._minimize_multiindex(diffs)
+        return PanelData(diffs)
+
+    @staticmethod
+    def _minimize_multiindex(df):
+        index_cols = list(df.index.names)
+        df = df.reset_index()
+        df = df.set_index(index_cols)
+        return df

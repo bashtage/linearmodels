@@ -1,7 +1,10 @@
 import numpy as np
-from numpy.linalg import pinv
+from numpy.linalg import matrix_rank, pinv
+from patsy.highlevel import dmatrices
+from patsy.missing import NAAction
 
-from .data import PanelData
+from linearmodels.utility import has_constant
+from linearmodels.panel.data import PanelData
 
 
 class PooledOLS(object):
@@ -10,13 +13,10 @@ class PooledOLS(object):
 
     Parameters
     ----------
-    endog: array-like
-        Endogenous or left-hand-side variable (entities by time)
+    dependent: array-like
+        Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
-        an intercept or have a constant column in the column span.
-    intercept : bool, optional
-        Flag whether to include an intercept in the model
+        Exogenous or right-hand-side variables (variable by time by entity). 
 
     Notes
     -----
@@ -24,21 +24,61 @@ class PooledOLS(object):
 
     .. math::
 
-        y_{it}=\alpha+\beta^{\prime}x_{it}+\epsilon_{it}
-
-    where :math:`\alpha` is omitted if ``intercept`` is ``False``.
+        y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
     """
 
-    def __init__(self, endog, exog, *, intercept=True):
-        self.endog = PanelData(endog)
+    def __init__(self, dependent, exog):
+        self.dependent = PanelData(dependent)
         self.exog = PanelData(exog)
-        self.intercept = intercept
+        self._constant = None
+        self._formula = None
+        self._validate_data()
+
+    def _validate_data(self):
+        y = self._y = self.dependent.a2d
+        x = self._x = self.exog.a2d
+        if y.shape[0] != x.shape[0]:
+            raise ValueError('dependent and exog must have the same number of '
+                             'observations.')
+        all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
+        missing = np.any(np.isnan(y), axis=1) | np.any(np.isnan(x), axis=1)
+        if np.any(missing):
+            if np.any(all_missing ^ missing):
+                import warnings
+                warnings.warn('Missing values detected. Dropping rows with one '
+                              'or more missing observation.', UserWarning)
+            self.dependent.drop(missing)
+            self.exog.drop(missing)
+            x = self.exog.a2d
+
+        self._constant, self._constant_index = has_constant(x)
+        if matrix_rank(x) < x.shape[1]:
+            raise ValueError('exog does not have full column rank.')
+
+    @property
+    def formula(self):
+        return self._formula
+
+    @formula.setter
+    def formula(self, value):
+        self._formula = value
+
+    @staticmethod
+    def from_formula(formula, data):
+        na_action = NAAction(on_NA='raise', NA_types=[])
+        data = PanelData(data)
+        parts = formula.split('~')
+        parts[1] = ' 0 + ' + parts[1]
+        cln_formula = '~'.join(parts)
+        dependent, exog = dmatrices(cln_formula, data.dataframe,
+                                    return_type='dataframe', NA_action=na_action)
+        mod = PooledOLS(dependent, exog)
+        mod.formula = formula
+        return mod
 
     def fit(self):
-        y = self.endog.a2d
+        y = self.dependent.a2d
         x = self.exog.a2d
-        if self.intercept:
-            x = np.c_[np.ones((x.shape[0], 1)), x]
         return pinv(x) @ y
 
 
@@ -46,17 +86,14 @@ class PanelOLS(PooledOLS):
     r"""
     Parameters
     ----------
-    endog: array-like
-        Endogenous or left-hand-side variable (entities by time)
+    dependent: array-like
+        Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
-        an intercept or have a constant column in the column span.
-    intercept : bool, optional
-        Flag whether to include an intercept in the model
+        Exogenous or right-hand-side variables (variable by time by entity). 
     entity_effect : bool, optional
-        Flag whether to include an intercept in the model
+        Flag whether to include entity (fixed) effects in the model
     time_effect : bool, optional
-        Flag whether to include an intercept in the model
+        Flag whether to include time effects in the model
 
     Notes
     -----
@@ -71,24 +108,22 @@ class PanelOLS(PooledOLS):
     ``time_effect`` are ``False``, the model reduces to :class:`PooledOLS`.
     """
 
-    def __init__(self, endog, exog, *, intercept=True, entity_effect=False, time_effect=False):
-        super(PanelOLS, self).__init__(endog, exog, intercept=intercept)
-        if intercept and (entity_effect or time_effect):
-            import warnings
-            warnings.warn('Intercept must be False when using entity or time effects.')
-            self.intercept = False
+    def __init__(self, dependent, exog, *, entity_effect=False, time_effect=False):
+        super(PanelOLS, self).__init__(dependent, exog)
         self.entity_effect = entity_effect
         self.time_effect = time_effect
 
     def fit(self):
-        y = self.endog.a2d
-        x = self.exog.a2d
-        if self.intercept:
-            x = np.c_[np.ones((x.shape[0], 1)), x]
+        y = self.dependent
+        x = self.exog
         if self.entity_effect:
-            raise NotImplementedError
+            y = y.demean('entity')
+            x = x.demean('entity')
         if self.time_effect:
-            raise NotImplementedError
+            y = y.demean('time')
+            x = x.demean('time')
+        y = y.a2d
+        x = x.a2d
 
         return pinv(x) @ y
 
@@ -97,13 +132,10 @@ class BetweenOLS(PooledOLS):
     r"""
     Parameters
     ----------
-    endog: array-like
-        Endogenous or left-hand-side variable (entities by time)
+    dependent: array-like
+        Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
-        an intercept or have a constant column in the column span.
-    intercept : bool, optional
-        Flag whether to include an intercept in the model
+        Exogenous or right-hand-side variables (variable by time by entity). 
 
     Notes
     -----
@@ -111,18 +143,17 @@ class BetweenOLS(PooledOLS):
 
     .. math::
 
-        \bar{y}_{i}=\alpha + \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}
+        \bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}
 
-    where :math:`\alpha` is omitted if ``intercept`` is ``False`` and
-    :math:`\bar{z}` is the time-average.
+    where :math:`\bar{z}` is the time-average.
     """
 
-    def __init__(self, endog, exog, *, intercept=True):
-        super(BetweenOLS, self).__init__(endog, exog, intercept=intercept)
+    def __init__(self, dependent, exog):
+        super(BetweenOLS, self).__init__(dependent, exog)
 
     def fit(self):
-        y = self.endog.a3d.mean(axis=1).T
-        x = self.exog.a3d.mean(axis=1).T
+        y = self.dependent.mean('time').values
+        x = self.exog.mean('time').values
 
         return pinv(x) @ y
 
@@ -131,11 +162,10 @@ class FirstDifferenceOLS(PooledOLS):
     r"""
     Parameters
     ----------
-    endog: array-like
-        Endogenous or left-hand-side variable (entities by time)
+    dependent: array-like
+        Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (entities by time by variable). Should not contain
-        an intercept or have a constant column in the column span.
+        Exogenous or right-hand-side variables (variable by time by entity). 
 
     Notes
     -----
@@ -146,13 +176,11 @@ class FirstDifferenceOLS(PooledOLS):
         \Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}
     """
 
-    def __init__(self, endog, exog, *, intercept=True):
-        super(FirstDifferenceOLS, self).__init__(endog, exog, intercept=intercept)
+    def __init__(self, dependent, exog):
+        super(FirstDifferenceOLS, self).__init__(dependent, exog)
 
     def fit(self):
-        y = np.diff(self.endog.a3d, axis=1)
-        x = np.diff(self.exog.a3d, axis=1)
-        n, t, k = self.exog.nentity, self.exog.nobs, self.exog.nvar
-        y = y.reshape((n * (t - 1), 1))
-        x = x.reshape((n * (t - 1), k))
+        y = self.dependent.first_difference().a2d
+        x = self.exog.first_difference().a2d
+
         return pinv(x) @ y
