@@ -520,7 +520,7 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
     def _endogeneity_setup(self, vars=None):
-        """Setup function for some endogeneity tests"""
+        """Setup function for some endogeneity iv"""
         if vars is not None and not isinstance(vars, list):
             vars = [vars]
         nobs = self.model.dependent.shape[0]
@@ -645,7 +645,7 @@ class IVResults(_CommonIVResults):
 
             \frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}
 
-        where :math:`q` is the number of variables tests,
+        where :math:`q` is the number of variables iv,
         :math:`v = n - n_{endog} - n_{exog} - q`. The test statistic has a
         :math:`F_{q, v}` distribution.
         """
@@ -915,7 +915,7 @@ class IVGMMResults(_CommonIVResults):
 
         Notes
         -----
-        The J-statistic tests whether the moment conditions are sufficiently
+        The J-statistic iv whether the moment conditions are sufficiently
         close to zero to indicate that the model is not overidentified. The
         statistic is defined as
 
@@ -948,7 +948,7 @@ class IVGMMResults(_CommonIVResults):
 
         Notes
         -----
-        The C statistic tests the difference between the model estimated by
+        The C statistic iv the difference between the model estimated by
         assuming one or more of the endogenous variables is actually
         exogenous.  The test is implemented as the difference between the
         J-statistics of two GMM estimations where both use the same weighting

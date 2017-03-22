@@ -42,11 +42,12 @@ def has_constant(x):
     n = x.shape[0]
     aug_rank = matrix_rank(np.c_[np.ones((n, 1)), x])
     rank = matrix_rank(x)
-    has_const = aug_rank == rank
+    has_const = bool(aug_rank == rank)
     loc = None
     if has_const:
         out = np.linalg.lstsq(x, np.ones((n, 1)))
-        loc = np.argmax(np.abs(out[0]) * x.var(0))
+        beta = out[0].ravel()
+        loc = np.argmax(np.abs(beta) * x.var(0))
     return has_const, loc
 
 
@@ -70,7 +71,7 @@ def inv_sqrth(x):
 
 class WaldTestStatistic(object):
     """
-    Test statistic holder for Wald-type tests
+    Test statistic holder for Wald-type iv
 
     Parameters
     ----------
@@ -102,7 +103,7 @@ class WaldTestStatistic(object):
             self.dist_name = 'chi2({0})'.format(df)
         else:
             self.dist = f(df, df_denom)
-            self.dist_name = 'f({0},{1})'.format(df, df_denom)
+            self.dist_name = 'F({0},{1})'.format(df, df_denom)
 
     @property
     def stat(self):
