@@ -7,7 +7,8 @@ import xarray as xr
 from numpy.random import random_sample
 from numpy.testing import assert_allclose
 
-from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS
+from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS, \
+    AmbiguityError
 from linearmodels.utility import AttrDict
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -15,10 +16,12 @@ TYPES = ['numpy', 'pandas', 'xarray']
 
 
 @pytest.fixture(params=list(product(PERC_MISSING, TYPES)),
-                ids=list(map(lambda x: str(int(100 * x[0])) + '-' + str(x[1]), product(PERC_MISSING, TYPES))))
+                ids=list(map(lambda x: str(int(100 * x[0])) + '-' + str(x[1]),
+                             product(PERC_MISSING, TYPES))))
 def data(request):
+    np.random.seed(12345)
     missing, datatype = request.param
-    n, t, k = 971, 4, 5
+    n, t, k = 971, 7, 5
     x = random_sample((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None]
     y = (x * beta).sum(0) + random_sample((t, n))
@@ -73,6 +76,38 @@ def test_pooled_ols_formula(data):
     assert mod.formula == formula
 
 
+def test_panel_ols_formula(data):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    joined = data.x
+    joined['y'] = data.y
+    formula = 'y ~ x1 + x2'
+    mod = PanelOLS.from_formula(formula, joined)
+    assert mod.formula == formula
+
+    formula = 'y ~ x1 + x2 + EntityEffect'
+    mod = PanelOLS.from_formula(formula, joined)
+    assert mod.formula == formula
+    assert mod.entity_effect is True
+    assert mod.time_effect is False
+
+    formula = 'y ~ x1 + x2 + TimeEffect'
+    mod = PanelOLS.from_formula(formula, joined)
+    assert mod.formula == formula
+    assert mod.time_effect is True
+    assert mod.entity_effect is False
+
+    formula = 'y ~ x1 + EntityEffect + TimeEffect + x2 '
+    mod = PanelOLS.from_formula(formula, joined)
+    assert mod.formula == formula
+    assert mod.entity_effect is True
+    assert mod.time_effect is True
+
+    formula = 'y ~ x1 + EntityEffect + FixedEffect + x2 '
+    with pytest.raises(ValueError):
+        PanelOLS.from_formula(formula, joined)
+
+
 def test_diff_data_size(data):
     if isinstance(data.x, pd.Panel):
         x = data.x.iloc[:, :, :-1]
@@ -86,15 +121,54 @@ def test_diff_data_size(data):
     with pytest.raises(ValueError):
         PooledOLS(y, x)
 
+
 def test_rank_deficient_array(data):
     x = data.x
     if isinstance(data.x, pd.Panel):
         x.iloc[1] = x.iloc[0]
     else:
         x[1] = x[0]
-
     with pytest.raises(ValueError):
         PooledOLS(data.y, x)
+
+
+def test_weights(data):
+    n = np.prod(data.y.shape)
+    weights = 1 + np.random.random_sample(n)
+    PooledOLS(data.y, data.x, weights=weights).fit()
+
+    n = data.y.shape[0]
+    weights = 1 + np.random.random_sample(n)
+    PooledOLS(data.y, data.x, weights=weights).fit()
+
+    n = data.y.shape[1]
+    weights = 1 + np.random.random_sample(n)
+    PooledOLS(data.y, data.x, weights=weights).fit()
+
+    weights = 1 + np.random.random_sample(data.y.shape)
+    PooledOLS(data.y, data.x, weights=weights).fit()
+
+
+def test_weight_ambiguity(data):
+    t = data.y.shape[0]
+    if isinstance(data.x, pd.Panel):
+        x = data.x.iloc[:, :, :t]
+    else:
+        x = data.x[:, :, :t]
+    y = data.y
+    weights = 1 + np.random.random_sample(t)
+    with pytest.raises(AmbiguityError):
+        PooledOLS(y, x, weights=weights)
+
+
+def test_weight_incorrect_shape(data):
+    weights = np.ones(np.prod(data.y.shape) - 1)
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=weights)
+
+    weights = np.ones((data.y.shape[0], data.y.shape[1] - 1))
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=weights)
 
 
 class TestPooledOLS(object):
