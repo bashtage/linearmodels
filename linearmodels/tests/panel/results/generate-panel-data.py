@@ -19,26 +19,33 @@ major = pd.date_range('12-31-1999', periods=t, freq='A-DEC')
 minor = ['firm.' + str(i) for i in range(1, n + 1)]
 
 x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
-x.major_axis.name = 'time'
-x.minor_axis.name = 'firm'
 
 y = pd.DataFrame(y, index=major, columns=minor)
 y = pd.Panel({'y': y})
-y.major_axis.name = 'time'
-y.minor_axis.name = 'firm'
 
 x = PanelData(x)
 y = PanelData(y)
+
 z = pd.concat([x.dataframe, y.dataframe], 1)
+z.index.levels[0].name = 'firm'
 z = z.reset_index()
 z['firm_id'] = z.firm.astype('category')
 z['firm_id'] = z.firm_id.cat.codes
 
 vars = ['y', 'x1', 'x2', 'x3', 'x4', 'x5']
-primes = [11, 13, 17, 19, 23, 29]
-for p, v in zip(primes, vars):
+missing = 0.05
+for v in vars:
+    locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
-    temp.iloc[::p] = np.nan
-    z[v + '_missing'] = temp
+    temp.loc[locs] = np.nan
+    z[v + '_light'] = temp
+
+vars = ['y', 'x1', 'x2', 'x3', 'x4', 'x5']
+missing = 0.20
+for v in vars:
+    locs = np.random.choice(n * t, int(n * t * missing))
+    temp = z[v].copy()
+    temp.loc[locs] = np.nan
+    z[v + '_heavy'] = temp
 
 z.to_stata('simulated-panel.dta')
