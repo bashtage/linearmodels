@@ -52,9 +52,10 @@ def test_invalid_test_statistic():
     assert np.isnan(ts.pval)
     assert ts.critical_values is None
 
+
 def test_inv_sqrth():
-    x = np.random.randn(1000,10)
+    x = np.random.randn(1000, 10)
     xpx = x.T @ x
     invsq = inv_sqrth(xpx)
     prod = invsq @ xpx @ invsq - np.eye(10)
-    assert_allclose(1 + prod, np.ones((10,10)))
+    assert_allclose(1 + prod, np.ones((10, 10)))

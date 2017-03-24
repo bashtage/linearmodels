@@ -26,7 +26,7 @@ instr = ['z1', 'z1 z2']
 other_options = ['', 'small', 'noconstant', 'small noconstant', 'small center',
                  'center', 'center noconstant', 'small center noconstant']
 weight_options = [' ', ' [aweight=weights] ']
-inputs = [methods, depvar_with_var, exog_vars, endog_vars, instr, other_options, weight_options ]
+inputs = [methods, depvar_with_var, exog_vars, endog_vars, instr, other_options, weight_options]
 configs = []
 for val in product(*inputs):
     method, dvo, exog, endog, instr, other_opt, weight_opt = val

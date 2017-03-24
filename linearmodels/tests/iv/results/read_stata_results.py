@@ -107,6 +107,7 @@ def process_results(filename):
 
 if __name__ == '__main__':
     import os
+
     blocks = parse_file(os.path.join(os.getcwd(), 'stata-iv-simulated-results.txt'))
     for key in blocks:
         out = parse_block(blocks[key])

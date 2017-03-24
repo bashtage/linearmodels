@@ -9,7 +9,7 @@ from numpy.testing import assert_allclose
 
 from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS, \
     AmbiguityError
-from linearmodels.utility import AttrDict
+from linearmodels.tests.panel._utility import lvsd, generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = ['numpy', 'pandas', 'xarray']
@@ -19,30 +19,8 @@ TYPES = ['numpy', 'pandas', 'xarray']
                 ids=list(map(lambda x: str(int(100 * x[0])) + '-' + str(x[1]),
                              product(PERC_MISSING, TYPES))))
 def data(request):
-    np.random.seed(12345)
     missing, datatype = request.param
-    n, t, k = 971, 7, 5
-    x = random_sample((k, t, n))
-    beta = np.arange(1, k + 1)[:, None, None]
-    y = (x * beta).sum(0) + random_sample((t, n))
-    if missing > 0:
-        locs = np.random.choice(n * t, int(n * t * missing))
-        y.flat[locs] = np.nan
-        locs = np.random.choice(n * t * k, int(n * t * k * missing))
-        x.flat[locs] = np.nan
-
-    if datatype in ('pandas', 'xarray'):
-        entities = ['firm' + str(i) for i in range(n)]
-        time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
-        vars = ['x' + str(i) for i in range(k)]
-        y = pd.DataFrame(y, index=time, columns=entities)
-        x = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
-
-    if datatype == 'xarray':
-        x = xr.DataArray(x)
-        y = xr.DataArray(y)
-
-    return AttrDict(y=y, x=x)
+    return generate_data(missing, datatype)
 
 
 def test_pooled_ols(data):
@@ -169,6 +147,24 @@ def test_weight_incorrect_shape(data):
     weights = np.ones((data.y.shape[0], data.y.shape[1] - 1))
     with pytest.raises(ValueError):
         PanelOLS(data.y, data.x, weights=weights)
+
+
+def test_panel_lvsd(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    y, x = mod.dependent.dataframe, mod.exog.dataframe
+    res = mod.fit()
+    expected = lvsd(y, x, has_const=False, entity=True)
+    assert_allclose(res.squeeze(), expected)
+
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res = mod.fit()
+    expected = lvsd(y, x, has_const=False, time=True)
+    assert_allclose(res.squeeze(), expected)
+
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    res = mod.fit()
+    expected = lvsd(y, x, has_const=False, entity=True, time=True)
+    assert_allclose(res.squeeze(), expected, rtol=1e-4)
 
 
 class TestPooledOLS(object):
