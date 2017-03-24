@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 from numpy.linalg import matrix_rank, pinv
-from patsy.highlevel import dmatrices
+from patsy.highlevel import dmatrices, ModelDesc
 from patsy.missing import NAAction
+
 
 from linearmodels.panel.data import PanelData
 from linearmodels.utility import has_constant
@@ -124,45 +125,25 @@ class PanelOLS(object):
         return self._time_effect
 
     @staticmethod
-    def _parse_effect(formula, effect):
-        """
-        Parameters
-        ----------
-        
-        Returns
-        -------
-        """
-        # TODO: This is too loose, check for multiple occurrences, parentheses balance
-        # 3 cases - first, last or middle
-        formula = formula.strip()
-        loc = formula.find(effect)
-        if loc < 0:
-            return formula, False
-        elen = len(effect)
-
-        if loc + elen == len(formula):  # Case 2, last term
-            formula = formula[:-elen].strip()[:-1]
-        else:
-            parts = formula.split(effect)
-            parts[0] = parts[0].strip()[:-1]
-            formula = ''.join(parts)
-        return formula, True
-
-    @staticmethod
     def from_formula(formula, data):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
-        parts = formula.split('~')
-        parts[1] = ' 0 + ' + parts[1]
-        parts[1], entity_effect = PanelOLS._parse_effect(parts[1], 'EntityEffect')
-        parts[1], fixed_effect = PanelOLS._parse_effect(parts[1], 'FixedEffect')
-        if entity_effect and fixed_effect:
-            raise ValueError('Cannot use both FixedEffect and EntityEffect')
-        entity_effect |= fixed_effect
-        parts[1], time_effect = PanelOLS._parse_effect(parts[1], 'TimeEffect')
+        cln_formula = formula + ' + 0 '
+        mod_descr = ModelDesc.from_formula(cln_formula)
+        rm_list = []
+        effects = {'EntityEffect':False, 'FixedEffect':False, 'TimeEffect':False}
+        for term in mod_descr.rhs_termlist:
+            if term.name() in effects:
+                effects[term.name()] = True
+                rm_list.append(term)
+        for term in rm_list:
+            mod_descr.rhs_termlist.remove(term)
 
-        cln_formula = '~'.join(parts)
-        dependent, exog = dmatrices(cln_formula, data.dataframe,
+        if effects['EntityEffect'] and effects['FixedEffect']:
+            raise ValueError('Cannot use both FixedEffect and EntityEffect')
+        entity_effect = effects['EntityEffect'] or effects['FixedEffect']
+        time_effect = effects['TimeEffect']
+        dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
         mod = PanelOLS(dependent, exog, entity_effect=entity_effect, time_effect=time_effect)
         mod.formula = formula
@@ -171,12 +152,17 @@ class PanelOLS(object):
     def fit(self):
         y = self.dependent
         x = self.exog
+        if self._constant:
+            const_name = x.dataframe.columns[self._constant_index]
+            const_col = x.dataframe[const_name]
         if self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
         if self.time_effect:
             y = y.demean('time')
             x = x.demean('time')
+        if self._constant:
+            x.dataframe.loc[:,const_name] = const_col
         y = y.a2d
         x = x.a2d
 
