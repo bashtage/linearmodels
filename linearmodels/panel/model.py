@@ -4,12 +4,13 @@ from numpy.linalg import matrix_rank, pinv
 from patsy.highlevel import dmatrices, ModelDesc
 from patsy.missing import NAAction
 
-
 from linearmodels.panel.data import PanelData
 from linearmodels.utility import has_constant
 
+
 class AmbiguityError(Exception):
     pass
+
 
 class PanelOLS(object):
     r"""
@@ -18,7 +19,7 @@ class PanelOLS(object):
     dependent: array-like
         Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (variable by time by entity). 
+        Exogenous or right-hand-side variables (variable by time by entity).
     entity_effect : bool, optional
         Flag whether to include entity (fixed) effects in the model
     time_effect : bool, optional
@@ -131,7 +132,7 @@ class PanelOLS(object):
         cln_formula = formula + ' + 0 '
         mod_descr = ModelDesc.from_formula(cln_formula)
         rm_list = []
-        effects = {'EntityEffect':False, 'FixedEffect':False, 'TimeEffect':False}
+        effects = {'EntityEffect': False, 'FixedEffect': False, 'TimeEffect': False}
         for term in mod_descr.rhs_termlist:
             if term.name() in effects:
                 effects[term.name()] = True
@@ -150,11 +151,11 @@ class PanelOLS(object):
         return mod
 
     def fit(self):
+        # TODO: Check got absorbing effects, aside form the constant column
         y = self.dependent
         x = self.exog
-        if self._constant:
-            const_name = x.dataframe.columns[self._constant_index]
-            const_col = x.dataframe[const_name]
+        y_gm = y.a2d.mean(0)
+        x_gm = x.a2d.mean(0)
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
@@ -164,11 +165,11 @@ class PanelOLS(object):
         elif self.time_effect:
             y = y.demean('time')
             x = x.demean('time')
-        if self._constant:
-            x.dataframe.loc[:,const_name] = const_col
         y = y.a2d
         x = x.a2d
-
+        if self._constant:
+            y = y + y_gm
+            x = x + x_gm
         return pinv(x) @ y
 
 
@@ -181,7 +182,7 @@ class PooledOLS(PanelOLS):
     dependent: array-like
         Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (variable by time by entity). 
+        Exogenous or right-hand-side variables (variable by time by entity).
 
     Notes
     -----
@@ -221,7 +222,7 @@ class BetweenOLS(PanelOLS):
     dependent: array-like
         Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (variable by time by entity). 
+        Exogenous or right-hand-side variables (variable by time by entity).
 
     Notes
     -----
@@ -238,8 +239,8 @@ class BetweenOLS(PanelOLS):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
 
     def fit(self):
-        y = self.dependent.mean('time').values
-        x = self.exog.mean('time').values
+        y = self.dependent.mean('entity').values
+        x = self.exog.mean('entity').values
 
         return pinv(x) @ y
 
@@ -251,7 +252,7 @@ class FirstDifferenceOLS(PanelOLS):
     dependent: array-like
         Dependent (left-hand-side) variable (time by entity)
     exog: array-like
-        Exogenous or right-hand-side variables (variable by time by entity). 
+        Exogenous or right-hand-side variables (variable by time by entity).
 
     Notes
     -----

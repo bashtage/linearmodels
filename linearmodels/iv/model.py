@@ -361,11 +361,11 @@ class IVLIML(object):
         -------
         wresids : ndarray
             Weighted model residuals
-        
+
         Notes
         -----
-        Uses weighted versions of data instead of raw data.  Identical to 
-        resids if all weights are unity. 
+        Uses weighted versions of data instead of raw data.  Identical to
+        resids if all weights are unity.
         """
         return self._wy - self._wx @ params
 
@@ -565,7 +565,7 @@ class IVGMM(IVLIML):
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
-        Additional keyword arguments to pass to the moment condition weight 
+        Additional keyword arguments to pass to the moment condition weight
         function
 
     Notes
@@ -622,7 +622,7 @@ class IVGMM(IVLIML):
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         **weight_config
-            Additional keyword arguments to pass to the moment condition weight 
+            Additional keyword arguments to pass to the moment condition weight
             function
 
         Notes
@@ -805,7 +805,7 @@ class IVGMMCUE(IVGMM):
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
-        Additional keyword arguments to pass to the moment condition weight 
+        Additional keyword arguments to pass to the moment condition weight
         function
 
     Notes
@@ -858,7 +858,7 @@ class IVGMMCUE(IVGMM):
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         **weight_config
-            Additional keyword arguments to pass to the moment condition weight 
+            Additional keyword arguments to pass to the moment condition weight
             function
 
         Returns

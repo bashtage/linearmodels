@@ -167,6 +167,17 @@ def test_panel_lvsd(data):
     assert_allclose(res.squeeze(), expected, rtol=1e-4)
 
 
+def test_panel_constant_smoke(data):
+    if isinstance(data.x, pd.Panel):
+        data.x['const'] = 1
+    else:
+        data.x[0] = 1
+
+    PanelOLS(data.y, data.x, entity_effect=True).fit()
+    PanelOLS(data.y, data.x, time_effect=True).fit()
+    PanelOLS(data.y, data.x, entity_effect=True, time_effect=True).fit()
+
+
 class TestPooledOLS(object):
     @classmethod
     def setup_class(cls):
