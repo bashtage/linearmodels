@@ -1,10 +1,26 @@
+from itertools import product
+
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from linearmodels.panel.data import PanelData
+from numpy.linalg import pinv
 from numpy.testing import assert_equal, assert_allclose
 from pandas.util.testing import assert_frame_equal, assert_panel_equal
+
+from linearmodels.panel.data import PanelData
+from linearmodels.tests.panel._utility import generate_data
+
+PERC_MISSING = [0, 0.02, 0.10, 0.33]
+TYPES = ['numpy', 'pandas', 'xarray']
+
+
+@pytest.fixture(params=list(product(PERC_MISSING, TYPES)),
+                ids=list(map(lambda x: str(int(100 * x[0])) + '-' + str(x[1]),
+                             product(PERC_MISSING, TYPES))))
+def data(request):
+    missing, datatype = request.param
+    return generate_data(missing, datatype)
 
 
 @pytest.fixture
@@ -220,6 +236,54 @@ def test_demean(panel):
     for i in range(3):
         expected[i] -= expected[i].mean(1)[:, None]
     assert_allclose(te.a3d, expected)
+
+
+def test_demean_against_groupby(data):
+    dh = PanelData(data.x)
+    df = dh.dataframe
+
+    def demean(x):
+        return x - x.mean()
+
+    entity_demean = df.groupby(level=0).transform(demean)
+    res = dh.demean('entity')
+    assert_allclose(entity_demean.values, res.dataframe.values)
+
+    time_demean = df.groupby(level=1).transform(demean)
+    res = dh.demean('time')
+    assert_allclose(time_demean.values, res.dataframe.values)
+
+
+def test_demean_against_dummy_regression(data):
+    dh = PanelData(data.x)
+    dh.drop(dh.isnull)
+
+    df = dh.dataframe
+    no_index = df.reset_index()
+
+    cat = pd.Categorical(no_index[df.index.levels[0].name])
+    d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    entity_demean = dh.demean('entity')
+    assert_allclose(1 + np.abs(entity_demean.dataframe.values),
+                    1 + np.abs(dummy_demeaned))
+
+    cat = pd.Categorical(no_index[df.index.levels[1].name])
+    d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    time_demean = dh.demean('time')
+    assert_allclose(1 + np.abs(time_demean.dataframe.values),
+                    1 + np.abs(dummy_demeaned))
+
+    cat = pd.Categorical(no_index[df.index.levels[0].name])
+    d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = pd.Categorical(no_index[df.index.levels[1].name])
+    d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
+    d = np.c_[d1.values, d2.values]
+    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    both_demean = dh.demean('both')
+    assert_allclose(1 + np.abs(both_demean.dataframe.values),
+                    1 + np.abs(dummy_demeaned))
 
 
 def test_demean_missing(panel):

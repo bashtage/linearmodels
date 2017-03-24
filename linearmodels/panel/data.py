@@ -109,7 +109,7 @@ class PanelData(object):
     def drop(self, locs):
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
-        self._n, self._t, self._k = self.shape
+        self._k, self._t, self._n = self.shape
 
     @property
     def shape(self):
@@ -171,6 +171,30 @@ class PanelData(object):
         ids = pd.Categorical(ids, ordered=True)
         return ids.codes[:, None]
 
+    def _demean_both(self):
+        """
+        Entity and time demean
+        """
+        if self.nentity > self.nobs:
+            group = 'entity'
+            dummy_level = 1
+        else:
+            group = 'time'
+            dummy_level = 0
+        e = self.demean(group)
+        cat = pd.Categorical(self._frame.index.labels[dummy_level])
+        d = pd.get_dummies(cat, drop_first=True)
+        d.index = e.dataframe.index
+        d = PanelData(d).demean(group)
+        d = d.dataframe.values
+        e = e.dataframe.values
+        resid = e - d @ np.linalg.pinv(d) @ e
+        resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
+
+        return PanelData(resid)
+
+
+
     def demean(self, group='entity'):
         """
         Demeans data by either entity or time group
@@ -186,14 +210,18 @@ class PanelData(object):
             Demeaned data according to type
         """
         v = self.panel.values
+        if group not in ('entity','time','both'):
+            raise ValueError
+        if group == 'both':
+            return self._demean_both()
+
         axis = 2 if group == 'time' else 1
         mu = np.nanmean(v, axis=axis)
         mu = np.expand_dims(mu, axis=axis)
         out = pd.Panel(v - mu, items=self.vars,
                        major_axis=self.time, minor_axis=self.entities)
         out = out.swapaxes(1, 2).to_frame(filter_observations=False)
-        if out.shape != self._frame.shape:
-            out = out.loc[self._frame.index]
+        out = out.loc[self._frame.index]
         return PanelData(out)
 
     def __str__(self):

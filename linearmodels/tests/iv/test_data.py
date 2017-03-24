@@ -204,6 +204,6 @@ class TestDataHandler(object):
             IVData(x, nobs=100)
 
     def test_mixed_data(self):
-        s = pd.Series([1,2,'a',-3.0])
+        s = pd.Series([1, 2, 'a', -3.0])
         with pytest.raises(ValueError):
             IVData(s)

@@ -155,10 +155,13 @@ class PanelOLS(object):
         if self._constant:
             const_name = x.dataframe.columns[self._constant_index]
             const_col = x.dataframe[const_name]
-        if self.entity_effect:
+        if self.entity_effect and self.time_effect:
+            y = y.demean('both')
+            x = x.demean('both')
+        elif self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
-        if self.time_effect:
+        elif self.time_effect:
             y = y.demean('time')
             x = x.demean('time')
         if self._constant:
