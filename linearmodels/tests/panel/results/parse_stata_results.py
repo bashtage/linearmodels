@@ -1,3 +1,4 @@
+import os
 from io import StringIO
 
 import pandas as pd
@@ -6,7 +7,8 @@ from linearmodels.utility import AttrDict
 
 filename = 'stata-panel-simulated-results.txt'
 
-results = open(filename)
+cwd = os.path.split(os.path.abspath(__file__))[0]
+results = open(os.path.join(cwd, filename))
 
 blocks = {}
 block = []

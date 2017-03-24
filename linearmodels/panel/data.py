@@ -6,7 +6,7 @@ import xarray as xr
 class PanelData(object):
     """
     Abstraction to handle alternative formats for panel data
-    
+
     Parameters
     ----------
     x : {ndarray, Series, DataFrame, DataArray}
@@ -14,33 +14,33 @@ class PanelData(object):
     var_name : str, optional
         Name to use when generating labels for the variables in the data
     convert_categoricals : bool, optional
-        Flag indicating whether categorical or string variables should be 
+        Flag indicating whether categorical or string variables should be
         converted to dummies
-    
+
     Notes
     -----
-    Data can be either 2- or 3-dimensional. The three key dimensions are 
-    
+    Data can be either 2- or 3-dimensional. The three key dimensions are
+
       * nvar - number of variables
       * nobs - number of time periods
       * nentity - number of entities
-    
+
     All 3-d inputs should be in the form (nvar, nobs, nentity). With one
     exception, 2-d inputs are treated as (nobs, nentity) so that the input
-    can be treated as being (1, nobs, nentity). 
-    
-    If the 2-d input is a pandas DataFrame and has a MultiIndex then it is 
+    can be treated as being (1, nobs, nentity).
+
+    If the 2-d input is a pandas DataFrame and has a MultiIndex then it is
     treated differently.  Index level 0 is assumed ot be entity.  Index level
     1 is time.  The columns are the variables.  This is the most precise format
     to use since pandas Panels do not preserve all variable type information
     across transformations between Panel and MultiIndex DataFrame.
-    
+
     Raises
     ------
     TypeError
         If the input type is not supported
     ValueError
-        If the input has the wrong number of dimensions or a MultiIndex 
+        If the input has the wrong number of dimensions or a MultiIndex
         DataFrame does not have 2 levels
     """
 
@@ -146,11 +146,11 @@ class PanelData(object):
     @property
     def entity_ids(self):
         """
-        Get array containing entity group membership information 
-        
+        Get array containing entity group membership information
+
         Returns
         -------
-        id : array 
+        id : array
             2d array containing entity ids corresponding dataframe view
         """
         ids = self._frame.reset_index()['entity']
@@ -160,11 +160,11 @@ class PanelData(object):
     @property
     def time_ids(self):
         """
-        Get array containing time membership information 
+        Get array containing time membership information
 
         Returns
         -------
-        id : array 
+        id : array
             2d array containing time ids corresponding dataframe view
         """
         ids = self._frame.reset_index()['time']
@@ -193,30 +193,30 @@ class PanelData(object):
 
         return PanelData(resid)
 
-
-
-    def demean(self, group='entity'):
+    def demean(self, group='entity', drop_first=False):
         """
         Demeans data by either entity or time group
-        
+
         Parameters
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
-        
+
         Returns
         -------
         demeaned : PanelData
             Demeaned data according to type
         """
         v = self.panel.values
-        if group not in ('entity','time','both'):
+        if group not in ('entity', 'time', 'both'):
             raise ValueError
         if group == 'both':
             return self._demean_both()
 
         axis = 2 if group == 'time' else 1
         mu = np.nanmean(v, axis=axis)
+        if drop_first:
+            mu[:, 0] = 0
         mu = np.expand_dims(mu, axis=axis)
         out = pd.Panel(v - mu, items=self.vars,
                        major_axis=self.time, minor_axis=self.entities)
@@ -245,15 +245,15 @@ class PanelData(object):
             Data mean according to type. Either (entity by var) or (time by var)
         """
         v = self.panel.values
-        axis = 1 if group == 'time' else 2
+        axis = 1 if group == 'entity' else 2
         mu = np.nanmean(v, axis=axis)
-        index = self.entities if group == 'time' else self.time
+        index = self.entities if group == 'entity' else self.time
         return pd.DataFrame(mu.T, index=index, columns=self.vars)
 
     def first_difference(self):
         """
         Compute first differences of variables
-        
+
         Returns
         -------
         diffs : PanelData

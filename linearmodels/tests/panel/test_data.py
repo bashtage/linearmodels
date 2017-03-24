@@ -338,3 +338,25 @@ def test_demean_many_missing_dropped(panel):
         expected[eid == i] -= np.nanmean(expected[eid == i], 0)
 
     assert_allclose(fe.a2d, expected)
+
+
+def test_demean_both_large_t():
+    data = PanelData(pd.Panel(np.random.standard_normal((1, 100, 10))))
+    demeaned = data.demean('both')
+
+    df = data.dataframe
+    no_index = df.reset_index()
+    cat = pd.Categorical(no_index[df.index.levels[0].name])
+    d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = pd.Categorical(no_index[df.index.levels[1].name])
+    d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
+    d = np.c_[d1.values, d2.values]
+    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    assert_allclose(1 + np.abs(demeaned.dataframe.values),
+                    1 + np.abs(dummy_demeaned))
+
+
+def test_demean_invalid(panel):
+    data = PanelData(panel)
+    with pytest.raises(ValueError):
+        data.demean('unknown')
