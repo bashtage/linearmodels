@@ -1,10 +1,9 @@
-# One
+# Linear Models
 
-[![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels) 
+[![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels)
 [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)
 
 
-# Linear Models
 
 Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmodels.org) to 
 include instrumental variable estimators:
