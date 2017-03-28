@@ -12,6 +12,24 @@ class AmbiguityError(Exception):
     pass
 
 
+# TODO: Results class
+# TODO: Rests for formulas
+# TODO: Homoskedastic covariance
+# TODO: Heteroskedastic covariance
+# TODO: One-way cluster covariance
+# TODO: Bootstrap covariance
+# TODO: R2 definitions
+# TODO: Degree of freedoms
+# TODO: RSS, TSS, etc.
+# TODO: Rmse
+# TODO: Regression F-stat
+# TODO: Pooled F-stat
+# TODO: number of entities/time
+# TODO: Warnign about 2 way cluster
+# TODO: Group stats, min, max, avg
+# TODO: WLS for BEtween
+
+
 class PanelOLS(object):
     r"""
     Parameters
@@ -125,8 +143,8 @@ class PanelOLS(object):
     def time_effect(self):
         return self._time_effect
 
-    @staticmethod
-    def from_formula(formula, data):
+    @classmethod
+    def from_formula(cls, formula, data):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
         cln_formula = formula + ' + 0 '
@@ -144,9 +162,11 @@ class PanelOLS(object):
             raise ValueError('Cannot use both FixedEffect and EntityEffect')
         entity_effect = effects['EntityEffect'] or effects['FixedEffect']
         time_effect = effects['TimeEffect']
+
         dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = PanelOLS(dependent, exog, entity_effect=entity_effect, time_effect=time_effect)
+        mod = cls.__class__(dependent, exog, entity_effect=entity_effect,
+                            time_effect=time_effect)
         mod.formula = formula
         return mod
 
@@ -196,8 +216,8 @@ class PooledOLS(PanelOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(PooledOLS, self).__init__(dependent, exog, weights=weights)
 
-    @staticmethod
-    def from_formula(formula, data):
+    @classmethod
+    def from_formula(cls, formula, data):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
         parts = formula.split('~')
@@ -205,7 +225,7 @@ class PooledOLS(PanelOLS):
         cln_formula = '~'.join(parts)
         dependent, exog = dmatrices(cln_formula, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = PooledOLS(dependent, exog)
+        mod = cls.__class__(dependent, exog)
         mod.formula = formula
         return mod
 
@@ -215,7 +235,7 @@ class PooledOLS(PanelOLS):
         return pinv(x) @ y
 
 
-class BetweenOLS(PanelOLS):
+class BetweenOLS(PooledOLS):
     r"""
     Parameters
     ----------
@@ -245,7 +265,7 @@ class BetweenOLS(PanelOLS):
         return pinv(x) @ y
 
 
-class FirstDifferenceOLS(PanelOLS):
+class FirstDifferenceOLS(PooledOLS):
     r"""
     Parameters
     ----------
