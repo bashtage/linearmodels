@@ -6,7 +6,8 @@ from numpy.random import random_sample
 from linearmodels.utility import AttrDict
 
 
-def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False, general=None):
+def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
+         general=None):
     x_orig = x
     nvar = x.shape[1]
     temp = x.reset_index()

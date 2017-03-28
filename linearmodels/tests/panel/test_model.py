@@ -41,51 +41,6 @@ def test_panel_ols(data):
     PanelOLS(data.y, data.x, time_effect=True).fit()
 
 
-def test_pooled_ols_formula(data):
-    if not isinstance(data.y, pd.DataFrame):
-        return
-    joined = data.x
-    joined['y'] = data.y
-    formula = 'y ~ x1 + x2'
-    mod = PooledOLS.from_formula(formula, joined)
-    res = mod.fit()
-    res2 = PooledOLS(joined['y'], joined[['x1', 'x2']]).fit()
-    assert_allclose(res, res2)
-    assert mod.formula == formula
-
-
-def test_panel_ols_formula(data):
-    if not isinstance(data.y, pd.DataFrame):
-        return
-    joined = data.x
-    joined['y'] = data.y
-    formula = 'y ~ x1 + x2'
-    mod = PanelOLS.from_formula(formula, joined)
-    assert mod.formula == formula
-
-    formula = 'y ~ x1 + x2 + EntityEffect'
-    mod = PanelOLS.from_formula(formula, joined)
-    assert mod.formula == formula
-    assert mod.entity_effect is True
-    assert mod.time_effect is False
-
-    formula = 'y ~ x1 + x2 + TimeEffect'
-    mod = PanelOLS.from_formula(formula, joined)
-    assert mod.formula == formula
-    assert mod.time_effect is True
-    assert mod.entity_effect is False
-
-    formula = 'y ~ x1 + EntityEffect + TimeEffect + x2 '
-    mod = PanelOLS.from_formula(formula, joined)
-    assert mod.formula == formula
-    assert mod.entity_effect is True
-    assert mod.time_effect is True
-
-    formula = 'y ~ x1 + EntityEffect + FixedEffect + x2 '
-    with pytest.raises(ValueError):
-        PanelOLS.from_formula(formula, joined)
-
-
 def test_diff_data_size(data):
     if isinstance(data.x, pd.Panel):
         x = data.x.iloc[:, :, :-1]
@@ -154,17 +109,17 @@ def test_panel_lvsd(data):
     y, x = mod.dependent.dataframe, mod.exog.dataframe
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, entity=True)
-    assert_allclose(res.squeeze(), expected)
+    assert_allclose(res.params.squeeze(), expected)
 
     mod = PanelOLS(data.y, data.x, time_effect=True)
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, time=True)
-    assert_allclose(res.squeeze(), expected)
+    assert_allclose(res.params.squeeze(), expected)
 
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, entity=True, time=True)
-    assert_allclose(res.squeeze(), expected, rtol=1e-4)
+    assert_allclose(res.params.squeeze(), expected, rtol=1e-4)
 
 
 def test_panel_constant_smoke(data):

@@ -99,11 +99,11 @@ class PanelData(object):
         return self._frame
 
     @property
-    def a2d(self):
+    def values2d(self):
         return self._frame.values
 
     @property
-    def a3d(self):
+    def values3d(self):
         return self.panel.values
 
     def drop(self, locs):

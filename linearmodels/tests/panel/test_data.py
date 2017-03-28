@@ -37,11 +37,11 @@ def test_numpy_3d():
     n, t, k = 11, 7, 3
     x = np.random.random((k, t, n))
     dh = PanelData(x)
-    assert_equal(np.reshape(x, (k, t, n)), dh.a3d)
+    assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
     assert dh.nentity == n
     assert dh.nobs == t
     assert dh.nvar == k
-    assert_equal(np.reshape(x.T, (n * t, k)), dh.a2d)
+    assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
     items = ['entity.{0}'.format(i) for i in range(n)]
     obs = [i for i in range(t)]
     vars = ['x.{0}'.format(i) for i in range(k)]
@@ -65,11 +65,11 @@ def test_numpy_2d():
     n, t, k = 11, 7, 1
     x = np.random.random((t, n))
     dh = PanelData(x)
-    assert_equal(np.reshape(x, (k, t, n)), dh.a3d)
+    assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
     assert dh.nentity == n
     assert dh.nobs == t
     assert dh.nvar == k
-    assert_equal(np.reshape(x.T, (n * t, k)), dh.a2d)
+    assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
     items = ['entity.{0}'.format(i) for i in range(n)]
     obs = [i for i in range(t)]
     vars = ['x.{0}'.format(i) for i in range(k)]
@@ -93,9 +93,9 @@ def test_pandas_panel():
     assert dh.nentity == n
     assert dh.nobs == t
     assert dh.nvar == k
-    assert_equal(dh.a3d, x.values)
+    assert_equal(dh.values3d, x.values)
     expected = np.reshape(x.swapaxes(0, 2).values, (n * t, k))
-    assert_equal(dh.a2d, expected)
+    assert_equal(dh.values2d, expected)
     assert_panel_equal(x, dh.panel)
     expected_frame = x.swapaxes(1, 2).to_frame()
     expected_frame.index.levels[0].name = 'entity'
@@ -141,7 +141,7 @@ def test_xarray_2d():
     x = xr.DataArray(x, dims=('time', 'entity'),
                      coords={'entity': list('firm.' + str(i) for i in range(n))})
     dh = PanelData(x)
-    assert_equal(dh.a2d, np.reshape(x.values.T, (n * t, 1)))
+    assert_equal(dh.values2d, np.reshape(x.values.T, (n * t, 1)))
 
 
 def test_xarray_3d():
@@ -151,7 +151,7 @@ def test_xarray_3d():
                      coords={'entity': list('firm.' + str(i) for i in range(n)),
                              'var': list('x.' + str(i) for i in range(k))})
     dh = PanelData(x)
-    assert_equal(np.reshape(x.values.T, (n * t, k)), dh.a2d)
+    assert_equal(np.reshape(x.values.T, (n * t, k)), dh.values2d)
 
 
 def test_dimensions(panel):
@@ -180,7 +180,7 @@ def test_labels(panel):
 def test_missing(panel):
     panel.iloc[0, :, ::3] = np.nan
     dh = PanelData(panel)
-    assert_equal(dh.isnull, np.any(np.isnan(dh.a2d), 1))
+    assert_equal(dh.isnull, np.any(np.isnan(dh.values2d), 1))
 
 
 def test_incorrect_dataframe():
@@ -229,13 +229,13 @@ def test_demean(panel):
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= expected[i].mean(0)
-    assert_allclose(fe.a3d, expected)
+    assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= expected[i].mean(1)[:, None]
-    assert_allclose(te.a3d, expected)
+    assert_allclose(te.values3d, expected)
 
 
 def test_demean_against_groupby(data):
@@ -293,13 +293,13 @@ def test_demean_missing(panel):
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
-    assert_allclose(fe.a3d, expected)
+    assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 1)[:, None]
-    assert_allclose(te.a3d, expected)
+    assert_allclose(te.values3d, expected)
 
 
 def test_demean_many_missing(panel):
@@ -312,18 +312,18 @@ def test_demean_many_missing(panel):
     data = PanelData(panel)
     fe = data.demean('entity')
     orig_nan = np.isnan(panel.values.ravel())
-    fe_nan = np.isnan(fe.a3d.ravel())
+    fe_nan = np.isnan(fe.values3d.ravel())
     assert np.all(fe_nan[orig_nan])
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
-    assert_allclose(fe.a3d, expected)
+    assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 1)[:, None]
-    assert_allclose(te.a3d, expected)
+    assert_allclose(te.values3d, expected)
 
 
 def test_demean_many_missing_dropped(panel):
@@ -332,12 +332,12 @@ def test_demean_many_missing_dropped(panel):
     data.drop(data.isnull)
     fe = data.demean('entity')
 
-    expected = data.a2d.copy()
+    expected = data.values2d.copy()
     eid = data.entity_ids.ravel()
     for i in np.unique(eid):
         expected[eid == i] -= np.nanmean(expected[eid == i], 0)
 
-    assert_allclose(fe.a2d, expected)
+    assert_allclose(fe.values2d, expected)
 
 
 def test_demean_both_large_t():

@@ -4,30 +4,28 @@ from numpy.linalg import matrix_rank, pinv
 from patsy.highlevel import dmatrices, ModelDesc
 from patsy.missing import NAAction
 
+from linearmodels.panel.covariance import HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
-from linearmodels.utility import has_constant
+from linearmodels.panel.results import PanelResults
+from linearmodels.utility import has_constant, AttrDict
 
 
 class AmbiguityError(Exception):
     pass
 
 
-# TODO: Results class
-# TODO: Rests for formulas
-# TODO: Homoskedastic covariance
 # TODO: Heteroskedastic covariance
 # TODO: One-way cluster covariance
 # TODO: Bootstrap covariance
 # TODO: R2 definitions
-# TODO: Degree of freedoms
 # TODO: RSS, TSS, etc.
 # TODO: Rmse
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
 # TODO: number of entities/time
-# TODO: Warnign about 2 way cluster
+# TODO: Warning about 2 way cluster
 # TODO: Group stats, min, max, avg
-# TODO: WLS for BEtween
+# TODO: WLS for Between
 
 
 class PanelOLS(object):
@@ -68,6 +66,7 @@ class PanelOLS(object):
         self.weights = PanelData(self.weights.dataframe / avg_w)
         self._entity_effect = entity_effect
         self._time_effect = time_effect
+        self._name = self.__class__.__name__
 
     def _adapt_weights(self, weights):
         frame = self.dependent.panel.iloc[0].copy()
@@ -100,9 +99,9 @@ class PanelOLS(object):
         return PanelData(weights)
 
     def _validate_data(self):
-        y = self._y = self.dependent.a2d
-        x = self._x = self.exog.a2d
-        w = self._w = self.weights.a2d
+        y = self._y = self.dependent.values2d
+        x = self._x = self.exog.values2d
+        w = self._w = self.weights.values2d
         if y.shape[0] != x.shape[0]:
             raise ValueError('dependent and exog must have the same number of '
                              'observations.')
@@ -121,7 +120,7 @@ class PanelOLS(object):
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)
-            x = self.exog.a2d
+            x = self.exog.values2d
 
         self._constant, self._constant_index = has_constant(x)
         if matrix_rank(x) < x.shape[1]:
@@ -170,27 +169,63 @@ class PanelOLS(object):
         mod.formula = formula
         return mod
 
-    def fit(self):
+    def _rsquared(self, params):
+        ym = self.dependent.demean('entity').values2d
+        xm = self.exog.demean('entity').values2d
+        yhatm = xm @ params
+        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())
+
+        yb = self.dependent.mean('entity').values
+        xb = self.exog.mean('entity').values
+        yhatb = xb @ params
+        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())
+        return r2w, r2b
+
+    def fit(self, debiased=False):
         # TODO: Check got absorbing effects, aside form the constant column
         y = self.dependent
         x = self.exog
-        y_gm = y.a2d.mean(0)
-        x_gm = x.a2d.mean(0)
+        y_gm = y.values2d.mean(0)
+        x_gm = x.values2d.mean(0)
+        neffects = 0
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
+            neffects = y.nentity - self._constant
         elif self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
+            neffects = y.nobs - self._constant
         elif self.time_effect:
             y = y.demean('time')
             x = x.demean('time')
-        y = y.a2d
-        x = x.a2d
+            neffects = y.nobs + y.nentity - self._constant
+        y = y.values2d
+        x = x.values2d
         if self._constant:
             y = y + y_gm
             x = x + x_gm
-        return pinv(x) @ y
+
+        params = pinv(x) @ y
+        df_resid = y.shape[0] - x.shape[1] - neffects
+        cov = HomoskedasticCovariance(y, x, params, df_resid)
+        eps = y - x @ params
+        resid_ss = float(eps.T @ eps)
+        if self._constant or self._entity_effect or self._time_effect:
+            mu = y - y.mean()
+        else:
+            mu = 0
+        total_ss = float((y - mu).T @ (y - mu))
+        r2w, r2b = self._rsquared(params)
+
+        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       debiased=debiased, df_resid=df_resid,
+                       df_model=x.shape[1] + neffects, nobs=y.shape[0],
+                       name=self._name, var_names=self.exog.vars,
+                       residual_ss=resid_ss, total_ss=total_ss,
+                       r2w=r2w, r2b=r2b, r2=r2w)  # TODO: Fix R2 definitions for multiple effects
+
+        return res
 
 
 class PooledOLS(PanelOLS):
@@ -229,10 +264,30 @@ class PooledOLS(PanelOLS):
         mod.formula = formula
         return mod
 
-    def fit(self):
-        y = self.dependent.a2d
-        x = self.exog.a2d
-        return pinv(x) @ y
+    def fit(self, debiased=False):
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        params = pinv(x) @ y
+        df_resid = y.shape[0] - x.shape[1]
+        cov = HomoskedasticCovariance(y, x, params, df_resid)
+        from linearmodels.utility import AttrDict
+
+        eps = y - x @ params
+        resid_ss = float(eps.T @ eps)
+        if self._constant:
+            mu = y - y.mean()
+        else:
+            mu = 0
+        total_ss = float((y - mu).T @ (y - mu))
+        r2 = 1 - resid_ss / total_ss
+        r2w, r2b = self._rsquared(params)
+        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       debiased=debiased, df_resid=df_resid,
+                       df_model=x.shape[1], nobs=y.shape[0],
+                       name=self._name, var_names=self.exog.vars,
+                       residual_ss=resid_ss, total_ss=total_ss,
+                       r2=r2, r2w=r2w, r2b=r2b)
+        return PanelResults(res)
 
 
 class BetweenOLS(PooledOLS):
@@ -258,11 +313,36 @@ class BetweenOLS(PooledOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
 
-    def fit(self):
+    def fit(self, debiased=False):
+        # TODO: Add WLS for unbalanced
         y = self.dependent.mean('entity').values
         x = self.exog.mean('entity').values
 
-        return pinv(x) @ y
+        params = pinv(x) @ y
+        df_resid = y.shape[0] - x.shape[1]
+        cov = HomoskedasticCovariance(y, x, params, df_resid)
+
+        eps = y - x @ params
+        resid_ss = float(eps.T @ eps)
+        if self._constant:
+            mu = y - y.mean()
+        else:
+            mu = 0
+        total_ss = float((y - mu).T @ (y - mu))
+        r2 = 1 - resid_ss / total_ss
+        r2w, r2b = self._rsquared(params)
+
+        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       debiased=debiased, df_resid=df_resid,
+                       df_model=x.shape[1], nobs=self.dependent.values2d.shape[0],
+                       name=self._name, var_names=self.exog.vars,
+                       residual_ss=resid_ss, total_ss=total_ss,
+                       r2=r2, r2w=r2w, r2b=r2b)
+        return PanelResults(res)
+
+    @classmethod
+    def from_formula(cls, formula, data):
+        return super(BetweenOLS, cls).from_formula(formula, data)
 
 
 class FirstDifferenceOLS(PooledOLS):
@@ -285,9 +365,31 @@ class FirstDifferenceOLS(PooledOLS):
 
     def __init__(self, dependent, exog, *, weights=None):
         super(FirstDifferenceOLS, self).__init__(dependent, exog, weights=weights)
+        if self._constant:
+            raise ValueError('Constants are not allowed in first difference regressions.')
 
-    def fit(self):
-        y = self.dependent.first_difference().a2d
-        x = self.exog.first_difference().a2d
+    def fit(self, debiased=False):
+        y = self.dependent.first_difference().values2d
+        x = self.exog.first_difference().values2d
 
-        return pinv(x) @ y
+        params = pinv(x) @ y
+        df_resid = y.shape[0] - x.shape[1]
+        cov = HomoskedasticCovariance(y, x, params, df_resid)
+        eps = y - x @ params
+        resid_ss = float(eps.T @ eps)
+        total_ss = float(y.T @ y)
+
+        r2 = 1 - resid_ss / total_ss
+        r2w, r2b = self._rsquared(params)
+        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       debiased=debiased, df_resid=df_resid,
+                       df_model=x.shape[1], nobs=y.shape[0],
+                       name=self._name, var_names=self.exog.vars,
+                       total_ss=total_ss, residual_ss=resid_ss,
+                       r2=r2, r2w=r2w, r2b=r2b)
+
+        return PanelResults(res)
+
+    @classmethod
+    def from_formula(cls, formula, data):
+        return super(FirstDifferenceOLS, cls).from_formula(formula, data)

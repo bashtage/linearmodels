@@ -1,4 +1,31 @@
 import numpy as np
+from numpy.linalg import inv
+
+
+class HomoskedasticCovariance(object):
+    def __init__(self, y, x, params, df_resid):
+        self._y = y
+        self._x = x
+        self._params = params
+        self._df_resid = df_resid
+
+    @property
+    def eps(self):
+        return self._y - self._x @ self._params
+
+    @property
+    def s2(self):
+        eps = self.eps
+        return float(eps.T @ eps) / self._df_resid
+
+    @property
+    def cov(self):
+        x = self._x
+        nobs = x.shape[0]
+        return self.s2 * inv(x.T @ x)
+
+    def deferred_cov(self):
+        return self.cov
 
 
 def homoskedastic_covariance(x, epsilon, *, debiased=False):
