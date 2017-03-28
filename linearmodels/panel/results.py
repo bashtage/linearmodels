@@ -18,6 +18,10 @@ class PanelResults(object):
         self._var_names = res.var_names
         self._residual_ss = res.residual_ss
         self._total_ss = res.total_ss
+        self._r2= res.r2
+        self._r2w= res.r2w
+        self._r2b= res.r2b
+        self._s2 = res.s2
 
     @property
     def params(self):
@@ -74,3 +78,19 @@ class PanelResults(object):
     def resid_ss(self):
         """Residual sum of squares"""
         return self._residual_ss
+
+    @property
+    def rsquared(self):
+        return self._r2
+
+    @property
+    def rsquared_between(self):
+        return self._r2b
+
+    @property
+    def rsquared_within(self):
+        return self._r2w
+
+    @property
+    def s2(self):
+        return self._s2

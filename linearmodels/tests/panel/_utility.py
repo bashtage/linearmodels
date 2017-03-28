@@ -38,7 +38,7 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
 
     wy = w * y.values
     wx = w * x.values
-    params = np.linalg.pinv(wx) @ wy
+    params = np.linalg.lstsq(wx,wy)[0]
     params = params.squeeze()
 
     return params[:nvar]

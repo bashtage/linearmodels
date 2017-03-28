@@ -188,7 +188,7 @@ class PanelData(object):
         d = PanelData(d).demean(group)
         d = d.dataframe.values
         e = e.dataframe.values
-        resid = e - d @ np.linalg.pinv(d) @ e
+        resid = e - d @ np.linalg.lstsq(d, e)[0]
         resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 
         return PanelData(resid)

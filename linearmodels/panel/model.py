@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from numpy.linalg import matrix_rank, pinv
+from numpy.linalg import matrix_rank, lstsq
 from patsy.highlevel import dmatrices, ModelDesc
 from patsy.missing import NAAction
 
@@ -10,6 +10,17 @@ from linearmodels.panel.results import PanelResults
 from linearmodels.utility import has_constant, AttrDict
 
 
+class AbsorbingEffectError(Exception):
+    pass
+
+
+absorbing_error_msg = """
+The model cannot be estimated. The included effects have fully absorbed 
+one or more of the variables. This occurs when one or more of the dependent 
+variable is perfectly explained using the effects included in the model.
+"""
+
+
 class AmbiguityError(Exception):
     pass
 
@@ -17,9 +28,6 @@ class AmbiguityError(Exception):
 # TODO: Heteroskedastic covariance
 # TODO: One-way cluster covariance
 # TODO: Bootstrap covariance
-# TODO: R2 definitions
-# TODO: RSS, TSS, etc.
-# TODO: Rmse
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
 # TODO: number of entities/time
@@ -170,24 +178,39 @@ class PanelOLS(object):
         return mod
 
     def _rsquared(self, params):
+        # TODO: Fix to be correct for time/entity effects or both
         ym = self.dependent.demean('entity').values2d
         xm = self.exog.demean('entity').values2d
         yhatm = xm @ params
-        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())
+        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0,1]
 
         yb = self.dependent.mean('entity').values
         xb = self.exog.mean('entity').values
         yhatb = xb @ params
-        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())
+        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0,1]
         return r2w, r2b
+
+    def _info(self):
+        def stats(ids):
+            bc = np.bincount(ids)
+            index = ['mean', 'median', 'max', 'min']
+            out = [bc.mean(), np.median(bc), bc.max(), bc.min()]
+            return pd.Series(out, index=index)
+
+        entity_info = stats(self.dependent.entity_ids.squeeze())
+        time_info = stats(self.dependent.time_ids.squeeze())
+        return entity_info, time_info
+
 
     def fit(self, debiased=False):
         # TODO: Check got absorbing effects, aside form the constant column
+        has_effect = self.entity_effect or self.time_effect
         y = self.dependent
         x = self.exog
         y_gm = y.values2d.mean(0)
         x_gm = x.values2d.mean(0)
         neffects = 0
+
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
@@ -202,28 +225,34 @@ class PanelOLS(object):
             neffects = y.nobs + y.nentity - self._constant
         y = y.values2d
         x = x.values2d
+
         if self._constant:
             y = y + y_gm
             x = x + x_gm
 
-        params = pinv(x) @ y
+        if has_effect:
+            if matrix_rank(x) < x.shape[1]:
+                raise AbsorbingEffectError(absorbing_error_msg)
+
+        params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1] - neffects
         cov = HomoskedasticCovariance(y, x, params, df_resid)
         eps = y - x @ params
         resid_ss = float(eps.T @ eps)
         if self._constant or self._entity_effect or self._time_effect:
-            mu = y - y.mean()
+            mu = y.mean()
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         r2w, r2b = self._rsquared(params)
-
+        entity_info, time_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        debiased=debiased, df_resid=df_resid,
                        df_model=x.shape[1] + neffects, nobs=y.shape[0],
                        name=self._name, var_names=self.exog.vars,
                        residual_ss=resid_ss, total_ss=total_ss,
-                       r2w=r2w, r2b=r2b, r2=r2w)  # TODO: Fix R2 definitions for multiple effects
+                       r2w=r2w, r2b=r2b, r2=r2w, s2=cov.s2,
+                       entity_info=entity_info, time_info=time_info)  # TODO: Fix R2 definitions for multiple effects
 
         return res
 
@@ -264,10 +293,22 @@ class PooledOLS(PanelOLS):
         mod.formula = formula
         return mod
 
+    def _rsquared(self, params):
+        ym = self.dependent.demean('entity').values2d
+        xm = self.exog.demean('entity').values2d
+        yhatm = xm @ params
+        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0,1]
+
+        yb = self.dependent.mean('entity').values
+        xb = self.exog.mean('entity').values
+        yhatb = xb @ params
+        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0,1]
+        return r2w, r2b
+
     def fit(self, debiased=False):
         y = self.dependent.values2d
         x = self.exog.values2d
-        params = pinv(x) @ y
+        params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov = HomoskedasticCovariance(y, x, params, df_resid)
         from linearmodels.utility import AttrDict
@@ -275,18 +316,20 @@ class PooledOLS(PanelOLS):
         eps = y - x @ params
         resid_ss = float(eps.T @ eps)
         if self._constant:
-            mu = y - y.mean()
+            mu = y.mean()
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss
         r2w, r2b = self._rsquared(params)
+        entity_info, time_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        debiased=debiased, df_resid=df_resid,
                        df_model=x.shape[1], nobs=y.shape[0],
                        name=self._name, var_names=self.exog.vars,
                        residual_ss=resid_ss, total_ss=total_ss,
-                       r2=r2, r2w=r2w, r2b=r2b)
+                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
+                       entity_info=entity_info, time_info=time_info)
         return PanelResults(res)
 
 
@@ -318,26 +361,27 @@ class BetweenOLS(PooledOLS):
         y = self.dependent.mean('entity').values
         x = self.exog.mean('entity').values
 
-        params = pinv(x) @ y
+        params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov = HomoskedasticCovariance(y, x, params, df_resid)
 
         eps = y - x @ params
         resid_ss = float(eps.T @ eps)
         if self._constant:
-            mu = y - y.mean()
+            mu = y.mean()
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss
         r2w, r2b = self._rsquared(params)
-
+        entity_info, time_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        debiased=debiased, df_resid=df_resid,
                        df_model=x.shape[1], nobs=self.dependent.values2d.shape[0],
                        name=self._name, var_names=self.exog.vars,
                        residual_ss=resid_ss, total_ss=total_ss,
-                       r2=r2, r2w=r2w, r2b=r2b)
+                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
+                       entity_info=entity_info, time_info=time_info)
         return PanelResults(res)
 
     @classmethod
@@ -372,7 +416,7 @@ class FirstDifferenceOLS(PooledOLS):
         y = self.dependent.first_difference().values2d
         x = self.exog.first_difference().values2d
 
-        params = pinv(x) @ y
+        params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov = HomoskedasticCovariance(y, x, params, df_resid)
         eps = y - x @ params
@@ -381,12 +425,14 @@ class FirstDifferenceOLS(PooledOLS):
 
         r2 = 1 - resid_ss / total_ss
         r2w, r2b = self._rsquared(params)
+        entity_info, time_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        debiased=debiased, df_resid=df_resid,
                        df_model=x.shape[1], nobs=y.shape[0],
                        name=self._name, var_names=self.exog.vars,
                        total_ss=total_ss, residual_ss=resid_ss,
-                       r2=r2, r2w=r2w, r2b=r2b)
+                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
+                       entity_info=entity_info, time_info=time_info)
 
         return PanelResults(res)
 
