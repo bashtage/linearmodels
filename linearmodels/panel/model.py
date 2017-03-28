@@ -165,8 +165,8 @@ class PanelOLS(object):
 
         dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = cls.__class__(dependent, exog, entity_effect=entity_effect,
-                            time_effect=time_effect)
+        mod = cls(dependent, exog, entity_effect=entity_effect,
+                  time_effect=time_effect)
         mod.formula = formula
         return mod
 
@@ -225,7 +225,7 @@ class PooledOLS(PanelOLS):
         cln_formula = '~'.join(parts)
         dependent, exog = dmatrices(cln_formula, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = cls.__class__(dependent, exog)
+        mod = cls(dependent, exog)
         mod.formula = formula
         return mod
 
