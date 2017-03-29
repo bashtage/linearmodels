@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numpy.random import random_sample
+from numpy.random import standard_normal
 
 from linearmodels.utility import AttrDict
 
@@ -48,9 +48,9 @@ def generate_data(missing, datatype):
     np.random.seed(12345)
 
     n, t, k = 971, 7, 5
-    x = random_sample((k, t, n))
-    beta = np.arange(1, k + 1)[:, None, None]
-    y = (x * beta).sum(0) + random_sample((t, n))
+    x = standard_normal((k, t, n))
+    beta = np.arange(1, k + 1)[:, None, None] / k
+    y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t,1))
     if missing > 0:
         locs = np.random.choice(n * t, int(n * t * missing))
         y.flat[locs] = np.nan

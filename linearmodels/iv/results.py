@@ -13,7 +13,8 @@ from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
 from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.iv._utility import annihilate, proj
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, cached_property)
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, cached_property, _str,
+                                  pval_format, _SummaryStr)
 
 
 def stub_concat(lists, sep='='):
@@ -37,39 +38,6 @@ def table_concat(lists, sep='='):
         out.extend(l)
         out.append(sep_cols)
     return out[:-1]
-
-
-def _str(v):
-    """Preferred basic formatter"""
-    if isnan(v):
-        return '        '
-    av = abs(v)
-    digits = 0
-    if av != 0:
-        digits = ceil(log10(av))
-    if digits > 4 or digits <= -4:
-        return '{0:8.4g}'.format(v)
-
-    if digits > 0:
-        d = int(5 - digits)
-    else:
-        d = int(4)
-
-    format_str = '{0:' + '0.{0}f'.format(d) + '}'
-    return format_str.format(v)
-
-
-class _SummaryStr(object):
-    def __str__(self):
-        return self.summary.as_text()
-
-    def __repr__(self):
-        return self.__str__() + '\n' + \
-               self.__class__.__name__ + \
-               ', id: {0}'.format(hex(id(self)))
-
-    def _repr_html_(self):
-        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
 
 
 class OLSResults(_SummaryStr):
@@ -280,9 +248,6 @@ class OLSResults(_SummaryStr):
     @property
     def summary(self):
         """Summary table of model estimation results"""
-
-        def pval_format(v):
-            return '{0:4.4f}'.format(v)
 
         title = self._method + ' Estimation Summary'
         mod = self.model

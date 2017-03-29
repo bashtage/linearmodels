@@ -154,7 +154,10 @@ class PanelOLS(object):
     def from_formula(cls, formula, data):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
-        cln_formula = formula + ' + 0 '
+        parts = formula.split('~')
+        parts[1] = ' 0 + ' + parts[1]
+        cln_formula = '~'.join(parts)
+
         mod_descr = ModelDesc.from_formula(cln_formula)
         rm_list = []
         effects = {'EntityEffect': False, 'FixedEffect': False, 'TimeEffect': False}
@@ -179,29 +182,48 @@ class PanelOLS(object):
 
     def _rsquared(self, params):
         # TODO: Fix to be correct for time/entity effects or both
+        # TODO: Handle no constant case
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        yhat = x @ params
+        r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
+
         ym = self.dependent.demean('entity').values2d
         xm = self.exog.demean('entity').values2d
         yhatm = xm @ params
-        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0,1]
+        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
 
         yb = self.dependent.mean('entity').values
         xb = self.exog.mean('entity').values
         yhatb = xb @ params
-        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0,1]
-        return r2w, r2b
+        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
+
+        return r2o, r2w, r2b
 
     def _info(self):
-        def stats(ids):
+        def stats(ids, name):
             bc = np.bincount(ids)
-            index = ['mean', 'median', 'max', 'min']
-            out = [bc.mean(), np.median(bc), bc.max(), bc.min()]
-            return pd.Series(out, index=index)
+            index = ['mean', 'median', 'max', 'min', 'total']
+            out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
+            return pd.Series(out, index=index, name=name)
 
-        entity_info = stats(self.dependent.entity_ids.squeeze())
-        time_info = stats(self.dependent.time_ids.squeeze())
+        entity_info = stats(self.dependent.entity_ids.squeeze(),
+                            'Observations per entity')
+        time_info = stats(self.dependent.time_ids.squeeze(),
+                          'Observations per time period')
         return entity_info, time_info
 
+    def _postestimation(self, params, cov, debiased):
+        r2o, r2w, r2b = self._rsquared(params)
+        entity_info, time_info = self._info()
+        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       debiased=debiased, name=self._name, var_names=self.exog.vars,
+                       r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
+                       entity_info=entity_info, time_info=time_info,
+                       model=self, cov_type='Unadjusted')  # TODO: Fix R2 definitions for multiple effects
+        return res
 
+        return
     def fit(self, debiased=False):
         # TODO: Check got absorbing effects, aside form the constant column
         has_effect = self.entity_effect or self.time_effect
@@ -244,17 +266,11 @@ class PanelOLS(object):
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
-        r2w, r2b = self._rsquared(params)
-        entity_info, time_info = self._info()
-        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
-                       debiased=debiased, df_resid=df_resid,
-                       df_model=x.shape[1] + neffects, nobs=y.shape[0],
-                       name=self._name, var_names=self.exog.vars,
-                       residual_ss=resid_ss, total_ss=total_ss,
-                       r2w=r2w, r2b=r2b, r2=r2w, s2=cov.s2,
-                       entity_info=entity_info, time_info=time_info)  # TODO: Fix R2 definitions for multiple effects
-
-        return res
+        res = self._postestimation(params, cov, debiased)
+        # TODO: Fix R2 definitions for multiple effects
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1] + neffects, nobs=y.shape[0],
+                       residual_ss=resid_ss, total_ss=total_ss))
+        return PanelResults(res)
 
 
 class PooledOLS(PanelOLS):
@@ -294,16 +310,23 @@ class PooledOLS(PanelOLS):
         return mod
 
     def _rsquared(self, params):
+        # TODO: Fix to be correct for time/entity effects or both
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        yhat = x @ params
+        r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
+
         ym = self.dependent.demean('entity').values2d
         xm = self.exog.demean('entity').values2d
         yhatm = xm @ params
-        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0,1]
+        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
 
         yb = self.dependent.mean('entity').values
         xb = self.exog.mean('entity').values
         yhatb = xb @ params
-        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0,1]
-        return r2w, r2b
+        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
+
+        return r2o, r2w, r2b
 
     def fit(self, debiased=False):
         y = self.dependent.values2d
@@ -311,7 +334,6 @@ class PooledOLS(PanelOLS):
         params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov = HomoskedasticCovariance(y, x, params, df_resid)
-        from linearmodels.utility import AttrDict
 
         eps = y - x @ params
         resid_ss = float(eps.T @ eps)
@@ -321,15 +343,9 @@ class PooledOLS(PanelOLS):
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss
-        r2w, r2b = self._rsquared(params)
-        entity_info, time_info = self._info()
-        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
-                       debiased=debiased, df_resid=df_resid,
-                       df_model=x.shape[1], nobs=y.shape[0],
-                       name=self._name, var_names=self.exog.vars,
-                       residual_ss=resid_ss, total_ss=total_ss,
-                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
-                       entity_info=entity_info, time_info=time_info)
+        res = self._postestimation(params, cov, debiased)
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
+                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
         return PanelResults(res)
 
 
@@ -373,15 +389,9 @@ class BetweenOLS(PooledOLS):
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss
-        r2w, r2b = self._rsquared(params)
-        entity_info, time_info = self._info()
-        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
-                       debiased=debiased, df_resid=df_resid,
-                       df_model=x.shape[1], nobs=self.dependent.values2d.shape[0],
-                       name=self._name, var_names=self.exog.vars,
-                       residual_ss=resid_ss, total_ss=total_ss,
-                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
-                       entity_info=entity_info, time_info=time_info)
+        res = self._postestimation(params, cov, debiased)
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
+                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
         return PanelResults(res)
 
     @classmethod
@@ -422,17 +432,11 @@ class FirstDifferenceOLS(PooledOLS):
         eps = y - x @ params
         resid_ss = float(eps.T @ eps)
         total_ss = float(y.T @ y)
-
         r2 = 1 - resid_ss / total_ss
-        r2w, r2b = self._rsquared(params)
-        entity_info, time_info = self._info()
-        res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
-                       debiased=debiased, df_resid=df_resid,
-                       df_model=x.shape[1], nobs=y.shape[0],
-                       name=self._name, var_names=self.exog.vars,
-                       total_ss=total_ss, residual_ss=resid_ss,
-                       r2=r2, r2w=r2w, r2b=r2b, s2=cov.s2,
-                       entity_info=entity_info, time_info=time_info)
+
+        res = self._postestimation(params, cov, debiased)
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
+                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
 
         return PanelResults(res)
 
