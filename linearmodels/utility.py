@@ -2,9 +2,10 @@ import functools
 from collections import OrderedDict
 
 import numpy as np
-from numpy import diag, sqrt, NaN
+from numpy import diag, sqrt, NaN, ceil, log10, isnan
 from numpy.linalg import matrix_rank, eigh
 from scipy.stats import chi2, f
+
 
 
 class AttrDict(dict):
@@ -226,3 +227,40 @@ class CachedProperty(object):
 
 
 cached_property = CachedProperty
+
+
+def _str(v):
+    """Preferred basic formatter"""
+    if isnan(v):
+        return '        '
+    av = abs(v)
+    digits = 0
+    if av != 0:
+        digits = ceil(log10(av))
+    if digits > 4 or digits <= -4:
+        return '{0:8.4g}'.format(v)
+
+    if digits > 0:
+        d = int(5 - digits)
+    else:
+        d = int(4)
+
+    format_str = '{0:' + '0.{0}f'.format(d) + '}'
+    return format_str.format(v)
+
+
+def pval_format(v):
+    """Preferred formatting for x in [0,1]"""
+    return '{0:4.4f}'.format(v)
+
+class _SummaryStr(object):
+    def __str__(self):
+        return self.summary.as_text()
+
+    def __repr__(self):
+        return self.__str__() + '\n' + \
+               self.__class__.__name__ + \
+               ', id: {0}'.format(hex(id(self)))
+
+    def _repr_html_(self):
+        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
