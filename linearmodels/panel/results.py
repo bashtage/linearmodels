@@ -35,7 +35,7 @@ class PanelResults(_SummaryStr):
 
     @property
     def params(self):
-        return Series(self._params, index=self._var_names)
+        return Series(self._params, index=self._var_names, name='parameter')
 
     @cached_property
     def cov(self):
@@ -43,11 +43,11 @@ class PanelResults(_SummaryStr):
 
     @property
     def std_errors(self):
-        return Series(sqrt(diag(self.cov)), self._var_names)
+        return Series(sqrt(diag(self.cov)), self._var_names, name='std_error')
 
     @property
     def tstats(self):
-        return self._params / self.std_errors
+        return Series(self._params / self.std_errors, name='tstat')
 
     @cached_property
     def pvalues(self):
@@ -56,7 +56,7 @@ class PanelResults(_SummaryStr):
             pv = 2 * (1 - stats.t.cdf(abs_tstats, self.df_resid))
         else:
             pv = 2 * (1 - stats.norm.cdf(abs_tstats))
-        return Series(pv, index=self._var_names)
+        return Series(pv, index=self._var_names, name='pvalue')
 
     @property
     def df_resid(self):

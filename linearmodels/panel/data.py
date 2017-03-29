@@ -171,7 +171,7 @@ class PanelData(object):
         ids = pd.Categorical(ids, ordered=True)
         return ids.codes[:, None]
 
-    def _demean_both(self):
+    def _demean_both(self, weights):
         """
         Entity and time demean
         """
@@ -181,11 +181,11 @@ class PanelData(object):
         else:
             group = 'time'
             dummy_level = 0
-        e = self.demean(group)
+        e = self.demean(group, weights=weights)
         cat = pd.Categorical(self._frame.index.labels[dummy_level])
         d = pd.get_dummies(cat, drop_first=True)
         d.index = e.dataframe.index
-        d = PanelData(d).demean(group)
+        d = PanelData(d).demean(group, weights=weights)
         d = d.dataframe.values
         e = e.dataframe.values
         resid = e - d @ np.linalg.lstsq(d, e)[0]
@@ -193,7 +193,7 @@ class PanelData(object):
 
         return PanelData(resid)
 
-    def demean(self, group='entity', drop_first=False):
+    def demean(self, group='entity', weights=None):
         """
         Demeans data by either entity or time group
 
@@ -201,25 +201,39 @@ class PanelData(object):
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
+        weights : PanelData, optional
+            Weights to implement weighted averaging
 
         Returns
         -------
         demeaned : PanelData
             Demeaned data according to type
+        
+        Notes
+        -----
+        If weights are provided, the values returned will be scaled by 
+        sqrt(weights) so that they can be used in WLS estimation.
         """
-        v = self.panel.values
+        v = self.values3d
         if group not in ('entity', 'time', 'both'):
             raise ValueError
         if group == 'both':
-            return self._demean_both()
+            return self._demean_both(weights)
 
         axis = 2 if group == 'time' else 1
-        mu = np.nanmean(v, axis=axis)
-        if drop_first:
-            mu[:, 0] = 0
-        mu = np.expand_dims(mu, axis=axis)
-        out = pd.Panel(v - mu, items=self.vars,
-                       major_axis=self.time, minor_axis=self.entities)
+        if weights is None:
+            mu = np.nanmean(v, axis=axis)
+            mu = np.expand_dims(mu, axis=axis)
+            delta = v - mu
+        else:
+            w = weights.values3d
+            root_w = np.sqrt(w)
+            vw = root_w * v
+            mu = np.nansum(w * v, axis=axis)
+            mu /= np.nansum(w, axis=axis)
+            delta = vw - mu
+        out = pd.Panel(delta, items=self.vars,
+                           major_axis=self.time, minor_axis=self.entities)
         out = out.swapaxes(1, 2).to_frame(filter_observations=False)
         out = out.loc[self._frame.index]
         return PanelData(out)
@@ -230,7 +244,14 @@ class PanelData(object):
     def __repr__(self):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
 
-    def mean(self, group='entity'):
+    def count(self, group='entity'):
+        v = self.panel.values
+        axis = 1 if group == 'entity' else 2
+        count = np.sum(np.isfinite(v), axis=axis)
+        index = self.entities if group == 'entity' else self.time
+        return pd.DataFrame(count.T, index=index, columns=self.vars)
+
+    def mean(self, group='entity', weights=None):
         """
         Compute data mean by either entity or time group
 
@@ -238,6 +259,8 @@ class PanelData(object):
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
+        weights : PanelData, optional
+            Weights to implement weighted averaging
 
         Returns
         -------
@@ -246,7 +269,13 @@ class PanelData(object):
         """
         v = self.panel.values
         axis = 1 if group == 'entity' else 2
-        mu = np.nanmean(v, axis=axis)
+        if weights is None:
+            mu = np.nanmean(v, axis=axis)
+        else:
+            w = weights.values3d
+            mu = np.nansum(w * v, axis=axis)
+            mu /= np.nansum(w, axis=axis)
+
         index = self.entities if group == 'entity' else self.time
         return pd.DataFrame(mu.T, index=index, columns=self.vars)
 
@@ -259,11 +288,13 @@ class PanelData(object):
         diffs : PanelData
             Differenced values
         """
-        diffs = self._frame.diff(1).iloc[1:]
-        elabels = self._frame.index.labels[0]
-        same = elabels[1:] == elabels[:-1]
-        diffs = diffs.loc[same]
-        diffs = self._minimize_multiindex(diffs)
+        diffs = self.panel.values
+        diffs = diffs[:,1:] -diffs[:,:-1]
+        diffs = pd.Panel(diffs, items=self.vars,
+                         major_axis=self.time[1:],
+                         minor_axis=self.entities)
+        diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
+        diffs = diffs.reindex(self._frame.index).dropna(how='any')
         return PanelData(diffs)
 
     @staticmethod

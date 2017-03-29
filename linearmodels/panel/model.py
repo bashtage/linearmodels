@@ -69,42 +69,41 @@ class PanelOLS(object):
         self._formula = None
         self.weights = self._adapt_weights(weights)
         self._validate_data()
-        # Normalize weights
-        avg_w = np.nanmean(self.weights.dataframe.values)
-        self.weights = PanelData(self.weights.dataframe / avg_w)
         self._entity_effect = entity_effect
         self._time_effect = time_effect
         self._name = self.__class__.__name__
 
     def _adapt_weights(self, weights):
-        frame = self.dependent.panel.iloc[0].copy()
-        nobs, nentity = self.exog.nobs, self.exog.nentity
         if weights is None:
+            frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = 1
-            frame = frame.T.stack(dropna=False)
-            frame.name = 'weight'
-            return PanelData(pd.DataFrame(frame))
-
-        if np.asarray(weights).squeeze().ndim == 1:
-            if weights.shape[0] == nobs and nobs == nentity:
-                raise AmbiguityError('Unable to distinguish nobs form nentity since they are '
-                                     'equal. You must use an 2-d array to avoid ambiguity.')
-            if weights.shape[0] == nobs:
-                weights = np.asarray(weights).squeeze()[:, None]
-                weights = weights @ np.ones((1, nentity))
-                frame.iloc[:, :] = weights
-            elif weights.shape[0] == nentity:
-                weights = np.asarray(weights).squeeze()[None, :]
-                weights = np.ones((nobs, 1)) @ weights
-                frame.iloc[:, :] = weights
-            elif weights.shape[0] == nentity * nobs:
-                frame = self.dependent.dataframe.copy()
-                frame.iloc[:, :] = weights[:, None]
-            else:
-                raise ValueError('Weights do not have a supported shape.')
+            frame.columns = ['weight']
             return PanelData(frame)
 
-        return PanelData(weights)
+        frame = self.dependent.panel.iloc[0].copy()
+        nobs, nentity = self.exog.nobs, self.exog.nentity
+
+        if weights.ndim == 3 or weights.shape == (nobs, nentity):
+            return PanelData(weights)
+
+        weights = np.squeeze(weights)
+        if weights.shape[0] == nobs and nobs == nentity:
+            raise AmbiguityError('Unable to distinguish nobs form nentity since they are '
+                                 'equal. You must use an 2-d array to avoid ambiguity.')
+        if weights.shape[0] == nobs:
+            weights = np.asarray(weights)[:, None]
+            weights = weights @ np.ones((1, nentity))
+            frame.iloc[:, :] = weights
+        elif weights.shape[0] == nentity:
+            weights = np.asarray(weights)[None, :]
+            weights = np.ones((nobs, 1)) @ weights
+            frame.iloc[:, :] = weights
+        elif weights.shape[0] == nentity * nobs:
+            frame = self.dependent.dataframe.copy()
+            frame.iloc[:, :] = weights[:, None]
+        else:
+            raise ValueError('Weights do not have a supported shape.')
+        return PanelData(frame)
 
     def _validate_data(self):
         y = self._y = self.dependent.values2d
@@ -224,6 +223,7 @@ class PanelOLS(object):
         return res
 
         return
+
     def fit(self, debiased=False):
         # TODO: Check got absorbing effects, aside form the constant column
         has_effect = self.entity_effect or self.time_effect
@@ -269,7 +269,7 @@ class PanelOLS(object):
         res = self._postestimation(params, cov, debiased)
         # TODO: Fix R2 definitions for multiple effects
         res.update(dict(df_resid=df_resid, df_model=x.shape[1] + neffects, nobs=y.shape[0],
-                       residual_ss=resid_ss, total_ss=total_ss))
+                        residual_ss=resid_ss, total_ss=total_ss))
         return PanelResults(res)
 
 
@@ -296,6 +296,26 @@ class PooledOLS(PanelOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(PooledOLS, self).__init__(dependent, exog, weights=weights)
 
+    def _prepare_between(self):
+        y = self.dependent.mean('entity').values
+        x = self.exog.mean('entity').values
+        # Weight transformation
+        winv = PanelData(1.0 / self.weights.dataframe)
+        wcount, wmean = winv.count('entity'), winv.mean('entity')
+        wsum = wcount * wmean
+        w = 1.0 / wsum.values
+        w = w / w.mean()
+
+        return y, x, w
+
+    def _prepare_within(self):
+        # TODO: What about weighted within when weights are non-trivial?
+        y = self.dependent.demean('entity').values2d
+        x = self.exog.demean('entity').values2d
+        w = self.weights.values2d
+
+        return y, x, w
+
     @classmethod
     def from_formula(cls, formula, data):
         na_action = NAAction(on_NA='raise', NA_types=[])
@@ -310,7 +330,6 @@ class PooledOLS(PanelOLS):
         return mod
 
     def _rsquared(self, params):
-        # TODO: Fix to be correct for time/entity effects or both
         y = self.dependent.values2d
         x = self.exog.values2d
         yhat = x @ params
@@ -331,21 +350,30 @@ class PooledOLS(PanelOLS):
     def fit(self, debiased=False):
         y = self.dependent.values2d
         x = self.exog.values2d
-        params = lstsq(x, y)[0]
-        df_resid = y.shape[0] - x.shape[1]
-        cov = HomoskedasticCovariance(y, x, params, df_resid)
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        wx = w * x
+        wy = w * y
 
-        eps = y - x @ params
-        resid_ss = float(eps.T @ eps)
+        params = lstsq(wx, wy)[0]
+
+        nobs = y.shape[0]
+        df_model = x.shape[1]
+        df_resid = nobs - df_model
+        cov_denom = nobs if not debiased else df_resid
+        cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        e = y
         if self._constant:
-            mu = y.mean()
-        else:
-            mu = 0
-        total_ss = float((y - mu).T @ (y - mu))
-        r2 = 1 - resid_ss / total_ss
+            e = e - np.average(y, weights=root_w)
+
+        total_ss = float(w.T @ (e ** 2))
+        r2 = 1 - residual_ss / total_ss
+
         res = self._postestimation(params, cov, debiased)
-        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
-                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
+        res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
         return PanelResults(res)
 
 
@@ -372,26 +400,52 @@ class BetweenOLS(PooledOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
 
-    def fit(self, debiased=False):
-        # TODO: Add WLS for unbalanced
-        y = self.dependent.mean('entity').values
-        x = self.exog.mean('entity').values
+    def fit(self, debiased=False, reweight=False):
+        """
+        Estimate model parameters
 
-        params = lstsq(x, y)[0]
-        df_resid = y.shape[0] - x.shape[1]
-        cov = HomoskedasticCovariance(y, x, params, df_resid)
+        Parameters
+        ----------
+        debiased : bool
+            Flag indicating to use a debiased parameter covariance estimator
+        reweight : bool
+            Flag indicating to reweight observations if the input data is
+            unbalanced
 
-        eps = y - x @ params
-        resid_ss = float(eps.T @ eps)
-        if self._constant:
-            mu = y.mean()
+        Returns
+        -------
+        results : PanelResults
+            Estimation results
+        """
+        y, x, w = self._prepare_between()
+        if np.all(self.weights.values2d == 1.0) and not reweight:
+            w = root_w = np.ones_like(w)
         else:
-            mu = 0
-        total_ss = float((y - mu).T @ (y - mu))
-        r2 = 1 - resid_ss / total_ss
+            root_w = np.sqrt(w)
+
+        wx = root_w * x
+        wy = root_w * y
+        params = lstsq(wx, wy)[0]
+
+        df_resid = y.shape[0] - x.shape[1]
+        df_model = x.shape[1],
+        nobs = y.shape[0]
+        cov_denom = y.shape[0] if not debiased else df_resid
+        cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        # TODO: Explain this formula
+        e = y
+        if self._constant:
+            e = e - np.average(y, weights=root_w)
+
+        total_ss = float(w.T @ (e ** 2))
+        r2 = 1 - residual_ss / total_ss
+
         res = self._postestimation(params, cov, debiased)
-        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
-                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
+        res.update(dict(df_resid=df_resid, df_model=df_model, nobs=nobs,
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
+
         return PanelResults(res)
 
     @classmethod
@@ -421,22 +475,40 @@ class FirstDifferenceOLS(PooledOLS):
         super(FirstDifferenceOLS, self).__init__(dependent, exog, weights=weights)
         if self._constant:
             raise ValueError('Constants are not allowed in first difference regressions.')
+        if self.dependent.nobs < 2:
+            raise ValueError('Panel must have at least 2 time periods')
 
     def fit(self, debiased=False):
         y = self.dependent.first_difference().values2d
         x = self.exog.first_difference().values2d
 
-        params = lstsq(x, y)[0]
+        w = 1.0 / self.weights.panel.values
+        w = w[:, :-1] + w[:, 1:]
+        w = pd.Panel(w, items=self.weights.vars,
+                     major_axis=self.weights.time[1:],
+                     minor_axis=self.weights.entities)
+        w = w.swapaxes(1, 2).to_frame(filter_observations=False)
+        w = w.reindex(self.weights.dataframe.index).dropna(how='any')
+        w = w.values
+
+        w /= w.mean()
+        root_w = np.sqrt(w)
+
+        wx = root_w * x
+        wy = root_w * y
+        params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
-        cov = HomoskedasticCovariance(y, x, params, df_resid)
-        eps = y - x @ params
-        resid_ss = float(eps.T @ eps)
-        total_ss = float(y.T @ y)
-        r2 = 1 - resid_ss / total_ss
+        cov_denom = df_resid if debiased else y.shape[0]
+        cov = HomoskedasticCovariance(y, x, params, cov_denom)
+
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        total_ss = float(w.T @ (y ** 2))
+        r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(params, cov, debiased)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
-                       residual_ss=resid_ss, total_ss=total_ss, r2=r2))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
 
         return PanelResults(res)
 
