@@ -14,3 +14,10 @@ root_w = np.sqrt(w)
 wd = root_w  * dummies.values
 wy = root_w  * y
 b = np.linalg.pinv(wd) @ wy
+
+data.x.iloc[0] = 1.0
+mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+p1 = mod._fit_lvsd()
+p2 = mod._fit_lvsd2()
+print(p1)
+print(p2[:data.x.shape[0]])

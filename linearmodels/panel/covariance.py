@@ -8,22 +8,22 @@ class HomoskedasticCovariance(object):
         self._x = x
         self._params = params
         self._df_resid = df_resid
-
+    
     @property
     def eps(self):
         return self._y - self._x @ self._params
-
+    
     @property
     def s2(self):
         eps = self.eps
         return float(eps.T @ eps) / self._df_resid
-
+    
     @property
     def cov(self):
         x = self._x
         nobs = x.shape[0]
         return self.s2 * inv(x.T @ x)
-
+    
     def deferred_cov(self):
         return self.cov
 
@@ -72,7 +72,7 @@ def homoskedastic_covariance(x, epsilon, *, debiased=False):
     xpxi = np.linalg.inv(xpx)
     scale = nt - k if debiased else nt
     s2 = epsilon.T @ epsilon / scale
-
+    
     return s2 * (xpxi + xpxi.T) / 2
 
 
@@ -120,13 +120,13 @@ def heteroskedastic_covariance(x, epsilon, *, debiased=False):
     nt, k = x.shape
     xpx = x.T @ x / nt
     xpxi = np.linalg.inv(xpx)
-
+    
     xe = x * epsilon
     scale = nt - k if debiased else nt
     xeex = xe.T @ xe / scale
-
+    
     cov = xpxi @ xeex @ xpxi
-
+    
     return (cov + cov.T) / 2
 
 
@@ -181,7 +181,7 @@ def oneway_clustered_covariance(x, epsilon, cluster, *, debiased=False):
     nt, k = x.shape
     xpx = x.T @ x / nt
     xpxi = np.linalg.inv(xpx)
-
+    
     ind = np.argsort(cluster.flat)
     x = x[ind]
     epsilon = epsilon[ind]
@@ -192,7 +192,7 @@ def oneway_clustered_covariance(x, epsilon, cluster, *, debiased=False):
         st, en = locs[i], locs[i + 1]
         xe = x[st:en] * epsilon[st:en]
         xeex += xe.T @ xe / (en - st)
-
+    
     cov = xpxi @ xeex @ xpxi
-
+    
     return (cov + cov.T) / 2

@@ -35,18 +35,18 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
                          columns=list(x.columns) + list(dummies.columns))
     if w is None:
         w = np.ones_like(y)
-
+    
     wy = w * y.values
     wx = w * x.values
     params = np.linalg.lstsq(wx, wy)[0]
     params = params.squeeze()
-
+    
     return params[:nvar]
 
 
 def generate_data(missing, datatype):
     np.random.seed(12345)
-
+    
     n, t, k = 971, 7, 5
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
@@ -57,7 +57,7 @@ def generate_data(missing, datatype):
         y.flat[locs] = np.nan
         locs = np.random.choice(n * t * k, int(n * t * k * missing))
         x.flat[locs] = np.nan
-
+    
     if datatype in ('pandas', 'xarray'):
         entities = ['firm' + str(i) for i in range(n)]
         time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
@@ -65,10 +65,10 @@ def generate_data(missing, datatype):
         y = pd.DataFrame(y, index=time, columns=entities)
         w = pd.DataFrame(w, index=time, columns=entities)
         x = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
-
+    
     if datatype == 'xarray':
         x = xr.DataArray(x)
         y = xr.DataArray(y)
         w = xr.DataArray(w)
-
+    
     return AttrDict(y=y, x=x, w=w)

@@ -69,15 +69,15 @@ def test_weights(data):
     n = np.prod(data.y.shape)
     weights = 1 + np.random.random_sample(n)
     PooledOLS(data.y, data.x, weights=weights).fit()
-
+    
     n = data.y.shape[0]
     weights = 1 + np.random.random_sample(n)
     PooledOLS(data.y, data.x, weights=weights).fit()
-
+    
     n = data.y.shape[1]
     weights = 1 + np.random.random_sample(n)
     PooledOLS(data.y, data.x, weights=weights).fit()
-
+    
     weights = 1 + np.random.random_sample(data.y.shape)
     PooledOLS(data.y, data.x, weights=weights).fit()
 
@@ -98,7 +98,7 @@ def test_weight_incorrect_shape(data):
     weights = np.ones(np.prod(data.y.shape) - 1)
     with pytest.raises(ValueError):
         PanelOLS(data.y, data.x, weights=weights)
-
+    
     weights = np.ones((data.y.shape[0], data.y.shape[1] - 1))
     with pytest.raises(ValueError):
         PanelOLS(data.y, data.x, weights=weights)
@@ -110,12 +110,12 @@ def test_panel_lvsd(data):
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, entity=True)
     assert_allclose(res.params.squeeze(), expected)
-
+    
     mod = PanelOLS(data.y, data.x, time_effect=True)
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, time=True)
     assert_allclose(res.params.squeeze(), expected)
-
+    
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, entity=True, time=True)
@@ -127,7 +127,7 @@ def test_panel_constant_smoke(data):
         data.x['const'] = 1
     else:
         data.x[0] = 1
-
+    
     PanelOLS(data.y, data.x, entity_effect=True).fit()
     PanelOLS(data.y, data.x, time_effect=True).fit()
     PanelOLS(data.y, data.x, entity_effect=True, time_effect=True).fit()
@@ -141,26 +141,26 @@ class TestPooledOLS(object):
         cls.x = random_sample((k, t, n))
         beta = np.arange(1, k + 1)[:, None, None]
         cls.y = (cls.x * beta).sum(0) + random_sample((t, n))
-
+        
         cls.y_pd = pd.DataFrame(cls.y)
         cls.x_pd = pd.Panel(cls.x)
-
+        
         cls.y_xr = xr.DataArray(cls.y)
         cls.x_xr = xr.DataArray(cls.x)
-
+        
         cls.mod = PooledOLS
-
+    
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         pols.fit()
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
         pols = self.mod(self.y_xr, self.x_xr)
@@ -172,23 +172,23 @@ class TestPanelOLS(TestPooledOLS):
     def setup_class(cls):
         super(TestPanelOLS, cls).setup_class()
         cls.mod = PanelOLS
-
+    
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
 
@@ -198,23 +198,23 @@ class TestBetweenOLS(TestPooledOLS):
     def setup_class(cls):
         super(TestBetweenOLS, cls).setup_class()
         cls.mod = BetweenOLS
-
+    
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
 
@@ -224,22 +224,22 @@ class TestFirstDifferenceOLS(TestPooledOLS):
     def setup_class(cls):
         super(TestFirstDifferenceOLS, cls).setup_class()
         cls.mod = FirstDifferenceOLS
-
+    
     def test_smoke(self):
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y, self.x)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_pd, self.x_pd)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
-
+        
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
