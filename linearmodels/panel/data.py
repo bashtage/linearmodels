@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from linearmodels.panel.dummy_iterator import DummyVariableIterator
+
 
 class PanelData(object):
     """
@@ -10,7 +12,7 @@ class PanelData(object):
     Parameters
     ----------
     x : {ndarray, Series, DataFrame, DataArray}
-       Input data, either 2 or 3 dimensaional
+       Input data, either 2 or 3 dimensional
     var_name : str, optional
         Name to use when generating labels for the variables in the data
     convert_categoricals : bool, optional
@@ -43,7 +45,7 @@ class PanelData(object):
         If the input has the wrong number of dimensions or a MultiIndex
         DataFrame does not have 2 levels
     """
-
+    
     # 3d -> variables, time, entities
     # 2d -> time, entities (single variable)
     # 2d, multiindex -> (entities, time), variables
@@ -51,14 +53,14 @@ class PanelData(object):
         if isinstance(x, PanelData):
             x = x._original
         self._original = x
-
+        
         if isinstance(x, xr.DataArray):
             if x.ndim not in (2, 3):
                 raise ValueError('Only 2-d or 3-d DataArrays are supported')
             x = x.to_pandas()
-
+        
         if isinstance(x, (pd.Panel, pd.DataFrame)):
-
+            
             if isinstance(x, pd.DataFrame):
                 if isinstance(x.index, pd.MultiIndex):
                     if len(x.index.levels) != 2:
@@ -74,7 +76,7 @@ class PanelData(object):
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:
                 x = x[None, :, :]
-
+            
             k, t, n = x.shape
             variables = [var_name + '.{0}'.format(i) for i in range(k)]
             entities = ['entity.{0}'.format(i) for i in range(n)]
@@ -89,60 +91,62 @@ class PanelData(object):
         self._k, self._t, self._n = self.panel.shape
         self._frame.index.levels[0].name = 'entity'
         self._frame.index.levels[1].name = 'time'
-
+    
     @property
     def panel(self):
         return self._frame.to_panel().swapaxes(1, 2)
-
+    
     @property
     def dataframe(self):
         return self._frame
-
+    
     @property
     def values2d(self):
         return self._frame.values
-
+    
     @property
     def values3d(self):
         return self.panel.values
-
+    
     def drop(self, locs):
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
         self._k, self._t, self._n = self.shape
-
+    
     @property
     def shape(self):
         return self.panel.shape
-
+    
     @property
     def isnull(self):
         return np.any(self._frame.isnull(), axis=1)
-
+    
     @property
     def nobs(self):
         return self._t
-
+    
     @property
     def nvar(self):
         return self._k
-
+    
     @property
     def nentity(self):
         return self._n
-
+    
     @property
     def vars(self):
-        return list(self.panel.items)
-
+        return list(self._frame.columns)
+    
     @property
     def time(self):
-        return list(self.panel.major_axis)
-
+        index = self._frame.index
+        return list(index.levels[1][index.labels[1]].unique())
+    
     @property
     def entities(self):
-        return list(self.panel.minor_axis)
-
+        index = self._frame.index
+        return list(index.levels[0][index.labels[0]].unique())
+    
     @property
     def entity_ids(self):
         """
@@ -153,10 +157,8 @@ class PanelData(object):
         id : array
             2d array containing entity ids corresponding dataframe view
         """
-        ids = self._frame.reset_index()['entity']
-        ids = pd.Categorical(ids, ordered=True)
-        return ids.codes[:, None]
-
+        return np.asarray(self._frame.index.labels[0])[:, None]
+    
     @property
     def time_ids(self):
         """
@@ -167,11 +169,9 @@ class PanelData(object):
         id : array
             2d array containing time ids corresponding dataframe view
         """
-        ids = self._frame.reset_index()['time']
-        ids = pd.Categorical(ids, ordered=True)
-        return ids.codes[:, None]
-
-    def _demean_both(self):
+        return np.asarray(self._frame.index.labels[1])[:, None]
+    
+    def _demean_both(self, weights):
         """
         Entity and time demean
         """
@@ -181,19 +181,19 @@ class PanelData(object):
         else:
             group = 'time'
             dummy_level = 0
-        e = self.demean(group)
+        e = self.demean(group, weights=weights)
         cat = pd.Categorical(self._frame.index.labels[dummy_level])
         d = pd.get_dummies(cat, drop_first=True)
         d.index = e.dataframe.index
-        d = PanelData(d).demean(group)
+        d = PanelData(d).demean(group, weights=weights)
         d = d.dataframe.values
         e = e.dataframe.values
         resid = e - d @ np.linalg.lstsq(d, e)[0]
         resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
-
+        
         return PanelData(resid)
-
-    def demean(self, group='entity', drop_first=False):
+    
+    def demean(self, group='entity', weights=None):
         """
         Demeans data by either entity or time group
 
@@ -201,36 +201,63 @@ class PanelData(object):
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
+        weights : PanelData, optional
+            Weights to implement weighted averaging
 
         Returns
         -------
         demeaned : PanelData
             Demeaned data according to type
+        
+        Notes
+        -----
+        If weights are provided, the values returned will be scaled by 
+        sqrt(weights) so that they can be used in WLS estimation.
         """
-        v = self.panel.values
+        v = self.values3d
         if group not in ('entity', 'time', 'both'):
             raise ValueError
         if group == 'both':
-            return self._demean_both()
-
+            return self._demean_both(weights)
+        
         axis = 2 if group == 'time' else 1
-        mu = np.nanmean(v, axis=axis)
-        if drop_first:
-            mu[:, 0] = 0
-        mu = np.expand_dims(mu, axis=axis)
-        out = pd.Panel(v - mu, items=self.vars,
-                       major_axis=self.time, minor_axis=self.entities)
+        if weights is None:
+            mu = np.nanmean(v, axis=axis)
+            mu = np.expand_dims(mu, axis=axis)
+            delta = v - mu
+        else:
+            w = weights.values3d
+            root_w = np.sqrt(w)
+            vw = root_w * v
+            mu = np.nansum(w * v, axis=axis)
+            mu /= np.nansum(w, axis=axis)
+            delta = vw - mu
+        out = pd.Panel(delta,
+                       items=self.panel.items,
+                       major_axis=self.panel.major_axis,
+                       minor_axis=self.panel.minor_axis)
         out = out.swapaxes(1, 2).to_frame(filter_observations=False)
         out = out.loc[self._frame.index]
         return PanelData(out)
-
+    
     def __str__(self):
         return self.__class__.__name__ + '\n' + str(self._frame)
-
+    
     def __repr__(self):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
-
-    def mean(self, group='entity'):
+    
+    def count(self, group='entity'):
+        v = self.panel.values
+        axis = 1 if group == 'entity' else 2
+        count = np.sum(np.isfinite(v), axis=axis)
+        
+        index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
+        out = pd.DataFrame(count.T, index=index, columns=self.vars)
+        reindex = self.entities if group == 'entity' else self.time
+        out = out.loc[reindex]
+        return out
+    
+    def mean(self, group='entity', weights=None):
         """
         Compute data mean by either entity or time group
 
@@ -238,6 +265,8 @@ class PanelData(object):
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
+        weights : PanelData, optional
+            Weights to implement weighted averaging
 
         Returns
         -------
@@ -246,10 +275,19 @@ class PanelData(object):
         """
         v = self.panel.values
         axis = 1 if group == 'entity' else 2
-        mu = np.nanmean(v, axis=axis)
-        index = self.entities if group == 'entity' else self.time
-        return pd.DataFrame(mu.T, index=index, columns=self.vars)
-
+        if weights is None:
+            mu = np.nanmean(v, axis=axis)
+        else:
+            w = weights.values3d
+            mu = np.nansum(w * v, axis=axis)
+            mu /= np.nansum(w, axis=axis)
+        
+        index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
+        out = pd.DataFrame(mu.T, index=index, columns=self.vars)
+        reindex = self.entities if group == 'entity' else self.time
+        out = out.loc[reindex]
+        return out
+    
     def first_difference(self):
         """
         Compute first differences of variables
@@ -259,16 +297,26 @@ class PanelData(object):
         diffs : PanelData
             Differenced values
         """
-        diffs = self._frame.diff(1).iloc[1:]
-        elabels = self._frame.index.labels[0]
-        same = elabels[1:] == elabels[:-1]
-        diffs = diffs.loc[same]
-        diffs = self._minimize_multiindex(diffs)
+        diffs = self.panel.values
+        diffs = diffs[:, 1:] - diffs[:, :-1]
+        diffs = pd.Panel(diffs, items=self.vars,
+                         major_axis=self.time[1:],
+                         minor_axis=self.entities)
+        diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
+        diffs = diffs.reindex(self._frame.index).dropna(how='any')
         return PanelData(diffs)
-
+    
     @staticmethod
     def _minimize_multiindex(df):
         index_cols = list(df.index.names)
         df = df.reset_index()
         df = df.set_index(index_cols)
         return df
+    
+    def dummies(self, group='entity', drop_first=False, iterator=False):
+        ids = self.entity_ids if group == 'entity' else self.time_ids
+        dvi = DummyVariableIterator(self.nentity, self.nobs, ids.ravel(), drop=drop_first)
+        if iterator:
+            return dvi
+        else:
+            return dvi.dummies

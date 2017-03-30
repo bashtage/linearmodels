@@ -209,7 +209,7 @@ def test_ids(panel):
     for i in range(0, len(eids), 7):
         assert np.ptp(eids[i:i + 7]) == 0
         assert np.all((eids[i + 8:] - eids[i]) != 0)
-
+    
     tids = data.time_ids
     assert tids.shape == (77, 1)
     assert len(np.unique(tids)) == 7
@@ -230,7 +230,7 @@ def test_demean(panel):
     for i in range(3):
         expected[i] -= expected[i].mean(0)
     assert_allclose(fe.values3d, expected)
-
+    
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -241,14 +241,14 @@ def test_demean(panel):
 def test_demean_against_groupby(data):
     dh = PanelData(data.x)
     df = dh.dataframe
-
+    
     def demean(x):
         return x - x.mean()
-
+    
     entity_demean = df.groupby(level=0).transform(demean)
     res = dh.demean('entity')
     assert_allclose(entity_demean.values, res.dataframe.values)
-
+    
     time_demean = df.groupby(level=1).transform(demean)
     res = dh.demean('time')
     assert_allclose(time_demean.values, res.dataframe.values)
@@ -257,24 +257,24 @@ def test_demean_against_groupby(data):
 def test_demean_against_dummy_regression(data):
     dh = PanelData(data.x)
     dh.drop(dh.isnull)
-
+    
     df = dh.dataframe
     no_index = df.reset_index()
-
+    
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     entity_demean = dh.demean('entity')
     assert_allclose(1 + np.abs(entity_demean.dataframe.values),
                     1 + np.abs(dummy_demeaned))
-
+    
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     time_demean = dh.demean('time')
     assert_allclose(1 + np.abs(time_demean.dataframe.values),
                     1 + np.abs(dummy_demeaned))
-
+    
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     cat = pd.Categorical(no_index[df.index.levels[1].name])
@@ -294,7 +294,7 @@ def test_demean_missing(panel):
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
     assert_allclose(fe.values3d, expected)
-
+    
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -318,7 +318,7 @@ def test_demean_many_missing(panel):
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
     assert_allclose(fe.values3d, expected)
-
+    
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -331,19 +331,19 @@ def test_demean_many_missing_dropped(panel):
     data = PanelData(panel)
     data.drop(data.isnull)
     fe = data.demean('entity')
-
+    
     expected = data.values2d.copy()
     eid = data.entity_ids.ravel()
     for i in np.unique(eid):
         expected[eid == i] -= np.nanmean(expected[eid == i], 0)
-
+    
     assert_allclose(fe.values2d, expected)
 
 
 def test_demean_both_large_t():
     data = PanelData(pd.Panel(np.random.standard_normal((1, 100, 10))))
     demeaned = data.demean('both')
-
+    
     df = data.dataframe
     no_index = df.reset_index()
     cat = pd.Categorical(no_index[df.index.levels[0].name])
@@ -360,3 +360,21 @@ def test_demean_invalid(panel):
     data = PanelData(panel)
     with pytest.raises(ValueError):
         data.demean('unknown')
+
+
+def test_dummies(panel):
+    data = PanelData(panel)
+    edummy = data.dummies()
+    assert edummy.shape == (77, 11)
+    assert np.all(edummy.sum(0) == 7)
+    tdummy = data.dummies(group='time')
+    assert tdummy.shape == (77, 7)
+    assert np.all(tdummy.sum(0) == 11)
+    tdummy_drop = data.dummies(group='time', drop_first=True)
+    assert tdummy_drop.shape == (77, 6)
+    assert np.all(tdummy.sum(0) == 11)
+    tdummy_iter = data.dummies(group='time', iterator=True)
+    assert hasattr(tdummy_iter, '__next__')
+    tdummy_iter.__iter__()
+    dummies = tdummy_iter.__next__()
+    assert_equal(dummies, tdummy)

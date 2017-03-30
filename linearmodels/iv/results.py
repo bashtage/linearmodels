@@ -135,7 +135,7 @@ class OLSResults(_SummaryStr):
     @property
     def tstats(self):
         """Parameter t-statistics"""
-        return self.params / self.std_errors
+        return Series(self._params / self.std_errors, name='tstat')
 
     @cached_property
     def pvalues(self):

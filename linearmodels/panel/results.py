@@ -4,10 +4,11 @@ import numpy as np
 from numpy import sqrt, diag
 from pandas import Series, DataFrame
 from scipy import stats
-from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
-    fmt_params
+from statsmodels.iolib.summary import (SimpleTable, Summary, fmt_2cols,
+                                       fmt_params)
 
-from linearmodels.utility import cached_property, pval_format, _str, _SummaryStr
+from linearmodels.utility import (cached_property, pval_format, _str,
+                                  _SummaryStr)
 
 
 class PanelResults(_SummaryStr):
@@ -32,23 +33,23 @@ class PanelResults(_SummaryStr):
         self.model = res.model
         self._cov_type = res.cov_type
         self._datetime = dt.datetime.now()
-
+    
     @property
     def params(self):
-        return Series(self._params, index=self._var_names)
-
+        return Series(self._params, index=self._var_names, name='parameter')
+    
     @cached_property
     def cov(self):
         return DataFrame(self._deferred_cov(), columns=self._var_names, index=self._var_names)
-
+    
     @property
     def std_errors(self):
-        return Series(sqrt(diag(self.cov)), self._var_names)
-
+        return Series(sqrt(diag(self.cov)), self._var_names, name='std_error')
+    
     @property
     def tstats(self):
-        return self._params / self.std_errors
-
+        return Series(self._params / self.std_errors, name='tstat')
+    
     @cached_property
     def pvalues(self):
         abs_tstats = np.abs(self.tstats)
@@ -56,67 +57,67 @@ class PanelResults(_SummaryStr):
             pv = 2 * (1 - stats.t.cdf(abs_tstats, self.df_resid))
         else:
             pv = 2 * (1 - stats.norm.cdf(abs_tstats))
-        return Series(pv, index=self._var_names)
-
+        return Series(pv, index=self._var_names, name='pvalue')
+    
     @property
     def df_resid(self):
         return self._df_resid
-
+    
     @property
     def df_model(self):
         return self._df_model
-
+    
     @property
     def nobs(self):
         return self._nobs
-
+    
     @property
     def name(self):
         return self._name
-
+    
     @property
     def total_ss(self):
         """Total sum of squares"""
         return self._total_ss
-
+    
     @property
     def model_ss(self):
         """Residual sum of squares"""
         return self._total_ss - self._residual_ss
-
+    
     @property
     def resid_ss(self):
         """Residual sum of squares"""
         return self._residual_ss
-
+    
     @property
     def rsquared(self):
         return self._r2
-
+    
     @property
     def rsquared_between(self):
         return self._r2b
-
+    
     @property
     def rsquared_within(self):
         return self._r2w
-
+    
     @property
     def rsquared_overall(self):
         return self._r2o
-
+    
     @property
     def s2(self):
         return self._s2
-
+    
     @property
     def entity_info(self):
         return self._entity_info
-
+    
     @property
     def time_info(self):
         return self._time_info
-
+    
     def conf_int(self, level=0.95):
         """
         Confidence interval construction
@@ -143,11 +144,11 @@ class PanelResults(_SummaryStr):
         q = q[None, :]
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._var_names, columns=['lower', 'upper'])
-
+    
     @property
     def summary(self):
         """Summary table of model estimation results"""
-
+        
         title = self.name + ' Estimation Summary'
         mod = self.model
         top_left = [('Dep. Variable:', mod.dependent.vars[0]),
@@ -163,7 +164,7 @@ class PanelResults(_SummaryStr):
                     ('Min Obs:', _str(self.entity_info['min'])),
                     ('Max Obs:', _str(self.entity_info['max'])),
                     ('', '')]
-
+        
         top_right = [('R-squared:', _str(self.rsquared)),
                      ('R-squared (Between):', _str(self.rsquared_between)),
                      ('R-squared (Within):', _str(self.rsquared_within)),
@@ -177,21 +178,21 @@ class PanelResults(_SummaryStr):
                      ('Min Obs:', _str(self.time_info['min'])),
                      ('Max Obs:', _str(self.time_info['max'])),
                      ('', '')]
-
+        
         stubs = []
         vals = []
         for stub, val in top_left:
             stubs.append(stub)
             vals.append([val])
         table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
-
+        
         # create summary table instance
         smry = Summary()
         # Top Table
         # Parameter table
         fmt = fmt_2cols
         fmt['data_fmts'][1] = '%18s'
-
+        
         top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
         stubs = []
         vals = []
@@ -200,7 +201,7 @@ class PanelResults(_SummaryStr):
             vals.append([val])
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
-
+        
         param_data = np.c_[self.params.values[:, None],
                            self.std_errors.values[:, None],
                            self.tstats.values[:, None],
@@ -224,5 +225,5 @@ class PanelResults(_SummaryStr):
                             headers=header,
                             title=title)
         smry.tables.append(table)
-
+        
         return smry
