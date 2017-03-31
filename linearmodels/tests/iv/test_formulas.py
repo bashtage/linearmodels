@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 # from patsy import SyntaxError
-from linearmodels.iv import IV2SLS, IVGMMCUE, IVGMM, IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
 
 @pytest.fixture(scope='module', params=[IV2SLS, IVLIML, IVGMMCUE, IVGMM])

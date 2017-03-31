@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS
+from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS
 from linearmodels.tests.panel._utility import generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -45,10 +45,10 @@ def test_basic_formulas(data, model, formula):
     res2 = model(data.y, x[vars]).fit()
     assert_allclose(res.params, res2.params)
     assert mod.formula == formula
-    
+
     if model is FirstDifferenceOLS:
         return
-    
+
     formula = formula.split('~')
     formula[1] = ' 1 + ' + formula[1]
     formula = '~'.join(formula)
@@ -70,25 +70,25 @@ def test_panel_ols_formula(data):
     formula = 'y ~ x1 + x2'
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
-    
+
     formula = 'y ~ x1 + x2 + EntityEffect'
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.entity_effect is True
     assert mod.time_effect is False
-    
+
     formula = 'y ~ x1 + x2 + TimeEffect'
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.time_effect is True
     assert mod.entity_effect is False
-    
+
     formula = 'y ~ x1 + EntityEffect + TimeEffect + x2 '
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
     assert mod.entity_effect is True
     assert mod.time_effect is True
-    
+
     formula = 'y ~ x1 + EntityEffect + FixedEffect + x2 '
     with pytest.raises(ValueError):
         PanelOLS.from_formula(formula, joined)

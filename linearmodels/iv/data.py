@@ -1,14 +1,14 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from linearmodels.compat.pandas import (is_string_like, is_categorical,
-                                        is_numeric_dtype, is_string_dtype,
-                                        is_categorical_dtype)
-
 import copy
 
 import numpy as np
 import pandas as pd
+import xarray as xr
+
+from linearmodels.compat.pandas import is_categorical, is_categorical_dtype, is_numeric_dtype, is_string_dtype, \
+    is_string_like
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
@@ -96,7 +96,6 @@ class IVData(object):
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
 
         else:
-            import xarray as xr
             if isinstance(x, xr.DataArray):
                 if x.ndim == 1:
                     x = xr.concat([x], dim=var_name).transpose()

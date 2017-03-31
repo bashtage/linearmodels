@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 from numpy.linalg import pinv
-from numpy.testing import assert_equal, assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 from pandas.util.testing import assert_frame_equal, assert_panel_equal
 
 from linearmodels.panel.data import PanelData
@@ -55,7 +55,7 @@ def test_numpy_3d():
 
 
 def test_numpy_1d():
-    n, t, k = 11, 1, 1
+    n = 11
     x = np.random.random(n)
     with pytest.raises(ValueError):
         PanelData(x)
@@ -136,7 +136,7 @@ def test_existing_panel_data():
 
 
 def test_xarray_2d():
-    n, t, k = 11, 7, 1
+    n, t = 11, 7
     x = np.random.random((t, n))
     x = xr.DataArray(x, dims=('time', 'entity'),
                      coords={'entity': list('firm.' + str(i) for i in range(n))})
@@ -209,7 +209,7 @@ def test_ids(panel):
     for i in range(0, len(eids), 7):
         assert np.ptp(eids[i:i + 7]) == 0
         assert np.all((eids[i + 8:] - eids[i]) != 0)
-    
+
     tids = data.time_ids
     assert tids.shape == (77, 1)
     assert len(np.unique(tids)) == 7
@@ -230,7 +230,7 @@ def test_demean(panel):
     for i in range(3):
         expected[i] -= expected[i].mean(0)
     assert_allclose(fe.values3d, expected)
-    
+
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -241,14 +241,14 @@ def test_demean(panel):
 def test_demean_against_groupby(data):
     dh = PanelData(data.x)
     df = dh.dataframe
-    
+
     def demean(x):
         return x - x.mean()
-    
+
     entity_demean = df.groupby(level=0).transform(demean)
     res = dh.demean('entity')
     assert_allclose(entity_demean.values, res.dataframe.values)
-    
+
     time_demean = df.groupby(level=1).transform(demean)
     res = dh.demean('time')
     assert_allclose(time_demean.values, res.dataframe.values)
@@ -257,24 +257,24 @@ def test_demean_against_groupby(data):
 def test_demean_against_dummy_regression(data):
     dh = PanelData(data.x)
     dh.drop(dh.isnull)
-    
+
     df = dh.dataframe
     no_index = df.reset_index()
-    
+
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     entity_demean = dh.demean('entity')
     assert_allclose(1 + np.abs(entity_demean.dataframe.values),
                     1 + np.abs(dummy_demeaned))
-    
+
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     time_demean = dh.demean('time')
     assert_allclose(1 + np.abs(time_demean.dataframe.values),
                     1 + np.abs(dummy_demeaned))
-    
+
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     cat = pd.Categorical(no_index[df.index.levels[1].name])
@@ -294,7 +294,7 @@ def test_demean_missing(panel):
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
     assert_allclose(fe.values3d, expected)
-    
+
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -318,7 +318,7 @@ def test_demean_many_missing(panel):
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
     assert_allclose(fe.values3d, expected)
-    
+
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
@@ -331,19 +331,19 @@ def test_demean_many_missing_dropped(panel):
     data = PanelData(panel)
     data.drop(data.isnull)
     fe = data.demean('entity')
-    
+
     expected = data.values2d.copy()
     eid = data.entity_ids.ravel()
     for i in np.unique(eid):
         expected[eid == i] -= np.nanmean(expected[eid == i], 0)
-    
+
     assert_allclose(fe.values2d, expected)
 
 
 def test_demean_both_large_t():
     data = PanelData(pd.Panel(np.random.standard_normal((1, 100, 10))))
     demeaned = data.demean('both')
-    
+
     df = data.dataframe
     no_index = df.reset_index()
     cat = pd.Categorical(no_index[df.index.levels[0].name])
@@ -394,7 +394,7 @@ def test_demean_missing_alt_types(data):
     entity_demean = xpd.demean('entity')
     expected = xpd.dataframe.groupby(level=0).transform(lambda s: s - s.mean())
     assert_frame_equal(entity_demean.dataframe, expected)
-    
+
     time_demean = xpd.demean('time')
     expected = xpd.dataframe.groupby(level=1).transform(lambda s: s - s.mean())
     assert_frame_equal(time_demean.dataframe, expected)
@@ -408,7 +408,7 @@ def test_mean_missing(data):
     expected = expected.loc[xpd.entities]
     expected.columns.name = None
     assert_frame_equal(entity_mean, expected)
-    
+
     time_mean = xpd.mean('time')
     expected = xpd.dataframe.groupby(level=1).mean()
     expected = expected.loc[xpd.time]
@@ -425,7 +425,7 @@ def test_count(data):
     expected.columns.name = None
     expected = expected.astype(np.int64)
     assert_frame_equal(entity_mean, expected)
-    
+
     time_mean = xpd.count('time')
     expected = xpd.dataframe.groupby(level=1).count()
     expected = expected.loc[xpd.time]
@@ -446,7 +446,7 @@ def test_demean_simple_weighted(data):
     unweighted_entity_demean = x.demean('entity')
     weighted_entity_demean = x.demean('entity', weights=w)
     assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
-    
+
     unweighted_entity_demean = x.demean('time')
     weighted_entity_demean = x.demean('time', weights=w)
     assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
@@ -458,7 +458,7 @@ def test_demean_weighted(data):
     missing = x.isnull | w.isnull
     x.drop(missing)
     w.drop(missing)
-    
+
     entity_demean = x.demean('entity', weights=w)
     d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[0]))
     d = d.values
@@ -469,7 +469,7 @@ def test_demean_weighted(data):
     e = wx - mu
     assert_allclose(1 + np.abs(entity_demean.dataframe.values),
                     1 + np.abs(e))
-    
+
     time_demean = x.demean('time', weights=w)
     d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[1]))
     d = d.values
@@ -498,7 +498,7 @@ def test_mean_weighted(data):
     wd = d * root_w
     mu = pinv(wd) @ wx
     assert_allclose(entity_mean, mu)
-    
+
     time_mean = x.mean('time', weights=w)
     c = x.dataframe.index.levels[1][x.dataframe.index.labels[1]]
     d = pd.get_dummies(pd.Categorical(c, ordered=True))

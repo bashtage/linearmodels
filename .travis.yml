@@ -51,8 +51,8 @@ install:
   - python setup.py develop
 
 script:
+  - set -ev
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels
-  - set -e
   - cd doc && make html && make html && cd ..
   - if [ ${PYTHON} = 3.5 ]; then doctr deploy doc; fi
 

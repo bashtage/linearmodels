@@ -6,8 +6,7 @@ from __future__ import absolute_import, division, print_function
 from numpy import asarray, unique
 from numpy.linalg import inv
 
-from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                        _cov_cluster, _cov_kernel)
+from linearmodels.iv.covariance import HomoskedasticCovariance, KERNEL_LOOKUP, _cov_cluster, _cov_kernel
 
 
 class HomoskedasticWeightMatrix(object):

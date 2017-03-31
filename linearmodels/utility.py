@@ -2,10 +2,9 @@ import functools
 from collections import OrderedDict
 
 import numpy as np
-from numpy import diag, sqrt, NaN, ceil, log10, isnan
-from numpy.linalg import matrix_rank, eigh
+from numpy import NaN, ceil, diag, isnan, log10, sqrt
+from numpy.linalg import eigh, matrix_rank
 from scipy.stats import chi2, f
-
 
 
 class AttrDict(dict):
@@ -252,6 +251,7 @@ def _str(v):
 def pval_format(v):
     """Preferred formatting for x in [0,1]"""
     return '{0:4.4f}'.format(v)
+
 
 class _SummaryStr(object):
     def __str__(self):

@@ -1,10 +1,9 @@
-from linearmodels.panel.data import PanelData
-from linearmodels.panel.dummy_iterator import DummyVariableIterator
-from linearmodels.panel.model import PooledOLS
+from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS
 from ._version import get_versions
 
-__all__ = ['EntityEffect', 'DummyVariableIterator', 'TimeEffect',
-           'GroupEffect', 'OldPanelData', 'PooledOLS', 'lm']
+__all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
+           'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS']
 
 __version__ = get_versions()['version']
 del get_versions

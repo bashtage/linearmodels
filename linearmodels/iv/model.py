@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import absolute_import, division, print_function
 
-from numpy import array, asarray, c_, isscalar, any, logical_not, ones, sqrt, average
+from numpy import any, array, asarray, average, c_, isscalar, logical_not, ones, sqrt
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series
 from scipy.optimize import minimize
