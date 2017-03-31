@@ -227,11 +227,15 @@ class PanelData(object):
             delta = v - mu
         else:
             w = weights.values3d
+            w = w * np.isfinite(v)
             root_w = np.sqrt(w)
-            vw = root_w * v
-            mu = np.nansum(w * v, axis=axis)
+            rootwv = root_w * v
+            wv = w * v
+           
+            mu = np.nansum(wv, axis=axis)
             mu /= np.nansum(w, axis=axis)
-            delta = vw - mu
+            mu = np.expand_dims(mu, axis=axis)
+            delta = rootwv - root_w * mu
         out = pd.Panel(delta,
                        items=self.panel.items,
                        major_axis=self.panel.major_axis,
@@ -247,6 +251,19 @@ class PanelData(object):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
     
     def count(self, group='entity'):
+        """
+        Count number of observations by entity or time
+        
+        Parameters
+        ----------
+        group : {'entity', 'time'}
+            Group to use in demeaning
+        
+        Returns
+        -------
+        count : DataFrame
+            Counts according to type. Either (entity by var) or (time by var)
+        """
         v = self.panel.values
         axis = 1 if group == 'entity' else 2
         count = np.sum(np.isfinite(v), axis=axis)
@@ -254,7 +271,7 @@ class PanelData(object):
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
         out = pd.DataFrame(count.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
-        out = out.loc[reindex]
+        out = out.loc[reindex].astype(np.int64)
         return out
     
     def mean(self, group='entity', weights=None):
@@ -279,7 +296,9 @@ class PanelData(object):
             mu = np.nanmean(v, axis=axis)
         else:
             w = weights.values3d
-            mu = np.nansum(w * v, axis=axis)
+            w = w * np.isfinite(v)
+            wv = w * v
+            mu = np.nansum(wv, axis=axis)
             mu /= np.nansum(w, axis=axis)
         
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
@@ -313,10 +332,13 @@ class PanelData(object):
         df = df.set_index(index_cols)
         return df
     
-    def dummies(self, group='entity', drop_first=False, iterator=False):
-        ids = self.entity_ids if group == 'entity' else self.time_ids
-        dvi = DummyVariableIterator(self.nentity, self.nobs, ids.ravel(), drop=drop_first)
-        if iterator:
-            return dvi
-        else:
-            return dvi.dummies
+    def dummies(self, group='entity', drop_first=False):
+        if group not in ('entity', 'time'):
+            raise ValueError
+        axis = 0 if group == 'entity' else 1
+        labels = self._frame.index.labels
+        levels = self._frame.index.levels
+        cat = pd.Categorical(levels[axis][labels[axis]])
+        dummies = pd.get_dummies(cat, drop_first=drop_first)
+        cols = self.entities if group == 'entity' else self.time
+        return dummies[[c for c in cols if c in dummies]]

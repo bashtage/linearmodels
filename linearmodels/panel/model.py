@@ -113,7 +113,8 @@ class PanelOLS(object):
             raise ValueError('dependent and exog must have the same number of '
                              'observations.')
         if y.shape[0] != w.shape[0]:
-            raise ValueError('weights must have the same number of observations as dependent.')
+            raise ValueError('weights must have the same number of '
+                             'observations as dependent.')
         
         all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
         missing = (np.any(np.isnan(y), axis=1) |
@@ -222,8 +223,6 @@ class PanelOLS(object):
                        model=self,
                        cov_type='Unadjusted')  # TODO: Fix R2 definitions for multiple effects
         return res
-        
-        return
     
     def _fit_lvsd(self, debiased=False):
         constant = self._constant
@@ -242,10 +241,10 @@ class PanelOLS(object):
             d = np.c_[ed, td]
         root_w = np.sqrt(w.values2d)
         wx = root_w * x.values2d
-        wd = root_w * d
-        if constant and has_effect:
-            wd -= root_w @ lstsq(root_w, wd)[0]
         if has_effect:
+            wd = root_w * d
+            if constant:
+                wd -= root_w @ lstsq(root_w, wd)[0]
             wx = np.c_[wx, wd]
         wy = root_w * y.values2d
         params = lstsq(wx, wy)[0]

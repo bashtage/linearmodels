@@ -373,8 +373,139 @@ def test_dummies(panel):
     tdummy_drop = data.dummies(group='time', drop_first=True)
     assert tdummy_drop.shape == (77, 6)
     assert np.all(tdummy.sum(0) == 11)
-    tdummy_iter = data.dummies(group='time', iterator=True)
-    assert hasattr(tdummy_iter, '__next__')
-    tdummy_iter.__iter__()
-    dummies = tdummy_iter.__next__()
-    assert_equal(dummies, tdummy)
+
+
+def test_roundtrip_3d(data):
+    x = data.x
+    xpd = PanelData(x)
+    xv = x if isinstance(x, np.ndarray) else x.values
+    assert_equal(xpd.values3d, xv)
+
+
+def test_roundtrip_multiindex(panel):
+    mi = panel.swapaxes(1, 2).to_frame(filter_observations=False)
+    panel = PanelData(mi)
+    assert_frame_equal(mi, panel.dataframe)
+
+
+def test_demean_missing_alt_types(data):
+    xpd = PanelData(data.x)
+    xpd.drop(xpd.isnull)
+    entity_demean = xpd.demean('entity')
+    expected = xpd.dataframe.groupby(level=0).transform(lambda s: s - s.mean())
+    assert_frame_equal(entity_demean.dataframe, expected)
+    
+    time_demean = xpd.demean('time')
+    expected = xpd.dataframe.groupby(level=1).transform(lambda s: s - s.mean())
+    assert_frame_equal(time_demean.dataframe, expected)
+
+
+def test_mean_missing(data):
+    xpd = PanelData(data.x)
+    xpd.drop(xpd.isnull)
+    entity_mean = xpd.mean('entity')
+    expected = xpd.dataframe.groupby(level=0).mean()
+    expected = expected.loc[xpd.entities]
+    expected.columns.name = None
+    assert_frame_equal(entity_mean, expected)
+    
+    time_mean = xpd.mean('time')
+    expected = xpd.dataframe.groupby(level=1).mean()
+    expected = expected.loc[xpd.time]
+    expected.columns.name = None
+    assert_frame_equal(time_mean, expected)
+
+
+def test_count(data):
+    xpd = PanelData(data.x)
+    xpd.drop(xpd.isnull)
+    entity_mean = xpd.count('entity')
+    expected = xpd.dataframe.groupby(level=0).count()
+    expected = expected.loc[xpd.entities]
+    expected.columns.name = None
+    expected = expected.astype(np.int64)
+    assert_frame_equal(entity_mean, expected)
+    
+    time_mean = xpd.count('time')
+    expected = xpd.dataframe.groupby(level=1).count()
+    expected = expected.loc[xpd.time]
+    expected.columns.name = None
+    expected = expected.astype(np.int64)
+    assert_frame_equal(time_mean, expected)
+
+
+def test_first_difference(data):
+    x = PanelData(data.x)
+    x.first_difference()
+
+
+def test_demean_simple_weighted(data):
+    x = PanelData(data.x)
+    w = PanelData(data.w)
+    w.dataframe.iloc[:, 0] = 1
+    unweighted_entity_demean = x.demean('entity')
+    weighted_entity_demean = x.demean('entity', weights=w)
+    assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
+    
+    unweighted_entity_demean = x.demean('time')
+    weighted_entity_demean = x.demean('time', weights=w)
+    assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
+
+
+def test_demean_weighted(data):
+    x = PanelData(data.x)
+    w = PanelData(data.w)
+    missing = x.isnull | w.isnull
+    x.drop(missing)
+    w.drop(missing)
+    
+    entity_demean = x.demean('entity', weights=w)
+    d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[0]))
+    d = d.values
+    root_w = np.sqrt(w.dataframe.values)
+    wx = root_w * x.dataframe.values
+    wd = d * root_w
+    mu = wd @ pinv(wd) @ wx
+    e = wx - mu
+    assert_allclose(1 + np.abs(entity_demean.dataframe.values),
+                    1 + np.abs(e))
+    
+    time_demean = x.demean('time', weights=w)
+    d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[1]))
+    d = d.values
+    root_w = np.sqrt(w.dataframe.values)
+    wx = root_w * x.dataframe.values
+    wd = d * root_w
+    mu = wd @ pinv(wd) @ wx
+    e = wx - mu
+    assert_allclose(1 + np.abs(time_demean.dataframe.values),
+                    1 + np.abs(e))
+
+
+def test_mean_weighted(data):
+    x = PanelData(data.x)
+    w = PanelData(data.w)
+    missing = x.isnull | w.isnull
+    x.drop(missing)
+    w.drop(missing)
+    entity_mean = x.mean('entity', weights=w)
+    c = x.dataframe.index.levels[0][x.dataframe.index.labels[0]]
+    d = pd.get_dummies(pd.Categorical(c, ordered=True))
+    d = d[entity_mean.index]
+    d = d.values
+    root_w = np.sqrt(w.dataframe.values)
+    wx = root_w * x.dataframe.values
+    wd = d * root_w
+    mu = pinv(wd) @ wx
+    assert_allclose(entity_mean, mu)
+    
+    time_mean = x.mean('time', weights=w)
+    c = x.dataframe.index.levels[1][x.dataframe.index.labels[1]]
+    d = pd.get_dummies(pd.Categorical(c, ordered=True))
+    d = d[time_mean.index]
+    d = d.values
+    root_w = np.sqrt(w.dataframe.values)
+    wx = root_w * x.dataframe.values
+    wd = d * root_w
+    mu = pinv(wd) @ wx
+    assert_allclose(time_mean, mu)

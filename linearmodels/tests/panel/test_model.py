@@ -4,12 +4,11 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS, \
+    AmbiguityError, AbsorbingEffectError
+from linearmodels.tests.panel._utility import lvsd, generate_data
 from numpy.random import random_sample
 from numpy.testing import assert_allclose
-
-from linearmodels.panel.model import PooledOLS, PanelOLS, BetweenOLS, FirstDifferenceOLS, \
-    AmbiguityError
-from linearmodels.tests.panel._utility import lvsd, generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = ['numpy', 'pandas', 'xarray']
@@ -243,3 +242,64 @@ class TestFirstDifferenceOLS(TestPooledOLS):
         
         pols = self.mod(self.y_xr, self.x_xr)
         pols.fit()
+
+
+def test_incorrect_weight_shape(data):
+    if isinstance(data.w, xr.DataArray):
+        return
+    
+    w = data.w
+    if isinstance(w, pd.DataFrame):
+        w = w.iloc[:3]
+        w = pd.Panel({'weights': w})
+    else:
+        w = w[:3]
+        w = w[None, :, :]
+    
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=w)
+
+
+def test_first_difference_errors(data):
+    if isinstance(data.x, pd.Panel):
+        x = data.x.iloc[:, [0], :]
+        y = data.y.iloc[[0], :]
+    else:
+        x = data.x[:, [0], :]
+        y = data.y[[0], :]
+    with pytest.raises(ValueError):
+        FirstDifferenceOLS(y, x)
+    
+    if not isinstance(data.x, pd.Panel):
+        return
+    x = data.x.copy()
+    x['Intercept'] = 1.0
+    with pytest.raises(ValueError):
+        FirstDifferenceOLS(data.y, x)
+
+
+def test_absorbing_effect(data):
+    if not isinstance(data.x, pd.Panel):
+        return
+    x = data.x.copy()
+    temp = data.x.iloc[0].copy()
+    temp.values[:, :] = 1.0
+    n = temp.shape[1]
+    temp.values[:, n // 2:] = 0
+    x['Intercept'] = 1.0
+    x['absorbed'] = temp
+    with pytest.raises(AbsorbingEffectError):
+        PanelOLS(data.y, x, entity_effect=True).fit()
+
+
+def test_lvsd_fit_smoke(data):
+    PanelOLS(data.y, data.x)._fit_lvsd()
+    PanelOLS(data.y, data.x, entity_effect=True)._fit_lvsd()
+    PanelOLS(data.y, data.x, time_effect=True)._fit_lvsd()
+    PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)._fit_lvsd()
+    
+    if not isinstance(data.x, pd.Panel):
+        return
+    x = data.x.copy()
+    x['Intercept'] = 1.0
+    PanelOLS(data.y, x, entity_effect=True)._fit_lvsd()
