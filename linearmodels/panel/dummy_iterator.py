@@ -6,7 +6,7 @@ class DummyVariableIterator(object):
     """
     Iterator object that produces dummy variables
     """
-    
+
     def __init__(self, n, t, groups, drop=False, max_size=10, sparse=False):
         self.n = n
         self.t = t
@@ -28,16 +28,16 @@ class DummyVariableIterator(object):
         locs = np.argwhere(np.diff(ordered) != 0)
         self._ends = np.concatenate([[[0]], locs + 1, [[len(ordered)]]])
         self._ends = self._ends.ravel()
-    
+
     def __iter__(self):
         self._iter_count = 0
         self._remaining_cols = self.groups.max() + 1
         return self
-    
+
     def __next__(self):
         if self._remaining_cols <= 0:
             raise StopIteration
-        
+
         cols = min(self._remaining_cols, self._array_cols)
         self._remaining_cols -= cols
         ends = self._ends
@@ -53,15 +53,15 @@ class DummyVariableIterator(object):
             locs = (rows, columns)
             shape = (self._rows, cols)
             out = csc_matrix((values, locs), shape=shape, dtype=np.float64)
-        
+
         if self.drop and np.any(group_ids == 0):
             out = out[:, 1:]
             # Ensure never return empty column
             if out.shape[1] == 0:
                 return self.__next__()
-        
+
         return out
-    
+
     @property
     def dummies(self):
         self.__iter__()

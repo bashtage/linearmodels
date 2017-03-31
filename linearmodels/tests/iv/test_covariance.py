@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
-from numpy import sin, cos, pi
+from numpy import cos, pi, sin
 from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
 
-from linearmodels.iv.covariance import HomoskedasticCovariance, kernel_weight_bartlett, \
-    kernel_weight_parzen, kernel_weight_quadratic_spectral, HeteroskedasticCovariance, \
-    OneWayClusteredCovariance, KernelCovariance, kernel_optimal_bandwidth, _cov_kernel
+from linearmodels.iv.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, KernelCovariance, \
+    OneWayClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, kernel_weight_bartlett, kernel_weight_parzen, \
+    kernel_weight_quadratic_spectral
 from linearmodels.utility import AttrDict
 
 

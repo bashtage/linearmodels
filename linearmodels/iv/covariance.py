@@ -1,11 +1,10 @@
 """
 Covariance estimation for 2SLS and LIML IV estimators
 """
-from __future__ import print_function, absolute_import, division
+from __future__ import absolute_import, division, print_function
 
-from numpy import (ceil, where, argsort, r_, unique, zeros, arange, pi, sin,
-                   cos, empty, sum, asarray, ones)
-from numpy.linalg import pinv, inv
+from numpy import arange, argsort, asarray, ceil, cos, empty, ones, pi, r_, sin, sum, unique, where, zeros
+from numpy.linalg import inv, pinv
 
 CLUSTER_ERR = """
 clusters has the wrong nobs. Expected {0}, got {1}.  Any missing observation

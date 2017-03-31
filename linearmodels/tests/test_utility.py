@@ -2,8 +2,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.utility import WaldTestStatistic, InvalidTestStatistic, \
-    has_constant, inv_sqrth
+from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic, has_constant, inv_sqrth
 
 
 def test_hasconstant():

@@ -9,7 +9,7 @@ from numpy.testing import assert_allclose, assert_equal
 from pandas.util.testing import assert_series_equal
 from statsmodels.api import add_constant
 
-from linearmodels.iv import IV2SLS, IVLIML, IVGMM, IVGMMCUE
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
 from linearmodels.utility import AttrDict
