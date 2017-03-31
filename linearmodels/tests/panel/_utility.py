@@ -45,10 +45,11 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
     return params[:nvar]
 
 
-def generate_data(missing, datatype, const=False):
+def generate_data(missing, datatype, const=False, ntk=(971, 7, 5)):
     np.random.seed(12345)
 
-    n, t, k = 971, 7, 5 + const
+    n, t, k = ntk
+    k += const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
     y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t, 1))
@@ -78,16 +79,23 @@ def generate_data(missing, datatype, const=False):
     return AttrDict(y=y, x=x, w=w)
 
 
-def assert_results_equal(res1, res2):
-    assert_series_equal(res1.params, res2.params)
-    assert_series_equal(res1.pvalues, res2.pvalues)
-    assert_series_equal(res1.tstats, res2.tstats)
-    assert_frame_equal(res1.cov, res2.cov)
-    assert_frame_equal(res1.conf_int(), res2.conf_int())
-    assert_allclose(res1.rsquared, res2.rsquared)
-    assert_allclose(res1.total_ss, res2.total_ss)
-    assert_allclose(res1.resid_ss, res2.resid_ss)
-    assert_allclose(res1.model_ss, res2.model_ss)
+def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True):
+    if n is None:
+        n=min(res1.params.shape[0], res2.params.shape[0])
+
+    assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
+    assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
+    assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n])
+    assert_frame_equal(res1.cov.iloc[:n,:n], res2.cov.iloc[:n,:n])
+    assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
     assert_allclose(res1.s2, res2.s2)
-    assert_allclose(res1.df_model, res2.df_model)
-    assert_allclose(res1.df_resid, res2.df_resid)
+    if test_df:
+        assert_allclose(res1.df_model, res2.df_model)
+        assert_allclose(res1.df_resid, res2.df_resid)
+    if test_fit:
+        assert_allclose(res1.rsquared, res2.rsquared)
+        assert_allclose(res1.total_ss, res2.total_ss)
+        assert_allclose(res1.resid_ss, res2.resid_ss)
+        assert_allclose(res1.model_ss, res2.model_ss)
+
+

@@ -254,53 +254,119 @@ class PanelOLS(object):
         params = lstsq(wx, wy)[0]
         return params
 
-    def fit(self, debiased=False):
-        # TODO: Check got absorbing effects, aside form the constant column
+    @property
+    def has_constant(self):
+        return self._constant
+
+    def _slow_path(self):
+        """Frisch-Waigh-Lovell Implemtation, mostly for weighted"""
         has_effect = self.entity_effect or self.time_effect
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+
+        y = root_w * self.dependent.values2d
+        x = root_w * self.exog.values2d
+        if not has_effect:
+            ybar = root_w @ lstsq(root_w, y)[0]
+            return y, x, ybar
+
+        d = []
+        if self.entity_effect:
+            d.append(self.dependent.dummies('entity', drop_first=self._constant).values)
+        if self.time_effect:
+            drop = self._constant or self.entity_effect
+            d.append(self.dependent.dummies('time', drop_first=drop).values)
+        d = np.column_stack(d)
+        if self.has_constant:
+            d -= d.mean(0)
+        d = root_w * d
+        x = x - d @ np.linalg.lstsq(d, x)[0]
+        y = y - d @ np.linalg.lstsq(d, y)[0]
+        ybar = root_w @ lstsq(root_w, y)[0]
+        return y, x, ybar
+
+    def _fast_path(self):
+        has_effect = self.entity_effect or self.time_effect
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        ybar = y.mean(0)
+
+        if not has_effect:
+            return y, x, ybar
+
+        y_gm = ybar
+        x_gm = x.mean(0)
+
         y = self.dependent
         x = self.exog
-        y_gm = y.values2d.mean(0)
-        x_gm = x.values2d.mean(0)
-        neffects = 0
 
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
-            neffects = y.nentity - self._constant
         elif self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
-            neffects = y.nobs - self._constant
         elif self.time_effect:
             y = y.demean('time')
             x = x.demean('time')
-            neffects = y.nobs + y.nentity - self._constant
+
         y = y.values2d
         x = x.values2d
 
-        if self._constant:
+        if self.has_constant:
             y = y + y_gm
             x = x + x_gm
+        else:
+            ybar = 0
 
-        if has_effect:
+        return y, x, ybar
+
+    def fit(self, debiased=False):
+        unweighted = np.all(self.weights.values2d == 1.0)
+        if unweighted:
+            y, x, ybar = self._fast_path()
+        else:
+            y, x, ybar = self._slow_path()
+
+        neffects = 0
+        if self.entity_effect:
+            neffects = self.dependent.nentity - self.has_constant
+            if self.time_effect:
+                neffects += self.dependent.nobs - 1
+        elif self.time_effect:
+            neffects = self.dependent.nobs - self.has_constant
+
+
+        if self.entity_effect or self.time_effect:
             if matrix_rank(x) < x.shape[1]:
                 raise AbsorbingEffectError(absorbing_error_msg)
 
-        params = lstsq(x, y)[0]
-        df_resid = y.shape[0] - x.shape[1] - neffects
-        cov = HomoskedasticCovariance(y, x, params, df_resid)
-        # TODO: Weighted eps
-        weps = eps = y - x @ params
-        resid_ss = float(eps.T @ eps)
-        if self._constant or self._entity_effect or self._time_effect:
-            mu = y.mean()
+        params = np.linalg.lstsq(x, y)[0]
+
+        # TODO: Broken from this point!
+        df_model = x.shape[1] + neffects
+        df_resid = y.shape[0] - df_model
+        cov_denom = df_resid if debiased else y.shape[0]
+        cov = HomoskedasticCovariance(y, x, params, cov_denom)
+        weps = y - x @ params
+        eps = weps
+        if not unweighted:
+            # TODO: eps is not right when there are effects and weighting
+            # TODO: Need the estimated effect matrices to construct epsilon
+            # TODO: Should be (y - effects) - (x - effects) @ params
+            eps = self.dependent.values2d - self.exog.values2d @ params
+        resid_ss = float(weps.T @ weps)
+
+        if self.has_constant or self.entity_effect or self.time_effect:
+            mu = ybar
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
         res = self._postestimation(params, cov, debiased)
-        # TODO: Fix R2 definitions for multiple effects
-        res.update(dict(df_resid=df_resid, df_model=x.shape[1] + neffects, nobs=y.shape[0],
-                        residual_ss=resid_ss, total_ss=total_ss, wresid=weps, resid=eps))
+        r2 = 1 - resid_ss / total_ss
+        res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
+                        residual_ss=resid_ss, total_ss=total_ss, wresid=weps, resid=eps,
+                        r2=r2))
         return PanelResults(res)
 
 
