@@ -4,6 +4,8 @@ import xarray as xr
 from numpy.random import standard_normal
 
 from linearmodels.utility import AttrDict
+from numpy.testing import assert_allclose
+from pandas.util.testing import assert_series_equal, assert_frame_equal
 
 
 def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
@@ -44,19 +46,23 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
     return params[:nvar]
 
 
-def generate_data(missing, datatype):
+def generate_data(missing, datatype, const=False):
     np.random.seed(12345)
     
-    n, t, k = 971, 7, 5
+    n, t, k = 971, 7, 5 + const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
     y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t, 1))
     w = np.random.chisquare(5, (t, n)) / 5
+    if const:
+        x[0] = 1.0
+
     if missing > 0:
         locs = np.random.choice(n * t, int(n * t * missing))
         y.flat[locs] = np.nan
         locs = np.random.choice(n * t * k, int(n * t * k * missing))
         x.flat[locs] = np.nan
+
     
     if datatype in ('pandas', 'xarray'):
         entities = ['firm' + str(i) for i in range(n)]
@@ -72,3 +78,18 @@ def generate_data(missing, datatype):
         w = xr.DataArray(w)
     
     return AttrDict(y=y, x=x, w=w)
+
+
+def assert_results_equal(res1, res2):
+    assert_series_equal(res1.params, res2.params)
+    assert_series_equal(res1.pvalues, res2.pvalues)
+    assert_series_equal(res1.tstats, res2.tstats)
+    assert_frame_equal(res1.cov, res2.cov)
+    assert_frame_equal(res1.conf_int(), res2.conf_int())
+    assert_allclose(res1.rsquared, res2.rsquared)
+    assert_allclose(res1.total_ss, res2.total_ss)
+    assert_allclose(res1.resid_ss, res2.resid_ss)
+    assert_allclose(res1.model_ss, res2.model_ss)
+    assert_allclose(res1.s2, res2.s2)
+    assert_allclose(res1.df_model, res2.df_model)
+    assert_allclose(res1.df_resid, res2.df_resid)

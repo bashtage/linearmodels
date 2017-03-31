@@ -33,6 +33,8 @@ class PanelResults(_SummaryStr):
         self.model = res.model
         self._cov_type = res.cov_type
         self._datetime = dt.datetime.now()
+        self._resid = res.resid
+        self._wresid = res.wresid
     
     @property
     def params(self):
@@ -227,3 +229,17 @@ class PanelResults(_SummaryStr):
         smry.tables.append(table)
         
         return smry
+
+    @property
+    def resid(self):
+        """Model residuals"""
+        out = self.model.dependent.dataframe.copy()
+        out.iloc[:,:] = self.resid
+        return out
+
+    @property
+    def wresid(self):
+        """Weighted model residuals"""
+        out = self.model.dependent.dataframe.copy()
+        out.iloc[:,:] = self.wresid
+        return out

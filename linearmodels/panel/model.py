@@ -129,7 +129,11 @@ class PanelOLS(object):
             self.exog.drop(missing)
             self.weights.drop(missing)
             x = self.exog.values2d
-        
+
+        w = self.weights.values2d
+        w = w / w.mean()
+        self.weights.dataframe.iloc[:,:] = w
+
         self._constant, self._constant_index = has_constant(x)
         if matrix_rank(x) < x.shape[1]:
             raise ValueError('exog does not have full column rank.')
@@ -151,7 +155,7 @@ class PanelOLS(object):
         return self._time_effect
     
     @classmethod
-    def from_formula(cls, formula, data):
+    def from_formula(cls, formula, data, *, weights=None):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
         parts = formula.split('~')
@@ -176,7 +180,7 @@ class PanelOLS(object):
         dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
         mod = cls(dependent, exog, entity_effect=entity_effect,
-                  time_effect=time_effect)
+                  time_effect=time_effect, weights=weights)
         mod.formula = formula
         return mod
     
@@ -285,7 +289,8 @@ class PanelOLS(object):
         params = lstsq(x, y)[0]
         df_resid = y.shape[0] - x.shape[1] - neffects
         cov = HomoskedasticCovariance(y, x, params, df_resid)
-        eps = y - x @ params
+        # TODO: Weighted eps
+        weps = eps = y - x @ params
         resid_ss = float(eps.T @ eps)
         if self._constant or self._entity_effect or self._time_effect:
             mu = y.mean()
@@ -295,7 +300,7 @@ class PanelOLS(object):
         res = self._postestimation(params, cov, debiased)
         # TODO: Fix R2 definitions for multiple effects
         res.update(dict(df_resid=df_resid, df_model=x.shape[1] + neffects, nobs=y.shape[0],
-                        residual_ss=resid_ss, total_ss=total_ss))
+                        residual_ss=resid_ss, total_ss=total_ss, wresid=weps, resid=eps))
         return PanelResults(res)
 
 
@@ -341,7 +346,7 @@ class PooledOLS(PanelOLS):
         return y, x, w
     
     @classmethod
-    def from_formula(cls, formula, data):
+    def from_formula(cls, formula, data, *, weights=None):
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
         parts = formula.split('~')
@@ -349,7 +354,7 @@ class PooledOLS(PanelOLS):
         cln_formula = '~'.join(parts)
         dependent, exog = dmatrices(cln_formula, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = cls(dependent, exog)
+        mod = cls(dependent, exog, weights=weights)
         mod.formula = formula
         return mod
     
@@ -376,8 +381,8 @@ class PooledOLS(PanelOLS):
         x = self.exog.values2d
         w = self.weights.values2d
         root_w = np.sqrt(w)
-        wx = w * x
-        wy = w * y
+        wx = root_w * x
+        wy = root_w * y
         
         params = lstsq(wx, wy)[0]
         
@@ -387,17 +392,19 @@ class PooledOLS(PanelOLS):
         cov_denom = nobs if not debiased else df_resid
         cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
         weps = wy - wx @ params
+        eps = y - x @ params
         residual_ss = float(weps.T @ weps)
         e = y
         if self._constant:
-            e = e - np.average(y, weights=root_w)
+            e = e - (w * y).sum() / w.sum()
         
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
         
         res = self._postestimation(params, cov, debiased)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
-                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps,
+                        resid=eps))
         return PanelResults(res)
 
 
@@ -460,24 +467,25 @@ class BetweenOLS(PooledOLS):
         cov_denom = y.shape[0] if not debiased else df_resid
         cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
         weps = wy - wx @ params
+        eps = y - x @ params
         residual_ss = float(weps.T @ weps)
         # TODO: Explain this formula
         e = y
         if self._constant:
-            e = e - np.average(y, weights=root_w)
+            e = e - (w * y).sum() / w.sum()
         
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
         
         res = self._postestimation(params, cov, debiased)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=nobs,
-                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps, resid=eps))
         
         return PanelResults(res)
     
     @classmethod
-    def from_formula(cls, formula, data):
-        return super(BetweenOLS, cls).from_formula(formula, data)
+    def from_formula(cls, formula, data, *, weights=None):
+        return super(BetweenOLS, cls).from_formula(formula, data, weights=weights)
 
 
 class FirstDifferenceOLS(PooledOLS):
@@ -529,16 +537,18 @@ class FirstDifferenceOLS(PooledOLS):
         cov = HomoskedasticCovariance(y, x, params, cov_denom)
         
         weps = wy - wx @ params
+        eps = y - x @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(w.T @ (y ** 2))
         r2 = 1 - residual_ss / total_ss
         
         res = self._postestimation(params, cov, debiased)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
-                        residual_ss=residual_ss, total_ss=total_ss, r2=r2))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2,
+                        resid=eps, wresid=weps))
         
         return PanelResults(res)
     
     @classmethod
-    def from_formula(cls, formula, data):
-        return super(FirstDifferenceOLS, cls).from_formula(formula, data)
+    def from_formula(cls, formula, data, *, weights=None):
+        return super(FirstDifferenceOLS, cls).from_formula(formula, data, weights=weights)

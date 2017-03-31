@@ -1,12 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-from numpy.testing import assert_allclose
-from pandas.util.testing import assert_series_equal, assert_frame_equal
 
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import BetweenOLS
-from linearmodels.tests.panel._utility import generate_data
+from linearmodels.tests.panel._utility import generate_data, assert_results_equal
 
 
 @pytest.fixture(params=['numpy', 'pandas', 'xarray'])
@@ -17,21 +15,6 @@ def data(request):
 @pytest.fixture(params=['numpy', 'pandas', 'xarray'])
 def missing_data(request):
     return generate_data(0.20, request.param)
-
-
-def assert_results_equal(res1, res2):
-    assert_series_equal(res1.params, res2.params)
-    assert_series_equal(res1.pvalues, res2.pvalues)
-    assert_series_equal(res1.tstats, res2.tstats)
-    assert_frame_equal(res1.cov, res2.cov)
-    assert_frame_equal(res1.conf_int(), res2.conf_int())
-    assert_allclose(res1.rsquared, res2.rsquared)
-    assert_allclose(res1.total_ss, res2.total_ss)
-    assert_allclose(res1.resid_ss, res2.resid_ss)
-    assert_allclose(res1.model_ss, res2.model_ss)
-    assert_allclose(res1.s2, res2.s2)
-    assert_allclose(res1.df_model, res2.df_model)
-    assert_allclose(res1.df_resid, res2.df_resid)
 
 
 def test_single_entity(data):
