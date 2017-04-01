@@ -429,11 +429,14 @@ class IVLIML(object):
         residual_ss = (weps.T @ weps)
         # TODO: Explain this formula
         w = self.weights.ndarray
-        e = self._y
+        # e = self._y
+        e = self._wy
         if self.has_constant:
-            e = e - average(self._y, weights=w)
+            # e = e - average(self._y, weights=w)
+            e = e - sqrt(self.weights.ndarray) * average(self._y, weights=w)
 
-        total_ss = float(w.T @ (e ** 2))
+        # total_ss = float(w.T @ (e ** 2))
+        total_ss = float(e.T @ e)
         r2 = 1 - residual_ss / total_ss
 
         fstat = self._f_statistic(params, cov, debiased)

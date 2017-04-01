@@ -339,4 +339,4 @@ class PanelData(object):
         cat = pd.Categorical(levels[axis][labels[axis]])
         dummies = pd.get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == 'entity' else self.time
-        return dummies[[c for c in cols if c in dummies]]
+        return dummies[[c for c in cols if c in dummies]].astype(np.float64)
