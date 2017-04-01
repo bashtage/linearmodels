@@ -175,13 +175,12 @@ class PanelData(object):
         """
         if self.nentity > self.nobs:
             group = 'entity'
-            dummy_level = 1
+            dummy = 'time'
         else:
             group = 'time'
-            dummy_level = 0
+            dummy = 'entity'
         e = self.demean(group, weights=weights)
-        cat = pd.Categorical(self._frame.index.labels[dummy_level])
-        d = pd.get_dummies(cat, drop_first=True)
+        d = self.dummies(dummy, drop_first=True)
         d.index = e.dataframe.index
         d = PanelData(d).demean(group, weights=weights)
         d = d.dataframe.values

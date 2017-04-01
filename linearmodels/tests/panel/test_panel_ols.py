@@ -215,24 +215,151 @@ def test_panel_entity_fwl(data):
     res2 = IV2SLS(y, x, None, None).fit('unadjusted')
     assert_results_equal(res, res2, test_df=False)
 
-#
-#
-# def test_panel_time(data):
-#     PanelOLS(data.y, data.x, time_effect=True)
-#
-#
-# def test_panel_entity_weighted(data):
-#     PanelOLS(data.y, data.x, entity_effect=True, weights=data.w)
-#
-#
-# def test_panel_time_weighted(data):
-#     PanelOLS(data.y, data.x, time_effect=True, weights=data.w)
-#
-#
-# def test_panel_entity_time(data):
-#     PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
-#
-#
-# def test_panel_entity_time_weighted(data):
-#     PanelOLS(data.y, data.x, entity_effect=True, time_effect=True,
-#              weights=data.w)
+
+def test_panel_time_lvsd(data):
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    d = mod.dependent.dummies('time', drop_first=mod.has_constant)
+    d_cols = list(d.columns)
+    d = d.values
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    xd = np.c_[x.values, d]
+    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_cols)
+
+    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+
+def test_panel_time_fwl(data):
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    d = mod.dependent.dummies('time', drop_first=mod.has_constant)
+    d = d.values
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    x = x - d @ np.linalg.lstsq(d, x)[0]
+    y = y - d @ np.linalg.lstsq(d, y)[0]
+
+    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+
+def test_panel_both_lvsd(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    d1 = mod.dependent.dummies('entity', drop_first=mod.has_constant)
+    d2 = mod.dependent.dummies('time', drop_first=True)
+    d = np.c_[d1.values, d2.values]
+
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    xd = np.c_[x.values, d]
+    xd = pd.DataFrame(xd,
+                      index=x.index,
+                      columns=list(x.columns) + list(d1.columns) + list(d2.columns))
+
+    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+
+def test_panel_both_fwl(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    d1 = mod.dependent.dummies('entity', drop_first=mod.has_constant)
+    d2 = mod.dependent.dummies('time', drop_first=True)
+    d = np.c_[d1.values, d2.values]
+
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    x = x - d @ np.linalg.lstsq(d, x)[0]
+    y = y - d @ np.linalg.lstsq(d, y)[0]
+
+    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+
+def test_panel_entity_lvsd_weighted(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True, weights=data.w)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    w = mod.weights.dataframe
+    d = mod.dependent.dummies('entity', drop_first=mod.has_constant)
+    d_cols = d.columns
+    d = d.values
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    xd = np.c_[x.values, d]
+    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
+
+    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+
+def test_panel_time_lvsd_weighted(data):
+    mod = PanelOLS(data.y, data.x, time_effect=True, weights=data.w)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    w = mod.weights.dataframe
+    d = mod.dependent.dummies('time', drop_first=mod.has_constant)
+    d_cols = d.columns
+    d = d.values
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    xd = np.c_[x.values, d]
+    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
+
+    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+
+def test_panel_both_lvsd_weighted(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True, weights=data.w)
+    res = mod.fit()
+
+    y = mod.dependent.dataframe
+    x = mod.exog.dataframe
+    w = mod.weights.dataframe
+    d1 = mod.dependent.dummies('entity', drop_first=mod.has_constant)
+    d2 = mod.dependent.dummies('time', drop_first=True)
+    d = np.c_[d1.values, d2.values]
+
+    if mod.has_constant:
+        z = np.ones_like(y)
+        d = d - z @ np.linalg.lstsq(z, d)[0]
+
+    xd = np.c_[x.values, d]
+    xd = pd.DataFrame(xd,
+                      index=x.index,
+                      columns=list(x.columns) + list(d1.columns) + list(d2.columns))
+
+    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)

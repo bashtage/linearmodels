@@ -7,7 +7,8 @@ from patsy.missing import NAAction
 from linearmodels.panel.covariance import HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
-from linearmodels.utility import AttrDict, has_constant
+from linearmodels.utility import AttrDict, has_constant, MissingValueWarning, \
+    missing_value_warning_msg
 
 
 class AbsorbingEffectError(Exception):
@@ -30,10 +31,7 @@ class AmbiguityError(Exception):
 # TODO: Bootstrap covariance
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
-# TODO: number of entities/time
 # TODO: Warning about 2 way cluster
-# TODO: Group stats, min, max, avg
-# TODO: WLS for Between
 
 
 class PanelOLS(object):
@@ -123,8 +121,7 @@ class PanelOLS(object):
         if np.any(missing):
             if np.any(all_missing ^ missing):
                 import warnings
-                warnings.warn('Missing values detected. Dropping rows with one '
-                              'or more missing observation.', UserWarning)
+                warnings.warn(missing_value_warning_msg, MissingValueWarning)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)
@@ -190,17 +187,29 @@ class PanelOLS(object):
         y = self.dependent.values2d
         x = self.exog.values2d
         yhat = x @ params
-        r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
+        yhat = yhat.squeeze()
+        if yhat.std() / np.abs(yhat).mean() <= np.finfo(np.float64).eps:
+            r2o = 0
+        else:
+            r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
 
         ym = self.dependent.demean('entity').values2d
         xm = self.exog.demean('entity').values2d
         yhatm = xm @ params
-        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
+        if np.all(yhatm == 0) or yhatm.ptp() == 0 or \
+                (yhatm.std() / np.abs(yhatm).mean() <= np.finfo(np.float64).eps):
+            r2w = 0
+        else:
+            r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
 
         yb = self.dependent.mean('entity').values
         xb = self.exog.mean('entity').values
         yhatb = xb @ params
-        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
+        if np.all(yhatb == 0) or yhatb.ptp() == 0 or \
+                (yhatb.std() / np.abs(yhatb).mean() <= np.finfo(np.float64).eps):
+            r2b = 0
+        else:
+            r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
 
         return r2o, r2w, r2b
 
@@ -225,7 +234,7 @@ class PanelOLS(object):
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
                        entity_info=entity_info, time_info=time_info,
                        model=self,
-                       cov_type='Unadjusted')  # TODO: Fix R2 definitions for multiple effects
+                       cov_type='Unadjusted')
         return res
 
     def _fit_lvsd(self, debiased=False):
@@ -303,6 +312,9 @@ class PanelOLS(object):
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
+            # TODO: Remove
+            self._y_both = y
+            self._x_both = x
         elif self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
@@ -336,14 +348,12 @@ class PanelOLS(object):
         elif self.time_effect:
             neffects = self.dependent.nobs - self.has_constant
 
-
         if self.entity_effect or self.time_effect:
             if matrix_rank(x) < x.shape[1]:
                 raise AbsorbingEffectError(absorbing_error_msg)
 
         params = np.linalg.lstsq(x, y)[0]
 
-        # TODO: Broken from this point!
         df_model = x.shape[1] + neffects
         df_resid = y.shape[0] - df_model
         cov_denom = df_resid if debiased else y.shape[0]
@@ -535,10 +545,9 @@ class BetweenOLS(PooledOLS):
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
-        # TODO: Explain this formula
         e = y
         if self._constant:
-            e = e - (w * y).sum() / w.sum()
+            e = y - (w * y).sum() / w.sum()
 
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss

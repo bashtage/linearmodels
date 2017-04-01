@@ -7,6 +7,14 @@ from numpy.linalg import eigh, matrix_rank
 from scipy.stats import chi2, f
 
 
+class MissingValueWarning(Warning):
+    pass
+
+
+missing_value_warning_msg = """
+Inputs contain missing values. Dropping rows with missing observations."""
+
+
 class AttrDict(dict):
     """
     Dictionary-like object that exposes keys as attributes

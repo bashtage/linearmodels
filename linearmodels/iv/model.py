@@ -17,7 +17,8 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  HomoskedasticWeightMatrix, IVGMMCovariance,
                                  KernelWeightMatrix, OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth
+from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth, \
+    MissingValueWarning, missing_value_warning_msg
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -249,7 +250,7 @@ class IVLIML(object):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
             import warnings
-            warnings.warn('Inputs contain missing values', UserWarning)
+            warnings.warn(missing_value_warning_msg, MissingValueWarning)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.endog.drop(missing)
@@ -427,15 +428,12 @@ class IVLIML(object):
         debiased = cov_estimator.debiased
 
         residual_ss = (weps.T @ weps)
-        # TODO: Explain this formula
+
         w = self.weights.ndarray
-        # e = self._y
         e = self._wy
         if self.has_constant:
-            # e = e - average(self._y, weights=w)
             e = e - sqrt(self.weights.ndarray) * average(self._y, weights=w)
 
-        # total_ss = float(w.T @ (e ** 2))
         total_ss = float(e.T @ e)
         r2 = 1 - residual_ss / total_ss
 
