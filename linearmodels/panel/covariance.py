@@ -21,7 +21,6 @@ class HomoskedasticCovariance(object):
     @property
     def cov(self):
         x = self._x
-        nobs = x.shape[0]
         return self.s2 * inv(x.T @ x)
 
     def deferred_cov(self):
