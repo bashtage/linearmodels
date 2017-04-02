@@ -36,8 +36,8 @@ class IVData(object):
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
     convert_dummies : bool, optional
-        Flat indicating whether pandas categoricals should be converted to
-        dummy variables
+        Flat indicating whether pandas categoricals or string input data 
+        should be converted to dummy variables
     drop_first : bool, optional
         Flag indicating to drop first dummy category
     """

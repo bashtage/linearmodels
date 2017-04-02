@@ -4,11 +4,10 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.panel.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, OneWayClusteredCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
-from linearmodels.utility import AttrDict, has_constant, MissingValueWarning, \
-    missing_value_warning_msg
+from linearmodels.utility import AttrDict, MissingValueWarning, has_constant, missing_value_warning_msg
 
 
 class AbsorbingEffectError(Exception):
@@ -26,12 +25,19 @@ class AmbiguityError(Exception):
     pass
 
 
-# TODO: Heteroskedastic covariance
-# TODO: One-way cluster covariance
-# TODO: Bootstrap covariance
+# TODO: CovarianceManager
+# TODO: Warning about 2 way cluster
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
-# TODO: Warning about 2 way cluster
+# TODO: Bootstrap covariance
+
+
+COVARIANCE_ESTIMATORS = {'unadjusted': HomoskedasticCovariance,
+                         'homoskedastic': HomoskedasticCovariance,
+                         'robust': HeteroskedasticCovariance,
+                         'heteroskedastic': HeteroskedasticCovariance,
+                         'oneway': OneWayClusteredCovariance,
+                         'clustered': OneWayClusteredCovariance}
 
 
 class PanelOLS(object):
@@ -46,6 +52,9 @@ class PanelOLS(object):
         Flag whether to include entity (fixed) effects in the model
     time_effect : bool, optional
         Flag whether to include time effects in the model
+    other_effects : array-like, optional
+        Category codes to use for any effects that are not entity or time 
+        effects. Each variable is treated as an effect. 
 
     Notes
     -----
@@ -57,19 +66,45 @@ class PanelOLS(object):
 
     where :math:`\alpha_i` is omitted if ``entity_effect`` is ``False`` and
     :math:`\gamma_i` is omitted if ``time_effect`` is ``False``. If both ``entity_effect``  and
-    ``time_effect`` are ``False``, the model reduces to :class:`PooledOLS`.
+    ``time_effect`` are ``False``, the model reduces to :class:`PooledOLS`. If ``other_effects`` 
+    is provided, then additional terms are present to reflect these effects.
+    
+    Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
+    2 other.
     """
 
-    def __init__(self, dependent, exog, *, weights=None, entity_effect=False, time_effect=False):
-        self.dependent = PanelData(dependent, 'dependent')
-        self.exog = PanelData(exog, 'exog')
+    def __init__(self, dependent, exog, *, weights=None, entity_effect=False, time_effect=False,
+                 other_effects=None):
+        self.dependent = PanelData(dependent, 'Dep')
+        self.exog = PanelData(exog, 'Exog')
+        self._entity_effect = entity_effect
+        self._time_effect = time_effect
         self._constant = None
         self._formula = None
         self.weights = self._adapt_weights(weights)
+        self._other_effect_cats = None
+        self.other_effects = self._validate_effects(other_effects)
         self._validate_data()
-        self._entity_effect = entity_effect
-        self._time_effect = time_effect
+        self._supported_covs = [HomoskedasticCovariance, HeteroskedasticCovariance, OneWayClusteredCovariance]
         self._name = self.__class__.__name__
+
+    def _validate_effects(self, effects):
+        if effects is None:
+            return False
+        effects = PanelData(effects, var_name='OtherEffect',
+                            convert_dummies=False)
+        num_effects = effects.nvar
+        if num_effects + self.entity_effect + self.time_effect > 2:
+            raise ValueError('At most two effects supported.')
+        cats = {}
+        effects_frame = effects.dataframe
+        for col in effects_frame:
+            cat = pd.Categorical(effects_frame[col])
+            cats[col] = cat.codes.astype(np.int64)
+        cats = pd.DataFrame(cats, index=effects_frame.index)
+        cats = cats[effects_frame.columns]
+        self._other_effect_cats = PanelData(cats)
+        return True
 
     def _adapt_weights(self, weights):
         if weights is None:
@@ -113,6 +148,11 @@ class PanelOLS(object):
         if y.shape[0] != w.shape[0]:
             raise ValueError('weights must have the same number of '
                              'observations as dependent.')
+        if self.other_effects:
+            oe = self._other_effect_cats.dataframe
+            if oe.shape[0] != y.shape[0]:
+                raise ValueError('other_effects must have the same number of '
+                                 'observations as dependent.')
 
         all_missing = np.any(np.isnan(y), axis=1) & np.all(np.isnan(x), axis=1)
         missing = (np.any(np.isnan(y), axis=1) |
@@ -125,15 +165,17 @@ class PanelOLS(object):
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)
+            if self.other_effects:
+                self._other_effect_cats.drop(missing)
             x = self.exog.values2d
 
-        w = self.weights.values2d
+        w = self.weights.dataframe
         w = w / w.mean()
-        self.weights.dataframe.iloc[:, :] = w
+        self.weights = PanelData(w)
 
-        self._constant, self._constant_index = has_constant(x)
         if matrix_rank(x) < x.shape[1]:
             raise ValueError('exog does not have full column rank.')
+        self._constant, self._constant_index = has_constant(x)
 
     @property
     def formula(self):
@@ -224,16 +266,24 @@ class PanelOLS(object):
                             'Observations per entity')
         time_info = stats(self.dependent.time_ids.squeeze(),
                           'Observations per time period')
-        return entity_info, time_info
+        other_info = None
+        if self.other_effects:
+            oe = self._other_effect_cats.dataframe
+            for c in oe:
+                name = 'Observations per group (' + c.name + ')'
+                other_info.append(stats(oe[c].values, name))
+            other_info = pd.DataFrame(other_info)
+
+        return entity_info, time_info, other_info
 
     def _postestimation(self, params, cov, debiased):
         r2o, r2w, r2b = self._rsquared(params)
-        entity_info, time_info = self._info()
+        entity_info, time_info, other_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        debiased=debiased, name=self._name, var_names=self.exog.vars,
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
                        entity_info=entity_info, time_info=time_info,
-                       model=self,
+                       other_info=other_info, model=self,
                        cov_type='Unadjusted')
         return res
 
@@ -269,7 +319,7 @@ class PanelOLS(object):
 
     def _slow_path(self):
         """Frisch-Waigh-Lovell Implemtation, mostly for weighted"""
-        has_effect = self.entity_effect or self.time_effect
+        has_effect = self.entity_effect or self.time_effect or self.other_effects
         w = self.weights.values2d
         root_w = np.sqrt(w)
 
@@ -279,12 +329,21 @@ class PanelOLS(object):
             ybar = root_w @ lstsq(root_w, y)[0]
             return y, x, ybar
 
+        drop_first = self._constant
         d = []
         if self.entity_effect:
-            d.append(self.dependent.dummies('entity', drop_first=self._constant).values)
+            d.append(self.dependent.dummies('entity', drop_first=drop_first).values)
+            drop_first = True
         if self.time_effect:
-            drop = self._constant or self.entity_effect
-            d.append(self.dependent.dummies('time', drop_first=drop).values)
+            d.append(self.dependent.dummies('time', drop_first=drop_first).values)
+            drop_first = True
+        if self.other_effects:
+            oe = self._other_effect_cats.dataframe
+            for c in oe:
+                dummies = pd.get_dummies(oe[c], drop_first=drop_first)
+                d.append(dummies.values)
+                drop_first = True
+
         d = np.column_stack(d)
         if self.has_constant:
             d -= d.mean(0)
@@ -312,9 +371,6 @@ class PanelOLS(object):
         if self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
-            # TODO: Remove
-            self._y_both = y
-            self._x_both = x
         elif self.entity_effect:
             y = y.demean('entity')
             x = x.demean('entity')
@@ -333,22 +389,28 @@ class PanelOLS(object):
 
         return y, x, ybar
 
-    def fit(self, debiased=False):
+    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
         unweighted = np.all(self.weights.values2d == 1.0)
-        if unweighted:
+        if unweighted and not self.other_effects:
             y, x, ybar = self._fast_path()
         else:
             y, x, ybar = self._slow_path()
 
         neffects = 0
+        drop_first = self.has_constant
         if self.entity_effect:
-            neffects = self.dependent.nentity - self.has_constant
-            if self.time_effect:
-                neffects += self.dependent.nobs - 1
-        elif self.time_effect:
-            neffects = self.dependent.nobs - self.has_constant
+            neffects += self.dependent.nentity - drop_first
+            drop_first = True
+        if self.time_effect:
+            neffects += self.dependent.nobs - drop_first
+            drop_first = True
+        if self.other_effects:
+            oe = self._other_effect_cats.dataframe
+            for c in oe:
+                neffects += oe[c].nunique() - drop_first
+                drop_first = True
 
-        if self.entity_effect or self.time_effect:
+        if self.entity_effect or self.time_effect or self.other_effects:
             if matrix_rank(x) < x.shape[1]:
                 raise AbsorbingEffectError(absorbing_error_msg)
 
@@ -357,17 +419,21 @@ class PanelOLS(object):
         df_model = x.shape[1] + neffects
         df_resid = y.shape[0] - df_model
         cov_denom = df_resid if debiased else y.shape[0]
-        cov = HomoskedasticCovariance(y, x, params, cov_denom)
+        # TODO: Clustered covariance needs work
+        cov_est = COVARIANCE_ESTIMATORS[cov_type]
+        if cov_est not in self._supported_covs:
+            raise ValueError('Requested covariance estimator is not supported for the model.')
+        cov = cov_est(y, x, params, cov_denom, **cov_config)
         weps = y - x @ params
         eps = weps
         if not unweighted:
             # TODO: eps is not right when there are effects and weighting
             # TODO: Need the estimated effect matrices to construct epsilon
-            # TODO: Should be (y - effects) - (x - effects) @ params
+            # TODO: Should be y - (x - x_effects) @ params - effects
             eps = self.dependent.values2d - self.exog.values2d @ params
         resid_ss = float(weps.T @ weps)
 
-        if self.has_constant or self.entity_effect or self.time_effect:
+        if self.has_constant:
             mu = ybar
         else:
             mu = 0
@@ -401,7 +467,10 @@ class PooledOLS(PanelOLS):
     """
 
     def __init__(self, dependent, exog, *, weights=None):
+        self._supported_covs = [HomoskedasticCovariance,
+                                HeteroskedasticCovariance]
         super(PooledOLS, self).__init__(dependent, exog, weights=weights)
+        self._supported_covs = [HomoskedasticCovariance, HeteroskedasticCovariance, OneWayClusteredCovariance]
 
     def _prepare_between(self):
         y = self.dependent.mean('entity', weights=self.weights).values
@@ -452,7 +521,7 @@ class PooledOLS(PanelOLS):
 
         return r2o, r2w, r2b
 
-    def fit(self, debiased=False):
+    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -466,7 +535,10 @@ class PooledOLS(PanelOLS):
         df_model = x.shape[1]
         df_resid = nobs - df_model
         cov_denom = nobs if not debiased else df_resid
-        cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
+        cov_est = COVARIANCE_ESTIMATORS[cov_type]
+        if cov_est not in self._supported_covs:
+            raise ValueError('Requested covariance estimator is not supported for the model.')
+        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -507,18 +579,21 @@ class BetweenOLS(PooledOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
 
-    def fit(self, debiased=False, reweight=False):
+    def fit(self, reweight=False, cov_type='unadjusted', debiased=False, **cov_config):
         """
         Estimate model parameters
 
         Parameters
         ----------
-        debiased : bool
-            Flag indicating to use a debiased parameter covariance estimator
         reweight : bool
             Flag indicating to reweight observations if the input data is
             unbalanced
-
+        cov_type : str
+            Either 'unadjusted' for homoskedastic covariance or 'robust' for 
+            heteroskedasticity robust covariance estimation.
+        debiased : bool
+            Flag indicating to use a debiased parameter covariance estimator
+    
         Returns
         -------
         results : PanelResults
@@ -541,7 +616,10 @@ class BetweenOLS(PooledOLS):
         df_model = x.shape[1],
         nobs = y.shape[0]
         cov_denom = y.shape[0] if not debiased else df_resid
-        cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
+        cov_est = COVARIANCE_ESTIMATORS[cov_type]
+        if cov_est not in self._supported_covs:
+            raise ValueError('Requested covariance estimator is not supported for the model.')
+        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -587,8 +665,9 @@ class FirstDifferenceOLS(PooledOLS):
             raise ValueError('Constants are not allowed in first difference regressions.')
         if self.dependent.nobs < 2:
             raise ValueError('Panel must have at least 2 time periods')
+        self._supported_cov = [HomoskedasticCovariance, HeteroskedasticCovariance]
 
-    def fit(self, debiased=False):
+    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.first_difference().values2d
         x = self.exog.first_difference().values2d
 
@@ -610,7 +689,10 @@ class FirstDifferenceOLS(PooledOLS):
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov_denom = df_resid if debiased else y.shape[0]
-        cov = HomoskedasticCovariance(wy, wx, params, cov_denom)
+        cov_est = COVARIANCE_ESTIMATORS[cov_type]
+        if cov_est not in self._supported_covs:
+            raise ValueError('Requested covariance estimator is not supported for the model.')
+        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
 
         weps = wy - wx @ params
         eps = y - x @ params

@@ -45,7 +45,7 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
     return params[:nvar]
 
 
-def generate_data(missing, datatype, const=False, ntk=(971, 7, 5)):
+def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0):
     np.random.seed(12345)
 
     n, t, k = ntk
@@ -54,6 +54,11 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5)):
     beta = np.arange(1, k + 1)[:, None, None] / k
     y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t, 1))
     w = np.random.chisquare(5, (t, n)) / 5
+    c = None
+    cats = ['cat.' + str(i) for i in range(other_effects)]
+    if other_effects:
+        c = np.random.randint(0,4,(other_effects,t,n))
+
     if const:
         x[0] = 1.0
 
@@ -70,13 +75,15 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5)):
         y = pd.DataFrame(y, index=time, columns=entities)
         w = pd.DataFrame(w, index=time, columns=entities)
         x = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+        c = pd.Panel(c, items=cats, major_axis=time, minor_axis=entities)
 
     if datatype == 'xarray':
         x = xr.DataArray(x)
         y = xr.DataArray(y)
         w = xr.DataArray(w)
+        c = xr.DataArray(c)
 
-    return AttrDict(y=y, x=x, w=w)
+    return AttrDict(y=y, x=x, w=w, c=c)
 
 
 def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True):

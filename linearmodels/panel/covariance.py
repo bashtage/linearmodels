@@ -1,8 +1,46 @@
 import numpy as np
 from numpy.linalg import inv
 
+from linearmodels.iv.covariance import _cov_cluster
+
 
 class HomoskedasticCovariance(object):
+    r"""
+    Homoskedastic covariance estimation
+
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
+    x : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        variables by 1 array of estimated model parameters
+    df_resid : int
+        Residual degree of freedom to use when normalizing covariance 
+
+    Notes
+    -----
+    The estimator of the covariance is
+
+    .. math:: s^2\hat{\Sigma}_{xx}^{-1}
+
+    where
+
+    .. math::
+
+        \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
+
+    and
+
+    .. math::
+
+        s^2 = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T \hat{\epsilon}_{it}^2
+
+    where NT is replace by NT-k if ``debiased`` is ``True``.
+
+    """
+
     def __init__(self, y, x, params, df_resid):
         self._y = y
         self._x = x
@@ -27,71 +65,22 @@ class HomoskedasticCovariance(object):
         return self.cov
 
 
-def homoskedastic_covariance(x, epsilon, *, debiased=False):
-    r"""
-    Homoskedastic covariance estimation
-
-    Parameters
-    ----------
-    x : ndarray
-        (entity x time) by variables stacked array of regressors
-    epsilon : ndarray
-        (entity x time) by 1 stacked array of errors
-    debiased : bool
-        Flag indicating whether to dias adjust
-
-    Returns
-    -------
-    cov : array
-        Estimated parameter covariance
-
-    Notes
-    -----
-    The estimator of the covariance is
-
-    .. math:: s^2\hat{\Sigma}_{xx}^{-1}
-
-    where
-
-    .. math::
-
-        \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
-
-    and
-
-    .. math::
-
-        s^2 = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T \hat{\epsilon}_{it}^2
-
-    where NT is replace by NT-k if ``debiased`` is ``True``.
-
-    """
-    nt, k = x.shape
-    xpx = x.T @ x / nt
-    xpxi = np.linalg.inv(xpx)
-    scale = nt - k if debiased else nt
-    s2 = epsilon.T @ epsilon / scale
-
-    return s2 * (xpxi + xpxi.T) / 2
-
-
-def heteroskedastic_covariance(x, epsilon, *, debiased=False):
+class HeteroskedasticCovariance(HomoskedasticCovariance):
     r"""
     Covariance estimation using White estimator
 
     Parameters
     ----------
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
     x : ndarray
-        (entity x time) by variables stacked array of regressors
-    epsilon : ndarray
-        (entity x time) by 1 stacked array of errors
-    debiased : bool
-        Flag indicating whether to dias adjust
-
-    Returns
-    -------
-    cov : array
-        Estimated parameter covariance
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        variables by 1 array of estimated model parameters
+    df_resid : int
+        Residual degree of freedom to use when normalizing covariance 
 
     Notes
     -----
@@ -116,33 +105,41 @@ def heteroskedastic_covariance(x, epsilon, *, debiased=False):
 
     where NT is replace by NT-k if ``debiased`` is ``True``.
     """
-    nt, k = x.shape
-    xpx = x.T @ x / nt
-    xpxi = np.linalg.inv(xpx)
 
-    xe = x * epsilon
-    scale = nt - k if debiased else nt
-    xeex = xe.T @ xe / scale
+    def __init__(self, y, x, params, df_resid):
+        super(HeteroskedasticCovariance, self).__init__(y, x, params, df_resid)
 
-    cov = xpxi @ xeex @ xpxi
+    @property
+    def cov(self):
+        x = self._x
+        nobs = x.shape[0]
+        xpxi = inv(x.T @ x / nobs)
+        eps = self.eps
+        xe = x * eps
+        xeex = xe.T @ xe / self._df_resid
+        out = (xpxi @ xeex @ xpxi) / nobs
+        out = (out + out.T) / 2
+        return out
 
-    return (cov + cov.T) / 2
 
-
-def oneway_clustered_covariance(x, epsilon, cluster, *, debiased=False):
+class OneWayClusteredCovariance(HomoskedasticCovariance):
     r"""
     One-way clustered (Rogers) covariance estimation
 
     Parameters
     ----------
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
     x : ndarray
-        (entity x time) by variables stacked array of regressors
-    epsilon : ndarray
-        (entity x time) by 1 stacked array of errors
-    cluster : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        variables by 1 array of estimated model parameters
+    df_resid : int
+        Residual degree of freedom to use when normalizing covariance 
+    cluster : ndarray, optional
         (entity x time) by 1 stacked array of cluster group
-    debiased : bool
-        Flag indicating whether to dias adjust
 
     Returns
     -------
@@ -177,21 +174,22 @@ def oneway_clustered_covariance(x, epsilon, cluster, *, debiased=False):
         * Small sample adjustments
 
     """
-    nt, k = x.shape
-    xpx = x.T @ x / nt
-    xpxi = np.linalg.inv(xpx)
 
-    ind = np.argsort(cluster.flat)
-    x = x[ind]
-    epsilon = epsilon[ind]
-    cluster = cluster[ind]
-    locs = np.where(np.r_[True, cluster.flat[:-1] != cluster.flat[1:], True].flat)[0]
-    xeex = np.zeros((k, k))
-    for i in range(locs.shape[0] - 1):
-        st, en = locs[i], locs[i + 1]
-        xe = x[st:en] * epsilon[st:en]
-        xeex += xe.T @ xe / (en - st)
+    def __init__(self, y, x, params, df_resid, clusters=None):
+        super(OneWayClusteredCovariance, self).__init__(y, x, params, df_resid)
+        if clusters is None:
+            clusters = np.arange(self._x.shape[0])
+        self._clusters = clusters.squeeze()
 
-    cov = xpxi @ xeex @ xpxi
+    @property
+    def cov(self):
+        x = self._x
+        nobs = x.shape[0]
+        xpxi = inv(x.T @ x / nobs)
 
-    return (cov + cov.T) / 2
+        eps = self.eps
+        xe = x * eps
+        xeex = _cov_cluster(xe, self._clusters) * (nobs / self._df_resid)
+        out = (xpxi @ xeex @ xpxi) / nobs
+        out = (out + out.T) / 2
+        return out
