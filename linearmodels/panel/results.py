@@ -34,6 +34,7 @@ class PanelResults(_SummaryStr):
         self._datetime = dt.datetime.now()
         self._resid = res.resid
         self._wresid = res.wresid
+        self._index = res.index
 
     @property
     def params(self):
@@ -232,13 +233,10 @@ class PanelResults(_SummaryStr):
     @property
     def resid(self):
         """Model residuals"""
-        out = self.model.dependent.dataframe.copy()
-        out.iloc[:, :] = self.resid
-        return out
+        return Series(self._resid.squeeze(), index=self._index, name='resid')
 
     @property
     def wresid(self):
         """Weighted model residuals"""
-        out = self.model.dependent.dataframe.copy()
-        out.iloc[:, :] = self.wresid
-        return out
+        return Series(self._wresid.squeeze(), index=self._index, name='wresid')
+

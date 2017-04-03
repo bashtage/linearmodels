@@ -32,7 +32,7 @@ class PanelData(object):
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
     convert_dummies : bool, optional
-        Flat indicating whether pandas categoricals or string input data 
+        Flat indicating whether pandas categoricals or string input data
         should be converted to dummy variables
     drop_first : bool, optional
         Flag indicating to drop first dummy category
@@ -63,13 +63,9 @@ class PanelData(object):
         If the input has the wrong number of dimensions or a MultiIndex
         DataFrame does not have 2 levels
     """
-
-    # 3d -> variables, time, entities
-    # 2d -> time, entities (single variable)
-    # 2d, multiindex -> (entities, time), variables
     def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
         if isinstance(x, PanelData):
-            x = x._original
+            x = x.dataframe
         self._original = x
 
         if isinstance(x, xr.DataArray):

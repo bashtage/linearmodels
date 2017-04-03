@@ -25,12 +25,12 @@ def data(request):
 def test_pooled_ols(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
-
+    
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-
+    
     res2 = IV2SLS(y, x, None, None).fit('unadjusted')
     assert_results_equal(res, res2)
 
@@ -38,13 +38,13 @@ def test_pooled_ols(data):
 def test_pooled_ols_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit()
-
+    
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
     w = mod.weights.dataframe
     y.index = np.arange(len(y))
     w.index = x.index = y.index
-
+    
     res2 = IV2SLS(y, x, None, None, weights=w).fit('unadjusted')
     assert_results_equal(res, res2)
 
@@ -71,3 +71,14 @@ def test_rank_deficient_array(data):
         x[1] = x[0]
     with pytest.raises(ValueError):
         PooledOLS(data.y, x)
+
+
+def test_results_smoke(data):
+    mod = PooledOLS(data.y, data.x)
+    res = mod.fit()
+    d = dir(res)
+    for key in d:
+        if not key.startswith('_'):
+            val = getattr(res, key)
+            if callable(val):
+                val()
