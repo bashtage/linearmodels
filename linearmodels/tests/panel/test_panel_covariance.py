@@ -9,7 +9,7 @@ class TestCovariance(object):
         cls.n, cls.t, cls.k = 1000, 4, 10
         cls.x = np.random.random_sample((cls.n * cls.t, cls.k))
         cls.epsilon = np.random.random_sample((cls.n * cls.t, 1))
-        cls.params = np.arange(1, cls.k + 1)[:,None] / cls.k
+        cls.params = np.arange(1, cls.k + 1)[:, None] / cls.k
         cls.df_resid = cls.n * cls.t
         cls.y = cls.x @ cls.params + cls.epsilon
         cls.cluster1 = np.tile(np.arange(1000)[:, None], (4, 1))

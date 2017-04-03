@@ -239,4 +239,3 @@ class PanelResults(_SummaryStr):
     def wresid(self):
         """Weighted model residuals"""
         return Series(self._wresid.squeeze(), index=self._index, name='wresid')
-

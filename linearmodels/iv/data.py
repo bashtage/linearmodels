@@ -84,9 +84,9 @@ class IVData(object):
                         copied = True
                     x[col] = c
                 dt = c.dtype
-                if not (is_numeric_dtype(dt) or
-                            is_categorical_dtype(dt)):
-                    raise ValueError('Only numeric, string  or categorical data permitted')
+                if not (is_numeric_dtype(dt) or is_categorical_dtype(dt)):
+                    raise ValueError('Only numeric, string  or categorical '
+                                     'data permitted')
 
             if convert_dummies:
                 x = expand_categoricals(x, drop_first)
