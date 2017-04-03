@@ -4,8 +4,8 @@ Linear Model Estimation
 .. warning::
 
   The instrumental variable estimation code is complete and tested. The
-  remainder of this package is completely unfinished and will radically
-  change.
+  panel data models are substantially complete although the API is not
+  finalized.
 
 Estimation and inference in some linear models (IV, panel and panel IV).
 
@@ -16,7 +16,7 @@ Estimation and inference in some linear models (IV, panel and panel IV).
    :glob:
 
    iv/index
-   panel/panel
+   panel/index
    utility
    plan
 

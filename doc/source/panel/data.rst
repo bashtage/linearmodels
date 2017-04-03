@@ -1,8 +1,8 @@
 Panel Data Structures
 ---------------------
 
-.. module:: linearmodels.panel.data
+.. currentmodule:: linearmodels.panel.data
 
-
-.. automodule:: linearmodels.panel.data
+.. autoclass:: PanelData
    :members:
+   :inherited-members:
