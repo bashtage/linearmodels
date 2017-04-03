@@ -1,14 +1,15 @@
 import numpy as np
 import pandas as pd
+from numpy.linalg import lstsq, matrix_rank
+from patsy.highlevel import ModelDesc, dmatrices
+from patsy.missing import NAAction
+
 from linearmodels.panel.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, \
     OneWayClusteredCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
 from linearmodels.utility import AttrDict, MissingValueWarning, has_constant, \
     missing_value_warning_msg
-from numpy.linalg import lstsq, matrix_rank
-from patsy.highlevel import ModelDesc, dmatrices
-from patsy.missing import NAAction
 
 
 class CovarianceManager(object):
@@ -51,7 +52,7 @@ class AmbiguityError(Exception):
 # TODO: 2 way cluster covariance
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
-# TODO: Add weights to alternative R2 estimators
+# TODO: Verify alternative R2 definitions
 # TODO: Bootstrap covariance
 # TODO: Test covariance estimators vs IV versions
 # TODO: Add likelihood and possibly AIC/BIC
@@ -249,37 +250,6 @@ class PanelOLS(object):
         mod.formula = formula
         return mod
 
-    def _rsquared(self, params):
-        # TODO: Fix to be correct for time/entity effects or both
-        # TODO: Handle no constant case
-        feps = np.finfo(np.float64).eps
-        y = self.dependent.values2d
-        x = self.exog.values2d
-        yhat = x @ params
-        yhat = yhat.squeeze()
-        if (yhat.std() / np.abs(yhat).mean()) <= feps:
-            r2o = 0
-        else:
-            r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
-
-        ym = self.dependent.demean('entity').values2d
-        xm = self.exog.demean('entity').values2d
-        yhatm = xm @ params
-        if np.all(yhatm == 0) or yhatm.ptp() == 0 or (yhatm.std() / np.abs(yhatm).mean() <= feps):
-            r2w = 0
-        else:
-            r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
-
-        yb = self.dependent.mean('entity').values
-        xb = self.exog.mean('entity').values
-        yhatb = xb @ params
-        if np.all(yhatb == 0) or yhatb.ptp() == 0 or (yhatb.std() / np.abs(yhatb).mean() <= feps):
-            r2b = 0
-        else:
-            r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
-
-        return r2o, r2w, r2b
-
     def _info(self):
         def stats(ids, name):
             bc = np.bincount(ids)
@@ -301,6 +271,73 @@ class PanelOLS(object):
             other_info = pd.DataFrame(other_info)
 
         return entity_info, time_info, other_info
+
+    def _prepare_between(self):
+        y = self.dependent.mean('entity', weights=self.weights).values
+        x = self.exog.mean('entity', weights=self.weights).values
+        # Weight transformation
+        wcount, wmean = self.weights.count('entity'), self.weights.mean('entity')
+        wsum = wcount * wmean
+        w = wsum.values
+        w = w / w.mean()
+
+        return y, x, w
+
+    def _rsquared(self, params, reweight=False):
+        if self.has_constant and self.dependent.nvar == 1:
+            # Constant only fast track
+            return 0.0, 0.0, 0.0
+        
+        #############################################
+        # R2 - Between
+        #############################################
+        y, x, w = self._prepare_between()
+        if np.all(self.weights.values2d == 1.0) and not reweight:
+            w = root_w = np.ones_like(w)
+        else:
+            root_w = np.sqrt(w)
+        wx = root_w * x
+        wy = root_w * y
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        e = y
+        if self.has_constant:
+            e = y - (w * y).sum() / w.sum()
+
+        total_ss = float(w.T @ (e ** 2))
+        r2b = 1 - residual_ss / total_ss
+
+        #############################################
+        # R2 - Overall
+        #############################################
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        wx = root_w * x
+        wy = root_w * y
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        mu = (w * y).sum() / w.sum() if self.has_constant else 0
+        we = wy - root_w * mu
+        total_ss = float(we.T @ we)
+        r2o = 1 - residual_ss / total_ss
+
+        #############################################
+        # R2 - Within
+        #############################################
+        # TODO: Test that this is correct in weighted and unweighted, const or not
+        wy = self.dependent.demean('entity', weights=self.weights).values2d
+        wx = self.exog.demean('entity', weights=self.weights).values2d
+        weps = wy - wx @ params
+        residual_ss = float(weps.T @ weps)
+        total_ss = float(wy.T @ wy)
+        if self.dependent.nobs == 1:
+            r2w = 0
+        else:
+            r2w = 1 - residual_ss / total_ss
+
+        return r2o, r2w, r2b
 
     def _postestimation(self, params, cov, debiased):
         r2o, r2w, r2b = self._rsquared(params)
@@ -507,24 +544,6 @@ class PooledOLS(PanelOLS):
                                                  HeteroskedasticCovariance,
                                                  OneWayClusteredCovariance)
 
-    def _prepare_between(self):
-        y = self.dependent.mean('entity', weights=self.weights).values
-        x = self.exog.mean('entity', weights=self.weights).values
-        # Weight transformation
-        wcount, wmean = self.weights.count('entity'), self.weights.mean('entity')
-        wsum = wcount * wmean
-        w = wsum.values
-        w = w / w.mean()
-
-        return y, x, w
-
-    def _prepare_within(self):
-        y = self.dependent.demean('entity', weights=self.weights).values2d
-        x = self.exog.demean('entity', weights=self.weights).values2d
-        w = self.weights.values2d
-
-        return y, x, w
-
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
         na_action = NAAction(on_NA='raise', NA_types=[])
@@ -537,24 +556,6 @@ class PooledOLS(PanelOLS):
         mod = cls(dependent, exog, weights=weights)
         mod.formula = formula
         return mod
-
-    def _rsquared(self, params):
-        y = self.dependent.values2d
-        x = self.exog.values2d
-        yhat = x @ params
-        r2o = np.corrcoef(yhat.squeeze(), y.squeeze())[0, 1] ** 2
-
-        ym = self.dependent.demean('entity').values2d
-        xm = self.exog.demean('entity').values2d
-        yhatm = xm @ params
-        r2w = np.corrcoef(yhatm.squeeze(), ym.squeeze())[0, 1] ** 2
-
-        yb = self.dependent.mean('entity').values
-        xb = self.exog.mean('entity').values
-        yhatb = xb @ params
-        r2b = np.corrcoef(yhatb.squeeze(), yb.squeeze())[0, 1] ** 2
-
-        return r2o, r2w, r2b
 
     def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.values2d
@@ -635,9 +636,6 @@ class BetweenOLS(PooledOLS):
             Estimation results
         """
         y, x, w = self._prepare_between()
-        self._avgy = y
-        self._avgx = x
-        self._avgw = w
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(w)
         else:

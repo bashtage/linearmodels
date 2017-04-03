@@ -1,5 +1,7 @@
-Panel Module Reference
-----------------------
+.. _panel-module-reference:
+
+Module Reference
+----------------
 
 .. toctree::
    :maxdepth: 3
@@ -7,4 +9,7 @@ Panel Module Reference
 
    models
    covariance
+   results
    data
+
+

@@ -1,7 +1,21 @@
 Models for Panel Data
 ---------------------
 
-.. module:: linearmodels.panel.model
+.. currentmodule:: linearmodels.panel.model
 
-.. automodule:: linearmodels.panel.model
+.. autoclass:: PanelOLS
    :members:
+   :inherited-members:
+
+.. autoclass:: BetweenOLS
+   :members:
+   :inherited-members:
+
+.. autoclass:: FirstDifferenceOLS
+   :members:
+   :inherited-members:
+
+.. autoclass:: PooledOLS
+   :members:
+   :inherited-members:
+

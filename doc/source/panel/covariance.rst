@@ -1,7 +1,16 @@
-Covariance Estimators
----------------------
+Panel Model Covariance Estimators
+---------------------------------
 
-.. module:: linearmodels.panel.covariance
+.. currentmodule:: linearmodels.panel.covariance
 
-.. automodule:: linearmodels.panel.covariance
+.. autoclass:: HomoskedasticCovariance
    :members:
+   :inherited-members:
+
+.. autoclass:: HeteroskedasticCovariance
+   :members:
+   :inherited-members:
+
+.. autoclass:: OneWayClusteredCovariance
+   :members:
+   :inherited-members:
