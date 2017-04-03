@@ -2,6 +2,23 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
+
+
+def convert_columns(s, drop_first):
+    if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
+        s = s.astype('category')
+
+    if is_categorical(s):
+        out = pd.get_dummies(s, drop_first=drop_first)
+        out.columns = [s.name + '.' + c for c in out]
+        return out
+    return s
+
+
+def expand_categoricals(x, drop_first):
+    return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+
 
 class PanelData(object):
     """
@@ -12,10 +29,13 @@ class PanelData(object):
     x : {ndarray, Series, DataFrame, DataArray}
        Input data, either 2 or 3 dimensional
     var_name : str, optional
-        Name to use when generating labels for the variables in the data
-    convert_categoricals : bool, optional
-        Flag indicating whether categorical or string variables should be
-        converted to dummies
+        Variable name to use when naming variables in NumPy arrays or
+        xarray DataArrays
+    convert_dummies : bool, optional
+        Flat indicating whether pandas categoricals or string input data 
+        should be converted to dummy variables
+    drop_first : bool, optional
+        Flag indicating to drop first dummy category
 
     Notes
     -----
@@ -47,7 +67,7 @@ class PanelData(object):
     # 3d -> variables, time, entities
     # 2d -> time, entities (single variable)
     # 2d, multiindex -> (entities, time), variables
-    def __init__(self, x, var_name='x'):
+    def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
         if isinstance(x, PanelData):
             x = x._original
         self._original = x
@@ -86,6 +106,10 @@ class PanelData(object):
         else:
             raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
                             'supported.')
+        if convert_dummies:
+            self._frame = expand_categoricals(self._frame, drop_first)
+            self._frame = self._frame.astype(np.float64)
+
         self._k, self._t, self._n = self.panel.shape
         self._frame.index.levels[0].name = 'entity'
         self._frame.index.levels[1].name = 'time'
@@ -183,8 +207,8 @@ class PanelData(object):
         d = self.dummies(dummy, drop_first=True)
         d.index = e.dataframe.index
         d = PanelData(d).demean(group, weights=weights)
-        d = d.dataframe.values
-        e = e.dataframe.values
+        d = d.values2d
+        e = e.values2d
         resid = e - d @ np.linalg.lstsq(d, e)[0]
         resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 

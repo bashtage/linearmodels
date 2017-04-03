@@ -8,6 +8,7 @@ from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
 from pandas.util.testing import assert_frame_equal, assert_panel_equal
 
+from linearmodels.compat.pandas import is_string_dtype
 from linearmodels.panel.data import PanelData
 from linearmodels.tests.panel._utility import generate_data
 
@@ -247,11 +248,11 @@ def test_demean_against_groupby(data):
 
     entity_demean = df.groupby(level=0).transform(demean)
     res = dh.demean('entity')
-    assert_allclose(entity_demean.values, res.dataframe.values)
+    assert_allclose(entity_demean.values, res.values2d)
 
     time_demean = df.groupby(level=1).transform(demean)
     res = dh.demean('time')
-    assert_allclose(time_demean.values, res.dataframe.values)
+    assert_allclose(time_demean.values, res.values2d)
 
 
 def test_demean_against_dummy_regression(data):
@@ -265,14 +266,14 @@ def test_demean_against_dummy_regression(data):
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     entity_demean = dh.demean('entity')
-    assert_allclose(1 + np.abs(entity_demean.dataframe.values),
+    assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     time_demean = dh.demean('time')
-    assert_allclose(1 + np.abs(time_demean.dataframe.values),
+    assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
     cat = pd.Categorical(no_index[df.index.levels[0].name])
@@ -282,7 +283,7 @@ def test_demean_against_dummy_regression(data):
     d = np.c_[d1.values, d2.values]
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     both_demean = dh.demean('both')
-    assert_allclose(1 + np.abs(both_demean.dataframe.values),
+    assert_allclose(1 + np.abs(both_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
 
@@ -352,7 +353,7 @@ def test_demean_both_large_t():
     d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
     d = np.c_[d1.values, d2.values]
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
-    assert_allclose(1 + np.abs(demeaned.dataframe.values),
+    assert_allclose(1 + np.abs(demeaned.values2d),
                     1 + np.abs(dummy_demeaned))
 
 
@@ -462,23 +463,23 @@ def test_demean_weighted(data):
     entity_demean = x.demean('entity', weights=w)
     d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[0]))
     d = d.values
-    root_w = np.sqrt(w.dataframe.values)
-    wx = root_w * x.dataframe.values
+    root_w = np.sqrt(w.values2d)
+    wx = root_w * x.values2d
     wd = d * root_w
     mu = wd @ pinv(wd) @ wx
     e = wx - mu
-    assert_allclose(1 + np.abs(entity_demean.dataframe.values),
+    assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(e))
 
     time_demean = x.demean('time', weights=w)
     d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[1]))
     d = d.values
-    root_w = np.sqrt(w.dataframe.values)
-    wx = root_w * x.dataframe.values
+    root_w = np.sqrt(w.values2d)
+    wx = root_w * x.values2d
     wd = d * root_w
     mu = wd @ pinv(wd) @ wx
     e = wx - mu
-    assert_allclose(1 + np.abs(time_demean.dataframe.values),
+    assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(e))
 
 
@@ -493,8 +494,8 @@ def test_mean_weighted(data):
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
-    root_w = np.sqrt(w.dataframe.values)
-    wx = root_w * x.dataframe.values
+    root_w = np.sqrt(w.values2d)
+    wx = root_w * x.values2d
     wd = d * root_w
     mu = pinv(wd) @ wx
     assert_allclose(entity_mean, mu)
@@ -504,8 +505,66 @@ def test_mean_weighted(data):
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
     d = d[time_mean.index]
     d = d.values
-    root_w = np.sqrt(w.dataframe.values)
-    wx = root_w * x.dataframe.values
+    root_w = np.sqrt(w.values2d)
+    wx = root_w * x.values2d
     wd = d * root_w
     mu = pinv(wd) @ wx
     assert_allclose(time_mean, mu)
+
+
+def test_categorical_conversion():
+    t, n = 3, 1000
+    string = np.random.choice(['a', 'b', 'c'], (t, n))
+    num = np.random.randn(t, n)
+    p = pd.Panel({'a': string, 'b': num})
+    p = p[['a', 'b']]
+    panel = PanelData(p, convert_dummies=False)
+    df = panel.dataframe.copy()
+    df['a'] = pd.Categorical(df['a'])
+    panel = PanelData(df, convert_dummies=True)
+
+    df = panel.dataframe
+    assert df.shape == (3000, 3)
+    s = string.T.ravel()
+    a_locs = np.where(s == 'a')
+    b_locs = np.where(s == 'b')
+    c_locs = np.where(s == 'c')
+    assert np.all(df.loc[:, 'a.b'].values[a_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.b'].values[b_locs] == 1.0)
+    assert np.all(df.loc[:, 'a.b'].values[c_locs] == 0.0)
+
+    assert np.all(df.loc[:, 'a.c'].values[a_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.c'].values[b_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.c'].values[c_locs] == 1.0)
+
+
+def test_string_conversion():
+    t, n = 3, 1000
+    string = np.random.choice(['a', 'b', 'c'], (t, n))
+    num = np.random.randn(t, n)
+    p = pd.Panel({'a': string, 'b': num})
+    p = p[['a', 'b']]
+    panel = PanelData(p, var_name='OtherEffect')
+    df = panel.dataframe
+    assert df.shape == (3000, 3)
+    s = string.T.ravel()
+    a_locs = np.where(s == 'a')
+    b_locs = np.where(s == 'b')
+    c_locs = np.where(s == 'c')
+    assert np.all(df.loc[:, 'a.b'].values[a_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.b'].values[b_locs] == 1.0)
+    assert np.all(df.loc[:, 'a.b'].values[c_locs] == 0.0)
+
+    assert np.all(df.loc[:, 'a.c'].values[a_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.c'].values[b_locs] == 0.0)
+    assert np.all(df.loc[:, 'a.c'].values[c_locs] == 1.0)
+
+
+def test_string_nonconversion():
+    t, n = 3, 1000
+    string = np.random.choice(['a', 'b', 'c'], (t, n))
+    num = np.random.randn(t, n)
+    p = pd.Panel({'a': string, 'b': num})
+    panel = PanelData(p, var_name='OtherEffect', convert_dummies=False)
+    assert is_string_dtype(panel.dataframe['a'].dtype)
+    assert np.all(panel.dataframe['a'] == string.T.ravel())
