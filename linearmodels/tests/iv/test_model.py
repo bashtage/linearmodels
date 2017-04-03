@@ -54,7 +54,7 @@ def get_all(v):
     for a in attr:
         val = getattr(v, a)
         if a in ('conf_int', 'durbin', 'wu_hausman', 'c_stat'):
-            val = val()
+            val()
 
 
 class TestErrors(object):

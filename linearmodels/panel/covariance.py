@@ -17,7 +17,7 @@ class HomoskedasticCovariance(object):
     params : ndarray
         variables by 1 array of estimated model parameters
     df_resid : int
-        Residual degree of freedom to use when normalizing covariance 
+        Residual degree of freedom to use when normalizing covariance
 
     Notes
     -----
@@ -80,7 +80,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     params : ndarray
         variables by 1 array of estimated model parameters
     df_resid : int
-        Residual degree of freedom to use when normalizing covariance 
+        Residual degree of freedom to use when normalizing covariance
 
     Notes
     -----
@@ -137,7 +137,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     params : ndarray
         variables by 1 array of estimated model parameters
     df_resid : int
-        Residual degree of freedom to use when normalizing covariance 
+        Residual degree of freedom to use when normalizing covariance
     cluster : ndarray, optional
         (entity x time) by 1 stacked array of cluster group
 
