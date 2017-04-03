@@ -49,12 +49,17 @@ class AmbiguityError(Exception):
     pass
 
 
-# TODO: CovarianceManager
-# TODO: Warning about 2 way cluster
+# TODO: 2 way cluster covariance
 # TODO: Regression F-stat
 # TODO: Pooled F-stat
+# TODO: Add weights to alternative R2 estimators
 # TODO: Bootstrap covariance
-
+# TODO: Test covariance estimators vs IV versions
+# TODO: Add likelihood and possibly AIC/BIC
+# TODO: Correlation between FE and XB
+# TODO: ??Alternative variance estimators??
+# TODO: Documentation
+# TODO: Example notebooks
 
 
 
