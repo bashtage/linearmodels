@@ -428,7 +428,7 @@ class PanelOLS(object):
     def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
 
         unweighted = np.all(self.weights.values2d == 1.0)
-        y_effects, x_effects = 0
+        y_effects = x_effects = 0
         if unweighted and not self.other_effects:
             y, x, ybar = self._fast_path()
         else:
