@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 
+from linearmodels.utility import cached_property
 from linearmodels.iv.covariance import _cov_cluster
 
 
@@ -56,7 +57,7 @@ class HomoskedasticCovariance(object):
         eps = self.eps
         return float(eps.T @ eps) / self._df_resid
 
-    @property
+    @cached_property
     def cov(self):
         x = self._x
         return self.s2 * inv(x.T @ x)
@@ -109,7 +110,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def __init__(self, y, x, params, df_resid):
         super(HeteroskedasticCovariance, self).__init__(y, x, params, df_resid)
 
-    @property
+    @cached_property
     def cov(self):
         x = self._x
         nobs = x.shape[0]
@@ -181,7 +182,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
             clusters = np.arange(self._x.shape[0])
         self._clusters = clusters.squeeze()
 
-    @property
+    @cached_property
     def cov(self):
         x = self._x
         nobs = x.shape[0]

@@ -8,7 +8,7 @@ from linearmodels.panel.covariance import HeteroskedasticCovariance, Homoskedast
     OneWayClusteredCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
-from linearmodels.utility import AttrDict, MissingValueWarning, has_constant, \
+from linearmodels.utility import AttrDict, InvalidTestStatistic, MissingValueWarning, WaldTestStatistic, has_constant, \
     missing_value_warning_msg
 
 
@@ -50,7 +50,6 @@ class AmbiguityError(Exception):
 
 
 # TODO: 2 way cluster covariance
-# TODO: Regression F-stat
 # TODO: Pooled F-stat
 # TODO: Verify alternative R2 definitions
 # TODO: Bootstrap covariance
@@ -250,6 +249,37 @@ class PanelOLS(object):
         mod.formula = formula
         return mod
 
+    def _f_statistic(self, params, cov_est, debiased, df_resid):
+        sel = np.ones(params.shape[0], dtype=np.bool)
+
+        def invalid_f():
+            name = 'Model F-statistic'
+            return InvalidTestStatistic('Model contains only a constant',
+                                        name=name)
+
+        if self.has_constant:
+            if len(sel) == 1:
+                return invalid_f
+            sel[self._constant_index] = False
+
+        def deferred_f():
+            test_params = params[sel]
+            test_cov = cov_est.cov[sel][:, sel]
+            test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+            test_stat = float(test_stat)
+            df = sel.sum()
+            null = 'All parameters ex. constant not zero'
+            name = 'Model F-statistic'
+
+            if debiased:
+                wald = WaldTestStatistic(test_stat / df, null, df, df_resid,
+                                         name=name)
+            else:
+                wald = WaldTestStatistic(test_stat, null, df, name=name)
+            return wald
+
+        return deferred_f
+
     def _info(self):
         def stats(ids, name):
             bc = np.bincount(ids)
@@ -287,7 +317,7 @@ class PanelOLS(object):
         if self.has_constant and self.dependent.nvar == 1:
             # Constant only fast track
             return 0.0, 0.0, 0.0
-        
+
         #############################################
         # R2 - Between
         #############################################
@@ -339,10 +369,12 @@ class PanelOLS(object):
 
         return r2o, r2w, r2b
 
-    def _postestimation(self, params, cov, debiased):
+    def _postestimation(self, params, cov, debiased, df_resid):
+        deferred_f = self._f_statistic(params, cov, debiased, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
         entity_info, time_info, other_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
+                       deferred_f=deferred_f,
                        debiased=debiased, name=self._name, var_names=self.exog.vars,
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
                        entity_info=entity_info, time_info=time_info,
@@ -510,7 +542,7 @@ class PanelOLS(object):
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
-        res = self._postestimation(params, cov, debiased)
+        res = self._postestimation(params, cov, debiased, df_resid)
         r2 = 1 - resid_ss / total_ss
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=resid_ss, total_ss=total_ss, wresid=weps, resid=eps,
@@ -583,7 +615,7 @@ class PooledOLS(PanelOLS):
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased)
+        res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps,
                         resid=eps, index=self.dependent.dataframe.index))
@@ -661,7 +693,7 @@ class BetweenOLS(PooledOLS):
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased)
+        res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=nobs,
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps, resid=eps,
                         index=self.dependent.entities))
@@ -732,7 +764,7 @@ class FirstDifferenceOLS(PooledOLS):
         total_ss = float(w.T @ (y ** 2))
         r2 = 1 - residual_ss / total_ss
 
-        res = self._postestimation(params, cov, debiased)
+        res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2,
                         resid=eps, wresid=weps, index=index))

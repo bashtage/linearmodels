@@ -35,6 +35,7 @@ class PanelResults(_SummaryStr):
         self._resid = res.resid
         self._wresid = res.wresid
         self._index = res.index
+        self._deferred_f = res.deferred_f
 
     @property
     def params(self):
@@ -239,3 +240,8 @@ class PanelResults(_SummaryStr):
     def wresid(self):
         """Weighted model residuals"""
         return Series(self._wresid.squeeze(), index=self._index, name='wresid')
+
+    @property
+    def f_statistic(self):
+        """Joint test of significance for non-constant regressors"""
+        return self._deferred_f()
