@@ -23,7 +23,6 @@ def test_hasconstant():
     x[1::2, 1] = 0
     hc, loc = has_constant(x)
     assert hc is True
-    print(loc)
 
 
 def test_wald_statistic():

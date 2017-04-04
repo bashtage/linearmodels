@@ -43,6 +43,7 @@ def table_concat(lists, sep='='):
 class OLSResults(_SummaryStr):
     def __init__(self, results, model):
         self._resid = results['eps']
+        self._wresid = results['weps']
         self._params = results['params']
         self._cov = results['cov']
         self.model = model
@@ -84,6 +85,11 @@ class OLSResults(_SummaryStr):
     def resids(self):
         """Estimated residuals"""
         return self._resid
+
+    @property
+    def wresids(self):
+        """Weighted estimated residuals"""
+        return self._wresid
 
     @property
     def nobs(self):

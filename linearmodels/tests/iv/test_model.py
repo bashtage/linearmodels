@@ -225,7 +225,6 @@ def test_wooldridge_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
     wr = res.wooldridge_regression
-
     ws = res.wooldridge_score
     print(wr)
     print(ws)

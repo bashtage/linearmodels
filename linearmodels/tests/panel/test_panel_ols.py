@@ -497,13 +497,12 @@ def test_panel_other_incorrect_size(data):
         PanelOLS(y, x, other_effects=cats)
 
 
-def test_results_smoke(data):
+def test_results_access(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     res = mod.fit()
     d = dir(res)
     for key in d:
         if not key.startswith('_'):
-            print(key)
             val = getattr(res, key)
             if callable(val):
                 val()

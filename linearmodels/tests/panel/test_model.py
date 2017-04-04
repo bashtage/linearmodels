@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from numpy.random import random_sample
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
+from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import AbsorbingEffectError, AmbiguityError, PanelOLS
 from linearmodels.tests.panel._utility import generate_data, lvsd
 
@@ -28,21 +28,50 @@ def test_panel_ols(data):
     PanelOLS(data.y, data.x, time_effect=True).fit()
 
 
-def test_valid_weight_shape_smokes(data):
+def test_valid_weight_shape(data):
+    # Same size
     n = np.prod(data.y.shape)
     weights = 1 + np.random.random_sample(n)
-    PanelOLS(data.y, data.x, weights=weights).fit()
-
+    mod = PanelOLS(data.y, data.x, weights=weights)
+    mod.fit()
+    w = mod.weights.values2d
+    missing = PanelData(data.y).isnull | PanelData(data.x).isnull
+    expected = weights[~missing.squeeze()][:, None]
+    expected = expected / expected.mean()
+    assert_equal(w, expected)
+    
+    # Per time
     n = data.y.shape[0]
     weights = 1 + np.random.random_sample(n)
-    PanelOLS(data.y, data.x, weights=weights).fit()
-
+    mod = PanelOLS(data.y, data.x, weights=weights)
+    mod.fit()
+    w = mod.weights.values2d
+    expected = weights[:, None] @ np.ones((1, data.y.shape[1]))
+    expected = expected.T.ravel()
+    expected = expected[~missing.squeeze()][:, None]
+    expected = expected / expected.mean()
+    assert_equal(w, expected)
+    
+    # Per entity
     n = data.y.shape[1]
     weights = 1 + np.random.random_sample(n)
-    PanelOLS(data.y, data.x, weights=weights).fit()
-
+    mod = PanelOLS(data.y, data.x, weights=weights)
+    mod.fit()
+    w = mod.weights.values2d
+    expected = np.ones((data.y.shape[0], 1)) @ weights[None, :]
+    expected = expected.T.ravel()
+    expected = expected[~missing.squeeze()][:, None]
+    expected = expected / expected.mean()
+    assert_equal(w, expected)
+    
     weights = 1 + np.random.random_sample(data.y.shape)
-    PanelOLS(data.y, data.x, weights=weights).fit()
+    mod = PanelOLS(data.y, data.x, weights=weights)
+    mod.fit()
+    w = mod.weights.values2d
+    expected = weights.T.ravel()
+    expected = expected[~missing.squeeze()][:, None]
+    expected = expected / expected.mean()
+    assert_equal(w, expected)
 
 
 def test_weight_incorrect_shape(data):
@@ -71,54 +100,6 @@ def test_panel_lvsd(data):
     res = mod.fit()
     expected = lvsd(y, x, has_const=False, entity=True, time=True)
     assert_allclose(res.params.squeeze(), expected, rtol=1e-4)
-
-
-def test_panel_constant_smoke(data):
-    if isinstance(data.x, pd.Panel):
-        data.x['const'] = 1
-    else:
-        data.x[0] = 1
-
-    PanelOLS(data.y, data.x, entity_effect=True).fit()
-    PanelOLS(data.y, data.x, time_effect=True).fit()
-    PanelOLS(data.y, data.x, entity_effect=True, time_effect=True).fit()
-
-
-class TestPanelOLS(object):
-    @classmethod
-    def setup_class(cls):
-        np.random.seed(12345)
-        n, t, k = 10000, 4, 5
-        cls.x = random_sample((k, t, n))
-        beta = np.arange(1, k + 1)[:, None, None]
-        cls.y = (cls.x * beta).sum(0) + random_sample((t, n))
-
-        cls.y_pd = pd.DataFrame(cls.y)
-        cls.x_pd = pd.Panel(cls.x)
-
-        cls.y_xr = xr.DataArray(cls.y)
-        cls.x_xr = xr.DataArray(cls.x)
-
-        cls.mod = PanelOLS
-
-    def test_smoke(self):
-        pols = self.mod(self.y, self.x)
-        pols.fit()
-
-        pols = self.mod(self.y, self.x)
-        pols.fit()
-
-        pols = self.mod(self.y_pd, self.x_pd)
-        pols.fit()
-
-        pols = self.mod(self.y_pd, self.x_pd)
-        pols.fit()
-
-        pols = self.mod(self.y_xr, self.x_xr)
-        pols.fit()
-
-        pols = self.mod(self.y_xr, self.x_xr)
-        pols.fit()
 
 
 def test_incorrect_weight_shape(data):
@@ -162,15 +143,3 @@ def test_absorbing_effect(data):
     with pytest.raises(AbsorbingEffectError):
         PanelOLS(data.y, x, entity_effect=True).fit()
 
-
-def test_lvsd_fit_smoke(data):
-    PanelOLS(data.y, data.x)._fit_lvsd()
-    PanelOLS(data.y, data.x, entity_effect=True)._fit_lvsd()
-    PanelOLS(data.y, data.x, time_effect=True)._fit_lvsd()
-    PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)._fit_lvsd()
-
-    if not isinstance(data.x, pd.Panel):
-        return
-    x = data.x.copy()
-    x['Intercept'] = 1.0
-    PanelOLS(data.y, x, entity_effect=True)._fit_lvsd()

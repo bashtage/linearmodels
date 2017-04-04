@@ -94,10 +94,14 @@ def test_missing(missing_data):
     mod = BetweenOLS(missing_data.y, missing_data.x)
     res = mod.fit(reweight=True)
     
-    dep = np.nanmean(mod.dependent.values3d, axis=1).T
-    exog = pd.DataFrame(np.nanmean(mod.exog.values3d, axis=1).T,
-                        columns=mod.exog.vars)
-    weights = np.nansum(mod.weights.values3d, axis=1).T
+    dep = mod.dependent.dataframe.groupby(level=0).mean()
+    exog = mod.exog.dataframe.groupby(level=0).mean()
+    weights = mod.weights.dataframe.groupby(level=0).sum()
+    
+    dep = dep.reindex(mod.dependent.entities)
+    exog = exog .reindex(mod.dependent.entities)
+    weights = weights.reindex(mod.dependent.entities)
+    
     ols = IV2SLS(dep, exog, None, None, weights=weights)
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
@@ -106,16 +110,20 @@ def test_missing(missing_data):
 def test_missing_weighted(missing_data):
     mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
     res = mod.fit(reweight=True)
+
+    weights = mod.weights.dataframe.groupby(level=0).sum()
+    weights = weights.reindex(mod.dependent.entities)
     
-    weights = np.nansum(mod.weights.values3d, axis=1).T
-    wdep = np.nansum(mod.weights.values3d * mod.dependent.values3d, axis=1).T
-    wexog = np.nansum(mod.weights.values3d * mod.exog.values3d, axis=1).T
-    wdep = wdep / weights
-    wexog = wexog / weights
-    
-    dep = wdep
-    exog = pd.DataFrame(wexog, columns=mod.exog.vars)
-    
+    dep = mod.dependent.dataframe * mod.weights.dataframe.values
+    dep = dep.groupby(level=0).sum()
+    dep = dep.reindex(mod.dependent.entities)
+    dep = dep / weights.values
+
+    exog = mod.weights.dataframe.values * mod.exog.dataframe
+    exog = exog.groupby(level=0).sum()
+    exog = exog.reindex(mod.dependent.entities)
+    exog = (1.0 / weights.values) * exog
+
     ols = IV2SLS(dep, exog, None, None, weights=weights)
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
@@ -133,13 +141,12 @@ def test_unknown_covariance(data):
         mod.fit(cov_type='unknown')
 
 
-def test_results_smoke(data):
+def test_results_access(data):
     mod = BetweenOLS(data.y, data.x)
     res = mod.fit()
     d = dir(res)
     for key in d:
         if not key.startswith('_'):
-            print(key)
             val = getattr(res, key)
             if callable(val):
                 val()
