@@ -39,22 +39,29 @@ class PanelResults(_SummaryStr):
 
     @property
     def params(self):
+        """Estimated parameters"""
         return Series(self._params, index=self._var_names, name='parameter')
 
     @cached_property
     def cov(self):
+        """Estimated covariance of parameters"""
         return DataFrame(self._deferred_cov(), columns=self._var_names, index=self._var_names)
 
     @property
     def std_errors(self):
+        """Estimated parameter standard errors"""
         return Series(sqrt(diag(self.cov)), self._var_names, name='std_error')
 
     @property
     def tstats(self):
+        """Parameter t-statistics"""
         return Series(self._params / self.std_errors, name='tstat')
 
     @cached_property
     def pvalues(self):
+        """
+        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        """
         abs_tstats = np.abs(self.tstats)
         if self._debiased:
             pv = 2 * (1 - stats.t.cdf(abs_tstats, self.df_resid))
@@ -64,18 +71,22 @@ class PanelResults(_SummaryStr):
 
     @property
     def df_resid(self):
+        """Residual degree of freedom"""
         return self._df_resid
 
     @property
     def df_model(self):
+        """Model degree of freedom"""
         return self._df_model
 
     @property
     def nobs(self):
+        """Number of observations"""
         return self._nobs
 
     @property
     def name(self):
+        """Model name"""
         return self._name
 
     @property
@@ -95,30 +106,37 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared(self):
+        """Model Coefficient of determination (R**2)"""
         return self._r2
 
     @property
     def rsquared_between(self):
+        """Between Coefficient of determination"""
         return self._r2b
 
     @property
     def rsquared_within(self):
+        """Within coefficient of determination"""
         return self._r2w
 
     @property
     def rsquared_overall(self):
+        """Overall coefficient of determination"""
         return self._r2o
 
     @property
     def s2(self):
+        """Residual variance estimator"""
         return self._s2
 
     @property
     def entity_info(self):
+        """Statistics on observations per entity"""
         return self._entity_info
 
     @property
     def time_info(self):
+        """Statistics on observations per time interval"""
         return self._time_info
 
     def conf_int(self, level=0.95):
@@ -172,7 +190,7 @@ class PanelResults(_SummaryStr):
         f_stat = _str(self.f_statistic.stat) if is_invalid else '--'
         f_pval = pval_format(self.f_statistic.pval) if is_invalid else '--'
         f_dist = self.f_statistic.dist_name if is_invalid else '--'
-        
+
         top_right = [('R-squared:', _str(self.rsquared)),
                      ('R-squared (Between):', _str(self.rsquared_between)),
                      ('R-squared (Within):', _str(self.rsquared_within)),
@@ -245,21 +263,21 @@ class PanelResults(_SummaryStr):
     def wresids(self):
         """Model residuals"""
         return Series(self._wresids.squeeze(), index=self._index, name='weighted residual')
-    
+
     @property
     def f_statistic(self):
         """
         Joint test of significance for non-constant regressors
-        
+
         Returns
         -------
         f_stat : WaldTestStatistic
             Statistic value, distribution and p-value
-        
+
         Notes
         -----
         Implemented as a Wald test using the estimated parameter covariance.
-        If debiased is True, then divided the Wald statistic by the number of 
+        If debiased is True, then divided the Wald statistic by the number of
         restrictions and uses an F distribution.
         """
         return self._deferred_f()

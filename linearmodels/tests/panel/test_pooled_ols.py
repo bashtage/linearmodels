@@ -26,12 +26,12 @@ def data(request):
 def test_pooled_ols(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
-    
+
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-    
+
     res2 = IV2SLS(y, x, None, None).fit('unadjusted')
     assert_results_equal(res, res2)
 
@@ -39,13 +39,13 @@ def test_pooled_ols(data):
 def test_pooled_ols_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit()
-    
+
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
     w = mod.weights.dataframe
     y.index = np.arange(len(y))
     w.index = x.index = y.index
-    
+
     res2 = IV2SLS(y, x, None, None, weights=w).fit('unadjusted')
     assert_results_equal(res, res2)
 
@@ -83,7 +83,7 @@ def test_results_access(data):
             val = getattr(res, key)
             if callable(val):
                 val()
-    
+
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=True)
     d = dir(res)
@@ -92,7 +92,7 @@ def test_results_access(data):
             val = getattr(res, key)
             if callable(val):
                 val()
-    
+
     if not isinstance(data.x, pd.Panel):
         return
     x = data.y.copy()
