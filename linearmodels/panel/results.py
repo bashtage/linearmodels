@@ -172,9 +172,9 @@ class PanelResults(_SummaryStr):
                      ('R-squared (Between):', _str(self.rsquared_between)),
                      ('R-squared (Within):', _str(self.rsquared_within)),
                      ('R-squared (Overall):', _str(self.rsquared_overall)),
-                     ('F-statistic:', '---'),  # TODO
-                     ('P-value (F-stat)', '---'),  # TODO
-                     ('Distribution:', '---'),  # TODO
+                     ('F-statistic:', _str(self.f_statistic.stat)),
+                     ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
+                     ('Distribution:', self.f_statistic.dist_name),
                      ('', ''),
                      ('Time periods:', str(int(self.time_info['total']))),
                      ('Avg Obs:', _str(self.time_info['mean'])),
@@ -243,5 +243,18 @@ class PanelResults(_SummaryStr):
 
     @property
     def f_statistic(self):
-        """Joint test of significance for non-constant regressors"""
+        """
+        Joint test of significance for non-constant regressors
+        
+        Returns
+        -------
+        f_stat : WaldTestStatistic
+            Statistic value, distribution and p-value
+        
+        Notes
+        -----
+        Implemented as a Wald test using the estimated parameter covariance.
+        If debiased is True, then divided the Wald statistic by the number of 
+        restrictions and uses an F distribution.
+        """
         return self._deferred_f()
