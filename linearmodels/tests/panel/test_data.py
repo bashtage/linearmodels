@@ -218,7 +218,7 @@ def test_ids(panel):
         assert np.ptp(tids[i::7]) == 0
 
 
-def test_str_repr_smoke(panel):
+def test_str_repr(panel):
     data = PanelData(panel)
     assert 'PanelData' in str(data)
     assert str(hex(id(data))) in data.__repr__()

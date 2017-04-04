@@ -16,7 +16,7 @@ class TestCovariance(object):
         cls.cluster2 = np.tile(np.arange(4)[:, None], (1000, 1))
         cls.cluster3 = np.random.random_integers(0, 10, (cls.n * cls.t, 1))
 
-    def test_clustered_covariance(self):
+    def test_clustered_covariance_smoke(self):
         cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster1).cov
         assert cov.shape == (self.k, self.k)
         cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster2).cov
@@ -24,13 +24,13 @@ class TestCovariance(object):
         cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster3).cov
         assert cov.shape == (self.k, self.k)
 
-    def test_heteroskedastic(self):
+    def test_heteroskedastic_smoke(self):
         cov = HeteroskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
         assert cov.shape == (self.k, self.k)
         cov = HeteroskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
         assert cov.shape == (self.k, self.k)
 
-    def test_homoskedastic(self):
+    def test_homoskedastic_smoke(self):
         cov = HomoskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
         assert cov.shape == (self.k, self.k)
         cov = HomoskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov

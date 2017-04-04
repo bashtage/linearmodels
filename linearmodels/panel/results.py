@@ -32,8 +32,8 @@ class PanelResults(_SummaryStr):
         self.model = res.model
         self._cov_type = res.cov_type
         self._datetime = dt.datetime.now()
-        self._resid = res.resid
-        self._wresid = res.wresid
+        self._resids = res.resids
+        self._wresids = res.wresids
         self._index = res.index
         self._deferred_f = res.deferred_f
 
@@ -237,15 +237,15 @@ class PanelResults(_SummaryStr):
         return smry
 
     @property
-    def resid(self):
+    def resids(self):
         """Model residuals"""
-        return Series(self._resid.squeeze(), index=self._index, name='resid')
+        return Series(self._resids.squeeze(), index=self._index, name='residual')
 
     @property
-    def wresid(self):
-        """Weighted model residuals"""
-        return Series(self._wresid.squeeze(), index=self._index, name='wresid')
-
+    def wresids(self):
+        """Model residuals"""
+        return Series(self._wresids.squeeze(), index=self._index, name='weighted residual')
+    
     @property
     def f_statistic(self):
         """

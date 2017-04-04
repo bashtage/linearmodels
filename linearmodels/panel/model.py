@@ -355,7 +355,6 @@ class PanelOLS(object):
         #############################################
         # R2 - Within
         #############################################
-        # TODO: Test that this is correct in weighted and unweighted, const or not
         wy = self.dependent.demean('entity', weights=self.weights).values2d
         wx = self.exog.demean('entity', weights=self.weights).values2d
         weps = wy - wx @ params
@@ -380,32 +379,6 @@ class PanelOLS(object):
                        other_info=other_info, model=self,
                        cov_type='Unadjusted', index=self.dependent.dataframe.index)
         return res
-
-    def _fit_lvsd(self, debiased=False):
-        constant = self._constant
-        has_effect = self.entity_effect or self.time_effect
-        w = self.weights
-        y = self.dependent
-        x = self.exog
-        # 1. Construct dummies
-        # 2. Append to x
-        # 3. Estimate parameters using x and y
-        if self.entity_effect:
-            d = ed = y.dummies('entity')
-        if self.time_effect:
-            d = td = y.dummies('time', drop_first=self.entity_effect)
-        if self.entity_effect and self.time_effect:
-            d = np.c_[ed, td]
-        root_w = np.sqrt(w.values2d)
-        wx = root_w * x.values2d
-        if has_effect:
-            wd = root_w * d
-            if constant:
-                wd -= root_w @ lstsq(root_w, wd)[0]
-            wx = np.c_[wx, wd]
-        wy = root_w * y.values2d
-        params = lstsq(wx, wy)[0]
-        return params
 
     @property
     def has_constant(self):
@@ -442,6 +415,8 @@ class PanelOLS(object):
         wd = root_w * d
         if self.has_constant:
             wd -= root_w * (w.T @ d / w.sum())
+            z = np.ones_like(root_w)
+            d -= z * (z.T @ d / z.sum())
 
         x_mean = np.linalg.lstsq(wd, x)[0]
         y_mean = np.linalg.lstsq(wd, y)[0]
@@ -533,7 +508,11 @@ class PanelOLS(object):
         if not unweighted:
             _y = self.dependent.values2d
             _x = self.exog.values2d
-            eps = _y - y_effects - (_x - x_effects) @ params
+            eps = (_y - y_effects) - (_x - x_effects) @ params
+            if self.has_constant:
+                # TODO: Understand source for this correction
+                w = self.weights.values2d
+                eps -= (w * eps).sum() / w.sum()
         resid_ss = float(weps.T @ weps)
 
         if self.has_constant:
@@ -544,7 +523,7 @@ class PanelOLS(object):
         res = self._postestimation(params, cov, debiased, df_resid)
         r2 = 1 - resid_ss / total_ss
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
-                        residual_ss=resid_ss, total_ss=total_ss, wresid=weps, resid=eps,
+                        residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
                         r2=r2))
         return PanelResults(res)
 
@@ -616,8 +595,8 @@ class PooledOLS(PanelOLS):
 
         res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
-                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps,
-                        resid=eps, index=self.dependent.dataframe.index))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresids=weps,
+                        resids=eps, index=self.dependent.dataframe.index))
         return PanelResults(res)
 
 
@@ -694,8 +673,8 @@ class BetweenOLS(PooledOLS):
 
         res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=nobs,
-                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresid=weps, resid=eps,
-                        index=self.dependent.entities))
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresids=weps,
+                        resids=eps, index=self.dependent.entities))
 
         return PanelResults(res)
 
@@ -766,7 +745,7 @@ class FirstDifferenceOLS(PooledOLS):
         res = self._postestimation(params, cov, debiased, df_resid)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2,
-                        resid=eps, wresid=weps, index=index))
+                        resids=eps, wresids=weps, index=index))
 
         return PanelResults(res)
 

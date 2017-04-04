@@ -74,7 +74,7 @@ def test_rank_deficient_array(data):
         PooledOLS(data.y, x)
 
 
-def test_results_smoke(data):
+def test_results_access(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit()
     d = dir(res)
@@ -105,9 +105,6 @@ def test_results_smoke(data):
             val = getattr(res, key)
             if callable(val):
                 val()
-    print(res)
-
-    
 
 
 def test_alt_rsquared(data):

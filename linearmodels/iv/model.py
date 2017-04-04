@@ -133,7 +133,7 @@ class IVLIML(object):
                                         [False] * self.endog.shape[1])
         self._columns = self.exog.cols + self.endog.cols
         self._instr_columns = self.exog.cols + self.instruments.cols
-        self._index = self.endog.rows
+        self._index = self.dependent.rows
 
         self._validate_inputs()
         if not hasattr(self, '_method'):
@@ -440,7 +440,7 @@ class IVLIML(object):
         fstat = self._f_statistic(params, cov, debiased)
         out = {'params': Series(params.squeeze(), vars, name='parameter'),
                'eps': Series(eps.squeeze(), index=index, name='residual'),
-               'weps': Series(weps.squeeze(), index=index, name='residual'),
+               'weps': Series(weps.squeeze(), index=index, name='weighted residual'),
                'cov': DataFrame(cov, columns=vars, index=vars),
                's2': float(cov_estimator.s2),
                'debiased': debiased,

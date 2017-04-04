@@ -85,7 +85,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     return AttrDict(y=y, x=x, w=w, c=c)
 
 
-def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True):
+def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_resids=True):
     if n is None:
         n = min(res1.params.shape[0], res2.params.shape[0])
 
@@ -103,3 +103,9 @@ def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True):
         assert_allclose(res1.total_ss, res2.total_ss)
         assert_allclose(res1.resid_ss, res2.resid_ss)
         assert_allclose(res1.model_ss, res2.model_ss)
+    if test_resids:
+        delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(), res2.resids.std())
+        assert_allclose(delta, np.ones_like(delta))
+        delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(), res2.wresids.std())
+        assert_allclose(delta, np.ones_like(delta))
+
