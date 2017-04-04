@@ -73,7 +73,7 @@ def test_numpy_2d():
     assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
     items = ['entity.{0}'.format(i) for i in range(n)]
     obs = [i for i in range(t)]
-    vars = ['x.{0}'.format(i) for i in range(k)]
+    vars = ['x']
     expected = pd.Panel(np.reshape(x, (k, t, n)), items=vars,
                         major_axis=obs, minor_axis=items)
     assert_panel_equal(dh.panel, expected)

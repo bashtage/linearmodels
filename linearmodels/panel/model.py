@@ -51,7 +51,6 @@ class AmbiguityError(Exception):
 
 # TODO: 2 way cluster covariance
 # TODO: Pooled F-stat
-# TODO: Verify alternative R2 definitions
 # TODO: Bootstrap covariance
 # TODO: Test covariance estimators vs IV versions
 # TODO: Add likelihood and possibly AIC/BIC
@@ -314,7 +313,7 @@ class PanelOLS(object):
         return y, x, w
 
     def _rsquared(self, params, reweight=False):
-        if self.has_constant and self.dependent.nvar == 1:
+        if self.has_constant and self.exog.nvar == 1:
             # Constant only fast track
             return 0.0, 0.0, 0.0
 
@@ -366,7 +365,7 @@ class PanelOLS(object):
             r2w = 0
         else:
             r2w = 1 - residual_ss / total_ss
-
+            
         return r2o, r2w, r2b
 
     def _postestimation(self, params, cov, debiased, df_resid):
@@ -440,10 +439,10 @@ class PanelOLS(object):
                 drop_first = True
 
         d = np.column_stack(d)
-        if self.has_constant:
-            d -= d.mean(0)
-
         wd = root_w * d
+        if self.has_constant:
+            wd -= root_w * (w.T @ d / w.sum())
+
         x_mean = np.linalg.lstsq(wd, x)[0]
         y_mean = np.linalg.lstsq(wd, y)[0]
 
