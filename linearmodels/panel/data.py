@@ -8,7 +8,7 @@ from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_strin
 def convert_columns(s, drop_first):
     if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
         s = s.astype('category')
-    
+
     if is_categorical(s):
         out = pd.get_dummies(s, drop_first=drop_first)
         out.columns = [s.name + '.' + c for c in out]
@@ -63,19 +63,18 @@ class PanelData(object):
         If the input has the wrong number of dimensions or a MultiIndex
         DataFrame does not have 2 levels
     """
-    
+
     def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
-        
+
         if isinstance(x, xr.DataArray):
             if x.ndim not in (2, 3):
                 raise ValueError('Only 2-d or 3-d DataArrays are supported')
             x = x.to_pandas()
-        
+
         if isinstance(x, (pd.Panel, pd.DataFrame)):
-            
             if isinstance(x, pd.DataFrame):
                 if isinstance(x.index, pd.MultiIndex):
                     if len(x.index.levels) != 2:
@@ -91,7 +90,7 @@ class PanelData(object):
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:
                 x = x[None, :, :]
-            
+
             k, t, n = x.shape
             variables = [var_name] if k == 1 else [var_name + '.{0}'.format(i) for i in range(k)]
             entities = ['entity.{0}'.format(i) for i in range(n)]
@@ -106,66 +105,66 @@ class PanelData(object):
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
             self._frame = self._frame.astype(np.float64)
-        
+
         self._k, self._t, self._n = self.panel.shape
         self._frame.index.levels[0].name = 'entity'
         self._frame.index.levels[1].name = 'time'
-    
+
     @property
     def panel(self):
         return self._frame.to_panel().swapaxes(1, 2)
-    
+
     @property
     def dataframe(self):
         return self._frame
-    
+
     @property
     def values2d(self):
         return self._frame.values
-    
+
     @property
     def values3d(self):
         return self.panel.values
-    
+
     def drop(self, locs):
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
         self._k, self._t, self._n = self.shape
-    
+
     @property
     def shape(self):
         return self.panel.shape
-    
+
     @property
     def isnull(self):
         return np.any(self._frame.isnull(), axis=1)
-    
+
     @property
     def nobs(self):
         return self._t
-    
+
     @property
     def nvar(self):
         return self._k
-    
+
     @property
     def nentity(self):
         return self._n
-    
+
     @property
     def vars(self):
         return list(self._frame.columns)
-    
+
     @property
     def time(self):
         index = self._frame.index
         return list(index.levels[1][index.labels[1]].unique())
-    
+
     @property
     def entities(self):
         index = self._frame.index
         return list(index.levels[0][index.labels[0]].unique())
-    
+
     @property
     def entity_ids(self):
         """
@@ -177,7 +176,7 @@ class PanelData(object):
             2d array containing entity ids corresponding dataframe view
         """
         return np.asarray(self._frame.index.labels[0])[:, None]
-    
+
     @property
     def time_ids(self):
         """
@@ -189,7 +188,7 @@ class PanelData(object):
             2d array containing time ids corresponding dataframe view
         """
         return np.asarray(self._frame.index.labels[1])[:, None]
-    
+
     def _demean_both(self, weights):
         """
         Entity and time demean
@@ -208,9 +207,9 @@ class PanelData(object):
         e = e.values2d
         resid = e - d @ np.linalg.lstsq(d, e)[0]
         resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
-        
+
         return PanelData(resid)
-    
+
     def demean(self, group='entity', weights=None):
         """
         Demeans data by either entity or time group
@@ -237,7 +236,7 @@ class PanelData(object):
             raise ValueError
         if group == 'both':
             return self._demean_both(weights)
-        
+
         axis = 2 if group == 'time' else 1
         if weights is None:
             mu = np.nanmean(v, axis=axis)
@@ -249,7 +248,7 @@ class PanelData(object):
             root_w = np.sqrt(w)
             rootwv = root_w * v
             wv = w * v
-            
+
             mu = np.nansum(wv, axis=axis)
             mu /= np.nansum(w, axis=axis)
             mu = np.expand_dims(mu, axis=axis)
@@ -261,13 +260,13 @@ class PanelData(object):
         out = out.swapaxes(1, 2).to_frame(filter_observations=False)
         out = out.loc[self._frame.index]
         return PanelData(out)
-    
+
     def __str__(self):
         return self.__class__.__name__ + '\n' + str(self._frame)
-    
+
     def __repr__(self):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
-    
+
     def count(self, group='entity'):
         """
         Count number of observations by entity or time
@@ -285,13 +284,13 @@ class PanelData(object):
         v = self.panel.values
         axis = 1 if group == 'entity' else 2
         count = np.sum(np.isfinite(v), axis=axis)
-        
+
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
         out = pd.DataFrame(count.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
         out = out.loc[reindex].astype(np.int64)
         return out
-    
+
     def mean(self, group='entity', weights=None):
         """
         Compute data mean by either entity or time group
@@ -318,13 +317,13 @@ class PanelData(object):
             wv = w * v
             mu = np.nansum(wv, axis=axis)
             mu /= np.nansum(w, axis=axis)
-        
+
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
         out = pd.DataFrame(mu.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
         out = out.loc[reindex]
         return out
-    
+
     def first_difference(self):
         """
         Compute first differences of variables
@@ -342,14 +341,14 @@ class PanelData(object):
         diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
         diffs = diffs.reindex(self._frame.index).dropna(how='any')
         return PanelData(diffs)
-    
+
     @staticmethod
     def _minimize_multiindex(df):
         index_cols = list(df.index.names)
         df = df.reset_index()
         df = df.set_index(index_cols)
         return df
-    
+
     def dummies(self, group='entity', drop_first=False):
         if group not in ('entity', 'time'):
             raise ValueError

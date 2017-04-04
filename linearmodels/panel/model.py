@@ -364,7 +364,7 @@ class PanelOLS(object):
             r2w = 0
         else:
             r2w = 1 - residual_ss / total_ss
-            
+
         return r2o, r2w, r2b
 
     def _postestimation(self, params, cov, debiased, df_resid):

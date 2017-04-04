@@ -39,7 +39,7 @@ def test_valid_weight_shape(data):
     expected = weights[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
     assert_equal(w, expected)
-    
+
     # Per time
     n = data.y.shape[0]
     weights = 1 + np.random.random_sample(n)
@@ -51,7 +51,7 @@ def test_valid_weight_shape(data):
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
     assert_equal(w, expected)
-    
+
     # Per entity
     n = data.y.shape[1]
     weights = 1 + np.random.random_sample(n)
@@ -63,7 +63,7 @@ def test_valid_weight_shape(data):
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
     assert_equal(w, expected)
-    
+
     weights = 1 + np.random.random_sample(data.y.shape)
     mod = PanelOLS(data.y, data.x, weights=weights)
     mod.fit()
