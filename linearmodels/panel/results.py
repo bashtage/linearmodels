@@ -168,13 +168,18 @@ class PanelResults(_SummaryStr):
                     ('Max Obs:', _str(self.entity_info['max'])),
                     ('', '')]
 
+        is_invalid = np.isfinite(self.f_statistic.stat)
+        f_stat = _str(self.f_statistic.stat) if is_invalid else '--'
+        f_pval = pval_format(self.f_statistic.pval) if is_invalid else '--'
+        f_dist = self.f_statistic.dist_name if is_invalid else '--'
+        
         top_right = [('R-squared:', _str(self.rsquared)),
                      ('R-squared (Between):', _str(self.rsquared_between)),
                      ('R-squared (Within):', _str(self.rsquared_within)),
                      ('R-squared (Overall):', _str(self.rsquared_overall)),
-                     ('F-statistic:', _str(self.f_statistic.stat)),
-                     ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
-                     ('Distribution:', self.f_statistic.dist_name),
+                     ('F-statistic:', f_stat),
+                     ('P-value (F-stat)', f_pval),
+                     ('Distribution:', f_dist),
                      ('', ''),
                      ('Time periods:', str(int(self.time_info['total']))),
                      ('Avg Obs:', _str(self.time_info['mean'])),
