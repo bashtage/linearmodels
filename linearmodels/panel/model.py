@@ -678,17 +678,19 @@ class BetweenOLS(PooledOLS):
         if cov_type in ('unadjusted', 'homoskedastic',
                         'robust', 'heteroskedastic'):
             return cov_est, cov_config_upd
-
         clusters = cov_config.get('clusters', None)
         if clusters is not None:
             clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
-            grouped = clusters.dataframe.groupby(level=0)
-            same = grouped.apply(lambda s: (s == s.iloc[0]).all())
-            if not same:
+            cluster_max = np.nanmax(clusters.values3d,axis=1)
+            delta = cluster_max - np.nanmin(clusters.values3d,axis=1)
+            if np.any(delta != 0):
                 raise ValueError('clusters must not vary within an entity')
-            clusters = grouped.first()
 
-        cov_config_upd['clusters'] = clusters.values
+            index = clusters.panel.minor_axis
+            reindex = clusters.entities
+            clusters = pd.DataFrame(cluster_max.T, index=index, columns=clusters.vars)
+            clusters = clusters.loc[reindex].astype(np.int64)
+            cov_config_upd['clusters'] = clusters
 
         return cov_est, cov_config_upd
 
@@ -725,7 +727,7 @@ class BetweenOLS(PooledOLS):
         df_resid = y.shape[0] - x.shape[1]
         df_model = x.shape[1],
         nobs = y.shape[0]
-        cov_est = self._cov_estimators[cov_type]
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
