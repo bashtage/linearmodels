@@ -165,7 +165,7 @@ perform inference. Four classes of covariance estimators are available:
 
 * 'clustered', 'one-way' - Allows for a one-way cluster structure where model
   scores within a cluster are correlated.
-  See :class:`~linearmodels.iv.covariance.OneWayClusteredCovariance`. Using
+  See :class:`~linearmodels.iv.covariance.ClusteredCovariance`. Using
   clustered covariance requires passing an array containing information
   containing cluster membership information.
 

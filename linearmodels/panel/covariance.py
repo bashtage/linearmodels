@@ -279,7 +279,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         super(ClusteredCovariance, self).__init__(y, x, params, debiased=debiased, extra_df=extra_df)
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
-        clusters = clusters.squeeze()
+        clusters = np.asarray(clusters).squeeze()
         self._group_debias = group_debias
         dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
         if clusters.ndim > 2 or dim1 > 2:
@@ -288,7 +288,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
-
 
     def _calc_group_debias(self, clusters):
         ngroups = len(np.unique(clusters))

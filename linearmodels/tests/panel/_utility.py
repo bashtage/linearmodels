@@ -108,4 +108,3 @@ def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_r
         assert_allclose(delta, np.ones_like(delta))
         delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(), res2.wresids.std())
         assert_allclose(delta, np.ones_like(delta))
-

@@ -5,7 +5,7 @@ from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.iv.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, KernelCovariance, \
-    OneWayClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, kernel_weight_bartlett, kernel_weight_parzen, \
+    ClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, kernel_weight_bartlett, kernel_weight_parzen, \
     kernel_weight_quadratic_spectral
 from linearmodels.utility import AttrDict
 
@@ -200,8 +200,8 @@ class TestHeteroskedasticCovariance(object):
 
 class TestClusteredCovariance(object):
     def test_asymptotic(self, data):
-        c = OneWayClusteredCovariance(data.x, data.y, data.z, data.params,
-                                      clusters=data.clusters)
+        c = ClusteredCovariance(data.x, data.y, data.z, data.params,
+                                clusters=data.clusters)
         assert c._kappa == 1
         assert c.debiased is False
         assert c.config['debiased'] is False
@@ -222,8 +222,8 @@ class TestClusteredCovariance(object):
         assert 'Num Clusters: {0}'.format(len(sums)) in cs
 
     def test_debiased(self, data):
-        c = OneWayClusteredCovariance(data.x, data.y, data.z, data.params,
-                                      debiased=True, clusters=data.clusters)
+        c = ClusteredCovariance(data.x, data.y, data.z, data.params,
+                                debiased=True, clusters=data.clusters)
         assert c.debiased is True
         assert c.config['debiased'] is True
         assert_equal(c.config['clusters'], data.clusters)
@@ -248,8 +248,8 @@ class TestClusteredCovariance(object):
 
     def test_errors(self, data):
         with pytest.raises(ValueError):
-            OneWayClusteredCovariance(data.x, data.y, data.z, data.params,
-                                      clusters=data.clusters[:10])
+            ClusteredCovariance(data.x, data.y, data.z, data.params,
+                                clusters=data.clusters[:10])
 
 
 class TestKernelCovariance(object):

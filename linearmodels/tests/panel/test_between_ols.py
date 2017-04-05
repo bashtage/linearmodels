@@ -4,6 +4,7 @@ import pytest
 from numpy.testing import assert_allclose
 
 from linearmodels.iv import IV2SLS
+from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
 from linearmodels.tests.panel._utility import assert_results_equal, generate_data
 
@@ -36,6 +37,16 @@ def test_single_entity(data):
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
 
+    res = mod.fit(cov_type='robust')
+    ols_res = ols.fit(cov_type='robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape),
+                            index=dep.index)
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, ols_res)
+
 
 def test_single_entity_weights(data):
     x = data.x
@@ -59,6 +70,16 @@ def test_single_entity_weights(data):
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
 
+    res = mod.fit(cov_type='robust')
+    ols_res = ols.fit(cov_type='robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape),
+                            index=dep.index)
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, ols_res)
+
 
 def test_multiple_obs_per_entity(data):
     mod = BetweenOLS(data.y, data.x)
@@ -69,6 +90,21 @@ def test_multiple_obs_per_entity(data):
                         columns=mod.exog.vars)
     ols = IV2SLS(dep, exog, None, None)
     ols_res = ols.fit('unadjusted')
+    assert_results_equal(res, ols_res)
+
+    res = mod.fit(cov_type='robust')
+    ols_res = ols.fit(cov_type='robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = mod.dependent.dataframe.copy()
+    clusters.loc[:, :] = 0
+    clusters = clusters.astype(np.int32)
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+
+    ols_clusters = PanelData(clusters).values3d.mean(1).T.astype(np.int32)
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -89,6 +125,21 @@ def test_multiple_obs_per_entity_weighted(data):
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
 
+    res = mod.fit(cov_type='robust')
+    ols_res = ols.fit(cov_type='robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = mod.dependent.dataframe.copy()
+    clusters.loc[:, :] = 0
+    clusters = clusters.astype(np.int32)
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+
+    ols_clusters = PanelData(clusters).values3d.mean(1).T.astype(np.int32)
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)
+
 
 def test_missing(missing_data):
     mod = BetweenOLS(missing_data.y, missing_data.x)
@@ -104,6 +155,23 @@ def test_missing(missing_data):
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
     ols_res = ols.fit('unadjusted')
+    assert_results_equal(res, ols_res)
+
+    res = mod.fit(reweight=True, cov_type='robust')
+    ols_res = ols.fit(cov_type='robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = mod.dependent.dataframe.copy()
+    clusters.loc[:, :] = 0
+    clusters = clusters.astype(np.int32)
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+
+    ols_clusters = clusters.groupby(level=0).mean().astype(np.int32)
+    ols_clusters = ols_clusters.reindex(mod.dependent.entities)
+
+    res = mod.fit(reweight=True, cov_type='clustered', clusters=clusters)
+    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -168,3 +236,25 @@ def test_alt_rsquared_weighted_missing(missing_data):
     mod = BetweenOLS(missing_data.y, missing_data.x, weights=missing_data.w)
     res = mod.fit()
     assert_allclose(res.rsquared, res.rsquared_between)
+
+
+def test_2way_cluster(data):
+    mod = BetweenOLS(data.y, data.x)
+
+    dep = mod.dependent.dataframe.groupby(level=0).mean()
+    exog = mod.exog.dataframe.groupby(level=0).mean()
+
+    clusters = mod.dependent.dataframe.copy()
+    clusters.columns = ['cluster.0']
+    clusters['cluster.1'] = mod.dependent.dataframe.copy()
+    clusters.loc[:, :] = 0
+    clusters = clusters.astype(np.int32)
+    for entity in mod.dependent.entities:
+        clusters.loc[entity, :] = np.random.randint(9, size=(1, 2))
+
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+
+    ols = IV2SLS(dep, exog, None, None)
+    ols_clusters = clusters.groupby(level=0).max()
+    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)

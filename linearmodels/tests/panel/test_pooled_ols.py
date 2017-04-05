@@ -211,3 +211,34 @@ def test_cov_equiv_cluster_weighted(data):
     ols_mod = IV2SLS(y, x, None, None, weights=w)
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2)
+
+
+def test_two_way_clustering(data):
+    mod = PooledOLS(data.y, data.x)
+
+    entity_clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
+
+    if isinstance(data.c, np.ndarray):
+        clusters = data.c[0]
+    elif isinstance(data.c, pd.Panel):
+        clusters = data.c.iloc[0].values
+    else:
+        clusters = data.c[0].values
+
+    clusters = clusters.T
+    retain = mod.not_null
+    clusters = clusters.ravel()[retain, None]
+    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
+    clusters['entity_clusters'] = entity_clusters
+
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    y.index = np.arange(len(y))
+    x.index = y.index
+    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+
+    ols_mod = IV2SLS(y, x, None, None)
+    ols_res = ols_mod.fit('clustered', clusters=clusters)
+    assert_results_equal(res, ols_res)

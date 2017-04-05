@@ -12,7 +12,7 @@ Instrumental Variable Covariance Estimation
    :members:
    :inherited-members:
 
-.. autoclass:: OneWayClusteredCovariance
+.. autoclass:: ClusteredCovariance
    :members:
    :inherited-members:
 

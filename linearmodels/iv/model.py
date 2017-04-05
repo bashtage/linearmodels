@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 from linearmodels.iv._utility import parse_formula
 from linearmodels.iv.covariance import (HeteroskedasticCovariance,
                                         HomoskedasticCovariance, KernelCovariance,
-                                        OneWayClusteredCovariance)
+                                        ClusteredCovariance)
 from linearmodels.iv.data import IVData
 from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  HomoskedasticWeightMatrix, IVGMMCovariance,
@@ -30,9 +30,9 @@ COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'hccm': HeteroskedasticCovariance,
                          'kernel': KernelCovariance,
                          'KernelCovariance': KernelCovariance,
-                         'one-way': OneWayClusteredCovariance,
-                         'clustered': OneWayClusteredCovariance,
-                         'OneWayClusteredCovariance': OneWayClusteredCovariance}
+                         'one-way': ClusteredCovariance,
+                         'clustered': ClusteredCovariance,
+                         'OneWayClusteredCovariance': ClusteredCovariance}
 
 WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'homoskedastic': HomoskedasticWeightMatrix,
@@ -40,7 +40,8 @@ WEIGHT_MATRICES = {'unadjusted': HomoskedasticWeightMatrix,
                    'heteroskedastic': HeteroskedasticWeightMatrix,
                    'kernel': KernelWeightMatrix,
                    'clustered': OneWayClusteredWeightMatrix,
-                   'one-way': OneWayClusteredWeightMatrix, }
+                   'one-way': OneWayClusteredWeightMatrix
+                   }
 
 
 class IVLIML(object):
