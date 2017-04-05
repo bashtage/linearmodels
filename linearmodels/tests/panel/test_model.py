@@ -142,4 +142,3 @@ def test_absorbing_effect(data):
     x['absorbed'] = temp
     with pytest.raises(AbsorbingEffectError):
         PanelOLS(data.y, x, entity_effect=True).fit()
-

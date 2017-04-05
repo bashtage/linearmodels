@@ -17,7 +17,7 @@ ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 @pytest.fixture(params=perms, ids=ids)
 def data(request):
     missing, datatype = request.param
-    return generate_data(missing, datatype)
+    return generate_data(missing, datatype, other_effects=1)
 
 
 def test_firstdifference_ols(data):
@@ -48,8 +48,36 @@ def test_firstdifference_ols(data):
     dy = dy.loc[~drop]
     dx = dx.loc[~drop]
 
-    res2 = IV2SLS(dy, dx, None, None).fit('unadjusted')
-    assert_results_equal(res, res2)
+    ols_mod = IV2SLS(dy, dx, None, None)
+    ols_res = ols_mod.fit('unadjusted')
+    assert_results_equal(res, ols_res)
+
+    res = mod.fit(cov_type='robust')
+    ols_res = ols_mod.fit('robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = mod.dependent.dataframe.copy()
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+
+    ols_clusters = clusters.copy()
+    index = mod.dependent.first_difference().dataframe.index
+    ols_clusters = ols_clusters.loc[index]
+
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)
+
+    entity_clusters = mod.dependent.first_difference().entity_ids
+    res = mod.fit(cov_type='clustered', cluster_entity=True)
+    ols_res = ols_mod.fit(cov_type='clustered', clusters=entity_clusters)
+    assert_results_equal(res, ols_res)
+
+    # TODO: Promote to actual test when IV has 2-way clustering
+    ols_clusters['entity.clusters'] = entity_clusters
+    mod.fit(cov_type='clustered', cluster_entity=True, clusters=clusters)
+    # ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    # assert_results_equal(res, ols_res)
 
 
 def test_firstdifference_ols_weighted(data):
@@ -92,8 +120,25 @@ def test_firstdifference_ols_weighted(data):
     dx = dx.loc[~drop]
     sw = sw.loc[~drop]
 
-    res2 = IV2SLS(dy, dx, None, None, weights=sw).fit('unadjusted')
-    assert_results_equal(res, res2)
+    ols_mod = IV2SLS(dy, dx, None, None, weights=sw)
+    ols_res = ols_mod.fit('unadjusted')
+    assert_results_equal(res, ols_res)
+
+    res = mod.fit(cov_type='robust')
+    ols_res = ols_mod.fit('robust')
+    assert_results_equal(res, ols_res)
+
+    clusters = mod.dependent.dataframe.copy()
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+
+    ols_clusters = clusters.copy()
+    index = mod.dependent.first_difference().dataframe.index
+    ols_clusters = ols_clusters.loc[index]
+
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)
 
 
 def test_first_difference_errors(data):

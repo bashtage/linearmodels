@@ -106,8 +106,7 @@ class PanelOLS(object):
         self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
         self._validate_data()
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance,
-                                                 ClusteredCovariance)
+                                                 HeteroskedasticCovariance, ClusteredCovariance)
 
         self._name = self.__class__.__name__
 
@@ -547,7 +546,6 @@ class PanelOLS(object):
 
         df_model = x.shape[1] + neffects
         df_resid = y.shape[0] - df_model
-        cov_denom = df_resid if debiased else y.shape[0]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         cov = cov_est(y, x, params, debiased=debiased, extra_df=neffects, **cov_config)
         weps = y - x @ params
@@ -597,9 +595,6 @@ class PooledOLS(PanelOLS):
 
     def __init__(self, dependent, exog, *, weights=None):
         super(PooledOLS, self).__init__(dependent, exog, weights=weights)
-        self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance,
-                                                 ClusteredCovariance)
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
@@ -668,8 +663,6 @@ class BetweenOLS(PooledOLS):
 
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
-        self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance, ClusteredCovariance)
 
     def _choose_cov(self, cov_type, **cov_config):
 
@@ -681,8 +674,8 @@ class BetweenOLS(PooledOLS):
         clusters = cov_config.get('clusters', None)
         if clusters is not None:
             clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
-            cluster_max = np.nanmax(clusters.values3d,axis=1)
-            delta = cluster_max - np.nanmin(clusters.values3d,axis=1)
+            cluster_max = np.nanmax(clusters.values3d, axis=1)
+            delta = cluster_max - np.nanmin(clusters.values3d, axis=1)
             if np.any(delta != 0):
                 raise ValueError('clusters must not vary within an entity')
 
@@ -775,8 +768,47 @@ class FirstDifferenceOLS(PooledOLS):
             raise ValueError('Constants are not allowed in first difference regressions.')
         if self.dependent.nobs < 2:
             raise ValueError('Panel must have at least 2 time periods')
-        self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance)
+
+    def _choose_cov(self, cov_type, **cov_config):
+        cov_est = self._cov_estimators[cov_type]
+        cov_config_upd = {k: v for k, v in cov_config.items()}
+        if cov_type in ('unadjusted', 'homoskedastic',
+                        'robust', 'heteroskedastic'):
+            return cov_est, cov_config_upd
+
+        clusters = cov_config.get('clusters', None)
+        if clusters is not None:
+            clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
+            fd = clusters.first_difference()
+            fd = fd.values2d
+            if np.any(fd.flat[np.isfinite(fd.flat)] != 0):
+                raise ValueError('clusters must be identical for values used '
+                                 'to compute the first difference')
+            clusters = clusters.dataframe.copy()
+
+        cluster_entity = cov_config_upd.pop('cluster_entity', False)
+        if cluster_entity:
+            group_ids = self.dependent.entity_ids.squeeze()
+            name = 'cov.cluster.entity'
+            group_ids = pd.Series(group_ids,
+                                  index=self.dependent.dataframe.index,
+                                  name=name)
+            if clusters is not None:
+                clusters[name] = group_ids
+            else:
+                clusters = pd.DataFrame(group_ids)
+        clusters = PanelData(clusters)
+        values = clusters.values3d[:, 1:]
+        clusters = pd.Panel(values, items=clusters.panel.items,
+                            major_axis=clusters.panel.major_axis[1:],
+                            minor_axis=clusters.panel.minor_axis)
+        clusters = PanelData(clusters).dataframe
+        clusters = clusters.loc[self.dependent.first_difference().dataframe.index]
+        clusters = clusters.astype(np.int64)
+
+        cov_config_upd['clusters'] = clusters.values
+
+        return cov_est, cov_config_upd
 
     def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.first_difference().values2d
@@ -800,7 +832,7 @@ class FirstDifferenceOLS(PooledOLS):
         wy = root_w * y
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
-        cov_est = self._cov_estimators[cov_type]
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
 
         weps = wy - wx @ params

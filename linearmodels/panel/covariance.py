@@ -289,7 +289,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
 
-
     def _calc_group_debias(self, clusters):
         ngroups = len(np.unique(clusters))
         return ngroups / (ngroups - 1)
