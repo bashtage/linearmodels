@@ -3,7 +3,7 @@ Covariance estimation for 2SLS and LIML IV estimators
 """
 from __future__ import absolute_import, division, print_function
 
-from numpy import arange, argsort, asarray, ceil, cos, empty, ones, pi, r_, sin, sum, unique, where, zeros
+from numpy import arange, argsort, asarray, ceil, cos, empty, ones, pi, r_, sin, sum, unique, where, zeros, int64
 from numpy.linalg import inv, pinv
 
 CLUSTER_ERR = """
@@ -546,7 +546,7 @@ class KernelCovariance(HomoskedasticCovariance):
                 'kappa': self._kappa}
 
 
-class OneWayClusteredCovariance(HomoskedasticCovariance):
+class ClusteredCovariance(HomoskedasticCovariance):
     r"""
     Covariance estimation for clustered data
 
@@ -563,7 +563,8 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     debiased : bool, optional
         Flag indicating whether to use a small-sample adjustment
     clusters : ndarray, optional
-        Cluster group assignment.  If not provided, uses clusters of 1
+        Cluster group assignment.  If not provided, uses clusters of 1.
+        Either nobs by ncluster where ncluster is 1 or 2.
     kappa : float, optional
         Value of kappa in k-class estimator
 
@@ -598,38 +599,59 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
     """
 
     def __init__(self, x, y, z, params, clusters=None, debiased=False, kappa=1):
-        super(OneWayClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        super(ClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
         clusters = asarray(clusters).squeeze()
         self._clusters = clusters
-        self._num_clusters = len(unique(clusters))
+        if clusters.ndim == 1:
+            self._num_clusters = [len(unique(clusters))]
+            self._num_clusters_str = str(self._num_clusters[0])
+        else:
+            self._num_clusters = [len(unique(clusters[:, 0])), len(unique(clusters[:, 1]))]
+            self._num_clusters_str = ', '.join(map(str, self._num_clusters))
         if clusters is not None and clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._name = 'Clustered Covariance (One-Way)'
 
     def __str__(self):
-        out = super(OneWayClusteredCovariance, self).__str__()
-        out += '\nNum Clusters: {0}'.format(self._num_clusters)
+        out = super(ClusteredCovariance, self).__str__()
+        out += '\nNum Clusters: {0}'.format(self._num_clusters_str)
         return out
 
     @property
     def s(self):
-        """One-way clustered estimator of score covariance"""
+        """Clustered estimator of score covariance"""
+
+        def rescale(s, nc, nobs):
+            scale = self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs)
+            return s * scale if self.debiased else s
+
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
 
         nobs, nvar = x.shape
         clusters = self._clusters
-        s = _cov_cluster(xhat_e, clusters)
+        if self._clusters.ndim == 1:
+            s = _cov_cluster(xhat_e, clusters)
+            s = rescale(s, self._num_clusters[0], nobs)
+        else:
+            s0 = _cov_cluster(xhat_e, clusters[:, 0].squeeze())
+            s0 = rescale(s0, self._num_clusters[0], nobs)
 
-        if self.debiased:
-            num_clusters = self._num_clusters
-            scale = self._scale
-            scale *= (num_clusters / (num_clusters - 1)) * ((nobs - 1) / nobs)
-            s *= scale
+            s1 = _cov_cluster(xhat_e, clusters[:, 1].squeeze())
+            s1 = rescale(s1, self._num_clusters[1], nobs)
+
+            c0 = clusters[:, 0] - clusters[:, 0].min() + 1
+            c1 = clusters[:, 1] - clusters[:, 1].min() + 1
+            c01 = (c0 * (c1.max() + 1) + c1).astype(int64)
+            s01 = _cov_cluster(xhat_e, c01.squeeze())
+            nc = len(unique(c01))
+            s01 = rescale(s01, nc, nobs)
+
+            s = s0 + s1 - s01
 
         return s
 

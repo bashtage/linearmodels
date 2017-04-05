@@ -73,11 +73,11 @@ def test_firstdifference_ols(data):
     ols_res = ols_mod.fit(cov_type='clustered', clusters=entity_clusters)
     assert_results_equal(res, ols_res)
 
-    # TODO: Promote to actual test when IV has 2-way clustering
     ols_clusters['entity.clusters'] = entity_clusters
-    mod.fit(cov_type='clustered', cluster_entity=True, clusters=clusters)
-    # ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
-    # assert_results_equal(res, ols_res)
+    ols_clusters = ols_clusters.astype(np.int32)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=clusters)
+    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)
 
 
 def test_firstdifference_ols_weighted(data):

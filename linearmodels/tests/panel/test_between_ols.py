@@ -252,10 +252,9 @@ def test_2way_cluster(data):
     for entity in mod.dependent.entities:
         clusters.loc[entity, :] = np.random.randint(9, size=(1, 2))
 
-    mod.fit(cov_type='clustered', clusters=clusters)
+    res = mod.fit(cov_type='clustered', clusters=clusters)
 
-    # TODO: Re-add as test when IV has 2-way, smoke for now
-    # ols = IV2SLS(dep, exog, None, None)
-    # ols_clusters = clusters.groupby(level=0).max()
-    # ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
-    # assert_results_equal(res, ols_res)
+    ols = IV2SLS(dep, exog, None, None)
+    ols_clusters = clusters.groupby(level=0).max()
+    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    assert_results_equal(res, ols_res)
