@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
+import xarray as xr
 
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
@@ -208,7 +209,12 @@ def test_panel_entity_lvsd(data):
     xd = np.c_[x.values, d_demean]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
 
-    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -229,7 +235,12 @@ def test_panel_entity_fwl(data):
     x = x - d_demean @ np.linalg.lstsq(d_demean, x)[0]
     y = y - d_demean @ np.linalg.lstsq(d_demean, y)[0]
 
-    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, x, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
@@ -249,7 +260,12 @@ def test_panel_time_lvsd(data):
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_cols)
 
-    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -268,7 +284,12 @@ def test_panel_time_fwl(data):
     x = x - d @ np.linalg.lstsq(d, x)[0]
     y = y - d @ np.linalg.lstsq(d, y)[0]
 
-    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, x, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
@@ -291,7 +312,12 @@ def test_panel_both_lvsd(data):
                       index=x.index,
                       columns=list(x.columns) + list(d1.columns) + list(d2.columns))
 
-    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -312,7 +338,12 @@ def test_panel_both_fwl(data):
     x = x - d @ np.linalg.lstsq(d, x)[0]
     y = y - d @ np.linalg.lstsq(d, y)[0]
 
-    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, x, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
@@ -336,7 +367,12 @@ def test_panel_entity_lvsd_weighted(data):
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
 
-    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -360,7 +396,12 @@ def test_panel_time_lvsd_weighted(data):
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
 
-    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -387,7 +428,12 @@ def test_panel_both_lvsd_weighted(data):
                       index=x.index,
                       columns=list(x.columns) + list(d1.columns) + list(d2.columns))
 
-    res2 = IV2SLS(y, xd, None, None, weights=w).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None, weights=w)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -434,9 +480,9 @@ def test_panel_other_lvsd(data):
     mod = PanelOLS(data.y, data.x, other_effects=data.c)
     res = mod.fit()
 
-    y = mod.dependent.dataframe
-    x = mod.exog.dataframe
-    c = mod._other_effect_cats.dataframe
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    c = mod._other_effect_cats.dataframe.copy()
     d = []
     d_columns = []
     for i, col in enumerate(c):
@@ -454,7 +500,15 @@ def test_panel_other_lvsd(data):
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_columns))
 
-    res2 = IV2SLS(y, xd, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, xd, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_fit=False)
+
+    res3 = mod.fit(cov_type='unadjusted')
+    assert_results_equal(res, res3)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
 
@@ -482,7 +536,12 @@ def test_panel_other_fwl(data):
     x = x - d @ np.linalg.lstsq(d, x)[0]
     y = y - d @ np.linalg.lstsq(d, y)[0]
 
-    res2 = IV2SLS(y, x, None, None).fit('unadjusted')
+    ols_mod = IV2SLS(y, x, None, None)
+    res2 = ols_mod.fit('unadjusted')
+    assert_results_equal(res, res2, test_df=False)
+
+    res = mod.fit(cov_type='robust')
+    res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
@@ -523,3 +582,39 @@ def test_alt_rsquared_weighted(data):
 def test_too_many_effects(data):
     with pytest.raises(ValueError):
         PanelOLS(data.y, data.x, entity_effect=True, time_effect=True, other_effects=data.c)
+
+
+def test_cov_equiv_cluster(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    res = mod.fit(cov_type='clustered', cluster_entity=True)
+    clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
+    res2 = mod.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, res2)
+
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res = mod.fit(cov_type='clustered', cluster_time=True)
+    clusters = pd.DataFrame(mod.dependent.time_ids, index=mod.dependent.dataframe.index)
+    res2 = mod.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, res2)
+
+
+def test_cluster_smoke(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod.fit(cov_type='clustered', cluster_time=True)
+    mod.fit(cov_type='clustered', cluster_entity=True)
+    y = mod.dependent.dataframe
+    c = PanelData(data.c).dataframe
+    c = c.loc[y.index]
+
+    mod.fit(cov_type='clustered', clusters=c)
+    c0 = c.iloc[:,[0]]
+    mod.fit(cov_type='clustered', cluster_entity=True, clusters=c0)
+    mod.fit(cov_type='clustered', cluster_time=True, clusters=c0)
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='clustered', cluster_time=True, clusters=c)
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='clustered', cluster_entity=True, clusters=c)
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True, clusters=c0)
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='clustered', clusters=c0.iloc[:-1, :])
