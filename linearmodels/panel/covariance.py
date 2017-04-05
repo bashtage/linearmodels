@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 
-from linearmodels.iv.covariance import _cov_cluster
+from linearmodels.iv.covariance import _cov_cluster, CLUSTER_ERR
 from linearmodels.utility import cached_property
 
 
@@ -17,8 +17,11 @@ class HomoskedasticCovariance(object):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
-    df_resid : int
-        Residual degree of freedom to use when normalizing covariance
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects
 
     Notes
     -----
@@ -42,11 +45,17 @@ class HomoskedasticCovariance(object):
 
     """
 
-    def __init__(self, y, x, params, df_resid):
+    def __init__(self, y, x, params, *, debiased=False, extra_df=0):
         self._y = y
         self._x = x
         self._params = params
-        self._df_resid = df_resid
+        self._debiased = debiased
+        self._extra_df = extra_df
+        self._nobs, self._nvar = x.shape
+        self._nobs_eff = self._nobs
+        if debiased:
+            self._nobs_eff -= (self._nvar + extra_df)
+        self._scale = self._nobs / self._nobs_eff
 
     @property
     def eps(self):
@@ -55,12 +64,13 @@ class HomoskedasticCovariance(object):
     @property
     def s2(self):
         eps = self.eps
-        return float(eps.T @ eps) / self._df_resid
+        return self._scale * float(eps.T @ eps) / self._nobs
 
     @cached_property
     def cov(self):
         x = self._x
-        return self.s2 * inv(x.T @ x)
+        out = self.s2 * inv(x.T @ x)
+        return (out + out.T) / 2
 
     def deferred_cov(self):
         return self.cov
@@ -72,16 +82,17 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     Parameters
     ----------
-    Parameters
-    ----------
     y : ndarray
         (entity x time) by 1 stacked array of dependent
     x : ndarray
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
-    df_resid : int
-        Residual degree of freedom to use when normalizing covariance
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects
 
     Notes
     -----
@@ -107,8 +118,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     where NT is replace by NT-k if ``debiased`` is ``True``.
     """
 
-    def __init__(self, y, x, params, df_resid):
-        super(HeteroskedasticCovariance, self).__init__(y, x, params, df_resid)
+    def __init__(self, y, x, params, *, debiased=False, extra_df=0):
+        super(HeteroskedasticCovariance, self).__init__(y, x, params, debiased=debiased,
+                                                        extra_df=extra_df)
 
     @cached_property
     def cov(self):
@@ -117,10 +129,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         xpxi = inv(x.T @ x / nobs)
         eps = self.eps
         xe = x * eps
-        xeex = xe.T @ xe / self._df_resid
+        xeex = self._scale * xe.T @ xe / nobs
+
         out = (xpxi @ xeex @ xpxi) / nobs
-        out = (out + out.T) / 2
-        return out
+        return (out + out.T) / 2
 
 
 class OneWayClusteredCovariance(HomoskedasticCovariance):
@@ -137,10 +149,15 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
-    df_resid : int
-        Residual degree of freedom to use when normalizing covariance
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects
     cluster : ndarray, optional
         (entity x time) by 1 stacked array of cluster group
+    group_debias : bool, optional
+        Flag indicating whether to apply small-number of groups adjustment
 
     Returns
     -------
@@ -176,11 +193,13 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
     """
 
-    def __init__(self, y, x, params, df_resid, clusters=None):
-        super(OneWayClusteredCovariance, self).__init__(y, x, params, df_resid)
+    def __init__(self, y, x, params, *, debiased=False, extra_df=0, clusters=None, group_debias=False):
+        super(OneWayClusteredCovariance, self).__init__(y, x, params, debiased=debiased,
+                                                        extra_df=extra_df)
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         self._clusters = clusters.squeeze()
+        self._group_debias = group_debias
 
     @cached_property
     def cov(self):
@@ -190,10 +209,12 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
 
         eps = self.eps
         xe = x * eps
-        xeex = _cov_cluster(xe, self._clusters) * (nobs / self._df_resid)
+        xeex = self._scale * _cov_cluster(xe, self._clusters)
+        if self._group_debias:
+            ngroups = len(np.unique(self._clusters))
+            xeex *= ngroups / (ngroups - 1)
         out = (xpxi @ xeex @ xpxi) / nobs
-        out = (out + out.T) / 2
-        return out
+        return (out + out.T) / 2
 
 
 class ClusteredCovariance(HomoskedasticCovariance):
@@ -210,11 +231,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
-    df_resid : int
-        Residual degree of freedom to use when normalizing covariance
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects
     cluster : ndarray, optional
         nobs by 1 or nobs by 2 array of cluster group ids
-    group_adj : bool, optional
+    group_debias : bool, optional
         Flag indicating whether to apply small-number of groups adjustment
 
     Returns
@@ -250,18 +274,23 @@ class ClusteredCovariance(HomoskedasticCovariance):
         * Small sample adjustments
     """
 
-    def __init__(self, y, x, params, df_resid, clusters=None, group_adj=False):
-        super(ClusteredCovariance, self).__init__(y, x, params, df_resid)
+    def __init__(self, y, x, params, *, debiased=False, extra_df=0, clusters=None,
+                 group_debias=False):
+        super(ClusteredCovariance, self).__init__(y, x, params, debiased=debiased, extra_df=extra_df)
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
-        self._clusters = clusters.squeeze()
-        self._group_adj = group_adj
-        dim1 = 1 if self._clusters.ndim == 1 else self._clusters.shape[1]
-        if self._clusters.ndim > 2 or dim1 > 2:
-            raise ValueError('Onle 1 or 2-way clustering supported.')
+        clusters = clusters.squeeze()
+        self._group_debias = group_debias
+        dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
+        if clusters.ndim > 2 or dim1 > 2:
+            raise ValueError('Only 1 or 2-way clustering supported.')
+        nobs = y.shape[0]
+        if clusters.shape[0] != nobs:
+            raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
+        self._clusters = clusters
 
 
-    def _calc_group_adj(self, clusters):
+    def _calc_group_debias(self, clusters):
         ngroups = len(np.unique(clusters))
         return ngroups / (ngroups - 1)
 
@@ -275,8 +304,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         xe = x * eps
         if self._clusters.ndim == 1:
             xeex = _cov_cluster(xe, self._clusters)
-            if self._group_adj:
-                xeex *= self._calc_group_adj(self._clusters)
+            if self._group_debias:
+                xeex *= self._calc_group_debias(self._clusters)
 
         else:
             clusters0 = self._clusters[:, 0]
@@ -294,15 +323,13 @@ class ClusteredCovariance(HomoskedasticCovariance):
             clusters01 = clusters01[resort_locs]
             xeex01 = _cov_cluster(xe, clusters01)
 
-            if self._group_adj:
-                xeex0 *= self._calc_group_adj(clusters0)
-                xeex1 *= self._calc_group_adj(clusters1)
-                xeex01 *= self._calc_group_adj(clusters01)
+            if self._group_debias:
+                xeex0 *= self._calc_group_debias(clusters0)
+                xeex1 *= self._calc_group_debias(clusters1)
+                xeex01 *= self._calc_group_debias(clusters01)
 
             xeex = xeex0 + xeex1 - xeex01
 
-        xeex *= (nobs / self._df_resid)
-
+        xeex *= self._scale
         out = (xpxi @ xeex @ xpxi) / nobs
-        out = (out + out.T) / 2
-        return out
+        return (out + out.T) / 2

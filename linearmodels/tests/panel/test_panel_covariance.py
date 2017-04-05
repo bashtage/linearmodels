@@ -1,6 +1,6 @@
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
 from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, HomoskedasticCovariance, \
     OneWayClusteredCovariance
@@ -22,57 +22,55 @@ class TestCovariance(object):
         cls.cluster5 = np.random.randint(0, 10, (cls.n * cls.t, 3))
 
     def test_oneway_clustered_covariance_smoke(self):
-        cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster1).cov
+        cov = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster1).cov
         assert cov.shape == (self.k, self.k)
-        cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster2).cov
+        cov = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster2).cov
         assert cov.shape == (self.k, self.k)
-        cov = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster3).cov
+        cov = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3).cov
         assert cov.shape == (self.k, self.k)
 
     def test_heteroskedastic_smoke(self):
-        cov = HeteroskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
+        cov = HeteroskedasticCovariance(self.y, self.x, self.params, extra_df=0).cov
         assert cov.shape == (self.k, self.k)
-        cov = HeteroskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
+        cov = HeteroskedasticCovariance(self.y, self.x, self.params, extra_df=0).cov
         assert cov.shape == (self.k, self.k)
 
     def test_homoskedastic_smoke(self):
-        cov = HomoskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
+        cov = HomoskedasticCovariance(self.y, self.x, self.params, extra_df=0).cov
         assert cov.shape == (self.k, self.k)
-        cov = HomoskedasticCovariance(self.y, self.x, self.params, self.df_resid).cov
+        cov = HomoskedasticCovariance(self.y, self.x, self.params, extra_df=0).cov
         assert cov.shape == (self.k, self.k)
 
     def test_clustered_covariance_smoke(self):
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster1).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid,
-                                         self.cluster1).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster1).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster1).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster2).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid,
-                                         self.cluster2).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster2).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster2).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster3).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster3).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster3,
-                                  group_adj=True).cov
-
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster4).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3,
+                                  group_debias=True).cov
         assert cov.shape == (self.k, self.k)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster4,
-                                  group_adj=True).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster4).cov
+        assert cov.shape == (self.k, self.k)
+
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster4,
+                                  group_debias=True).cov
         assert cov.shape == (self.k, self.k)
 
         with pytest.raises(ValueError):
-            ClusteredCovariance(self.y, self.x, self.params, self.df_resid, self.cluster5)
-
+            ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster5)

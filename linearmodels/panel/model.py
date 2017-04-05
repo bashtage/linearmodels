@@ -5,7 +5,7 @@ from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
 from linearmodels.panel.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, \
-    OneWayClusteredCovariance
+    ClusteredCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
 from linearmodels.utility import AttrDict, InvalidTestStatistic, MissingValueWarning, WaldTestStatistic, has_constant, \
@@ -17,8 +17,7 @@ class CovarianceManager(object):
                              'homoskedastic': HomoskedasticCovariance,
                              'robust': HeteroskedasticCovariance,
                              'heteroskedastic': HeteroskedasticCovariance,
-                             'oneway': OneWayClusteredCovariance,
-                             'clustered': OneWayClusteredCovariance}
+                             'clustered': ClusteredCovariance}
 
     def __init__(self, estimator, *cov_estimators):
         self._estimator = estimator
@@ -49,7 +48,6 @@ class AmbiguityError(Exception):
     pass
 
 
-# TODO: 2 way cluster covariance
 # TODO: Pooled F-stat
 # TODO: Bootstrap covariance
 # TODO: Test covariance estimators vs IV versions
@@ -58,8 +56,7 @@ class AmbiguityError(Exception):
 # TODO: ??Alternative variance estimators??
 # TODO: Documentation
 # TODO: Example notebooks
-# TODO: Test model residuals when compared to reference implementations
-# TODO: Test other outputs
+# TODO: Formal test of other outputs
 
 
 class PanelOLS(object):
@@ -106,10 +103,11 @@ class PanelOLS(object):
         self.weights = self._adapt_weights(weights)
         self._other_effect_cats = None
         self.other_effects = self._validate_effects(other_effects)
+        self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
         self._validate_data()
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
                                                  HeteroskedasticCovariance,
-                                                 OneWayClusteredCovariance)
+                                                 ClusteredCovariance)
 
         self._name = self.__class__.__name__
 
@@ -193,6 +191,7 @@ class PanelOLS(object):
             if self.other_effects:
                 self._other_effect_cats.drop(missing)
             x = self.exog.values2d
+            self._not_null = ~missing
 
         w = self.weights.dataframe
         w = w / w.mean()
@@ -204,6 +203,7 @@ class PanelOLS(object):
 
     @property
     def formula(self):
+        """Formula used to construct the model"""
         return self._formula
 
     @formula.setter
@@ -212,11 +212,18 @@ class PanelOLS(object):
 
     @property
     def entity_effect(self):
+        """Flag indicating whether entity effects are included"""
         return self._entity_effect
 
     @property
     def time_effect(self):
+        """Flag indicating whether time effects are included"""
         return self._time_effect
+
+    @property
+    def not_null(self):
+        """Locations of non-missing observations"""
+        return self._not_null
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
@@ -468,7 +475,48 @@ class PanelOLS(object):
 
         return y, x, ybar
 
-    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
+    def _choose_cov(self, cov_type, **cov_config):
+
+        cov_est = self._cov_estimators[cov_type]
+        cov_config_upd = {k: v for k, v in cov_config.items()}
+        if cov_type in ('unadjusted', 'homoskedastic',
+                        'robust', 'heteroskedastic'):
+            return cov_est, cov_config_upd
+
+        clusters = cov_config.get('clusters', None)
+        if clusters is not None:
+            clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
+            clusters = clusters.dataframe.copy()
+
+        cluster_entity = cov_config_upd.pop('cluster_entity', False)
+        if cluster_entity:
+            group_ids = self.dependent.entity_ids.squeeze()
+            name = 'cov.cluster.entity'
+            group_ids = pd.Series(group_ids,
+                                  index=self.dependent.dataframe.index,
+                                  name=name)
+            if clusters is not None:
+                clusters[name] = group_ids
+            else:
+                clusters = pd.DataFrame(group_ids)
+
+        cluster_time = cov_config_upd.pop('cluster_time', False)
+        if cluster_time:
+            group_ids = self.dependent.time_ids.squeeze()
+            name = 'cov.cluster.time'
+            group_ids = pd.Series(group_ids,
+                                  index=self.dependent.dataframe.index,
+                                  name=name)
+            if clusters is not None:
+                clusters[name] = group_ids
+            else:
+                clusters = pd.DataFrame(group_ids)
+
+        cov_config_upd['clusters'] = clusters.values
+
+        return cov_est, cov_config_upd
+
+    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
 
         unweighted = np.all(self.weights.values2d == 1.0)
         y_effects = x_effects = 0
@@ -500,9 +548,8 @@ class PanelOLS(object):
         df_model = x.shape[1] + neffects
         df_resid = y.shape[0] - df_model
         cov_denom = df_resid if debiased else y.shape[0]
-        # TODO: Clustered covariance needs work
-        cov_est = self._cov_estimators[cov_type]
-        cov = cov_est(y, x, params, cov_denom, **cov_config)
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
+        cov = cov_est(y, x, params, debiased=debiased, extra_df=neffects, **cov_config)
         weps = y - x @ params
         eps = weps
         if not unweighted:
@@ -552,7 +599,7 @@ class PooledOLS(PanelOLS):
         super(PooledOLS, self).__init__(dependent, exog, weights=weights)
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
                                                  HeteroskedasticCovariance,
-                                                 OneWayClusteredCovariance)
+                                                 ClusteredCovariance)
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
@@ -567,7 +614,7 @@ class PooledOLS(PanelOLS):
         mod.formula = formula
         return mod
 
-    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -580,9 +627,8 @@ class PooledOLS(PanelOLS):
         nobs = y.shape[0]
         df_model = x.shape[1]
         df_resid = nobs - df_model
-        cov_denom = nobs if not debiased else df_resid
-        cov_est = self._cov_estimators[cov_type]
-        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
+        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -623,9 +669,30 @@ class BetweenOLS(PooledOLS):
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance)
+                                                 HeteroskedasticCovariance, ClusteredCovariance)
 
-    def fit(self, reweight=False, cov_type='unadjusted', debiased=False, **cov_config):
+    def _choose_cov(self, cov_type, **cov_config):
+
+        cov_est = self._cov_estimators[cov_type]
+        cov_config_upd = {k: v for k, v in cov_config.items()}
+        if cov_type in ('unadjusted', 'homoskedastic',
+                        'robust', 'heteroskedastic'):
+            return cov_est, cov_config_upd
+
+        clusters = cov_config.get('clusters', None)
+        if clusters is not None:
+            clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
+            grouped = clusters.dataframe.groupby(level=0)
+            same = grouped.apply(lambda s: (s == s.iloc[0]).all())
+            if not same:
+                raise ValueError('clusters must not vary within an entity')
+            clusters = grouped.first()
+
+        cov_config_upd['clusters'] = clusters.values
+
+        return cov_est, cov_config_upd
+
+    def fit(self, *, reweight=False, cov_type='unadjusted', debiased=False, **cov_config):
         """
         Estimate model parameters
 
@@ -658,9 +725,8 @@ class BetweenOLS(PooledOLS):
         df_resid = y.shape[0] - x.shape[1]
         df_model = x.shape[1],
         nobs = y.shape[0]
-        cov_denom = y.shape[0] if not debiased else df_resid
         cov_est = self._cov_estimators[cov_type]
-        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
+        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -710,7 +776,7 @@ class FirstDifferenceOLS(PooledOLS):
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
                                                  HeteroskedasticCovariance)
 
-    def fit(self, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
         y = self.dependent.first_difference().values2d
         x = self.exog.first_difference().values2d
 
@@ -732,9 +798,8 @@ class FirstDifferenceOLS(PooledOLS):
         wy = root_w * y
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
-        cov_denom = df_resid if debiased else y.shape[0]
         cov_est = self._cov_estimators[cov_type]
-        cov = cov_est(wy, wx, params, cov_denom, **cov_config)
+        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
 
         weps = wy - wx @ params
         eps = y - x @ params

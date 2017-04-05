@@ -20,7 +20,7 @@ ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 @pytest.fixture(params=perms, ids=ids)
 def data(request):
     missing, datatype, const = request.param
-    return generate_data(missing, datatype, const=const)
+    return generate_data(missing, datatype, const=const, other_effects=1)
 
 
 def test_pooled_ols(data):
@@ -34,6 +34,9 @@ def test_pooled_ols(data):
 
     res2 = IV2SLS(y, x, None, None).fit('unadjusted')
     assert_results_equal(res, res2)
+
+    res3 = mod.fit(cov_type='homoskedastic')
+    assert_results_equal(res, res3)
 
 
 def test_pooled_ols_weighted(data):
@@ -96,7 +99,7 @@ def test_results_access(data):
     if not isinstance(data.x, pd.Panel):
         return
     x = data.y.copy()
-    x.iloc[:,:] = 1
+    x.iloc[:, :] = 1
     mod = PooledOLS(data.y, x)
     res = mod.fit()
     d = dir(res)
@@ -117,3 +120,94 @@ def test_alt_rsquared_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
     res = mod.fit()
     assert_allclose(res.rsquared, res.rsquared_overall)
+
+
+def test_cov_equiv(data):
+    mod = PooledOLS(data.y, data.x)
+    res = mod.fit(cov_type='robust')
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    y.index = np.arange(len(y))
+    x.index = y.index
+    res2 = IV2SLS(y, x, None, None).fit('robust')
+    assert_results_equal(res, res2)
+
+    res3 = mod.fit(cov_type='heteroskedastic')
+    assert_results_equal(res, res3)
+
+
+def test_cov_equiv_weighted(data):
+    mod = PooledOLS(data.y, data.x, weights=data.w)
+    res = mod.fit(cov_type='robust')
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    w = mod.weights.dataframe.copy()
+    y.index = np.arange(len(y))
+    w.index = x.index = y.index
+
+    res2 = IV2SLS(y, x, None, None, weights=w).fit('robust')
+    assert_results_equal(res, res2)
+
+    res3 = mod.fit(cov_type='heteroskedastic')
+    assert_results_equal(res, res3)
+
+
+def test_cov_equiv_cluster(data):
+    mod = PooledOLS(data.y, data.x)
+    res = mod.fit(cov_type='clustered', cluster_entity=True)
+    clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
+    res2 = mod.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, res2)
+
+    res = mod.fit(cov_type='clustered', cluster_time=True)
+    clusters = pd.DataFrame(mod.dependent.time_ids, index=mod.dependent.dataframe.index)
+    res2 = mod.fit(cov_type='clustered', clusters=clusters)
+    assert_results_equal(res, res2)
+
+    if isinstance(data.c, np.ndarray):
+        clusters = data.c[0]
+    elif isinstance(data.c, pd.Panel):
+        clusters = data.c.iloc[0].values
+    else:
+        clusters = data.c[0].values
+
+    clusters = clusters.T
+    retain = mod.not_null
+    clusters = clusters.ravel()[retain, None]
+    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    y.index = np.arange(len(y))
+    x.index = y.index
+    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+    ols_mod = IV2SLS(y, x, None, None)
+    res2 = ols_mod.fit('clustered', clusters=clusters)
+    assert_results_equal(res, res2)
+
+
+def test_cov_equiv_cluster_weighted(data):
+    mod = PooledOLS(data.y, data.x, weights=data.w)
+    if isinstance(data.c, np.ndarray):
+        clusters = data.c[0]
+    elif isinstance(data.c, pd.Panel):
+        clusters = data.c.iloc[0].values
+    else:
+        clusters = data.c[0].values
+
+    clusters = clusters.T
+    retain = mod.not_null
+    clusters = clusters.ravel()[retain, None]
+    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
+    res = mod.fit(cov_type='clustered', clusters=clusters)
+
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+    w = mod.weights.dataframe
+    y.index = np.arange(len(y))
+    w.index = x.index = y.index
+    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+    ols_mod = IV2SLS(y, x, None, None, weights=w)
+    res2 = ols_mod.fit('clustered', clusters=clusters)
+    assert_results_equal(res, res2)

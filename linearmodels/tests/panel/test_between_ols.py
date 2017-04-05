@@ -99,7 +99,7 @@ def test_missing(missing_data):
     weights = mod.weights.dataframe.groupby(level=0).sum()
 
     dep = dep.reindex(mod.dependent.entities)
-    exog = exog .reindex(mod.dependent.entities)
+    exog = exog.reindex(mod.dependent.entities)
     weights = weights.reindex(mod.dependent.entities)
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
@@ -127,12 +127,6 @@ def test_missing_weighted(missing_data):
     ols = IV2SLS(dep, exog, None, None, weights=weights)
     ols_res = ols.fit('unadjusted')
     assert_results_equal(res, ols_res)
-
-
-def test_unsupported_covariance(data):
-    mod = BetweenOLS(data.y, data.x)
-    with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', clusters=None)
 
 
 def test_unknown_covariance(data):
