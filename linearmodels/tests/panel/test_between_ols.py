@@ -258,3 +258,16 @@ def test_2way_cluster(data):
     ols_clusters = clusters.groupby(level=0).max()
     ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
+
+
+def test_cluster_error(data):
+    mod = BetweenOLS(data.y, data.x)
+    clusters = mod.dependent.dataframe.copy()
+    clusters.loc[:, :] = 0
+    clusters = clusters.astype(np.int32)
+    for entity in mod.dependent.entities:
+        clusters.loc[entity] = np.random.randint(9)
+    clusters.iloc[::7,:] = 0
+
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='clustered', clusters=clusters)
