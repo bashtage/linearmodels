@@ -47,30 +47,38 @@ class TestCovariance(object):
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster1).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster1).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster1).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                         clusters=self.cluster1).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster2).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster2).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster2, group_debias=True).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                         clusters=self.cluster2, group_debias=True).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3).cov
-        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster3).cov
+        cov2 = OneWayClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                         clusters=self.cluster3).cov
         assert cov.shape == (self.k, self.k)
         assert_allclose(cov, cov2)
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster3,
-                                  group_debias=True).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster3, group_debias=True).cov
         assert cov.shape == (self.k, self.k)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster4).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster4).cov
         assert cov.shape == (self.k, self.k)
 
-        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster4,
-                                  group_debias=True).cov
+        cov = ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                  clusters=self.cluster4, group_debias=True).cov
         assert cov.shape == (self.k, self.k)
 
         with pytest.raises(ValueError):
-            ClusteredCovariance(self.y, self.x, self.params, extra_df=0, clusters=self.cluster5)
+            ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                clusters=self.cluster5)

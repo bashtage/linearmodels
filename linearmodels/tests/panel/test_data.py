@@ -264,14 +264,14 @@ def test_demean_against_dummy_regression(data):
 
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
     entity_demean = dh.demean('entity')
     assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
     time_demean = dh.demean('time')
     assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(dummy_demeaned))
@@ -281,7 +281,7 @@ def test_demean_against_dummy_regression(data):
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
     d = np.c_[d1.values, d2.values]
-    dummy_demeaned = df.values - d @ pinv(d) @ df.values
+    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
     both_demean = dh.demean('both')
     assert_allclose(1 + np.abs(both_demean.values2d),
                     1 + np.abs(dummy_demeaned))
@@ -374,6 +374,8 @@ def test_dummies(panel):
     tdummy_drop = data.dummies(group='time', drop_first=True)
     assert tdummy_drop.shape == (77, 6)
     assert np.all(tdummy.sum(0) == 11)
+    with pytest.raises(ValueError):
+        data.dummies('unknown')
 
 
 def test_roundtrip_3d(data):
@@ -466,7 +468,7 @@ def test_demean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = wd @ pinv(wd) @ wx
+    mu = wd @ np.linalg.lstsq(wd, wx)[0]
     e = wx - mu
     assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(e))
@@ -477,7 +479,7 @@ def test_demean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = wd @ pinv(wd) @ wx
+    mu = wd @ np.linalg.lstsq(wd, wx)[0]
     e = wx - mu
     assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(e))
@@ -497,7 +499,7 @@ def test_mean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = pinv(wd) @ wx
+    mu = np.linalg.lstsq(wd, wx)[0]
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean('time', weights=w)

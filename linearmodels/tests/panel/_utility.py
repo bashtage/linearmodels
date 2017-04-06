@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-from linearmodels.utility import AttrDict
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
 from pandas.util.testing import assert_frame_equal, assert_series_equal
+
+from linearmodels.utility import AttrDict
 
 
 def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
@@ -35,18 +36,18 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
                          columns=list(x.columns) + list(dummies.columns))
     if w is None:
         w = np.ones_like(y)
-
+    
     wy = w * y.values
     wx = w * x.values
     params = np.linalg.lstsq(wx, wy)[0]
     params = params.squeeze()
-
+    
     return params[:nvar]
 
 
 def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0):
     np.random.seed(12345)
-
+    
     n, t, k = ntk
     k += const
     x = standard_normal((k, t, n))
@@ -57,16 +58,20 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     cats = ['cat.' + str(i) for i in range(other_effects)]
     if other_effects:
         c = np.random.randint(0, 4, (other_effects, t, n))
-
+    
+    vcats = ['varcat.' + str(i) for i in range(2)]
+    vc2 = np.ones((2, t, 1)) @ np.random.randint(0, n // 2, (2, 1, n))
+    vc1 = vc2[[0]]
+    
     if const:
         x[0] = 1.0
-
+    
     if missing > 0:
         locs = np.random.choice(n * t, int(n * t * missing))
         y.flat[locs] = np.nan
         locs = np.random.choice(n * t * k, int(n * t * k * missing))
         x.flat[locs] = np.nan
-
+    
     if datatype in ('pandas', 'xarray'):
         entities = ['firm' + str(i) for i in range(n)]
         time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
@@ -75,20 +80,24 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
         w = pd.DataFrame(w, index=time, columns=entities)
         x = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
         c = pd.Panel(c, items=cats, major_axis=time, minor_axis=entities)
-
+        vc1 = pd.Panel(vc1, items=vcats[:1], major_axis=time, minor_axis=entities)
+        vc2 = pd.Panel(vc2, items=vcats, major_axis=time, minor_axis=entities)
+    
     if datatype == 'xarray':
         x = xr.DataArray(x)
         y = xr.DataArray(y)
         w = xr.DataArray(w)
         c = xr.DataArray(c)
-
-    return AttrDict(y=y, x=x, w=w, c=c)
+        vc1 = xr.DataArray(vc1)
+        vc2 = xr.DataArray(vc2)
+    
+    return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 
 
 def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_resids=True):
     if n is None:
         n = min(res1.params.shape[0], res2.params.shape[0])
-
+    
     assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
     assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
     assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n])
@@ -104,7 +113,9 @@ def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_r
         assert_allclose(res1.resid_ss, res2.resid_ss)
         assert_allclose(res1.model_ss, res2.model_ss)
     if test_resids:
-        delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(), res2.resids.std())
+        delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(),
+                                                                    res2.resids.std())
         assert_allclose(delta, np.ones_like(delta))
-        delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(), res2.wresids.std())
+        delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(),
+                                                                      res2.wresids.std())
         assert_allclose(delta, np.ones_like(delta))
