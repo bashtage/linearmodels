@@ -352,7 +352,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     linearmodels.iv.covariance.KernelCovariance,
     linearmodels.iv.covariance.OneWayClusteredCovariance
     """
-
+    # TODO: 2-way clustering
     def __init__(self, x, y, z, params, w, cov_type='robust', debiased=False,
                  **cov_config):
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)

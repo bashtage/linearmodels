@@ -56,6 +56,11 @@ class HomoskedasticCovariance(object):
         if debiased:
             self._nobs_eff -= (self._nvar + extra_df)
         self._scale = self._nobs / self._nobs_eff
+        self._name = 'Unadjusted'
+    
+    @property
+    def name(self):
+        return self._name
 
     @property
     def eps(self):
@@ -121,6 +126,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def __init__(self, y, x, params, *, debiased=False, extra_df=0):
         super(HeteroskedasticCovariance, self).__init__(y, x, params, debiased=debiased,
                                                         extra_df=extra_df)
+        self._name = 'Robust'
 
     @cached_property
     def cov(self):
@@ -200,6 +206,7 @@ class OneWayClusteredCovariance(HomoskedasticCovariance):
             clusters = np.arange(self._x.shape[0])
         self._clusters = clusters.squeeze()
         self._group_debias = group_debias
+        self._name = 'One-way Clustered'
 
     @cached_property
     def cov(self):
@@ -288,6 +295,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
+        self._name = 'Clustered'
 
     def _calc_group_debias(self, clusters):
         ngroups = len(np.unique(clusters))

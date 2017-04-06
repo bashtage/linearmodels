@@ -252,6 +252,8 @@ class TestGMMCovariance(object):
         assert_allclose(c.cov, cov)
         assert c.config['debiased'] is False
         assert_equal(c.config['clusters'], data.clusters)
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'clustered')
+        assert 'Clustered' in str(c)
 
     def test_kernel(self, data, kernel, bandwidth):
         c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel',
@@ -267,6 +269,9 @@ class TestGMMCovariance(object):
         assert c.config['kernel'] == kernel.kernel
         assert c.config['debiased'] is False
         assert c.config['bandwidth'] == bandwidth or nobs - 2
+        c = IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, 'kernel')
+        assert 'Kernel' in str(c)
+        
 
     def test_unknown(self, data):
         with pytest.raises(ValueError):
