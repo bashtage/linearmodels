@@ -305,7 +305,7 @@ class PanelResults(_SummaryStr):
         return self._deferred_f()
 
     @property
-    def f_statistic(self):
+    def f_pooled(self):
         """
         Test that included effects are jointly zero.
 
@@ -319,4 +319,5 @@ class PanelResults(_SummaryStr):
         Joint test that all included effects are zero.  Only correct under an
         assumption of homoskedasticity.
         """
-        return self._deferred_f()
+        return self._f_pooled
+
