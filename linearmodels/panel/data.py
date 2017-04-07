@@ -11,7 +11,7 @@ def convert_columns(s, drop_first):
 
     if is_categorical(s):
         out = pd.get_dummies(s, drop_first=drop_first)
-        out.columns = [s.name + '.' + c for c in out]
+        out.columns = [str(s.name) + '.' + str(c) for c in out]
         return out
     return s
 
@@ -65,6 +65,9 @@ class PanelData(object):
     """
 
     def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
+        self._var_name = var_name
+        self._convert_dummies=convert_dummies
+        self._drop_first=drop_first
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
@@ -298,7 +301,8 @@ class PanelData(object):
 
     def copy(self):
         """Return a deep copy"""
-        return PanelData(self._frame.copy())
+        return PanelData(self._frame.copy(), var_name=self._var_name,
+                         convert_dummies=self._convert_dummies, drop_first=self._drop_first)
 
     def mean(self, group='entity', weights=None):
         """
