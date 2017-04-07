@@ -57,7 +57,7 @@ class AmbiguityError(Exception):
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
 # TODO: Test Pooled F-stat
-# TODO: Add fast path for no-constant, entity or time effect
+# TODO: Add fast path for no-constant, entity or time effect <- Depends on whether it is easy to compute FE
 # TODO: Test alternative acceptable cluster formats
 
 
