@@ -7,6 +7,7 @@ import xarray as xr
 from numpy.testing import assert_allclose
 
 from linearmodels.iv import IV2SLS
+from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS
 from linearmodels.tests.panel._utility import assert_results_equal, generate_data
 
@@ -155,90 +156,59 @@ def test_cov_equiv_weighted(data):
 def test_cov_equiv_cluster(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(cov_type='clustered', cluster_entity=True)
-    clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
+    y = PanelData(data.y)
+    clusters = pd.DataFrame(y.entity_ids, index=y.index)
     res2 = mod.fit(cov_type='clustered', clusters=clusters)
     assert_results_equal(res, res2)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
-    clusters = pd.DataFrame(mod.dependent.time_ids, index=mod.dependent.dataframe.index)
+    clusters = pd.DataFrame(y.time_ids, index=y.index)
     res2 = mod.fit(cov_type='clustered', clusters=clusters)
     assert_results_equal(res, res2)
 
-    if isinstance(data.c, np.ndarray):
-        clusters = data.c[0]
-    elif isinstance(data.c, pd.Panel):
-        clusters = data.c.iloc[0].values
-    else:
-        clusters = data.c[0].values
-
-    clusters = clusters.T
-    retain = mod.not_null
-    clusters = clusters.ravel()[retain, None]
-    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
-    res = mod.fit(cov_type='clustered', clusters=clusters)
-
+    res = mod.fit(cov_type='clustered', clusters=data.vc1)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+    clusters = mod.reformat_clusters(data.vc1)
     ols_mod = IV2SLS(y, x, None, None)
-    res2 = ols_mod.fit('clustered', clusters=clusters)
+    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
     assert_results_equal(res, res2)
 
 
 def test_cov_equiv_cluster_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
-    if isinstance(data.c, np.ndarray):
-        clusters = data.c[0]
-    elif isinstance(data.c, pd.Panel):
-        clusters = data.c.iloc[0].values
-    else:
-        clusters = data.c[0].values
-
-    clusters = clusters.T
-    retain = mod.not_null
-    clusters = clusters.ravel()[retain, None]
-    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
-    res = mod.fit(cov_type='clustered', clusters=clusters)
+    res = mod.fit(cov_type='clustered', clusters=data.vc1)
 
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     w = mod.weights.dataframe
     y.index = np.arange(len(y))
     w.index = x.index = y.index
-    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+    clusters = mod.reformat_clusters(data.vc1)
     ols_mod = IV2SLS(y, x, None, None, weights=w)
-    res2 = ols_mod.fit('clustered', clusters=clusters)
+    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
     assert_results_equal(res, res2)
 
 
 def test_two_way_clustering(data):
     mod = PooledOLS(data.y, data.x)
 
-    entity_clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
-
-    if isinstance(data.c, np.ndarray):
-        clusters = data.c[0]
-    elif isinstance(data.c, pd.Panel):
-        clusters = data.c.iloc[0].values
-    else:
-        clusters = data.c[0].values
-
-    clusters = clusters.T
-    retain = mod.not_null
-    clusters = clusters.ravel()[retain, None]
-    clusters = pd.DataFrame(clusters, mod.dependent.dataframe.index, columns=['ids'])
-    clusters['entity_clusters'] = entity_clusters
-
+    y = PanelData(data.y)
+    entity_clusters = pd.DataFrame(y.entity_ids, index=y.index)
+    vc1 = PanelData(data.vc1)
+    clusters = vc1.copy()
+    clusters.dataframe['var.cluster.entity'] = entity_clusters
+    clusters._frame = clusters._frame.astype(np.int64)
     res = mod.fit(cov_type='clustered', clusters=clusters)
 
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-    clusters = pd.DataFrame(clusters.values, index=y.index, columns=clusters.columns)
+    clusters = mod.reformat_clusters(clusters)
 
     ols_mod = IV2SLS(y, x, None, None)
-    ols_res = ols_mod.fit('clustered', clusters=clusters)
+    ols_res = ols_mod.fit('clustered', clusters=clusters.dataframe)
     assert_results_equal(res, ols_res)

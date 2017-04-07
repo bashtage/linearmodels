@@ -57,7 +57,7 @@ class HomoskedasticCovariance(object):
             self._nobs_eff -= (self._nvar + extra_df)
         self._scale = self._nobs / self._nobs_eff
         self._name = 'Unadjusted'
-    
+
     @property
     def name(self):
         return self._name

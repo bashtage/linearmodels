@@ -56,26 +56,22 @@ def test_firstdifference_ols(data):
     ols_res = ols_mod.fit('robust')
     assert_results_equal(res, ols_res)
 
-    clusters = mod.dependent.dataframe.copy()
-    for entity in mod.dependent.entities:
-        clusters.loc[entity] = np.random.randint(9)
-
-    ols_clusters = clusters.copy()
-    index = mod.dependent.first_difference().dataframe.index
-    ols_clusters = ols_clusters.loc[index]
-
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(data.vc1)
+    fd = mod.dependent.first_difference()
+    ols_clusters = ols_clusters.dataframe.loc[fd.index]
     res = mod.fit(cov_type='clustered', clusters=clusters)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
-    entity_clusters = mod.dependent.first_difference().entity_ids
     res = mod.fit(cov_type='clustered', cluster_entity=True)
+    entity_clusters = mod.dependent.first_difference().entity_ids
     ols_res = ols_mod.fit(cov_type='clustered', clusters=entity_clusters)
     assert_results_equal(res, ols_res)
 
     ols_clusters['entity.clusters'] = entity_clusters
     ols_clusters = ols_clusters.astype(np.int32)
-    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=clusters)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=data.vc1)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
@@ -128,13 +124,10 @@ def test_firstdifference_ols_weighted(data):
     ols_res = ols_mod.fit('robust')
     assert_results_equal(res, ols_res)
 
-    clusters = mod.dependent.dataframe.copy()
-    for entity in mod.dependent.entities:
-        clusters.loc[entity] = np.random.randint(9)
-
-    ols_clusters = clusters.copy()
-    index = mod.dependent.first_difference().dataframe.index
-    ols_clusters = ols_clusters.loc[index]
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(data.vc1)
+    fd = mod.dependent.first_difference()
+    ols_clusters = ols_clusters.dataframe.loc[fd.index]
 
     res = mod.fit(cov_type='clustered', clusters=clusters)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
@@ -169,13 +162,14 @@ def test_results_access(data):
             if callable(val):
                 val()
 
+
 def test_firstdifference_error(data):
     mod = FirstDifferenceOLS(data.y, data.x)
 
     clusters = mod.dependent.dataframe.copy()
     for entity in mod.dependent.entities:
         clusters.loc[entity] = np.random.randint(9)
-    clusters.iloc[::3,:] = clusters.iloc[::3,:] + 1
+    clusters.iloc[::3, :] = clusters.iloc[::3, :] + 1
 
     with pytest.raises(ValueError):
         mod.fit(cov_type='clustered', clusters=clusters)

@@ -63,7 +63,7 @@ class TestErrors(object):
         exog[:, :2] = 1
         with pytest.raises(ValueError):
             IV2SLS(data.dep, exog, data.endog, data.instr)
-    
+
     def test_rank_deficient_endog(self, data):
         endog = data.endog.copy()
         endog[:, :2] = 1
@@ -71,12 +71,12 @@ class TestErrors(object):
             IV2SLS(data.dep, data.exog, endog, data.instr)
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.exog, data.instr)
-    
+
     def test_invalid_weights(self, data):
         weights = np.zeros_like(data.dep)
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
-    
+
     def test_rank_deficient_instr(self, data):
         instr = data.instr.copy()
         instr[:, :2] = 1
@@ -84,20 +84,20 @@ class TestErrors(object):
             IV2SLS(data.dep, data.exog, data.endog, instr)
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.endog, data.exog)
-    
+
     def test_kappa_error(self, data):
         with pytest.raises(ValueError):
             IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
-    
+
     def test_fuller_error(self, data):
         with pytest.raises(ValueError):
             IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=np.array([1]))
-    
+
     def test_kappa_fuller_warning(self, data):
         with warnings.catch_warnings(record=True) as w:
             IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=0.99, fuller=1)
         assert len(w) == 1
-    
+
     def test_string_cat(self, data):
         instr = data.instr.copy()
         n = data.instr.shape[0]
@@ -108,11 +108,11 @@ class TestErrors(object):
         instr['cat'] = cat.astype('category')
         res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit('unadjusted')
         assert_series_equal(res.params, res_cat.params)
-    
+
     def test_no_regressors(self, data):
         with pytest.raises(ValueError):
             IV2SLS(data.dep, None, None, None)
-    
+
     def test_too_few_instruments(self, data):
         with pytest.raises(ValueError):
             IV2SLS(data.dep, data.exog, data.endog, None)
@@ -179,7 +179,7 @@ def test_gmm_cue(data):
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
-    
+
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr, center=False)
     res = mod.fit()
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr, center=False)
@@ -192,7 +192,7 @@ def test_gmm_cue_starting_vals(data):
     sv = mod.fit().params
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
     mod.fit(starting=sv, display=True)
-    
+
     with pytest.raises(ValueError):
         mod.fit(starting=sv[:-1], display=True)
 
@@ -236,7 +236,7 @@ def test_model_summary_smoke(data):
     res.__str__()
     res._repr_html_()
     res.summary
-    
+
     res = _OLS(data.dep, data.exog).fit()
     res.__repr__()
     res.__str__()
@@ -256,7 +256,7 @@ def test_model_missing(data):
     data.instr[::29, :] = np.nan
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    
+
     vars = [data.dep, data.exog, data.endog, data.instr]
     missing = list(map(lambda x: np.any(np.isnan(x), 1), vars))
     missing = np.any(np.c_[missing], 0)
@@ -287,7 +287,7 @@ def test_compare(data):
     c = compare(res)
     c.summary
     c.pvalues
-    
+
     res1 = IV2SLS(data.dep, data.exog[:, :1], None, None).fit()
     res2 = IV2SLS(data.dep, data.exog[:, :2], None, None).fit()
     c = compare({'Model A': res1,
