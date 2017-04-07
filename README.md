@@ -57,7 +57,7 @@ Should eventually add some useful linear model estimators such as panel regressi
 only the single variable IV estimators are polished.
 
 * Linear Instrumental variable estimation - *complete*
-* Linear Panel model estimation - *incomplete*
+* Linear Panel model estimation - *substantially complete ex. Random Effects*
 * Linear IV Panel model estimation - *not started*
 * System regression - *not started*
 

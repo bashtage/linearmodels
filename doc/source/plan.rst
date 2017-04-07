@@ -15,19 +15,30 @@ Univariate
 Panel
 =====
 
-Not Implemented
-~~~~~~~~~~~~~~~
-
 Least Squares Estimators
 ************************
 
-* Pooled
-* Between
-* Fixed Effects
+* Fixed Effects - :class:`linearmodels.panel.model.PanelOLS`
+* Pooled - :class:`linearmodels.panel.model.PooledOLS`
+* Between - :class:`linearmodels.panel.model.BetweenOLS`
+* First Difference - :class:`linearmodels.panel.model.FirstDifferenceOLS`
+
+Not Implemented
+~~~~~~~~~~~~~~~
 * Random Effects
 
 Instrumental Variable Estimators
 ********************************
-
+Not Implemented
+~~~~~~~~~~~~~~~
 * 2SLS
+* GMM
+
+
+Fama Macbeth
+************
+
+Not Implemented
+~~~~~~~~~~~~~~~
+* Fama-MacBeth
 * GMM
