@@ -731,7 +731,8 @@ def test_panel_other_incorrect_size(data):
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
     cats = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
-    cats = cats.iloc[:cats.shape[0] // 2]
+    cats = PanelData(cats)
+    cats = cats.panel.iloc[:, :, :cats.panel.shape[2] // 2]
 
     with pytest.raises(ValueError):
         PanelOLS(y, x, other_effects=cats)

@@ -21,7 +21,7 @@ TYPES = ['numpy', 'pandas', 'xarray']
                              product(PERC_MISSING, TYPES))))
 def data(request):
     missing, datatype = request.param
-    return generate_data(missing, datatype)
+    return generate_data(missing, datatype, ntk=(231, 7, 5))
 
 
 @pytest.fixture
