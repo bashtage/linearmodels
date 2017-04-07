@@ -36,6 +36,8 @@ class PanelResults(_SummaryStr):
         self._wresids = res.wresids
         self._index = res.index
         self._deferred_f = res.deferred_f
+        self._f_pooled = res.f_pooled
+        self._f_stat = res.f_stat
 
     @property
     def params(self):
@@ -265,6 +267,27 @@ class PanelResults(_SummaryStr):
         return Series(self._wresids.squeeze(), index=self._index, name='weighted residual')
 
     @property
+    def f_statistic_robust(self):
+        """
+        Joint test of significance for non-constant regressors
+
+        Returns
+        -------
+        f_stat : WaldTestStatistic
+            Statistic value, distribution and p-value
+
+        Notes
+        -----
+        Implemented as a Wald test using the estimated parameter covariance,
+        and so inherits any robustness that the choice of covariance estimator
+        provides.
+
+        If ``debiased`` is True, then the Wald statistic is divided by the
+        number of restrictions and inference is made using an F distribution.
+        """
+        return self._deferred_f()
+
+    @property
     def f_statistic(self):
         """
         Joint test of significance for non-constant regressors
@@ -276,8 +299,24 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        Implemented as a Wald test using the estimated parameter covariance.
-        If debiased is True, then divided the Wald statistic by the number of
-        restrictions and uses an F distribution.
+        Classical F-stat that is only correct under an assumption of
+        homoskedasticity.
+        """
+        return self._deferred_f()
+
+    @property
+    def f_statistic(self):
+        """
+        Test that included effects are jointly zero.
+
+        Returns
+        -------
+        f_pooled : WaldTestStatistic
+            Statistic value, distribution and p-value
+
+        Notes
+        -----
+        Joint test that all included effects are zero.  Only correct under an
+        assumption of homoskedasticity.
         """
         return self._deferred_f()

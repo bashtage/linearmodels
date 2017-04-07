@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
-import xarray as xr
 
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
@@ -195,7 +194,7 @@ def test_panel_no_effects_weighted(data):
 def test_panel_entity_lvsd(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     res = mod.fit()
-    
+
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
     if mod.has_constant:
@@ -205,35 +204,37 @@ def test_panel_entity_lvsd(data):
     else:
         d = mod.dependent.dummies('entity', drop_first=False)
         d_demean = d.values
-    
+
     xd = np.c_[x.values, d_demean]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
-    
+
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
-    
+
     res = mod.fit(cov_type='robust')
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
-    
-    clusters = mod.reformat_clusters(data.vc1)
+
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(data.vc1)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
-    
-    clusters = mod.reformat_clusters(data.vc2)
+
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(data.vc2)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
-    
+
     res = mod.fit(cov_type='clustered', cluster_time=True)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.dataframe.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
-    
+
     res = mod.fit(cov_type='clustered', cluster_entity=True)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.dataframe.index,
@@ -292,14 +293,16 @@ def test_panel_time_lvsd(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -368,14 +371,16 @@ def test_panel_both_lvsd(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -447,14 +452,16 @@ def test_panel_entity_lvsd_weighted(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -500,14 +507,16 @@ def test_panel_time_lvsd_weighted(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -556,14 +565,16 @@ def test_panel_both_lvsd_weighted(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -655,14 +666,16 @@ def test_panel_other_lvsd(data):
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc1)
+    clusters = data.vc1
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = mod.reformat_clusters(data.vc2)
+    clusters = data.vc2
+    ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters)
-    res2 = ols_mod.fit('clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     res = mod.fit(cov_type='clustered', cluster_time=True)
@@ -755,13 +768,16 @@ def test_too_many_effects(data):
 def test_cov_equiv_cluster(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     res = mod.fit(cov_type='clustered', cluster_entity=True)
-    clusters = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.dataframe.index)
+
+    y = PanelData(data.y)
+    clusters = pd.DataFrame(y.entity_ids, index=y.dataframe.index)
     res2 = mod.fit(cov_type='clustered', clusters=clusters)
     assert_results_equal(res, res2)
 
     mod = PanelOLS(data.y, data.x, time_effect=True)
     res = mod.fit(cov_type='clustered', cluster_time=True)
-    clusters = pd.DataFrame(mod.dependent.time_ids, index=mod.dependent.dataframe.index)
+    y = PanelData(data.y)
+    clusters = pd.DataFrame(y.time_ids, index=y.dataframe.index)
     res2 = mod.fit(cov_type='clustered', clusters=clusters)
     assert_results_equal(res, res2)
 
@@ -770,19 +786,18 @@ def test_cluster_smoke(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     mod.fit(cov_type='clustered', cluster_time=True)
     mod.fit(cov_type='clustered', cluster_entity=True)
-    y = mod.dependent.dataframe
-    c = PanelData(data.c).dataframe
-    c = c.loc[y.index]
+    c2 = PanelData(data.vc2)
+    c1 = PanelData(data.vc1)
 
-    mod.fit(cov_type='clustered', clusters=c)
-    c0 = c.iloc[:,[0]]
-    mod.fit(cov_type='clustered', cluster_entity=True, clusters=c0)
-    mod.fit(cov_type='clustered', cluster_time=True, clusters=c0)
+    mod.fit(cov_type='clustered', clusters=c2)
+    mod.fit(cov_type='clustered', cluster_entity=True, clusters=c1)
+    mod.fit(cov_type='clustered', cluster_time=True, clusters=c1)
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', cluster_time=True, clusters=c)
+        mod.fit(cov_type='clustered', cluster_time=True, clusters=c2)
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', cluster_entity=True, clusters=c)
+        mod.fit(cov_type='clustered', cluster_entity=True, clusters=c2)
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True, clusters=c0)
+        mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True, clusters=c1)
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', clusters=c0.iloc[:-1, :])
+        clusters = c1.panel.iloc[:, :, :c1.panel.shape[2] // 2]
+        mod.fit(cov_type='clustered', clusters=clusters)
