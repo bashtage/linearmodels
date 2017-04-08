@@ -30,7 +30,7 @@ def test_firstdifference_ols(data):
     dy = pd.DataFrame(dy, index=mod.dependent.panel.major_axis[1:],
                       columns=mod.dependent.panel.minor_axis)
     dy = dy.T.stack()
-    dy = dy.reindex(mod.dependent.dataframe.index)
+    dy = dy.reindex(mod.dependent.index)
 
     dx = x[:, 1:] - x[:, :-1]
     _dx = {}
@@ -38,7 +38,7 @@ def test_firstdifference_ols(data):
         temp = pd.DataFrame(dxi, index=mod.dependent.panel.major_axis[1:],
                             columns=mod.dependent.panel.minor_axis)
         temp = temp.T.stack()
-        temp = temp.reindex(mod.dependent.dataframe.index)
+        temp = temp.reindex(mod.dependent.index)
         _dx[mod.exog.vars[i]] = temp
     dx = pd.DataFrame(index=_dx[mod.exog.vars[i]].index)
     for key in _dx:
@@ -86,7 +86,7 @@ def test_firstdifference_ols_weighted(data):
     dy = pd.DataFrame(dy, index=mod.dependent.panel.major_axis[1:],
                       columns=mod.dependent.panel.minor_axis)
     dy = dy.T.stack()
-    dy = dy.reindex(mod.dependent.dataframe.index)
+    dy = dy.reindex(mod.dependent.index)
 
     dx = x[:, 1:] - x[:, :-1]
     _dx = {}
@@ -94,7 +94,7 @@ def test_firstdifference_ols_weighted(data):
         temp = pd.DataFrame(dxi, index=mod.dependent.panel.major_axis[1:],
                             columns=mod.dependent.panel.minor_axis)
         temp = temp.T.stack()
-        temp = temp.reindex(mod.dependent.dataframe.index)
+        temp = temp.reindex(mod.dependent.index)
         _dx[mod.exog.vars[i]] = temp
     dx = pd.DataFrame(index=_dx[mod.exog.vars[i]].index)
     for key in _dx:
@@ -107,7 +107,7 @@ def test_firstdifference_ols_weighted(data):
     sw = pd.DataFrame(sw, index=mod.dependent.panel.major_axis[1:],
                       columns=mod.dependent.panel.minor_axis)
     sw = sw.T.stack()
-    sw = sw.reindex(mod.dependent.dataframe.index)
+    sw = sw.reindex(mod.dependent.index)
     sw = 1.0 / sw
     sw = sw / sw.mean()
 

@@ -463,7 +463,7 @@ def test_demean_weighted(data):
     w.drop(missing)
 
     entity_demean = x.demean('entity', weights=w)
-    d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[0]))
+    d = pd.get_dummies(pd.Categorical(x.index.labels[0]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -474,7 +474,7 @@ def test_demean_weighted(data):
                     1 + np.abs(e))
 
     time_demean = x.demean('time', weights=w)
-    d = pd.get_dummies(pd.Categorical(x.dataframe.index.labels[1]))
+    d = pd.get_dummies(pd.Categorical(x.index.labels[1]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -492,7 +492,7 @@ def test_mean_weighted(data):
     x.drop(missing)
     w.drop(missing)
     entity_mean = x.mean('entity', weights=w)
-    c = x.dataframe.index.levels[0][x.dataframe.index.labels[0]]
+    c = x.index.levels[0][x.index.labels[0]]
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
@@ -503,7 +503,7 @@ def test_mean_weighted(data):
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean('time', weights=w)
-    c = x.dataframe.index.levels[1][x.dataframe.index.labels[1]]
+    c = x.index.levels[1][x.index.labels[1]]
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
     d = d[time_mean.index]
     d = d.values
@@ -570,3 +570,9 @@ def test_string_nonconversion():
     panel = PanelData(p, var_name='OtherEffect', convert_dummies=False)
     assert is_string_dtype(panel.dataframe['a'].dtype)
     assert np.all(panel.dataframe['a'] == string.T.ravel())
+
+
+def test_repr_html(panel):
+    data = PanelData(panel)
+    html = data._repr_html_()
+    assert '<br/>' in html

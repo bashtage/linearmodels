@@ -9,8 +9,7 @@ from linearmodels.panel.covariance import HeteroskedasticCovariance, Homoskedast
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
 from linearmodels.utility import AttrDict, InvalidTestStatistic, MissingValueWarning, \
-    WaldTestStatistic, has_constant, \
-    missing_value_warning_msg
+    WaldTestStatistic, has_constant, InapplicableTestStatistic, missing_value_warning_msg
 
 
 class CovarianceManager(object):
@@ -236,7 +235,7 @@ class PooledOLS(object):
         num = float(weps_const.T @ weps_const - resid_ss)
         denom = resid_ss
         denom_df = df_resid
-        stat = (num / num_df) / (denom / denom_df)
+        stat = float((num / num_df) / (denom / denom_df))
         return WaldTestStatistic(stat, null='All parameters ex. constant not zero',
                                  df=num_df, df_denom=denom_df, name=name)
 
@@ -340,13 +339,14 @@ class PooledOLS(object):
         deferred_f = self._f_statistic_robust(params, cov, debiased, df_resid)
         f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
-        f_pooled = InvalidTestStatistic('Model has no effects', name='Pooled F-stat')
+        f_pooled = InapplicableTestStatistic(reason='Model has no effects',
+                                             name='Pooled F-stat')
         entity_info, time_info, other_info = self._info()
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        deferred_f=deferred_f, f_stat=f_stat,
                        debiased=debiased, name=self._name, var_names=self.exog.vars,
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
-                       model=self, cov_type=cov.name, index=self.dependent.dataframe.index,
+                       model=self, cov_type=cov.name, index=self.dependent.index,
                        entity_info=entity_info, time_info=time_info, other_info=other_info,
                        f_pooled=f_pooled)
         return res
@@ -390,7 +390,7 @@ class PooledOLS(object):
             group_ids = self.dependent.entity_ids.squeeze()
             name = 'cov.cluster.entity'
             group_ids = pd.Series(group_ids,
-                                  index=self.dependent.dataframe.index,
+                                  index=self.dependent.index,
                                   name=name)
             if clusters is not None:
                 clusters[name] = group_ids
@@ -402,7 +402,7 @@ class PooledOLS(object):
             group_ids = self.dependent.time_ids.squeeze()
             name = 'cov.cluster.time'
             group_ids = pd.Series(group_ids,
-                                  index=self.dependent.dataframe.index,
+                                  index=self.dependent.index,
                                   name=name)
             if clusters is not None:
                 clusters[name] = group_ids
@@ -481,7 +481,7 @@ class PooledOLS(object):
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresids=weps,
-                        resids=eps, index=self.dependent.dataframe.index))
+                        resids=eps, index=self.dependent.index))
 
         return PanelResults(res)
 
@@ -1034,7 +1034,7 @@ class FirstDifferenceOLS(PooledOLS):
             group_ids = self.dependent.entity_ids.squeeze()
             name = 'cov.cluster.entity'
             group_ids = pd.Series(group_ids,
-                                  index=self.dependent.dataframe.index,
+                                  index=self.dependent.index,
                                   name=name)
             if clusters is not None:
                 clusters[name] = group_ids
@@ -1046,7 +1046,7 @@ class FirstDifferenceOLS(PooledOLS):
                             major_axis=clusters.panel.major_axis[1:],
                             minor_axis=clusters.panel.minor_axis)
         clusters = PanelData(clusters).dataframe
-        clusters = clusters.loc[self.dependent.first_difference().dataframe.index]
+        clusters = clusters.loc[self.dependent.first_difference().index]
         clusters = clusters.astype(np.int64)
 
         cov_config_upd['clusters'] = clusters.values if clusters is not None else clusters
@@ -1105,7 +1105,7 @@ class FirstDifferenceOLS(PooledOLS):
                      major_axis=self.weights.panel.major_axis[1:],
                      minor_axis=self.weights.panel.minor_axis)
         w = w.swapaxes(1, 2).to_frame(filter_observations=False)
-        w = w.reindex(self.weights.dataframe.index).dropna(how='any')
+        w = w.reindex(self.weights.index).dropna(how='any')
         index = w.index
         w = w.values
 

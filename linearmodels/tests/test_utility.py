@@ -2,7 +2,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic, has_constant, inv_sqrth
+from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, WaldTestStatistic, has_constant, \
+    inv_sqrth
 
 
 def test_hasconstant():
@@ -45,6 +46,14 @@ def test_wald_statistic():
 
 def test_invalid_test_statistic():
     ts = InvalidTestStatistic('_REASON_', name='_NAME_')
+    assert str(hex(id(ts))) in ts.__repr__()
+    assert '_REASON_' in str(ts)
+    assert np.isnan(ts.pval)
+    assert ts.critical_values is None
+
+
+def test_inapplicable_test_statistic():
+    ts = InapplicableTestStatistic(reason='_REASON_', name='_NAME_')
     assert str(hex(id(ts))) in ts.__repr__()
     assert '_REASON_' in str(ts)
     assert np.isnan(ts.pval)

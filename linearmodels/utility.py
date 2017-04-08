@@ -167,13 +167,10 @@ class InvalidTestStatistic(WaldTestStatistic):
     WaldTestStatistic
     """
 
-    def __init__(self, reason, *, name=None, silent=True):
+    def __init__(self, reason, *, name=None):
         self._reason = reason
         super(InvalidTestStatistic, self).__init__(NaN, NaN, df=1, df_denom=1, name=name)
         self.dist_name = 'None'
-        if not silent:
-            import warnings
-            warnings.warn(reason, InvalidTestWarning)
 
     @property
     def pval(self):
@@ -187,6 +184,46 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __str__(self):
         msg = "Invalid test statistic\n{reason}\n{name}"
+        name = '' if self._name is None else self._name
+        return msg.format(name=name, reason=self._reason)
+
+
+class InapplicableTestStatistic(WaldTestStatistic):
+    """
+    Class returned if a requested test is not applicable for a specification
+
+    Parameters
+    ----------
+    reason : str
+        Explanation why test is invalid
+    name : str, optional
+        Name of test
+
+    See Also
+    --------
+    WaldTestStatistic
+    """
+
+    def __init__(self, *, reason=None, name=None):
+        self._reason = reason
+        if reason is None:
+            self._reason = 'Test is not applicable to model specification'
+
+        super(InapplicableTestStatistic, self).__init__(NaN, NaN, df=1, df_denom=1, name=name)
+        self.dist_name = 'None'
+
+    @property
+    def pval(self):
+        """Always returns NaN"""
+        return NaN
+
+    @property
+    def critical_values(self):
+        """Always returns None"""
+        return None
+
+    def __str__(self):
+        msg = "Irrelevant test statistic\n{reason}\n{name}"
         name = '' if self._name is None else self._name
         return msg.format(name=name, reason=self._reason)
 

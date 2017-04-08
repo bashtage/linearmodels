@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from numpy import ndarray
+from pandas import DataFrame, Panel
+from xarray import DataArray
+
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
 
 
@@ -35,7 +39,7 @@ class PanelData(object):
         Flat indicating whether pandas categoricals or string input data
         should be converted to dummy variables
     drop_first : bool, optional
-        Flag indicating to drop first dummy category
+        Flag indicating to drop first dummy category when converting
 
     Notes
     -----
@@ -47,13 +51,14 @@ class PanelData(object):
 
     All 3-d inputs should be in the form (nvar, nobs, nentity). With one
     exception, 2-d inputs are treated as (nobs, nentity) so that the input
-    can be treated as being (1, nobs, nentity).
+    can be treated as-if being (1, nobs, nentity).
 
-    If the 2-d input is a pandas DataFrame and has a MultiIndex then it is
-    treated differently.  Index level 0 is assumed ot be entity.  Index level
-    1 is time.  The columns are the variables.  This is the most precise format
-    to use since pandas Panels do not preserve all variable type information
-    across transformations between Panel and MultiIndex DataFrame.
+    If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
+    input is treated differently.  Index level 0 is assumed ot be entity.  
+    Index level 1 is time.  The columns are the variables.  This is the most 
+    precise format to use since pandas Panels do not preserve all variable 
+    type information across transformations between Panel and MultiIndex 
+    DataFrame.
 
     Raises
     ------
@@ -72,23 +77,23 @@ class PanelData(object):
             x = x.dataframe
         self._original = x
 
-        if isinstance(x, xr.DataArray):
+        if isinstance(x, DataArray):
             if x.ndim not in (2, 3):
                 raise ValueError('Only 2-d or 3-d DataArrays are supported')
             x = x.to_pandas()
 
-        if isinstance(x, (pd.Panel, pd.DataFrame)):
-            if isinstance(x, pd.DataFrame):
+        if isinstance(x, (Panel, DataFrame)):
+            if isinstance(x, DataFrame):
                 if isinstance(x.index, pd.MultiIndex):
                     if len(x.index.levels) != 2:
                         raise ValueError('DataFrame input must have a '
                                          'MultiIndex with 2 levels')
                     self._frame = x
                 else:
-                    self._frame = pd.DataFrame({var_name: x.T.stack(dropna=False)})
+                    self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
             else:
                 self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
-        elif isinstance(x, np.ndarray):
+        elif isinstance(x, ndarray):
             if not 2 <= x.ndim <= 3:
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:
@@ -99,7 +104,7 @@ class PanelData(object):
             entities = ['entity.{0}'.format(i) for i in range(n)]
             time = list(range(t))
             x = x.astype(np.float64)
-            panel = pd.Panel(x, items=variables, major_axis=time,
+            panel = Panel(x, items=variables, major_axis=time,
                              minor_axis=entities)
             self._frame = panel.swapaxes(1, 2).to_frame(filter_observations=False)
         else:
@@ -115,56 +120,75 @@ class PanelData(object):
 
     @property
     def panel(self):
+        """pandas Panel view of data"""
         return self._frame.to_panel().swapaxes(1, 2)
 
     @property
     def dataframe(self):
+        """pandas DataFrame view of data"""
         return self._frame
 
     @property
     def values2d(self):
+        """NumPy ndarray view of dataframe"""
         return self._frame.values
 
     @property
     def values3d(self):
+        """NumPy ndarray view of panel"""
         return self.panel.values
 
     def drop(self, locs):
+        """
+        Parameters
+        ----------
+        locs : array
+            Booleam array indicating observations to drop with reference to 
+            the dataframe view of the data
+        """
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
         self._k, self._t, self._n = self.shape
 
     @property
     def shape(self):
+        """Shape of panel view of data"""
         return self.panel.shape
 
     @property
     def isnull(self):
+        """Locations with missing observations"""
         return np.any(self._frame.isnull(), axis=1)
 
     @property
     def nobs(self):
+        """Number of time observations"""
         return self._t
 
     @property
     def nvar(self):
+        """Number of variables"""
         return self._k
 
     @property
     def nentity(self):
+        """Number of entities"""
         return self._n
 
     @property
     def vars(self):
+        """List of variable names"""
         return list(self._frame.columns)
 
     @property
     def time(self):
+        """List of time index names"""
         index = self._frame.index
         return list(index.levels[1][index.labels[1]].unique())
 
     @property
     def entities(self):
+        """List of entity index names"""
         index = self._frame.index
         return list(index.levels[0][index.labels[0]].unique())
 
@@ -195,6 +219,11 @@ class PanelData(object):
     def _demean_both(self, weights):
         """
         Entity and time demean
+        
+        Parameters
+        ----------
+        weights : PanelData, optional
+             Weights to use in demeaning
         """
         if self.nentity > self.nobs:
             group = 'entity'
@@ -204,12 +233,12 @@ class PanelData(object):
             dummy = 'entity'
         e = self.demean(group, weights=weights)
         d = self.dummies(dummy, drop_first=True)
-        d.index = e.dataframe.index
+        d.index = e.index
         d = PanelData(d).demean(group, weights=weights)
         d = d.values2d
         e = e.values2d
         resid = e - d @ np.linalg.lstsq(d, e)[0]
-        resid = pd.DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
+        resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 
         return PanelData(resid)
 
@@ -256,7 +285,7 @@ class PanelData(object):
             mu /= np.nansum(w, axis=axis)
             mu = np.expand_dims(mu, axis=axis)
             delta = rootwv - root_w * mu
-        out = pd.Panel(delta,
+        out = Panel(delta,
                        items=self.panel.items,
                        major_axis=self.panel.major_axis,
                        minor_axis=self.panel.minor_axis)
@@ -269,6 +298,9 @@ class PanelData(object):
 
     def __repr__(self):
         return self.__str__() + '\n' + self.__class__.__name__ + ' object, id: ' + hex(id(self))
+
+    def _repr_html_(self):
+        return self.__class__.__name__ + '<br/>' + self._frame._repr_html_()
 
     def count(self, group='entity'):
         """
@@ -289,7 +321,7 @@ class PanelData(object):
         count = np.sum(np.isfinite(v), axis=axis)
 
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
-        out = pd.DataFrame(count.T, index=index, columns=self.vars)
+        out = DataFrame(count.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
         out = out.loc[reindex].astype(np.int64)
         return out
@@ -332,7 +364,7 @@ class PanelData(object):
             mu /= np.nansum(w, axis=axis)
 
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
-        out = pd.DataFrame(mu.T, index=index, columns=self.vars)
+        out = DataFrame(mu.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
         out = out.loc[reindex]
         return out
@@ -348,7 +380,7 @@ class PanelData(object):
         """
         diffs = self.panel.values
         diffs = diffs[:, 1:] - diffs[:, :-1]
-        diffs = pd.Panel(diffs, items=self.panel.items,
+        diffs = Panel(diffs, items=self.panel.items,
                          major_axis=self.panel.major_axis[1:],
                          minor_axis=self.panel.minor_axis)
         diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
