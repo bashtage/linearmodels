@@ -55,7 +55,10 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t, 1))
     w = np.random.chisquare(5, (t, n)) / 5
     c = None
-    cats = ['cat.' + str(i) for i in range(other_effects)]
+    if other_effects == 1:
+        cats = ['Industries']
+    else:
+        cats = ['cat.' + str(i) for i in range(other_effects)]
     if other_effects:
         c = np.random.randint(0, 4, (other_effects, t, n))
 
