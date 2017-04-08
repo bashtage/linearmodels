@@ -4,12 +4,11 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, \
-    ClusteredCovariance
+from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelResults
-from linearmodels.utility import AttrDict, InvalidTestStatistic, MissingValueWarning, \
-    WaldTestStatistic, has_constant, InapplicableTestStatistic, missing_value_warning_msg
+from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, MissingValueWarning, \
+    WaldTestStatistic, has_constant, missing_value_warning_msg
 
 
 class CovarianceManager(object):
@@ -57,7 +56,8 @@ class AmbiguityError(Exception):
 # TODO: Formal test of other outputs
 # TODO: Test Pooled F-stat
 # TODO: Add fast path for no-constant, entity or time effect <- Depends on whether it is easy to compute FE
-# TODO: Test alternative acceptable cluster formats
+
+
 
 
 class PooledOLS(object):
@@ -71,9 +71,9 @@ class PooledOLS(object):
     exog : array-like
         Exogenous or right-hand-side variables (variable by time by entity).
     weights : array-like, optional
-        Weights to use in estimation.  Assumes residual variance is 
-        proportional to inverse of weight to that the residual time 
-        the weight should be homoskedastic. 
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
 
     Notes
     -----
@@ -443,14 +443,14 @@ class PooledOLS(object):
         Three covariance estimators are supported:
 
           * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using 
+          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
             White's estimator
           * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.  
-              Clusters should be integer values, although other types will 
+            * ``clusters`` - Input containing containing 1 or 2 variables.
+              Clusters should be integer values, although other types will
               be coerced to integer values by treating as categorical variables
-            * ``cluster_entity`` - Boolean flag indicating to use entity 
+            * ``cluster_entity`` - Boolean flag indicating to use entity
               clusters
             * ``cluster_time`` - Boolean indicating to use time clusters
         """
@@ -491,13 +491,13 @@ class PanelOLS(PooledOLS):
     Parameters
     ----------
     dependent : array-like
-        Dependent (left-hand-side) variable (time by entity)
+        Dependent (left-hand-side) variable (time by entity).
     exog : array-like
         Exogenous or right-hand-side variables (variable by time by entity).
     weights : array-like, optional
-        Weights to use in estimation.  Assumes residual variance is 
-        proportional to inverse of weight to that the residual time 
-        the weight should be homoskedastic. 
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
     entity_effect : bool, optional
         Flag whether to include entity (fixed) effects in the model
     time_effect : bool, optional
@@ -508,16 +508,33 @@ class PanelOLS(PooledOLS):
 
     Notes
     -----
-    The model is given by
+    Many models can be estimated. The most common included entity effects and
+    can be described
 
     .. math::
 
-        y_{it}=\alpha_i + \gamma_t +\beta^{\prime}x_{it}+\epsilon_{it}
+        y_{it} = \alpha_i + \beta^{\prime}x_{it} + \epsilon_{it}
 
-    where :math:`\alpha_i` is omitted if ``entity_effect`` is ``False`` and
-    :math:`\gamma_i` is omitted if ``time_effect`` is ``False``. If both ``entity_effect``  and
-    ``time_effect`` are ``False``, the model reduces to :class:`PooledOLS`. If ``other_effects``
-    is provided, then additional terms are present to reflect these effects.
+    where :math:`\alpha_i` is included if ``entity_effect`` is ``True.
+
+    Time effect are also supported, which leads to a model of the form
+
+    .. math::
+
+        y_{it}= \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}
+
+    where :math:`\gamma_i` is included if ``time_effect`` is ``True``.
+
+    Both effects can be simultaneously used,
+
+    .. math::
+
+        y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}
+
+    Additionally , arbitrary effects can be specified using categorical variables.
+
+    If both ``entity_effect``  and``time_effect`` are ``False``, and no other
+    effects are included, the model reduces to :class:`PooledOLS`.
 
     Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
     2 other.
@@ -576,29 +593,29 @@ class PanelOLS(PooledOLS):
     def from_formula(cls, formula, data, *, weights=None):
         """
         Create a model from a formula
-        
+
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules 
-            with two special variable names, EntityEffect and TimeEffect 
+            Formula to transform into model. Conforms to patsy formula rules
+            with two special variable names, EntityEffect and TimeEffect
             which can be used to specify that the model should contain an
             entity effect or a time effect, respectively. See Examples.
         data : array-like
-            Data structure that can be coerced into a PanelData.  In most 
-            cases, this should be a multi-index DataFrame where the level 0 
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
             weights : array-like, optional
         weights: array-like
-            Weights to use in estimation.  Assumes residual variance is 
-            proportional to inverse of weight to that the residual time 
-            the weight should be homoskedastic. 
-        
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual time
+            the weight should be homoskedastic.
+
         Returns
         -------
         model : PanelOLS
             Model specified using the formula
-        
+
         Examples
         --------
         >>> from linearmodels import PanelOLS
@@ -634,7 +651,7 @@ class PanelOLS(PooledOLS):
         return mod
 
     def _slow_path(self):
-        """Frisch-Waigh-Lovell Implemtation, mostly for weighted"""
+        """Frisch-Waigh-Lovell implementation, mostly for weighted"""
         has_effect = self.entity_effect or self.time_effect or self.other_effect
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -739,7 +756,7 @@ class PanelOLS(PooledOLS):
     def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
         """
         Estimate model parameters
-        
+
         Parameters
         ----------
         cov_type : str, optional
@@ -749,31 +766,31 @@ class PanelOLS(PooledOLS):
             a degree of freedom adjustment.
         **cov_config
             Additional covariance-specific options.  See Notes.
-        
+
         Returns
         -------
         results :  PanelResults
             Estimation results
-        
+
         Examples
         --------
         >>> from linearmodels import PanelOLS
         >>> mod = PanelOLS(y, x)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
-        
+
         Notes
         -----
         Three covariance estimators are supported:
-        
+
           * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using 
+          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
             White's estimator
           * 'clustered` - One or two way clustering.  Configuration options are:
-          
-            * ``clusters`` - Input containing containing 1 or 2 variables.  
-              Clusters should be integer values, although other types will 
+
+            * ``clusters`` - Input containing containing 1 or 2 variables.
+              Clusters should be integer values, although other types will
               be coerced to integer values by treating as categorical variables
-            * ``cluster_entity`` - Boolean flag indicating to use entity 
+            * ``cluster_entity`` - Boolean flag indicating to use entity
               clusters
             * ``cluster_time`` - Boolean indicating to use time clusters
         """
@@ -861,9 +878,9 @@ class BetweenOLS(PooledOLS):
     exog : array-like
         Exogenous or right-hand-side variables (variable by time by entity).
     weights : array-like, optional
-        Weights to use in estimation.  Assumes residual variance is 
-        proportional to inverse of weight to that the residual time 
-        the weight should be homoskedastic. 
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
 
     Notes
     -----
@@ -935,16 +952,16 @@ class BetweenOLS(PooledOLS):
         Three covariance estimators are supported:
 
           * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using 
+          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
             White's estimator
           * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.  
-              Clusters should be integer values, although other types will 
+            * ``clusters`` - Input containing containing 1 or 2 variables.
+              Clusters should be integer values, although other types will
               be coerced to integer values by treating as categorical variables
-        
-        When using a clustered covariance estimator, all cluster ids must be 
-        identical within an entity.  
+
+        When using a clustered covariance estimator, all cluster ids must be
+        identical within an entity.
         """
 
         y, x, w = self._prepare_between()
@@ -993,9 +1010,9 @@ class FirstDifferenceOLS(PooledOLS):
     exog : array-like
         Exogenous or right-hand-side variables (variable by time by entity).
     weights : array-like, optional
-        Weights to use in estimation.  Assumes residual variance is 
-        proportional to inverse of weight to that the residual time 
-        the weight should be homoskedastic. 
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
 
     Notes
     -----
@@ -1083,15 +1100,17 @@ class FirstDifferenceOLS(PooledOLS):
         Three covariance estimators are supported:
 
           * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using 
+          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
             White's estimator
           * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.  
-              Clusters should be integer values, although other types will 
+            * ``clusters`` - Input containing containing 1 or 2 variables.
+              Clusters should be integer values, although other types will
               be coerced to integer values by treating as categorical variables
+            * ``cluster_entity`` - Boolean flag indicating to use entity
+              clusters
 
-        When using a clustered covariance estimator, all cluster ids must be 
+        When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
         """

@@ -138,7 +138,7 @@ class PanelResults(_SummaryStr):
         -------
         rsquared : float
             Between coefficient of determination
-            
+
         Notes
         -----
         The between rsquared measures the fit of the time-averaged dependent 
