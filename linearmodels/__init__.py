@@ -8,6 +8,5 @@ __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
 __version__ = get_versions()['version']
 del get_versions
 
-# TODO: Remove one-way covariance estimators
 # TODO: Finish documentation for IV estimators
 # TODO: Finish examples for IV estimators
