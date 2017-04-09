@@ -391,6 +391,19 @@ def test_roundtrip_multiindex(panel):
     assert_frame_equal(mi, panel.dataframe)
 
 
+def test_series_multiindex(panel):
+    mi = panel.swapaxes(1, 2).to_frame(filter_observations=False)
+    from_df = PanelData(mi.iloc[:, [0]])
+    from_series = PanelData(mi.iloc[:, 0])
+    assert_frame_equal(from_df.dataframe, from_series.dataframe)
+
+
+def test_invalid_seires(panel):
+    si = panel.to_frame().reset_index()
+    with pytest.raises(ValueError):
+        PanelData(si.iloc[:, 0])
+
+
 def test_demean_missing_alt_types(data):
     xpd = PanelData(data.x)
     xpd.drop(xpd.isnull)

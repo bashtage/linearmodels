@@ -229,7 +229,7 @@ class PanelResults(_SummaryStr):
     @property
     def summary(self):
         """Summary table of model estimation results"""
-        # TODO: Report optional effects
+        # TODO: Report on include effects, if any
 
         title = self.name + ' Estimation Summary'
         mod = self.model

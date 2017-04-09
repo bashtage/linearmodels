@@ -5,4 +5,5 @@ Panel Data Model Estimation
    :maxdepth: 1
    :glob:
 
+   examples/data-formats.ipynb
    reference

@@ -3,7 +3,7 @@ import pandas as pd
 import xarray as xr
 
 from numpy import ndarray
-from pandas import DataFrame, Panel
+from pandas import Series, DataFrame, Panel
 from xarray import DataArray
 
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
@@ -30,8 +30,8 @@ class PanelData(object):
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, DataArray}
-       Input data, either 2 or 3 dimensional
+    x : {ndarray, Series, DataFrame, Panel, DataArray}
+       Input data
     var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
@@ -58,7 +58,8 @@ class PanelData(object):
     Index level 1 is time.  The columns are the variables.  This is the most 
     precise format to use since pandas Panels do not preserve all variable 
     type information across transformations between Panel and MultiIndex 
-    DataFrame.
+    DataFrame. MultiIndex Series are also accepted and treated as single
+    column MultiIndex DataFrames.
 
     Raises
     ------
@@ -81,6 +82,11 @@ class PanelData(object):
             if x.ndim not in (2, 3):
                 raise ValueError('Only 2-d or 3-d DataArrays are supported')
             x = x.to_pandas()
+
+        if isinstance(x, Series) and isinstance(x.index, pd.MultiIndex):
+            x = DataFrame(x)
+        elif isinstance(x, Series):
+            raise ValueError('Series can only be used with a 2-level MultiIndex')
 
         if isinstance(x, (Panel, DataFrame)):
             if isinstance(x, DataFrame):
