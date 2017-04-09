@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
-
 from numpy import ndarray
-from pandas import Series, DataFrame, Panel
+from pandas import DataFrame, Panel, Series
 from xarray import DataArray
 
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
@@ -72,8 +70,8 @@ class PanelData(object):
 
     def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
         self._var_name = var_name
-        self._convert_dummies=convert_dummies
-        self._drop_first=drop_first
+        self._convert_dummies = convert_dummies
+        self._drop_first = drop_first
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
@@ -111,7 +109,7 @@ class PanelData(object):
             time = list(range(t))
             x = x.astype(np.float64)
             panel = Panel(x, items=variables, major_axis=time,
-                             minor_axis=entities)
+                          minor_axis=entities)
             self._frame = panel.swapaxes(1, 2).to_frame(filter_observations=False)
         else:
             raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
@@ -292,9 +290,9 @@ class PanelData(object):
             mu = np.expand_dims(mu, axis=axis)
             delta = rootwv - root_w * mu
         out = Panel(delta,
-                       items=self.panel.items,
-                       major_axis=self.panel.major_axis,
-                       minor_axis=self.panel.minor_axis)
+                    items=self.panel.items,
+                    major_axis=self.panel.major_axis,
+                    minor_axis=self.panel.minor_axis)
         out = out.swapaxes(1, 2).to_frame(filter_observations=False)
         out = out.loc[self._frame.index]
         return PanelData(out)
@@ -387,8 +385,8 @@ class PanelData(object):
         diffs = self.panel.values
         diffs = diffs[:, 1:] - diffs[:, :-1]
         diffs = Panel(diffs, items=self.panel.items,
-                         major_axis=self.panel.major_axis[1:],
-                         minor_axis=self.panel.minor_axis)
+                      major_axis=self.panel.major_axis[1:],
+                      minor_axis=self.panel.minor_axis)
         diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
         diffs = diffs.reindex(self._frame.index).dropna(how='any')
         return PanelData(diffs)
@@ -396,9 +394,15 @@ class PanelData(object):
     @staticmethod
     def _minimize_multiindex(df):
         index_cols = list(df.index.names)
-        # TODO: Must check names for existence before resetting and restoring
+        orig_names = index_cols[:]
+        for i, col in enumerate(index_cols):
+            while col in df:
+                col = '_' + col
+            index_cols[i] = col
+        df.index.names = index_cols
         df = df.reset_index()
         df = df.set_index(index_cols)
+        df.index.names = orig_names
         return df
 
     def dummies(self, group='entity', drop_first=False):
