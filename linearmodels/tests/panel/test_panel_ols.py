@@ -757,6 +757,7 @@ def test_results_access(data):
             if callable(val):
                 val()
 
+
 def test_alt_rsquared(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     res = mod.fit()
@@ -810,3 +811,49 @@ def test_cluster_smoke(data):
     with pytest.raises(ValueError):
         clusters = c1.panel.iloc[:, :, :c1.panel.shape[2] // 2]
         mod.fit(cov_type='clustered', clusters=clusters)
+
+
+def test_f_pooled(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    res = mod.fit()
+
+    mod2 = PooledOLS(data.y, data.x)
+    res2 = mod2.fit()
+
+    eps = res.resids.values
+    eps2 = res2.resids.values
+    v1 = res.df_model - res2.df_model
+    v2 = res.df_resid
+    f_pool = (eps2.T @ eps2 - eps.T @ eps) / v1
+    f_pool /= ((eps.T @ eps) / v2)
+    f_pool = float(f_pool)
+    assert_allclose(res.f_pooled.stat, f_pool)
+    assert res.f_pooled.df == v1
+    assert res.f_pooled.df_denom == v2
+
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res = mod.fit()
+    eps = res.resids.values
+    eps2 = res2.resids.values
+    v1 = res.df_model - res2.df_model
+    v2 = res.df_resid
+    f_pool = (eps2.T @ eps2 - eps.T @ eps) / v1
+    f_pool /= ((eps.T @ eps) / v2)
+    f_pool = float(f_pool)
+    assert_allclose(res.f_pooled.stat, f_pool)
+    assert res.f_pooled.df == v1
+    assert res.f_pooled.df_denom == v2
+
+
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    res = mod.fit()
+    eps = res.resids.values
+    eps2 = res2.resids.values
+    v1 = res.df_model - res2.df_model
+    v2 = res.df_resid
+    f_pool = (eps2.T @ eps2 - eps.T @ eps) / v1
+    f_pool /= ((eps.T @ eps) / v2)
+    f_pool = float(f_pool)
+    assert_allclose(res.f_pooled.stat, f_pool)
+    assert res.f_pooled.df == v1
+    assert res.f_pooled.df_denom == v2
