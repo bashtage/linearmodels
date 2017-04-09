@@ -2,8 +2,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, WaldTestStatistic, has_constant, \
-    inv_sqrth
+from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, WaldTestStatistic, cached_property, \
+    has_constant, inv_sqrth
 
 
 def test_hasconstant():
@@ -59,6 +59,9 @@ def test_inapplicable_test_statistic():
     assert np.isnan(ts.pval)
     assert ts.critical_values is None
 
+    ts = InapplicableTestStatistic()
+    assert 'not applicable' in str(ts)
+
 
 def test_inv_sqrth():
     x = np.random.randn(1000, 10)
@@ -66,3 +69,29 @@ def test_inv_sqrth():
     invsq = inv_sqrth(xpx)
     prod = invsq @ xpx @ invsq - np.eye(10)
     assert_allclose(1 + prod, np.ones((10, 10)))
+
+
+def test_cached_property():
+    class A(object):
+        def __init__(self):
+            self.a_count = 0
+
+        @cached_property
+        def a(self):
+            print('a called')
+            self.a_count += 1
+            return 'a'
+
+    o = A()
+    o.__getattribute__('a')
+    assert o.a == 'a'
+    assert o.a_count == 1
+    assert o.a == 'a'
+    assert o.a_count == 1
+    delattr(o, 'a')
+    assert o.a == 'a'
+    assert o.a_count == 2
+
+    # To improve coverage
+    cp = cached_property(lambda x: x)
+    cp.__get__(cp, None)
