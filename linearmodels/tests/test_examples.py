@@ -9,7 +9,7 @@ try:
     import jupyter_client
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
-except ImportError:
+except ImportError:  # pragma: no cover
     pytest.mark.skip(reason='Required packages not available')
 
 kernels = jupyter_client.kernelspec.find_kernel_specs()
@@ -21,7 +21,7 @@ print(NOTEBOOK_DIR)
 
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, '*.ipynb')))
 ids = list(map(lambda s: os.path.split(s)[-1].split('.')[0], nbs))
-if not nbs:
+if not nbs:  # pragma: no cover
     pytest.mark.skip(reason='No notebooks found so not tests run')
 
 
