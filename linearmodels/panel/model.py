@@ -833,7 +833,7 @@ class PanelOLS(PooledOLS):
             _x = self.exog.values2d
             eps = (_y - y_effects) - (_x - x_effects) @ params
             if self.has_constant:
-                # TODO: Understand source for this correction
+                # Correction since y_effecs and x_effects @ params add mean
                 w = self.weights.values2d
                 eps -= (w * eps).sum() / w.sum()
         resid_ss = float(weps.T @ weps)
