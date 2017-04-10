@@ -202,9 +202,9 @@ class PanelResults(_SummaryStr):
     @property
     def included_effects(self):
         """List of effects included in the model"""
-        entity_effect = getattr(self.model, 'entity_effect')
-        time_effect = getattr(self.model, 'time_effect')
-        other_effect = getattr(self.model, 'other_effect')
+        entity_effect = getattr(self.model, 'entity_effect', False)
+        time_effect = getattr(self.model, 'time_effect', False)
+        other_effect = getattr(self.model, 'other_effect', False)
         if entity_effect or time_effect or other_effect:
             effects = []
             if entity_effect:
