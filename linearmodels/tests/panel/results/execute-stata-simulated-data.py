@@ -11,11 +11,20 @@ dtafile = join(os.getcwd(), 'simulated-panel.dta')
 # datasets, (nothing), _light, _heavy
 # vce options -> conventional (be, fe), robust(fe, *regress*), ols(*regress*)
 
-configs = {'xtreg {vars}, be vce(conventional)': 'between-conventional',
-           'xtreg {vars}, fe vce(conventional)': 'fixed_effect-conventional',
-           'xtreg {vars}, fe vce(robust)': 'fixed_effect-robust',
-           'regress {vars}, vce(ols)': 'pooled-unadjusted',
-           'regress {vars}, vce(robust)': 'pooled-robust', }
+configs = {'xtreg {vars}, be vce(conventional)': 'between-conventional-',
+           'xtreg {vars}, be wls vce(conventional)': 'between-conventional-wls',
+           'xtreg {vars}, fe vce(conventional)': 'fixed_effect-conventional-',
+           'xtreg {vars}, fe vce(robust)': 'fixed_effect-robust-',
+           'xtreg {vars}, fe vce(cluster firm_id)': 'fixed_effect-cluster-',
+           'xtreg {vars} [aweight=w], fe vce(conventional)': 'fixed_effect-conventional-weighted',
+           'xtreg {vars} [aweight=w], fe vce(robust)': 'fixed_effect-robust-weighted',
+           'xtreg {vars} [aweight=w], fe vce(cluster firm_id)': 'fixed_effect-cluster-weighted',
+           'regress {vars}, vce(ols)': 'pooled-conventional-',
+           'regress {vars}, vce(robust)': 'pooled-robust-',
+           'regress {vars}, vce(cluster firm_id)': 'pooled-cluster-',
+           'regress {vars} [aweight=w], vce(ols)': 'pooled-conventional-weighted',
+           'regress {vars} [aweight=w], vce(robust)': 'pooled-robust-weighted',
+           'regress {vars} [aweight=w], vce(cluster firm_id)': 'pooled-cluster-weighted'}
 
 start = """
 use {dtafile}, clear \n
@@ -27,7 +36,7 @@ endings = ['', '_light', '_heavy']
 vars = ['y', 'x1', 'x2', 'x3', 'x4', 'x5']
 
 results = """
-estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
+estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) """
 
 results += """stats(rss df_m df_r r2 rmse mss r2_a ll ll_0 tss N df_b r2_w df_a F F_f Tbar g_min rho sigma sigma_e r2_b r2_o corr sigma_u N_g g_max g_avg, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
