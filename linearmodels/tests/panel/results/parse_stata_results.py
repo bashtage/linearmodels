@@ -37,12 +37,13 @@ def parse_block(block):
             stats_start = i
         if '** Variance **' in line:
             variance_start = i + 1
-
-    for i in range(params_start, stats_start, 2):
+    
+    for i in range(params_start, stats_start, 3):
         name, value = block[i].split('\t')
         value = float(value)
         tstat = float(block[i + 1])
-        params[name] = pd.Series({'param': value, 'tstat': tstat})
+        pvalue = float(block[i + 1])
+        params[name] = pd.Series({'param': value, 'tstat': tstat, 'pvalue': pvalue})
     params = pd.DataFrame(params).sort_index()
     for i in range(stats_start, variance_start - 1):
         if '\t' in block[i]:
@@ -59,7 +60,7 @@ def parse_block(block):
     out = AttrDict(variance=variance, params=params.T)
     for key in stats.index:
         out[key] = stats.loc[key]
-
+    
     return out
 
 

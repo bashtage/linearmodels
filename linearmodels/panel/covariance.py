@@ -215,8 +215,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._name = 'Clustered'
 
     def _calc_group_debias(self, clusters):
-        ngroups = len(np.unique(clusters))
-        return ngroups / (ngroups - 1)
+        n = clusters.shape[0]
+        ngroups = np.unique(clusters).shape[0]
+        return (ngroups / (ngroups - 1)) * ((n-1) / n)
 
     @cached_property
     def cov(self):

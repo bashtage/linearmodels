@@ -963,7 +963,7 @@ class BetweenOLS(PooledOLS):
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
         """
-
+        # TODO: What to do for R2_between when reweighted=True?
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(w)
