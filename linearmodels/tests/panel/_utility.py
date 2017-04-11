@@ -45,8 +45,11 @@ def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
     return params[:nvar]
 
 
-def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0):
-    np.random.seed(12345)
+def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0, rng=None):
+    if rng is None:
+        np.random.seed(12345)
+    else:
+        np.random.set_state(rng.get_state())
 
     n, t, k = ntk
     k += const
@@ -93,6 +96,9 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
         c = xr.DataArray(c)
         vc1 = xr.DataArray(vc1)
         vc2 = xr.DataArray(vc2)
+    
+    if rng is not None:
+        rng.set_state(np.random.get_state())
 
     return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 

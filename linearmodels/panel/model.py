@@ -56,6 +56,7 @@ class AmbiguityError(Exception):
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
 # TODO: Add fast path for no-constant, entity or time effect
+# TODO: Correct handling of entity df adjustment in PanelOLS w/ clustered
 
 class PooledOLS(object):
     r"""
