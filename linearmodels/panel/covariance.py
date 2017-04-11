@@ -21,7 +21,8 @@ class HomoskedasticCovariance(object):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects
+        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        adjusted for extra_df irrespective of the setting of debiased
 
     Notes
     -----
@@ -52,9 +53,9 @@ class HomoskedasticCovariance(object):
         self._debiased = debiased
         self._extra_df = extra_df
         self._nobs, self._nvar = x.shape
-        self._nobs_eff = self._nobs
+        self._nobs_eff = self._nobs - extra_df
         if debiased:
-            self._nobs_eff -= (self._nvar + extra_df)
+            self._nobs_eff -= self._nvar
         self._scale = self._nobs / self._nobs_eff
         self._name = 'Unadjusted'
 
@@ -97,7 +98,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects
+        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        adjusted for extra_df irrespective of the setting of debiased
 
     Notes
     -----
@@ -159,7 +161,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects
+        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        adjusted for extra_df irrespective of the setting of debiased
     cluster : ndarray, optional
         nobs by 1 or nobs by 2 array of cluster group ids
     group_debias : bool, optional
@@ -200,7 +203,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(self, y, x, params, *, debiased=False, extra_df=0, clusters=None,
                  group_debias=False):
-        super(ClusteredCovariance, self).__init__(y, x, params, debiased=debiased, extra_df=extra_df)
+        super(ClusteredCovariance, self).__init__(y, x, params,
+                                                  debiased=debiased,
+                                                  extra_df=extra_df)
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         clusters = np.asarray(clusters).squeeze()

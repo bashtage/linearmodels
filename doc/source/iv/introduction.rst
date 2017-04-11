@@ -129,9 +129,9 @@ GMM and GMM-CUE Estimation
     :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`.
   * 'kernel' - Allows for both heteroskedasticity and autocorrrelation in the
     moment conditions. See :class:`~linearmodels.iv.gmm.KernelWeightMatrix`.
-  * 'cluster' - Allows for a one-way cluster structure where moment conditions
-    within a cluster are correlated.
-    See :class:`~linearmodels.iv.gmm.OneWayClusteredWeightMatrix`.
+  * 'cluster' - Allows for a one- and two-way cluster structure where moment
+    conditions within a cluster are correlated.
+    See :class:`~linearmodels.iv.gmm.ClusteredWeightMatrix`.
 
   Each weight type accepts a set of additional parameters which are similar to
   those for the corresponding covariance estimator.

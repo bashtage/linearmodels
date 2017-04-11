@@ -37,7 +37,7 @@ def parse_block(block):
             stats_start = i
         if '** Variance **' in line:
             variance_start = i + 1
-    
+
     for i in range(params_start, stats_start, 3):
         name, value = block[i].split('\t')
         value = float(value)
@@ -60,7 +60,7 @@ def parse_block(block):
     out = AttrDict(variance=variance, params=params.T)
     for key in stats.index:
         out[key] = stats.loc[key]
-    
+
     return out
 
 

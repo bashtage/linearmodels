@@ -12,9 +12,9 @@ from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format
 
 class PanelResults(_SummaryStr):
     """
-    Results container for panel data models
+    Results container for panel data models that do not include effects
     """
-    
+
     def __init__(self, res):
         self._params = res.params.squeeze()
         self._deferred_cov = res.deferred_cov
@@ -33,7 +33,6 @@ class PanelResults(_SummaryStr):
         self._s2 = res.s2
         self._entity_info = res.entity_info
         self._time_info = res.time_info
-        self._other_info = res.other_info
         self.model = res.model
         self._cov_type = res.cov_type
         self._datetime = dt.datetime.now()
@@ -41,31 +40,31 @@ class PanelResults(_SummaryStr):
         self._wresids = res.wresids
         self._index = res.index
         self._deferred_f = res.deferred_f
-        self._f_pooled = res.f_pooled
         self._f_stat = res.f_stat
-    
+        self._loglik = res.loglik
+
     @property
     def params(self):
         """Estimated parameters"""
         return Series(self._params, index=self._var_names, name='parameter')
-    
+
     @cached_property
     def cov(self):
         """Estimated covariance of parameters"""
         return DataFrame(self._deferred_cov(),
                          columns=self._var_names,
                          index=self._var_names)
-    
+
     @property
     def std_errors(self):
         """Estimated parameter standard errors"""
         return Series(sqrt(diag(self.cov)), self._var_names, name='std_error')
-    
+
     @property
     def tstats(self):
         """Parameter t-statistics"""
         return Series(self._params / self.std_errors, name='tstat')
-    
+
     @cached_property
     def pvalues(self):
         """
@@ -77,63 +76,63 @@ class PanelResults(_SummaryStr):
         else:
             pv = 2 * (1 - stats.norm.cdf(abs_tstats))
         return Series(pv, index=self._var_names, name='pvalue')
-    
+
     @property
     def df_resid(self):
         """
-        Residual degree of freedom 
-        
+        Residual degree of freedom
+
         Notes
         -----
         Defined as nobs minus nvar minus the number of included effects, if any.
         """
         return self._df_resid
-    
+
     @property
     def df_model(self):
         """
         Model degree of freedom
-        
+
         Notes
         -----
         Defined as nvar plus the number of included effects, if any.
         """
         return self._df_model
-    
+
     @property
     def nobs(self):
         """Number of observations used to estimate the model"""
         return self._nobs
-    
+
     @property
     def name(self):
         """Model name"""
         return self._name
-    
+
     @property
     def total_ss(self):
         """Total sum of squares"""
         return self._total_ss
-    
+
     @property
     def model_ss(self):
         """Residual sum of squares"""
         return self._total_ss - self._residual_ss
-    
+
     @property
     def resid_ss(self):
         """Residual sum of squares"""
         return self._residual_ss
-    
+
     @property
     def rsquared(self):
         """Model Coefficient of determination"""
         return self._r2
-    
+
     @property
     def rsquared_between(self):
         """Between Coefficient of determination
-        
+
         Returns
         -------
         rsquared : float
@@ -141,11 +140,11 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        The between rsquared measures the fit of the time-averaged dependent 
-        variable on the time averaged dependent variables.  
+        The between rsquared measures the fit of the time-averaged dependent
+        variable on the time averaged dependent variables.
         """
         return self._r2b
-    
+
     @property
     def rsquared_within(self):
         """Within coefficient of determination
@@ -161,7 +160,7 @@ class PanelResults(_SummaryStr):
         effects on the exogenous purged of entity effects.
         """
         return self._r2w
-    
+
     @property
     def rsquared_overall(self):
         """Overall coefficient of determination
@@ -173,53 +172,27 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        The overall rsquared measures the fit of the dependent 
-        variable on the dependent variables ignoring any included effects.  
+        The overall rsquared measures the fit of the dependent
+        variable on the dependent variables ignoring any included effects.
         """
-        
+
         return self._r2o
-    
+
     @property
     def s2(self):
         """Residual variance estimator"""
         return self._s2
-    
+
     @property
     def entity_info(self):
         """Statistics on observations per entity"""
         return self._entity_info
-    
-    @property
-    def other_info(self):
-        """Statistics on observations per group for other effects"""
-        return self._other_info
-    
+
     @property
     def time_info(self):
         """Statistics on observations per time interval"""
         return self._time_info
 
-    @property
-    def included_effects(self):
-        """List of effects included in the model"""
-        entity_effect = getattr(self.model, 'entity_effect', False)
-        time_effect = getattr(self.model, 'time_effect', False)
-        other_effect = getattr(self.model, 'other_effect', False)
-        if entity_effect or time_effect or other_effect:
-            effects = []
-            if entity_effect:
-                effects.append('Entity')
-            if time_effect:
-                effects.append('Time')
-            if other_effect:
-                oe = self.model._other_effect_cats.dataframe
-                for c in oe:
-                    effects.append('Other Effect (' + str(c) + ')')
-        else:
-            effects = None
-        return effects
-
-    
     def conf_int(self, level=0.95):
         """
         Confidence interval construction
@@ -246,19 +219,14 @@ class PanelResults(_SummaryStr):
         q = q[None, :]
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._var_names, columns=['lower', 'upper'])
-    
+
     @property
     def summary(self):
         """Summary table of model estimation results"""
-        # TODO: Report on include effects, if any
-        
+
         title = self.name + ' Estimation Summary'
         mod = self.model
-        
-        is_invalid = np.isfinite(self.f_pooled.stat)
-        f_pool = _str(self.f_pooled.stat) if is_invalid else '--'
-        f_pool_pval = pval_format(self.f_pooled.pval) if is_invalid else '--'
-        f_pool_name = self.f_pooled.dist_name if is_invalid else '--'
+
         top_left = [('Dep. Variable:', mod.dependent.vars[0]),
                     ('Estimator:', self.name),
                     ('No. Observations:', self.nobs),
@@ -276,20 +244,21 @@ class PanelResults(_SummaryStr):
                     ('Min Obs:', _str(self.time_info['min'])),
                     ('Max Obs:', _str(self.time_info['max'])),
                     ('', '')]
-        
+
         is_invalid = np.isfinite(self.f_statistic.stat)
         f_stat = _str(self.f_statistic.stat) if is_invalid else '--'
         f_pval = pval_format(self.f_statistic.pval) if is_invalid else '--'
         f_dist = self.f_statistic.dist_name if is_invalid else '--'
-        
+
         f_robust = _str(self.f_statistic_robust.stat) if is_invalid else '--'
         f_robust_pval = pval_format(self.f_statistic_robust.pval) if is_invalid else '--'
         f_robust_name = self.f_statistic_robust.dist_name if is_invalid else '--'
-        
+
         top_right = [('R-squared:', _str(self.rsquared)),
                      ('R-squared (Between):', _str(self.rsquared_between)),
                      ('R-squared (Within):', _str(self.rsquared_within)),
                      ('R-squared (Overall):', _str(self.rsquared_overall)),
+                     ('Log-likelihood', _str(self._loglik)),
                      ('', ''),
                      ('F-statistic:', f_stat),
                      ('P-value', f_pval),
@@ -299,25 +268,25 @@ class PanelResults(_SummaryStr):
                      ('P-value', f_robust_pval),
                      ('Distribution:', f_robust_name),
                      ('', ''),
-                     ('F-stat (pooled):', f_pool),
-                     ('P-value', f_pool_pval),
-                     ('Distribution:', f_pool_name),
-                     ('', '')]
-        
+                     ('', ''),
+                     ('', ''),
+                     ('', ''),
+                     ]
+
         stubs = []
         vals = []
         for stub, val in top_left:
             stubs.append(stub)
             vals.append([val])
         table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
-        
+
         # create summary table instance
         smry = Summary()
         # Top Table
         # Parameter table
         fmt = fmt_2cols
         fmt['data_fmts'][1] = '%18s'
-        
+
         top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
         stubs = []
         vals = []
@@ -326,7 +295,7 @@ class PanelResults(_SummaryStr):
             vals.append([val])
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
-        
+
         param_data = np.c_[self.params.values[:, None],
                            self.std_errors.values[:, None],
                            self.tstats.values[:, None],
@@ -350,36 +319,19 @@ class PanelResults(_SummaryStr):
                             headers=header,
                             title=title)
         smry.tables.append(table)
-        extra_text = []
-        if self.included_effects:
-            effects = ', '.join(self.included_effects)
-            extra_text.append('Included effects: ' + effects)
-        
-        if self.other_info is not None:
-            ncol = self.other_info.shape[1]
-            extra_text.append('Model includes {0} other effects'.format(ncol))
-            for c in self.other_info.T:
-                col = self.other_info.T[c]
-                extra_text.append('Other Effect {0}:'.format(c))
-                stats = 'Avg Obs: {0}, Min Obs: {1}, Max Obs: {2}, Groups: {3}'
-                stats = stats.format(_str(col['mean']), _str(col['min']), _str(col['max']),
-                                     int(col['total']))
-                extra_text.append(stats)
-        
-        smry.add_extra_txt(extra_text)
-        
+
         return smry
-    
+
     @property
     def resids(self):
         """Model residuals"""
         return Series(self._resids.squeeze(), index=self._index, name='residual')
-    
+
     @property
     def wresids(self):
         """Weighted model residuals"""
         return Series(self._wresids.squeeze(), index=self._index, name='weighted residual')
-    
+
     @property
     def f_statistic_robust(self):
         r"""
@@ -395,14 +347,14 @@ class PanelResults(_SummaryStr):
         Implemented as a Wald test using the estimated parameter covariance,
         and so inherits any robustness that the choice of covariance estimator
         provides.
-        
+
         .. math::
-        
+
            W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}
-        
+
         where :math:`\hat{\beta}_{-}` does not include the model constant and
-        :math:`\hat{\Sigma}_{-}` is tht estimated covariance of the 
-        parameters, also excluding the constant.  The test statistic is 
+        :math:`\hat{\Sigma}_{-}` is tht estimated covariance of the
+        parameters, also excluding the constant.  The test statistic is
         distributed as :math:`\chi^2_{k}` where k is the number of non-
         constant parameters.
 
@@ -411,7 +363,7 @@ class PanelResults(_SummaryStr):
         distribution where df is the residual degree of freedom from the model.
         """
         return self._deferred_f()
-    
+
     @property
     def f_statistic(self):
         r"""
@@ -426,20 +378,42 @@ class PanelResults(_SummaryStr):
         -----
         Classical F-stat that is only correct under an assumption of
         homoskedasticity.  The test statistic is defined as
-         
+
         .. math::
-        
+
           F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}
-        
-        where :math:`RSS_R` is the restricted sum of squares from the model 
-        where the coefficients on all exog variables is zero, excluding a 
-        constant if one was included. :math:`RSS_U` is the unrestricted 
+
+        where :math:`RSS_R` is the restricted sum of squares from the model
+        where the coefficients on all exog variables is zero, excluding a
+        constant if one was included. :math:`RSS_U` is the unrestricted
         residual sum of squares.  k is the number of non-constant regressors
         in the model and :math:`df_U` is the residual degree of freedom in the
         unrestricted model.  The test has an :math:`F_{k,df_U}` distribution.
         """
         return self._f_stat
-    
+
+    @property
+    def loglik(self):
+        """Log-likelihood of model"""
+        return self._loglik
+
+
+class PanelEffectsResults(PanelResults):
+    """
+    Results container for panel data models that include effects
+    """
+
+    def __init__(self, res):
+        super(PanelEffectsResults, self).__init__(res)
+        self._other_info = res.other_info
+        self._f_pooled = res.f_pooled
+        self._entity_effect = res.entity_effect
+        self._time_effect = res.time_effect
+        self._other_effect = res.other_effect
+        self._rho = res.rho
+        self._sigma2_eps = res.sigma2_eps
+        self._sigma2_effects = res.sigma2_effects
+
     @property
     def f_pooled(self):
         r"""
@@ -454,19 +428,85 @@ class PanelResults(_SummaryStr):
         -----
         Joint test that all included effects are zero.  Only correct under an
         assumption of homoskedasticity.
-        
-        The test statistic is defined as 
+
+        The test statistic is defined as
 
         .. math::
 
           F = \frac{(RSS_{pool}-RSS_{effect})/(df_{pool}-df_{effect})}{RSS_{effect}/df_{effect}}
-        
+
         where :math:`RSS_{pool}` is the residual sum of squares from a no-
         effect (pooled) model. :math:`RSS_{effect}` is the residual sum of
-        squares from a model with effects.  :math:`df_{pool}` is the residual 
-        degree of freedom in the pooled regression and :math:`df_{effect}` is 
-        the residual degree of freedom from the model with effects. The test 
-        has an :math:`F_{k,df_{effect}}` distribution where 
+        squares from a model with effects.  :math:`df_{pool}` is the residual
+        degree of freedom in the pooled regression and :math:`df_{effect}` is
+        the residual degree of freedom from the model with effects. The test
+        has an :math:`F_{k,df_{effect}}` distribution where
         :math:`k=df_{pool}-df_{effect}`.
         """
         return self._f_pooled
+
+    @property
+    def included_effects(self):
+        """List of effects included in the model"""
+        entity_effect = self._entity_effect
+        time_effect = self._time_effect
+        other_effect = self._other_effect
+        if entity_effect or time_effect or other_effect:
+            effects = []
+            if entity_effect:
+                effects.append('Entity')
+            if time_effect:
+                effects.append('Time')
+            if other_effect:
+                oe = self.model._other_effect_cats.dataframe
+                for c in oe:
+                    effects.append('Other Effect (' + str(c) + ')')
+        else:
+            effects = None
+        return effects
+
+    @property
+    def other_info(self):
+        """Statistics on observations per group for other effects"""
+        return self._other_info
+
+    @property
+    def summary(self):
+        smry = super(PanelEffectsResults, self).summary
+
+        is_invalid = np.isfinite(self.f_pooled.stat)
+        f_pool = _str(self.f_pooled.stat) if is_invalid else '--'
+        f_pool_pval = pval_format(self.f_pooled.pval) if is_invalid else '--'
+        f_pool_name = self.f_pooled.dist_name if is_invalid else '--'
+
+        extra_text = []
+        if is_invalid:
+            extra_text.append('F-test for Poolability: {0}'.format(f_pool))
+            extra_text.append('P-value: {0}'.format(f_pool_pval))
+            extra_text.append('Distribution: {0}'.format(f_pool_name))
+            extra_text.append('')
+
+        if self.included_effects:
+            effects = ', '.join(self.included_effects)
+            extra_text.append('Included effects: ' + effects)
+
+        if self.other_info is not None:
+            ncol = self.other_info.shape[1]
+            extra_text.append('Model includes {0} other effects'.format(ncol))
+            for c in self.other_info.T:
+                col = self.other_info.T[c]
+                extra_text.append('Other Effect {0}:'.format(c))
+                stats = 'Avg Obs: {0}, Min Obs: {1}, Max Obs: {2}, Groups: {3}'
+                stats = stats.format(_str(col['mean']), _str(col['min']), _str(col['max']),
+                                     int(col['total']))
+                extra_text.append(stats)
+
+        smry.add_extra_txt(extra_text)
+
+        return smry
+
+    def variance_decomposition(self):
+        """Decomposition of total variance into effects and residuals"""
+        vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
+        index = ['Effects', 'Residual', 'Percent due to Effects']
+        return Series(vals, index=index, name='Variance Decomposition')
