@@ -51,7 +51,7 @@ def data(request):
         entities = pd.DataFrame(eid, index=y_data.index, columns=['firm_ids'])
         fit_options.update({'cov_type': 'clustered', 'clusters': entities})
 
-    if vcv == 'cluster':
+    if vcv == 'cluster' or (model == 'fixed_effect' and vcv=='robust'):
         fit_options.update({'group_debias': True})
     spec_mod = mod(y, x, **mod_options)
     fit = spec_mod.fit(**fit_options)
@@ -85,9 +85,6 @@ def test_rsquared_within(data):
 
 
 def test_cov(data):
-    if data.model_name == 'fixed_effect' and data.vcv in ('cluster', 'robust'):
-        pytest.xfail(reason='Stata does not adjust for # effects, and '
-                            'so LSDV and FE disagree')
     fit = data.fit
     stata = data.stata
     repl = []
@@ -113,10 +110,6 @@ def test_f_pooled(data):
 
 
 def test_f_stat(data):
-    if data.model_name == 'fixed_effect' and data.vcv in ('cluster', 'robust'):
-        pytest.xfail(reason='Stata does not adjust for # effects, and '
-                            'so LSDV and FE disagree')
-
     if data.vcv == 'conventional':
         f_stat = data.fit.f_statistic.stat
     else:
@@ -129,9 +122,6 @@ def test_f_stat(data):
 
 
 def test_t_stat(data):
-    if data.model_name == 'fixed_effect' and data.vcv in ('cluster', 'robust'):
-        pytest.xfail(reason='Stata does not adjust for # effects, and '
-                            'so LSDV and FE disagree')
     stata_t = data.stata.params.tstat
     repl = []
     for c in stata_t.index:

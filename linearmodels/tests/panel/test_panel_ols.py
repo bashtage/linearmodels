@@ -193,7 +193,7 @@ def test_panel_no_effects_weighted(data):
 
 def test_panel_entity_lsdv(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -212,30 +212,30 @@ def test_panel_entity_lsdv(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(data.vc1)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(data.vc2)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -245,7 +245,7 @@ def test_panel_entity_lsdv(data):
 
 def test_panel_entity_fwl(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -264,14 +264,14 @@ def test_panel_entity_fwl(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_df=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
 def test_panel_time_lsdv(data):
     mod = PanelOLS(data.y, data.x, time_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -289,30 +289,30 @@ def test_panel_time_lsdv(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -322,7 +322,7 @@ def test_panel_time_lsdv(data):
 
 def test_panel_time_fwl(data):
     mod = PanelOLS(data.y, data.x, time_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -339,14 +339,14 @@ def test_panel_time_fwl(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_df=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
 def test_panel_both_lsdv(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -367,30 +367,30 @@ def test_panel_both_lsdv(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -400,7 +400,7 @@ def test_panel_both_lsdv(data):
 
 def test_panel_both_fwl(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -419,14 +419,14 @@ def test_panel_both_fwl(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_df=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 
 
 def test_panel_entity_lsdv_weighted(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True, weights=data.w)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -448,30 +448,30 @@ def test_panel_entity_lsdv_weighted(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -481,7 +481,7 @@ def test_panel_entity_lsdv_weighted(data):
 
 def test_panel_time_lsdv_weighted(data):
     mod = PanelOLS(data.y, data.x, time_effect=True, weights=data.w)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -503,30 +503,30 @@ def test_panel_time_lsdv_weighted(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -536,7 +536,7 @@ def test_panel_time_lsdv_weighted(data):
 
 def test_panel_both_lsdv_weighted(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True, weights=data.w)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -561,30 +561,30 @@ def test_panel_both_lsdv_weighted(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -633,7 +633,7 @@ def test_panel_entity_time_other_equivalence(data):
 
 def test_panel_other_lsdv(data):
     mod = PanelOLS(data.y, data.x, other_effects=data.c)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
@@ -659,33 +659,33 @@ def test_panel_other_lsdv(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
 
-    res3 = mod.fit(cov_type='unadjusted', count_effects=False)
+    res3 = mod.fit(cov_type='unadjusted', auto_df=False, count_effects=False)
     assert_results_equal(res, res3)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
     clusters = data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
-    res = mod.fit(cov_type='clustered', clusters=clusters, count_effects=False)
+    res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False)
     res2 = ols_mod.fit('clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_time=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.time_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
     res2 = ols_mod.fit('clustered', clusters=clusters)
     assert_results_equal(res, res2, test_fit=False)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, count_effects=False)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, auto_df=False, count_effects=False)
     clusters = pd.DataFrame(mod.dependent.entity_ids,
                             index=mod.dependent.index,
                             columns=['var.clust'])
@@ -695,7 +695,7 @@ def test_panel_other_lsdv(data):
 
 def test_panel_other_fwl(data):
     mod = PanelOLS(data.y, data.x, other_effects=data.c)
-    res = mod.fit(count_effects=False)
+    res = mod.fit(auto_df=False, count_effects=False)
 
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -721,7 +721,7 @@ def test_panel_other_fwl(data):
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_df=False)
 
-    res = mod.fit(cov_type='robust', count_effects=False)
+    res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_df=False)
 

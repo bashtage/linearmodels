@@ -754,7 +754,16 @@ class PanelOLS(PooledOLS):
 
         return entity_info, time_info, other_info
 
-    def fit(self, *, cov_type='unadjusted', debiased=False, count_effects=True, **cov_config):
+    def _determine_df_adjustment(self, cov_type, **cov_config):
+        # TODO: Needs more scenarios once monte carlo is finished
+        # TODO: Decide about nested effects in clusters
+        if cov_type != 'clustered':
+            return True
+        else:
+            return False
+
+    def fit(self, *, cov_type='unadjusted', debiased=False, auto_df=True,
+            count_effects=True, **cov_config):
         """
         Estimate model parameters
 
@@ -765,9 +774,16 @@ class PanelOLS(PooledOLS):
         debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
+        auto_df : bool, optional
+            Flag indicating that the treatment of estimated effects in degree 
+            of freedom adjustment is automatically handeled. This is useful 
+            since clustered standard errors that are clustered using the same
+            variable as an effect do not require degree of freedom correction
+            while other estimators such as the unadjusted covariance do.
         count_effects : bool, optional
             Flag indicating that the covariance estimator should be adjusted
-            to account for the estimation of effects in the model.
+            to account for the estimation of effects in the model. Only used
+            if ``auto_df=False``.
         **cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -779,7 +795,7 @@ class PanelOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS(y, x)
+        >>> mod = PanelOLS(y, x, entity_effect=True)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
 
         Notes
@@ -828,7 +844,10 @@ class PanelOLS(PooledOLS):
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
+        if auto_df:
+            count_effects = self._determine_df_adjustment(cov_type, **cov_config)
         extra_df = neffects if count_effects else 0
+
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         cov = cov_est(y, x, params, debiased=debiased, extra_df=extra_df, **cov_config)
         weps = y - x @ params
