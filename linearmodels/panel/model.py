@@ -4,10 +4,12 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, HomoskedasticCovariance
+from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, \
+    HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.results import PanelResults
-from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, MissingValueWarning, \
+from linearmodels.panel.results import PanelEffectsResults, PanelResults
+from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
+    MissingValueWarning, \
     WaldTestStatistic, has_constant, missing_value_warning_msg
 
 
@@ -48,17 +50,12 @@ class AmbiguityError(Exception):
 
 
 # TODO: Bootstrap covariance
-# TODO: Add likelihood and possibly AIC/BIC
+# TODO: Possibly add AIC/BIC
 # TODO: Correlation between FE and XB
-# TODO: Component variance estimators
 # TODO: Documentation
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
-# TODO: Test Pooled F-stat
-# TODO: Add fast path for no-constant, entity or time effect <- Depends on whether it is easy to compute FE
-
-
-
+# TODO: Add fast path for no-constant, entity or time effect
 
 class PooledOLS(object):
     r"""
@@ -328,7 +325,7 @@ class PooledOLS(object):
         weps = wy - wx @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)
-        if self.dependent.nobs == 1:
+        if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
             r2w = 0
         else:
             r2w = 1 - residual_ss / total_ss
@@ -342,13 +339,16 @@ class PooledOLS(object):
         f_pooled = InapplicableTestStatistic(reason='Model has no effects',
                                              name='Pooled F-stat')
         entity_info, time_info, other_info = self._info()
+        nobs = weps.shape[0]
+        sigma2 = float(weps.T @ weps / nobs)
+        loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        deferred_f=deferred_f, f_stat=f_stat,
                        debiased=debiased, name=self._name, var_names=self.exog.vars,
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
                        model=self, cov_type=cov.name, index=self.dependent.index,
                        entity_info=entity_info, time_info=time_info, other_info=other_info,
-                       f_pooled=f_pooled)
+                       f_pooled=f_pooled, loglik=loglik)
         return res
 
     @property
@@ -753,7 +753,7 @@ class PanelOLS(PooledOLS):
 
         return entity_info, time_info, other_info
 
-    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, cov_type='unadjusted', debiased=False, count_effects=True, **cov_config):
         """
         Estimate model parameters
 
@@ -764,6 +764,9 @@ class PanelOLS(PooledOLS):
         debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
+        count_effects : bool, optional
+            Flag indicating that the covariance estimator should be adjusted
+            to account for the estimation of effects in the model.
         **cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -795,9 +798,9 @@ class PanelOLS(PooledOLS):
             * ``cluster_time`` - Boolean indicating to use time clusters
         """
 
-        unweighted = np.all(self.weights.values2d == 1.0)
+        weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
-        if unweighted and not self.other_effect:
+        if not weighted and not self.other_effect:
             y, x, ybar = self._fast_path()
         else:
             y, x, ybar, y_effects, x_effects = self._slow_path()
@@ -821,23 +824,30 @@ class PanelOLS(PooledOLS):
                 raise AbsorbingEffectError(absorbing_error_msg)
 
         params = np.linalg.lstsq(x, y)[0]
-
+        nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
-        df_resid = y.shape[0] - df_model
+        df_resid = nobs - df_model
+        extra_df = neffects if count_effects else 0
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(y, x, params, debiased=debiased, extra_df=neffects, **cov_config)
+        cov = cov_est(y, x, params, debiased=debiased, extra_df=extra_df, **cov_config)
         weps = y - x @ params
         eps = weps
-        if not unweighted:
-            _y = self.dependent.values2d
-            _x = self.exog.values2d
+        _y = self.dependent.values2d
+        _x = self.exog.values2d
+        if weighted:
             eps = (_y - y_effects) - (_x - x_effects) @ params
             if self.has_constant:
                 # Correction since y_effecs and x_effects @ params add mean
                 w = self.weights.values2d
                 eps -= (w * eps).sum() / w.sum()
-        resid_ss = float(weps.T @ weps)
 
+        eps_effects = _y - _x @ params
+        sigma2_tot = float(eps_effects.T @ eps_effects / nobs)
+        sigma2_eps = float(eps.T @ eps / nobs)
+        sigma2_effects = sigma2_tot - sigma2_eps
+        rho = sigma2_effects / sigma2_tot
+
+        resid_ss = float(weps.T @ weps)
         if self.has_constant:
             mu = ybar
         else:
@@ -865,8 +875,11 @@ class PanelOLS(PooledOLS):
 
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
-                        r2=r2))
-        return PanelResults(res)
+                        r2=r2, entity_effect=self.entity_effect, time_effect=self.time_effect,
+                        other_effect=self.other_effect, sigma2_eps=sigma2_eps,
+                        sigma2_effects=sigma2_effects, rho=rho))
+
+        return PanelEffectsResults(res)
 
 
 class BetweenOLS(PooledOLS):

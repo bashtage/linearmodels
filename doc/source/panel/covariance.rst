@@ -11,6 +11,6 @@ Panel Model Covariance Estimators
    :members:
    :inherited-members:
 
-.. autoclass:: OneWayClusteredCovariance
+.. autoclass:: ClusteredCovariance
    :members:
    :inherited-members:

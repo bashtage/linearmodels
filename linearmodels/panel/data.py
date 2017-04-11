@@ -52,10 +52,10 @@ class PanelData(object):
     can be treated as-if being (1, nobs, nentity).
 
     If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
-    input is treated differently.  Index level 0 is assumed ot be entity.  
-    Index level 1 is time.  The columns are the variables.  This is the most 
-    precise format to use since pandas Panels do not preserve all variable 
-    type information across transformations between Panel and MultiIndex 
+    input is treated differently.  Index level 0 is assumed ot be entity.
+    Index level 1 is time.  The columns are the variables.  This is the most
+    precise format to use since pandas Panels do not preserve all variable
+    type information across transformations between Panel and MultiIndex
     DataFrame. MultiIndex Series are also accepted and treated as single
     column MultiIndex DataFrames.
 
@@ -147,7 +147,7 @@ class PanelData(object):
         Parameters
         ----------
         locs : array
-            Booleam array indicating observations to drop with reference to 
+            Booleam array indicating observations to drop with reference to
             the dataframe view of the data
         """
         self._frame = self._frame.loc[~locs.ravel()]
@@ -223,7 +223,7 @@ class PanelData(object):
     def _demean_both(self, weights):
         """
         Entity and time demean
-        
+
         Parameters
         ----------
         weights : PanelData, optional

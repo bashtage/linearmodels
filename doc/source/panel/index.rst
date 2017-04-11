@@ -11,3 +11,5 @@ Panel Data Model Estimation
    examples/using-formulas.ipynb
    reference
    mathematical-formula
+   faq
+

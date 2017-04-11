@@ -41,7 +41,7 @@ def data(request):
     fit_options = {'debiased': True}
     if weights == 'wls':
         fit_options.update({'reweight': True})
-    if vcv == 'unadjusted':
+    if vcv == 'conventional':
         fit_options.update({'cov_type': 'unadjusted'})
     elif vcv == 'robust' and model != 'fixed_effect':
         fit_options.update({'cov_type': 'robust'})
@@ -49,9 +49,8 @@ def data(request):
         y_data = PanelData(y)
         eid = y_data.entity_ids
         entities = pd.DataFrame(eid, index=y_data.index, columns=['firm_ids'])
-        fit_options.update({'cov_type': 'clustered',
-                            'clusters': entities})
-    
+        fit_options.update({'cov_type': 'clustered', 'clusters': entities})
+
     if vcv == 'cluster':
         fit_options.update({'group_debias': True})
     spec_mod = mod(y, x, **mod_options)
@@ -67,16 +66,18 @@ def test_params(data):
     assert_allclose(stata_params.values, model_params.params.squeeze())
 
 
-@pytest.mark.skip(reason='Not compatible yet')
 def test_rsquared_between(data):
+    if data.weights in ('weighted', 'wls') or data.missing in ('_heavy', '_light'):
+        pytest.xfail(reason='Respect weights in calculation')
     r2_between = data.fit.rsquared_between
     if np.isnan(data.stata.r2_b):
         return
     assert_allclose(r2_between, data.stata.r2_b, rtol=1e-3)
 
 
-@pytest.mark.skip(reason='Not compatible yet')
 def test_rsquared_within(data):
+    if data.model_name == 'between':
+        pytest.xfail(reason='Use stricter definition of rsquared within')
     r2_within = data.fit.rsquared_within
     if np.isnan(data.stata.r2_w):
         return
@@ -103,25 +104,24 @@ def test_cov(data):
 
 
 # TODO: pvals, r2o, r2
-
 def test_f_pooled(data):
-    f_pool = data.fit.f_pooled.stat
+    f_pool = getattr(data.fit, 'f_pooled', None)
     stata_f_pool = data.stata.F_f
-    if np.isnan(f_pool) or np.isnan(stata_f_pool):
-        pytest.skip('Reulst not available for testing')
-    assert_allclose(f_pool, stata_f_pool)
+    if not f_pool or np.isnan(stata_f_pool):
+        pytest.skip('Result not available for testing')
+    assert_allclose(f_pool.stat, stata_f_pool)
 
 
 def test_f_stat(data):
     if data.model_name == 'fixed_effect' and data.vcv in ('cluster', 'robust'):
         pytest.xfail(reason='Stata does not adjust for # effects, and '
                             'so LSDV and FE disagree')
-    
+
     if data.vcv == 'conventional':
         f_stat = data.fit.f_statistic.stat
     else:
         f_stat = data.fit.f_statistic_robust.stat
-    
+
     stata_f_stat = data.stata.F
     if np.isnan(f_stat) or np.isnan(stata_f_stat):
         pytest.skip('Reulst not available for testing')

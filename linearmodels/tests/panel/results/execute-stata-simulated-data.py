@@ -1,6 +1,7 @@
 import os
 import subprocess
 from os.path import join
+from collections import OrderedDict
 
 STATA_PATH = join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.exe')
 
@@ -25,6 +26,12 @@ configs = {'xtreg {vars}, be vce(conventional)': 'between-conventional-',
            'regress {vars} [aweight=w], vce(ols)': 'pooled-conventional-weighted',
            'regress {vars} [aweight=w], vce(robust)': 'pooled-robust-weighted',
            'regress {vars} [aweight=w], vce(cluster firm_id)': 'pooled-cluster-weighted'}
+
+od = OrderedDict()
+for key in sorted(configs.keys()):
+    od[key] = configs[key]
+
+configs = od
 
 start = """
 use {dtafile}, clear \n
