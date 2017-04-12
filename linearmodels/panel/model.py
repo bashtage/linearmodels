@@ -56,7 +56,6 @@ class AmbiguityError(Exception):
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
 # TODO: Add fast path for no-constant, entity or time effect
-# TODO: Correct handling of entity df adjustment in PanelOLS w/ clustered
 
 class PooledOLS(object):
     r"""
@@ -754,13 +753,47 @@ class PanelOLS(PooledOLS):
 
         return entity_info, time_info, other_info
 
+    def _is_effect_nested(self, effects, clusters):
+        is_nested = np.zeros(effects.shape[1], dtype=np.bool)
+        for i, e in enumerate(effects.T):
+            e = (e - e.min()).astype(np.int64)
+            e_count = len(np.unique(e))
+            for c in clusters.T:
+                c = (c - c.min()).astype(np.int64)
+                cmax = c.max()
+                ec = e * (cmax + 1) + c
+                is_nested[i] = len(np.unique(ec)) == e_count
+        return np.all(is_nested)
+
     def _determine_df_adjustment(self, cov_type, **cov_config):
-        # TODO: Needs more scenarios once monte carlo is finished
-        # TODO: Decide about nested effects in clusters
-        if cov_type != 'clustered':
+        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        if cov_type != 'clustered' or not has_effect:
             return True
-        else:
-            return False
+        num_effects = self.entity_effect + self.time_effect
+        if self.other_effect:
+            num_effects += self._other_effect_cats.shape[1]
+
+        clusters = cov_config.get('clusters', None)
+        clusters = [] if clusters is None else [clusters]
+        if cov_config.get('cluster_entity', False):
+            clusters.append(self.dependent.entity_ids)
+        if cov_config.get('cluster_time', False):
+            clusters.append(self.dependent.time_ids)
+        if not clusters:  # No clusters
+            return True
+        clusters = np.column_stack(clusters)
+
+
+        effects = [self._other_effect_cats] if self.other_effect else []
+        if self.entity_effect:
+            effects.append(self.dependent.entity_ids)
+        if self.time_effect:
+            effects.append(self.dependent.time_ids)
+        effects = np.column_stack(effects)
+        if num_effects == 1:
+            return not self._is_effect_nested(effects, clusters)
+        # TODO: Take a decision on this
+        return True  # Default case for 2-way -- unclear
 
     def fit(self, *, cov_type='unadjusted', debiased=False, auto_df=True,
             count_effects=True, **cov_config):
@@ -844,11 +877,11 @@ class PanelOLS(PooledOLS):
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         if auto_df:
             count_effects = self._determine_df_adjustment(cov_type, **cov_config)
         extra_df = neffects if count_effects else 0
 
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         cov = cov_est(y, x, params, debiased=debiased, extra_df=extra_df, **cov_config)
         weps = y - x @ params
         eps = weps
@@ -996,7 +1029,6 @@ class BetweenOLS(PooledOLS):
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
         """
-        # TODO: What to do for R2_between when reweighted=True?
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(w)
