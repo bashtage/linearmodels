@@ -458,6 +458,9 @@ def test_first_difference(data):
 def test_demean_simple_weighted(data):
     x = PanelData(data.x)
     w = PanelData(data.w)
+    missing = x.isnull | w.isnull
+    x.drop(missing)
+    w.drop(missing)
     w.dataframe.iloc[:, 0] = 1
     unweighted_entity_demean = x.demean('entity')
     weighted_entity_demean = x.demean('entity', weights=w)

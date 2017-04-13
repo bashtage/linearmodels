@@ -267,35 +267,24 @@ class PanelData(object):
         If weights are provided, the values returned will be scaled by
         sqrt(weights) so that they can be used in WLS estimation.
         """
-        v = self.values3d
         if group not in ('entity', 'time', 'both'):
             raise ValueError
         if group == 'both':
             return self._demean_both(weights)
 
-        axis = 2 if group == 'time' else 1
+        level = 0 if group == 'entity' else 1
         if weights is None:
-            mu = np.nanmean(v, axis=axis)
-            mu = np.expand_dims(mu, axis=axis)
-            delta = v - mu
+            group_mu = self._frame.groupby(level=level).transform('mean')
+            return PanelData(self._frame - group_mu)
         else:
-            w = weights.values3d
-            w = w * np.isfinite(v)
-            root_w = np.sqrt(w)
-            rootwv = root_w * v
-            wv = w * v
-
-            mu = np.nansum(wv, axis=axis)
-            mu /= np.nansum(w, axis=axis)
-            mu = np.expand_dims(mu, axis=axis)
-            delta = rootwv - root_w * mu
-        out = Panel(delta,
-                    items=self.panel.items,
-                    major_axis=self.panel.major_axis,
-                    minor_axis=self.panel.minor_axis)
-        out = out.swapaxes(1, 2).to_frame(filter_observations=False)
-        out = out.loc[self._frame.index]
-        return PanelData(out)
+            w = weights.values2d
+            frame = self._frame.copy()
+            frame = w * frame
+            weighted_sum = frame.groupby(level=level).transform('sum')
+            frame.iloc[:,:] = w
+            sum_weights = frame.groupby(level=level).transform('sum')
+            group_mu = weighted_sum / sum_weights
+            return PanelData(np.sqrt(w) * (self._frame - group_mu))
 
     def __str__(self):
         return self.__class__.__name__ + '\n' + str(self._frame)
