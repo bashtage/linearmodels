@@ -246,6 +246,44 @@ class PanelData(object):
 
         return PanelData(resid)
 
+    def general_demean(self, groups):
+        """
+        Multi-way demeaning using only groupby
+        
+        Parameters
+        ----------
+        groups : PanelData
+            Arrays with the same size containing group identifiers
+
+        Returns
+        -------
+        demeaned : PanelData
+            Demeaned data according to groups
+               
+        Notes
+        -----
+        Iterates until convergence
+        """
+        if not isinstance(groups, PanelData):
+            groups = PanelData(groups)
+        groups = groups.values2d
+
+        def demean_pass(frame):
+            for i, g in enumerate(groups.T):
+                if i == 0:
+                    frame = frame - frame.groupby(g).transform('mean')
+                else:
+                    frame -= frame.groupby(g).transform('mean')
+            return frame
+
+        previous = self._frame.copy()
+        current = demean_pass(previous)
+        while np.max(np.abs(current.values - previous.values)) > 1e-8:
+            previous = current
+            current = demean_pass(current)
+
+        return PanelData(current)
+
     def demean(self, group='entity', weights=None):
         """
         Demeans data by either entity or time group
@@ -281,7 +319,7 @@ class PanelData(object):
             frame = self._frame.copy()
             frame = w * frame
             weighted_sum = frame.groupby(level=level).transform('sum')
-            frame.iloc[:,:] = w
+            frame.iloc[:, :] = w
             sum_weights = frame.groupby(level=level).transform('sum')
             group_mu = weighted_sum / sum_weights
             return PanelData(np.sqrt(w) * (self._frame - group_mu))

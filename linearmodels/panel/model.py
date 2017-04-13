@@ -699,7 +699,7 @@ class PanelOLS(PooledOLS):
         return y, x, ybar, y_effects, x_effects
 
     def _fast_path(self):
-        has_effect = self.entity_effect or self.time_effect
+        has_effect = self.entity_effect or self.time_effect or self.other_effect
         y = self.dependent.values2d
         x = self.exog.values2d
         ybar = y.mean(0)
@@ -713,7 +713,18 @@ class PanelOLS(PooledOLS):
         y = self.dependent
         x = self.exog
 
-        if self.entity_effect and self.time_effect:
+        if self.other_effect:
+            groups = self._other_effect_cats
+            if self.entity_effect or self.time_effect:
+                groups = groups.copy()
+                effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
+                col = 'additional.effect'
+                while col in groups.dataframe:
+                    col = '_' + col + '_'
+                groups.dataframe[col] = effect
+            y = y.general_demean(groups)
+            x = x.general_demean(groups)
+        elif self.entity_effect and self.time_effect:
             y = y.demean('both')
             x = x.demean('both')
         elif self.entity_effect:
@@ -850,7 +861,7 @@ class PanelOLS(PooledOLS):
 
         weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
-        if not weighted and not self.other_effect:
+        if not weighted:
             y, x, ybar = self._fast_path()
         else:
             y, x, ybar, y_effects, x_effects = self._slow_path()
