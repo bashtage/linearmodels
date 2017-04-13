@@ -266,21 +266,29 @@ class PanelData(object):
         """
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
-        groups = groups.values2d
+        groups = groups.values2d.astype(np.int64)
 
         def demean_pass(frame):
-            for i, g in enumerate(groups.T):
+            levels = len(frame.index.levels) if isinstance(frame.index, pd.MultiIndex) else 1
+            for i in range(levels):
+                mu = frame.groupby(level=i).transform('mean')
                 if i == 0:
-                    frame = frame - frame.groupby(g).transform('mean')
+                    frame = frame - mu
                 else:
-                    frame -= frame.groupby(g).transform('mean')
+                    frame -= mu
             return frame
 
-        previous = self._frame.copy()
+        # Swap out the index for better performance
+        init = self._frame.copy()
+        init_index = pd.DataFrame(groups)
+        init_index.set_index(list(init_index.columns), inplace=True)
+        init.index = init_index.index
+        previous = init
         current = demean_pass(previous)
         while np.max(np.abs(current.values - previous.values)) > 1e-8:
             previous = current
             current = demean_pass(current)
+        current.index = self._frame.index
 
         return PanelData(current)
 

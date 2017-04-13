@@ -886,3 +886,28 @@ def test_f_pooled(data):
     assert_allclose(res.f_pooled.stat, f_pool)
     assert res.f_pooled.df == v1
     assert res.f_pooled.df_denom == v2
+
+
+def test_entity_other(data):
+    y = PanelData(data.y)
+    x = PanelData(data.x)
+    c = PanelData(data.c).copy()
+    missing = y.isnull | x.isnull | c.isnull
+    y.drop(missing)
+    x.drop(missing)
+    c.drop(missing)
+    c_entity = c.dataframe.copy()
+    c_entity.iloc[:, 1] = y.entity_ids.squeeze()
+    c_entity = c_entity.astype(np.int64)
+
+    mod = PanelOLS(y, x, other_effects=c_entity)
+    res = mod.fit()
+    c_only = PanelData(c.dataframe.iloc[:, [0]].astype(np.int64))
+    mod2 = PanelOLS(y, x, other_effects=c_only, entity_effect=True)
+    res2 = mod2.fit()
+    assert_results_equal(res, res2)
+
+
+def test_other_weighted_smoke(data):
+    mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c)
+    mod.fit()
