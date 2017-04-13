@@ -592,3 +592,42 @@ def test_repr_html(panel):
     data = PanelData(panel)
     html = data._repr_html_()
     assert '<br/>' in html
+
+
+def test_general_demean_oneway(panel):
+    y = PanelData(panel)
+    dm1 = y.demean('entity')
+    g = pd.DataFrame(y.entity_ids, index=y.index)
+    dm2 = y.general_demean(g)
+    assert_allclose(dm1.values2d, dm2.values2d)
+
+    dm1 = y.demean('time')
+    g = pd.DataFrame(y.time_ids, index=y.index)
+    dm2 = y.general_demean(g)
+    assert_allclose(dm1.values2d, dm2.values2d)
+
+    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    dm2 = y.general_demean(g)
+    g = pd.Categorical(g.iloc[:, 0])
+    d = pd.get_dummies(g)
+    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    assert_allclose(dm1, dm2.values2d)
+
+
+def test_general_demean_twoway(panel):
+    y = PanelData(panel)
+    dm1 = y.demean('both')
+    g = pd.DataFrame(y.entity_ids, index=y.index)
+    g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
+    dm2 = y.general_demean(g)
+    assert_allclose(dm1.values2d, dm2.values2d)
+
+    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    dm2 = y.general_demean(g)
+    g1 = pd.Categorical(g.iloc[:, 0])
+    d1 = pd.get_dummies(g1)
+    g2 = pd.Categorical(g.iloc[:, 1])
+    d2 = pd.get_dummies(g2, drop_first=True)
+    d = np.c_[d1, d2]
+    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    assert_allclose(dm1, dm2.values2d, rtol=1e-6)
