@@ -472,6 +472,7 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def summary(self):
+        """Summary table of model estimation results"""
         smry = super(PanelEffectsResults, self).summary
 
         is_invalid = np.isfinite(self.f_pooled.stat)
