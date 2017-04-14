@@ -821,6 +821,10 @@ def test_cov_equiv_cluster(data):
     res2 = mod.fit(cov_type='clustered', clusters=clusters)
     assert_results_equal(res, res2)
 
+    res = mod.fit(cov_type='clustered')
+    res2 = mod.fit(cov_type='clustered', clusters=None)
+    assert_results_equal(res, res2)
+
 
 def test_cluster_smoke(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
@@ -914,6 +918,11 @@ def test_other_weighted_smoke(data):
 
 
 def test_lsdv_options(data):
+    mod = PanelOLS(data.y, data.x, weights=data.w)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
     mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
@@ -936,6 +945,11 @@ def test_lsdv_options(data):
     assert_results_equal(res1, res2)
 
     mod = PanelOLS(data.y, data.x, time_effect=True, other_effects=c1)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    mod = PanelOLS(data.y, data.x, weights=data.w, time_effect=True, other_effects=c1)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)

@@ -5,33 +5,12 @@ from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
 from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, \
-    HomoskedasticCovariance
+    HomoskedasticCovariance, CovarianceManager
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelEffectsResults, PanelResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
-    MissingValueWarning, \
-    WaldTestStatistic, has_constant, missing_value_warning_msg
-
-
-class CovarianceManager(object):
-    COVARIANCE_ESTIMATORS = {'unadjusted': HomoskedasticCovariance,
-                             'homoskedastic': HomoskedasticCovariance,
-                             'robust': HeteroskedasticCovariance,
-                             'heteroskedastic': HeteroskedasticCovariance,
-                             'clustered': ClusteredCovariance}
-
-    def __init__(self, estimator, *cov_estimators):
-        self._estimator = estimator
-        self._supported = cov_estimators
-
-    def __getitem__(self, item):
-        if item not in self.COVARIANCE_ESTIMATORS:
-            raise KeyError('Unknown covariance estimator type.')
-        cov_est = self.COVARIANCE_ESTIMATORS[item]
-        if cov_est not in self._supported:
-            raise ValueError('Requested covariance estimator is not supported '
-                             'for the {0}.'.format(self._estimator))
-        return cov_est
+    MissingValueWarning, WaldTestStatistic, has_constant, missing_value_warning_msg, \
+    ensure_unique_column
 
 
 class AbsorbingEffectError(Exception):
@@ -719,9 +698,7 @@ class PanelOLS(PooledOLS):
             if self.entity_effect or self.time_effect:
                 groups = groups.copy()
                 effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
-                col = 'additional.effect'
-                while col in groups.dataframe:
-                    col = '_' + col + '_'
+                col = ensure_unique_column('additional.effect', groups.dataframe)
                 groups.dataframe[col] = effect
             y = y.general_demean(groups)
             x = x.general_demean(groups)
@@ -770,9 +747,7 @@ class PanelOLS(PooledOLS):
             if self.entity_effect or self.time_effect:
                 groups = groups.copy()
                 effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
-                col = 'additional.effect'
-                while col in groups.dataframe:
-                    col = '_' + col + '_'
+                col = ensure_unique_column('additional.effect', groups.dataframe)
                 groups.dataframe[col] = effect
             wy = y.weighted_general_demean(groups, weights=self.weights)
             wx = x.weighted_general_demean(groups, weights=self.weights)
@@ -840,14 +815,8 @@ class PanelOLS(PooledOLS):
             num_effects += self._other_effect_cats.shape[1]
 
         clusters = cov_config.get('clusters', None)
-        clusters = [] if clusters is None else [clusters]
-        if cov_config.get('cluster_entity', False):
-            clusters.append(self.dependent.entity_ids)
-        if cov_config.get('cluster_time', False):
-            clusters.append(self.dependent.time_ids)
-        if not clusters:  # No clusters
+        if clusters is None:  # No clusters
             return True
-        clusters = np.column_stack(clusters)
 
         effects = [self._other_effect_cats] if self.other_effect else []
         if self.entity_effect:

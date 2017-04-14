@@ -310,3 +310,9 @@ class _SummaryStr(object):
 
     def _repr_html_(self):
         return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
+
+
+def ensure_unique_column(col_name, df, addition='_'):
+    while col_name in df:
+        col_name = addition + col_name + addition
+    return col_name

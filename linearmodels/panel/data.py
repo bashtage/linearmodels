@@ -4,6 +4,7 @@ from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 from xarray import DataArray
 
+from linearmodels.utility import ensure_unique_column
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
 
 
@@ -158,6 +159,11 @@ class PanelData(object):
     def shape(self):
         """Shape of panel view of data"""
         return self.panel.shape
+
+    @property
+    def ndim(self):
+        """Number of dimensions of panel view of data"""
+        return 3
 
     @property
     def isnull(self):
@@ -501,8 +507,7 @@ class PanelData(object):
         index_cols = list(df.index.names)
         orig_names = index_cols[:]
         for i, col in enumerate(index_cols):
-            while col in df:
-                col = '_' + col
+            col = ensure_unique_column(col, df)
             index_cols[i] = col
         df.index.names = index_cols
         df = df.reset_index()

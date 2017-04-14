@@ -263,3 +263,25 @@ class ClusteredCovariance(HomoskedasticCovariance):
         xeex *= self._scale
         out = (xpxi @ xeex @ xpxi) / nobs
         return (out + out.T) / 2
+
+
+class CovarianceManager(object):
+    COVARIANCE_ESTIMATORS = {'unadjusted': HomoskedasticCovariance,
+                             'conventional': HomoskedasticCovariance,
+                             'homoskedastic': HomoskedasticCovariance,
+                             'robust': HeteroskedasticCovariance,
+                             'heteroskedastic': HeteroskedasticCovariance,
+                             'clustered': ClusteredCovariance}
+
+    def __init__(self, estimator, *cov_estimators):
+        self._estimator = estimator
+        self._supported = cov_estimators
+
+    def __getitem__(self, item):
+        if item not in self.COVARIANCE_ESTIMATORS:
+            raise KeyError('Unknown covariance estimator type.')
+        cov_est = self.COVARIANCE_ESTIMATORS[item]
+        if cov_est not in self._supported:
+            raise ValueError('Requested covariance estimator is not supported '
+                             'for the {0}.'.format(self._estimator))
+        return cov_est

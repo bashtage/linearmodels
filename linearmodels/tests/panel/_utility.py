@@ -8,7 +8,7 @@ from pandas.util.testing import assert_frame_equal, assert_series_equal
 from linearmodels.utility import AttrDict
 
 
-def lvsd(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
+def lsdv(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
          general=None):
     nvar = x.shape[1]
     temp = x.reset_index()
@@ -104,8 +104,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
 
 
 def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_resids=True):
-    if n is None:
-        n = min(res1.params.shape[0], res2.params.shape[0])
+    n = min(res1.params.shape[0], res2.params.shape[0])
 
     assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
     assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
@@ -113,18 +112,20 @@ def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_r
     assert_frame_equal(res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n])
     assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
     assert_allclose(res1.s2, res2.s2)
+
+    delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(),
+                                                                res2.resids.std())
+    assert_allclose(delta, np.ones_like(delta))
+    delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(),
+                                                                  res2.wresids.std())
+    assert_allclose(delta, np.ones_like(delta))
+
     if test_df:
         assert_allclose(res1.df_model, res2.df_model)
         assert_allclose(res1.df_resid, res2.df_resid)
+
     if test_fit:
         assert_allclose(res1.rsquared, res2.rsquared)
         assert_allclose(res1.total_ss, res2.total_ss)
         assert_allclose(res1.resid_ss, res2.resid_ss)
         assert_allclose(res1.model_ss, res2.model_ss)
-    if test_resids:
-        delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(),
-                                                                    res2.resids.std())
-        assert_allclose(delta, np.ones_like(delta))
-        delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(),
-                                                                      res2.wresids.std())
-        assert_allclose(delta, np.ones_like(delta))
