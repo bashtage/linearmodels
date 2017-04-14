@@ -31,7 +31,6 @@ class AmbiguityError(Exception):
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
 # TODO: Correlation between FE and XB
-# TODO: Documentation
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
 
@@ -90,7 +89,7 @@ class PooledOLS(object):
 
         Notes
         -----
-        This is exposed for testing and is not normally used during estimation
+        This is exposed for testing and is not normally needed for estimation
         """
         clusters = PanelData(clusters, var_name='cov.cluster', convert_dummies=False)
         if clusters.shape[1:] != self._original_shape[1:]:
@@ -100,6 +99,7 @@ class PooledOLS(object):
         return clusters
 
     def _info(self):
+        """Information about panel structure"""
         def stats(ids, name):
             bc = np.bincount(ids)
             index = ['mean', 'median', 'max', 'min', 'total']
@@ -115,6 +115,7 @@ class PooledOLS(object):
         return entity_info, time_info, other_info
 
     def _adapt_weights(self, weights):
+        """Check and transform weights depending on size"""
         if weights is None:
             frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = 1
@@ -147,6 +148,7 @@ class PooledOLS(object):
         return PanelData(frame)
 
     def _validate_data(self):
+        """Check input shape and remove missing"""
         y = self._y = self.dependent.values2d
         x = self._x = self.exog.values2d
         w = self._w = self.weights.values2d
@@ -197,6 +199,7 @@ class PooledOLS(object):
         return self._constant
 
     def _f_statistic(self, weps, y, x, root_w, df_resid):
+        """Compute model F-statistic"""
         weps_const = y
         num_df = x.shape[1]
         name = 'Model F-statistic (homoskedastic)'
@@ -217,6 +220,7 @@ class PooledOLS(object):
                                  df=num_df, df_denom=denom_df, name=name)
 
     def _f_statistic_robust(self, params, cov_est, debiased, df_resid):
+        """Compute Wald test that all parameters are 0, ex. constant"""
         sel = np.ones(params.shape[0], dtype=np.bool)
         name = 'Model F-statistic (robust)'
 
@@ -247,6 +251,7 @@ class PooledOLS(object):
         return deferred_f
 
     def _prepare_between(self):
+        """Prepare values for between estimation of R2"""
         y = self.dependent.mean('entity', weights=self.weights).values
         x = self.exog.mean('entity', weights=self.weights).values
         # Weight transformation
@@ -258,6 +263,7 @@ class PooledOLS(object):
         return y, x, w
 
     def _rsquared(self, params, reweight=False):
+        """Compute alternative measures of R2"""
         if self.has_constant and self.exog.nvar == 1:
             # Constant only fast track
             return 0.0, 0.0, 0.0
@@ -313,6 +319,7 @@ class PooledOLS(object):
         return r2o, r2w, r2b
 
     def _postestimation(self, params, cov, debiased, df_resid, weps, y, x, root_w):
+        """Common post-estimation values"""
         deferred_f = self._f_statistic_robust(params, cov, debiased, df_resid)
         f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
@@ -338,6 +345,38 @@ class PooledOLS(object):
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array-like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array-like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        model : PooledOLS
+            Model specified using the formula
+        
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a 
+        constant using the constant indicator (1)  
+
+        Examples
+        --------
+        >>> from linearmodels import PooledOLS
+        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', data)
+        >>> res = mod.fit()
+        """
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
         parts = formula.split('~')
@@ -530,6 +569,7 @@ class PanelOLS(PooledOLS):
         self._other_effect = self._validate_effects(other_effects)
 
     def _validate_effects(self, effects):
+        """Check model effects"""
         if effects is None:
             return False
         effects = PanelData(effects, var_name='OtherEffect',
@@ -585,7 +625,6 @@ class PanelOLS(PooledOLS):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-            weights : array-like, optional
         weights: array-like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
@@ -600,7 +639,7 @@ class PanelOLS(PooledOLS):
         --------
         >>> from linearmodels import PanelOLS
         >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffect', data)
-        >>> res = mod.fit()
+        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
         data = PanelData(data)
@@ -679,6 +718,7 @@ class PanelOLS(PooledOLS):
         return y, x, ybar, y_effects, x_effects
 
     def _fast_path(self):
+        """Dummy-variable free estimation without weights"""
         has_effect = self.entity_effect or self.time_effect or self.other_effect
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -724,6 +764,7 @@ class PanelOLS(PooledOLS):
         return y, x, ybar
 
     def _weighted_fast_path(self):
+        """Dummy-variable free estimation with weights"""
         has_effect = self.entity_effect or self.time_effect or self.other_effect
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -776,6 +817,7 @@ class PanelOLS(PooledOLS):
         return wy, wx, wybar, wy_effects, wx_effects
 
     def _info(self):
+        """Information about model effects and panel structure"""
         def stats(ids, name):
             bc = np.bincount(ids)
             index = ['mean', 'median', 'max', 'min', 'total']
@@ -795,6 +837,7 @@ class PanelOLS(PooledOLS):
         return entity_info, time_info, other_info
 
     def _is_effect_nested(self, effects, clusters):
+        """Determine whether an effect is nested by the covariance clusters"""
         is_nested = np.zeros(effects.shape[1], dtype=np.bool)
         for i, e in enumerate(effects.T):
             e = (e - e.min()).astype(np.int64)
@@ -837,7 +880,9 @@ class PanelOLS(PooledOLS):
         Parameters
         ----------
         use_lsdv : bool, optional
-            Flag indicating to use LSDV to eliminate effects
+            Flag indicating to use the Least Squares Dummy Variable estimator 
+            to eliminate effects.  The default value uses only means and does 
+            note require constructing dummy variables for each effect.
         cov_type : str, optional
             Name of covariance estimator. See Notes.
         debiased : bool, optional
@@ -845,7 +890,7 @@ class PanelOLS(PooledOLS):
             a degree of freedom adjustment.
         auto_df : bool, optional
             Flag indicating that the treatment of estimated effects in degree
-            of freedom adjustment is automatically handeled. This is useful
+            of freedom adjustment is automatically handled. This is useful
             since clustered standard errors that are clustered using the same
             variable as an effect do not require degree of freedom correction
             while other estimators such as the unadjusted covariance do.
@@ -1001,7 +1046,7 @@ class BetweenOLS(PooledOLS):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
 
     def _choose_cov(self, cov_type, **cov_config):
-
+        """Return covariance estimator reformat clusters"""
         cov_est = self._cov_estimators[cov_type]
         if cov_type != 'clustered':
             return cov_est, cov_config
@@ -1031,7 +1076,8 @@ class BetweenOLS(PooledOLS):
         ----------
         reweight : bool
             Flag indicating to reweight observations if the input data is
-            unbalanced
+            unbalanced using a WLS estimator.  If weights are provided, these
+            are accounted for when reweighting. Has no effect on balanced data.
         cov_type : str, optional
             Name of covariance estimator. See Notes.
         debiased : bool, optional
@@ -1101,6 +1147,38 @@ class BetweenOLS(PooledOLS):
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array-like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array-like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        model : BetweenOLS
+            Model specified using the formula
+
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a 
+        constant using the constant indicator (1)  
+
+        Examples
+        --------
+        >>> from linearmodels import BetweenOLS
+        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', data)
+        >>> res = mod.fit()
+        """
         return super(BetweenOLS, cls).from_formula(formula, data, weights=weights)
 
 
@@ -1134,6 +1212,7 @@ class FirstDifferenceOLS(PooledOLS):
             raise ValueError('Panel must have at least 2 time periods')
 
     def _choose_cov(self, cov_type, **cov_config):
+        """Return covariance estimator and reformat clusters"""
         cov_est = self._cov_estimators[cov_type]
         if cov_type != 'clustered':
             return cov_est, cov_config
@@ -1189,7 +1268,7 @@ class FirstDifferenceOLS(PooledOLS):
 
         Returns
         -------
-        results :  PanelResults
+        results : PanelResults
             Estimation results
 
         Examples
@@ -1197,6 +1276,7 @@ class FirstDifferenceOLS(PooledOLS):
         >>> from linearmodels import FirstDifferenceOLS
         >>> mod = FirstDifferenceOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
+        >>> res = mod.fit(cov_type='cluster', cluster_entity=True)
 
         Notes
         -----
@@ -1256,4 +1336,36 @@ class FirstDifferenceOLS(PooledOLS):
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None):
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array-like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array-like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        model : FirstDifferenceOLS
+            Model specified using the formula
+
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a 
+        constant using the constant indicator (1)  
+
+        Examples
+        --------
+        >>> from linearmodels import FirstDifferenceOLS
+        >>> mod = FirstDifferenceOLS.from_formula('y ~ 1 + x1', data)
+        >>> res = mod.fit()
+        """
         return super(FirstDifferenceOLS, cls).from_formula(formula, data, weights=weights)

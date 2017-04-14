@@ -4,6 +4,7 @@ from numpy.linalg import inv
 from linearmodels.iv.covariance import _cov_cluster, CLUSTER_ERR
 from linearmodels.utility import cached_property
 
+# TODO: Documentation
 
 class HomoskedasticCovariance(object):
     r"""
