@@ -8,7 +8,7 @@ from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import AbsorbingEffectError, AmbiguityError, PanelOLS
-from linearmodels.tests.panel._utility import generate_data, lvsd
+from linearmodels.tests.panel._utility import generate_data, lsdv
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = ['numpy', 'pandas', 'xarray']
@@ -19,7 +19,8 @@ TYPES = ['numpy', 'pandas', 'xarray']
                              product(PERC_MISSING, TYPES))))
 def data(request):
     missing, datatype = request.param
-    return generate_data(missing, datatype, ntk=(131, 4, 3))
+    rng = np.random.RandomState(12345)
+    return generate_data(missing, datatype, ntk=(131, 4, 3), rng=rng)
 
 
 def test_panel_ols(data):
@@ -84,21 +85,50 @@ def test_weight_incorrect_shape(data):
         PanelOLS(data.y, data.x, weights=weights)
 
 
-def test_panel_lvsd(data):
+def test_invalid_weight_values(data):
+    w = PanelData(data.w)
+    w.dataframe.iloc[::13, :] = 0.0
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=w)
+
+    w = PanelData(data.w)
+    w.dataframe.iloc[::13, :] = -0.0
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=w)
+
+    w = PanelData(data.w)
+    w.dataframe.iloc[::29, :] = -1.0
+    with pytest.raises(ValueError):
+        PanelOLS(data.y, data.x, weights=w)
+
+
+def test_panel_lsdv(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     y, x = mod.dependent.dataframe, mod.exog.dataframe
     res = mod.fit()
-    expected = lvsd(y, x, has_const=False, entity=True)
+    expected = lsdv(y, x, has_const=False, entity=True)
     assert_allclose(res.params.squeeze(), expected)
 
     mod = PanelOLS(data.y, data.x, time_effect=True)
     res = mod.fit()
-    expected = lvsd(y, x, has_const=False, time=True)
+    expected = lsdv(y, x, has_const=False, time=True)
     assert_allclose(res.params.squeeze(), expected)
 
     mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
     res = mod.fit()
-    expected = lvsd(y, x, has_const=False, entity=True, time=True)
+    expected = lsdv(y, x, has_const=False, entity=True, time=True)
+    assert_allclose(res.params.squeeze(), expected, rtol=1e-4)
+
+    other = y.copy()
+    other.iloc[:, :] = 0
+    other = other.astype(np.int64)
+    skip = other.shape[0] // 3
+    for i in range(skip):
+        other.iloc[i::skip] = i
+
+    mod = PanelOLS(y, x, other_effects=other)
+    res = mod.fit()
+    expected = lsdv(y, x, has_const=False, general=other.iloc[:, 0].values)
     assert_allclose(res.params.squeeze(), expected, rtol=1e-4)
 
 
@@ -142,3 +172,15 @@ def test_absorbing_effect(data):
     x['absorbed'] = temp
     with pytest.raises(AbsorbingEffectError):
         PanelOLS(data.y, x, entity_effect=True).fit()
+
+
+def test_all_missing(data):
+    y = PanelData(data.y)
+    x = PanelData(data.x)
+    missing = y.isnull | x.isnull
+    y.drop(missing)
+    x.drop(missing)
+    import warnings
+    with warnings.catch_warnings(record=True) as w:
+        PanelOLS(y.panel, x.panel).fit()
+        assert len(w) == 0

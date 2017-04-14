@@ -41,17 +41,17 @@ def data(request):
     fit_options = {'debiased': True}
     if weights == 'wls':
         fit_options.update({'reweight': True})
-    if vcv == 'conventional':
-        fit_options.update({'cov_type': 'unadjusted'})
-    elif vcv == 'robust' and model != 'fixed_effect':
+    if vcv == 'robust' and model != 'fixed_effect':
         fit_options.update({'cov_type': 'robust'})
     elif vcv in ('cluster', 'robust'):
         y_data = PanelData(y)
         eid = y_data.entity_ids
         entities = pd.DataFrame(eid, index=y_data.index, columns=['firm_ids'])
         fit_options.update({'cov_type': 'clustered', 'clusters': entities})
+    else:
+        fit_options.update({'cov_type': 'unadjusted'})
 
-    if vcv == 'cluster' or (model == 'fixed_effect' and vcv=='robust'):
+    if vcv == 'cluster' or (model == 'fixed_effect' and vcv == 'robust'):
         fit_options.update({'group_debias': True})
     spec_mod = mod(y, x, **mod_options)
     fit = spec_mod.fit(**fit_options)
@@ -116,8 +116,6 @@ def test_f_stat(data):
         f_stat = data.fit.f_statistic_robust.stat
 
     stata_f_stat = data.stata.F
-    if np.isnan(f_stat) or np.isnan(stata_f_stat):
-        pytest.skip('Reulst not available for testing')
     print(f_stat, data.fit.f_statistic_robust.stat, stata_f_stat)
 
 

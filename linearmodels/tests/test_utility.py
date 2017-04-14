@@ -1,9 +1,10 @@
 import numpy as np
+import pandas as pd
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, WaldTestStatistic, cached_property, \
-    has_constant, inv_sqrth
+from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, \
+    WaldTestStatistic, cached_property, has_constant, inv_sqrth, ensure_unique_column
 
 
 def test_hasconstant():
@@ -95,3 +96,16 @@ def test_cached_property():
     # To improve coverage
     cp = cached_property(lambda x: x)
     cp.__get__(cp, None)
+
+
+def test_ensure_unique_column():
+    df = pd.DataFrame({'a': [0, 1, 0], 'b': [1.0, 0.0, 1.0]})
+    out = ensure_unique_column('a', df)
+    assert out == '_a_'
+    out = ensure_unique_column('c', df)
+    assert out == 'c'
+    out = ensure_unique_column('a', df, '=')
+    assert out == '=a='
+    df['_a_'] = -1
+    out = ensure_unique_column('a', df)
+    assert out == '__a__'

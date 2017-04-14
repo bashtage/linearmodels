@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
 
-from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, HomoskedasticCovariance
+from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, HomoskedasticCovariance, \
+    CovarianceManager
 
 
 class TestCovariance(object):
@@ -58,6 +59,25 @@ class TestCovariance(object):
                                   clusters=self.cluster4, group_debias=True).cov
         assert cov.shape == (self.k, self.k)
 
+    def test_clustered_covariance_error(self):
         with pytest.raises(ValueError):
             ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
                                 clusters=self.cluster5)
+
+        with pytest.raises(ValueError):
+            ClusteredCovariance(self.y, self.x, self.params, extra_df=0,
+                                clusters=self.cluster4[::2])
+
+
+def test_covariance_manager():
+    cm = CovarianceManager('made-up-class', HomoskedasticCovariance, HeteroskedasticCovariance)
+    with pytest.raises(ValueError):
+        cm['clustered']
+
+    with pytest.raises(KeyError):
+        cm['unknown']
+
+    assert cm['unadjusted'] is HomoskedasticCovariance
+    assert cm['homoskedastic'] is HomoskedasticCovariance
+    assert cm['robust'] is HeteroskedasticCovariance
+    assert cm['heteroskedastic'] is HeteroskedasticCovariance
