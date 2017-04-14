@@ -55,7 +55,6 @@ class AmbiguityError(Exception):
 # TODO: Documentation
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
-# TODO: Add fast path for no-constant, entity or time effect
 
 class PooledOLS(object):
     r"""
@@ -195,6 +194,8 @@ class PooledOLS(object):
             self._not_null = ~missing
 
         w = self.weights.dataframe
+        if np.any(w.values <= 0):
+            raise ValueError('weights must be strictly positive.')
         w = w / w.mean()
         self.weights = PanelData(w)
 
@@ -651,7 +652,7 @@ class PanelOLS(PooledOLS):
         return mod
 
     def _slow_path(self):
-        """Frisch-Waigh-Lovell implementation, mostly for weighted"""
+        """Frisch-Waigh-Lovell implementation, works for all scenarios"""
         has_effect = self.entity_effect or self.time_effect or self.other_effect
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -745,6 +746,60 @@ class PanelOLS(PooledOLS):
 
         return y, x, ybar
 
+    def _weighted_fast_path(self):
+        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        wybar = root_w * (w.T @ y / w.sum())
+
+        if not has_effect:
+            wy = root_w * self.dependent.values2d
+            wx = root_w * self.exog.values2d
+            return wy, wx, wybar, 0, 0
+
+        wy_gm = wybar
+        wx_gm = root_w * (w.T @ x / w.sum())
+
+        y = self.dependent
+        x = self.exog
+
+        if self.other_effect:
+            groups = self._other_effect_cats
+            if self.entity_effect or self.time_effect:
+                groups = groups.copy()
+                effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
+                col = 'additional.effect'
+                while col in groups.dataframe:
+                    col = '_' + col + '_'
+                groups.dataframe[col] = effect
+            wy = y.weighted_general_demean(groups, weights=self.weights)
+            wx = x.weighted_general_demean(groups, weights=self.weights)
+        elif self.entity_effect and self.time_effect:
+            wy = y.demean('both', weights=self.weights)
+            wx = x.demean('both', weights=self.weights)
+        elif self.entity_effect:
+            wy = y.demean('entity', weights=self.weights)
+            wx = x.demean('entity', weights=self.weights)
+        else:  # self.time_effect
+            wy = y.demean('time', weights=self.weights)
+            wx = x.demean('time', weights=self.weights)
+
+        wy = wy.values2d
+        wx = wx.values2d
+
+        if self.has_constant:
+            wy += wy_gm
+            wx += wx_gm
+        else:
+            wybar = 0
+
+        wy_effects = y.values2d - wy / root_w
+        wx_effects = x.values2d - wx / root_w
+
+        return wy, wx, wybar, wy_effects, wx_effects
+
     def _info(self):
         def stats(ids, name):
             bc = np.bincount(ids)
@@ -794,7 +849,6 @@ class PanelOLS(PooledOLS):
             return True
         clusters = np.column_stack(clusters)
 
-
         effects = [self._other_effect_cats] if self.other_effect else []
         if self.entity_effect:
             effects.append(self.dependent.entity_ids)
@@ -806,21 +860,23 @@ class PanelOLS(PooledOLS):
         # TODO: Take a decision on this
         return True  # Default case for 2-way -- unclear
 
-    def fit(self, *, cov_type='unadjusted', debiased=False, auto_df=True,
+    def fit(self, *, use_lsdv=False, cov_type='unadjusted', debiased=False, auto_df=True,
             count_effects=True, **cov_config):
         """
         Estimate model parameters
 
         Parameters
         ----------
+        use_lsdv : bool, optional
+            Flag indicating to use LSDV to eliminate effects
         cov_type : str, optional
             Name of covariance estimator. See Notes.
         debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         auto_df : bool, optional
-            Flag indicating that the treatment of estimated effects in degree 
-            of freedom adjustment is automatically handeled. This is useful 
+            Flag indicating that the treatment of estimated effects in degree
+            of freedom adjustment is automatically handeled. This is useful
             since clustered standard errors that are clustered using the same
             variable as an effect do not require degree of freedom correction
             while other estimators such as the unadjusted covariance do.
@@ -861,10 +917,12 @@ class PanelOLS(PooledOLS):
 
         weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
-        if not weighted:
+        if use_lsdv:
+            y, x, ybar, y_effects, x_effects = self._slow_path()
+        elif not weighted:
             y, x, ybar = self._fast_path()
         else:
-            y, x, ybar, y_effects, x_effects = self._slow_path()
+            y, x, ybar, y_effects, x_effects = self._weighted_fast_path()
 
         neffects = 0
         drop_first = self.has_constant

@@ -911,3 +911,36 @@ def test_entity_other(data):
 def test_other_weighted_smoke(data):
     mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c)
     mod.fit()
+
+
+def test_lsdv_options(data):
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    mod = PanelOLS(data.y, data.x, time_effect=True)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    mod = PanelOLS(data.y, data.x, time_effect=True, entity_effect=True)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    c1 = PanelData(data.c).dataframe.iloc[:, [0]]
+    mod = PanelOLS(data.y, data.x, entity_effect=True, other_effects=c1)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    mod = PanelOLS(data.y, data.x, time_effect=True, other_effects=c1)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)
+
+    mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c)
+    res1 = mod.fit()
+    res2 = mod.fit(use_lsdv=True)
+    assert_results_equal(res1, res2)

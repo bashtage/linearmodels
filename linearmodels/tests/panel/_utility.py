@@ -96,7 +96,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
         c = xr.DataArray(c)
         vc1 = xr.DataArray(vc1)
         vc2 = xr.DataArray(vc2)
-    
+
     if rng is not None:
         rng.set_state(np.random.get_state())
 

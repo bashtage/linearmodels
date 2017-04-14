@@ -26,8 +26,9 @@ def data(request):
 
 @pytest.fixture
 def panel():
+    np.random.seed(12345)
     n, t, k = 11, 7, 3
-    x = np.random.random((k, t, n))
+    x = np.random.standard_normal((k, t, n))
     major = pd.date_range('12-31-1999', periods=7)
     items = ['var.{0}'.format(i) for i in range(1, k + 1)]
     minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
@@ -630,4 +631,82 @@ def test_general_demean_twoway(panel):
     d2 = pd.get_dummies(g2, drop_first=True)
     d = np.c_[d1, d2]
     dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
-    assert_allclose(dm1, dm2.values2d, rtol=1e-6)
+    assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
+
+
+def test_general_unit_weighted_demean_oneway(panel):
+    y = PanelData(panel)
+    dm1 = y.demean('entity')
+    g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
+    weights = PanelData(g).copy()
+    weights.dataframe.iloc[:, :] = 1
+    dm2 = y.weighted_general_demean(g, weights)
+    assert_allclose(dm1.values2d, dm2.values2d)
+    dm3 = y.general_demean(g)
+    assert_allclose(dm3.values2d, dm2.values2d)
+
+    dm1 = y.demean('time')
+    g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
+    dm2 = y.weighted_general_demean(g, weights)
+    assert_allclose(dm1.values2d, dm2.values2d)
+    dm3 = y.general_demean(g)
+    assert_allclose(dm3.values2d, dm2.values2d)
+
+    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
+    dm2 = y.weighted_general_demean(g, weights)
+    dm3 = y.general_demean(g)
+    g = pd.Categorical(g.dataframe.iloc[:, 0])
+    d = pd.get_dummies(g)
+    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    assert_allclose(dm1, dm2.values2d)
+    assert_allclose(dm3.values2d, dm2.values2d)
+
+
+def test_general_weighted_demean_oneway(panel):
+    y = PanelData(panel)
+    weights = pd.DataFrame(np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
+    w = PanelData(weights)
+
+    dm1 = y.demean('entity', weights=w)
+    g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
+    dm2 = y.weighted_general_demean(g, w)
+    assert_allclose(dm1.values2d, dm2.values2d)
+
+    dm1 = y.demean('time', weights=w)
+    g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
+    dm2 = y.weighted_general_demean(g, w)
+    assert_allclose(dm1.values2d, dm2.values2d)
+
+    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
+    dm2 = y.weighted_general_demean(g, w)
+    g = pd.Categorical(g.dataframe.iloc[:, 0])
+    d = pd.get_dummies(g)
+    wd = np.sqrt(w.values2d) * d
+    wy = np.sqrt(w.values2d) * y.values2d
+    dm1 = wy - wd @ np.linalg.lstsq(wd, wy)[0]
+    assert_allclose(dm1, dm2.values2d)
+
+
+def test_general_unit_weighted_demean_twoway(panel):
+    np.random.seed(12345)
+    y = PanelData(panel)
+    weights = pd.DataFrame(np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
+    w = PanelData(weights)
+
+    dm1 = y.demean('both', weights=w)
+    g = pd.DataFrame(y.entity_ids, index=y.index)
+    g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
+    dm2 = y.weighted_general_demean(g, weights=w)
+    assert_allclose(dm1.values2d - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
+
+    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    dm2 = y.weighted_general_demean(g, weights=w)
+    g1 = pd.Categorical(g.iloc[:, 0])
+    d1 = pd.get_dummies(g1)
+    g2 = pd.Categorical(g.iloc[:, 1])
+    d2 = pd.get_dummies(g2, drop_first=True)
+    d = np.c_[d1, d2]
+    wd = np.sqrt(w.values2d) * d
+    wy = np.sqrt(w.values2d) * y.values2d
+    dm1 = wy - wd @ np.linalg.lstsq(wd, wy)[0]
+    assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)

@@ -246,10 +246,75 @@ class PanelData(object):
 
         return PanelData(resid)
 
+    def weighted_general_demean(self, groups, weights):
+        """
+        Multi-way demeaning using only groupby
+
+        Parameters
+        ----------
+        groups : PanelData
+            Arrays with the same size containing group identifiers
+        weights : PanelData
+            Weights to use in the weighted demeaning
+
+        Returns
+        -------
+        demeaned : PanelData
+            Weighted, demeaned data according to groups
+
+        Notes
+        -----
+        Iterates until convergence
+        """
+        # TODO: Need to check scale in iteration limit
+
+        if not isinstance(groups, PanelData):
+            groups = PanelData(groups)
+        weights = weights.values2d
+        groups = groups.values2d.astype(np.int64)
+
+        def weighted_group_mean(df, weights, root_w, level):
+            num = (root_w * df).groupby(level=level).transform('sum')
+            denom = weights.groupby(level=level).transform('sum')
+            return num.values / denom.values
+
+        def demean_pass(frame, weights, root_w):
+            levels = groups.shape[1]
+            for level in range(levels):
+                mu = weighted_group_mean(frame, weights, root_w, level)
+                if level == 0:
+                    frame = frame - root_w * mu
+                else:
+                    frame -= root_w * mu
+
+            return frame
+
+        # Swap out the index for better performance
+        init_index = pd.DataFrame(groups)
+        init_index.set_index(list(init_index.columns), inplace=True)
+
+        root_w = np.sqrt(weights)
+        weights = pd.DataFrame(weights, index=init_index.index)
+        wframe = root_w * self._frame
+        wframe.index = init_index.index
+
+        previous = wframe
+        current = demean_pass(previous, weights, root_w)
+        if groups.shape[1] == 1:
+            current.index = self._frame.index
+            return PanelData(current)
+
+        while np.max(np.abs(current.values - previous.values)) > 1e-8:
+            previous = current
+            current = demean_pass(previous, weights, root_w)
+        current.index = self._frame.index
+
+        return PanelData(current)
+
     def general_demean(self, groups):
         """
         Multi-way demeaning using only groupby
-        
+
         Parameters
         ----------
         groups : PanelData
@@ -259,11 +324,12 @@ class PanelData(object):
         -------
         demeaned : PanelData
             Demeaned data according to groups
-               
+
         Notes
         -----
         Iterates until convergence
         """
+        # TODO: Consolidate with weighted version
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
         groups = groups.values2d.astype(np.int64)
@@ -279,12 +345,16 @@ class PanelData(object):
             return frame
 
         # Swap out the index for better performance
-        init = self._frame.copy()
+        previous = self._frame.copy()
         init_index = pd.DataFrame(groups)
         init_index.set_index(list(init_index.columns), inplace=True)
-        init.index = init_index.index
-        previous = init
+        previous.index = init_index.index
         current = demean_pass(previous)
+
+        if groups.shape[1] == 1:
+            current.index = self._frame.index
+            return PanelData(current)
+
         while np.max(np.abs(current.values - previous.values)) > 1e-8:
             previous = current
             current = demean_pass(current)
@@ -391,21 +461,21 @@ class PanelData(object):
         mean : DataFrame
             Data mean according to type. Either (entity by var) or (time by var)
         """
-        v = self.panel.values
-        axis = 1 if group == 'entity' else 2
+        level = 0 if group == 'entity' else 1
         if weights is None:
-            mu = np.nanmean(v, axis=axis)
+            mu = self._frame.groupby(level=level).mean()
         else:
-            w = weights.values3d
-            w = w * np.isfinite(v)
-            wv = w * v
-            mu = np.nansum(wv, axis=axis)
-            mu /= np.nansum(w, axis=axis)
+            w = weights.values2d
+            frame = self._frame.copy()
+            frame = w * frame
+            weighted_sum = frame.groupby(level=level).sum()
+            frame.iloc[:, :] = w
+            sum_weights = frame.groupby(level=level).sum()
+            mu = weighted_sum / sum_weights
 
-        index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
-        out = DataFrame(mu.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
-        out = out.loc[reindex]
+        out = mu.loc[reindex]
+
         return out
 
     def first_difference(self):
