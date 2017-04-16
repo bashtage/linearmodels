@@ -310,7 +310,15 @@ class PanelData(object):
             current.index = self._frame.index
             return PanelData(current)
 
-        while np.max(np.abs(current.values - previous.values)) > 1e-8:
+        exclude = np.ptp(self._frame.values,0) == 0
+        max_rmse = np.sqrt(self._frame.values.var(0).max())
+        scale = self._frame.std().values
+        exclude = exclude | (scale < 1e-14 * max_rmse)
+        replacement = np.maximum(scale, 1)
+        scale[exclude] = replacement[exclude]
+        scale = scale[None,:]
+
+        while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
             previous = current
             current = demean_pass(previous, weights, root_w)
         current.index = self._frame.index
@@ -361,7 +369,15 @@ class PanelData(object):
             current.index = self._frame.index
             return PanelData(current)
 
-        while np.max(np.abs(current.values - previous.values)) > 1e-8:
+        exclude = np.ptp(self._frame.values,0) == 0
+        max_rmse = np.sqrt(self._frame.values.var(0).max())
+        scale = self._frame.std().values
+        exclude = exclude | (scale < 1e-14 * max_rmse)
+        replacement = np.maximum(scale, 1)
+        scale[exclude] = replacement[exclude]
+        scale = scale[None,:]
+
+        while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
             previous = current
             current = demean_pass(current)
         current.index = self._frame.index
