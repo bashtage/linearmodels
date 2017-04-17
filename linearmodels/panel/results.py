@@ -414,6 +414,7 @@ class PanelEffectsResults(PanelResults):
         self._sigma2_eps = res.sigma2_eps
         self._sigma2_effects = res.sigma2_effects
         self._r2_ex_effects = res.r2_ex_effects
+        self._effects = res.effects
 
     @property
     def f_pooled(self):
@@ -511,6 +512,11 @@ class PanelEffectsResults(PanelResults):
         smry.add_extra_txt(extra_text)
 
         return smry
+
+    @property
+    def estimated_effects(self):
+        """Estimated effects"""
+        return self._effects
 
     def variance_decomposition(self):
         """Decomposition of total variance into effects and residuals"""

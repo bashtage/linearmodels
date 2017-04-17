@@ -30,8 +30,6 @@ class AmbiguityError(Exception):
 
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
-# TODO: Correlation between FE and XB
-# TODO: Report effects in results
 # TODO: Test effects using LSDV
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
@@ -1026,12 +1024,20 @@ class PanelOLS(PooledOLS):
                                          df_num, df_denom=df_denom,
                                          name='Pooled F-statistic')
             res.update(f_pooled=f_pooled)
+            effects = pd.DataFrame(eps_effects - eps, columns=['effects'],
+                                   index=self.dependent.index)
+            xb = self.exog.values2d @ params
+        else:
+            effects = pd.DataFrame(np.zeros_like(eps), columns=['effects'],
+                                   index=self.dependent.index)
+            effect_corr = 0
 
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
                         r2=r2, entity_effect=self.entity_effect, time_effect=self.time_effect,
                         other_effect=self.other_effect, sigma2_eps=sigma2_eps,
-                        sigma2_effects=sigma2_effects, rho=rho, r2_ex_effects=r2_ex_effects))
+                        sigma2_effects=sigma2_effects, rho=rho, r2_ex_effects=r2_ex_effects,
+                        effects=effects))
 
         return PanelEffectsResults(res)
 
