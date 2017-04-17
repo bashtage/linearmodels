@@ -1,3 +1,5 @@
+.. _panel-implementation-choices:
+
 Implementation Choices
 ----------------------
 

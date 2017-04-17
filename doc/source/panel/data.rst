@@ -1,3 +1,5 @@
+.. _panel-module-reference-data:
+
 Panel Data Structures
 ---------------------
 

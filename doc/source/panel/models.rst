@@ -1,3 +1,5 @@
+.. _panel-module-reference-models:
+
 Models for Panel Data
 ---------------------
 

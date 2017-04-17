@@ -7,6 +7,8 @@ from xarray import DataArray
 from linearmodels.utility import ensure_unique_column
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
 
+# TODO: Require numeric or datatime for time index to ensure order
+
 
 def convert_columns(s, drop_first):
     if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
@@ -147,7 +149,7 @@ class PanelData(object):
         """
         Parameters
         ----------
-        locs : array
+        locs : ndarray
             Booleam array indicating observations to drop with reference to
             the dataframe view of the data
         """
@@ -209,7 +211,7 @@ class PanelData(object):
 
         Returns
         -------
-        id : array
+        id : ndarray
             2d array containing entity ids corresponding dataframe view
         """
         return np.asarray(self._frame.index.labels[0])[:, None]
@@ -221,7 +223,7 @@ class PanelData(object):
 
         Returns
         -------
-        id : array
+        id : ndarray
             2d array containing time ids corresponding dataframe view
         """
         return np.asarray(self._frame.index.labels[1])[:, None]
@@ -310,13 +312,13 @@ class PanelData(object):
             current.index = self._frame.index
             return PanelData(current)
 
-        exclude = np.ptp(self._frame.values,0) == 0
+        exclude = np.ptp(self._frame.values, 0) == 0
         max_rmse = np.sqrt(self._frame.values.var(0).max())
         scale = self._frame.std().values
         exclude = exclude | (scale < 1e-14 * max_rmse)
         replacement = np.maximum(scale, 1)
         scale[exclude] = replacement[exclude]
-        scale = scale[None,:]
+        scale = scale[None, :]
 
         while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
             previous = current
@@ -369,13 +371,13 @@ class PanelData(object):
             current.index = self._frame.index
             return PanelData(current)
 
-        exclude = np.ptp(self._frame.values,0) == 0
+        exclude = np.ptp(self._frame.values, 0) == 0
         max_rmse = np.sqrt(self._frame.values.var(0).max())
         scale = self._frame.std().values
         exclude = exclude | (scale < 1e-14 * max_rmse)
         replacement = np.maximum(scale, 1)
         scale[exclude] = replacement[exclude]
-        scale = scale[None,:]
+        scale = scale[None, :]
 
         while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
             previous = current

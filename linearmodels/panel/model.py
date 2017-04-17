@@ -4,13 +4,13 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance, \
-    HomoskedasticCovariance, CovarianceManager
+from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager, \
+    HeteroskedasticCovariance, HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelEffectsResults, PanelResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
-    MissingValueWarning, WaldTestStatistic, has_constant, missing_value_warning_msg, \
-    ensure_unique_column
+    MissingValueWarning, WaldTestStatistic, ensure_unique_column, has_constant, \
+    missing_value_warning_msg
 
 
 class AbsorbingEffectError(Exception):
@@ -33,6 +33,8 @@ class AmbiguityError(Exception):
 # TODO: Correlation between FE and XB
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
+# TODO: Test rsquared-inclusive against lsdv (weighted and un)
+
 
 class PooledOLS(object):
     r"""
@@ -100,6 +102,7 @@ class PooledOLS(object):
 
     def _info(self):
         """Information about panel structure"""
+
         def stats(ids, name):
             bc = np.bincount(ids)
             index = ['mean', 'median', 'max', 'min', 'total']
@@ -365,11 +368,11 @@ class PooledOLS(object):
         -------
         model : PooledOLS
             Model specified using the formula
-        
+
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a 
-        constant using the constant indicator (1)  
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
 
         Examples
         --------
@@ -534,7 +537,7 @@ class PanelOLS(PooledOLS):
 
         y_{it} = \alpha_i + \beta^{\prime}x_{it} + \epsilon_{it}
 
-    where :math:`\alpha_i` is included if ``entity_effect`` is ``True.
+    where :math:`\alpha_i` is included if ``entity_effect=True``.
 
     Time effect are also supported, which leads to a model of the form
 
@@ -542,7 +545,7 @@ class PanelOLS(PooledOLS):
 
         y_{it}= \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}
 
-    where :math:`\gamma_i` is included if ``time_effect`` is ``True``.
+    where :math:`\gamma_i` is included if ``time_effect=True``.
 
     Both effects can be simultaneously used,
 
@@ -610,7 +613,7 @@ class PanelOLS(PooledOLS):
         return self._other_effect
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(cls, formula, data, *, weights=None, other_effects=None):
         """
         Create a model from a formula
 
@@ -629,6 +632,10 @@ class PanelOLS(PooledOLS):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
+        other_effects : array-like, optional
+            Category codes to use for any effects that are not entity or time
+            effects. Each variable is treated as an effect.
+
 
         Returns
         -------
@@ -665,7 +672,7 @@ class PanelOLS(PooledOLS):
         dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
         mod = cls(dependent, exog, entity_effect=entity_effect,
-                  time_effect=time_effect, weights=weights)
+                  time_effect=time_effect, weights=weights, other_effects=other_effects)
         mod.formula = formula
         return mod
 
@@ -818,6 +825,7 @@ class PanelOLS(PooledOLS):
 
     def _info(self):
         """Information about model effects and panel structure"""
+
         def stats(ids, name):
             bc = np.bincount(ids)
             index = ['mean', 'median', 'max', 'min', 'total']
@@ -836,7 +844,8 @@ class PanelOLS(PooledOLS):
 
         return entity_info, time_info, other_info
 
-    def _is_effect_nested(self, effects, clusters):
+    @staticmethod
+    def _is_effect_nested(effects, clusters):
         """Determine whether an effect is nested by the covariance clusters"""
         is_nested = np.zeros(effects.shape[1], dtype=np.bool)
         for i, e in enumerate(effects.T):
@@ -880,8 +889,8 @@ class PanelOLS(PooledOLS):
         Parameters
         ----------
         use_lsdv : bool, optional
-            Flag indicating to use the Least Squares Dummy Variable estimator 
-            to eliminate effects.  The default value uses only means and does 
+            Flag indicating to use the Least Squares Dummy Variable estimator
+            to eliminate effects.  The default value uses only means and does
             note require constructing dummy variables for each effect.
         cov_type : str, optional
             Name of covariance estimator. See Notes.
@@ -992,6 +1001,13 @@ class PanelOLS(PooledOLS):
         r2 = 1 - resid_ss / total_ss
 
         root_w = np.sqrt(self.weights.values2d)
+        y_ex = root_w * self.dependent.values2d
+        mu_ex = 0
+        if self.has_constant or self.entity_effect or self.time_effect or self.other_effect:
+            mu_ex = (root_w.T @ y_ex) / (root_w.T @ root_w)
+        total_ss_ex_effect = float((y_ex - mu_ex).T @ (y_ex - mu_ex))
+        r2_ex_effects = 1 - resid_ss / total_ss_ex_effect
+
         res = self._postestimation(params, cov, debiased, df_resid, weps, y, x, root_w)
         ######################################
         # Pooled f-stat
@@ -1013,7 +1029,7 @@ class PanelOLS(PooledOLS):
                         residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
                         r2=r2, entity_effect=self.entity_effect, time_effect=self.time_effect,
                         other_effect=self.other_effect, sigma2_eps=sigma2_eps,
-                        sigma2_effects=sigma2_effects, rho=rho))
+                        sigma2_effects=sigma2_effects, rho=rho, r2_ex_effects=r2_ex_effects))
 
         return PanelEffectsResults(res)
 
@@ -1170,8 +1186,8 @@ class BetweenOLS(PooledOLS):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a 
-        constant using the constant indicator (1)  
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
 
         Examples
         --------
@@ -1359,8 +1375,8 @@ class FirstDifferenceOLS(PooledOLS):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a 
-        constant using the constant indicator (1)  
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
 
         Examples
         --------
