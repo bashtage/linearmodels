@@ -6,7 +6,89 @@ from linearmodels import PanelOLS
 etdata = data.set_index(['firm','year'])
 PanelOLS(etdata.invest,etdata[['value','capital']],entity_effect=True).fit(debiased=True)
 
+
 import numpy as np
+
+x=np.random.randn(10,2)
+p = np.zeros((10,10))
+p[:5,:5] = 1 / 5
+p[5:,5:] = 1 / 5
+z=np.zeros((10,2))
+z[:5,0] = 1
+z[5:,1] = 1
+a = x.T@p@x
+b = (x.T@z)@(x.T@z).T
+
+
+import numpy as np
+from statsmodels.datasets import grunfeld
+data = grunfeld.load_pandas().data
+data.year = data.year.astype(np.int64)
+from linearmodels import PanelOLS
+etdata = data.set_index(['firm','year'])
+PanelOLS(etdata.invest,etdata[['value','capital']],entity_effect=True).fit(debiased=True)
+res=_
+res.estimated_effects
+res.estimated_effects
+res
+res.estimated_effects
+res.estimated_effects()
+x=np.random.randn(10,2)
+p = np.zeros((10,10))
+p[:5,:5] = 1 / 5
+p[5:,5:] = 1 / 5
+p
+x
+x.T@p
+x.T@p@x
+x
+x.T@p@x
+x.mean(0)
+x.sum(0)
+x.sum(0)[:,None].T
+x.sum(0)[:,None]
+x.sum(0)[:,None]@.sum(0)[:,None]
+x.sum(0)[:,None]@x.sum(0)[:,None]
+x.sum(0)[:,None]@x.sum(0)[:,None].T
+x.sum(0)[:,None]@x.sum(0)[:,None].T / 5
+p
+x.T@p
+(x.T@p).T
+x.T@((x.T@p).T)
+(x.T@p).T)
+x[:5].mean(0)
+pd.DataFrame(x)
+import pandas as pd
+pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
+z=pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
+z.groupby(level=0).transform('mean')
+z.groupby(level=0).transform('mean').values.T@x
+z=np.zeros((10,2))
+z[:5,0] = 1
+z[5:,1] = 1
+z
+x.t@z
+x.T@z
+x.sum()
+x.sum(0)
+x[:5].sum(0)
+zz=pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
+zz.groupby(level=0).sum()
+zz.groupby(level=0).sum().T
+o=zz.groupby(level=0).sum().T.values
+o
+o@o.T
+(x.T@z)@(x.T@z).T
+a = x.T@p@x
+b = (x.T@z)@(x.T@z).T
+a
+b
+np.linalg.inv(a)@b
+np.linalg.trace(np.linalg.inv(a)@b)
+np.trace(np.linalg.inv(a)@b)
+%hist -s 30
+%hist -l 30
+%hist
 
 from linearmodels import PanelOLS
 from linearmodels.panel.data import PanelData
