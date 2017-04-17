@@ -38,7 +38,7 @@ class AmbiguityError(Exception):
 
 class PooledOLS(object):
     r"""
-    Estimation of linear model with pooled parameters
+    Pooled coefficient estimator for panel data
 
     Parameters
     ----------
@@ -510,6 +510,8 @@ class PooledOLS(object):
 
 class PanelOLS(PooledOLS):
     r"""
+    One- and two-way fixed effects estimator for panel data
+    
     Parameters
     ----------
     dependent : array-like
@@ -1044,6 +1046,8 @@ class PanelOLS(PooledOLS):
 
 class BetweenOLS(PooledOLS):
     r"""
+    Between estimator for panel data
+    
     Parameters
     ----------
     dependent : array-like
@@ -1208,6 +1212,8 @@ class BetweenOLS(PooledOLS):
 
 class FirstDifferenceOLS(PooledOLS):
     r"""
+    First difference model for panel data
+    
     Parameters
     ----------
     dependent : array-like
@@ -1393,3 +1399,91 @@ class FirstDifferenceOLS(PooledOLS):
         >>> res = mod.fit()
         """
         return super(FirstDifferenceOLS, cls).from_formula(formula, data, weights=weights)
+
+
+class RandomEffects(PooledOLS):
+    r"""
+    One-way Random Effects model for panel data
+    
+    Parameters
+    ----------
+    dependent : array-like
+        Dependent (left-hand-side) variable (time by entity)
+    exog : array-like
+        Exogenous or right-hand-side variables (variable by time by entity).
+    weights : array-like, optional
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
+
+    Notes
+    -----
+    The model is given by
+    """
+
+    # TODO: Math docs
+
+    def fit(self, *, small_sample=False, cov_type='unadjusted', debiased=False, **cov_config):
+        # Steps
+        # 1. Estimate FE-model
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        y = self.dependent.demean('entity', weights=self.weights).values2d
+        x = self.exog.demean('entity', weights=self.weights).values2d
+        if self.has_constant:
+            w_sum = w.sum()
+            y_gm = (w * self.dependent.values2d).sum(0) / w_sum
+            x_gm = (w * self.exog.values2d).sum(0) / w_sum
+            y += root_w * y_gm
+            x += root_w * x_gm
+        params = np.linalg.lstsq(x, y)[0]
+        weps = y - x @ params
+
+        wybar = self.dependent.mean('entity', weights=self.weights)
+        wxbar = self.exog.mean('entity', weights=self.weights)
+        params = np.linalg.lstsq(wxbar, wybar)[0]
+        wu = wybar.values - wxbar.values @ params
+
+        nobs = weps.shape[0]
+        neffects = wu.shape[0]
+        nvar = x.shape[1]
+        sigma2_e = float(weps.T @ weps) / (nobs - nvar - neffects + 1)
+        ssr = float(wu.T @ wu)
+        t = self.dependent.count('entity').values
+        t_bar = neffects / ((1.0 / t).sum())
+        sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
+
+        theta = 1 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
+
+        wy = root_w * self.dependent.values2d
+        wx = root_w * self.exog.values2d
+        index = self.dependent.index
+        reindex = index.levels[0][index.labels[0]]
+        wybar = (theta * wybar).loc[reindex]
+        wxbar = (theta * wxbar).loc[reindex]
+        wy -= wybar.values
+        wx -= wxbar.values
+        params = np.linalg.lstsq(wx, wy)[0]
+
+        df_resid = wy.shape[0] - wx.shape[1]
+        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
+        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
+
+        weps = wy - wx @ params
+        eps = weps / root_w
+        residual_ss = float(weps.T @ weps)
+        wmu = 0
+        if self.has_constant:
+            wmu = root_w * lstsq(root_w, wy)[0]
+        wy_demeaned = wy - wmu
+        total_ss = float(wy_demeaned.T @ wy_demeaned)
+        r2 = 1 - residual_ss / total_ss
+
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
+                        residual_ss=residual_ss, total_ss=total_ss, r2=r2,
+                        resids=eps, wresids=weps, index=index))
+
+        self._REMOVE_ME = np.sqrt(sigma2_u), np.sqrt(sigma2_e), theta
+
+        return PanelResults(res)

@@ -1,98 +1,102 @@
+from linearmodels.panel.data import PanelData
 import numpy as np
+import pandas as pd
 from statsmodels.datasets import grunfeld
-data = grunfeld.load_pandas().data
-data.year = data.year.astype(np.int64)
-from linearmodels import PanelOLS
-etdata = data.set_index(['firm','year'])
-PanelOLS(etdata.invest,etdata[['value','capital']],entity_effect=True).fit(debiased=True)
+
+from linearmodels.panel.model import RandomEffects
+from linearmodels.tests.panel._utility import generate_data
+
+data = pd.read_stata(r'C:\git\linearmodels\linearmodels\tests\panel\results\simulated-panel.dta')
+data= data.set_index(['firm','time'])
+mod = RandomEffects(data.y, data[['intercept', 'x1','x2','x3','x4','x5']])
+res = mod.fit()
 
 
-import numpy as np
-
-x=np.random.randn(10,2)
-p = np.zeros((10,10))
-p[:5,:5] = 1 / 5
-p[5:,5:] = 1 / 5
-z=np.zeros((10,2))
-z[:5,0] = 1
-z[5:,1] = 1
-a = x.T@p@x
-b = (x.T@z)@(x.T@z).T
-
+mod = RandomEffects(data.y_light, data[['intercept', 'x1_light','x2_light','x3_light','x4_light','x5_light']])
+res = mod.fit()
 
 import numpy as np
 from statsmodels.datasets import grunfeld
+
 data = grunfeld.load_pandas().data
 data.year = data.year.astype(np.int64)
 from linearmodels import PanelOLS
-etdata = data.set_index(['firm','year'])
-PanelOLS(etdata.invest,etdata[['value','capital']],entity_effect=True).fit(debiased=True)
-res=_
-res.estimated_effects
-res.estimated_effects
-res
-res.estimated_effects
-res.estimated_effects()
-x=np.random.randn(10,2)
-p = np.zeros((10,10))
-p[:5,:5] = 1 / 5
-p[5:,5:] = 1 / 5
+
+etdata = data.set_index(['firm', 'year'])
+PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True).fit(debiased=True)
+
+import numpy as np
+
+x = np.random.randn(10, 2)
+p = np.zeros((10, 10))
+p[:5, :5] = 1 / 5
+p[5:, 5:] = 1 / 5
+z = np.zeros((10, 2))
+z[:5, 0] = 1
+z[5:, 1] = 1
+a = x.T @ p @ x
+b = (x.T @ z) @ (x.T @ z).T
+
+import numpy as np
+from statsmodels.datasets import grunfeld
+
+data = grunfeld.load_pandas().data
+data.year = data.year.astype(np.int64)
+from linearmodels import PanelOLS
+
+etdata = data.set_index(['firm', 'year'])
+res = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True).fit(debiased=True)
+x = np.random.randn(10, 2)
+p = np.zeros((10, 10))
+p[:5, :5] = 1 / 5
+p[5:, 5:] = 1 / 5
 p
 x
-x.T@p
-x.T@p@x
+x.T @ p
+x.T @ p @ x
 x
-x.T@p@x
+x.T @ p @ x
 x.mean(0)
 x.sum(0)
-x.sum(0)[:,None].T
-x.sum(0)[:,None]
-x.sum(0)[:,None]@.sum(0)[:,None]
-x.sum(0)[:,None]@x.sum(0)[:,None]
-x.sum(0)[:,None]@x.sum(0)[:,None].T
-x.sum(0)[:,None]@x.sum(0)[:,None].T / 5
+x.sum(0)[:, None].T
+x.sum(0)[:, None]
+x.sum(0)[:, None] @ x.sum(0)[:, None].T
+x.sum(0)[:, None] @ x.sum(0)[:, None].T / 5
 p
-x.T@p
-(x.T@p).T
-x.T@((x.T@p).T)
-(x.T@p).T)
+x.T @ p
+(x.T @ p).T
+x.T @ ((x.T @ p).T)
 x[:5].mean(0)
 pd.DataFrame(x)
 import pandas as pd
-pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
-z=pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
+
+pd.DataFrame(x, index=[1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
+z = pd.DataFrame(x, index=[1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
 z.groupby(level=0).transform('mean')
-z.groupby(level=0).transform('mean').values.T@x
-z=np.zeros((10,2))
-z[:5,0] = 1
-z[5:,1] = 1
+z.groupby(level=0).transform('mean').values.T @ x
+z = np.zeros((10, 2))
+z[:5, 0] = 1
+z[5:, 1] = 1
 z
-x.t@z
-x.T@z
+x.T @ z
 x.sum()
 x.sum(0)
 x[:5].sum(0)
-zz=pd.DataFrame(x,index=[1,1,1,1,1,2,2,2,2,2])
+zz = pd.DataFrame(x, index=[1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
 zz.groupby(level=0).sum()
 zz.groupby(level=0).sum().T
-o=zz.groupby(level=0).sum().T.values
+o = zz.groupby(level=0).sum().T.values
 o
-o@o.T
-(x.T@z)@(x.T@z).T
-a = x.T@p@x
-b = (x.T@z)@(x.T@z).T
+o @ o.T
+(x.T @ z) @ (x.T @ z).T
+a = x.T @ p @ x
+b = (x.T @ z) @ (x.T @ z).T
 a
 b
-np.linalg.inv(a)@b
-np.linalg.trace(np.linalg.inv(a)@b)
-np.trace(np.linalg.inv(a)@b)
-%hist -s 30
-%hist -l 30
-%hist
-
-from linearmodels import PanelOLS
-from linearmodels.panel.data import PanelData
-from linearmodels.tests.panel._utility import generate_data
+np.linalg.inv(a) @ b
+np.trace(np.linalg.inv(a) @ b)
+30
+30
 
 data = generate_data(0, 'pandas', ntk=(101, 3, 5), other_effects=1, const=False)
 
@@ -100,7 +104,7 @@ y = PanelData(data.y)
 x = PanelData(data.x)
 w = PanelData(data.w)
 
-x.dataframe.iloc[:,0] = 1
+x.dataframe.iloc[:, 0] = 1
 mod = PanelOLS(data.y, data.x, weights=data.w)
 mod.fit()
 mod = PanelOLS(y, x, weights=data.w, entity_effect=True)
@@ -166,6 +170,6 @@ wd1 = root_w * d1
 wd2 = root_w * d2
 for i in range(50):
     xm -= wd1 @ np.linalg.lstsq(wd1, xm)[0]
-    xm -= wd2 @ np.linalg.lstsq(wd2, xm)[0]
+xm -= wd2 @ np.linalg.lstsq(wd2, xm)[0]
 
 print(np.max(np.abs(xdw.values2d - xm)))
