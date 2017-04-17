@@ -31,9 +31,11 @@ class AmbiguityError(Exception):
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
 # TODO: Correlation between FE and XB
+# TODO: Report effects in results
+# TODO: Test effects using LSDV
 # TODO: Example notebooks
 # TODO: Formal test of other outputs
-# TODO: Test rsquared-inclusive against lsdv (weighted and un)
+# TODO: Test rsquared-inclusive against LSDV (weighted and un)
 
 
 class PooledOLS(object):

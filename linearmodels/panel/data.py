@@ -7,7 +7,7 @@ from xarray import DataArray
 from linearmodels.utility import ensure_unique_column
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
 
-# TODO: Require numeric or datatime for time index to ensure order
+# TODO: Require numeric or datetime for time index to ensure order
 
 
 def convert_columns(s, drop_first):
@@ -95,7 +95,7 @@ class PanelData(object):
                     if len(x.index.levels) != 2:
                         raise ValueError('DataFrame input must have a '
                                          'MultiIndex with 2 levels')
-                    self._frame = x
+                    self._frame = x.copy()
                 else:
                     self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
             else:
@@ -274,8 +274,6 @@ class PanelData(object):
         -----
         Iterates until convergence
         """
-        # TODO: Need to check scale in iteration limit
-
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
         weights = weights.values2d
