@@ -413,6 +413,7 @@ class PanelEffectsResults(PanelResults):
         self._rho = res.rho
         self._sigma2_eps = res.sigma2_eps
         self._sigma2_effects = res.sigma2_effects
+        self._r2_ex_effects = res.r2_ex_effects
 
     @property
     def f_pooled(self):
@@ -469,6 +470,11 @@ class PanelEffectsResults(PanelResults):
     def other_info(self):
         """Statistics on observations per group for other effects"""
         return self._other_info
+
+    @property
+    def rsquared_inclusive(self):
+        """Model Coefficient of determination including fit of included effects"""
+        return self._r2_ex_effects
 
     @property
     def summary(self):

@@ -1,3 +1,5 @@
+.. _panel-module-reference-covariance:
+
 Panel Model Covariance Estimators
 ---------------------------------
 

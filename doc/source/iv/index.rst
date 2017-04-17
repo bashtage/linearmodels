@@ -9,7 +9,7 @@ estimators, GMM weighting estimators and the results are presented in
 :ref:`iv-module-reference`.
 
 :ref:`Basic Examples <iv/examples/basic-examples.ipynb>` shows basic usage
-through examples from Wooldridge's introductior text book and
+through examples from Wooldridge's introductory text book and
 :ref:`Advanced Examples <iv/examples/advanced-examples.ipynb>` shows more
 advanced examples following the examples in Cameron and Trivedi's Stata
 introduction.

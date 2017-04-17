@@ -4,9 +4,13 @@ Linear Models
 |Build Status| |codecov|
 
 Linear (regression) models for Python. Extends
-`statsmodels <http://www.statsmodels.org>`__ to include instrumental
-variable estimators:
+`statsmodels <http://www.statsmodels.org>`__ to include Panel regression
+and instrumental variable estimators:
 
+-  Panel regression with fixed effects (maximum two-way)
+-  First difference regression
+-  Between estimator for panel data
+-  Pooled regression for panel data
 -  Two-stage Least Squares
 -  Limited Information Maximum Likelihood
 -  k-class Estimators
@@ -14,9 +18,42 @@ variable estimators:
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 
+Panel models
+~~~~~~~~~~~~
+
 Like `statsmodels <http://www.statsmodels.org>`__ to include, supports
 `patsy <https://patsy.readthedocs.io/en/latest/>`__ formulas for
-specifying models. For example,
+specifying models. For example, the classic Grunfeld regression can be
+specified
+
+.. code:: python
+
+    import numpy as np
+    from statsmodels.datasets import grunfeld
+    data = grunfeld.load_pandas().data
+    data.year = data.year.astype(np.int64)
+    # MultiIndex, entity - time
+    data = data.set_index(['firm','year'])
+    from linearmodels import PanelOLS
+    mod = PanelOLS(data.invest, data[['value','capital']], entity_effect=True)
+    res = mod.fit(cov_type='clustered', cluster_entity=True)
+
+Models can also be specified using the formula interface.
+
+.. code:: python
+
+    from linearmodels import PanelOLS
+    mod = PanelOLS.from_formula('invest ~ value + capital + EntityEffect', data)
+    res = mod.fit(cov_type='clustered', cluster_entity=True)
+
+The formula interface for ``PanelOLS`` supports the special values
+``EntityEffects`` and ``TimeEffects`` which add entity (fixed) and time
+effects, respectively.
+
+Instrumental Variable Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+IV regression models can be similarly specified.
 
 .. code:: python
 
@@ -61,11 +98,11 @@ Should eventually add some useful linear model estimators such as panel
 regression. Currently only the single variable IV estimators are
 polished.
 
--  Linear Instrumental variable estimation - *complete*
--  Linear Panel model estimation - *substantially complete ex. Random
-   Effects*
--  Linear IV Panel model estimation - *not started*
--  System regression - *not started*
+-  Linear Instrumental variable estimation - **complete**
+-  Linear Panel model estimation - **complete** *ex. Random Effects*
+-  Fama-MacBeth regression - **not started**
+-  Linear IV Panel model estimation - \*\*not started\*()
+-  System regression - **not started**
 
 Requirements
 ------------
