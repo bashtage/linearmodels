@@ -211,6 +211,7 @@ def test_panel_entity_lsdv(data):
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
+    assert_allclose(res.rsquared_inclusive, res2.rsquared)
 
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
@@ -288,6 +289,7 @@ def test_panel_time_lsdv(data):
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
+    assert_allclose(res.rsquared_inclusive, res2.rsquared)
 
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
@@ -366,6 +368,7 @@ def test_panel_both_lsdv(data):
     ols_mod = IV2SLS(y, xd, None, None)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
+    assert_allclose(res.rsquared_inclusive, res2.rsquared)
 
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
@@ -447,6 +450,7 @@ def test_panel_entity_lsdv_weighted(data):
     ols_mod = IV2SLS(y, xd, None, None, weights=w)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
+    assert_allclose(res.rsquared_inclusive, res2.rsquared)
 
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
@@ -560,6 +564,8 @@ def test_panel_both_lsdv_weighted(data):
     ols_mod = IV2SLS(y, xd, None, None, weights=w)
     res2 = ols_mod.fit('unadjusted')
     assert_results_equal(res, res2, test_fit=False)
+    assert_allclose(res.rsquared_inclusive, res2.rsquared)
+
 
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
@@ -958,3 +964,13 @@ def test_lsdv_options(data):
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
+
+
+def test_rsquared_inclusive_equivalence(data):
+    mod = PanelOLS(data.y, data.x)
+    res = mod.fit()
+    assert_allclose(res.rsquared, res.rsquared_inclusive)
+    
+    mod = PanelOLS(data.y, data.x, weights=data.w)
+    res = mod.fit()
+    assert_allclose(res.rsquared, res.rsquared_inclusive)
