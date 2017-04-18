@@ -518,8 +518,34 @@ class PanelEffectsResults(PanelResults):
         """Estimated effects"""
         return self._effects
 
+    @property
     def variance_decomposition(self):
         """Decomposition of total variance into effects and residuals"""
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ['Effects', 'Residual', 'Percent due to Effects']
         return Series(vals, index=index, name='Variance Decomposition')
+
+
+class RandomEffectsResults(PanelResults):
+    """
+    Results container for random effect panel data models
+    """
+
+    def __init__(self, res):
+        super(RandomEffectsResults, self).__init__(res)
+        self._theta = res.theta
+        self._sigma2_effects = res.sigma2_effects
+        self._sigma2_eps = res.sigma2_eps
+        self._rho = res.rho
+
+    @property
+    def variance_decomposition(self):
+        """Decomposition of total variance into effects and residuals"""
+        vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
+        index = ['Effects', 'Residual', 'Percent due to Effects']
+        return Series(vals, index=index, name='Variance Decomposition')
+
+    @property
+    def theta(self):
+        """Values used in generalized demeaning"""
+        return self._theta

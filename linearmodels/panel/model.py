@@ -7,7 +7,7 @@ from patsy.missing import NAAction
 from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager, \
     HeteroskedasticCovariance, HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.results import PanelEffectsResults, PanelResults
+from linearmodels.panel.results import PanelEffectsResults, PanelResults, RandomEffectsResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
     MissingValueWarning, WaldTestStatistic, ensure_unique_column, has_constant, \
     missing_value_warning_msg
@@ -28,12 +28,20 @@ class AmbiguityError(Exception):
     pass
 
 
+# Essential
+# TODO: Example notebooks
+# TODO: Report variance components for RE
+# TODO: Small sample adjustment for RE
+# TODO: Cluster adjustment for RandomEffects?
+# TODO: Test estimated effects using LSDV
+# TODO: Test rsquared-inclusive against LSDV (weighted and un)
+# Likely
+# TODO: Formal test of other outputs
+# TODO: Test categorical nesting when using other effects
+# Future
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
-# TODO: Test effects using LSDV
-# TODO: Example notebooks
-# TODO: Formal test of other outputs
-# TODO: Test rsquared-inclusive against LSDV (weighted and un)
+# TODO: ML Estimation of RE model
 
 
 class PooledOLS(object):
@@ -73,6 +81,15 @@ class PooledOLS(object):
                                                  HeteroskedasticCovariance, ClusteredCovariance)
 
         self._validate_data()
+
+    def __str__(self):
+        out = '{name} \nNum exog: {num_exog}, Constant: {has_constant}'
+        return out.format(name=self.__class__.__name__,
+                          num_exog=self.exog.dataframe.shape[1],
+                          has_constant=self.has_constant)
+
+    def __repr__(self):
+        return self.__str__() + '\nid: ' + str(hex(id(self)))
 
     def reformat_clusters(self, clusters):
         """
@@ -511,7 +528,7 @@ class PooledOLS(object):
 class PanelOLS(PooledOLS):
     r"""
     One- and two-way fixed effects estimator for panel data
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -572,6 +589,16 @@ class PanelOLS(PooledOLS):
         self._time_effect = time_effect
         self._other_effect_cats = None
         self._other_effect = self._validate_effects(other_effects)
+
+    def __str__(self):
+        out = super(PanelOLS, self).__str__()
+        additional = '\nEntity Effects: {ee}, Time Effects: {te}, Num Other Effects: {oe}'
+        oe = 0
+        if self.other_effect:
+            oe = self._other_effect_cats.nvar
+        additional = additional.format(ee=self.entity_effect, te=self.time_effect, oe=oe)
+        out += additional
+        return out
 
     def _validate_effects(self, effects):
         """Check model effects"""
@@ -1028,11 +1055,9 @@ class PanelOLS(PooledOLS):
             res.update(f_pooled=f_pooled)
             effects = pd.DataFrame(eps_effects - eps, columns=['effects'],
                                    index=self.dependent.index)
-            xb = self.exog.values2d @ params
         else:
             effects = pd.DataFrame(np.zeros_like(eps), columns=['effects'],
                                    index=self.dependent.index)
-            effect_corr = 0
 
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
@@ -1047,7 +1072,7 @@ class PanelOLS(PooledOLS):
 class BetweenOLS(PooledOLS):
     r"""
     Between estimator for panel data
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -1213,7 +1238,7 @@ class BetweenOLS(PooledOLS):
 class FirstDifferenceOLS(PooledOLS):
     r"""
     First difference model for panel data
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -1404,7 +1429,7 @@ class FirstDifferenceOLS(PooledOLS):
 class RandomEffects(PooledOLS):
     r"""
     One-way Random Effects model for panel data
-    
+
     Parameters
     ----------
     dependent : array-like
@@ -1419,13 +1444,52 @@ class RandomEffects(PooledOLS):
     Notes
     -----
     The model is given by
+
+    .. math::
+
+        y_{it} = \beta^{\prime}x_{it} + u_i + \epsilon_{it}
+
+    where :math:`u_i` is a shock that is independent of :math:`x_{it}` but
+    common to all entities i.
     """
 
-    # TODO: Math docs
+    @classmethod
+    def from_formula(cls, formula, data, *, weights=None):
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array-like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array-like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        model : RandomEffects
+            Model specified using the formula
+
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
+
+        Examples
+        --------
+        >>> from linearmodels import RandomEffects
+        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', data)
+        >>> res = mod.fit()
+        """
+        return super(RandomEffects, cls).from_formula(formula, data, weights=weights)
 
     def fit(self, *, small_sample=False, cov_type='unadjusted', debiased=False, **cov_config):
-        # Steps
-        # 1. Estimate FE-model
         w = self.weights.values2d
         root_w = np.sqrt(w)
         y = self.dependent.demean('entity', weights=self.weights).values2d
@@ -1452,9 +1516,10 @@ class RandomEffects(PooledOLS):
         t = self.dependent.count('entity').values
         t_bar = neffects / ((1.0 / t).sum())
         sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
+        rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
-
+        theta_out = pd.DataFrame(theta, columns=['theta'], index=wybar.index)
         wy = root_w * self.dependent.values2d
         wx = root_w * self.exog.values2d
         index = self.dependent.index
@@ -1482,8 +1547,7 @@ class RandomEffects(PooledOLS):
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2,
-                        resids=eps, wresids=weps, index=index))
+                        resids=eps, wresids=weps, index=index, sigma2_eps=sigma2_e,
+                        sigma2_effects=sigma2_u, rho=rho, theta=theta_out))
 
-        self._REMOVE_ME = np.sqrt(sigma2_u), np.sqrt(sigma2_e), theta
-
-        return PanelResults(res)
+        return RandomEffectsResults(res)

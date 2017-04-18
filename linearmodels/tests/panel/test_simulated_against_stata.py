@@ -6,12 +6,13 @@ import pytest
 from numpy.testing import assert_allclose
 
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS
+from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS, RandomEffects
 from linearmodels.tests.panel.results import parse_stata_results
 from linearmodels.utility import AttrDict
 
 STATA_RESULTS = parse_stata_results.data()
-MODELS = {'between': BetweenOLS, 'fixed_effect': PanelOLS, 'pooled': PooledOLS}
+MODELS = {'between': BetweenOLS, 'fixed_effect': PanelOLS, 'pooled': PooledOLS,
+          'random_effect': RandomEffects}
 cwd = os.path.split(os.path.abspath(__file__))[0]
 sim_data = pd.read_stata(os.path.join(cwd, 'results', 'simulated-panel.dta'))
 sim_data = sim_data.set_index(['firm', 'time'])
@@ -41,7 +42,7 @@ def data(request):
     fit_options = {'debiased': True}
     if weights == 'wls':
         fit_options.update({'reweight': True})
-    if vcv == 'robust' and model != 'fixed_effect':
+    if vcv == 'robust' and model not in ('fixed_effect', 'random_effect'):
         fit_options.update({'cov_type': 'robust'})
     elif vcv in ('cluster', 'robust'):
         y_data = PanelData(y)
@@ -51,7 +52,7 @@ def data(request):
     else:
         fit_options.update({'cov_type': 'unadjusted'})
 
-    if vcv == 'cluster' or (model == 'fixed_effect' and vcv == 'robust'):
+    if vcv == 'cluster' or (model in ('fixed_effect', 'random_effect') and vcv == 'robust'):
         fit_options.update({'group_debias': True})
     spec_mod = mod(y, x, **mod_options)
     fit = spec_mod.fit(**fit_options)
