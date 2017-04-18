@@ -21,7 +21,7 @@ class HomoskedasticCovariance(object):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
 
     Notes
@@ -98,7 +98,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
 
     Notes
@@ -161,7 +161,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Flag indicating whether to debias the estimator
     extra_df : int, optional
         Additional degrees of freedom consumed by models beyond the number of
-        columns in x, e.g., fixed effects.  Covariance estiamtors are always
+        columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
     cluster : ndarray, optional
         nobs by 1 or nobs by 2 array of cluster group ids

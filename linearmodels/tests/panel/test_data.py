@@ -722,8 +722,8 @@ def test_original_unmodified(data):
 
         mi_df_y = PanelData(data.y).dataframe
         mi_df_x = PanelData(data.x).dataframe
-        mi_df_y.index.names = ['firm','period']
-        mi_df_x.index.names = ['firm','period']
+        mi_df_y.index.names = ['firm', 'period']
+        mi_df_x.index.names = ['firm', 'period']
         mi_df_w = PanelData(data.w).dataframe
         pre_y = mi_df_y.copy()
         pre_x = mi_df_x.copy()

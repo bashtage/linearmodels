@@ -23,7 +23,8 @@ data.year = data.year.astype(np.int64)
 from linearmodels import PanelOLS
 
 etdata = data.set_index(['firm', 'year'])
-PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True).fit(debiased=True)
+mod2 = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True)
+res2 = mod2.fit(debiased=True)
 
 import numpy as np
 

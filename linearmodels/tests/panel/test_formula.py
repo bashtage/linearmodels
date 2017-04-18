@@ -4,7 +4,8 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS
+from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
+    RandomEffects
 from linearmodels.tests.panel._utility import generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -26,7 +27,7 @@ def formula(request):
     return request.param
 
 
-@pytest.fixture(params=[PooledOLS, BetweenOLS, FirstDifferenceOLS])
+@pytest.fixture(params=[PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects])
 def model(request):
     return request.param
 
@@ -44,6 +45,7 @@ def test_basic_formulas(data, model, formula):
     x = data.x
     res2 = model(data.y, x[vars]).fit()
     assert_allclose(res.params, res2.params)
+    assert isinstance(mod, model)
     assert mod.formula == formula
 
     if model is FirstDifferenceOLS:

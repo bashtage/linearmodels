@@ -10,13 +10,16 @@ dtafile = join(os.getcwd(), 'simulated-panel.dta')
 # Permutations
 # estimator -> be, fe, or regress to match pooled
 # datasets, (nothing), _light, _heavy
-# vce options -> conventional (be, fe), robust(fe, *regress*), ols(*regress*)
+# vce options -> conventional (be, fe, re), robust(re, fe, *regress*), ols(*regress*)
 
 configs = {'xtreg {vars}, be vce(conventional)': 'between-conventional-',
            'xtreg {vars}, be wls vce(conventional)': 'between-conventional-wls',
            'xtreg {vars}, fe vce(conventional)': 'fixed_effect-conventional-',
            'xtreg {vars}, fe vce(robust)': 'fixed_effect-robust-',
            'xtreg {vars}, fe vce(cluster firm_id)': 'fixed_effect-cluster-',
+           'xtreg {vars}, re vce(conventional)': 'random_effect-conventional-',
+           'xtreg {vars}, re vce(robust)': 'random_effect-robust-',
+           'xtreg {vars}, re vce(cluster firm_id)': 'random_effect-cluster-',
            'xtreg {vars} [aweight=w], fe vce(conventional)': 'fixed_effect-conventional-weighted',
            'xtreg {vars} [aweight=w], fe vce(robust)': 'fixed_effect-robust-weighted',
            'xtreg {vars} [aweight=w], fe vce(cluster firm_id)': 'fixed_effect-cluster-weighted',
