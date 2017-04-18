@@ -10,8 +10,11 @@ data = pd.read_stata(r'C:\git\linearmodels\linearmodels\tests\panel\results\simu
 data= data.set_index(['firm','time'])
 mod = RandomEffects(data.y, data[['intercept', 'x1','x2','x3','x4','x5']])
 res = mod.fit()
+print(res.variance_decomposition)
+res = mod.fit(small_sample=True)
+print(res.variance_decomposition)
 
-
+raise NotImplementedError
 mod = RandomEffects(data.y_light, data[['intercept', 'x1_light','x2_light','x3_light','x4_light','x5_light']])
 res = mod.fit()
 
@@ -86,9 +89,9 @@ x[:5].sum(0)
 zz = pd.DataFrame(x, index=[1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
 zz.groupby(level=0).sum()
 zz.groupby(level=0).sum().T
-o = zz.groupby(level=0).sum().T.values
+o = zz.groupby(level=0).sum().values
 o
-o @ o.T
+o.T @ o
 (x.T @ z) @ (x.T @ z).T
 a = x.T @ p @ x
 b = (x.T @ z) @ (x.T @ z).T

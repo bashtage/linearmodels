@@ -30,11 +30,8 @@ class AmbiguityError(Exception):
 
 # Essential
 # TODO: Example notebooks
-# TODO: Report variance components for RE
-# TODO: Small sample adjustment for RE
 # TODO: Cluster adjustment for RandomEffects?
 # TODO: Test estimated effects using LSDV
-# TODO: Test rsquared-inclusive against LSDV (weighted and un)
 # Likely
 # TODO: Formal test of other outputs
 # TODO: Test categorical nesting when using other effects
@@ -941,7 +938,7 @@ class PanelOLS(PooledOLS):
 
         Returns
         -------
-        results :  PanelResults
+        results :  PanelEffectsResults
             Estimation results
 
         Examples
@@ -1033,7 +1030,7 @@ class PanelOLS(PooledOLS):
         y_ex = root_w * self.dependent.values2d
         mu_ex = 0
         if self.has_constant or self.entity_effect or self.time_effect or self.other_effect:
-            mu_ex = (root_w.T @ y_ex) / (root_w.T @ root_w)
+            mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
         total_ss_ex_effect = float((y_ex - mu_ex).T @ (y_ex - mu_ex))
         r2_ex_effects = 1 - resid_ss / total_ss_ex_effect
 
@@ -1514,8 +1511,19 @@ class RandomEffects(PooledOLS):
         sigma2_e = float(weps.T @ weps) / (nobs - nvar - neffects + 1)
         ssr = float(wu.T @ wu)
         t = self.dependent.count('entity').values
-        t_bar = neffects / ((1.0 / t).sum())
-        sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
+        unbalanced = np.ptp(t) != 0
+        if small_sample and unbalanced:
+            ssr = float((t * wu).T @ wu)
+            wx = root_w * self.exog.dataframe
+            means = wx.groupby(level=0).transform('mean').values
+            denom = means.T @ means
+            sums = wx.groupby(level=0).sum().values
+            num = sums.T @ sums
+            tr = np.trace(np.linalg.inv(denom) @ num)
+            sigma2_u = max(0, (ssr - (neffects - nvar) * sigma2_e) / (nobs - tr))
+        else:
+            t_bar = neffects / ((1.0 / t).sum())
+            sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
