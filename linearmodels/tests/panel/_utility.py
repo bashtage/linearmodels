@@ -55,7 +55,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     k += const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((t, 1))
+    y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
     w = np.random.chisquare(5, (t, n)) / 5
     c = None
     if other_effects == 1:
