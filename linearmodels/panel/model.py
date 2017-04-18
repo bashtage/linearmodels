@@ -30,7 +30,6 @@ class AmbiguityError(Exception):
 
 # Essential
 # TODO: Example notebooks
-# TODO: Cluster adjustment for RandomEffects?
 # Likely
 # TODO: Formal test of other outputs
 # TODO: Test categorical nesting when using other effects
@@ -448,7 +447,7 @@ class PooledOLS(object):
 
         return cov_est, cov_config_upd
 
-    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, cov_type='unadjusted', debiased=True, **cov_config):
         """
         Estimate model parameters
 
@@ -906,7 +905,7 @@ class PanelOLS(PooledOLS):
         # TODO: Take a decision on this
         return True  # Default case for 2-way -- unclear
 
-    def fit(self, *, use_lsdv=False, cov_type='unadjusted', debiased=False, auto_df=True,
+    def fit(self, *, use_lsdv=False, cov_type='unadjusted', debiased=True, auto_df=True,
             count_effects=True, **cov_config):
         """
         Estimate model parameters
@@ -1117,7 +1116,7 @@ class BetweenOLS(PooledOLS):
 
         return cov_est, cov_config_upd
 
-    def fit(self, *, reweight=False, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, reweight=False, cov_type='unadjusted', debiased=True, **cov_config):
         """
         Estimate model parameters
 
@@ -1303,7 +1302,7 @@ class FirstDifferenceOLS(PooledOLS):
 
         return cov_est, cov_config_upd
 
-    def fit(self, *, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, cov_type='unadjusted', debiased=True, **cov_config):
         """
         Estimate model parameters
 
@@ -1485,7 +1484,7 @@ class RandomEffects(PooledOLS):
         """
         return super(RandomEffects, cls).from_formula(formula, data, weights=weights)
 
-    def fit(self, *, small_sample=False, cov_type='unadjusted', debiased=False, **cov_config):
+    def fit(self, *, small_sample=False, cov_type='unadjusted', debiased=True, **cov_config):
         w = self.weights.values2d
         root_w = np.sqrt(w)
         y = self.dependent.demean('entity', weights=self.weights).values2d

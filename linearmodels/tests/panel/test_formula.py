@@ -2,7 +2,7 @@ from itertools import product
 
 import pandas as pd
 import pytest
-from numpy.testing import assert_allclose
+import numpy as np
 
 from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
     RandomEffects
@@ -44,7 +44,7 @@ def test_basic_formulas(data, model, formula):
     vars = list(map(lambda s: s.strip(), vars))
     x = data.x
     res2 = model(data.y, x[vars]).fit()
-    assert_allclose(res.params, res2.params)
+    np.testing.assert_allclose(res.params, res2.params)
     assert isinstance(mod, model)
     assert mod.formula == formula
 
@@ -60,8 +60,28 @@ def test_basic_formulas(data, model, formula):
     vars = ['Intercept'] + vars
     mod2 = model(data.y, x[vars])
     res2 = mod2.fit()
-    assert_allclose(res.params, res2.params)
+    np.testing.assert_allclose(res.params, res2.params)
     assert mod.formula == formula
+
+
+def test_basic_formulas_math_op(data, model, formula):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    joined = data.x
+    joined['y'] = data.y
+    formula = formula.replace('x0','np.exp(x0)')
+    formula = formula.replace('x1', 'np.arctan(x1)')
+    model.from_formula(formula, joined).fit()
+
+
+def test_panel_ols_formulas_math_op(data):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    joined = data.x
+    joined['y'] = data.y
+    formula = 'y ~ x1 + np.exp(x2)'
+    mod = PanelOLS.from_formula(formula, joined)
+    mod.fit()
 
 
 def test_panel_ols_formula(data):

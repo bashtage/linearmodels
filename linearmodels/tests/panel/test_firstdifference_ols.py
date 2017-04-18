@@ -52,7 +52,7 @@ def test_firstdifference_ols(data):
     ols_res = ols_mod.fit('unadjusted')
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust')
+    res = mod.fit(cov_type='robust', debiased=False)
     ols_res = ols_mod.fit('robust')
     assert_results_equal(res, ols_res)
 
@@ -60,25 +60,25 @@ def test_firstdifference_ols(data):
     ols_clusters = mod.reformat_clusters(data.vc1)
     fd = mod.dependent.first_difference()
     ols_clusters = ols_clusters.dataframe.loc[fd.index]
-    res = mod.fit(cov_type='clustered', clusters=clusters)
+    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, debiased=False)
     entity_clusters = mod.dependent.first_difference().entity_ids
     ols_res = ols_mod.fit(cov_type='clustered', clusters=entity_clusters)
     assert_results_equal(res, ols_res)
 
     ols_clusters['entity.clusters'] = entity_clusters
     ols_clusters = ols_clusters.astype(np.int32)
-    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=data.vc1)
+    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=data.vc1, debiased=False)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
 def test_firstdifference_ols_weighted(data):
     mod = FirstDifferenceOLS(data.y, data.x, weights=data.w)
-    res = mod.fit()
+    res = mod.fit(debiased=False)
 
     y = mod.dependent.values3d
     x = mod.exog.values3d
@@ -120,7 +120,7 @@ def test_firstdifference_ols_weighted(data):
     ols_res = ols_mod.fit('unadjusted')
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust')
+    res = mod.fit(cov_type='robust', debiased=False)
     ols_res = ols_mod.fit('robust')
     assert_results_equal(res, ols_res)
 
@@ -129,7 +129,7 @@ def test_firstdifference_ols_weighted(data):
     fd = mod.dependent.first_difference()
     ols_clusters = ols_clusters.dataframe.loc[fd.index]
 
-    res = mod.fit(cov_type='clustered', clusters=clusters)
+    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
@@ -154,7 +154,7 @@ def test_first_difference_errors(data):
 
 def test_results_access(data):
     mod = FirstDifferenceOLS(data.y, data.x)
-    res = mod.fit()
+    res = mod.fit(debiased=False)
     d = dir(res)
     for key in d:
         if not key.startswith('_'):

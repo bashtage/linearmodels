@@ -9,6 +9,11 @@ Models for Panel Data
    :members:
    :inherited-members:
 
+.. autoclass:: RandomEffects
+   :members:
+   :inherited-members:
+
+
 .. autoclass:: BetweenOLS
    :members:
    :inherited-members:
