@@ -566,7 +566,6 @@ def test_panel_both_lsdv_weighted(data):
     assert_results_equal(res, res2, test_fit=False)
     assert_allclose(res.rsquared_inclusive, res2.rsquared)
 
-
     res = mod.fit(cov_type='robust', auto_df=False, count_effects=False)
     res2 = ols_mod.fit('robust')
     assert_results_equal(res, res2, test_fit=False)
@@ -970,7 +969,41 @@ def test_rsquared_inclusive_equivalence(data):
     mod = PanelOLS(data.y, data.x)
     res = mod.fit()
     assert_allclose(res.rsquared, res.rsquared_inclusive)
-    
+
     mod = PanelOLS(data.y, data.x, weights=data.w)
     res = mod.fit()
     assert_allclose(res.rsquared, res.rsquared_inclusive)
+
+
+def test_panel_effects_sanity(data):
+    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    res = mod.fit(auto_df=False, count_effects=False)
+    fitted = mod.exog.values2d @ res.params.values[:, None]
+    expected = fitted
+    expected += res.resids.values[:, None]
+    expected += res.estimated_effects.values
+    assert_allclose(mod.dependent.values2d, expected)
+
+    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    res = mod.fit(auto_df=False, count_effects=False)
+    fitted = mod.exog.values2d @ res.params.values[:, None]
+    expected = fitted
+    expected += res.resids.values[:, None]
+    expected += res.estimated_effects.values
+    assert_allclose(mod.dependent.values2d, expected)
+
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True)
+    res = mod.fit(auto_df=False, count_effects=False)
+    fitted = mod.exog.values2d @ res.params.values[:, None]
+    expected = fitted
+    expected += res.resids.values[:, None]
+    expected += res.estimated_effects.values
+    assert_allclose(mod.dependent.values2d, expected)
+
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True, time_effect=True)
+    res = mod.fit(auto_df=False, count_effects=False)
+    fitted = mod.exog.values2d @ res.params.values[:, None]
+    expected = fitted
+    expected += res.resids.values[:, None]
+    expected += res.estimated_effects.values
+    assert_allclose(mod.dependent.values2d, expected)

@@ -31,7 +31,6 @@ class AmbiguityError(Exception):
 # Essential
 # TODO: Example notebooks
 # TODO: Cluster adjustment for RandomEffects?
-# TODO: Test estimated effects using LSDV
 # Likely
 # TODO: Formal test of other outputs
 # TODO: Test categorical nesting when using other effects
