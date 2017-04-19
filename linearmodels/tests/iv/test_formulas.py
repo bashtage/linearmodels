@@ -4,10 +4,12 @@ import pytest
 
 # from patsy import SyntaxError
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 
 
-@pytest.fixture(scope='module', params=[IV2SLS, IVLIML, IVGMMCUE, IVGMM])
-def model(request):
+@pytest.fixture(scope='module', params=list(zip([IV2SLS, IVLIML, IVGMMCUE, IVGMM],
+                                                [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm])))
+def model_and_func(request):
     return request.param
 
 
@@ -47,7 +49,8 @@ def data():
     return data
 
 
-def test_formula(data, model, formula):
+def test_formula(data, model_and_func, formula):
+    model, func = model_and_func
     mod = model.from_formula(formula, data)
     res = mod.fit()
     exog = data[['Intercept', 'x3', 'x4', 'x5']]
@@ -57,8 +60,14 @@ def test_formula(data, model, formula):
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
 
+    mod = func(formula, data)
+    res = mod.fit()
+    assert res.rsquared == res2.rsquared
+    assert mod.formula == formula
 
-def test_formula_weights(data, model, formula):
+
+def test_formula_weights(data, model_and_func, formula):
+    model, func = model_and_func
     mod = model.from_formula(formula, data, weights=data.weights)
     res = mod.fit()
     exog = data[['Intercept', 'x3', 'x4', 'x5']]
@@ -68,36 +77,52 @@ def test_formula_weights(data, model, formula):
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
 
+    mod = func(formula, data, weights=data.weights)
+    res = mod.fit()
+    assert res.rsquared == res2.rsquared
+    assert mod.formula == formula
 
-def test_formula_kernel(data, model, formula):
+
+def test_formula_kernel(data, model_and_func, formula):
+    model, func = model_and_func
     mod = model.from_formula(formula, data)
     mod.fit(cov_type='kernel')
+    func(formula, data).fit(cov_type='kernel')
 
 
-def test_formula_ols(data, model):
+def test_formula_ols(data, model_and_func):
+    model, func = model_and_func
     formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5'
     exog = data[['Intercept', 'x1', 'x2', 'x3', 'x4', 'x5']]
     res2 = model(data.y, exog, None, None)
     res2 = res2.fit()
     res = model.from_formula(formula, data).fit()
+    res3 = func(formula, data).fit()
 
     assert res.rsquared == res2.rsquared
+    assert res.rsquared == res3.rsquared
 
 
-def test_formula_ols_weights(data, model):
+def test_formula_ols_weights(data, model_and_func):
+    model, func = model_and_func
     formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5'
     exog = data[['Intercept', 'x1', 'x2', 'x3', 'x4', 'x5']]
     res2 = model(data.y, exog, None, None, weights=data.weights)
     res2 = res2.fit()
     res = model.from_formula(formula, data, weights=data.weights).fit()
+    res3 = func(formula, data, weights=data.weights).fit()
 
     assert res.rsquared == res2.rsquared
+    assert res.rsquared == res3.rsquared
 
 
-def test_invalid_formula(data, model):
+def test_invalid_formula(data, model_and_func):
+    model, func = model_and_func
     formula = 'y ~ 1 + x1 + x2 ~ x3 + [x4  x5 ~ z1 z2]'
     with pytest.raises(ValueError):
         model.from_formula(formula, data).fit()
+    with pytest.raises(ValueError):
+        func(formula, data).fit()
     formula = 'y ~ 1 + x1 + x2 + x3 + x4 + x5 ~ z1 z2'
     with pytest.raises(ValueError):
         model.from_formula(formula, data).fit()

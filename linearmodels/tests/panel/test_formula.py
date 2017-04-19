@@ -6,6 +6,8 @@ import numpy as np
 
 from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
     RandomEffects
+from linearmodels.formula import between_ols, first_difference_ols, panel_ols, pooled_ols, \
+    random_effects
 from linearmodels.tests.panel._utility import generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -26,25 +28,36 @@ def data(request):
 def formula(request):
     return request.param
 
-
-@pytest.fixture(params=[PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects])
-def model(request):
+classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects]
+funcs = [pooled_ols, between_ols, first_difference_ols, random_effects]
+@pytest.fixture(params=list(zip(classes, funcs)))
+def models(request):
     return request.param
 
 
-def test_basic_formulas(data, model, formula):
+def test_basic_formulas(data, models, formula):
     if not isinstance(data.y, pd.DataFrame):
         return
     joined = data.x
     joined['y'] = data.y
+    model, formula_func = models
     mod = model.from_formula(formula, joined)
     res = mod.fit()
+    wmod = model.from_formula(formula, joined, weights=data.w)
+    wres = wmod.fit()
+
+    mod2 = formula_func(formula, joined)
+    res2 = mod2.fit()
+    np.testing.assert_allclose(res.params, res2.params)
+
     parts = formula.split('~')
     vars = parts[1].replace(' 1 ', ' const ').split('+')
     vars = list(map(lambda s: s.strip(), vars))
     x = data.x
     res2 = model(data.y, x[vars]).fit()
+    wres2 = model(data.y, x[vars], weights=data.w).fit()
     np.testing.assert_allclose(res.params, res2.params)
+    np.testing.assert_allclose(wres.params, wres2.params)
     assert isinstance(mod, model)
     assert mod.formula == formula
 
@@ -56,6 +69,11 @@ def test_basic_formulas(data, model, formula):
     formula = '~'.join(formula)
     mod = model.from_formula(formula, joined)
     res = mod.fit()
+
+    mod2 = formula_func(formula, joined)
+    res2 = mod2.fit()
+    np.testing.assert_allclose(res.params, res2.params)
+
     x['Intercept'] = 1.0
     vars = ['Intercept'] + vars
     mod2 = model(data.y, x[vars])
@@ -64,13 +82,14 @@ def test_basic_formulas(data, model, formula):
     assert mod.formula == formula
 
 
-def test_basic_formulas_math_op(data, model, formula):
+def test_basic_formulas_math_op(data, models, formula):
     if not isinstance(data.y, pd.DataFrame):
         return
     joined = data.x
     joined['y'] = data.y
     formula = formula.replace('x0','np.exp(x0)')
     formula = formula.replace('x1', 'np.arctan(x1)')
+    model, formula_func = models
     model.from_formula(formula, joined).fit()
 
 
@@ -110,6 +129,10 @@ def test_panel_ols_formula(data):
     assert mod.formula == formula
     assert mod.entity_effect is True
     assert mod.time_effect is True
+    mod2 = panel_ols(formula, joined)
+    res = mod.fit()
+    res2 = mod2.fit()
+    np.testing.assert_allclose(res.params, res2.params)
 
     formula = 'y ~ x1 + EntityEffect + FixedEffect + x2 '
     with pytest.raises(ValueError):

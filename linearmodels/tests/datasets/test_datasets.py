@@ -1,9 +1,10 @@
 import pandas as pd
 import pytest
 
-from linearmodels.datasets import birthweight, card, fertility, jobtraining, meps, mroz, wage
+from linearmodels.datasets import birthweight, card, fertility, jobtraining, \
+    meps, mroz, wage, wage_panel
 
-DATASETS = [birthweight, card, fertility, jobtraining, meps, mroz, wage]
+DATASETS = [birthweight, card, fertility, jobtraining, meps, mroz, wage, wage_panel]
 
 
 @pytest.fixture(params=DATASETS, scope='module')
