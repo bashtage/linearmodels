@@ -8,13 +8,24 @@ are some differenced worth noting.
 
 Clustered Covariance with Fixed Effects
 =======================================
-By default, Stata does not adjust the covariance estimator for the degrees
-of freedom used to estimate included effects.  This can have a substantial
-effect on the estimated parameter covariance when the number of time periods
-is small (e.g. 2 or 3).  It also means running LSDV and using a model with
-fixed effects will produce different results. By default, covariance estimators
-are always adjusted for degrees of freedom consumed by effects.  This can be
-overridden using by setting the fit option ``count_effects=False``.
+When suing clustered standard errors and entity effects, it isn't necessary
+to adjust for estimated effects. ``PanelOLS`` attempts to detect when this is
+the case and automatically adjust the degree of freedom. This can be
+overridden using by setting the fit option ``auto_df=False`` and then
+changing the value of ``count_effects``.
 
 R2 definitions
 ==============
+The :math:`R^2` definitions are all designed so that the reported value will
+match the original model using the estimated parameters.  This differs from
+other packages, such as Stata, which use a correlation based measure which
+ignores the estimated intercept (if included) and allows for affine
+adjustments to estimated parameters. The main reported :math:`R^2`
+(``rsquared`` in returned results) is always the :math:`R^2` from
+the actual model fit, after adjusting the data for:
+
+  * weights (all estimators)
+  * effects (:class:`~linearmodels.panel.models.PanelOLS`)
+  * recentering (:class:`~linearmodels.panel.models.RandomEffects`)
+  * within entity aggregation (:class:`~linearmodels.panel.models.BetweenOLS`)
+  * differencing (:class:`~linearmodels.panel.models.FirstDifferenceOLS`)

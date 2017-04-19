@@ -105,7 +105,7 @@ investment.
 The call to the deprecated pandas PanelOLS is similar. Note the use of the
 time-entity data format.
 
-.. code-block::python
+.. code-block:: python
 
     tedata = data.set_index(['year','firm'])
     from pandas.stats import plm
