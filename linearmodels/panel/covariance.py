@@ -4,6 +4,8 @@ from numpy.linalg import inv
 from linearmodels.iv.covariance import _cov_cluster, CLUSTER_ERR
 from linearmodels.utility import cached_property
 
+# TODO: Driscoll Kraay
+
 
 class HomoskedasticCovariance(object):
     r"""
@@ -34,16 +36,16 @@ class HomoskedasticCovariance(object):
 
     .. math::
 
-        \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
+        \hat{\Sigma}_{xx} = X'X
 
     and
 
     .. math::
 
-        s^2 = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T \hat{\epsilon}_{it}^2
+        s^2 = (n-df)^{-1} \hat{\epsilon}'\hat{\epsilon}
 
-    where NT is replace by NT-k if ``debiased`` is ``True``.
-
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is 
+    ``True``.
     """
 
     def __init__(self, y, x, params, *, debiased=False, extra_df=0):
@@ -113,16 +115,16 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     .. math::
 
-        \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
+        \hat{\Sigma}_{xx} = X'X
 
     and
 
     .. math::
 
-        \widehat{Cov}(x_it\epsilon_{it}) = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T
-                                           \hat{\epsilon}_{it}^2 x_{it}x_{it}^{\prime}
+        s^2 = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i
 
-    where NT is replace by NT-k if ``debiased`` is ``True``.
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is 
+    ``True``.
     """
 
     def __init__(self, y, x, params, *, debiased=False, extra_df=0):
@@ -163,7 +165,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
-    cluster : ndarray, optional
+    clusters : ndarray, optional
         nobs by 1 or nobs by 2 array of cluster group ids
     group_debias : bool, optional
         Flag indicating whether to apply small-number of groups adjustment
@@ -179,26 +181,30 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     .. math::
 
-        \hat{\Sigma}_{xx}^{-1}\widehat{Cov}(x_{it}\epsilon_{it})\hat{\Sigma}_{xx}^{-1}
+        \hat{\Sigma}_{xx}^{-1}\widehat{Cov}_\mathcal{G}(x_{it}\epsilon_{it})\hat{\Sigma}_{xx}^{-1}
 
     where
 
     .. math::
 
-        \hat{\Sigma}_{xx} = (NT)^{-1}\sum_{i=1}^N\sum_{t=1}^T x_{it}x_{it}^{\prime}
+        \hat{\Sigma}_{xx} = X'X
 
-    and
-
-    .. math::
-
-        \widehat{Cov}(x_it\epsilon_{it}) = (NT)^{-1}\sum_{j=1}^G xe_j^{\prime}xe_j
-
-    where ...
-
-    .. todo::
-
-        * Complete -- math is wrong
-        * Small sample adjustments
+    and :math:`\widehat{Cov}_\mathcal{G}(x_{it}\epsilon_{it})` is a one- or 
+    two-way cluster covariance of the scores.  Two-way clustering is 
+    implemented by summing up the two one-way clusters and then subtracting 
+    the one-way clustering covariance computed using the group formed from 
+    the intersection of the two groups.
+    
+    Two small sample adjustment are available.  ``debias=True`` will account 
+    for regressors in the main model. ``group_debias`` will provide a small 
+    sample adjustment for the number of clusters of the form 
+    
+    .. math ::
+    
+      (g / (g- 1)) ((n - 1) / n)
+    
+    where g is the number of distinct groups and n is the number of 
+    observations.
     """
 
     def __init__(self, y, x, params, *, debiased=False, extra_df=0, clusters=None,
