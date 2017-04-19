@@ -5,7 +5,8 @@ from pandas import DataFrame, Panel, Series
 from xarray import DataArray
 
 from linearmodels.utility import ensure_unique_column
-from linearmodels.compat.pandas import is_categorical, is_string_dtype, is_string_like
+from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
+    is_string_like, is_numeric_dtype, is_datetime64_any_dtype
 
 # TODO: Require numeric or datetime for time index to ensure order
 
@@ -121,6 +122,11 @@ class PanelData(object):
             self._frame = expand_categoricals(self._frame, drop_first)
             self._frame = self._frame.astype(np.float64)
 
+        time_index = Series(self._frame.index.levels[1])
+        if not (is_numeric_dtype(time_index.dtype) or
+                    is_datetime64_any_dtype(time_index.dtype)):
+            raise ValueError('The index on the time dimension must be either '
+                             'numeric or date-like')
         self._k, self._t, self._n = self.panel.shape
         self._frame.index.levels[0].name = 'entity'
         self._frame.index.levels[1].name = 'time'

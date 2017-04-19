@@ -113,7 +113,7 @@ def test_pandas_multiindex_dataframe():
     minor = ['var.{0}'.format(i) for i in range(1, k + 1)]
     items = ['item.{0}'.format(i) for i in range(1, n + 1)]
     x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
-    x = x.to_frame()
+    x = x.swapaxes(1, 2).swapaxes(0, 1).to_frame()
     PanelData(x)
 
 
@@ -741,3 +741,33 @@ def test_original_unmodified(data):
         assert_allclose(data.y, pre_y)
         assert_allclose(data.x, pre_x)
         assert_allclose(data.w, pre_w)
+
+
+def test_incorrect_time_axis():
+    x = np.random.randn(3, 3, 1000)
+    entities = ['entity.{0}'.format(i) for i in range(1000)]
+    time = ['time.{0}' for i in range(3)]
+    vars = ['var.{0}' for i in range(3)]
+    p = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+    with pytest.raises(ValueError):
+        PanelData(p)
+    df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
+    with pytest.raises(ValueError):
+        PanelData(df)
+    da = xr.DataArray(x, coords={'entities': entities, 'time': time, 'vars': vars},
+                      dims=['vars', 'time', 'entities'])
+    with pytest.raises(ValueError):
+        PanelData(da)
+
+    time = [1, pd.datetime(1960, 1, 1), 'a']
+    vars = ['var.{0}' for i in range(3)]
+    p = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+    with pytest.raises(ValueError):
+        PanelData(p)
+    df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
+    with pytest.raises(ValueError):
+        PanelData(df)
+    da = xr.DataArray(x, coords={'entities': entities, 'time': time, 'vars': vars},
+                      dims=['vars', 'time', 'entities'])
+    with pytest.raises(ValueError):
+        PanelData(da)

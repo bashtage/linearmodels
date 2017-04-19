@@ -32,7 +32,6 @@ class AmbiguityError(Exception):
 # TODO: Example notebooks
 # Likely
 # TODO: Formal test of other outputs
-# TODO: Test categorical nesting when using other effects
 # Future
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
@@ -619,6 +618,24 @@ class PanelOLS(PooledOLS):
         other_effects = PanelData(cats)
         other_effects.drop(~self.not_null)
         self._other_effect_cats = other_effects
+        cats = other_effects.values2d
+        nested = False
+        if cats.shape[1] == 2:
+            nested = self._is_effect_nested(cats[:,[0]],cats[:,[1]])
+            nested |= self._is_effect_nested(cats[:,[1]],cats[:,[0]])
+            nesting_effect = 'other effects'
+        elif self.entity_effect:
+            nested = self._is_effect_nested(cats[:, [0]], self.dependent.entity_ids)
+            nested |= self._is_effect_nested(self.dependent.entity_ids, cats[:,[0]])
+            nesting_effect = 'entity effects'
+        elif self.time_effect:
+            nested = self._is_effect_nested(cats[:, [0]], self.dependent.time_ids)
+            nested |= self._is_effect_nested(self.dependent.time_ids, cats[:,[0]])
+            nesting_effect = 'time effects'
+        if nested:
+            raise ValueError('Included other effects nest or are nested '
+                             'by {effect}'.format(effect=nesting_effect))
+
         return True
 
     @property
