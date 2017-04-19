@@ -2,7 +2,7 @@ Instrumental Variable Covariance Estimation
 -------------------------------------------
 
 .. module:: linearmodels.iv.covariance
-
+   :synopsis: Covariance estimators for linear IV models
 
 .. autoclass:: HomoskedasticCovariance
    :members:

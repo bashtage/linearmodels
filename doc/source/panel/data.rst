@@ -3,7 +3,8 @@
 Panel Data Structures
 ---------------------
 
-.. currentmodule:: linearmodels.panel.data
+.. module:: linearmodels.panel.data
+   :synopsis: Data structured used in panel data models
 
 .. autoclass:: PanelData
    :members:

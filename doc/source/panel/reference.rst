@@ -8,8 +8,8 @@ Module Reference
    :caption: Contents:
 
    models
-   covariance
    results
+   covariance
    data
 
 
