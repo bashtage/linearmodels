@@ -109,19 +109,19 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     .. math::
 
-        \hat{\Sigma}_{xx}^{-1}\widehat{Cov}(x_{it}\epsilon_{it})\hat{\Sigma}_{xx}^{-1}
+        n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}
 
     where
 
     .. math::
 
-        \hat{\Sigma}_{xx} = X'X
+        \hat{\Sigma}_{xx} = n^{-1}X'X
 
     and
 
     .. math::
 
-        s^2 = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i
+        \hat{S} = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i
 
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is 
     ``True``.
@@ -181,7 +181,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     .. math::
 
-        \hat{\Sigma}_{xx}^{-1}\widehat{Cov}_\mathcal{G}(x_{it}\epsilon_{it})\hat{\Sigma}_{xx}^{-1}
+        \hat{\Sigma}_{xx}^{-1}\hat{S}_{\mathcal{G}}\hat{\Sigma}_{xx}^{-1}
 
     where
 
@@ -189,15 +189,15 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         \hat{\Sigma}_{xx} = X'X
 
-    and :math:`\widehat{Cov}_\mathcal{G}(x_{it}\epsilon_{it})` is a one- or 
-    two-way cluster covariance of the scores.  Two-way clustering is 
-    implemented by summing up the two one-way clusters and then subtracting 
-    the one-way clustering covariance computed using the group formed from 
-    the intersection of the two groups.
+    and :math:`\hat{S}_{\mathcal{G}}` is a one- or two-way cluster covariance 
+    of the scores.  Two-way clustering is implemented by summing up the two 
+    one-way cluster covariances and then subtracting the one-way clustering 
+    covariance computed using the group formed from the intersection of the 
+    two groups.
     
     Two small sample adjustment are available.  ``debias=True`` will account 
-    for regressors in the main model. ``group_debias`` will provide a small 
-    sample adjustment for the number of clusters of the form 
+    for regressors in the main model. ``group_debias=True`` will provide a 
+    small sample adjustment for the number of clusters of the form 
     
     .. math ::
     
