@@ -1,2 +1,2 @@
-Formulas and Mathematical Detail
-================================
+Mathematical Appendix
+=====================

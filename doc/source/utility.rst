@@ -2,7 +2,7 @@ Utilities
 ---------
 
 .. module:: linearmodels.utility
-.. currentmodule:: linearmodels.utility
+   :synopsis: Utilities used across all model types
 
 .. autoclass:: WaldTestStatistic
    :members:

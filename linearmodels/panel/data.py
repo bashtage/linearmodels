@@ -8,8 +8,7 @@ from linearmodels.utility import ensure_unique_column
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
     is_string_like, is_numeric_dtype, is_datetime64_any_dtype
 
-# TODO: Require numeric or datetime for time index to ensure order
-
+__all__ = ['PanelData']
 
 def convert_columns(s, drop_first):
     if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
