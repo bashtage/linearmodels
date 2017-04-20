@@ -1,3 +1,30 @@
+from linearmodels.panel import PanelOLS, RandomEffects, PooledOLS
+from linearmodels.datasets import wage_panel
+import statsmodels.api as sm
+data = wage_panel.load()
+data = data.set_index(['nr','year'])
+dependent = data.lwage
+exog = sm.add_constant(data[['expersq','married','union']])
+mod = PanelOLS(dependent, exog, entity_effect=True, time_effect=True)
+res = mod.fit(cov_type='unadjusted')
+res2 = mod.fit(cov_type='robust')
+exog = sm.add_constant(data[['exper', 'expersq','married','union']])
+mod = PanelOLS(dependent, exog, entity_effect=True)
+res3 = mod.fit(cov_type='clustered',cluster_entity=True)
+mod = RandomEffects(dependent, exog)
+res4 = mod.fit(cov_type='robust')
+from linearmodels.panel.results import compare
+
+exog = sm.add_constant(data[['exper', 'expersq','married','union']].copy())
+import pandas as pd
+exog['year'] = pd.Categorical(data.reset_index()['year'])
+mod = PooledOLS(dependent, exog)
+res5 = mod.fit(cov_type='robust')
+print(compare([res,res2, res3, res4, res5]))
+
+print(data.columns)
+
+
 from linearmodels.panel.data import PanelData
 import numpy as np
 import pandas as pd
@@ -14,7 +41,7 @@ print(res.variance_decomposition)
 res = mod.fit(small_sample=True)
 print(res.variance_decomposition)
 
-raise NotImplementedError
+
 mod = RandomEffects(data.y_light, data[['intercept', 'x1_light','x2_light','x3_light','x4_light','x5_light']])
 res = mod.fit()
 
