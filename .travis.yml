@@ -48,7 +48,7 @@ before_install:
   - export PYTHONHASHSEED=0
 
 install:
-  - python setup.py develop
+  - python setup.py install
 
 script:
   - set -ev
