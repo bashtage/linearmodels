@@ -36,3 +36,14 @@ def test_random_effects_small_sample(data):
         assert(ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects)
     else:
         assert(ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects)
+
+
+def test_results_access(data):
+    mod = RandomEffects(data.y, data.x)
+    res = mod.fit(debiased=False)
+    d = dir(res)
+    for key in d:
+        if not key.startswith('_'):
+            val = getattr(res, key)
+            if callable(val):
+                val()

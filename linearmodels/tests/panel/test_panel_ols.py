@@ -638,6 +638,7 @@ def test_panel_entity_time_other_equivalence(data):
 
 def test_panel_other_lsdv(data):
     mod = PanelOLS(data.y, data.x, other_effects=data.c)
+    assert 'Num Other Effects: 2' in str(mod)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe.copy()

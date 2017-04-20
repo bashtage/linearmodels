@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import pytest
 import statsmodels.api as sm
 
@@ -23,8 +24,6 @@ def test_single(data):
         if value.startswith('_'):
             continue
         a = getattr(comp, value)
-        if callable(a):
-            a()
 
 
 def test_multiple(data):
@@ -44,8 +43,6 @@ def test_multiple(data):
         if value.startswith('_'):
             continue
         a = getattr(comp, value)
-        if callable(a):
-            a()
 
 
 def test_multiple_no_effects(data):
@@ -63,8 +60,7 @@ def test_multiple_no_effects(data):
         if value.startswith('_'):
             continue
         a = getattr(comp, value)
-        if callable(a):
-            a()
+    compare(OrderedDict(a=res, model2=res3, model3=res4))
 
 
 def test_incorrect_type(data):
