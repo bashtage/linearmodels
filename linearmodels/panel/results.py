@@ -468,7 +468,7 @@ class PanelEffectsResults(PanelResults):
                 for c in oe:
                     effects.append('Other Effect (' + str(c) + ')')
         else:
-            effects = None
+            effects = []
         return effects
     
     @property
