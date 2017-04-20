@@ -1,2 +1,60 @@
-Mathematical Appendix
-=====================
+
+Formulas and Mathematical Detail
+================================
+
+Models
+------
+
+Fixed Effect Estimation (PanelOLS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Random Effect Estimation (RandomEffects)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Between Estimation (BetweenOLS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Between estimation regresses time averages of the dependent variable on
+the time averaged values of the regressors,
+
+.. math:: \bar{y}_{i}=\bar{x}_{i}\beta+\bar{\epsilon}_{i}.
+
+When weights are included, weighted averages are used so that
+
+.. math:: \bar{y}_{i}^{w}=\frac{\sum_{t=1}^{T}w_{it}y_{it}}{\sum_{t=1}^{T}w_{it}}
+
+with :math:`\bar{x}_{i}` similarly defined. Note that if the conditional
+variance of :math:`y_{it}\propto w_{it}^{-1}` then the conditional
+variance of :math:`\bar{y}_{i}^{w}\propto\frac{1}{\sum w_{i}}` and these
+weights are used when regressing the weighted averages. Also note that
+when :math:`w_{i}=1` but the panel is imbalanced than the conditional
+variance of :math:`\bar{y}_{i}^{w}=\bar{y}_{i}\propto\frac{1}{T_{i}}`.
+Re-weighting unbalanced panels is exposed through the fit option
+``reweight``.
+
+First Difference Estimation (FirstDifferenceOLS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+First difference estimation regresses first difference of the dependent
+variable on the first difference the regressors,
+
+.. math:: \Delta y_{it}=\Delta x_{it}\beta+\Delta\epsilon_{it}.
+
+When weights are included, weighted are summed to that the weight on
+:math:`\Delta y_{it}` is
+:math:`\left(w_{it}^{-1}+w_{it-1}^{-1}\right)^{-1}` which exploits that
+the conditional variance of :math:`y_{it}\propto w_{it}^{-1}` and the
+variance of the difference is the sum of the variances when observations
+are conditionally uncorrelated.
+
+Pooled Model Estimation (PooledOLS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The pooled estimator is a standard regression,
+
+.. math:: y_{it}=x_{it}\beta+\epsilon_{it}.
+
+When weights are included, the data is transformed by multiplying with
+the square root of the weights prior to the regression (i.e.,
+:math:`y_{it}` is replaced by :math:`\sqrt{w_{it}}y_{it}` and
+:math:`x_{it}` is similarly transformed).

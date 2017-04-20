@@ -1058,10 +1058,16 @@ class PanelOLS(PooledOLS):
         ######################################
         if self.entity_effect or self.time_effect or self.other_effect:
             wy, wx = root_w * self.dependent.values2d, root_w * self.exog.values2d
+            df_num, df_denom = (df_model - wx.shape[1]), df_resid
+            if not self.has_constant:
+                # Correction for when models does not have explicit constant
+                wy -= root_w * np.linalg.lstsq(root_w, wy)[0]
+                wx -= root_w * np.linalg.lstsq(root_w, wx)[0]
+                df_num -= 1
             weps_pooled = wy - wx @ np.linalg.lstsq(wx, wy)[0]
             resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
-            df_num, df_denom = (df_model - wx.shape[1]), df_resid
             num = (resid_ss_pooled - resid_ss) / df_num
+            
             denom = resid_ss / df_denom
             stat = num / denom
             f_pooled = WaldTestStatistic(stat, 'Effects are zero',

@@ -21,11 +21,11 @@ a similar set of functionality with a few notable differences:
    estimated. The version in pandas used LSDV which is not feasible in
    large models and can be slow in moderately large model.
 
-3. Effects are not explicitly estimate nor are they reported.
+3. Effects are not explicitly estimated nor are they reported in model summaries.
    Effects are usually not consistent (e.g., entity effects in a large-N
-   panel) and so it does not usually make sense to report them.  Effects
-   that can be consistent estimated can be included as dummies (e.g. time
-   effects in a model with fixed T but large-N).
+   panel) and so it does not usually make sense to report them with parameter
+   estimates.  Effects that can be consistent estimated can be included as
+   dummies (e.g. time effects in a model with fixed T but large-N).
 
 4. R-squared definitions differ.  The default R-squared in ``linearmodels``
    reports the fit after included effects are removed.
@@ -40,7 +40,7 @@ a similar set of functionality with a few notable differences:
    method. Fit options, such as the choice of covariance estimator, are
    provided when fitting the model.
 
-6. Intercept must be explicitly included if desired.  If a model with effects
+6. The intercept must be explicitly included if desired.  If a model with effects
    is estimated without an intercept, then all effects are included.  If a
    model is estimated with an intercept, the estimated model is demeaned to
    using the restriction that the sum of the effects is 0 so that the intercept
