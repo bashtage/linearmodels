@@ -596,9 +596,6 @@ class _ModelComparison(_SummaryStr):
             if not isinstance(self._results[key], self._supported):
                 raise TypeError('Results from unknown model')
     
-    def estimator_type(self):
-        pass
-    
     def _get_series_property(self, name):
         out = ([(k, getattr(v, name)) for k, v in self._results.items()])
         cols = [v[0] for v in out]
