@@ -23,3 +23,12 @@ All other Models
 .. autoclass:: PanelResults
    :members:
    :inherited-members:
+
+Comparing Multiple Models
+=========================
+.. autofunction:: compare
+
+.. autoclass:: PanelModelComparison
+   :members:
+   :inherited-members:
+
