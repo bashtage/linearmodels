@@ -99,10 +99,10 @@ regression. Currently only the single variable IV estimators are
 polished.
 
 -  Linear Instrumental variable estimation - **complete**
--  Linear Panel model estimation - **complete** *ex. Random Effects*
--  Fama-MacBeth regression - **not started**
--  Linear IV Panel model estimation - \*\*not started\*()
--  System regression - **not started**
+-  Linear Panel model estimation - **complete**
+-  Fama-MacBeth regression - *not started*
+-  Linear IV Panel model estimation - *not started*
+-  System regression - *not started*
 
 Requirements
 ------------
