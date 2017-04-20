@@ -856,7 +856,13 @@ def test_f_pooled(data):
     mod = PanelOLS(data.y, data.x, entity_effect=True)
     res = mod.fit(debiased=False)
 
-    mod2 = PooledOLS(data.y, data.x)
+    if mod.has_constant:
+        mod2 = PooledOLS(data.y, data.x)
+    else:
+        exog = mod.exog.dataframe.copy()
+        exog['Intercept'] = 1.0
+        mod2 = PooledOLS(mod.dependent.dataframe, exog)
+    
     res2 = mod2.fit(debiased=False)
 
     eps = res.resids.values
