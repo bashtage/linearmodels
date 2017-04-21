@@ -25,8 +25,8 @@ def data(request):
 
 def test_panel_ols(data):
     PanelOLS(data.y, data.x).fit()
-    PanelOLS(data.y, data.x, entity_effect=True).fit()
-    PanelOLS(data.y, data.x, time_effect=True).fit()
+    PanelOLS(data.y, data.x, entity_effects=True).fit()
+    PanelOLS(data.y, data.x, time_effects=True).fit()
 
 
 def test_valid_weight_shape(data):
@@ -103,18 +103,18 @@ def test_invalid_weight_values(data):
 
 
 def test_panel_lsdv(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     y, x = mod.dependent.dataframe, mod.exog.dataframe
     res = mod.fit()
     expected = lsdv(y, x, has_const=False, entity=True)
     assert_allclose(res.params.squeeze(), expected)
 
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit()
     expected = lsdv(y, x, has_const=False, time=True)
     assert_allclose(res.params.squeeze(), expected)
 
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit()
     expected = lsdv(y, x, has_const=False, entity=True, time=True)
     assert_allclose(res.params.squeeze(), expected, rtol=1e-4)
@@ -171,7 +171,7 @@ def test_absorbing_effect(data):
     x['Intercept'] = 1.0
     x['absorbed'] = temp
     with pytest.raises(AbsorbingEffectError):
-        PanelOLS(data.y, x, entity_effect=True).fit()
+        PanelOLS(data.y, x, entity_effects=True).fit()
 
 
 def test_all_missing(data):

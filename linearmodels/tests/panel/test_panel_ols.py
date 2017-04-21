@@ -57,7 +57,7 @@ def test_const_data_only_weights(const_data):
 
 def test_const_data_entity(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, entity_effect=True)
+    mod = PanelOLS(y, x, entity_effects=True)
     res = mod.fit(debiased=False)
 
     x = mod.exog.dataframe
@@ -73,7 +73,7 @@ def test_const_data_entity(const_data):
 
 def test_const_data_entity_weights(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, entity_effect=True, weights=const_data.w)
+    mod = PanelOLS(y, x, entity_effects=True, weights=const_data.w)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.dataframe
@@ -97,7 +97,7 @@ def test_const_data_entity_weights(const_data):
 
 def test_const_data_time(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, time_effect=True)
+    mod = PanelOLS(y, x, time_effects=True)
     res = mod.fit(debiased=False)
 
     x = mod.exog.dataframe
@@ -113,7 +113,7 @@ def test_const_data_time(const_data):
 
 def test_const_data_time_weights(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, time_effect=True, weights=const_data.w)
+    mod = PanelOLS(y, x, time_effects=True, weights=const_data.w)
     res = mod.fit(debiased=False)
 
     y = mod.dependent.dataframe
@@ -137,7 +137,7 @@ def test_const_data_time_weights(const_data):
 
 def test_const_data_both(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(y, x, entity_effects=True, time_effects=True)
     res = mod.fit(debiased=False)
 
     x = mod.exog.dataframe
@@ -156,7 +156,7 @@ def test_const_data_both(const_data):
 
 def test_const_data_both_weights(const_data):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, entity_effect=True, time_effect=True, weights=const_data.w)
+    mod = PanelOLS(y, x, entity_effects=True, time_effects=True, weights=const_data.w)
     res = mod.fit(debiased=False)
 
     w = mod.weights.dataframe
@@ -192,7 +192,7 @@ def test_panel_no_effects_weighted(data):
 
 
 def test_panel_entity_lsdv(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -249,7 +249,7 @@ def test_panel_entity_lsdv(data):
 
 
 def test_panel_entity_fwl(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -275,7 +275,7 @@ def test_panel_entity_fwl(data):
 
 
 def test_panel_time_lsdv(data):
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -331,7 +331,7 @@ def test_panel_time_lsdv(data):
 
 
 def test_panel_time_fwl(data):
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -355,7 +355,7 @@ def test_panel_time_fwl(data):
 
 
 def test_panel_both_lsdv(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -414,7 +414,7 @@ def test_panel_both_lsdv(data):
 
 
 def test_panel_both_fwl(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -440,7 +440,7 @@ def test_panel_both_fwl(data):
 
 
 def test_panel_entity_lsdv_weighted(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, weights=data.w)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, weights=data.w)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -500,7 +500,7 @@ def test_panel_entity_lsdv_weighted(data):
 
 
 def test_panel_time_lsdv_weighted(data):
-    mod = PanelOLS(data.y, data.x, time_effect=True, weights=data.w)
+    mod = PanelOLS(data.y, data.x, time_effects=True, weights=data.w)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -559,7 +559,7 @@ def test_panel_time_lsdv_weighted(data):
 
 
 def test_panel_both_lsdv_weighted(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True, weights=data.w)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True, weights=data.w)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -622,7 +622,7 @@ def test_panel_both_lsdv_weighted(data):
 
 
 def test_panel_entity_other_equivalence(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit()
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -634,7 +634,7 @@ def test_panel_entity_other_equivalence(data):
 
 
 def test_panel_time_other_equivalence(data):
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit()
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -646,7 +646,7 @@ def test_panel_time_other_equivalence(data):
 
 
 def test_panel_entity_time_other_equivalence(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit()
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
@@ -761,7 +761,7 @@ def test_panel_other_fwl(data):
 
 
 def test_panel_other_incorrect_size(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     y = mod.dependent.dataframe
     x = mod.exog.dataframe
     cats = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.index)
@@ -773,7 +773,7 @@ def test_panel_other_incorrect_size(data):
 
 
 def test_results_access(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit()
     d = dir(res)
     for key in d:
@@ -791,7 +791,7 @@ def test_results_access(data):
             if callable(val):
                 val()
 
-    mod = PanelOLS(data.y, data.x, time_effect=True, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True, entity_effects=True)
     res = mod.fit()
     d = dir(res)
     for key in d:
@@ -823,24 +823,24 @@ def test_results_access(data):
 
 
 def test_alt_rsquared(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_within)
 
 
 def test_alt_rsquared_weighted(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True, weights=data.w)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, weights=data.w)
     res = mod.fit(debiased=False)
     assert_allclose(res.rsquared, res.rsquared_within)
 
 
 def test_too_many_effects(data):
     with pytest.raises(ValueError):
-        PanelOLS(data.y, data.x, entity_effect=True, time_effect=True, other_effects=data.c)
+        PanelOLS(data.y, data.x, entity_effects=True, time_effects=True, other_effects=data.c)
 
 
 def test_cov_equiv_cluster(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(cov_type='clustered', cluster_entity=True, debiased=False)
 
     y = PanelData(data.y)
@@ -848,7 +848,7 @@ def test_cov_equiv_cluster(data):
     res2 = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
     assert_results_equal(res, res2)
 
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit(cov_type='clustered', cluster_time=True, debiased=False)
     y = PanelData(data.y)
     clusters = pd.DataFrame(y.time_ids, index=y.index)
@@ -861,7 +861,7 @@ def test_cov_equiv_cluster(data):
 
 
 def test_cluster_smoke(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     mod.fit(cov_type='clustered', cluster_time=True, debiased=False)
     mod.fit(cov_type='clustered', cluster_entity=True, debiased=False)
     c2 = PanelData(data.vc2)
@@ -883,7 +883,7 @@ def test_cluster_smoke(data):
 
 
 def test_f_pooled(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(debiased=False)
 
     if mod.has_constant:
@@ -906,7 +906,7 @@ def test_f_pooled(data):
     assert res.f_pooled.df == v1
     assert res.f_pooled.df_denom == v2
 
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res = mod.fit(debiased=False)
     eps = res.resids.values
     eps2 = res2.resids.values
@@ -919,7 +919,7 @@ def test_f_pooled(data):
     assert res.f_pooled.df == v1
     assert res.f_pooled.df_denom == v2
 
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit(debiased=False)
     eps = res.resids.values
     eps2 = res2.resids.values
@@ -948,7 +948,7 @@ def test_entity_other(data):
     mod = PanelOLS(y, x, other_effects=c_entity)
     res = mod.fit(debiased=False)
     c_only = PanelData(c.dataframe.iloc[:, [0]].astype(np.int64))
-    mod2 = PanelOLS(y, x, other_effects=c_only, entity_effect=True)
+    mod2 = PanelOLS(y, x, other_effects=c_only, entity_effects=True)
     res2 = mod2.fit(debiased=False)
     assert_results_equal(res, res2)
 
@@ -964,33 +964,33 @@ def test_lsdv_options(data):
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
-    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
-    mod = PanelOLS(data.y, data.x, time_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
-    mod = PanelOLS(data.y, data.x, time_effect=True, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, time_effects=True, entity_effects=True)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
     c1 = PanelData(data.c).dataframe.iloc[:, [0]]
-    mod = PanelOLS(data.y, data.x, entity_effect=True, other_effects=c1)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, other_effects=c1)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
-    mod = PanelOLS(data.y, data.x, time_effect=True, other_effects=c1)
+    mod = PanelOLS(data.y, data.x, time_effects=True, other_effects=c1)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
 
-    mod = PanelOLS(data.y, data.x, weights=data.w, time_effect=True, other_effects=c1)
+    mod = PanelOLS(data.y, data.x, weights=data.w, time_effects=True, other_effects=c1)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
     assert_results_equal(res1, res2)
@@ -1012,7 +1012,7 @@ def test_rsquared_inclusive_equivalence(data):
 
 
 def test_panel_effects_sanity(data):
-    mod = PanelOLS(data.y, data.x, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit(auto_df=False, count_effects=False)
     fitted = mod.exog.values2d @ res.params.values[:, None]
     expected = fitted
@@ -1020,7 +1020,7 @@ def test_panel_effects_sanity(data):
     expected += res.estimated_effects.values
     assert_allclose(mod.dependent.values2d, expected)
 
-    mod = PanelOLS(data.y, data.x, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False)
     fitted = mod.exog.values2d @ res.params.values[:, None]
     expected = fitted
@@ -1028,7 +1028,7 @@ def test_panel_effects_sanity(data):
     expected += res.estimated_effects.values
     assert_allclose(mod.dependent.values2d, expected)
 
-    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True)
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True)
     res = mod.fit(auto_df=False, count_effects=False)
     fitted = mod.exog.values2d @ res.params.values[:, None]
     expected = fitted
@@ -1036,7 +1036,7 @@ def test_panel_effects_sanity(data):
     expected += res.estimated_effects.values
     assert_allclose(mod.dependent.values2d, expected)
 
-    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effect=True, time_effect=True)
+    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False)
     fitted = mod.exog.values2d @ res.params.values[:, None]
     expected = fitted

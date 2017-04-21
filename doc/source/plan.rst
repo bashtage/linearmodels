@@ -1,5 +1,7 @@
 Module Plans
 ------------
+The plan for this modules is to add some key missing linear models.  This plan is intentionally
+limited since there is no intention to statsmodels.
 
 Univariate
 ==========

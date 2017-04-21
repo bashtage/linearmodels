@@ -1,11 +1,12 @@
+from linearmodels.compat.statsmodels import Summary
+
 import datetime as dt
 
 import numpy as np
 from numpy import diag, sqrt
 from pandas import DataFrame, Series, concat
 from scipy import stats
-from statsmodels.iolib.summary import (SimpleTable, Summary, fmt_2cols,
-                                       fmt_params)
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format, _ModelComparison
@@ -410,9 +411,9 @@ class PanelEffectsResults(PanelResults):
         super(PanelEffectsResults, self).__init__(res)
         self._other_info = res.other_info
         self._f_pooled = res.f_pooled
-        self._entity_effect = res.entity_effect
-        self._time_effect = res.time_effect
-        self._other_effect = res.other_effect
+        self._entity_effect = res.entity_effects
+        self._time_effect = res.time_effects
+        self._other_effect = res.other_effects
         self._rho = res.rho
         self._sigma2_eps = res.sigma2_eps
         self._sigma2_effects = res.sigma2_effects
@@ -632,7 +633,7 @@ class PanelModelComparison(_ModelComparison):
         vals[2] = [str(v) for v in vals[2]]
         for i in range(4, len(vals)):
             f = _str
-            if i == 8:
+            if i == 9:
                 f = pval_format
             vals[i] = [f(v) for v in vals[i]]
 

@@ -111,12 +111,12 @@ def test_nested_effects(data):
     y = PanelData(data.y)
     effects = pd.DataFrame(y.entity_ids // 2, index=y.index)
     with pytest.raises(ValueError) as exception:
-        PanelOLS(data.y, data.x, entity_effect=True, other_effects=effects)
+        PanelOLS(data.y, data.x, entity_effects=True, other_effects=effects)
     assert 'entity effects' in str(exception.value)
 
     effects = pd.DataFrame(y.time_ids // 2, index=y.index)
     with pytest.raises(ValueError) as exception:
-        PanelOLS(data.y, data.x, time_effect=True, other_effects=effects)
+        PanelOLS(data.y, data.x, time_effects=True, other_effects=effects)
     assert 'time effects' in str(exception.value)
 
     effects1 = pd.Series(y.entity_ids.squeeze() // 2, index=y.index)

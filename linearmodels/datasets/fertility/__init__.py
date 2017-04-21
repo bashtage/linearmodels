@@ -1,5 +1,5 @@
 DESCR = """
-W. Sander, "The Effect of Women’s Schooling on Fertility," Economics Letters
+W. Sander, "The Effect of Women's Schooling on Fertility," Economics Letters
 40, 229-233.
 
 ear                     72 to 84, even

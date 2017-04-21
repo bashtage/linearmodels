@@ -538,9 +538,9 @@ class PanelOLS(PooledOLS):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
-    entity_effect : bool, optional
+    entity_effects : bool, optional
         Flag whether to include entity (fixed) effects in the model
-    time_effect : bool, optional
+    time_effects : bool, optional
         Flag whether to include time effects in the model
     other_effects : array-like, optional
         Category codes to use for any effects that are not entity or time
@@ -555,7 +555,7 @@ class PanelOLS(PooledOLS):
 
         y_{it} = \alpha_i + \beta^{\prime}x_{it} + \epsilon_{it}
 
-    where :math:`\alpha_i` is included if ``entity_effect=True``.
+    where :math:`\alpha_i` is included if ``entity_effects=True``.
 
     Time effect are also supported, which leads to a model of the form
 
@@ -563,7 +563,7 @@ class PanelOLS(PooledOLS):
 
         y_{it}= \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}
 
-    where :math:`\gamma_i` is included if ``time_effect=True``.
+    where :math:`\gamma_i` is included if ``time_effects=True``.
 
     Both effects can be simultaneously used,
 
@@ -573,29 +573,29 @@ class PanelOLS(PooledOLS):
 
     Additionally , arbitrary effects can be specified using categorical variables.
 
-    If both ``entity_effect``  and``time_effect`` are ``False``, and no other
+    If both ``entity_effect``  and``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
 
     Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
     2 other.
     """
 
-    def __init__(self, dependent, exog, *, weights=None, entity_effect=False, time_effect=False,
+    def __init__(self, dependent, exog, *, weights=None, entity_effects=False, time_effects=False,
                  other_effects=None):
         super(PanelOLS, self).__init__(dependent, exog, weights=weights)
 
-        self._entity_effect = entity_effect
-        self._time_effect = time_effect
+        self._entity_effects = entity_effects
+        self._time_effects = time_effects
         self._other_effect_cats = None
-        self._other_effect = self._validate_effects(other_effects)
+        self._other_effects = self._validate_effects(other_effects)
 
     def __str__(self):
         out = super(PanelOLS, self).__str__()
         additional = '\nEntity Effects: {ee}, Time Effects: {te}, Num Other Effects: {oe}'
         oe = 0
-        if self.other_effect:
+        if self.other_effects:
             oe = self._other_effect_cats.nvar
-        additional = additional.format(ee=self.entity_effect, te=self.time_effect, oe=oe)
+        additional = additional.format(ee=self.entity_effects, te=self.time_effects, oe=oe)
         out += additional
         return out
 
@@ -611,7 +611,7 @@ class PanelOLS(PooledOLS):
                              'entites and time periods as dependent.')
 
         num_effects = effects.nvar
-        if num_effects + self.entity_effect + self.time_effect > 2:
+        if num_effects + self.entity_effects + self.time_effects > 2:
             raise ValueError('At most two effects supported.')
         cats = {}
         effects_frame = effects.dataframe
@@ -629,11 +629,11 @@ class PanelOLS(PooledOLS):
             nested = self._is_effect_nested(cats[:, [0]], cats[:, [1]])
             nested |= self._is_effect_nested(cats[:, [1]], cats[:, [0]])
             nesting_effect = 'other effects'
-        elif self.entity_effect:
+        elif self.entity_effects:
             nested = self._is_effect_nested(cats[:, [0]], self.dependent.entity_ids)
             nested |= self._is_effect_nested(self.dependent.entity_ids, cats[:, [0]])
             nesting_effect = 'entity effects'
-        elif self.time_effect:
+        elif self.time_effects:
             nested = self._is_effect_nested(cats[:, [0]], self.dependent.time_ids)
             nested |= self._is_effect_nested(self.dependent.time_ids, cats[:, [0]])
             nesting_effect = 'time effects'
@@ -644,19 +644,19 @@ class PanelOLS(PooledOLS):
         return True
 
     @property
-    def entity_effect(self):
+    def entity_effects(self):
         """Flag indicating whether entity effects are included"""
-        return self._entity_effect
+        return self._entity_effects
 
     @property
-    def time_effect(self):
+    def time_effects(self):
         """Flag indicating whether time effects are included"""
-        return self._time_effect
+        return self._time_effects
 
     @property
-    def other_effect(self):
+    def other_effects(self):
         """Flag indicating whether other (generic) effects are included"""
-        return self._other_effect
+        return self._other_effects
 
     @classmethod
     def from_formula(cls, formula, data, *, weights=None, other_effects=None):
@@ -667,7 +667,7 @@ class PanelOLS(PooledOLS):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules
-            with two special variable names, EntityEffect and TimeEffect
+            with two special variable names, EntityEffects and TimeEffects
             which can be used to specify that the model should contain an
             entity effect or a time effect, respectively. See Examples.
         data : array-like
@@ -691,7 +691,7 @@ class PanelOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffect', data)
+        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', data)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
@@ -702,7 +702,7 @@ class PanelOLS(PooledOLS):
 
         mod_descr = ModelDesc.from_formula(cln_formula)
         rm_list = []
-        effects = {'EntityEffect': False, 'FixedEffect': False, 'TimeEffect': False}
+        effects = {'EntityEffects': False, 'FixedEffects': False, 'TimeEffects': False}
         for term in mod_descr.rhs_termlist:
             if term.name() in effects:
                 effects[term.name()] = True
@@ -710,21 +710,21 @@ class PanelOLS(PooledOLS):
         for term in rm_list:
             mod_descr.rhs_termlist.remove(term)
 
-        if effects['EntityEffect'] and effects['FixedEffect']:
-            raise ValueError('Cannot use both FixedEffect and EntityEffect')
-        entity_effect = effects['EntityEffect'] or effects['FixedEffect']
-        time_effect = effects['TimeEffect']
+        if effects['EntityEffects'] and effects['FixedEffects']:
+            raise ValueError('Cannot use both FixedEffects and EntityEffects')
+        entity_effect = effects['EntityEffects'] or effects['FixedEffects']
+        time_effect = effects['TimeEffects']
 
         dependent, exog = dmatrices(mod_descr, data.dataframe,
                                     return_type='dataframe', NA_action=na_action)
-        mod = cls(dependent, exog, entity_effect=entity_effect,
-                  time_effect=time_effect, weights=weights, other_effects=other_effects)
+        mod = cls(dependent, exog, entity_effects=entity_effect,
+                  time_effects=time_effect, weights=weights, other_effects=other_effects)
         mod.formula = formula
         return mod
 
     def _slow_path(self):
         """Frisch-Waigh-Lovell implementation, works for all scenarios"""
-        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        has_effect = self.entity_effects or self.time_effects or self.other_effects
         w = self.weights.values2d
         root_w = np.sqrt(w)
 
@@ -736,13 +736,13 @@ class PanelOLS(PooledOLS):
 
         drop_first = self._constant
         d = []
-        if self.entity_effect:
+        if self.entity_effects:
             d.append(self.dependent.dummies('entity', drop_first=drop_first).values)
             drop_first = True
-        if self.time_effect:
+        if self.time_effects:
             d.append(self.dependent.dummies('time', drop_first=drop_first).values)
             drop_first = True
-        if self.other_effect:
+        if self.other_effects:
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 dummies = pd.get_dummies(oe[c], drop_first=drop_first).astype(np.float64)
@@ -772,7 +772,7 @@ class PanelOLS(PooledOLS):
 
     def _fast_path(self):
         """Dummy-variable free estimation without weights"""
-        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
         x = self.exog.values2d
         ybar = y.mean(0)
@@ -786,11 +786,11 @@ class PanelOLS(PooledOLS):
         y = self.dependent
         x = self.exog
 
-        if self.other_effect:
+        if self.other_effects:
             groups = self._other_effect_cats
-            if self.entity_effect or self.time_effect:
+            if self.entity_effects or self.time_effects:
                 groups = groups.copy()
-                if self.entity_effect:
+                if self.entity_effects:
                     effect = self.dependent.entity_ids
                 else:
                     effect = self.dependent.time_ids
@@ -798,13 +798,13 @@ class PanelOLS(PooledOLS):
                 groups.dataframe[col] = effect
             y = y.general_demean(groups)
             x = x.general_demean(groups)
-        elif self.entity_effect and self.time_effect:
+        elif self.entity_effects and self.time_effects:
             y = y.demean('both')
             x = x.demean('both')
-        elif self.entity_effect:
+        elif self.entity_effects:
             y = y.demean('entity')
             x = x.demean('entity')
-        else:  # self.time_effect
+        else:  # self.time_effects
             y = y.demean('time')
             x = x.demean('time')
 
@@ -821,7 +821,7 @@ class PanelOLS(PooledOLS):
 
     def _weighted_fast_path(self):
         """Dummy-variable free estimation with weights"""
-        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
@@ -839,11 +839,11 @@ class PanelOLS(PooledOLS):
         y = self.dependent
         x = self.exog
 
-        if self.other_effect:
+        if self.other_effects:
             groups = self._other_effect_cats
-            if self.entity_effect or self.time_effect:
+            if self.entity_effects or self.time_effects:
                 groups = groups.copy()
-                if self.entity_effect:
+                if self.entity_effects:
                     effect = self.dependent.entity_ids
                 else:
                     effect = self.dependent.time_ids
@@ -851,13 +851,13 @@ class PanelOLS(PooledOLS):
                 groups.dataframe[col] = effect
             wy = y.general_demean(groups, weights=self.weights)
             wx = x.general_demean(groups, weights=self.weights)
-        elif self.entity_effect and self.time_effect:
+        elif self.entity_effects and self.time_effects:
             wy = y.demean('both', weights=self.weights)
             wx = x.demean('both', weights=self.weights)
-        elif self.entity_effect:
+        elif self.entity_effects:
             wy = y.demean('entity', weights=self.weights)
             wx = x.demean('entity', weights=self.weights)
-        else:  # self.time_effect
+        else:  # self.time_effects
             wy = y.demean('time', weights=self.weights)
             wx = x.demean('time', weights=self.weights)
 
@@ -886,7 +886,7 @@ class PanelOLS(PooledOLS):
 
         entity_info, time_info, other_info = super(PanelOLS, self)._info()
 
-        if self.other_effect:
+        if self.other_effects:
             other_info = []
             oe = self._other_effect_cats.dataframe
             for c in oe:
@@ -911,21 +911,21 @@ class PanelOLS(PooledOLS):
         return np.all(is_nested)
 
     def _determine_df_adjustment(self, cov_type, **cov_config):
-        has_effect = self.entity_effect or self.time_effect or self.other_effect
+        has_effect = self.entity_effects or self.time_effects or self.other_effects
         if cov_type != 'clustered' or not has_effect:
             return True
-        num_effects = self.entity_effect + self.time_effect
-        if self.other_effect:
+        num_effects = self.entity_effects + self.time_effects
+        if self.other_effects:
             num_effects += self._other_effect_cats.shape[1]
 
         clusters = cov_config.get('clusters', None)
         if clusters is None:  # No clusters
             return True
 
-        effects = [self._other_effect_cats] if self.other_effect else []
-        if self.entity_effect:
+        effects = [self._other_effect_cats] if self.other_effects else []
+        if self.entity_effects:
             effects.append(self.dependent.entity_ids)
-        if self.time_effect:
+        if self.time_effects:
             effects.append(self.dependent.time_ids)
         effects = np.column_stack(effects)
         if num_effects == 1:
@@ -970,7 +970,7 @@ class PanelOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS(y, x, entity_effect=True)
+        >>> mod = PanelOLS(y, x, entity_effects=True)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
 
         Notes
@@ -1001,19 +1001,19 @@ class PanelOLS(PooledOLS):
 
         neffects = 0
         drop_first = self.has_constant
-        if self.entity_effect:
+        if self.entity_effects:
             neffects += self.dependent.nentity - drop_first
             drop_first = True
-        if self.time_effect:
+        if self.time_effects:
             neffects += self.dependent.nobs - drop_first
             drop_first = True
-        if self.other_effect:
+        if self.other_effects:
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 neffects += oe[c].nunique() - drop_first
                 drop_first = True
 
-        if self.entity_effect or self.time_effect or self.other_effect:
+        if self.entity_effects or self.time_effects or self.other_effects:
             if matrix_rank(x) < x.shape[1]:
                 raise AbsorbingEffectError(absorbing_error_msg)
 
@@ -1056,7 +1056,7 @@ class PanelOLS(PooledOLS):
         root_w = np.sqrt(self.weights.values2d)
         y_ex = root_w * self.dependent.values2d
         mu_ex = 0
-        if self.has_constant or self.entity_effect or self.time_effect or self.other_effect:
+        if self.has_constant or self.entity_effects or self.time_effects or self.other_effects:
             mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
         total_ss_ex_effect = float((y_ex - mu_ex).T @ (y_ex - mu_ex))
         r2_ex_effects = 1 - resid_ss / total_ss_ex_effect
@@ -1065,7 +1065,7 @@ class PanelOLS(PooledOLS):
         ######################################
         # Pooled f-stat
         ######################################
-        if self.entity_effect or self.time_effect or self.other_effect:
+        if self.entity_effects or self.time_effects or self.other_effects:
             wy, wx = root_w * self.dependent.values2d, root_w * self.exog.values2d
             df_num, df_denom = (df_model - wx.shape[1]), df_resid
             if not self.has_constant:
@@ -1091,8 +1091,8 @@ class PanelOLS(PooledOLS):
 
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=resid_ss, total_ss=total_ss, wresids=weps, resids=eps,
-                        r2=r2, entity_effect=self.entity_effect, time_effect=self.time_effect,
-                        other_effect=self.other_effect, sigma2_eps=sigma2_eps,
+                        r2=r2, entity_effects=self.entity_effects, time_effects=self.time_effects,
+                        other_effects=self.other_effects, sigma2_eps=sigma2_eps,
                         sigma2_effects=sigma2_effects, rho=rho, r2_ex_effects=r2_ex_effects,
                         effects=effects))
 
