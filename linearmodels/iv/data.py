@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from linearmodels.compat.pandas import is_categorical, is_categorical_dtype, is_numeric_dtype, is_string_dtype, \
-    is_string_like
+from linearmodels.compat.pandas import is_categorical, is_categorical_dtype,  \
+    is_numeric_dtype, is_string_dtype, is_string_like
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'

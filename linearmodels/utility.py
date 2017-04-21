@@ -5,6 +5,7 @@ import numpy as np
 from numpy import NaN, ceil, diag, isnan, log10, sqrt
 from numpy.linalg import eigh, matrix_rank
 from scipy.stats import chi2, f
+from pandas import DataFrame, Series, concat
 
 
 class MissingValueWarning(Warning):
@@ -316,3 +317,76 @@ def ensure_unique_column(col_name, df, addition='_'):
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name
+
+
+class _ModelComparison(_SummaryStr):
+    """
+    Base class for model comparisons
+    """
+    _supported = tuple([])
+
+    def __init__(self, results):
+        if not isinstance(results, (dict, OrderedDict)):
+            _results = OrderedDict()
+            for i, res in enumerate(results):
+                _results['Model ' + str(i)] = results[i]
+            results = _results
+        elif not isinstance(results, OrderedDict):
+            _results = OrderedDict()
+            for key in sorted(results.keys()):
+                _results[key] = results[key]
+            results = _results
+        self._results = results
+
+        for key in self._results:
+            if not isinstance(self._results[key], self._supported):
+                raise TypeError('Results from unknown model')
+
+    def _get_series_property(self, name):
+        out = ([(k, getattr(v, name)) for k, v in self._results.items()])
+        cols = [v[0] for v in out]
+        values = concat([v[1] for v in out], 1)
+        values.columns = cols
+        return values
+
+    def _get_property(self, name):
+        out = OrderedDict()
+        items = []
+        for k, v in self._results.items():
+            items.append(k)
+            out[k] = getattr(v, name)
+        return Series(out, name=name).loc[items]
+
+    @property
+    def nobs(self):
+        """Parameters for all models"""
+        return self._get_property('nobs')
+
+    @property
+    def params(self):
+        """Parameters for all models"""
+        return self._get_series_property('params')
+
+    @property
+    def tstats(self):
+        """Parameter t-stats for all models"""
+        return self._get_series_property('tstats')
+
+    @property
+    def pvalues(self):
+        """Parameter p-vals for all models"""
+        return self._get_series_property('pvalues')
+
+    @property
+    def rsquared(self):
+        """Coefficients of determination (R**2)"""
+        return self._get_property('rsquared')
+
+    @property
+    def f_statistic(self):
+        """F-statistics and P-values"""
+        out = self._get_property('f_statistic')
+        out_df = DataFrame(np.empty((len(out), 2)), columns=['F stat', 'P-value'], index=out.index)
+        for loc in out.index:
+            out_df.loc[loc] = out[loc].stat, out[loc].pval
+        return out_df

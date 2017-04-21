@@ -1,13 +1,14 @@
 import numpy as np
 from numpy.linalg import inv
+from pandas import DataFrame
 
 from linearmodels.iv.covariance import _cov_cluster, CLUSTER_ERR
+from linearmodels.iv.covariance import _cov_kernel, KERNEL_LOOKUP
 from linearmodels.utility import cached_property
-
-# TODO: Driscoll Kraay
 
 __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
            'ClusteredCovariance', 'CovarianceManager']
+
 
 class HomoskedasticCovariance(object):
     r"""
@@ -21,6 +22,8 @@ class HomoskedasticCovariance(object):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
         Flag indicating whether to debias the estimator
     extra_df : int, optional
@@ -46,14 +49,15 @@ class HomoskedasticCovariance(object):
 
         s^2 = (n-df)^{-1} \hat{\epsilon}'\hat{\epsilon}
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is 
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
 
-    def __init__(self, y, x, params, *, debiased=False, extra_df=0):
+    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0):
         self._y = y
         self._x = x
         self._params = params
+        self._time_ids = time_ids
         self._debiased = debiased
         self._extra_df = extra_df
         self._nobs, self._nvar = x.shape
@@ -98,6 +102,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
         Flag indicating whether to debias the estimator
     extra_df : int, optional
@@ -125,12 +131,12 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         \hat{S} = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i
 
-    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is 
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
 
-    def __init__(self, y, x, params, *, debiased=False, extra_df=0):
-        super(HeteroskedasticCovariance, self).__init__(y, x, params, debiased=debiased,
+    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0):
+        super(HeteroskedasticCovariance, self).__init__(y, x, params, time_ids, debiased=debiased,
                                                         extra_df=extra_df)
         self._name = 'Robust'
 
@@ -161,6 +167,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
         Flag indicating whether to debias the estimator
     extra_df : int, optional
@@ -191,27 +199,27 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         \hat{\Sigma}_{xx} = X'X
 
-    and :math:`\hat{S}_{\mathcal{G}}` is a one- or two-way cluster covariance 
-    of the scores.  Two-way clustering is implemented by summing up the two 
-    one-way cluster covariances and then subtracting the one-way clustering 
-    covariance computed using the group formed from the intersection of the 
+    and :math:`\hat{S}_{\mathcal{G}}` is a one- or two-way cluster covariance
+    of the scores.  Two-way clustering is implemented by summing up the two
+    one-way cluster covariances and then subtracting the one-way clustering
+    covariance computed using the group formed from the intersection of the
     two groups.
-    
-    Two small sample adjustment are available.  ``debias=True`` will account 
-    for regressors in the main model. ``group_debias=True`` will provide a 
-    small sample adjustment for the number of clusters of the form 
-    
+
+    Two small sample adjustment are available.  ``debias=True`` will account
+    for regressors in the main model. ``group_debias=True`` will provide a
+    small sample adjustment for the number of clusters of the form
+
     .. math ::
-    
+
       (g / (g- 1)) ((n - 1) / n)
-    
-    where g is the number of distinct groups and n is the number of 
+
+    where g is the number of distinct groups and n is the number of
     observations.
     """
 
-    def __init__(self, y, x, params, *, debiased=False, extra_df=0, clusters=None,
+    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0, clusters=None,
                  group_debias=False):
-        super(ClusteredCovariance, self).__init__(y, x, params,
+        super(ClusteredCovariance, self).__init__(y, x, params, time_ids,
                                                   debiased=debiased,
                                                   extra_df=extra_df)
         if clusters is None:
@@ -269,6 +277,98 @@ class ClusteredCovariance(HomoskedasticCovariance):
             xeex = xeex0 + xeex1 - xeex01
 
         xeex *= self._scale
+        out = (xpxi @ xeex @ xpxi) / nobs
+        return (out + out.T) / 2
+
+
+class DriscollKraay(HomoskedasticCovariance):
+    r"""
+    Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation
+
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
+    x : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        variables by 1 array of estimated model parameters
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects.  Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased
+    kernel : str, options
+        Name of one of the supported kernels
+    bandwidth : int, optional
+        Non-negative integer to use as bandwidth.  If not provided a rule-of-
+        thumb value is used.
+
+    Notes
+    -----
+    Supported kernels:
+
+      * 'bartlett', 'newey-west' - Bartlett's kernel
+      * 'quadratic-spectral', 'qs', 'andrews' - Quadratic-Spectral Kernel
+      * 'parzen', 'gallant' - Parzen kernel
+
+    Bandwidth is set to the common value for the Bartlett kernel if not
+    provided.
+    
+    The estimator of the covariance is
+
+    .. math::
+
+        n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}
+
+    where
+
+    .. math::
+
+        \hat{\Sigma}_{xx} = n^{-1}X'X
+
+    and
+
+    .. math::
+      \xi_t & = \sum_{i=1}^{n_t} \epsilon_i x_{i} \\
+      \hat{S}_0 & = \sum_{i=1}^{t} \xi'_t \xi_t \\
+      \hat{S}_j & = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\
+      \hat{S}   & = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j
+
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
+    ``True``. :math:`K(i, bw)` is the kernel weighting function.
+    """
+    # TODO: Test
+
+    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0,
+                 kernel='newey-west', bandwidth=None):
+        super(DriscollKraay, self).__init__(y, x, params, time_ids, debiased=debiased,
+                                            extra_df=extra_df)
+        self._kernel = kernel
+        self._bandwidth = bandwidth
+
+    @cached_property
+    def cov(self):
+        x = self._x
+        nobs = x.shape[0]
+        xpxi = inv(x.T @ x / nobs)
+        eps = self.eps
+
+        xe = x * eps
+        xe = DataFrame(xe, index=self._time_ids.squeeze())
+        xe = xe.groupby(level=0).sum()
+        xe.sort_index(inplace=True)
+        xe_nobs = xe.shape[0]
+        bw = self._bandwidth
+        if self._bandwidth is None:
+            bw = int(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
+        w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
+        xeex = _cov_kernel(xe.values, w) * (xe_nobs / nobs)
+        xeex *= self._scale
+
         out = (xpxi @ xeex @ xpxi) / nobs
         return (out + out.T) / 2
 

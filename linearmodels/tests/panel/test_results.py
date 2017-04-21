@@ -23,7 +23,7 @@ def test_single(data):
     for value in d:
         if value.startswith('_'):
             continue
-        a = getattr(comp, value)
+        getattr(comp, value)
 
 
 def test_multiple(data):
@@ -42,7 +42,7 @@ def test_multiple(data):
     for value in d:
         if value.startswith('_'):
             continue
-        a = getattr(comp, value)
+        getattr(comp, value)
 
 
 def test_multiple_no_effects(data):
@@ -59,7 +59,7 @@ def test_multiple_no_effects(data):
     for value in d:
         if value.startswith('_'):
             continue
-        a = getattr(comp, value)
+        getattr(comp, value)
     compare(OrderedDict(a=res, model2=res3, model3=res4))
 
 

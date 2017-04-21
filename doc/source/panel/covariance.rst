@@ -23,3 +23,9 @@ One- and Two-way Clustered covariance estimator
 .. autoclass:: ClusteredCovariance
    :members:
    :inherited-members:
+
+Driscoll-Kraay HAC Estimator
+============================
+.. autoclass:: DriscollKraay
+   :members:
+   :inherited-members:

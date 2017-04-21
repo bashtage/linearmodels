@@ -114,7 +114,6 @@ def test_nested_effects(data):
         PanelOLS(data.y, data.x, entity_effect=True, other_effects=effects)
     assert 'entity effects' in str(exception.value)
 
-
     effects = pd.DataFrame(y.time_ids // 2, index=y.index)
     with pytest.raises(ValueError) as exception:
         PanelOLS(data.y, data.x, time_effect=True, other_effects=effects)

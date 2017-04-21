@@ -4,9 +4,9 @@ from numpy import cos, pi, sin
 from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
 
-from linearmodels.iv.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, KernelCovariance, \
-    ClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, kernel_weight_bartlett, kernel_weight_parzen, \
-    kernel_weight_quadratic_spectral
+from linearmodels.iv.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, \
+    KernelCovariance, ClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, \
+    kernel_weight_bartlett, kernel_weight_parzen, kernel_weight_quadratic_spectral
 from linearmodels.utility import AttrDict
 
 
