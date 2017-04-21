@@ -1,5 +1,5 @@
 DESCR = """
-T.A. Mroz (1987), "The Sensitivity of an Empirical Model of Married Women’s
+T.A. Mroz (1987), "The Sensitivity of an Empirical Model of Married Women's
 Hours of Work to Economic and Statistical Assumptions," Econometrica 55,
 765-799.
 

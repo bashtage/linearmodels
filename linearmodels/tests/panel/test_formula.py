@@ -115,28 +115,28 @@ def test_panel_ols_formula(data):
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
 
-    formula = 'y ~ x1 + x2 + EntityEffect'
+    formula = 'y ~ x1 + x2 + EntityEffects'
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
-    assert mod.entity_effect is True
-    assert mod.time_effect is False
+    assert mod.entity_effects is True
+    assert mod.time_effects is False
 
-    formula = 'y ~ x1 + x2 + TimeEffect'
+    formula = 'y ~ x1 + x2 + TimeEffects'
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
-    assert mod.time_effect is True
-    assert mod.entity_effect is False
+    assert mod.time_effects is True
+    assert mod.entity_effects is False
 
-    formula = 'y ~ x1 + EntityEffect + TimeEffect + x2 '
+    formula = 'y ~ x1 + EntityEffects + TimeEffects + x2 '
     mod = PanelOLS.from_formula(formula, joined)
     assert mod.formula == formula
-    assert mod.entity_effect is True
-    assert mod.time_effect is True
+    assert mod.entity_effects is True
+    assert mod.time_effects is True
     mod2 = panel_ols(formula, joined)
     res = mod.fit()
     res2 = mod2.fit()
     np.testing.assert_allclose(res.params, res2.params)
 
-    formula = 'y ~ x1 + EntityEffect + FixedEffect + x2 '
+    formula = 'y ~ x1 + EntityEffects + FixedEffects + x2 '
     with pytest.raises(ValueError):
         PanelOLS.from_formula(formula, joined)

@@ -1,6 +1,6 @@
 
-Mathematical Formulas
-=====================
+Formulas and Mathematical Detail
+================================
 
 Notation
 --------

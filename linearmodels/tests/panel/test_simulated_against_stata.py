@@ -36,7 +36,7 @@ def data(request):
     mod = MODELS[model]
     mod_options = {}
     if model == 'fixed_effect':
-        mod_options = {'entity_effect': True}
+        mod_options = {'entity_effects': True}
     if weights == 'weighted':
         mod_options.update({'weights': sim_data['w']})
     fit_options = {'debiased': True}

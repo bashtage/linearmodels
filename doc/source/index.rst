@@ -1,7 +1,7 @@
 Linear Model Estimation
 =======================
 
-Estimation and inference in some linear models:
+Estimation and inference in some common linear models:
 
   * Models for panel data
 

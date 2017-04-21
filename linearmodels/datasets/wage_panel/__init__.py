@@ -1,6 +1,6 @@
 DESCR = """
-F. Vella and M. Verbeek (1998), “Whose Wages Do Unions Raise? A Dynamic Model
-of Unionism and Wage Rate Determination for Young Men,” Journal of Applied
+F. Vella and M. Verbeek (1998), "Whose Wages Do Unions Raise? A Dynamic Model
+of Unionism and Wage Rate Determination for Young Men," Journal of Applied
 Econometrics 13, 163-183.
 
 nr                       person identifier

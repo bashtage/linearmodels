@@ -5,11 +5,11 @@ data = wage_panel.load()
 data = data.set_index(['nr','year'])
 dependent = data.lwage
 exog = sm.add_constant(data[['expersq','married','union']])
-mod = PanelOLS(dependent, exog, entity_effect=True, time_effect=True)
+mod = PanelOLS(dependent, exog, entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='unadjusted')
 res2 = mod.fit(cov_type='robust')
 exog = sm.add_constant(data[['exper', 'expersq','married','union']])
-mod = PanelOLS(dependent, exog, entity_effect=True)
+mod = PanelOLS(dependent, exog, entity_effects=True)
 res3 = mod.fit(cov_type='clustered',cluster_entity=True)
 mod = RandomEffects(dependent, exog)
 res4 = mod.fit(cov_type='robust')
@@ -53,7 +53,7 @@ data.year = data.year.astype(np.int64)
 from linearmodels import PanelOLS
 
 etdata = data.set_index(['firm', 'year'])
-mod2 = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True)
+mod2 = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effects=True)
 res2 = mod2.fit(debiased=True)
 
 import numpy as np
@@ -76,7 +76,7 @@ data.year = data.year.astype(np.int64)
 from linearmodels import PanelOLS
 
 etdata = data.set_index(['firm', 'year'])
-res = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effect=True).fit(debiased=True)
+res = PanelOLS(etdata.invest, etdata[['value', 'capital']], entity_effects=True).fit(debiased=True)
 x = np.random.randn(10, 2)
 p = np.zeros((10, 10))
 p[:5, :5] = 1 / 5
@@ -138,11 +138,11 @@ w = PanelData(data.w)
 x.dataframe.iloc[:, 0] = 1
 mod = PanelOLS(data.y, data.x, weights=data.w)
 mod.fit()
-mod = PanelOLS(y, x, weights=data.w, entity_effect=True)
+mod = PanelOLS(y, x, weights=data.w, entity_effects=True)
 mod.fit()
-mod = PanelOLS(data.y, data.x, weights=data.w, time_effect=True)
+mod = PanelOLS(data.y, data.x, weights=data.w, time_effects=True)
 mod.fit()
-mod = PanelOLS(data.y, data.x, weights=data.w, time_effect=True, entity_effect=True)
+mod = PanelOLS(data.y, data.x, weights=data.w, time_effects=True, entity_effects=True)
 mod.fit()
 
 missing = y.isnull | x.isnull | w.isnull

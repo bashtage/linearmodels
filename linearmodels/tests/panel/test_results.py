@@ -16,7 +16,7 @@ def data(request):
 def test_single(data):
     dependent = data.set_index(['nr', 'year']).lwage
     exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
-    res = PanelOLS(dependent, exog, entity_effect=True).fit()
+    res = PanelOLS(dependent, exog, entity_effects=True).fit()
     comp = compare([res])
     assert len(comp.rsquared) == 1
     d = dir(comp)
@@ -29,9 +29,9 @@ def test_single(data):
 def test_multiple(data):
     dependent = data.set_index(['nr', 'year']).lwage
     exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
-    res = PanelOLS(dependent, exog, entity_effect=True, time_effect=True).fit()
-    res2 = PanelOLS(dependent, exog, entity_effect=True).fit(cov_type='clustered',
-                                                             cluster_entity=True)
+    res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
+    res2 = PanelOLS(dependent, exog, entity_effects=True).fit(cov_type='clustered',
+                                                              cluster_entity=True)
     exog = sm.add_constant(data.set_index(['nr', 'year'])[['married', 'union']])
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(['nr', 'year'])[['exper']]

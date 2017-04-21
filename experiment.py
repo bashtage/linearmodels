@@ -16,8 +16,8 @@ NUM_REPS = 250
 # 1-way effects: entity, time, random
 # 1-way cluster: entity, time, random, other random
 mod_entity = {'entity_effect': True}
-mod_time = {'time_effect': True}
-mod_entity_time = {'entity_effect': True, 'time_effect': True}
+mod_time = {'time_effects': True}
+mod_entity_time = {'entity_effect': True, 'time_effects': True}
 mod_random = {'other_effects': 0}
 fit_entity = {'cov_type': 'clustered', 'cluster_entity': True}
 fit_time = {'cov_type': 'clustered', 'cluster_time': True}
