@@ -31,6 +31,7 @@ class AmbiguityError(Exception):
 __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS',
            'BetweenOLS', 'AbsorbingEffectError', 'AmbiguityError']
 
+
 # Essential
 # TODO: Example notebooks
 # Likely
@@ -503,7 +504,8 @@ class PooledOLS(object):
         df_model = x.shape[1]
         df_resid = nobs - df_model
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
+        cov = cov_est(wy, wx, params, self.dependent.time_ids,
+                      debiased=debiased, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -624,16 +626,16 @@ class PanelOLS(PooledOLS):
         cats = other_effects.values2d
         nested = False
         if cats.shape[1] == 2:
-            nested = self._is_effect_nested(cats[:,[0]],cats[:,[1]])
-            nested |= self._is_effect_nested(cats[:,[1]],cats[:,[0]])
+            nested = self._is_effect_nested(cats[:, [0]], cats[:, [1]])
+            nested |= self._is_effect_nested(cats[:, [1]], cats[:, [0]])
             nesting_effect = 'other effects'
         elif self.entity_effect:
             nested = self._is_effect_nested(cats[:, [0]], self.dependent.entity_ids)
-            nested |= self._is_effect_nested(self.dependent.entity_ids, cats[:,[0]])
+            nested |= self._is_effect_nested(self.dependent.entity_ids, cats[:, [0]])
             nesting_effect = 'entity effects'
         elif self.time_effect:
             nested = self._is_effect_nested(cats[:, [0]], self.dependent.time_ids)
-            nested |= self._is_effect_nested(self.dependent.time_ids, cats[:,[0]])
+            nested |= self._is_effect_nested(self.dependent.time_ids, cats[:, [0]])
             nesting_effect = 'time effects'
         if nested:
             raise ValueError('Included other effects nest or are nested '
@@ -788,7 +790,10 @@ class PanelOLS(PooledOLS):
             groups = self._other_effect_cats
             if self.entity_effect or self.time_effect:
                 groups = groups.copy()
-                effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
+                if self.entity_effect:
+                    effect = self.dependent.entity_ids
+                else:
+                    effect = self.dependent.time_ids
                 col = ensure_unique_column('additional.effect', groups.dataframe)
                 groups.dataframe[col] = effect
             y = y.general_demean(groups)
@@ -838,11 +843,14 @@ class PanelOLS(PooledOLS):
             groups = self._other_effect_cats
             if self.entity_effect or self.time_effect:
                 groups = groups.copy()
-                effect = self.dependent.entity_ids if self.entity_effect else self.dependent.time_ids
+                if self.entity_effect:
+                    effect = self.dependent.entity_ids
+                else:
+                    effect = self.dependent.time_ids
                 col = ensure_unique_column('additional.effect', groups.dataframe)
                 groups.dataframe[col] = effect
-            wy = y.weighted_general_demean(groups, weights=self.weights)
-            wx = x.weighted_general_demean(groups, weights=self.weights)
+            wy = y.general_demean(groups, weights=self.weights)
+            wx = x.general_demean(groups, weights=self.weights)
         elif self.entity_effect and self.time_effect:
             wy = y.demean('both', weights=self.weights)
             wx = x.demean('both', weights=self.weights)
@@ -1018,7 +1026,8 @@ class PanelOLS(PooledOLS):
             count_effects = self._determine_df_adjustment(cov_type, **cov_config)
         extra_df = neffects if count_effects else 0
 
-        cov = cov_est(y, x, params, debiased=debiased, extra_df=extra_df, **cov_config)
+        cov = cov_est(y, x, params, self.dependent.time_ids,
+                      debiased=debiased, extra_df=extra_df, **cov_config)
         weps = y - x @ params
         eps = weps
         _y = self.dependent.values2d
@@ -1067,7 +1076,7 @@ class PanelOLS(PooledOLS):
             weps_pooled = wy - wx @ np.linalg.lstsq(wx, wy)[0]
             resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
             num = (resid_ss_pooled - resid_ss) / df_num
-            
+
             denom = resid_ss / df_denom
             stat = num / denom
             f_pooled = WaldTestStatistic(stat, 'Effects are zero',
@@ -1201,7 +1210,8 @@ class BetweenOLS(PooledOLS):
         df_model = x.shape[1],
         nobs = y.shape[0]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
+        cov = cov_est(wy, wx, params, self.dependent.time_ids,
+                      debiased=debiased, **cov_config)
         weps = wy - wx @ params
         eps = y - x @ params
         residual_ss = float(weps.T @ weps)
@@ -1395,7 +1405,8 @@ class FirstDifferenceOLS(PooledOLS):
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
+        cov = cov_est(wy, wx, params, self.dependent.time_ids,
+                      debiased=debiased, **cov_config)
 
         weps = wy - wx @ params
         eps = y - x @ params
@@ -1564,7 +1575,8 @@ class RandomEffects(PooledOLS):
 
         df_resid = wy.shape[0] - wx.shape[1]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(wy, wx, params, debiased=debiased, **cov_config)
+        cov = cov_est(wy, wx, params, self.dependent.time_ids,
+                      debiased=debiased, **cov_config)
 
         weps = wy - wx @ params
         eps = weps / root_w

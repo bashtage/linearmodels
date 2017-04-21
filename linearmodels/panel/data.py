@@ -4,11 +4,12 @@ from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 from xarray import DataArray
 
-from linearmodels.utility import ensure_unique_column
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
     is_string_like, is_numeric_dtype, is_datetime64_any_dtype
+from linearmodels.utility import ensure_unique_column
 
 __all__ = ['PanelData']
+
 
 def convert_columns(s, drop_first):
     if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
@@ -123,7 +124,7 @@ class PanelData(object):
 
         time_index = Series(self._frame.index.levels[1])
         if not (is_numeric_dtype(time_index.dtype) or
-                    is_datetime64_any_dtype(time_index.dtype)):
+                is_datetime64_any_dtype(time_index.dtype)):
             raise ValueError('The index on the time dimension must be either '
                              'numeric or date-like')
         self._k, self._t, self._n = self.panel.shape
@@ -259,7 +260,7 @@ class PanelData(object):
 
         return PanelData(resid)
 
-    def weighted_general_demean(self, groups, weights):
+    def general_demean(self, groups, weights=None):
         """
         Multi-way demeaning using only groupby
 
@@ -267,7 +268,7 @@ class PanelData(object):
         ----------
         groups : PanelData
             Arrays with the same size containing group identifiers
-        weights : PanelData
+        weights : PanelData, optional
             Weights to use in the weighted demeaning
 
         Returns
@@ -281,12 +282,22 @@ class PanelData(object):
         """
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
+        if weights is None:
+            weights = PanelData(pd.DataFrame(np.ones((self._frame.shape[0], 1)),
+                                             index=self.index,
+                                             columns=['weights']))
         weights = weights.values2d
         groups = groups.values2d.astype(np.int64)
 
+        weight_sum = {}
+
         def weighted_group_mean(df, weights, root_w, level):
             num = (root_w * df).groupby(level=level).transform('sum')
-            denom = weights.groupby(level=level).transform('sum')
+            if level in weight_sum:
+                denom = weight_sum[level]
+            else:
+                denom = weights.groupby(level=level).transform('sum')
+                weight_sum[level] = denom
             return num.values / denom.values
 
         def demean_pass(frame, weights, root_w):
@@ -326,65 +337,6 @@ class PanelData(object):
         while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
             previous = current
             current = demean_pass(previous, weights, root_w)
-        current.index = self._frame.index
-
-        return PanelData(current)
-
-    def general_demean(self, groups):
-        """
-        Multi-way demeaning using only groupby
-
-        Parameters
-        ----------
-        groups : PanelData
-            Arrays with the same size containing group identifiers
-
-        Returns
-        -------
-        demeaned : PanelData
-            Demeaned data according to groups
-
-        Notes
-        -----
-        Iterates until convergence
-        """
-        # TODO: Consolidate with weighted version
-        if not isinstance(groups, PanelData):
-            groups = PanelData(groups)
-        groups = groups.values2d.astype(np.int64)
-
-        def demean_pass(frame):
-            levels = len(frame.index.levels) if isinstance(frame.index, pd.MultiIndex) else 1
-            for i in range(levels):
-                mu = frame.groupby(level=i).transform('mean')
-                if i == 0:
-                    frame = frame - mu
-                else:
-                    frame -= mu
-            return frame
-
-        # Swap out the index for better performance
-        previous = self._frame.copy()
-        init_index = pd.DataFrame(groups)
-        init_index.set_index(list(init_index.columns), inplace=True)
-        previous.index = init_index.index
-        current = demean_pass(previous)
-
-        if groups.shape[1] == 1:
-            current.index = self._frame.index
-            return PanelData(current)
-
-        exclude = np.ptp(self._frame.values, 0) == 0
-        max_rmse = np.sqrt(self._frame.values.var(0).max())
-        scale = self._frame.std().values
-        exclude = exclude | (scale < 1e-14 * max_rmse)
-        replacement = np.maximum(scale, 1)
-        scale[exclude] = replacement[exclude]
-        scale = scale[None, :]
-
-        while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
-            previous = current
-            current = demean_pass(current)
         current.index = self._frame.index
 
         return PanelData(current)

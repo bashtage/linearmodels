@@ -635,20 +635,20 @@ def test_general_unit_weighted_demean_oneway(panel):
     g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
     weights = PanelData(g).copy()
     weights.dataframe.iloc[:, :] = 1
-    dm2 = y.weighted_general_demean(g, weights)
+    dm2 = y.general_demean(g, weights)
     assert_allclose(dm1.values2d, dm2.values2d)
     dm3 = y.general_demean(g)
     assert_allclose(dm3.values2d, dm2.values2d)
 
     dm1 = y.demean('time')
     g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
-    dm2 = y.weighted_general_demean(g, weights)
+    dm2 = y.general_demean(g, weights)
     assert_allclose(dm1.values2d, dm2.values2d)
     dm3 = y.general_demean(g)
     assert_allclose(dm3.values2d, dm2.values2d)
 
     g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
-    dm2 = y.weighted_general_demean(g, weights)
+    dm2 = y.general_demean(g, weights)
     dm3 = y.general_demean(g)
     g = pd.Categorical(g.dataframe.iloc[:, 0])
     d = pd.get_dummies(g)
@@ -664,16 +664,16 @@ def test_general_weighted_demean_oneway(panel):
 
     dm1 = y.demean('entity', weights=w)
     g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
-    dm2 = y.weighted_general_demean(g, w)
+    dm2 = y.general_demean(g, w)
     assert_allclose(dm1.values2d, dm2.values2d)
 
     dm1 = y.demean('time', weights=w)
     g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
-    dm2 = y.weighted_general_demean(g, w)
+    dm2 = y.general_demean(g, w)
     assert_allclose(dm1.values2d, dm2.values2d)
 
     g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
-    dm2 = y.weighted_general_demean(g, w)
+    dm2 = y.general_demean(g, w)
     g = pd.Categorical(g.dataframe.iloc[:, 0])
     d = pd.get_dummies(g)
     wd = np.sqrt(w.values2d) * d
@@ -691,11 +691,11 @@ def test_general_unit_weighted_demean_twoway(panel):
     dm1 = y.demean('both', weights=w)
     g = pd.DataFrame(y.entity_ids, index=y.index)
     g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
-    dm2 = y.weighted_general_demean(g, weights=w)
+    dm2 = y.general_demean(g, weights=w)
     assert_allclose(dm1.values2d - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
 
     g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
-    dm2 = y.weighted_general_demean(g, weights=w)
+    dm2 = y.general_demean(g, weights=w)
     g1 = pd.Categorical(g.iloc[:, 0])
     d1 = pd.get_dummies(g1)
     g2 = pd.Categorical(g.iloc[:, 1])

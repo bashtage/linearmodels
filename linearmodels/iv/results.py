@@ -2,7 +2,6 @@
 Results containers and post-estimation diagnostics for IV models
 """
 import datetime as dt
-from collections import OrderedDict
 
 import scipy.stats as stats
 from numpy import array, asarray, c_, diag, empty, log, ones, sqrt
@@ -13,8 +12,8 @@ from statsmodels.iolib.summary import SimpleTable, Summary, fmt_2cols, \
 from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.iv._utility import annihilate, proj
-from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic, _SummaryStr, _str, cached_property, \
-    pval_format
+from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic, \
+    _SummaryStr, _str, cached_property, pval_format, _ModelComparison
 
 
 def stub_concat(lists, sep='='):
@@ -1152,7 +1151,7 @@ def compare(results):
     return IVModelComparison(results)
 
 
-class IVModelComparison(_SummaryStr):
+class IVModelComparison(_ModelComparison):
     """
     Comparison of multiple models
 
@@ -1162,77 +1161,15 @@ class IVModelComparison(_SummaryStr):
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
     """
+    _supported = (IVResults, IVGMMResults, OLSResults)
 
     def __init__(self, results):
-
-        if not isinstance(results, (dict, OrderedDict)):
-            _results = OrderedDict()
-            for i, res in enumerate(results):
-                _results['Model ' + str(i)] = results[i]
-            results = _results
-        elif not isinstance(results, OrderedDict):
-            _results = OrderedDict()
-            for key in sorted(results.keys()):
-                _results[key] = results[key]
-            results = _results
-        self._results = results
-
-    def estimator_type(self):
-        pass
-
-    def _get_series_property(self, name):
-        out = ([(k, getattr(v, name)) for k, v in self._results.items()])
-        cols = [v[0] for v in out]
-        values = concat([v[1] for v in out], 1)
-        values.columns = cols
-        return values
-
-    def _get_property(self, name):
-        out = OrderedDict()
-        items = []
-        for k, v in self._results.items():
-            items.append(k)
-            out[k] = getattr(v, name)
-        return Series(out, name=name).loc[items]
-
-    @property
-    def nobs(self):
-        """Parameters for all models"""
-        return self._get_property('nobs')
-
-    @property
-    def params(self):
-        """Parameters for all models"""
-        return self._get_series_property('params')
-
-    @property
-    def tstats(self):
-        """Parameter t-stats for all models"""
-        return self._get_series_property('tstats')
-
-    @property
-    def pvalues(self):
-        """Parameter p-vals for all models"""
-        return self._get_series_property('pvalues')
-
-    @property
-    def rsquared(self):
-        """Coefficients of determination (R**2)"""
-        return self._get_property('rsquared')
+        super(IVModelComparison, self).__init__(results)
 
     @property
     def rsquared_adj(self):
         """Sample-size adjusted coefficients of determination (R**2)"""
         return self._get_property('rsquared_adj')
-
-    @property
-    def f_statistic(self):
-        """F-statistics and P-values"""
-        out = self._get_property('f_statistic')
-        out_df = DataFrame(empty((len(out), 2)), columns=['F stat', 'P-value'], index=out.index)
-        for loc in out.index:
-            out_df.loc[loc] = out[loc].stat, out[loc].pval
-        return out_df
 
     @property
     def estimator_method(self):

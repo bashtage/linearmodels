@@ -1,13 +1,13 @@
 from itertools import product
 
+import numpy as np
 import pandas as pd
 import pytest
-import numpy as np
 
-from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
-    RandomEffects
 from linearmodels.formula import between_ols, first_difference_ols, panel_ols, pooled_ols, \
     random_effects
+from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
+    RandomEffects
 from linearmodels.tests.panel._utility import generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -28,8 +28,11 @@ def data(request):
 def formula(request):
     return request.param
 
+
 classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects]
 funcs = [pooled_ols, between_ols, first_difference_ols, random_effects]
+
+
 @pytest.fixture(params=list(zip(classes, funcs)))
 def models(request):
     return request.param
@@ -87,7 +90,7 @@ def test_basic_formulas_math_op(data, models, formula):
         return
     joined = data.x
     joined['y'] = data.y
-    formula = formula.replace('x0','np.exp(x0)')
+    formula = formula.replace('x0', 'np.exp(x0)')
     formula = formula.replace('x1', 'np.arctan(x1)')
     model, formula_func = models
     model.from_formula(formula, joined).fit()
