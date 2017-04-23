@@ -28,6 +28,8 @@ Estimation and inference in some common linear models:
    panel/index
    utility
    plan
+   contributing
+   changes
 
 
 Indices and tables
