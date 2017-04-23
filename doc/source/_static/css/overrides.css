@@ -1,0 +1,16 @@
+body {
+  font-size: 14px;
+}
+
+.sidebar-toc {
+  font-size: 13px;
+}
+
+blockquote {
+   font-size: 14px;
+}
+
+code, pre, tt {
+  font-size: 14px;
+  font-family: Consolas, monospace;
+}
