@@ -223,6 +223,11 @@ y_{it}=x_{it}\beta+d_{1,it}\gamma_{1}+d_{2,it}\gamma_{2}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula $d_{1,it}$
 \end_inset
@@ -268,7 +273,7 @@ When weights are used, the results are identical to the LSDV model where
 \end_inset
 
 (if included) – are multiplied by 
-\begin_inset Formula $w_{it}$
+\begin_inset Formula $\sqrt{w_{it}}$
 \end_inset
 
 .
@@ -410,8 +415,8 @@ Weights
 \begin_layout Standard
 \noindent
 When weights are included the averages are replaced by weighted averages
- and the final regression is weighted by 
-\begin_inset Formula $w_{it}$
+ and the final regression terms are all multiplied by 
+\begin_inset Formula $\sqrt{w_{it}}$
 \end_inset
 
 .
@@ -606,6 +611,11 @@ s^{2}\Sigma_{XX}^{-1}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where
 \begin_inset Formula 
 \[
@@ -701,6 +711,11 @@ n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{\mathcal{G}}\Sigma_{XX}^{-1}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where in the case of one-way clustering, 
 \begin_inset Formula 
 \[
@@ -709,6 +724,11 @@ where in the case of one-way clustering,
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula 
 \[
@@ -717,6 +737,11 @@ where
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 and 
 \begin_inset Formula $it\in G_{g}$
 \end_inset
@@ -738,6 +763,11 @@ by
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 Where the group debiasing is applies individually to each of the three component
 s depending on the number of groups in the three estimators.
  If the group debias term is not used, the expression 
@@ -790,6 +820,11 @@ n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{HAC}\Sigma_{XX}^{-1}
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 where 
 \begin_inset Formula 
 \begin{align*}
@@ -800,6 +835,11 @@ where
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 and 
 \begin_inset Formula $K\left(i,bw\right)$
 \end_inset

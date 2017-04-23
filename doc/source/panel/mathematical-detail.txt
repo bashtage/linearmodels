@@ -44,7 +44,7 @@ fixed effect model can be expressed as a least squares dummy variable
 
 .. math:: y_{it}=x_{it}\beta+d_{1,it}\gamma_{1}+d_{2,it}\gamma_{2}
 
- where :math:`d_{1,it}` and :math:`d_{2,it}` are the dummy variables for
+where :math:`d_{1,it}` and :math:`d_{2,it}` are the dummy variables for
 the first and second effect. When the model contains an intercept, one
 dummy is dropped form each group and the dummies are orthogonalized to a
 constant so that they have mean 0. This allows the constant to be
@@ -55,7 +55,7 @@ of dummies will contain all values and the second will have one dropped.
 
 When weights are used, the results are identical to the LSDV model where
 all variables :math:`y_{it,}`\ :math:`x_{it}`, :math:`d_{1,it}` and
-:math:`d_{2,it}`\ (if included) are multiplied by :math:`w_{it}`.
+:math:`d_{2,it}`\ (if included) are multiplied by :math:`\sqrt{w_{it}}`.
 
 Random Effect Estimation (RandomEffects)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +93,8 @@ are unbalanced.
 **Weights**
 
 When weights are included the averages are replaced by weighted averages
-and the final regression is weighted by :math:`w_{it}`.
+and the final regression terms are all multiplied by
+:math:`\sqrt{w_{it}}`.
 
 Between Estimation (BetweenOLS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,7 +164,7 @@ The standard covariance estimator is
 
 .. math:: s^{2}\Sigma_{XX}^{-1}
 
- where
+where
 
 .. math:: \Sigma_{XX}=\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}x_{it}^{\prime}x_{it}
 
@@ -194,21 +195,21 @@ The clustered covariance estimator supports 1 and 2 way clustering.
 
 .. math:: n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{\mathcal{G}}\Sigma_{XX}^{-1}
 
- where in the case of one-way clustering,
+where in the case of one-way clustering,
 
 .. math:: \hat{S}_{\mathcal{G}}=\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\sum_{g=1}^{G}\xi_{g}^{\prime}\xi_{g}
 
- where
+where
 
 .. math:: \xi_{g}=\sum_{it\in G_{g}}\hat{\epsilon}_{ii}^{2}x_{it}^{\prime}x_{it}
 
- and :math:`it\in G_{g}` indicates that observation belongs to group
+and :math:`it\in G_{g}` indicates that observation belongs to group
 :math:`g`. The two-way clustered replaces
 :math:`\hat{S}_{\mathcal{G}}`\ by
 
 .. math:: \hat{S}_{\mathcal{G}_{1}}+\hat{S}_{\mathcal{G}_{2}}-\hat{S}_{\mathcal{G}_{1}\cap\mathcal{G}_{2}}.
 
- Where the group debiasing is applies individually to each of the three
+Where the group debiasing is applies individually to each of the three
 components depending on the number of groups in the three estimators. If
 the group debias term is not used, the expression
 :math:`\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}` is omitted. The
@@ -229,7 +230,7 @@ are given by
 
 .. math:: n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{HAC}\Sigma_{XX}^{-1}
 
- where
+where
 
 .. math::
 
@@ -238,5 +239,5 @@ are given by
    \hat{\Gamma}_{i} & =\sum_{t=i+1}^{T}\xi_{t}^{\prime}\xi_{t}\\
    \xi_{t} & =\sum_{i=1}^{n_{t}}\hat{\epsilon}_{it}x_{it}\end{aligned}
 
- and :math:`K\left(i,bw\right)` is a kernel weighting function. Kernel
+and :math:`K\left(i,bw\right)` is a kernel weighting function. Kernel
 supported include the Bartlett, Parzen and Quadratic Spectral.

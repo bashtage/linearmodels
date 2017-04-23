@@ -54,9 +54,10 @@ the fixed effect model can be expressed as a least squares dummy variable
 \[
 y_{it}=x_{it}\beta+d_{1,it}\gamma_{1}+d_{2,it}\gamma_{2}
 \]
-where $d_{1,it}$ and $d_{2,it}$ are the dummy variables for the
-first and second effect. When the model contains an intercept, one
-dummy is dropped form each group and the dummies are orthogonalized
+
+\noindent where $d_{1,it}$ and $d_{2,it}$ are the dummy variables
+for the first and second effect. When the model contains an intercept,
+one dummy is dropped form each group and the dummies are orthogonalized
 to a constant so that they have mean 0. This allows the constant to
 be estimated. If the model does not contain an intercept, the first
 group of dummies will contain all values and the second will have
@@ -67,7 +68,7 @@ one dropped.
 \noindent When weights are used, the results are identical to the
 LSDV model where all variables \textendash{} $y_{it,}$$x_{it}$,
 $d_{1,it}$ and $d_{2,it}$(if included) \textendash{} are multiplied
-by $w_{it}$. 
+by $\sqrt{w_{it}}$. 
 
 \subsubsection{Random Effect Estimation (RandomEffects)}
 
@@ -108,7 +109,7 @@ data are unbalanced.
 \noindent \textbf{Weights}
 
 \noindent When weights are included the averages are replaced by weighted
-averages and the final regression is weighted by $w_{it}$. 
+averages and the final regression terms are all multiplied by $\sqrt{w_{it}}$. 
 
 \subsubsection{Between Estimation (BetweenOLS)}
 
@@ -176,7 +177,8 @@ transformed).
 \[
 s^{2}\Sigma_{XX}^{-1}
 \]
-where
+
+\noindent where
 \[
 \Sigma_{XX}=\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}x_{it}^{\prime}x_{it}
 \]
@@ -212,22 +214,26 @@ The clustered covariance estimator supports 1 and 2 way clustering.
 \[
 n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{\mathcal{G}}\Sigma_{XX}^{-1}
 \]
-where in the case of one-way clustering, 
+
+\noindent where in the case of one-way clustering, 
 \[
 \hat{S}_{\mathcal{G}}=\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\sum_{g=1}^{G}\xi_{g}^{\prime}\xi_{g}
 \]
-where 
+
+\noindent where 
 \[
 \xi_{g}=\sum_{it\in G_{g}}\hat{\epsilon}_{ii}^{2}x_{it}^{\prime}x_{it}
 \]
-and $it\in G_{g}$ indicates that observation belongs to group $g$.
-The two-way clustered replaces $\hat{S}_{\mathcal{G}}$by 
+
+\noindent and $it\in G_{g}$ indicates that observation belongs to
+group $g$. The two-way clustered replaces $\hat{S}_{\mathcal{G}}$by
 \[
 \hat{S}_{\mathcal{G}_{1}}+\hat{S}_{\mathcal{G}_{2}}-\hat{S}_{\mathcal{G}_{1}\cap\mathcal{G}_{2}}.
 \]
-Where the group debiasing is applies individually to each of the three
-components depending on the number of groups in the three estimators.
-If the group debias term is not used, the expression $\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}$
+
+\noindent Where the group debiasing is applies individually to each
+of the three components depending on the number of groups in the three
+estimators. If the group debias term is not used, the expression $\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}$
 is omitted. The $-k$ term is dropped if the debiased estimator is
 not used. 
 
@@ -248,12 +254,14 @@ and are given by
 \[
 n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{HAC}\Sigma_{XX}^{-1}
 \]
-where 
+
+\noindent where 
 \begin{align*}
 \hat{S}_{HAC} & =\hat{\Gamma}_{0}+\sum_{i=1}^{bw}K(i,bw)(\hat{\Gamma}_{1}+\hat{\Gamma}_{1}^{\prime})\\
 \hat{\Gamma}_{i} & =\sum_{t=i+1}^{T}\xi_{t}^{\prime}\xi_{t}\\
 \xi_{t} & =\sum_{i=1}^{n_{t}}\hat{\epsilon}_{it}x_{it}
 \end{align*}
-and $K\left(i,bw\right)$ is a kernel weighting function. Kernel supported
-include the Bartlett, Parzen and Quadratic Spectral. 
+
+\noindent and $K\left(i,bw\right)$ is a kernel weighting function.
+Kernel supported include the Bartlett, Parzen and Quadratic Spectral. 
 \end{document}
