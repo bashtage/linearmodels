@@ -517,7 +517,10 @@ def test_mean_weighted(data):
     time_mean = x.mean('time', weights=w)
     c = x.index.levels[1][x.index.labels[1]]
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
-    d = d[time_mean.index]
+    ilocs = [int(d.columns.get_indexer_for([i])) for i in time_mean.index]
+    d = d.iloc[:, ilocs]
+    # TODO: Restore when fixed in pandas
+    # d = d[time_mean.index]
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
