@@ -27,12 +27,12 @@ projecting the endogenous regressors.
 There are four estimation methods available to fit models of this type.  All accept the
 same four required inputs:
 
-  * ``dependent`` - The variable to be modeled, :math:`y_i` in the model
-  * ``exog`` - The exogenous regressors, :math:`x_{1i}` in the model. Note
-    that :math:`x_{1i}` and :math:`z_{1i}` are the same since variables are
-    also valid to use when projecting the endogenous variables.
-  * ``endog`` - The endogenous regressors, :math:`x_{2i}` in the model
-  * ``instruments`` - The instruments, :math:`z_{2i}` in the model
+* ``dependent`` - The variable to be modeled, :math:`y_i` in the model
+* ``exog`` - The exogenous regressors, :math:`x_{1i}` in the model. Note
+  that :math:`x_{1i}` and :math:`z_{1i}` are the same since variables are
+  also valid to use when projecting the endogenous variables.
+* ``endog`` - The endogenous regressors, :math:`x_{2i}` in the model
+* ``instruments`` - The instruments, :math:`z_{2i}` in the model
 
 
 .. code-block:: python
@@ -169,11 +169,11 @@ perform inference. Four classes of covariance estimators are available:
   clustered covariance requires passing an array containing information
   containing cluster membership information.
 
-    .. code-block:: python
+.. code-block:: python
 
-       mod = IV2SLS(dependent, exog, endog, instruments)
-       iq_bands = data.IQ // 20
-       res = mod.fit(cov_type='clustered', clusters=iq_bands)
+   mod = IV2SLS(dependent, exog, endog, instruments)
+   iq_bands = data.IQ // 20
+   res = mod.fit(cov_type='clustered', clusters=iq_bands)
 
 GMM Estimation
 **************

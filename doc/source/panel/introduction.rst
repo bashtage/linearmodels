@@ -25,29 +25,29 @@ uncorrelated with :math:`\alpha_i` and the covariates :math:`x_{it}`.
 
 All models require two inputs
 
-  * ``dependent`` - The variable to be modeled, :math:`y_{it}` in the model
-  * ``exog`` - The regressors, :math:`x_{it}` in the model.
+* ``dependent`` - The variable to be modeled, :math:`y_{it}` in the model
+* ``exog`` - The regressors, :math:`x_{it}` in the model.
 
 and use different techniques to address the presence of :math:`\alpha_i`.
 
 In particular,
 
-  * :class:`~linearmodels.panel.model.PanelOLS` uses fixed effect
-    (i.e., entity effects) to eliminate the entity specific components.
-    This is mathematically equivalent to including a dummy variable for
-    each entity, although the implementation does not do this for
-    performance reasons.
-  * :class:`~linearmodels.panel.model.BetweenOLS` averages within an
-    entity and then regresses the time-averaged values using OLS.
-  * :class:`~linearmodels.panel.model.FirstDifferenceOLS` takes the first
-    difference to eliminate the entity specific effect.
-  * :class:`~linearmodels.panel.model.RandomEffects` uses a quasi-difference
-    to efficiently estimate :math:`\beta` when the entity effect is
-    independent from the regressors.  It is, however, not consistent when
-    there is dependence between the entity effect and the regressors.
-  * :class:`~linearmodels.panel.model.PooledOLS` ignores the entity effect
-    and is consistent but inefficient when the effect is independent of the
-    regressors.
+* :class:`~linearmodels.panel.model.PanelOLS` uses fixed effect
+  (i.e., entity effects) to eliminate the entity specific components.
+  This is mathematically equivalent to including a dummy variable for
+  each entity, although the implementation does not do this for
+  performance reasons.
+* :class:`~linearmodels.panel.model.BetweenOLS` averages within an
+  entity and then regresses the time-averaged values using OLS.
+* :class:`~linearmodels.panel.model.FirstDifferenceOLS` takes the first
+  difference to eliminate the entity specific effect.
+* :class:`~linearmodels.panel.model.RandomEffects` uses a quasi-difference
+  to efficiently estimate :math:`\beta` when the entity effect is
+  independent from the regressors.  It is, however, not consistent when
+  there is dependence between the entity effect and the regressors.
+* :class:`~linearmodels.panel.model.PooledOLS` ignores the entity effect
+  and is consistent but inefficient when the effect is independent of the
+  regressors.
 
 :class:`~linearmodels.panel.model.PanelOLS` is somewhat more general than the
 other estimators and can be used to model 2 effects (e.g., entity and time

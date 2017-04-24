@@ -15,6 +15,14 @@ code, pre, tt {
   font-family: Consolas, monospace;
 }
 
+code, tt {
+    color: #428bca;
+}
+
+div.seealso {
+    background-color: #f9f9f9;
+    border: none;
+}
 
 .m { color: #05003b} /* Literal.Number */
 .mf { color: #05003b } /* Literal.Number.Float */

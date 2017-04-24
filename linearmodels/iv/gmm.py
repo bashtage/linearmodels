@@ -151,9 +151,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     -----
     Supported kernels:
 
-      * 'bartlett', 'newey-west' - Bartlett's kernel
-      * 'parzen', 'gallant' - Parzen's kernel
-      * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
+    * 'bartlett', 'newey-west' - Bartlett's kernel
+    * 'parzen', 'gallant' - Parzen's kernel
+    * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
 
     .. math::
 
@@ -335,16 +335,16 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     **kernel**
 
-      * ``kernel``: Name of kernel to use.  See
-        linearmodels.covariance.KernelCovariance for details on available
-        kernels
-      * ``bandwidth``: Bandwidth to use when computing the weight.  If not
-        provided, nobs - 2 is used.
+    * ``kernel``: Name of kernel to use.  See
+      linearmodels.covariance.KernelCovariance for details on available
+      kernels
+    * ``bandwidth``: Bandwidth to use when computing the weight.  If not
+      provided, nobs - 2 is used.
 
     **cluster**
 
-      * ``clusters``: Array containing the cluster indices.  See
-        linearmodels.covariance.OneWayClusteredCovariance
+    * ``clusters``: Array containing the cluster indices.  See
+      linearmodels.covariance.OneWayClusteredCovariance
 
     See also
     --------

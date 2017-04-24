@@ -574,12 +574,12 @@ class IVGMM(IVLIML):
     -----
     Available GMM weight functions are:
 
-      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
-        homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
-        autocorrelation
-      * 'kernel' - Allows for heteroskedasticity and autocorrelation
-      * 'cluster' - Allows for one-way cluster dependence
+    * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+      homoskedastic
+    * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+      autocorrelation
+    * 'kernel' - Allows for heteroskedasticity and autocorrelation
+    * 'cluster' - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -726,12 +726,12 @@ class IVGMM(IVLIML):
 
         Available covariance functions are:
 
-          * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
-            homoskedastic
-          * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
-            autocorrelation
-          * 'kernel' - Allows for heteroskedasticity and autocorrelation
-          * 'cluster' - Allows for one-way cluster dependence
+        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+          homoskedastic
+        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+          autocorrelation
+        * 'kernel' - Allows for heteroskedasticity and autocorrelation
+        * 'cluster' - Allows for one-way cluster dependence
         """
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs = wy.shape[0]
@@ -814,12 +814,12 @@ class IVGMMCUE(IVGMM):
     -----
     Available weight functions are:
 
-      * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
-        homoskedastic
-      * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
-        autocorrelation
-      * 'kernel' - Allows for heteroskedasticity and autocorrelation
-      * 'cluster' - Allows for one-way cluster dependence
+    * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+      homoskedastic
+    * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+      autocorrelation
+    * 'kernel' - Allows for heteroskedasticity and autocorrelation
+    * 'cluster' - Allows for one-way cluster dependence
 
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence.

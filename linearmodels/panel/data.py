@@ -47,9 +47,9 @@ class PanelData(object):
     -----
     Data can be either 2- or 3-dimensional. The three key dimensions are
 
-      * nvar - number of variables
-      * nobs - number of time periods
-      * nentity - number of entities
+    * nvar - number of variables
+    * nobs - number of time periods
+    * nentity - number of entities
 
     All 3-d inputs should be in the form (nvar, nobs, nentity). With one
     exception, 2-d inputs are treated as (nobs, nentity) so that the input

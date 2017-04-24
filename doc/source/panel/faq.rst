@@ -24,8 +24,8 @@ adjustments to estimated parameters. The main reported :math:`R^2`
 (``rsquared`` in returned results) is always the :math:`R^2` from
 the actual model fit, after adjusting the data for:
 
-  * weights (all estimators)
-  * effects (:class:`~linearmodels.panel.model.PanelOLS`)
-  * recentering (:class:`~linearmodels.panel.model.RandomEffects`)
-  * within entity aggregation (:class:`~linearmodels.panel.model.BetweenOLS`)
-  * differencing (:class:`~linearmodels.panel.model.FirstDifferenceOLS`)
+* weights (all estimators)
+* effects (:class:`~linearmodels.panel.model.PanelOLS`)
+* recentering (:class:`~linearmodels.panel.model.RandomEffects`)
+* within entity aggregation (:class:`~linearmodels.panel.model.BetweenOLS`)
+* differencing (:class:`~linearmodels.panel.model.FirstDifferenceOLS`)

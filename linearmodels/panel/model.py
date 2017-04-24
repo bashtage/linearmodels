@@ -479,17 +479,17 @@ class PooledOLS(object):
         -----
         Three covariance estimators are supported:
 
-          * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
-            White's estimator
-          * 'clustered` - One or two way clustering.  Configuration options are:
+        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
+        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+          White's estimator
+        * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.
-              Clusters should be integer values, although other types will
-              be coerced to integer values by treating as categorical variables
-            * ``cluster_entity`` - Boolean flag indicating to use entity
-              clusters
-            * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``clusters`` - Input containing containing 1 or 2 variables.
+            Clusters should be integer values, although other types will
+            be coerced to integer values by treating as categorical variables
+          * ``cluster_entity`` - Boolean flag indicating to use entity
+            clusters
+          * ``cluster_time`` - Boolean indicating to use time clusters
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -977,17 +977,17 @@ class PanelOLS(PooledOLS):
         -----
         Three covariance estimators are supported:
 
-          * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
-            White's estimator
-          * 'clustered` - One or two way clustering.  Configuration options are:
+        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
+        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+          White's estimator
+        * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.
-              Clusters should be integer values, although other types will
-              be coerced to integer values by treating as categorical variables
-            * ``cluster_entity`` - Boolean flag indicating to use entity
-              clusters
-            * ``cluster_time`` - Boolean indicating to use time clusters
+          * ``clusters`` - Input containing containing 1 or 2 variables.
+            Clusters should be integer values, although other types will
+            be coerced to integer values by treating as categorical variables
+          * ``cluster_entity`` - Boolean flag indicating to use entity
+            clusters
+          * ``cluster_time`` - Boolean indicating to use time clusters
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -1184,14 +1184,14 @@ class BetweenOLS(PooledOLS):
         -----
         Three covariance estimators are supported:
 
-          * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
-            White's estimator
-          * 'clustered` - One or two way clustering.  Configuration options are:
+        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
+        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+          White's estimator
+        * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.
-              Clusters should be integer values, although other types will
-              be coerced to integer values by treating as categorical variables
+          * ``clusters`` - Input containing containing 1 or 2 variables.
+            Clusters should be integer values, although other types will
+            be coerced to integer values by treating as categorical variables
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within an entity.
@@ -1368,16 +1368,16 @@ class FirstDifferenceOLS(PooledOLS):
         -----
         Three covariance estimators are supported:
 
-          * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-          * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
-            White's estimator
-          * 'clustered` - One or two way clustering.  Configuration options are:
+        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
+        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+          White's estimator
+        * 'clustered` - One or two way clustering.  Configuration options are:
 
-            * ``clusters`` - Input containing containing 1 or 2 variables.
-              Clusters should be integer values, although other types will
-              be coerced to integer values by treating as categorical variables
-            * ``cluster_entity`` - Boolean flag indicating to use entity
-              clusters
+          * ``clusters`` - Input containing containing 1 or 2 variables.
+            Clusters should be integer values, although other types will
+            be coerced to integer values by treating as categorical variables
+          * ``cluster_entity`` - Boolean flag indicating to use entity
+            clusters
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
