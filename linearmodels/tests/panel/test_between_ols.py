@@ -245,7 +245,7 @@ def test_2way_cluster(data):
     clusters.loc[:, :] = 0
     clusters = clusters.astype(np.int32)
     for entity in mod.dependent.entities:
-        clusters.loc[entity, :] = np.random.randint(9, size=(1, 2))
+        clusters.loc[entity, :] = np.random.randint(33, size=(1, 2))
 
     res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
 

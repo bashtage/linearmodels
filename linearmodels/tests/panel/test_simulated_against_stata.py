@@ -117,7 +117,6 @@ def test_f_stat(data):
         f_stat = data.fit.f_statistic_robust.stat
 
     stata_f_stat = data.stata.F
-    print(f_stat, data.fit.f_statistic_robust.stat, stata_f_stat)
 
 
 def test_t_stat(data):

@@ -18,7 +18,7 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  KernelWeightMatrix, OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth, \
-    MissingValueWarning, missing_value_warning_msg
+    missing_warning
 
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
@@ -250,8 +250,7 @@ class IVLIML(object):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
-            import warnings
-            warnings.warn(missing_value_warning_msg, MissingValueWarning)
+            missing_warning(missing)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.endog.drop(missing)

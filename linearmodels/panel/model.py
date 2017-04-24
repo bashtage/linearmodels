@@ -9,8 +9,7 @@ from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelEffectsResults, PanelResults, RandomEffectsResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
-    MissingValueWarning, WaldTestStatistic, ensure_unique_column, has_constant, \
-    missing_value_warning_msg
+    WaldTestStatistic, ensure_unique_column, has_constant, missing_warning
 
 
 class AbsorbingEffectError(Exception):
@@ -182,9 +181,7 @@ class PooledOLS(object):
                    np.any(np.isnan(x), axis=1) |
                    np.any(np.isnan(w), axis=1))
         if np.any(missing):
-            if np.any(all_missing ^ missing):
-                import warnings
-                warnings.warn(missing_value_warning_msg, MissingValueWarning)
+            missing_warning(all_missing ^ missing)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)

@@ -1,3 +1,9 @@
+import numpy as np
+import linearmodels as lm
+lm.WARN_ON_MISSING = False
+from linearmodels import utility
+utility.missing_warning(np.array([True, True, False]))
+
 from linearmodels.panel import PanelOLS, RandomEffects, PooledOLS
 from linearmodels.datasets import wage_panel
 import statsmodels.api as sm

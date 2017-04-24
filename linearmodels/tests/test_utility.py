@@ -79,7 +79,6 @@ def test_cached_property():
 
         @cached_property
         def a(self):
-            print('a called')
             self.a_count += 1
             return 'a'
 
