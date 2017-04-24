@@ -319,13 +319,21 @@ def test_demean_many_missing(panel):
     assert np.all(fe_nan[orig_nan])
     expected = panel.values.copy()
     for i in range(3):
-        expected[i] -= np.nanmean(expected[i], 0)
+        mu = np.ones(expected[i].shape[1]) * np.nan
+        for j in range(expected[i].shape[1]):
+            if np.any(np.isfinite(expected[i][:,j])):
+                mu[j] = np.nanmean(expected[i][:,j])
+        expected[i] -= mu
     assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
-        expected[i] -= np.nanmean(expected[i], 1)[:, None]
+        mu = np.ones((expected[i].shape[0],1)) * np.nan
+        for j in range(expected[i].shape[0]):
+            if np.any(np.isfinite(expected[i][j])):
+                mu[j,0] = np.nanmean(expected[i][j])
+        expected[i] -= mu
     assert_allclose(te.values3d, expected)
 
 

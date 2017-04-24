@@ -16,7 +16,6 @@ kernel_name = 'python%s' % sys.version_info.major
 
 head, _ = os.path.split(__file__)
 NOTEBOOK_DIR = os.path.abspath(os.path.join(head, '..', '..', 'examples'))
-print(NOTEBOOK_DIR)
 
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, '*.ipynb')))
 ids = list(map(lambda s: os.path.split(s)[-1].split('.')[0], nbs))

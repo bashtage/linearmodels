@@ -7,6 +7,8 @@ from numpy.linalg import eigh, matrix_rank
 from scipy.stats import chi2, f
 from pandas import DataFrame, Series, concat
 
+DROP_MISSING = True
+WARN_ON_MISSING = True
 
 class MissingValueWarning(Warning):
     pass
@@ -390,3 +392,13 @@ class _ModelComparison(_SummaryStr):
         for loc in out.index:
             out_df.loc[loc] = out[loc].stat, out[loc].pval
         return out_df
+
+
+def missing_warning(missing):
+    """Utility function to perform missing value check and warning"""
+    if not np.any(missing):
+        return
+    import linearmodels
+    if linearmodels.WARN_ON_MISSING:
+        import warnings
+        warnings.warn(missing_value_warning_msg, MissingValueWarning)

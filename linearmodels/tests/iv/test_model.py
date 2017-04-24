@@ -174,14 +174,14 @@ def test_gmm_iter(data):
 
 def test_gmm_cue(data):
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
-    res = mod.fit()
+    res = mod.fit(display=False)
     assert res.iterations > 2
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
 
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr, center=False)
-    res = mod.fit()
+    res = mod.fit(display=False)
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr, center=False)
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
@@ -191,7 +191,7 @@ def test_gmm_cue_starting_vals(data):
     mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
     sv = mod.fit().params
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
-    mod.fit(starting=sv, display=True)
+    mod.fit(starting=sv, display=False)
 
     with pytest.raises(ValueError):
         mod.fit(starting=sv[:-1], display=True)
@@ -224,10 +224,8 @@ def test_wuhausman_smoke(data):
 def test_wooldridge_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    wr = res.wooldridge_regression
-    ws = res.wooldridge_score
-    print(wr)
-    print(ws)
+    res.wooldridge_regression
+    res.wooldridge_score
 
 
 def test_model_summary_smoke(data):
