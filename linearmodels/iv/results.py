@@ -3,6 +3,7 @@ Results containers and post-estimation diagnostics for IV models
 """
 from linearmodels.compat.statsmodels import Summary
 
+from collections import OrderedDict
 import datetime as dt
 
 import scipy.stats as stats
@@ -671,7 +672,7 @@ class IVResults(_CommonIVResults):
         e = annihilate(self.model.dependent.ndarray, self.model._x)
         r = annihilate(self.model.endog.ndarray, self.model._z)
         nobs = e.shape[0]
-        res = _OLS(ones((nobs, 1)), r * e).fit('unadjusted')
+        res = _OLS(ones((nobs, 1)), r * e).fit(cov_type='unadjusted')
         stat = res.nobs - res.resid_ss
         df = self.model.endog.shape[1]
         null = 'Endogenous variables are exogenous'
@@ -711,7 +712,7 @@ class IVResults(_CommonIVResults):
         r = annihilate(self.model.endog.ndarray, self.model._z)
         augx = c_[self.model._x, r]
         mod = _OLS(self.model.dependent, augx)
-        res = mod.fit(self.cov_type, **self.cov_config)
+        res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
         test_params = res.params.values[norig:]
         test_cov = res.cov.values[norig:, norig:]
@@ -766,7 +767,7 @@ class IVResults(_CommonIVResults):
         q = instruments.ndarray[:, :(ninstr - nendog)]
         q_res = annihilate(q, c_[self.model.exog.ndarray, endog_hat])
         test_functions = q_res * self.resids.values[:, None]
-        res = _OLS(ones((nobs, 1)), test_functions).fit('unadjusted')
+        res = _OLS(ones((nobs, 1)), test_functions).fit(cov_type='unadjusted')
 
         stat = res.nobs * res.rsquared
         df = ninstr - nendog
@@ -1021,6 +1022,7 @@ class FirstStageResults(_SummaryStr):
               Wald test statistic with a chi2 distribution.
             * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial R-squared
+            & f.dist - Distribution of f.stat
             * shea.rsquared - Shea's r-squared which measures the correlation
               between the projected and orthogonalized instrument on the
               orthogonalized endogenous regressor where the orthogonalization
@@ -1033,7 +1035,7 @@ class FirstStageResults(_SummaryStr):
         x = w * exog.ndarray
         px = x @ pinv(x)
         ez = z - px @ z
-        out = {}
+        out = OrderedDict()
         individual_results = self.individual
         for col in endog.pandas:
             inner = {}
@@ -1041,7 +1043,7 @@ class FirstStageResults(_SummaryStr):
             y = w * endog.pandas[[col]].values
             ey = y - px @ y
             mod = _OLS(ey, ez)
-            res = mod.fit(self._cov_type, **self._cov_config)
+            res = mod.fit(cov_type=self._cov_type, **self._cov_config)
             inner['partial.rsquared'] = res.rsquared
             params = res.params.values
             params = params[:, None]
@@ -1050,19 +1052,20 @@ class FirstStageResults(_SummaryStr):
             w_test = WaldTestStatistic(stat, null='', df=params.shape[0])
             inner['f.stat'] = w_test.stat
             inner['f.pval'] = w_test.pval
+            inner['f.dist'] = w_test.dist_name
             out[col] = Series(inner)
         out = DataFrame(out).T
 
         dep = self.dep
-        r2sls = IV2SLS(dep, exog, endog, instr, weights=weights).fit('unadjusted')
-        rols = _OLS(dep, self._reg, weights=weights).fit('unadjusted')
+        r2sls = IV2SLS(dep, exog, endog, instr, weights=weights).fit(cov_type='unadjusted')
+        rols = _OLS(dep, self._reg, weights=weights).fit(cov_type='unadjusted')
         shea = (rols.std_errors / r2sls.std_errors) ** 2
         shea *= (1 - r2sls.rsquared) / (1 - rols.rsquared)
         out['shea.rsquared'] = shea[out.index]
-        cols = ['rsquared', 'partial.rsquared', 'shea.rsquared', 'f.stat', 'f.pval']
+        cols = ['rsquared', 'partial.rsquared', 'shea.rsquared', 'f.stat', 'f.pval', 'f.dist']
         out = out[cols]
         for c in out:
-            out[c] = to_numeric(out[c])
+            out[c] = to_numeric(out[c], errors='ignore')
 
         return out
 
@@ -1081,11 +1084,11 @@ class FirstStageResults(_SummaryStr):
         w = sqrt(self.weights.ndarray)
         exog_instr = w * c_[self.exog.ndarray, self.instr.ndarray]
         exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
-        res = {}
+        res = OrderedDict()
         for col in self.endog.pandas:
             dep = w.squeeze() * self.endog.pandas[col]
             mod = _OLS(dep, exog_instr)
-            res[col] = mod.fit(self._cov_type, **self._cov_config)
+            res[col] = mod.fit(cov_type=self._cov_type, **self._cov_config)
 
         return res
 
@@ -1095,11 +1098,17 @@ class FirstStageResults(_SummaryStr):
         stubs_lookup = {'rsquared': 'R-squared',
                         'partial.rsquared': 'Partial R-squared',
                         'shea.rsquared': 'Shea\'s R-squared',
-                        'f.stat': 'F-statistic',
-                        'f.pval': 'P-value (F-stat)'}
+                        'f.stat': 'Partial F-statistic',
+                        'f.pval': 'P-value (Partial F-stat)',
+                        'f.dist': 'Partial F-stat Distn'}
         smry = Summary()
         diagnostics = self.diagnostics
-        vals = [[_str(v) for v in diagnostics[c]] for c in diagnostics]
+        vals = []
+        for c in diagnostics:
+            if c != 'f.dist':
+                vals.append([_str(v) for v in diagnostics[c]])
+            else:
+                vals.append([v for v in diagnostics[c]])
         stubs = [stubs_lookup[s] for s in list(diagnostics.columns)]
         header = list(diagnostics.index)
 
@@ -1191,7 +1200,7 @@ class IVModelComparison(_ModelComparison):
         title = 'Model Comparison'
         stubs = ['Dep. Variable', 'Estimator', 'No. Observations', 'Cov. Est.', 'R-squared',
                  'Adj. R-squared', 'F-statistic', 'P-value (F-stat)']
-        dep_name = {}
+        dep_name = OrderedDict()
         for key in self._results:
             dep_name[key] = self._results[key].model.dependent.cols[0]
         dep_name = Series(dep_name)

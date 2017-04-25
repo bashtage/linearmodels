@@ -49,11 +49,11 @@ def test_firstdifference_ols(data):
     dx = dx.loc[~drop]
 
     ols_mod = IV2SLS(dy, dx, None, None)
-    ols_res = ols_mod.fit('unadjusted')
+    ols_res = ols_mod.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols_mod.fit('robust')
+    ols_res = ols_mod.fit(cov_type='robust')
     assert_results_equal(res, ols_res)
 
     clusters = data.vc1
@@ -117,11 +117,11 @@ def test_firstdifference_ols_weighted(data):
     sw = sw.loc[~drop]
 
     ols_mod = IV2SLS(dy, dx, None, None, weights=sw)
-    ols_res = ols_mod.fit('unadjusted')
+    ols_res = ols_mod.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols_mod.fit('robust')
+    ols_res = ols_mod.fit(cov_type='robust')
     assert_results_equal(res, ols_res)
 
     clusters = data.vc1

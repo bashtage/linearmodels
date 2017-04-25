@@ -104,9 +104,9 @@ class TestErrors(object):
         cat = pd.Series(['a'] * (n // 2) + ['b'] * (n // 2))
         instr = pd.DataFrame(instr)
         instr['cat'] = cat
-        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit('unadjusted')
+        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type='unadjusted')
         instr['cat'] = cat.astype('category')
-        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit('unadjusted')
+        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type='unadjusted')
         assert_series_equal(res.params, res_cat.params)
 
     def test_no_regressors(self, data):
