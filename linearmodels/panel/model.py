@@ -31,8 +31,6 @@ __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS',
            'BetweenOLS', 'AbsorbingEffectError', 'AmbiguityError']
 
 
-# Essential
-# TODO: Example notebooks
 # Likely
 # TODO: Formal test of other outputs
 # Future
@@ -927,8 +925,7 @@ class PanelOLS(PooledOLS):
         effects = np.column_stack(effects)
         if num_effects == 1:
             return not self._is_effect_nested(effects, clusters)
-        # TODO: Take a decision on this
-        return True  # Default case for 2-way -- unclear
+        return True  # Default case for 2-way -- not completely clear
 
     def fit(self, *, use_lsdv=False, cov_type='unadjusted', debiased=True, auto_df=True,
             count_effects=True, **cov_config):

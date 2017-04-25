@@ -31,7 +31,7 @@ def test_sargan(data):
     # Stata code:
     # ivregress 2sls y_robust x3 x4 x5 (x1=z1 z2)
     # estat overid
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.sargan.stat, .176535, rtol=1e-4)
     assert_allclose(res.sargan.pval, 0.6744, rtol=1e-4)
 
@@ -40,13 +40,13 @@ def test_basmann(data):
     # Stata code:
     # ivregress 2sls y_robust x3 x4 x5 (x1=z1 z2)
     # estat overid
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.basmann.stat, .174822, rtol=1e-4)
     assert_allclose(res.basmann.pval, 0.6759, rtol=1e-3)
 
 
 def test_durbin(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.durbin().stat, 35.1258, rtol=1e-4)
     assert_allclose(res.durbin().pval, 0.0000, atol=1e-6)
 
@@ -55,7 +55,7 @@ def test_durbin(data):
 
 
 def test_wu_hausman(data):
-    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.wu_hausman().stat, 18.4063, rtol=1e-4)
     assert_allclose(res.wu_hausman().pval, 0.0000, atol=1e-6)
 
@@ -65,31 +65,31 @@ def test_wu_hausman(data):
 
 @pytest.mark.xfail(reason='Unknown why these differ so much')
 def test_wooldridge_score(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit('robust')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit(cov_type='robust')
     assert_allclose(res.wooldridge_score.stat, 22.684, rtol=1e-4)
     assert_allclose(res.wooldridge_score.pval, 0.0000, atol=1e-6)
 
 
 @pytest.mark.xfail(reason='Stata ses an F rather than a standard Wald')
 def test_wooldridge_regression(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit('robust')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit(cov_type='robust')
     assert_allclose(res.wooldridge_regression.stat, 13.3461, rtol=1e-4)
     assert_allclose(res.wooldridge_regression.pval, 0.0000, atol=1e-6)
 
 
 def test_wooldridge_overid(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('robust')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit(cov_type='robust')
     assert_allclose(res.wooldridge_overid.stat, 0.221648, rtol=1e-4)
     assert_allclose(res.wooldridge_overid.pval, 0.6378, rtol=1e-3)
 
 
 def test_anderson_rubin(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.nobs * (res._liml_kappa - 1), .176587, rtol=1e-4)
 
 
 def test_basmann_f(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit('unadjusted')
+    res = IV2SLS(data.dep, data.exog, data.endog[['x1']], data.instr).fit(cov_type='unadjusted')
     assert_allclose(res.basmann_f.stat, .174821, rtol=1e-4)
     assert_allclose(res.basmann_f.pval, 0.6760, rtol=1e-3)
 

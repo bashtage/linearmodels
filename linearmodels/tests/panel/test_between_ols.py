@@ -34,7 +34,7 @@ def test_single_entity(data):
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
@@ -67,7 +67,7 @@ def test_single_entity_weights(data):
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None, weights=mod.weights.values2d)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
@@ -89,7 +89,7 @@ def test_multiple_obs_per_entity(data):
     exog = pd.DataFrame(mod.exog.values3d.mean(1).T,
                         columns=mod.exog.vars)
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
@@ -122,7 +122,7 @@ def test_multiple_obs_per_entity_weighted(data):
     exog = pd.DataFrame(wexog, columns=mod.exog.vars)
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(cov_type='robust', debiased=False)
@@ -154,7 +154,7 @@ def test_missing(missing_data):
     weights = weights.reindex(mod.dependent.entities)
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
     res = mod.fit(reweight=True, cov_type='robust', debiased=False)
@@ -188,7 +188,7 @@ def test_missing_weighted(missing_data):
     exog = (1.0 / weights.values) * exog
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit('unadjusted')
+    ols_res = ols.fit(cov_type='unadjusted')
     assert_results_equal(res, ols_res)
 
 
@@ -283,5 +283,5 @@ def test_default_clusters(data):
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit('clustered')
+    ols_res = ols.fit(cov_type='clustered')
     assert_results_equal(res, ols_res)

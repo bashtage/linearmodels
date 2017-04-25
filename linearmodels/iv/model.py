@@ -303,7 +303,7 @@ class IVLIML(object):
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
         return min(eigvalsh(q))
 
-    def fit(self, cov_type='robust', **cov_config):
+    def fit(self, *, cov_type='robust', **cov_config):
         """
         Estimate model parameters
 
@@ -686,7 +686,7 @@ class IVGMM(IVLIML):
         zpy = z.T @ y
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
-    def fit(self, iter_limit=2, tol=1e-4, initial_weight=None,
+    def fit(self, *, iter_limit=2, tol=1e-4, initial_weight=None,
             cov_type='robust', **cov_config):
         """
         Estimate model parameters
@@ -971,7 +971,7 @@ class IVGMMCUE(IVGMM):
 
         return res.x[:, None], res.nit
 
-    def fit(self, starting=None, display=False, cov_type='robust', **cov_config):
+    def fit(self, *, starting=None, display=False, cov_type='robust', **cov_config):
         r"""
         Estimate model parameters
 
