@@ -20,6 +20,9 @@ from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth, \
     missing_warning
 
+__all__ = ['COVARIANCE_ESTIMATORS', 'WEIGHT_MATRICES', 'IVGMM', 'IVLIML', 'IV2SLS',
+           'IVGMMCUE', '_OLS']
+
 COVARIANCE_ESTIMATORS = {'homoskedastic': HomoskedasticCovariance,
                          'unadjusted': HomoskedasticCovariance,
                          'HomoskedasticCovariance': HomoskedasticCovariance,
@@ -295,6 +298,9 @@ class IVLIML(object):
         is_exog = self._regressor_is_exog
         e = c_[y, x[:, ~is_exog]]
         x1 = x[:, is_exog]
+        if x1.shape[1] == 0:
+            # No exogenous regressors
+            return 1
 
         ez = e - z @ (pinv(z) @ e)
         ex1 = e - x1 @ (pinv(x1) @ e)
@@ -340,7 +346,10 @@ class IVLIML(object):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['kappa'] = kappa
-        cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config)
+        cov_config_copy = {k:v for k,v in cov_config.items()}
+        if 'center' in cov_config_copy:
+            del cov_config_copy['center']
+        cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config_copy)
 
         results = {'kappa': kappa,
                    'liml_kappa': liml_kappa}
@@ -1026,7 +1035,8 @@ class IVGMMCUE(IVGMM):
         eps = wy - wx @ params
         wmat = inv(weight_matrix(wx, wz, eps))
 
-        cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat, **cov_config)
+        cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat, cov_type,
+                                        **cov_config)
         results = self._post_estimation(params, cov_estimator, cov_type)
         gmm_pe = self._gmm_post_estimation(params, wmat, iters)
         results.update(gmm_pe)

@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen, \
@@ -8,7 +7,7 @@ from linearmodels.iv.covariance import kernel_weight_bartlett, kernel_weight_par
 from linearmodels.iv.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix, \
     IVGMMCovariance, KernelWeightMatrix, OneWayClusteredWeightMatrix
 from linearmodels.utility import AttrDict
-
+from linearmodels.tests.iv._utility import generate_data
 
 @pytest.fixture(params=[None, 12], scope='module')
 def bandwidth(request):
@@ -33,29 +32,7 @@ def kernel(request):
 
 @pytest.fixture(scope='module')
 def data():
-    n, k, p = 1000, 5, 3
-    np.random.seed(12345)
-    clusters = np.random.randint(0, 10, n)
-    rho = 0.5
-    r = np.zeros((k + p + 1, k + p + 1))
-    r.fill(rho)
-    r[-1, 2:] = 0
-    r[2:, -1] = 0
-    r[-1, -1] = 0.5
-    r += np.eye(9) * 0.5
-    v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
-    x = v[:, :k]
-    z = v[:, 2:k + p]
-    e = v[:, [-1]]
-    params = np.arange(1, k + 1) / k
-    params = params[:, None]
-    y = x @ params + e
-    nobs, nvar = x.shape
-    xzizx = x.T @ z @ z.T @ x / nobs
-    xzizx_inv = inv(xzizx)
-    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, params=params,
-                    clusters=clusters, nvar=nvar, i=np.eye(k + p - 2),
-                    xzizx=xzizx, xzizx_inv=xzizx_inv)
+    return generate_data()
 
 
 class TestHomoskedasticWeight(object):

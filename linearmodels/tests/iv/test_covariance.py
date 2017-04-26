@@ -8,6 +8,7 @@ from linearmodels.iv.covariance import HeteroskedasticCovariance, HomoskedasticC
     KernelCovariance, ClusteredCovariance, _cov_kernel, kernel_optimal_bandwidth, \
     kernel_weight_bartlett, kernel_weight_parzen, kernel_weight_quadratic_spectral
 from linearmodels.utility import AttrDict
+from linearmodels.tests.iv._utility import generate_data
 
 
 @pytest.fixture(params=['bartlett', 'qs', 'parzen'], scope='module')
@@ -28,36 +29,7 @@ def kernel(request):
 
 @pytest.fixture(scope='module')
 def data():
-    n, k, p = 1000, 5, 3
-    np.random.seed(12345)
-    clusters = np.random.randint(0, 10, n)
-    rho = 0.5
-    r = np.zeros((k + p + 1, k + p + 1))
-    r.fill(rho)
-    r[-1, 2:] = 0
-    r[2:, -1] = 0
-    r[-1, -1] = 0.5
-    r += np.eye(9) * 0.5
-    v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
-    x = v[:, :k]
-    z = v[:, 2:k + p]
-    e = v[:, [-1]]
-    params = np.arange(1, k + 1) / k
-    params = params[:, None]
-    y = x @ params + e
-    xhat = z @ np.linalg.pinv(z) @ x
-    nobs, nvar = x.shape
-    s2 = e.T @ e / nobs
-    s2_debiased = e.T @ e / (nobs - nvar)
-    v = xhat.T @ xhat / nobs
-    vinv = inv(v)
-    kappa = 0.99
-    vk = (x.T @ x * (1 - kappa) + kappa * xhat.T @ xhat) / nobs
-    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, xhat=xhat,
-                    params=params, s2=s2, s2_debiased=s2_debiased,
-                    clusters=clusters, nvar=nvar, v=v, vinv=vinv, vk=vk,
-                    kappa=kappa)
-
+    return generate_data()
 
 def test_cov_kernel():
     with pytest.raises(ValueError):

@@ -7,7 +7,7 @@ from collections import OrderedDict
 import datetime as dt
 
 import scipy.stats as stats
-from numpy import array, asarray, c_, diag, empty, log, ones, sqrt
+from numpy import array, asarray, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, \
@@ -184,7 +184,25 @@ class OLSResults(_SummaryStr):
 
     @property
     def f_statistic(self):
-        """Joint test of significance for non-constant regressors"""
+        """
+        Model F-statistic
+
+        Returns
+        -------
+        f : WaldTestStatistic
+            Test statistic for null all coefficients excluding constant terms
+            are zero.
+
+        Notes
+        -----
+        Despite name, always implemented using a quadratic-form test based on
+        estimated parameter covariance. Default is to use a chi2 distribution
+        to compute p-values. If ``debiased`` is True, divides statistic by
+        number of parameters tested and uses an F-distribution.
+        
+        This version of the F-statistic directly uses the model covariance 
+        estimator and so is robust against the same specification issues.
+        """
         return self._f_statistic
 
     @property
@@ -218,40 +236,6 @@ class OLSResults(_SummaryStr):
         q = q[None, :]
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
-
-    @property
-    def f_stat(self):
-        """
-        Model F-statistic
-
-        Returns
-        -------
-        f : WaldTestStatistic
-            Test statistic for null all coefficients excluding constant terms
-            are zero.
-
-        Notes
-        -----
-        Despite name, always implemented using a quadratic-form test based on
-        estimated parameter covariance. Default is to use a chi2 distribution
-        to compute p-values. If ``debiased`` is True, divides statistic by
-        number of parameters tested and uses an F-distribution.
-        """
-        p = self.params.values[:, None]
-        c = self.cov.values
-        if self.has_constant:
-            loc = self.model._const_loc
-            ex = [i for i in range(len(p)) if i != loc]
-            p = p[ex]
-            c = c[ex][:, ex]
-        stat = p.T @ inv(c) @ p
-        df = p.shape[0]
-        null = 'All coefficients ex. const are 0'
-        name = 'Model F-statistic'
-        if self.cov_config['debiased']:
-            df_denom = self.nobs - p.shape[0]
-            return WaldTestStatistic(stat, null, df, df_denom, name=name)
-        return WaldTestStatistic(stat, null, df, name=name)
 
     @property
     def summary(self):
@@ -1036,7 +1020,12 @@ class FirstStageResults(_SummaryStr):
         w = sqrt(weights.ndarray)
         z = w * instr.ndarray
         x = w * exog.ndarray
-        px = x @ pinv(x)
+        nobs = endog.shape[0]
+        if x.shape[1] == 0:
+            # No exogenous regressors
+            px = zeros((nobs, nobs))
+        else:
+            px = x @ pinv(x)
         ez = z - px @ z
         out = OrderedDict()
         individual_results = self.individual

@@ -1415,11 +1415,13 @@ class FirstDifferenceOLS(PooledOLS):
         if np.all(self.weights.values2d == 1.0):
             w = root_w = np.ones_like(y)
         else:
-            w = 1.0 / self.weights.values3d[0]
-            w = w[:-1] + w[1:]
+            w = 1.0 / self.weights.values3d
+            w = w[:, :-1] + w[:, 1:]
             w = 1.0 / w
-            w = pd.DataFrame(w, index=self.weights.time[1:], columns=self.weights.entities)
-            w = PanelData(w).dataframe
+            w = pd.Panel(w, items=self.weights.panel.items,
+                         major_axis=self.weights.panel.major_axis[1:],
+                         minor_axis=self.weights.panel.minor_axis)
+            w = w.swapaxes(1, 2).to_frame(filter_observations=False)
             w = w.reindex(self.weights.index).dropna(how='any')
             index = w.index
             w = w.values
