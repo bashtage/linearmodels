@@ -575,7 +575,7 @@ class IVResults(_CommonIVResults):
 
         name = 'Durbin test of exogeneity'
         df = ntested
-        return WaldTestStatistic(stat.squeeze(), null, df, name=name)
+        return WaldTestStatistic(float(stat), null, df, name=name)
 
     def wu_hausman(self, vars=None):
         r"""
