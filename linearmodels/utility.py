@@ -7,8 +7,6 @@ from numpy.linalg import eigh, matrix_rank
 from scipy.stats import chi2, f
 from pandas import DataFrame, Series, concat
 
-DROP_MISSING = True
-WARN_ON_MISSING = True
 
 class MissingValueWarning(Warning):
     pass

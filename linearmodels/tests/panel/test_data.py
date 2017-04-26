@@ -321,18 +321,18 @@ def test_demean_many_missing(panel):
     for i in range(3):
         mu = np.ones(expected[i].shape[1]) * np.nan
         for j in range(expected[i].shape[1]):
-            if np.any(np.isfinite(expected[i][:,j])):
-                mu[j] = np.nanmean(expected[i][:,j])
+            if np.any(np.isfinite(expected[i][:, j])):
+                mu[j] = np.nanmean(expected[i][:, j])
         expected[i] -= mu
     assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
     expected = panel.values.copy()
     for i in range(3):
-        mu = np.ones((expected[i].shape[0],1)) * np.nan
+        mu = np.ones((expected[i].shape[0], 1)) * np.nan
         for j in range(expected[i].shape[0]):
             if np.any(np.isfinite(expected[i][j])):
-                mu[j,0] = np.nanmean(expected[i][j])
+                mu[j, 0] = np.nanmean(expected[i][j])
         expected[i] -= mu
     assert_allclose(te.values3d, expected)
 
@@ -525,10 +525,7 @@ def test_mean_weighted(data):
     time_mean = x.mean('time', weights=w)
     c = x.index.levels[1][x.index.labels[1]]
     d = pd.get_dummies(pd.Categorical(c, ordered=True))
-    ilocs = [int(d.columns.get_indexer_for([i])) for i in time_mean.index]
-    d = d.iloc[:, ilocs]
-    # TODO: Restore when fixed in pandas
-    # d = d[time_mean.index]
+    d = d[time_mean.index]
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d

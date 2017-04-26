@@ -199,8 +199,8 @@ class OLSResults(_SummaryStr):
         estimated parameter covariance. Default is to use a chi2 distribution
         to compute p-values. If ``debiased`` is True, divides statistic by
         number of parameters tested and uses an F-distribution.
-        
-        This version of the F-statistic directly uses the model covariance 
+
+        This version of the F-statistic directly uses the model covariance
         estimator and so is robust against the same specification issues.
         """
         return self._f_statistic
@@ -650,7 +650,7 @@ class IVResults(_CommonIVResults):
         variable :math:`x_j` on the exogenous variables and instruments.
 
         The test is a :math:`n\times R^2 \sim \chi^2_{p}`.
-        
+
         Implemented using the expression in Wooldridge (2002), Eq. 6.19
         """
         from linearmodels.iv.model import _OLS

@@ -77,6 +77,7 @@ class TestCovariance(object):
         cov = DriscollKraay(self.y, self.x, self.params, self.time_ids, bandwidth=12).cov
         assert cov.shape == (self.k, self.k)
 
+
 def test_covariance_manager():
     cm = CovarianceManager('made-up-class', HomoskedasticCovariance, HeteroskedasticCovariance)
     with pytest.raises(ValueError):

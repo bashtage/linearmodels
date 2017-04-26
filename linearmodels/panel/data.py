@@ -513,12 +513,4 @@ class PanelData(object):
         cat = pd.Categorical(levels[axis][labels[axis]])
         dummies = pd.get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == 'entity' else self.time
-        # TODO: Remove workaround when fixed in pandas
-        # return dummies[[c for c in cols if c in dummies]].astype(np.float64)
-        ilocs = []
-        for c in cols:
-            if c in dummies:
-                ilocs.append(int(dummies.columns.get_indexer_for([c])))
-        return dummies.iloc[:,ilocs].astype(np.float64)
-
-
+        return dummies[[c for c in cols if c in dummies]].astype(np.float64)

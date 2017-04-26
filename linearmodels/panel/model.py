@@ -487,14 +487,14 @@ class PooledOLS(object):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
-        
+
         * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
-        
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
-            Default is Bartlett's kernel, which is produces a covariance 
+
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
+            Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
-            not provided, a naive default is used. 
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+            not provided, a naive default is used.
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -992,13 +992,13 @@ class PanelOLS(PooledOLS):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
-        
+
         * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
-        
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
-            Default is Bartlett's kernel, which is produces a covariance 
+
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
+            Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
         """
 
@@ -1392,13 +1392,13 @@ class FirstDifferenceOLS(PooledOLS):
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
-        
+
         * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
-        
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
-            Default is Bartlett's kernel, which is produces a covariance 
+
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
+            Default is Bartlett's kernel, which is produces a covariance
             estimator similar to the Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
 
         When using a clustered covariance estimator, all cluster ids must be
@@ -1410,7 +1410,6 @@ class FirstDifferenceOLS(PooledOLS):
         index = y.index
         y = y.values2d
         x = self.exog.first_difference().values2d
-
 
         if np.all(self.weights.values2d == 1.0):
             w = root_w = np.ones_like(y)

@@ -31,6 +31,7 @@ def kernel(request):
 def data():
     return generate_data()
 
+
 def test_cov_kernel():
     with pytest.raises(ValueError):
         _cov_kernel(np.arange(100), 1 - np.arange(101) / 101)

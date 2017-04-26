@@ -9,6 +9,7 @@ from linearmodels.iv.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeight
 from linearmodels.utility import AttrDict
 from linearmodels.tests.iv._utility import generate_data
 
+
 @pytest.fixture(params=[None, 12], scope='module')
 def bandwidth(request):
     return request.param

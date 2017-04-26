@@ -60,6 +60,8 @@ def data(request):
                     stata=STATA_RESULTS[request.param], fit_options=fit_options,
                     model_name=model, vcv=vcv, weights=weights, missing=missing)
 
+# TODO: pvals, r2o, r2
+
 
 def test_params(data):
     model_params = data.fit
@@ -101,7 +103,6 @@ def test_cov(data):
     assert_allclose(fit.cov.values, var.values, rtol=1e-4)
 
 
-# TODO: pvals, r2o, r2
 def test_f_pooled(data):
     f_pool = getattr(data.fit, 'f_pooled', None)
     stata_f_pool = data.stata.F_f
@@ -111,12 +112,11 @@ def test_f_pooled(data):
 
 
 def test_f_stat(data):
-    if data.vcv == 'conventional':
-        f_stat = data.fit.f_statistic.stat
-    else:
-        f_stat = data.fit.f_statistic_robust.stat
-
+    f_stat = data.fit.f_statistic_robust.stat
     stata_f_stat = data.stata.F
+    if np.isnan(stata_f_stat):
+        return
+    assert_allclose(stata_f_stat, f_stat)
 
 
 def test_t_stat(data):

@@ -317,7 +317,7 @@ class DriscollKraay(HomoskedasticCovariance):
 
     Bandwidth is set to the common value for the Bartlett kernel if not
     provided.
-    
+
     The estimator of the covariance is
 
     .. math::

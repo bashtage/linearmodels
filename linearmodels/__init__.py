@@ -18,4 +18,3 @@ __version__ = get_versions()['version']
 del get_versions
 
 # TODO: Finish documentation for IV estimators
-# TODO: Finish examples for IV estimators

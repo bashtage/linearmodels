@@ -346,7 +346,7 @@ class IVLIML(object):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['kappa'] = kappa
-        cov_config_copy = {k:v for k,v in cov_config.items()}
+        cov_config_copy = {k: v for k,v in cov_config.items()}
         if 'center' in cov_config_copy:
             del cov_config_copy['center']
         cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config_copy)
