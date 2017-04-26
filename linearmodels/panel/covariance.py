@@ -7,7 +7,7 @@ from linearmodels.iv.covariance import _cov_kernel, KERNEL_LOOKUP
 from linearmodels.utility import cached_property
 
 __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
-           'ClusteredCovariance', 'CovarianceManager']
+           'ClusteredCovariance', 'DriscollKraay', 'CovarianceManager']
 
 
 class HomoskedasticCovariance(object):
@@ -347,6 +347,7 @@ class DriscollKraay(HomoskedasticCovariance):
                  kernel='newey-west', bandwidth=None):
         super(DriscollKraay, self).__init__(y, x, params, time_ids, debiased=debiased,
                                             extra_df=extra_df)
+        self._name = 'Driscoll-Kraay'
         self._kernel = kernel
         self._bandwidth = bandwidth
 
@@ -379,7 +380,10 @@ class CovarianceManager(object):
                              'homoskedastic': HomoskedasticCovariance,
                              'robust': HeteroskedasticCovariance,
                              'heteroskedastic': HeteroskedasticCovariance,
-                             'clustered': ClusteredCovariance}
+                             'clustered': ClusteredCovariance,
+                             'driscollkraay': DriscollKraay,
+                             'dk': DriscollKraay,
+                             'kernel': DriscollKraay}
 
     def __init__(self, estimator, *cov_estimators):
         self._estimator = estimator

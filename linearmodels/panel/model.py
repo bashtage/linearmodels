@@ -5,7 +5,7 @@ from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
 from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager, \
-    HeteroskedasticCovariance, HomoskedasticCovariance
+    HeteroskedasticCovariance, HomoskedasticCovariance, DriscollKraay
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelEffectsResults, PanelResults, RandomEffectsResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
@@ -37,6 +37,7 @@ __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS',
 # TODO: Bootstrap covariance
 # TODO: Possibly add AIC/BIC
 # TODO: ML Estimation of RE model
+# TODO: Defer estimation of 3 R2 values -- slow
 
 
 class PooledOLS(object):
@@ -73,7 +74,8 @@ class PooledOLS(object):
         self.weights = self._adapt_weights(weights)
         self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
-                                                 HeteroskedasticCovariance, ClusteredCovariance)
+                                                 HeteroskedasticCovariance, ClusteredCovariance,
+                                                 DriscollKraay)
 
         self._validate_data()
 
@@ -472,7 +474,7 @@ class PooledOLS(object):
 
         Notes
         -----
-        Three covariance estimators are supported:
+        Four covariance estimators are supported:
 
         * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
         * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
@@ -485,6 +487,14 @@ class PooledOLS(object):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+        
+        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
+            Default is Bartlett's kernel, which is produces a covariance 
+            estimator similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
+            not provided, a naive default is used. 
         """
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -982,6 +992,14 @@ class PanelOLS(PooledOLS):
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
+        
+        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
+            Default is Bartlett's kernel, which is produces a covariance 
+            estimator similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
+            not provided, a naive default is used.
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
@@ -1121,6 +1139,8 @@ class BetweenOLS(PooledOLS):
 
     def __init__(self, dependent, exog, *, weights=None):
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
+        self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
+                                                 HeteroskedasticCovariance, ClusteredCovariance)
 
     def _choose_cov(self, cov_type, **cov_config):
         """Return covariance estimator reformat clusters"""
@@ -1372,35 +1392,47 @@ class FirstDifferenceOLS(PooledOLS):
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
+        
+        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs). 
+            Default is Bartlett's kernel, which is produces a covariance 
+            estimator similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If 
+            not provided, a naive default is used.
 
         When using a clustered covariance estimator, all cluster ids must be
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
         """
-        y = self.dependent.first_difference().values2d
+        y = self.dependent.first_difference()
+        time_ids = y.time_ids
+        index = y.index
+        y = y.values2d
         x = self.exog.first_difference().values2d
 
-        w = 1.0 / self.weights.panel.values
-        w = w[:, :-1] + w[:, 1:]
-        w = 1.0 / w
-        w = pd.Panel(w, items=self.weights.panel.items,
-                     major_axis=self.weights.panel.major_axis[1:],
-                     minor_axis=self.weights.panel.minor_axis)
-        w = w.swapaxes(1, 2).to_frame(filter_observations=False)
-        w = w.reindex(self.weights.index).dropna(how='any')
-        index = w.index
-        w = w.values
 
-        w /= w.mean()
-        root_w = np.sqrt(w)
+        if np.all(self.weights.values2d == 1.0):
+            w = root_w = np.ones_like(y)
+        else:
+            w = 1.0 / self.weights.values3d[0]
+            w = w[:-1] + w[1:]
+            w = 1.0 / w
+            w = pd.DataFrame(w, index=self.weights.time[1:], columns=self.weights.entities)
+            w = PanelData(w).dataframe
+            w = w.reindex(self.weights.index).dropna(how='any')
+            index = w.index
+            w = w.values
+
+            w /= w.mean()
+            root_w = np.sqrt(w)
 
         wx = root_w * x
         wy = root_w * y
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(wy, wx, params, self.dependent.time_ids,
-                      debiased=debiased, **cov_config)
+        cov = cov_est(wy, wx, params, time_ids, debiased=debiased, **cov_config)
 
         weps = wy - wx @ params
         eps = y - x @ params
