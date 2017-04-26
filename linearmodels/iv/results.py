@@ -666,12 +666,15 @@ class IVResults(_CommonIVResults):
         variable :math:`x_j` on the exogenous variables and instruments.
 
         The test is a :math:`n\times R^2 \sim \chi^2_{p}`.
+        
+        Implemented using the expression in Wooldridge (2002), Eq. 6.19
         """
         from linearmodels.iv.model import _OLS
 
         e = annihilate(self.model.dependent.ndarray, self.model._x)
         r = annihilate(self.model.endog.ndarray, self.model._z)
         nobs = e.shape[0]
+        r = annihilate(r, self.model._x)
         res = _OLS(ones((nobs, 1)), r * e).fit(cov_type='unadjusted')
         stat = res.nobs - res.resid_ss
         df = self.model.endog.shape[1]

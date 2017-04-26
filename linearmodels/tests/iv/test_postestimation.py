@@ -63,18 +63,18 @@ def test_wu_hausman(data):
     assert_allclose(res.wu_hausman('x1').pval, 0.6944, rtol=1e-3)
 
 
-@pytest.mark.xfail(reason='Unknown why these differ so much')
 def test_wooldridge_score(data):
     res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit(cov_type='robust')
     assert_allclose(res.wooldridge_score.stat, 22.684, rtol=1e-4)
-    assert_allclose(res.wooldridge_score.pval, 0.0000, atol=1e-6)
+    assert_allclose(res.wooldridge_score.pval, 0.0000, atol=1e-4)
 
 
-@pytest.mark.xfail(reason='Stata ses an F rather than a standard Wald')
 def test_wooldridge_regression(data):
-    res = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr).fit(cov_type='robust')
-    assert_allclose(res.wooldridge_regression.stat, 13.3461, rtol=1e-4)
-    assert_allclose(res.wooldridge_regression.pval, 0.0000, atol=1e-6)
+    mod = IV2SLS(data.dep, data.exog, data.endog[['x1', 'x2']], data.instr)
+    res = mod.fit(cov_type='robust', debiased=True)
+    # Scale to correct for F vs Wald treatment
+    assert_allclose(res.wooldridge_regression.stat, 2 * 13.3461, rtol=1e-4)
+    assert_allclose(res.wooldridge_regression.pval, 0.0000, atol=1e-4)
 
 
 def test_wooldridge_overid(data):
