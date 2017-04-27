@@ -23,6 +23,8 @@ def convert_columns(s, drop_first):
 
 
 def expand_categoricals(x, drop_first):
+    if x.shape[1] == 0:
+        return x
     return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
