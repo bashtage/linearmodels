@@ -8,7 +8,7 @@ from pandas.util.testing import assert_frame_equal, assert_series_equal
 from linearmodels.utility import AttrDict
 
 
-def lsdv(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False, time=False,
+def lsdv(y: pd.DataFrame, x: pd.DataFrame, has_const=False, entity=False, time=False,
          general=None):
     nvar = x.shape[1]
     temp = x.reset_index()
@@ -34,8 +34,7 @@ def lsdv(y: pd.DataFrame, x: pd.DataFrame, w=None, has_const=False, entity=False
         x = pd.DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
                          index=x.index,
                          columns=list(x.columns) + list(dummies.columns))
-    if w is None:
-        w = np.ones_like(y)
+    w = np.ones_like(y)
 
     wy = w * y.values
     wx = w * x.values

@@ -1,10 +1,11 @@
 import numpy as np
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
-# from patsy import SyntaxError
-from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
 
 @pytest.fixture(scope='module', params=list(zip([IV2SLS, IVLIML, IVGMMCUE, IVGMM],
@@ -114,6 +115,22 @@ def test_formula_ols_weights(data, model_and_func):
 
     assert res.rsquared == res2.rsquared
     assert res.rsquared == res3.rsquared
+
+
+def test_no_exog(data, model_and_func):
+    model, func = model_and_func
+    formula = 'y ~ [x1 + x2 ~ z1 + z2 + z3]'
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
+    res2 = func(formula, data).fit()
+
+    assert res.rsquared == res2.rsquared
+    assert mod.formula == formula
+
+    mod2 = model(data.y, None, data[['x1', 'x2']], data[['z1', 'z2', 'z3']])
+    res3 = mod2.fit()
+
+    assert_allclose(res.rsquared, res3.rsquared)
 
 
 def test_invalid_formula(data, model_and_func):

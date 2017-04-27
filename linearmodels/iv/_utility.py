@@ -54,6 +54,7 @@ def annihilate(y, x):
 
 
 def parse_formula(formula, data):
+    """Parse an IV model forumla"""
     na_action = NAAction(on_NA='raise', NA_types=[])
     if formula.count('~') == 1:
         dep, exog = dmatrices(formula, data, return_type='dataframe', NA_action=na_action)
@@ -81,12 +82,15 @@ def parse_formula(formula, data):
             'instrument block must not start or end with +. This block was: {0}'.format(instr))
     if exog2:
         exog += exog2
-    exog = exog[:-1].strip() if exog[-1] == '+' else exog
+
+    if exog:
+        exog = exog[:-1].strip() if exog[-1] == '+' else exog
 
     try:
         dep = dmatrix('0 + ' + dep, data, eval_env=2,
                       return_type='dataframe', NA_action=na_action)
-        exog = dmatrix('0 + ' + exog, data, eval_env=2,
+        exog = '0 + ' + exog if exog else '0'
+        exog = dmatrix(exog, data, eval_env=2,
                        return_type='dataframe', NA_action=na_action)
         endog = dmatrix('0 + ' + endog, data, eval_env=2,
                         return_type='dataframe', NA_action=na_action)

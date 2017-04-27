@@ -204,7 +204,22 @@ def test_2sls_just_identified(data):
     fs = res.first_stage
     fs.diagnostics
     # Fetch again to test cache
+    get_all(fs)
     get_all(res)
+
+    mod = IV2SLS(data.dep, data.exog, data.endog[:, :1], data.instr[:, :1])
+    res = mod.fit()
+    get_all(res)
+    fs = res.first_stage
+    fs.diagnostics
+    get_all(fs)
+
+    mod = IV2SLS(data.dep, None, data.endog[:, :1], data.instr[:, :1])
+    res = mod.fit()
+    get_all(res)
+    fs = res.first_stage
+    fs.diagnostics
+    get_all(fs)
 
 
 def test_durbin_smoke(data):
@@ -214,7 +229,7 @@ def test_durbin_smoke(data):
     res.durbin([mod.endog.cols[1]])
 
 
-def test_wuhausman_smoke(data):
+def test_wu_hausman_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
     res.wu_hausman()
@@ -290,6 +305,27 @@ def test_compare(data):
     res2 = IV2SLS(data.dep, data.exog[:, :2], None, None).fit()
     c = compare({'Model A': res1,
                  'Model B': res2})
+    c.summary
+
+
+def test_compare_single(data):
+    res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
+    c = compare([res1])
+    assert len(c.rsquared) == 1
+    c.summary
+    c = compare({'Model A': res1})
+    c.summary
+    res = OrderedDict()
+    res['Model A'] = res1
+    c = compare(res)
+    c.summary
+    c.pvalues
+
+
+def test_compare_single_single_parameter(data):
+    res1 = IV2SLS(data.dep, data.exog[:, :1], None, None).fit()
+    c = compare([res1])
+    assert len(c.rsquared) == 1
     c.summary
 
 
