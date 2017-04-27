@@ -388,7 +388,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
             if clusters is not None:
                 nclusters = len(unique(asarray(clusters)))
                 out += '\nNum Clusters: {0}'.format(nclusters)
-        elif cov_type == 'kernel':
+        else:  # kernel
             out += '\nKernel (HAC)'
             if self._cov_config.get('kernel', False):
                 out += '\nKernel: {0}'.format(self._cov_config['kernel'])

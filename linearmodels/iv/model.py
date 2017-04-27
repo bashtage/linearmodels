@@ -346,7 +346,7 @@ class IVLIML(object):
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['kappa'] = kappa
-        cov_config_copy = {k: v for k,v in cov_config.items()}
+        cov_config_copy = {k: v for k, v in cov_config.items()}
         if 'center' in cov_config_copy:
             del cov_config_copy['center']
         cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config_copy)
@@ -1018,11 +1018,12 @@ class IVGMMCUE(IVGMM):
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         if starting is None:
+            exog = None if self.exog.shape[1] == 0 else self.exog
             endog = None if self.endog.shape[1] == 0 else self.endog
             instr = None if self.instruments.shape[1] == 0 else \
                 self.instruments
 
-            res = IVGMM(self.dependent, self.exog, endog, instr,
+            res = IVGMM(self.dependent, exog, endog, instr,
                         weights=self.weights, weight_type=self._weight_type,
                         **self._weight_config).fit()
             starting = res.params.values

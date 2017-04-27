@@ -60,17 +60,17 @@ def parse_formula(formula, data):
         dep, exog = dmatrices(formula, data, return_type='dataframe', NA_action=na_action)
         endog = instr = None
         return dep, exog, endog, instr
-    
+
     elif formula.count('~') > 2:
         raise ValueError('formula not understood.  Must have 1 or 2 '
                          'occurrences of ~')
-    
+
     blocks = [bl.strip() for bl in formula.strip().split('~')]
     if '[' not in blocks[1] or ']' not in blocks[2]:
         raise ValueError('formula not understood. Endogenous variables and '
                          'instruments must be segregated in a block that '
                          'starts with [ and ends with ].')
-    
+
     dep = blocks[0].strip()
     exog, endog = [bl.strip() for bl in blocks[1].split('[')]
     instr, exog2 = [bl.strip() for bl in blocks[2].split(']')]
@@ -82,10 +82,10 @@ def parse_formula(formula, data):
             'instrument block must not start or end with +. This block was: {0}'.format(instr))
     if exog2:
         exog += exog2
-    
+
     if exog:
         exog = exog[:-1].strip() if exog[-1] == '+' else exog
-    
+
     try:
         dep = dmatrix('0 + ' + dep, data, eval_env=2,
                       return_type='dataframe', NA_action=na_action)
@@ -98,5 +98,5 @@ def parse_formula(formula, data):
                         return_type='dataframe', NA_action=na_action)
     except Exception as e:
         raise type(e)(PARSING_ERROR.format(dep, exog, endog, instr) + e.msg, e.args[1])
-    
+
     return dep, exog, endog, instr

@@ -252,7 +252,7 @@ class InapplicableTestStatistic(WaldTestStatistic):
 def update_wrapper(wrapper, wrapped, *a, **ka):
     try:
         functools.update_wrapper(wrapper, wrapped, *a, **ka)
-    except AttributeError:
+    except AttributeError:  # pragma: no cover
         pass
 
 
@@ -266,7 +266,7 @@ class CachedProperty(object):
         self.func = func
 
     def __get__(self, obj, cls):
-        if obj is None:
+        if obj is None:  # pragma: no cover
             return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value

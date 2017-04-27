@@ -1,9 +1,10 @@
 import numpy as np
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
-# from patsy import SyntaxError
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
 
@@ -34,7 +35,7 @@ def data():
     r[-1, -1] = 0.5
     r += np.eye(9) * 0.5
     v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
-    
+
     x = v[:, :k]
     z = v[:, k:k + p]
     e = v[:, [-1]]
@@ -59,7 +60,7 @@ def test_formula(data, model_and_func, formula):
     res2 = model(data.y, exog, endog, instr).fit()
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
-    
+
     mod = func(formula, data)
     res = mod.fit()
     assert res.rsquared == res2.rsquared
@@ -76,7 +77,7 @@ def test_formula_weights(data, model_and_func, formula):
     res2 = model(data.y, exog, endog, instr, weights=data.weights).fit()
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
-    
+
     mod = func(formula, data, weights=data.weights)
     res = mod.fit()
     assert res.rsquared == res2.rsquared
@@ -98,7 +99,7 @@ def test_formula_ols(data, model_and_func):
     res2 = res2.fit()
     res = model.from_formula(formula, data).fit()
     res3 = func(formula, data).fit()
-    
+
     assert res.rsquared == res2.rsquared
     assert res.rsquared == res3.rsquared
 
@@ -111,7 +112,7 @@ def test_formula_ols_weights(data, model_and_func):
     res2 = res2.fit()
     res = model.from_formula(formula, data, weights=data.weights).fit()
     res3 = func(formula, data, weights=data.weights).fit()
-    
+
     assert res.rsquared == res2.rsquared
     assert res.rsquared == res3.rsquared
 
@@ -122,14 +123,14 @@ def test_no_exog(data, model_and_func):
     mod = model.from_formula(formula, data)
     res = mod.fit()
     res2 = func(formula, data).fit()
-    
+
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
-    
-    mod = model(data.y, None, data[['x1', 'x2']], data[['z1', 'z2', 'z3']])
-    res3 = mod.fit()
-    
-    assert res.rsquared == res3.rsquared
+
+    mod2 = model(data.y, None, data[['x1', 'x2']], data[['z1', 'z2', 'z3']])
+    res3 = mod2.fit()
+
+    assert_allclose(res.rsquared, res3.rsquared)
 
 
 def test_invalid_formula(data, model_and_func):

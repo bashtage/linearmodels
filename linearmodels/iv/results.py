@@ -1110,8 +1110,6 @@ class FirstStageResults(_SummaryStr):
             v = c_[res.params.values, res.tstats.values]
             params.append(v.ravel())
         params = array(params)
-        if params.ndim == 1:
-            params = params[:, None]
         params_fmt = [[_str(val) for val in row] for row in params.T]
         for i in range(1, len(params_fmt), 2):
             for j in range(len(params_fmt[i])):
