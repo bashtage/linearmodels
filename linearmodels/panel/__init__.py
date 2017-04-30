@@ -1,6 +1,6 @@
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects, BetweenOLS, \
-    FirstDifferenceOLS
+    FirstDifferenceOLS, FamaMacBeth
 from linearmodels.panel.results import compare
 
 __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS', 'BetweenOLS',
-           'compare']
+           'FamaMacBeth', 'compare']

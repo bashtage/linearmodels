@@ -69,8 +69,7 @@ class FamaMacBeth(object):
         cov = np.cov(lam.T) / nobs
         tstats = rp / np.sqrt(np.diag(cov))
         return rp, cov, tstats
-<<<<<<< HEAD
-    
+
     def _fit_cs(self):
         f = self.factors.ndarray
         nobs, nfactor = f.shape
@@ -96,8 +95,6 @@ class FamaMacBeth(object):
         print(np.linalg.eigvalsh(xeex))
         
         return lam, alpha
-=======
->>>>>>> ENH: Add TS method to FMB mod
 
     def fit2(self):
         # Step 1, n regressions to get B

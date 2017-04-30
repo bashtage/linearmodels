@@ -4,8 +4,8 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager, \
-    HeteroskedasticCovariance, HomoskedasticCovariance, DriscollKraay
+from linearmodels.panel.covariance import ClusteredCovariance, CovarianceManager, DriscollKraay, FamaMacBethCovariance, \
+    FamaMacBethKernelCovariance, HeteroskedasticCovariance, HomoskedasticCovariance
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import PanelEffectsResults, PanelResults, RandomEffectsResults
 from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
@@ -28,7 +28,8 @@ class AmbiguityError(Exception):
 
 
 __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS',
-           'BetweenOLS', 'AbsorbingEffectError', 'AmbiguityError']
+           'BetweenOLS', 'AbsorbingEffectError', 'AmbiguityError',
+           'FamaMacBeth']
 
 
 # Likely
@@ -1622,3 +1623,57 @@ class RandomEffects(PooledOLS):
                         sigma2_effects=sigma2_u, rho=rho, theta=theta_out))
 
         return RandomEffectsResults(res)
+
+
+class FamaMacBeth(PooledOLS):
+    def __init__(self, dependent, exog, *, weights=None):
+        super(FamaMacBeth, self).__init__(dependent, exog, weights=weights)
+
+    def fit(self, cov_type='unadjusted', debiased=True, **cov_config):
+        y = self.dependent.dataframe
+        x = self.exog.dataframe
+        yx = pd.DataFrame(np.c_[y.values, x.values],
+                          columns=list(y.columns) + list(x.columns),
+                          index=y.index)
+
+        def single(z: pd.DataFrame):
+            x = z.iloc[:, 1:].values
+            if x.shape[0] < x.shape[1]:
+                return pd.Series([np.nan] * len(z.columns), index=z.columns)
+            y = z.iloc[:, :1].values
+            params = np.linalg.lstsq(x, y)[0]
+            return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
+
+        all_params = yx.groupby(level=1).apply(single)
+        all_params = all_params.iloc[:, 1:].values
+        params = all_params.mean(0)[:, None]
+
+        # df_resid = params.shape[1]
+        wy = self.dependent.values2d
+        wx = self.exog.values2d
+        weps = eps = self.dependent.values2d - self.exog.values2d @ params
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        #
+        residual_ss = float(weps.T @ weps)
+        e = y
+        if self.has_constant:
+            e = y - (w * y).sum() / w.sum()
+        total_ss = float(w.T @ (e ** 2))
+        r2 = 1 - residual_ss / total_ss
+
+        if cov_type in ('robust', 'unadjusted', 'homoskedastic', 'heteroskedastic'):
+            cov_est = FamaMacBethCovariance
+        elif cov_type == 'kernel':
+            cov_est = FamaMacBethKernelCovariance
+        else:
+            raise ValueError('Unknown cov_type')
+
+        cov = cov_est(wy, wx, params, all_params, debiased=debiased, **cov_config)
+        df_resid = wy.shape[0] - params.shape[0]
+        res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
+        index = self.dependent.index
+        res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
+                        residual_ss=residual_ss, total_ss=total_ss,
+                        r2=r2, resids=eps, wresids=weps, index=index))
+        return PanelResults(res)
