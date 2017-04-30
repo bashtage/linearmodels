@@ -36,3 +36,10 @@ Pooled OLS
    :members:
    :inherited-members:
 
+
+Fama-MacBeth
+============
+.. autoclass:: FamaMacBeth
+   :members:
+   :inherited-members:
+
