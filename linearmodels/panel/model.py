@@ -1723,8 +1723,9 @@ class FamaMacBeth(PooledOLS):
             return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
-        all_params = all_params.iloc[:, 1:].values
-        params = all_params.mean(0)[:, None]
+        all_params = all_params.iloc[:, 1:]
+        params = all_params.mean(0).values[:, None]
+        all_params = all_params.values
 
         # df_resid = params.shape[1]
         wy = self.dependent.values2d
