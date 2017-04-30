@@ -1009,7 +1009,7 @@ class FirstStageResults(_SummaryStr):
               Wald test statistic with a chi2 distribution.
             * f.pval - P-value of the test that all coefficients are zero
               in the model used to estimate the partial R-squared
-            & f.dist - Distribution of f.stat
+            * f.dist - Distribution of f.stat
             * shea.rsquared - Shea's r-squared which measures the correlation
               between the projected and orthogonalized instrument on the
               orthogonalized endogenous regressor where the orthogonalization

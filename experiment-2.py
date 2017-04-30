@@ -4,13 +4,17 @@ lm.WARN_ON_MISSING = False
 from linearmodels import utility
 utility.missing_warning(np.array([True, True, False]))
 
-from linearmodels.panel import PanelOLS, RandomEffects, PooledOLS
+from linearmodels.panel import PanelOLS, RandomEffects, PooledOLS, FamaMacBeth
 from linearmodels.datasets import wage_panel
 import statsmodels.api as sm
 data = wage_panel.load()
 data = data.set_index(['nr','year'])
 dependent = data.lwage
 exog = sm.add_constant(data[['expersq','married','union']])
+out = FamaMacBeth(dependent, exog).fit()
+print(out)
+
+raise NotImplementedError
 mod = PanelOLS(dependent, exog, entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='unadjusted')
 res2 = mod.fit(cov_type='robust')

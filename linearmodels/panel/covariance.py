@@ -2,8 +2,7 @@ import numpy as np
 from numpy.linalg import inv
 from pandas import DataFrame
 
-from linearmodels.iv.covariance import _cov_cluster, CLUSTER_ERR
-from linearmodels.iv.covariance import _cov_kernel, KERNEL_LOOKUP
+from linearmodels.iv.covariance import CLUSTER_ERR, KERNEL_LOOKUP, _cov_cluster, _cov_kernel
 from linearmodels.utility import cached_property
 
 __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
@@ -341,6 +340,7 @@ class DriscollKraay(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
+
     # TODO: Test
 
     def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0,
@@ -397,3 +397,39 @@ class CovarianceManager(object):
             raise ValueError('Requested covariance estimator is not supported '
                              'for the {0}.'.format(self._estimator))
         return cov_est
+
+
+class FamaMacBethCovariance(HomoskedasticCovariance):
+    def __init__(self, y, x, params, all_params, *, debiased=False):
+        super(FamaMacBethCovariance, self).__init__(y, x, params, None, debiased=debiased)
+        self._all_params = all_params
+        self._name = 'Fama-MacBeth Std Cov'
+
+    @cached_property
+    def cov(self):
+        e = self._all_params - self._params.T
+        e = e[np.all(np.isfinite(e), 1)]
+        nobs = e.shape[0]
+        cov = (e.T @ e / nobs)
+        return cov / (nobs - int(bool(self._debiased)))
+
+
+class FamaMacBethKernelCovariance(FamaMacBethCovariance):
+    def __init__(self, y, x, params, all_params, *, debiased=False, kernel='newey-west', bandwidth=None):
+        super(FamaMacBethKernelCovariance, self).__init__(y, x, params, all_params, debiased=debiased)
+        self._name = 'Fama-MacBeth Kernel Cov'
+        self._bandwidth = bandwidth
+        self._kernel = kernel
+
+    @cached_property
+    def cov(self):
+        e = self._all_params - self._params.T
+        e = e[np.all(np.isfinite(e), 1)]
+        nobs = e.shape[0]
+
+        bw = self._bandwidth
+        if self._bandwidth is None:
+            bw = int(np.floor(4 * (nobs / 100) ** (2 / 9)))
+        w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
+        cov = _cov_kernel(e, w)
+        return cov / (nobs - int(bool(self._debiased)))
