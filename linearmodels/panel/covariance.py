@@ -9,6 +9,8 @@ __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
            'ClusteredCovariance', 'DriscollKraay', 'CovarianceManager']
 
 
+# TODO: Kernel Covriance w/o X-section dependence
+
 class HomoskedasticCovariance(object):
     r"""
     Homoskedastic covariance estimation
