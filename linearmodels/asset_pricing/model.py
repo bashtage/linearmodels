@@ -4,14 +4,36 @@ from numpy.linalg import pinv
 from linearmodels.iv.data import IVData
 
 
-class FamaMacBeth(object):
-    """Fama-MacBeth Estimation"""
-
-    def __init__(self, factors, portfolios, *, constant=True):
+class LinearFactorModel(object):
+    """Asset pricing linear factor models estimator
+    
+    Parameters
+    ----------
+    factors : array-like
+        nobs by nfactor array of priced factors
+    portfolio : array-like
+        nobs by nportfolio array of test portfolios
+    constant : bool, optional
+        Flag indicating whether to include a constant when estimating
+        portfolio loadings
+    sigma : array-like, optional
+        nportfolio by nportfolio positive definite covariance matrix of
+        portfolio residuals for use in estimation.  If not provided, an
+        identify matrix is used
+   
+    Notes
+    -----
+    Implements both time-series and cross-section estimators of risk premia,
+    factor loadings and model tests
+    """
+    
+    def __init__(self, factors, portfolios, *, constant=True, sigma=None):
         self.factors = IVData(factors)
         self.portfolios = IVData(portfolios)
         self.constant = constant
-
+        nportfolio = self.portfolios.shape[1]
+        self.sigma = sigma if sigma is not None else np.eye(nportfolio)
+    
     def _fit_ts(self):
         f = self.factors.ndarray
         p = self.portfolios.ndarray
@@ -30,46 +52,28 @@ class FamaMacBeth(object):
         stat = alpha.T @ pinv(sigma) @ alpha
         stat *= (nobs - nfactor - nportfolio) / nportfolio
         stat /= (1 + rp.T @ pinv(omega) @ rp)
-
+        
         # VCV calculation
         # Need to rearrange ex-post
         xpxi = np.kron(pinv(fc.T @ fc / nobs), np.eye(nportfolio))
         f_rep = np.tile(fc, (1, nportfolio))
         eps_rep = np.tile(eps, (nfactor + 1, 1))  # 1 2 3 ... 25 1 2 3 ...
         eps_rep = eps_rep.ravel(order='F')
-        eps_rep = np.reshape(eps_rep, (nobs, (nfactor + 1) * nportfolio),order='F')
+        eps_rep = np.reshape(eps_rep, (nobs, (nfactor + 1) * nportfolio), order='F')
         xe = f_rep * eps_rep
         xeex = xe.T @ xe / nobs
         vcv = xpxi @ xeex @ xpxi / nobs
-
+        
         # Rearrange VCV
         order = np.reshape(np.arange((nfactor + 1) * nportfolio), (nportfolio, nfactor + 1))
         order = order.T.ravel()
         vcv = vcv[order][:, order]
-
+        
         # Return values
         alpha_vcv = vcv[:nportfolio, :nportfolio]
         stat = float(alpha.T @ pinv(alpha_vcv) @ alpha)
-        return alpha, alpha_vcv, stat
-
-    def fit(self, method='fama-macbeth'):
-        return self._fit_ts()
-        # Step 1, n regressions to get B
-        f = self.factors.ndarray
-        nobs = f.shape[0]
-        fc = np.c_[np.ones((nobs, 1)), f]
-        p = self.portfolios.ndarray
-        b = np.linalg.lstsq(fc, p)[0]  # nf by np
-        bc = b.copy()
-        bc[0] = 1
-        # Step 2, t regressions to get lambda(T)
-        lam = np.linalg.lstsq(bc.T, p.T)[0].T
-        # Step 3, average lambda(t)
-        rp = lam.mean(0)
-        cov = np.cov(lam.T) / nobs
-        tstats = rp / np.sqrt(np.diag(cov))
-        return rp, cov, tstats
-
+        return alpha, stat
+    
     def _fit_cs(self):
         f = self.factors.ndarray
         nobs, nfactor = f.shape
@@ -92,27 +96,35 @@ class FamaMacBeth(object):
         alpha = pricing_errors.mean(0)
         scores = np.c_[f_rep * eps_rep, pricing_errors @ bc.T]
         xeex = scores.T @ scores / nobs
-        print(np.linalg.eigvalsh(xeex))
         
         return lam, alpha
+    
+    def fit(self, method='cs'):
+        """
+        Parameters
+        ----------
+        method : {'cs', 'ts', 'time-series', 'cross-section'}
+            Method to use when estimating risk premia and constructing
+            model tests
+        
+        Returns
+        -------
+        results : LinearFactorResult
+            Results class with parameter estimates, covariance and test statistics
+        """
+        if method.lower() in ('ts', 'time-series'):
+            return self._fit_ts()
+        elif method.lower() in ('cs', 'cross-section'):
+            return self._fit_cs()
+        else:
+            raise ValueError('Unknown method: {0}'.format(method))
 
-    def fit2(self):
-        # Step 1, n regressions to get B
-        f = self.factors.ndarray
-        nobs = f.shape[0]
-        fc = np.c_[np.ones((nobs, 1)), f]
-        p = self.portfolios.ndarray
-        b = np.linalg.lstsq(fc, p)[0]  # nf by np
-        bc = b.copy()
-        bc[0] = 1
-        # Step 2, t regressions to get lambda(T)
-        rp = np.linalg.lstsq(bc.T, p.mean(0)[:, None])[0].T
-        return rp
 
-
-class FamaMacBethGMM(FamaMacBeth):
+class LinearFactorModelGMM(LinearFactorModel):
+    """GMM estimation of asset pricing linear factor model"""
+    
     def __init__(self, factors, portfolios, *, constant=True):
-        super(FamaMacBethGMM, self).__init__(factors, portfolios, constant=constant)
-
+        super(LinearFactorModelGMM, self).__init__(factors, portfolios, constant=constant)
+    
     def fit(self):
         raise NotImplementedError()
