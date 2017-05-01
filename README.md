@@ -8,14 +8,17 @@
 Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmodels.org) to 
 include Panel regression and instrumental variable estimators:
  
-  * Panel regression with fixed effects (maximum two-way)
-  * First difference regression
-  * Between estimator for panel data
-  * Pooled regression for panel data
-  * Two-stage Least Squares
-  * Limited Information Maximum Likelihood
-  * k-class Estimators
-  * Generalized Method of Moments, also with continuously updating
+- **Panel models**:
+  - Fixed effects (maximum two-way)
+  - First difference regression
+  - Between estimator for panel data
+  - Pooled regression for panel data
+  - Fama-MacBeth estimation of panel models
+- **Instrumental Variable estimators**
+  - Two-stage Least Squares
+  - Limited Information Maximum Likelihood
+  - k-class Estimators
+  - Generalized Method of Moments, also with continuously updating
   
 Designed to work equally well with NumPy, Pandas or xarray data.
 
