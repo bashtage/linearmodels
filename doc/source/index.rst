@@ -26,6 +26,7 @@ Estimation and inference in some common linear models:
 
    iv/index
    panel/index
+   asset_pricing/index
    utility
    plan
    contributing

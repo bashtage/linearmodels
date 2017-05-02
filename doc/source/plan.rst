@@ -14,13 +14,9 @@ Univariate
 * GMM IV Estimation - :class:`linearmodels.iv.model.IVGMM`
 * GMM-CUE Estimation - :class:`linearmodels.iv.model.IVGMMCUE`
 
-Fama Macbeth
-************
-
-Not Implemented
-~~~~~~~~~~~~~~~
-* Fama-MacBeth
-* GMM
+In Progress
+***********
+* Linear Asset Pricing Model Estimation - :class:`linearmodels.asset_pricing.model.LinearFactorModel`
 
 Panel
 =====
@@ -33,10 +29,12 @@ Least Squares Estimators
 * Pooled - :class:`linearmodels.panel.model.PooledOLS`
 * Between - :class:`linearmodels.panel.model.BetweenOLS`
 * First Difference - :class:`linearmodels.panel.model.FirstDifferenceOLS`
+* Fama-MacBeth - :class:`linearmodels.panel.model.FamaMacBeth`
 
 
 Instrumental Variable Estimators
 ********************************
+
 Not Implemented
 ~~~~~~~~~~~~~~~
 * 2SLS
