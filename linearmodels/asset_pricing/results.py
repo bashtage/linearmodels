@@ -34,7 +34,7 @@ class TradedFactorModelResults(_SummaryStr):
         title = self.name + ' Estimation Summary'
         mod = self.model
 
-        top_left = [('No. Test Portfolios:', len(self._portfoio_names)),
+        top_left = [('No. Test Portfolios:', len(self._portfolio_names)),
                     ('No. Factors:', len(self._factor_names)),
                     ('No. Observations:', self.nobs),
                     ('Date:', self._datetime.strftime('%a, %b %d %Y')),
@@ -179,7 +179,7 @@ class TradedFactorModelResults(_SummaryStr):
     def params(self):
         """Estimated parameters"""
         cols = ['const'] + ['{0}'.format(f) for f in self._factor_names]
-        return pd.DataFrame(self._params, columns=cols, index=self._portfoio_names)
+        return pd.DataFrame(self._params, columns=cols, index=self._portfolio_names)
 
     @property
     def std_errors(self):
@@ -190,7 +190,7 @@ class TradedFactorModelResults(_SummaryStr):
         se = se[:nloadings]
         se = se.reshape((nportfolio, nfactor))
         cols = ['alpha'] + ['beta.{0}' for f in self._factor_names]
-        return pd.DataFrame(se, columns=cols, index=self._portfoio_names[:nloadings])
+        return pd.DataFrame(se, columns=cols, index=self._portfolio_names[:nloadings])
 
     @cached_property
     def tstats(self):

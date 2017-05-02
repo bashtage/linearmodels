@@ -12,9 +12,9 @@ class TradedFactorModel(object):
     Parameters
     ----------
     portfolios : array-like
-        nobs by nportfolio array of test portfolios
+        array of test portfolio returns (nobs by nportfolio)
     factors : array-like
-        nobs by nfactor array of priced factors
+        array of priced factor returns (nobs by nfactor 
    
     Notes
     -----
@@ -62,6 +62,9 @@ class TradedFactorModel(object):
         ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral) 
         and ``bandwidth`` (a positive integer).
         """
+        # TODO: Homoskedastic covariance
+        # TODO: Verify order of parameters and vcv
+
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         nportfolio = p.shape[1]
@@ -119,10 +122,7 @@ class TradedFactorModel(object):
         alpha_vcv = vcv[:nportfolio, :nportfolio]
         stat = float(alphas.T @ pinv(alpha_vcv) @ alphas)
         jstat = WaldTestStatistic(stat, 'All alphas are 0', nportfolio, name='J-statistic')
-        param_order = np.reshape(np.arange((nfactor + 1) * nportfolio),
-                                 (nfactor + 1, nportfolio)).T.ravel()
         params = b.T
-        vcv = vcv[param_order][:, param_order]
         betas = b[1:].T
         residual_ss = (eps ** 2).sum()
         e = p - p.mean(0)[None, :]
@@ -139,9 +139,9 @@ class TradedFactorModel(object):
         res = AttrDict(params=params, cov=full_vcv, betas=betas, rp=rp, rp_cov=rp_cov,
                        alphas=alphas, alpha_vcv=alpha_vcv, jstat=jstat,
                        rsquared=r2, total_ss=total_ss, residual_ss=residual_ss,
-                       param_names=param_names,
-                       portfolio_names=self.portfolios.cols, factor_names=self.factors.cols,
-                       name=self._name, cov_type=cov_type, model=self, nobs=nobs)
+                       param_names=param_names, portfolio_names=self.portfolios.cols,
+                       factor_names=self.factors.cols, name=self._name,
+                       cov_type=cov_type, model=self, nobs=nobs)
 
         return TradedFactorModelResults(res)
 
@@ -152,9 +152,9 @@ class LinearFactorModel(TradedFactorModel):
     Parameters
     ----------
     portfolios : array-like
-        nobs by nportfolio array of test portfolios
+        array of test portfolio returns (nobs by nportfolio)
     factors : array-like
-        nobs by nfactor array of priced factors
+        array of priced factorreturns (nobs by nfactor 
     sigma : array-like, optiona
         positive definite residual covariance (nportfolio by nportfolio) 
 
@@ -180,7 +180,13 @@ class LinearFactorModel(TradedFactorModel):
         eps = p - fc @ b
         bc = b[1:]
         # Step 2, t regressions to get lambda(T)
-        lam = np.linalg.lstsq(bc.T, p.mean(0)[:, None])[0].T
+        if self._sigma is not None:
+            vals, vecs = np.linalg.eigh(self._sigma)
+            sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
+        else:
+            sigma_m12 = np.eye(nportfolio)
+
+        lam = np.linalg.lstsq(sigma_m12 @ bc.T, sigma_m12 @ p.mean(0)[:, None])[0].T
 
         f_rep = np.tile(fc, (1, nportfolio))
         eps_rep = np.tile(eps, (nfactor + 1, 1))
