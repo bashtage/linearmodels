@@ -1,7 +1,10 @@
 import numpy as np
 from numpy.linalg import pinv
 
+from linearmodels.asset_pricing.results import TimeSeriesFactorModelResults
+from linearmodels.iv.covariance import KERNEL_LOOKUP, _cov_kernel
 from linearmodels.iv.data import IVData
+from linearmodels.utility import AttrDict, WaldTestStatistic
 
 
 class LinearFactorModel(object):
@@ -9,10 +12,10 @@ class LinearFactorModel(object):
     
     Parameters
     ----------
+    portfolios : array-like
+        nobs by nportfolio array of test portfolios
     factors : array-like
         nobs by nfactor array of priced factors
-    portfolio : array-like
-        nobs by nportfolio array of test portfolios
     constant : bool, optional
         Flag indicating whether to include a constant when estimating
         portfolio loadings
@@ -27,31 +30,33 @@ class LinearFactorModel(object):
     factor loadings and model tests
     """
     
-    def __init__(self, factors, portfolios, *, constant=True, sigma=None):
-        self.factors = IVData(factors)
+    def __init__(self, portfolios, factors, *, constant=True, sigma=None):
         self.portfolios = IVData(portfolios)
+        self.factors = IVData(factors)
         self.constant = constant
         nportfolio = self.portfolios.shape[1]
         self.sigma = sigma if sigma is not None else np.eye(nportfolio)
+        self._name = self.__class__.__name__
     
-    def _fit_ts(self):
-        f = self.factors.ndarray
+    def _fit_ts(self, cov_type='robust', debiased=True, **cov_config):
         p = self.portfolios.ndarray
+        f = self.factors.ndarray
         nportfolio = p.shape[1]
         nobs, nfactor = f.shape
         fc = np.c_[np.ones((nobs, 1)), f]
         rp = f.mean(0)[:, None]
+        fe = f - f.mean(0)
         b = pinv(fc) @ p
         eps = p - fc @ b
-        alpha = b[:1].T
-        beta = b[1:].T
+        alphas = b[:1].T
+        
         # Classic stat
-        fe = f - f.mean(0)
-        omega = fe.T @ fe / nobs
-        sigma = eps.T @ eps / nobs
-        stat = alpha.T @ pinv(sigma) @ alpha
-        stat *= (nobs - nfactor - nportfolio) / nportfolio
-        stat /= (1 + rp.T @ pinv(omega) @ rp)
+        
+        # omega = fe.T @ fe / nobs
+        # sigma = eps.T @ eps / nobs
+        # stat = alphas.T @ pinv(sigma) @ alphas
+        # stat *= (nobs - nfactor - nportfolio) / nportfolio
+        # stat /= (1 + rp.T @ pinv(omega) @ rp)
         
         # VCV calculation
         # Need to rearrange ex-post
@@ -61,9 +66,23 @@ class LinearFactorModel(object):
         eps_rep = eps_rep.ravel(order='F')
         eps_rep = np.reshape(eps_rep, (nobs, (nfactor + 1) * nportfolio), order='F')
         xe = f_rep * eps_rep
-        xeex = xe.T @ xe / nobs
-        vcv = xpxi @ xeex @ xpxi / nobs
-        
+        if cov_type in ('robust', 'heteroskedastic'):
+            xeex = xe.T @ xe / nobs
+            rp_cov = fe.T @ fe / nobs
+        elif cov_type == 'kernel':
+            kernel = cov_config.get('kernel', 'bartlett')
+            bw = cov_config.get('bandwidth', None)
+            bw = int(np.ceil(4 * (nobs / 100) ** (2 / 9))) if bw is None else bw
+            w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
+            xeex = _cov_kernel(xe, w)
+            rp_cov = _cov_kernel(fe, w)
+        else:
+            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+        debiased = int(bool(debiased))
+        df = fc.shape[1]
+        vcv = xpxi @ xeex @ xpxi / (nobs - debiased * df)
+        rp_cov = rp_cov / (nobs - debiased)
+
         # Rearrange VCV
         order = np.reshape(np.arange((nfactor + 1) * nportfolio), (nportfolio, nfactor + 1))
         order = order.T.ravel()
@@ -71,8 +90,31 @@ class LinearFactorModel(object):
         
         # Return values
         alpha_vcv = vcv[:nportfolio, :nportfolio]
-        stat = float(alpha.T @ pinv(alpha_vcv) @ alpha)
-        return alpha, stat
+        stat = float(alphas.T @ pinv(alpha_vcv) @ alphas)
+        jstat = WaldTestStatistic(stat, 'All alphas are 0', nportfolio, name='J-statistic')
+        param_order = np.reshape(np.arange((nfactor + 1) * nportfolio),
+                                 (nfactor + 1, nportfolio)).T.ravel()
+        params = b.T
+        vcv = vcv[param_order][:, param_order]
+        betas = b[1:].T
+        residual_ss = (eps ** 2).sum()
+        e = p - p.mean(0)[None, :]
+        total_ss = (e ** 2).sum()
+        r2 = 1 - residual_ss / total_ss
+        param_names = []
+        for portfolio in self.portfolios.cols:
+            param_names.append('alpha.{0}'.format(portfolio))
+            for factor in self.factors.cols:
+                param_names.append('{0}-beta.{1}'.format(portfolio, factor))
+        
+        res = AttrDict(params=params, cov=vcv, betas=betas, rp=rp, rp_cov=rp_cov,
+                       alphas=alphas, alpha_vcv=alpha_vcv, jstat=jstat,
+                       rsquared=r2, total_ss=total_ss, residual_ss=residual_ss,
+                       param_names=param_names,
+                       portfolio_names=self.portfolios.cols, factor_names=self.factors.cols,
+                       name=self._name, cov_type=cov_type, model=self, nobs=nobs)
+        
+        return TimeSeriesFactorModelResults(res)
     
     def _fit_cs(self):
         f = self.factors.ndarray

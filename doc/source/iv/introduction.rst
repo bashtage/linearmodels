@@ -65,7 +65,7 @@ same four required inputs:
 
                                  Parameter Estimates
     ==============================================================================
-               Parameters  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+                Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
     ------------------------------------------------------------------------------
     const          4.4912     0.4692     9.5719     0.0000      3.5716      5.4108
     exper          0.0341     0.0073     4.6649     0.0000      0.0198      0.0485
