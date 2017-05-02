@@ -49,6 +49,7 @@ before_install:
   - source activate linearmodels-test
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
   - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr nbsphinx guzzle_sphinx_theme -q
+  - pip install sphinx --upgrade
   - export PYTHONHASHSEED=0
 
 install:

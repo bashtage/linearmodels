@@ -6,8 +6,17 @@ Linear Asset Pricing Models
 .. module:: linearmodels.asset_pricing.model
    :synopsis: Models for asset prices
 
-Fixed Effect Estimation
-=======================
-.. autoclass:: LinearFactorModel
+Estimation
+==========
+.. autoclass:: TradedFactorModel
+   :members:
+   :inherited-members:
+
+.. module:: linearmodels.asset_pricing.results
+   :synopsis: Results asset pricing models
+
+Results
+=======
+.. autoclass:: TradedFactorModelResults
    :members:
    :inherited-members:

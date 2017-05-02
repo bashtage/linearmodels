@@ -16,7 +16,7 @@ Univariate
 
 In Progress
 ***********
-* Linear Asset Pricing Model Estimation - :class:`linearmodels.asset_pricing.model.LinearFactorModel`
+* Linear Asset Pricing Model Estimation - :class:`linearmodels.asset_pricing.model.TradedFactorModel`
 
 Panel
 =====

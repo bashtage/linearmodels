@@ -18,6 +18,9 @@ Estimation and inference in some common linear models:
 * Generalized Method of Moments (GMM) (:class:`~linearmodels.iv.model.IVGMM`)
 * Continuously Updating GMM (:class:`~linearmodels.iv.model.IVGMMCUE`)
 
+**Asset Pricing Model Estimation and Testing**
+
+* Asset Pricing using Traded Factors (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 
 .. toctree::
    :maxdepth: 1

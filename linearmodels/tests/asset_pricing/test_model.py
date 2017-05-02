@@ -1,6 +1,6 @@
 import pytest
 
-from linearmodels.asset_pricing.model import LinearFactorModel
+from linearmodels.asset_pricing.model import LinearFactorModel, TradedFactorModel
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 
@@ -21,19 +21,23 @@ def get_all(res):
 
 def test_linear_model_cross_section_smoke(data):
     mod = LinearFactorModel(data.portfolios, data.factors)
-    mod.fit(method='cs')
-    res = mod.fit(method='cross-section')
+    res = mod.fit()
     # get_all(res)
 
 
 def test_linear_model_time_series_smoke(data):
-    mod = LinearFactorModel(data.portfolios, data.factors)
-    mod.fit(method='ts')
-    res = mod.fit(method='time-series')
+    mod = TradedFactorModel(data.portfolios, data.factors)
+    mod.fit()
+    res = mod.fit()
     get_all(res)
 
 
-def test_linear_model_type_error(data):
-    mod = LinearFactorModel(data.portfolios, data.factors)
+def test_linear_model_time_series_kernel_smoke(data):
+    mod = TradedFactorModel(data.portfolios, data.factors)
+    mod.fit(cov_type='kernel')
+
+
+def test_linear_model_time_series_error(data):
+    mod = TradedFactorModel(data.portfolios, data.factors)
     with pytest.raises(ValueError):
-        mod.fit(method='unknown')
+        mod.fit(cov_type='unknown')
