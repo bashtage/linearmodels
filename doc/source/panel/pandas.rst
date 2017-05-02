@@ -88,7 +88,7 @@ investment.
 
                                  Parameter Estimates
     ==============================================================================
-               Parameters  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+                Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
     ------------------------------------------------------------------------------
     value          0.1101     0.0113     9.7461     0.0000      0.0879      0.1324
     capital        0.3100     0.0165     18.744     0.0000      0.2774      0.3426

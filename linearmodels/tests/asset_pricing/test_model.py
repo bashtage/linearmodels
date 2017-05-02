@@ -9,19 +9,31 @@ def data(request):
     return generate_data(output=request.param)
 
 
+def get_all(res):
+    attrs = dir(res)
+    for attr in attrs:
+        if attr.startswith('_'):
+            continue
+        attr = getattr(res, attr)
+        if callable(attr):
+            attr()
+
+
 def test_linear_model_cross_section_smoke(data):
-    mod = LinearFactorModel(data.factors, data.portfolios)
+    mod = LinearFactorModel(data.portfolios, data.factors)
     mod.fit(method='cs')
-    mod.fit(method='cross-section')
+    res = mod.fit(method='cross-section')
+    # get_all(res)
 
 
 def test_linear_model_time_series_smoke(data):
-    mod = LinearFactorModel(data.factors, data.portfolios)
+    mod = LinearFactorModel(data.portfolios, data.factors)
     mod.fit(method='ts')
-    mod.fit(method='time-series')
+    res = mod.fit(method='time-series')
+    get_all(res)
 
 
 def test_linear_model_type_error(data):
-    mod = LinearFactorModel(data.factors, data.portfolios)
+    mod = LinearFactorModel(data.portfolios, data.factors)
     with pytest.raises(ValueError):
         mod.fit(method='unknown')

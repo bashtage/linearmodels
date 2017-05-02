@@ -99,7 +99,7 @@ result is a summary table.
 
                                  Parameter Estimates
     ==============================================================================
-               Parameters  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+                Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
     ------------------------------------------------------------------------------
     const          1.3953     0.0123     113.50     0.0000      1.3712      1.4194
     expersq        0.0037     0.0002     19.560     0.0000      0.0033      0.0041

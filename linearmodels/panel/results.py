@@ -316,7 +316,7 @@ class PanelResults(_SummaryStr):
             data.append(txt_row)
         title = 'Parameter Estimates'
         table_stubs = list(self.params.index)
-        header = ['Parameters', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+        header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
         table = SimpleTable(data,
                             stubs=table_stubs,
                             txt_fmt=fmt_params,

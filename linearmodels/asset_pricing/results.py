@@ -1,0 +1,222 @@
+import datetime as dt
+
+import numpy as np
+import pandas as pd
+from scipy import stats
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
+
+from linearmodels.compat.statsmodels import Summary
+from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format
+
+
+class TimeSeriesFactorModelResults(_SummaryStr):
+    def __init__(self, res):
+        self._jstat = res.jstat
+        self._params = res.params
+        self._param_names = res.param_names
+        self._factor_names = res.factor_names
+        self._portfoio_names = res.portfolio_names
+        self._rp = res.rp
+        self._cov = res.cov
+        self._rp_cov = res.rp_cov
+        self._rsquared = res.rsquared
+        self._total_ss = res.total_ss
+        self._residual_ss = res.residual_ss
+        self._name = res.name
+        self._cov_type = res.cov_type
+        self.model = res.model
+        self._nobs = res.nobs
+        self._datetime = dt.datetime.now()
+    
+    @property
+    def summary(self):
+        """Summary table of model estimation results"""
+        
+        title = self.name + ' Estimation Summary'
+        mod = self.model
+        
+        top_left = [('No. Test Portfolios:', len(self._portfoio_names)),
+                    ('No. Factors:', len(self._factor_names)),
+                    ('No. Observations:', self.nobs),
+                    ('Date:', self._datetime.strftime('%a, %b %d %Y')),
+                    ('Time:', self._datetime.strftime('%H:%M:%S')),
+                    ('Cov. Estimator:', self._cov_type),
+                    ('', '')
+                    ]
+        
+        j_stat = _str(self.j_statistic.stat)
+        j_pval = pval_format(self.j_statistic.pval)
+        j_dist = self.j_statistic.dist_name
+        
+        top_right = [('R-squared:', _str(self.rsquared)),
+                     ('J-statistic:', j_stat),
+                     ('P-value', j_pval),
+                     ('Distribution:', j_dist),
+                     ('', ''),
+                     ('', ''),
+                     ('', ''),
+                     ]
+        
+        stubs = []
+        vals = []
+        for stub, val in top_left:
+            stubs.append(stub)
+            vals.append([val])
+        table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
+        
+        # create summary table instance
+        smry = Summary()
+        # Top Table
+        # Parameter table
+        fmt = fmt_2cols
+        fmt['data_fmts'][1] = '%18s'
+        
+        top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
+        stubs = []
+        vals = []
+        for stub, val in top_right:
+            stubs.append(stub)
+            vals.append([val])
+        table.extend_right(SimpleTable(vals, stubs=stubs))
+        smry.tables.append(table)
+        
+        rp = self.risk_premia.values[:, None]
+        se = self.risk_premia_se.values[:, None]
+        tstats = (self.risk_premia / self.risk_premia_se).values
+        pvalues = 2 - 2 * stats.norm.cdf(np.abs(tstats))
+        ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
+        param_data = np.c_[rp,
+                           se,
+                           tstats[:, None],
+                           pvalues[:, None],
+                           ci]
+        data = []
+        for row in param_data:
+            txt_row = []
+            for i, v in enumerate(row):
+                f = _str
+                if i == 3:
+                    f = pval_format
+                txt_row.append(f(v))
+            data.append(txt_row)
+        title = 'Risk Premia Estimates'
+        table_stubs = list(self.risk_premia.index)
+        header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+        table = SimpleTable(data,
+                            stubs=table_stubs,
+                            txt_fmt=fmt_params,
+                            headers=header,
+                            title=title)
+        smry.tables.append(table)
+        smry.add_extra_txt(['See full_summary for complete results'])
+        
+        return smry
+    
+    @staticmethod
+    def _single_table(params, se, name, param_names, first=False):
+        tstats = (params / se)
+        pvalues = 2 - 2 * stats.norm.cdf(tstats)
+        ci = params + se * stats.norm.ppf([[0.025, 0.975]])
+        param_data = np.c_[params, se, tstats, pvalues, ci]
+        
+        data = []
+        for row in param_data:
+            txt_row = []
+            for i, v in enumerate(row):
+                f = _str
+                if i == 3:
+                    f = pval_format
+                txt_row.append(f(v))
+            data.append(txt_row)
+        title = '{0} Coefficients'.format(name)
+        table_stubs = param_names
+        if first:
+            header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+        else:
+            header=None
+        table = SimpleTable(data, stubs=table_stubs, txt_fmt=fmt_params, headers=header, title=title)
+
+        return table
+    
+    @property
+    def full_summary(self):
+        smry = self.summary
+        params = self.params
+        se = self.std_errors
+        param_names = list(params.columns)
+        first=True
+        for row in params.index:
+            smry.tables.append(SimpleTable(['']))
+            smry.tables.append(self._single_table(params.loc[row].values[:, None],
+                                                  se.loc[row].values[:, None],
+                                                  row, param_names, first))
+            first=False
+            
+        return smry
+    
+    @property
+    def nobs(self):
+        return self._nobs
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @property
+    def alphas(self):
+        return self.params.iloc[:, 0]
+    
+    @property
+    def betas(self):
+        return self.params.iloc[:, 1:]
+    
+    @property
+    def params(self):
+        cols = ['const'] + ['{0}'.format(f) for f in self._factor_names]
+        return pd.DataFrame(self._params, columns=cols, index=self._portfoio_names)
+    
+    @property
+    def std_errors(self):
+        """Estimated parameter standard errors"""
+        se = np.sqrt(np.diag(self._cov))
+        nportfolio, nfactor = self._params.shape
+        se = se.reshape((nportfolio, nfactor))
+        cols = ['alpha'] + ['beta.{0}' for f in self._factor_names]
+        return pd.DataFrame(se, columns=cols, index=self._portfoio_names)
+    
+    @cached_property
+    def tstats(self):
+        return self.params / self.std_errors
+    
+    @property
+    def cov(self):
+        return pd.DataFrame(self._cov, columns=self._param_names, index=self._param_names)
+    
+    @property
+    def j_statistic(self):
+        return self._jstat
+    
+    @property
+    def risk_premia(self):
+        return pd.Series(self._rp.squeeze(), index=self._factor_names)
+    
+    @property
+    def risk_premia_se(self):
+        se = np.sqrt(np.diag(self._rp_cov))
+        return pd.Series(se, index=self._factor_names)
+    
+    @property
+    def risk_premia_tstats(self):
+        return self.risk_premia / self.risk_premia_se
+    
+    @property
+    def rsquared(self):
+        return self._rsquared
+    
+    @property
+    def total_ss(self):
+        return self._total_ss
+    
+    @property
+    def residual_ss(self):
+        return self._residual_ss
