@@ -1,9 +1,10 @@
 import numpy as np
+from numpy.linalg import pinv
+
 from linearmodels.asset_pricing.results import TradedFactorModelResults
 from linearmodels.iv.covariance import KERNEL_LOOKUP, _cov_kernel
 from linearmodels.iv.data import IVData
 from linearmodels.utility import AttrDict, WaldTestStatistic
-from numpy.linalg import pinv
 
 
 class TradedFactorModel(object):
@@ -25,13 +26,13 @@ class TradedFactorModel(object):
     
     .. math::
     
-        r_{p,it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}
+        r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}
     
-    where :math:`r_{p,it}^e` is the excess return to test portfolio i.  The
-    model is directly tested using the estimated values
-    :\math:`\hat{\alpha}_i`. Risk premia, :math:`\lambda_i` are estimated 
-    using the sample averages of the factors, which must be excess returns on 
-    traded portfolios.
+    where :math:`r_{it}^e` is the excess return on test portfolio i and 
+    :math:`f_t` are the traded factor returns.  The model is directly 
+    tested using the estimated values :\math:`\hat{\alpha}_i`. Risk premia, 
+    :math:`\lambda_i` are estimated using the sample averages of the factors,
+    which must be excess returns on traded portfolios.
     """
 
     def __init__(self, portfolios, factors):
@@ -63,7 +64,6 @@ class TradedFactorModel(object):
         and ``bandwidth`` (a positive integer).
         """
         # TODO: Homoskedastic covariance
-        # TODO: Verify order of parameters and vcv
 
         p = self.portfolios.ndarray
         f = self.factors.ndarray
@@ -76,19 +76,9 @@ class TradedFactorModel(object):
         eps = p - fc @ b
         alphas = b[:1].T
 
-        # Classic stat
-
-        # omega = fe.T @ fe / nobs
-        # sigma = eps.T @ eps / nobs
-        # stat = alphas.T @ pinv(sigma) @ alphas
-        # stat *= (nobs - nfactor - nportfolio) / nportfolio
-        # stat /= (1 + rp.T @ pinv(omega) @ rp)
-
-        # VCV calculation
-        # Need to rearrange ex-post
         nloading = (nfactor + 1) * nportfolio
         xpxi = np.eye(nloading + nfactor)
-        xpxi[:nloading, :nloading] = np.kron(pinv(fc.T @ fc / nobs), np.eye(nportfolio))
+        xpxi[:nloading, :nloading] = np.kron(np.eye(nportfolio), pinv(fc.T @ fc / nobs))
         f_rep = np.tile(fc, (1, nportfolio))
         eps_rep = np.tile(eps, (nfactor + 1, 1))  # 1 2 3 ... 25 1 2 3 ...
         eps_rep = eps_rep.ravel(order='F')
@@ -130,11 +120,11 @@ class TradedFactorModel(object):
         r2 = 1 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:
-            param_names.append('{0}-alpha'.format(portfolio))
+            param_names.append('alpha-{0}'.format(portfolio))
             for factor in self.factors.cols:
-                param_names.append('{0}-beta.{1}'.format(portfolio, factor))
+                param_names.append('beta-{0}-{1}'.format(portfolio, factor))
         for factor in self.factors.cols:
-            param_names.append('lambda.{0}'.format(factor))
+            param_names.append('lambda-{0}'.format(factor))
 
         res = AttrDict(params=params, cov=full_vcv, betas=betas, rp=rp, rp_cov=rp_cov,
                        alphas=alphas, alpha_vcv=alpha_vcv, jstat=jstat,
