@@ -1,0 +1,234 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+r_{1t}-a_{1}-\beta_{1}f_{t}\\
+\left(r_{1t}-a_{1}-\beta_{1}f_{t}\right)f_{t}\\
+r_{2t}-a_{2}-\beta_{2}f_{t}\\
+\left(r_{2t}-a_{2}-\beta_{2}f_{t}\right)f_{t}\\
+\beta^{\prime}\left(r_{t}-\beta\lambda\right)\\
+r_{1t}-\beta_{1}\lambda-\alpha_{1}\\
+r_{2t}-\beta_{2}\lambda-\alpha_{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Parameters of intererts are 
+\begin_inset Formula $\beta_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $\beta_{2}$
+\end_inset
+
+
+\begin_inset Formula $\lambda$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha=\mu_{r}-\beta^{\prime}\lambda$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\begin{array}{ccccccc}
+1 & f_{t} & 0 & 0 & 0 & 0 & 0\\
+f_{t} & f_{t}^{2} & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 1 & f_{t} & 0 & 0 & 0\\
+0 & 0 & f_{t} & f_{t}^{2} & 0 & 0 & 0\\
+0 & r_{t}-2\beta_{1}\lambda & 0 & r_{t}-2\beta_{2}\lambda & \beta_{1}^{2}+\beta_{2}^{2} & 0 & 0\\
+0 & -\lambda & 0 & 0 & -\beta_{1} & 1 & 0\\
+0 & 0 & 0 & -\lambda & -\beta_{2} & 0 & 1
+\end{array}
+\]
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\epsilon_{t}\\
+\epsilon_{t}\otimes f_{t}\\
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\tilde{f}_{t}\otimes\epsilon_{t}\\
+\beta^{\prime}\left(r_{t}-\beta\text{\lambda}\right)\\
+r_{t}-\beta\text{\lambda}-\alpha
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\left[\begin{array}{ccc}
+I_{N}\otimes\Sigma_{\tilde{f}} & 0 & 0\\
+G_{21} & \beta^{\prime}\beta & 0\\
+G_{31} & \beta & I_{N}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The blocks 
+\begin_inset Formula $G_{21}$
+\end_inset
+
+ and 
+\begin_inset Formula $G_{31}$
+\end_inset
+
+ are 
+\begin_inset Formula 
+\[
+G_{31}=\left[G_{31,1}\ G_{31,2}\ \ldots G_{31,N}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and 
+\begin_inset Formula 
+\[
+G_{31,i}=\left[0_{N\times1}\ e_{i}\otimes\lambda\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $e_{i}$
+\end_inset
+
+is a 
+\begin_inset Formula $N$
+\end_inset
+
+by 1 vector of 0 except in location 
+\begin_inset Formula $i$
+\end_inset
+
+ which is 1 and 
+\begin_inset Formula $\beta_{i}$
+\end_inset
+
+ is 
+\begin_inset Formula $1$
+\end_inset
+
+ by 
+\begin_inset Formula $K$
+\end_inset
+
+.
+ 
+\end_layout
+
+\end_body
+\end_document

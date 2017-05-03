@@ -26,6 +26,7 @@ class TradedFactorModelResults(_SummaryStr):
         self.model = res.model
         self._nobs = res.nobs
         self._datetime = dt.datetime.now()
+        self._cols = ['const'] + ['{0}'.format(f) for f in self._factor_names]
 
     @property
     def summary(self):
@@ -178,8 +179,7 @@ class TradedFactorModelResults(_SummaryStr):
     @property
     def params(self):
         """Estimated parameters"""
-        cols = ['const'] + ['{0}'.format(f) for f in self._factor_names]
-        return pd.DataFrame(self._params, columns=cols, index=self._portfolio_names)
+        return pd.DataFrame(self._params, columns=self._cols, index=self._portfolio_names)
 
     @property
     def std_errors(self):
@@ -189,8 +189,7 @@ class TradedFactorModelResults(_SummaryStr):
         nloadings = nportfolio * nfactor
         se = se[:nloadings]
         se = se.reshape((nportfolio, nfactor))
-        cols = ['alpha'] + ['beta.{0}' for f in self._factor_names]
-        return pd.DataFrame(se, columns=cols, index=self._portfolio_names[:nloadings])
+        return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
 
     @cached_property
     def tstats(self):
