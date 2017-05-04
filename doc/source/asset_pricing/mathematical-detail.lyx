@@ -27,9 +27,10 @@
 \bibtex_command default
 \index_command default
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -53,6 +54,8 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 2cm
+\rightmargin 2cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -143,7 +146,7 @@ f_{t} & f_{t}^{2} & 0 & 0 & 0 & 0 & 0\\
 \begin_inset Formula 
 \[
 \left[\begin{array}{c}
-\tilde{f}_{t}\otimes\epsilon_{t}\\
+\epsilon_{t}\otimes\left[1\,f_{t}^{\prime}\right]^{\prime}\\
 \beta^{\prime}\left(r_{t}-\beta\text{\lambda}\right)\\
 r_{t}-\beta\text{\lambda}-\alpha
 \end{array}\right]
@@ -158,9 +161,9 @@ r_{t}-\beta\text{\lambda}-\alpha
 \begin_inset Formula 
 \[
 -\left[\begin{array}{ccc}
-I_{N}\otimes\Sigma_{\tilde{f}} & 0 & 0\\
+I_{N}\otimes\Sigma_{\left[1\,f\right]} & 0 & 0\\
 G_{21} & \beta^{\prime}\beta & 0\\
-G_{31} & \beta & I_{N}
+I_{N}\otimes\left[0\ \lambda\right] & \beta & I_{N}
 \end{array}\right]
 \]
 
@@ -210,7 +213,7 @@ is a
 \begin_inset Formula $N$
 \end_inset
 
-by 1 vector of 0 except in location 
+ by 1 vector of 0 except in location 
 \begin_inset Formula $i$
 \end_inset
 
@@ -228,6 +231,190 @@ by 1 vector of 0 except in location
 
 .
  
+\end_layout
+
+\begin_layout Standard
+Verification with 3 assets and 2 factors
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\left[\begin{array}{c}
+r_{1t}-a_{1}-\beta_{11}f_{1t}-\beta_{12}f_{2t}\\
+\left(r_{1t}-a_{1}-\beta_{11}f_{1t}-\beta_{12}f_{2t}\right)f_{1t}\\
+\left(r_{1t}-a_{1}-\beta_{11}f_{1t}-\beta_{12}f_{2t}\right)f_{2t}\\
+r_{2t}-a_{2}-\beta_{21}f_{1t}-\beta_{22}f_{2t}\\
+\left(r_{2t}-a_{2}-\beta_{21}f_{1t}-\beta_{22}f_{2t}\right)f_{1t}\\
+\left(r_{2t}-a_{2}-\beta_{21}f_{1t}-\beta_{22}f_{2t}\right)f_{2t}\\
+r_{3t}-a_{3}-\beta_{31}f_{1t}-\beta_{32}f_{2t}\\
+\left(r_{3t}-a_{3}-\beta_{31}f_{1t}-\beta_{32}f_{3t}\right)f_{1t}\\
+\left(r_{3t}-a_{3}-\beta_{31}f_{1t}-\beta_{32}f_{3t}\right)f_{2t}\\
+\sum_{i=1}^{3}\beta_{i1}\left(r_{it}-\beta_{i1}\lambda_{1}-\beta_{i2}\lambda_{2}\right)\\
+\sum_{i=1}^{3}\beta_{i2}\left(r_{it}-\beta_{i1}\lambda_{1}-\beta_{i2}\lambda_{2}\right)\\
+r_{1t}-\beta_{11}\lambda_{1}-\beta_{12}\lambda_{2}-\alpha_{1}\\
+r_{2t}-\beta_{21}\lambda_{1}-\beta_{22}\lambda_{2}-\alpha_{2}\\
+r_{3t}-\beta_{31}\lambda_{1}-\beta_{32}\lambda_{2}-\alpha_{3}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{small}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\left[\begin{array}{cccccccccccccc}
+1 & f_{1t} & f_{2t} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+f_{1t} & f_{1t}^{2} & f_{1t}f_{2t} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+f_{2t} & f_{1t}f_{2t} & f_{2t}^{2} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 1 & f_{1t} & f_{2t} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & f_{1t} & f_{1t}^{2} & f_{1t}f_{2t} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & f_{2t} & f_{1t}f_{2t} & f_{2t}^{2} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & f_{1t} & f_{2t} & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & f_{1t} & f_{1t}^{2} & f_{1t}f_{2t} & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & f_{2t} & f_{1t}f_{2t} & f_{2t}^{2} & 0 & 0 & 0 & 0 & 0\\
+0 & \beta_{11}\lambda_{1}-u_{1t} & \beta_{11}\lambda_{2} & 0 & \beta_{21}\lambda_{2}-u_{2t} & \beta_{21}\lambda_{1} & 0 & \beta_{31}\lambda_{2}-u_{3t} & \beta_{31}\lambda_{1} & \sum\beta_{i1}^{2} & \sum\beta_{i1}\beta_{i2} & 0 & 0 & 0\\
+0 & \beta_{12}\lambda_{1} & \beta_{12}\lambda_{2}-u_{1t} & 0 & \beta_{22}\lambda_{1} & \beta_{22}\lambda_{2}-u_{2t} & 0 & \beta_{32}\lambda_{1} & \beta_{32}\lambda_{2}-u_{3t} & \sum\beta_{i1}\beta_{i2} & \sum\beta_{i2}^{2} & 0 & 0 & 0\\
+0 & \lambda_{1} & \lambda_{2} & 0 & 0 & 0 & 0 & 0 & 0 & \beta_{11} & \beta_{12} & 1 & 0 & 0\\
+0 & 0 & 0 & 0 & \lambda_{1} & \lambda_{2} & 0 & 0 & 0 & \beta_{21} & \beta_{22} & 0 & 1 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & \lambda_{1} & \lambda_{2} & \beta_{31} & \beta_{32} & 0 & 0 & 1
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\beta$
+\end_inset
+
+ is 
+\begin_inset Formula $p$
+\end_inset
+
+ by 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ 
+\begin_inset Formula $f_{t}$
+\end_inset
+
+ is 
+\begin_inset Formula $k$
+\end_inset
+
+ by 1.
+ 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is 
+\begin_inset Formula $k$
+\end_inset
+
+ by 1.
+ 
+\begin_inset Formula $r_{t}$
+\end_inset
+
+ is 
+\begin_inset Formula $p$
+\end_inset
+
+ by 1.
+ 
+\begin_inset Formula $\epsilon_{t}$
+\end_inset
+
+ is 
+\begin_inset Formula $p$
+\end_inset
+
+ by 1.
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is 
+\begin_inset Formula $p$
+\end_inset
+
+ by 1
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\left[\begin{array}{ccc}
+I_{3}\otimes\Sigma_{\left[1\,f_{t}^{\prime}\right]} & 0 & 0\\
+G_{21} & \beta^{\prime}\beta & 0\\
+I_{3}\otimes\left[0\,\lambda^{\prime}\right] & \beta & I_{3}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G_{21}=\left[G_{21,1}\ G_{21,2}\:G_{21,3}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G_{21,i}=\left[0_{2\times1}\:\left(\beta_{i}^{\prime}\lambda^{\prime}-E_{T}\left[u_{it}\right]I_{2}\right)\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{small}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body
