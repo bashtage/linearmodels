@@ -210,7 +210,7 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def j_statistic(self):
         r"""
-        Model J-statistic
+        Model J statistic
 
         Returns
         -------
