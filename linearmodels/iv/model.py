@@ -786,7 +786,7 @@ class IVGMM(IVLIML):
         return gmm_specific
 
     def _j_statistic(self, params, weight_mat):
-        """J-stat and test"""
+        """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
         eps = y - x @ params
@@ -921,7 +921,7 @@ class IVGMMCUE(IVGMM):
         Returns
         -------
         j : float
-            GMM objective function, also known as the J-statistic
+            GMM objective function, also known as the J statistic
 
         Notes
         -----

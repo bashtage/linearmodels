@@ -30,7 +30,7 @@ class TradedFactorModel(object):
     
     where :math:`r_{it}^e` is the excess return on test portfolio i and 
     :math:`f_t` are the traded factor returns.  The model is directly 
-    tested using the estimated values :\math:`\hat{\alpha}_i`. Risk premia, 
+    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia, 
     :math:`\lambda_i` are estimated using the sample averages of the factors,
     which must be excess returns on traded portfolios.
     """
@@ -184,7 +184,7 @@ class LinearFactorModel(TradedFactorModel):
     where :math:`\bar{r}_i^e` is the average excess return to portfolio i.    
     
     The model is tested using the estimated values 
-    :\math:`\hat{\alpha}_i=\hat{eta}_i`.     
+    :math:`\hat{\alpha}_i=\hat{\eta}_i`.     
     """
 
     def __init__(self, portfolios, factors, *, sigma=None):
@@ -263,7 +263,7 @@ class LinearFactorModel(TradedFactorModel):
         jstat = WaldTestStatistic(stat, 'All alphas are 0', nportfolio - nfactor,
                                   name='J-statistic')
 
-        total_ss = ((p - alphas.T) ** 2).sum()
+        total_ss = ((p - p.mean(0)[None,:]) ** 2).sum()
         residual_ss = (eps ** 2).sum()
         r2 = 1 - residual_ss / total_ss
         rp = lam

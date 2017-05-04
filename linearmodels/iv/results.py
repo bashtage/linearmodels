@@ -871,11 +871,11 @@ class IVGMMResults(_CommonIVResults):
         Returns
         -------
         j : WaldTestStatistic
-            J-statistic test of overidentifying restrictions
+            J statistic  test of overidentifying restrictions
 
         Notes
         -----
-        The J-statistic iv whether the moment conditions are sufficiently
+        The J statistic  iv whether the moment conditions are sufficiently
         close to zero to indicate that the model is not overidentified. The
         statistic is defined as
 
@@ -911,7 +911,7 @@ class IVGMMResults(_CommonIVResults):
         The C statistic iv the difference between the model estimated by
         assuming one or more of the endogenous variables is actually
         exogenous.  The test is implemented as the difference between the
-        J-statistics of two GMM estimations where both use the same weighting
+        J statistic s of two GMM estimations where both use the same weighting
         matrix.  The use of a common weighting matrix is required for the C
         statistic to be positive.
 
