@@ -2,13 +2,14 @@ import datetime as dt
 
 import numpy as np
 import pandas as pd
-from linearmodels.compat.statsmodels import Summary
-from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
+from linearmodels.compat.statsmodels import Summary
+from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format
 
-class TradedFactorModelResults(_SummaryStr):
+
+class LinearFactorModelResults(_SummaryStr):
     def __init__(self, res):
         self._jstat = res.jstat
         self._params = res.params
@@ -26,7 +27,7 @@ class TradedFactorModelResults(_SummaryStr):
         self.model = res.model
         self._nobs = res.nobs
         self._datetime = dt.datetime.now()
-        self._cols = ['const'] + ['{0}'.format(f) for f in self._factor_names]
+        self._cols = ['alpha'] + ['{0}'.format(f) for f in self._factor_names]
 
     @property
     def summary(self):

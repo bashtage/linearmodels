@@ -17,10 +17,10 @@ def data(request):
 
 def get_all(res):
     attrs = dir(res)
-    for attr in attrs:
-        if attr.startswith('_'):
+    for attr_name in attrs:
+        if attr_name.startswith('_'):
             continue
-        attr = getattr(res, attr)
+        attr = getattr(res, attr_name)
         if callable(attr):
             attr()
 
@@ -28,7 +28,7 @@ def get_all(res):
 def test_linear_model_cross_section_smoke(data):
     mod = LinearFactorModel(data.portfolios, data.factors)
     res = mod.fit(cov_type='robust')
-    # get_all(res)
+    get_all(res)
 
 
 def test_linear_model_time_series_smoke(data):

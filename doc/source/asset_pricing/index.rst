@@ -8,15 +8,19 @@ Linear Asset Pricing Models
 
 Estimation
 ==========
+.. autoclass:: LinearFactorModel
+   :members:
+   :inherited-members:
+
 .. autoclass:: TradedFactorModel
    :members:
    :inherited-members:
 
 .. module:: linearmodels.asset_pricing.results
-   :synopsis: Results asset pricing models
+   :synopsis: Results for asset pricing models
 
 Results
 =======
-.. autoclass:: TradedFactorModelResults
+.. autoclass:: LinearFactorModelResults
    :members:
    :inherited-members:

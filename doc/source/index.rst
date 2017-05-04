@@ -10,6 +10,7 @@ Estimation and inference in some common linear models:
 * First Difference (:class:`~linearmodels.panel.model.FirstDifferenceOLS`)
 * Between Estimation (:class:`~linearmodels.panel.model.BetweenOLS`)
 * Pooled OLS (:class:`~linearmodels.panel.model.PooledOLS`)
+* Fama-MacBeth Estimation (:class:`~linearmodels.panel.model.FamaMacBeth`)
 
 **Single equation instrumental variables (IV) models**
 
@@ -20,7 +21,10 @@ Estimation and inference in some common linear models:
 
 **Asset Pricing Model Estimation and Testing**
 
-* Asset Pricing using Traded Factors (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
+* Linear Factor Model (2-step, for traded or non-traded factors)
+  (:class:`~linearmodels.asset_pricing.model.LinearFactorModel`)
+* Linear factor model (1-step SUR, only for traded factors)
+  (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 
 .. toctree::
    :maxdepth: 1
