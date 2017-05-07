@@ -23,6 +23,8 @@ Estimation and inference in some common linear models:
 
 * Linear Factor Model (2-step, for traded or non-traded factors)
   (:class:`~linearmodels.asset_pricing.model.LinearFactorModel`)
+* Linear Factor Model (GMM, for traded or non-traded factors)
+  (:class:`~linearmodels.asset_pricing.model.LinearFactorModelGMM`)
 * Linear factor model (1-step SUR, only for traded factors)
   (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 

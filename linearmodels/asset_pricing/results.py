@@ -28,6 +28,8 @@ class LinearFactorModelResults(_SummaryStr):
         self._nobs = res.nobs
         self._datetime = dt.datetime.now()
         self._cols = ['alpha'] + ['{0}'.format(f) for f in self._factor_names]
+        self._rp_names = res.rp_names
+        self._alpha_vcv = res.alpha_vcv
 
     @property
     def summary(self):
@@ -229,13 +231,13 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def risk_premia(self):
         """Estimated factor risk premia (lambda)"""
-        return pd.Series(self._rp.squeeze(), index=self._factor_names)
+        return pd.Series(self._rp.squeeze(), index=self._rp_names)
 
     @property
     def risk_premia_se(self):
         """Estimated factor risk premia standard errors"""
         se = np.sqrt(np.diag(self._rp_cov))
-        return pd.Series(se, index=self._factor_names)
+        return pd.Series(se, index=self._rp_names)
 
     @property
     def risk_premia_tstats(self):
@@ -256,3 +258,19 @@ class LinearFactorModelResults(_SummaryStr):
     def residual_ss(self):
         """Residual sum of squares"""
         return self._residual_ss
+
+
+class GMMFactorModelResults(LinearFactorModelResults):
+    def __init__(self, res):
+        super(GMMFactorModelResults, self).__init__(res)
+
+    @property
+    def std_errors(self):
+        """Estimated parameter standard errors"""
+        se = np.sqrt(np.diag(self._cov))
+        ase = np.sqrt(np.diag(self._alpha_vcv))
+        nportfolio, nfactor = self._params.shape
+        nloadings = nportfolio * (nfactor-1)
+        se = np.r_[ase, se[:nloadings]]
+        se = se.reshape((nportfolio, nfactor))
+        return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)

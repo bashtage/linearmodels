@@ -5,14 +5,15 @@ import statsmodels.api as sm
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.asset_pricing.model import LinearFactorModel, TradedFactorModel
+from linearmodels.asset_pricing.model import LinearFactorModel, TradedFactorModel, \
+    LinearFactorModelGMM
 from linearmodels.iv.model import _OLS
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 
 @pytest.fixture(scope='module', params=['numpy', 'pandas'])
 def data(request):
-    return generate_data(output=request.param)
+    return generate_data(nportfolio=10, output=request.param)
 
 
 def get_all(res):
@@ -28,6 +29,12 @@ def get_all(res):
 def test_linear_model_cross_section_smoke(data):
     mod = LinearFactorModel(data.portfolios, data.factors)
     res = mod.fit(cov_type='robust')
+    get_all(res)
+
+
+def test_linear_model_gmm_smoke(data):
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    res = mod.fit(cov_type='robust', disp=5)
     get_all(res)
 
 

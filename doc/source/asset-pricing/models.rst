@@ -12,6 +12,12 @@ Linear Factor Models (Traded or Non-traded Factors)
    :members:
    :inherited-members:
 
+GMM Estimation of Linear Factor Models
+======================================
+.. autoclass:: LinearFactorModelGMM
+   :members:
+   :inherited-members:
+
 Linear Factor Models (Traded Factors)
 =====================================
 .. autoclass:: TradedFactorModel
