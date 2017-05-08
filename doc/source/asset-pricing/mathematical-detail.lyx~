@@ -653,6 +653,13 @@ The loss of degrees of freedom is obvious since
 
 \begin_layout Subsection
 GMM Estimation of Linear Factor Models
+\end_layout
+
+\begin_layout Standard
+The GMM estimator solves a set of non-linear moment conditions of the form
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \[
 \left[\begin{array}{c}
@@ -667,20 +674,42 @@ f_{t}-\mu
 \end_layout
 
 \begin_layout Standard
+\noindent
 where 
 \begin_inset Formula 
 \[
-\epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
+\epsilon_{t}=r_{t}^{e}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 is the vector of pricing errors.
+ This assumes that the model for expected returns is 
+\begin_inset Formula 
+\[
+E\left[r_{it}^{e}\right]=\lambda_{0}+\sum_{i=1}^{k}\beta_{i}\lambda_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+so that the risk-free rate might not be zero.
+ This form is sometimes used with excess returns if there is doubt about
+ the risk-free rate used.
  The Jacobian is then 
 \begin_inset Formula 
 \[
 -\left[\begin{array}{ccc}
-I_{N}\otimes\left(\tilde{\lambda}+f_{t}\right)f_{t} & \left[\begin{array}{c}
+I_{N}\otimes\left(\tilde{\lambda}+f_{t}-\mu\right)\left[1\:f_{t}^{\prime}\right]^{\prime} & \left[\begin{array}{c}
 \left[1\:f_{t}^{\prime}\right]^{\prime}\left[1\!\beta_{1}\right]\\
 \vdots\\
 \left[1\:f_{t}^{\prime}\right]^{\prime}\left[1\!\beta_{N}\right]
@@ -699,6 +728,13 @@ I_{N}\otimes\left(\tilde{\lambda}+f_{t}\right)f_{t} & \left[\begin{array}{c}
 \end_layout
 
 \begin_layout Standard
+\noindent
+When the risk-free rate is not estimated (assumed to be 0), then the residuals
+ are
+\end_layout
+
+\begin_layout Standard
+\noindent
 \begin_inset Formula 
 \[
 \epsilon_{t}=r_{t}-\beta\lambda-\beta\left(f_{t}-\mu\right)
@@ -710,10 +746,16 @@ I_{N}\otimes\left(\tilde{\lambda}+f_{t}\right)f_{t} & \left[\begin{array}{c}
 \end_layout
 
 \begin_layout Standard
+\noindent
+and the Jacobian is
+\end_layout
+
+\begin_layout Standard
+\noindent
 \begin_inset Formula 
 \[
 -\left[\begin{array}{ccc}
-I_{N}\otimes\lambda+f_{t}f_{t} & \left[\begin{array}{c}
+I_{N}\otimes\left(\lambda+f_{t}-\mu\right)f_{t} & \left[\begin{array}{c}
 \left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{1}\\
 \vdots\\
 \left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
@@ -723,7 +765,7 @@ I_{N}\otimes\lambda+f_{t}f_{t} & \left[\begin{array}{c}
 -\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
 \end{array}\right]\\
 0 & 0 & I_{K}
-\end{array}\right]
+\end{array}\right].
 \]
 
 \end_inset
