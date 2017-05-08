@@ -307,15 +307,11 @@ The second stage regression then uses the estimated coefficients as regressors
  to estimate the risk premia, 
 \begin_inset Formula 
 \[
-\bar{r}_{i}^{e}=\hat{\beta}\lambda+\eta_{i}.
+\bar{r}_{i}^{e}=\left[1_{N}\,\hat{\beta}\right]\lambda+\eta_{i}.
 \]
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
@@ -330,6 +326,16 @@ Note that the residual from this regression
 \end_inset
 
  is generating.
+ If the risk free rate is assumed to be 0, then the column of 1s is not
+ included and 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is 
+\begin_inset Formula $K$
+\end_inset
+
+ by 1.
  
 \end_layout
 
@@ -351,8 +357,8 @@ Inference is conducted by treating this as a 3-step GMM problem where the
 \[
 g_{t}=\left[\begin{array}{c}
 \epsilon_{t}\otimes\left[1\,f_{t}^{\prime}\right]^{\prime}\\
-\beta^{\prime}\left(r_{t}-\beta\lambda\right)\\
-r_{t}-\beta\lambda-\alpha
+\beta^{\prime}\left(r_{t}-\left[1_{N}\,\beta\right]\lambda\right)\\
+r_{t}-\left[1_{N}\,\beta\right]\lambda-\alpha
 \end{array}\right]
 \]
 
@@ -520,8 +526,8 @@ f_{t} & f_{t}^{2} & 0 & 0 & 0 & 0 & 0\\
 \[
 \hat{G}=-\left[\begin{array}{ccc}
 I_{N}\otimes\Sigma_{\left[1\,f\right]} & 0 & 0\\
-G_{21} & \beta^{\prime}\beta & 0\\
-I_{N}\otimes\left[0\ \lambda\right] & \beta & I_{N}
+G_{21} & \left[1_{N}\,\beta\right]^{\prime}\left[1_{N}\,\beta\right] & 0\\
+I_{N}\otimes\left[0\ \lambda\right] & \left[1_{N}\,\beta\right] & I_{N}
 \end{array}\right]
 \]
 
@@ -555,7 +561,7 @@ G_{21}=\left[G_{21,1}\ G_{21,2}\:\ldots\ G_{21,N}\right]
 \noindent
 \begin_inset Formula 
 \[
-G_{21,i}=\left[0_{K\times1}\:\left(\beta_{i}^{\prime}\lambda^{\prime}-E_{T}\left[u_{it}\right]I_{K}\right)\right]
+G_{21,i}=\left[0_{\left(K+1\right)\times1}\;\left(\left[1\;\beta_{i}\right]^{\prime}\lambda^{\prime}-\left[0_{K}\;E_{T}\left[u_{it}\right]I_{K}\right]^{\prime}\right)\right]
 \]
 
 \end_inset
@@ -566,7 +572,27 @@ G_{21,i}=\left[0_{K\times1}\:\left(\beta_{i}^{\prime}\lambda^{\prime}-E_{T}\left
 \begin_layout Standard
 \noindent
 where expectations are replaced by sample averaged.
- 
+ When the risk free rate is 0, all terms of the form 
+\begin_inset Formula $[1_{N}\;\beta]$
+\end_inset
+
+ become 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+G_{21,i}=\left[0_{K\times1}\;\left(\beta_{i}^{\prime}\lambda^{\prime}-E_{T}\left[u_{it}\right]I_{K}\right)\right]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -623,6 +649,86 @@ The loss of degrees of freedom is obvious since
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+GMM Estimation of Linear Factor Models
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\epsilon_{t}\otimes\left[1\:f_{t}^{\prime}\right]^{\prime}\\
+f_{t}-\mu
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+\epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
+\]
+
+\end_inset
+
+is the vector of pricing errors.
+ The Jacobian is then 
+\begin_inset Formula 
+\[
+-\left[\begin{array}{ccc}
+I_{N}\otimes\left(\tilde{\lambda}+f_{t}-\mu\right)\left[1\:f_{t}^{\prime}\right]^{\prime} & \left[\begin{array}{c}
+\left[1\:f_{t}^{\prime}\right]^{\prime}\left[1\!\beta_{1}\right]\\
+\vdots\\
+\left[1\:f_{t}^{\prime}\right]^{\prime}\left[1\!\beta_{N}\right]
+\end{array}\right] & \left[\begin{array}{c}
+-\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{1}\\
+\vdots\\
+-\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
+\end{array}\right]\\
+0 & 0 & I_{K}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\epsilon_{t}=r_{t}-\beta\lambda-\beta\left(f_{t}-\mu\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\left[\begin{array}{ccc}
+I_{N}\otimes\left(\lambda+f_{t}-\mu\right)f_{t} & \left[\begin{array}{c}
+\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{1}\\
+\vdots\\
+\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
+\end{array}\right] & \left[\begin{array}{c}
+-\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{1}\\
+\vdots\\
+-\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
+\end{array}\right]\\
+0 & 0 & I_{K}
+\end{array}\right]
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
