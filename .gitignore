@@ -27,6 +27,7 @@ wheels/
 .installed.cfg
 *.egg
 *.do
+*.lyx~
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
