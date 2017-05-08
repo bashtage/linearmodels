@@ -375,7 +375,7 @@ class LinearFactorModelGMM(TradedFactorModel):
     def __init__(self, factors, portfolios):
         super(LinearFactorModelGMM, self).__init__(factors, portfolios)
 
-    def fit(self, excess_returns=True, steps=2, disp=10, max_iter=1000,
+    def fit(self, excess_returns=True, center=True, use_cue=False, steps=2, disp=10, max_iter=1000,
             cov_type='robust', debiased=True, **cov_config):
         """
         Estimate model parameters
@@ -385,6 +385,11 @@ class LinearFactorModelGMM(TradedFactorModel):
         excess_returns : bool, optional
             Flag indicating whether returns are excess or not.  If False, the 
             risk-free rate is jointly estimated with the other risk premia.
+        center : bool, optional
+            Flag indicating to center the moment ocnditions before computing
+            the weighting matrix.
+        use_cue : bool, optional
+            Flag indicating to use continuously updating estimator
         steps : int, optional
             Number of steps to use when estimating parameters.  2 corresponds 
             to the standard efficient gmm estimator. Higher values will
@@ -422,6 +427,7 @@ class LinearFactorModelGMM(TradedFactorModel):
         mu = self.factors.ndarray.mean(0)
         sv = np.r_[betas, lam, mu][:, None]
         g = self._moments(sv, excess_returns)
+        g -= g.mean(0)[None, :] if center else 0
         # TODO: allow different weights type
         w = np.linalg.inv(g.T @ g / nobs)
         args = (excess_returns, w)
@@ -433,21 +439,30 @@ class LinearFactorModelGMM(TradedFactorModel):
         params = res.x
         last_obj = res.fun
         # 3. Step 2 using step 1 estimates
-        # TODO: Add convergence criteria
-        for i in range(steps - 1):
-            g = self._moments(params, excess_returns)
-            w = np.linalg.inv(g.T @ g / nobs)
-            args = (excess_returns, w)
+        if not use_cue:
+            # TODO: Add convergence criteria
+            for i in range(steps - 1):
+                g = self._moments(params, excess_returns)
+                g -= g.mean(0)[None, :] if center else 0
+                w = np.linalg.inv(g.T @ g / nobs)
+                args = (excess_returns, w)
 
-            # 2. Step 1 using w = inv(s) from SV
-            callback = callback_factory(self._j, args, disp=disp)
-            res = minimize(self._j, params, args=args, callback=callback,
+                # 2. Step 1 using w = inv(s) from SV
+                callback = callback_factory(self._j, args, disp=disp)
+                res = minimize(self._j, params, args=args, callback=callback,
+                               options={'disp': bool(disp), 'maxiter': max_iter})
+                params = res.x
+                obj = res.fun
+                if np.abs(obj - last_obj) < 1e-6:
+                    break
+                last_obj = obj
+        else:
+            args = (excess_returns, center)
+            obj = self._j_cue
+            callback = callback_factory(obj, args, disp=disp)
+            res = minimize(obj, params, args=args, callback=callback,
                            options={'disp': bool(disp), 'maxiter': max_iter})
             params = res.x
-            obj = res.fun
-            if np.abs(obj - last_obj) < 1e-6:
-                break
-            last_obj = obj
 
         # 4. Compute final S and G for inference
         g = self._moments(params, excess_returns)
@@ -457,8 +472,8 @@ class LinearFactorModelGMM(TradedFactorModel):
         full_vcv = np.linalg.inv(jac.T @ np.linalg.inv(s) @ jac) / nobs
         rp = params[(n * k):(n * k + k + nrf)]
         rp_cov = full_vcv[(n * k):(n * k + k + nrf), (n * k):(n * k + k + nrf)]
-        alphas = g.mean(0)[0:(n * (k+1)):(k + 1), None]
-        alpha_vcv = s[0:(n * (k+1)):(k + 1), 0:(n * (k+1)):(k + 1)] / nobs  # TODO: Fix this
+        alphas = g.mean(0)[0:(n * (k + 1)):(k + 1), None]
+        alpha_vcv = s[0:(n * (k + 1)):(k + 1), 0:(n * (k + 1)):(k + 1)] / nobs  # TODO: Fix this
         stat = self._j(params, excess_returns, w)
         jstat = WaldTestStatistic(stat, 'All alphas are 0', n, name='J-statistic')
 
@@ -517,6 +532,16 @@ class LinearFactorModelGMM(TradedFactorModel):
         g = self._moments(parameters, excess_returns)
         nobs = self.portfolios.shape[0]
         gbar = g.mean(0)[:, None]
+        return nobs * float(gbar.T @ w @ gbar)
+
+    def _j_cue(self, parameters, excess_returns, center):
+        """CUE Objective function"""
+        g = self._moments(parameters, excess_returns)
+        gbar = g.mean(0)[:, None]
+        nobs = self.portfolios.shape[0]
+        if center:
+            g -= gbar.T
+        w = np.linalg.inv(g.T @ g / nobs)
         return nobs * float(gbar.T @ w @ gbar)
 
     def _jacobian(self, params, excess_returns):
