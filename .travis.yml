@@ -11,7 +11,7 @@ addons:
 
 env:
   global:
-    - PANDAS=0.19
+    - PANDAS=pandas
     - COVERAGE=true
     - secure: "aCm98s/mNxRSoTEhpIgfvRKzzJKdDkm/9TufIvgWvnkeiyDQqZwoqRVDIikZ+v6mkFeu7dr7BBojyPXnhkhji+SkNFz5ArtEqahJTvIZhP2nWgktlQSWkaC2Q5GyCWPhdQag/ImYbM4RK1WvtIVcSL7GPL0jLTgFDXY6/Hdl0eQY7kfWtojxIZUJShxn9IPfXE3gGQeWHEOL7SkZ3+8KxBJAUzrdd9J32PiHWZb5BcUupTQcW29ajoco4q1fdL/xPu3GZnys8EClorHxnPptQWfGGlnoJ79Q6H7Jhw6BGIj2fDCG9qX4boEH2zvH8ZKlbuTvMeVcBiLxPE8BpRmx2drX2kDyUo5ywVwA0W/7zsZ2YUYEyHEYL+cr4WVFdoDpwwPKaHOTp8F4Q+lQgkvxZbSlO6dUEMLNxnltgujAAdiaRJKLd2CwA85RjqYGLkMzTqBgYhH+p+7wB6jK8EJgoqxU3k98LfaeqyhsPrdWsxVLleLVAvzhXpNilQfX4NBPf+DYsn9NeyXYzp85H9p+J8DGJMJ42kBdP1r/cz1Y44SrGZhlk1MhLhb+uX7kV7nnmcW87NYoGSr52S5vNVL9iSU980SzJ08wOZwxwkKXOqgEJtMqdHsEuqY9jSQ2m/xAdarpxBsDD+Pw2gPfar+R8Lcptep50pMPFMgddDWV2f4="
 
@@ -23,7 +23,7 @@ matrix:
     - PYTHON=3.5
     - NUMPY=1.11
     - SCIPY=0.17
-    - PANDAS=0.18
+    - PANDAS="pandas=0.18"
   - python: 3.5
     env:
     - PYTHON=3.5
@@ -45,7 +45,7 @@ before_install:
   - conda update conda
   # Install packages
   - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} xarray statsmodels matplotlib seaborn
-  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} xarray statsmodels matplotlib seaborn
+  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} xarray statsmodels matplotlib seaborn
   - source activate linearmodels-test
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
   - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr nbsphinx guzzle_sphinx_theme -q
