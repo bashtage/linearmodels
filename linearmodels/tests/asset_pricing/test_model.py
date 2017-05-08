@@ -32,9 +32,21 @@ def test_linear_model_cross_section_smoke(data):
     get_all(res)
 
 
+def test_linear_model_cross_section_risk_free_smoke(data):
+    mod = LinearFactorModel(data.portfolios, data.factors)
+    res = mod.fit(cov_type='robust', excess_returns=False)
+    get_all(res)
+
+
 def test_linear_model_gmm_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type='robust', disp=5)
+    get_all(res)
+
+
+def test_linear_model_gmm_smoke_risk_free(data):
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    res = mod.fit(excess_returns=False, cov_type='robust', disp=10)
     get_all(res)
 
 

@@ -146,23 +146,31 @@ regression of :math:`N` average returns on :math:`K` factor loadings.
 :math:`\hat{\Sigma}_{\alpha}` is the bottom right block of
 :math:`\hat{\Sigma}`.
 
-GMM Estimation of Linear Factor Models 
+GMM Estimation of Linear Factor Models
+--------------------------------------
+
+The GMM estimator solves a set of non-linear moment conditions of the
+form
 
 .. math::
 
-   \left[\protect\begin{array}{c}
-   \epsilon_{t}\otimes\left[1\:f_{t}^{\prime}\right]^{\prime}\protect\\
+   \left[\begin{array}{c}
+   \epsilon_{t}\otimes\left[1\:f_{t}^{\prime}\right]^{\prime}\\
    f_{t}-\mu
-   \protect\end{array}\right]
-
- 
------------------------------------------------------------------------
+   \end{array}\right]
 
 where
 
-.. math:: \epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
+.. math:: \epsilon_{t}=r_{t}^{e}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
 
- is the vector of pricing errors. The Jacobian is then
+is the vector of pricing errors. The factors can be traded or
+non-traded. This assumes that the model for expected returns is
+
+.. math:: E\left[r_{it}^{e}\right]=\lambda_{0}+\sum_{i=1}^{k}\beta_{i}\lambda_{i}
+
+so that the risk-free rate might not be zero. This form is sometimes
+used with excess returns if there is doubt about the risk-free rate
+used. The Jacobian is then
 
 .. math::
 
@@ -179,7 +187,12 @@ where
    0 & 0 & I_{K}
    \end{array}\right]
 
+When the risk-free rate is not estimated (assumed to be 0), then the
+residuals are
+
 .. math:: \epsilon_{t}=r_{t}-\beta\lambda-\beta\left(f_{t}-\mu\right)
+
+and the Jacobian is
 
 .. math::
 
@@ -194,4 +207,4 @@ where
    -\left[1\:f_{t}^{\prime}\right]^{\prime}\beta_{N}
    \end{array}\right]\\
    0 & 0 & I_{K}
-   \end{array}\right]
+   \end{array}\right].
