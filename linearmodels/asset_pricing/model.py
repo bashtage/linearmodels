@@ -135,7 +135,7 @@ class TradedFactorModel(object):
         
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
-        >>> mod = TradedFactorModel.from_formula(formula, data)
+        >>> mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
         orig_formula = formula
@@ -362,7 +362,7 @@ class LinearFactorModel(TradedFactorModel):
         
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
-        >>> mod = LinearFactorModel.from_formula(formula, data)
+        >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
         orig_formula = formula
@@ -589,7 +589,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
-        >>> mod = LinearFactorModel.from_formula(formula, data)
+        >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         return super(LinearFactorModelGMM, cls).from_formula(formula, data,
                                                              portfolios=portfolios,
@@ -613,7 +613,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             iterate until convergence or up to the number of steps given
         disp : int, optional
             Number of iterations between printed update. 0 or negative values
-            suppress iterative output
+            suppresses output
         max_iter : int, positive, optional
             Maximum number of iterations when minimizing objective
         cov_type : str, optional
