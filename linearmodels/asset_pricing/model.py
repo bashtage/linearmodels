@@ -5,7 +5,8 @@ from patsy.missing import NAAction
 from scipy.optimize import minimize
 
 from linearmodels.asset_pricing.results import GMMFactorModelResults, LinearFactorModelResults
-from linearmodels.iv.covariance import KERNEL_LOOKUP, _cov_kernel
+from linearmodels.asset_pricing.covariance import HeteroskedasticCovariance, KernelCovariance, KernelWeight, \
+    HeteroskedasticWeight
 from linearmodels.iv.data import IVData
 from linearmodels.utility import AttrDict, WaldTestStatistic, has_constant, matrix_rank, \
     missing_warning
@@ -205,22 +206,23 @@ class TradedFactorModel(object):
         xe = f_rep * eps_rep
         xe = np.c_[xe, fe]
         if cov_type in ('robust', 'heteroskedastic'):
-            xeex = xe.T @ xe / nobs
-            rp_cov = fe.T @ fe / nobs
+            cov_est = HeteroskedasticCovariance(xe, inv_jacobian=xpxi, center=False,
+                                                debiased=debiased, df=fc.shape[1])
+            rp_cov_est = HeteroskedasticCovariance(fe, jacobian=np.eye(f.shape[1]), center=False,
+                                                   debiased=debiased, df=1)
         elif cov_type == 'kernel':
-            kernel = cov_config.get('kernel', 'bartlett')
-            bw = cov_config.get('bandwidth', None)
-            bw = int(np.ceil(4 * (nobs / 100) ** (2 / 9))) if bw is None else bw
-            w = KERNEL_LOOKUP[kernel](bw, nobs - 1)
-            xeex = _cov_kernel(xe, w)
-            rp_cov = _cov_kernel(fe, w)
+            cov_est = KernelCovariance(xe, inv_jacobian=xpxi, center=False, debiased=debiased, df=fc.shape[1],
+                                       **cov_config)
+            bw = cov_est.bandwidth
+            _cov_config = {k: v for k, v in cov_config.items()}
+            _cov_config['bandwidth'] = bw
+            rp_cov_est = KernelCovariance(fe, jacobian=np.eye(f.shape[1]), center=False,
+                                          debiased=debiased, df=1, **_cov_config)
         else:
             raise ValueError('Unknown cov_type: {0}'.format(cov_type))
-        debiased = int(bool(debiased))
-        df = fc.shape[1]
-        full_vcv = xpxi @ xeex @ xpxi / (nobs - debiased * df)
+        full_vcv = cov_est.cov
+        rp_cov = rp_cov_est.cov
         vcv = full_vcv[:nloading, :nloading]
-        rp_cov = rp_cov / (nobs - debiased)
 
         # Rearrange VCV
         order = np.reshape(np.arange((nfactor + 1) * nportfolio), (nportfolio, nfactor + 1))
@@ -340,7 +342,7 @@ class LinearFactorModel(TradedFactorModel):
 
         Returns
         -------
-        model : TradedFactorModel
+        model : LinearFactorModel
             Model instance
 
         Notes
@@ -379,7 +381,7 @@ class LinearFactorModel(TradedFactorModel):
         mod.formula = orig_formula
         return mod
 
-    def fit(self, cov_type='robust', **cov_config):
+    def fit(self, cov_type='robust', debiased=True, **cov_config):
         """
         Estimate model parameters
 
@@ -438,9 +440,8 @@ class LinearFactorModel(TradedFactorModel):
         alphas = pricing_errors.mean(0)[:, None]
 
         moments = np.c_[f_rep * eps_rep, pricing_errors @ betas, pricing_errors - alphas.T]
-        S = moments.T @ moments / nobs
         # Jacobian
-        G = np.eye(S.shape[0])
+        G = np.eye(moments.shape[1])
         s2 = (nfactor + 1) * nportfolio
         s3 = s2 + (nfactor + nrf)
         fpf = fc.T @ fc / nobs
@@ -458,9 +459,18 @@ class LinearFactorModel(TradedFactorModel):
             G[s2:s3, (i * (nfactor + 1)):((i + 1) * (nfactor + 1))] = block
         zero_lam = np.r_[[[0]], lam] if excess_returns else np.r_[[[0]], lam[1:]]
         G[s3:, :s2] = np.kron(np.eye(nportfolio), zero_lam.T)
-        Ginv = np.linalg.inv(G)
+
+        if cov_type in ('robust', 'heteroskedastic'):
+            cov_est = HeteroskedasticCovariance
+        elif cov_type == 'kernel':
+            cov_est = KernelCovariance
+        else:
+            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+        cov_est = cov_est(moments, jacobian=G, center=False,
+                          debiased=debiased, df=fc.shape[1], **cov_config)
+
         # VCV
-        full_vcv = Ginv @ S @ Ginv.T / nobs
+        full_vcv = cov_est.cov
         alpha_vcv = full_vcv[s3:, s3:]
         stat = float(alphas.T @ np.linalg.inv(alpha_vcv) @ alphas)
         jstat = WaldTestStatistic(stat, 'All alphas are 0', nportfolio - nfactor,
@@ -567,7 +577,7 @@ class LinearFactorModelGMM(LinearFactorModel):
 
         Returns
         -------
-        model : TradedFactorModel
+        model : LinearFactorModelGMM
             Model instance
 
         Notes
@@ -647,7 +657,17 @@ class LinearFactorModelGMM(LinearFactorModel):
         g = self._moments(sv, excess_returns)
         g -= g.mean(0)[None, :] if center else 0
         # TODO: allow different weights type
-        w = np.linalg.inv(g.T @ g / nobs)
+        if cov_type not in ('robust', 'heteroskedastic', 'kernel'):
+            raise ValueError('Unknown weight: {0}'.format(cov_type))
+        if cov_type in ('robust', 'heteroskedastic'):
+            weight_est = HeteroskedasticWeight
+            cov_est = HeteroskedasticCovariance
+        else:  # 'kernel':
+            weight_est = KernelWeight
+            cov_est = KernelCovariance
+        weight_est = weight_est(g, center=center, **cov_config)
+        w = weight_est.w(g)
+
         args = (excess_returns, w)
 
         # 2. Step 1 using w = inv(s) from SV
@@ -661,8 +681,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             # TODO: Add convergence criteria
             for i in range(steps - 1):
                 g = self._moments(params, excess_returns)
-                g -= g.mean(0)[None, :] if center else 0
-                w = np.linalg.inv(g.T @ g / nobs)
+                w = weight_est.w(g)
                 args = (excess_returns, w)
 
                 # 2. Step 1 using w = inv(s) from SV
@@ -675,7 +694,7 @@ class LinearFactorModelGMM(LinearFactorModel):
                     break
                 last_obj = obj
         else:
-            args = (excess_returns, center)
+            args = (excess_returns, weight_est)
             obj = self._j_cue
             callback = callback_factory(obj, args, disp=disp)
             res = minimize(obj, params, args=args, callback=callback,
@@ -687,7 +706,10 @@ class LinearFactorModelGMM(LinearFactorModel):
         s = g.T @ g / nobs
         jac = self._jacobian(params, excess_returns)
 
-        full_vcv = np.linalg.inv(jac.T @ np.linalg.inv(s) @ jac) / nobs
+        cov_est = cov_est(g, jacobian=jac, center=center, debiased=debiased,
+                          df=self.factors.shape[1], **cov_config)
+
+        full_vcv = cov_est.cov
         rp = params[(n * k):(n * k + k + nrf)]
         rp_cov = full_vcv[(n * k):(n * k + k + nrf), (n * k):(n * k + k + nrf)]
         alphas = g.mean(0)[0:(n * (k + 1)):(k + 1), None]
@@ -752,14 +774,12 @@ class LinearFactorModelGMM(LinearFactorModel):
         gbar = g.mean(0)[:, None]
         return nobs * float(gbar.T @ w @ gbar)
 
-    def _j_cue(self, parameters, excess_returns, center):
+    def _j_cue(self, parameters, excess_returns, weight_est):
         """CUE Objective function"""
         g = self._moments(parameters, excess_returns)
         gbar = g.mean(0)[:, None]
         nobs = self.portfolios.shape[0]
-        if center:
-            g -= gbar.T
-        w = np.linalg.inv(g.T @ g / nobs)
+        w = weight_est.w(g)
         return nobs * float(gbar.T @ w @ gbar)
 
     def _jacobian(self, params, excess_returns):
