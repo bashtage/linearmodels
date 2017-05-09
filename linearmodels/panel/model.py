@@ -1647,21 +1647,21 @@ class FamaMacBeth(PooledOLS):
     .. math::
 
         y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
-    
+
     The Fama-MacBeth estimator is computed by performing T regressions, one
     for each time period using all availabl entity observations.  Denote the
     estimate of the model parameters as :math:`\hat{\beta}_t`.  The reported
-    estimator is then 
-    
+    estimator is then
+
     .. math::
-    
+
         \hat{\beta} = T^{-1}\sum_{t=1}^T \hat{\beta}_t
-    
-    While the model does not explicitly include time-effects, the 
+
+    While the model does not explicitly include time-effects, the
     implementation based on regressing all observation in a single
     time period is "as-if" time effects are included.
-         
-    Parameter inference is made using the set T parameter estimates using 
+
+    Parameter inference is made using the set T parameter estimates using
     either the standard covariance estiamtor or a kernel-based covariance,
     depending on ``cov_type``.
     """
@@ -1703,7 +1703,7 @@ class FamaMacBeth(PooledOLS):
         * 'kernel' - HAC estimator. Configurations options are:
 
           * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is implements the the 
+            Default is Bartlett's kernel, which is implements the the
             Newey-West covariance estimator.
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.

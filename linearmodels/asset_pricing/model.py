@@ -1,11 +1,14 @@
 import numpy as np
 from numpy.linalg import pinv
+from patsy.highlevel import dmatrix
+from patsy.missing import NAAction
+from scipy.optimize import minimize
 
-from linearmodels.asset_pricing.results import LinearFactorModelResults, GMMFactorModelResults
+from linearmodels.asset_pricing.results import GMMFactorModelResults, LinearFactorModelResults
 from linearmodels.iv.covariance import KERNEL_LOOKUP, _cov_kernel
 from linearmodels.iv.data import IVData
-from linearmodels.utility import AttrDict, WaldTestStatistic
-from scipy.optimize import minimize
+from linearmodels.utility import AttrDict, WaldTestStatistic, has_constant, matrix_rank, \
+    missing_warning
 
 
 def callback_factory(obj, args, disp=1):
@@ -23,28 +26,28 @@ def callback_factory(obj, args, disp=1):
 
 class TradedFactorModel(object):
     r"""Linear factor models estimator applicable to traded factors
-    
+
     Parameters
     ----------
     portfolios : array-like
         Test portfolio returns (nobs by nportfolio)
     factors : array-like
-        Priced factor returns (nobs by nfactor 
-   
+        Priced factor returns (nobs by nfactor)
+
     Notes
     -----
-    Implements both time-series estimators of risk premia, factor loadings 
+    Implements both time-series estimators of risk premia, factor loadings
     and zero-alpha tests.
-    
-    The model estimated is 
-    
+
+    The model estimated is
+
     .. math::
-    
+
         r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}
-    
-    where :math:`r_{it}^e` is the excess return on test portfolio i and 
-    :math:`f_t` are the traded factor returns.  The model is directly 
-    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia, 
+
+    where :math:`r_{it}^e` is the excess return on test portfolio i and
+    :math:`f_t` are the traded factor returns.  The model is directly
+    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,
     :math:`\lambda_i` are estimated using the sample averages of the factors,
     which must be excess returns on traded portfolios.
     """
@@ -53,36 +56,129 @@ class TradedFactorModel(object):
         self.portfolios = IVData(portfolios, var_name='portfolio')
         self.factors = IVData(factors, var_name='factor')
         self._name = self.__class__.__name__
+        self._formula = None
+        self._validate_data()
+
+    def _drop_missing(self):
+        data = (self.portfolios, self.factors)
+        missing = np.any(np.c_[[dh.isnull for dh in data]], 0)
+        if any(missing):
+            if all(missing):
+                raise ValueError('All observations contain missing data. '
+                                 'Model cannot be estimated.')
+            missing_warning(missing)
+            self.portfolios.drop(missing)
+            self.factors.drop(missing)
+
+        return missing
+
+    def _validate_data(self):
+        p = self.portfolios.ndarray
+        f = self.factors.ndarray
+        if p.shape[0] != f.shape[0]:
+            raise ValueError('The number of observations in portfolios and '
+                             'factors is not the same.')
+        self._drop_missing()
+
+        p = self.portfolios.ndarray
+        f = self.factors.ndarray
+        if has_constant(p)[0]:
+            raise ValueError('portfolios must not contains a constant or equivalent.')
+        if has_constant(f)[0]:
+            raise ValueError('factors must not contain a constant or equivalent.')
+        if matrix_rank(f) < f.shape[1]:
+            raise ValueError('Model cannot be estimated. factors do not have full column rank.')
+        if matrix_rank(p) < p.shape[1]:
+            raise ValueError('Model cannot be estimated. portfolios do not have full column rank.')
+
+    @property
+    def formula(self):
+        return self._formula
+
+    @formula.setter
+    def formula(self, value):
+        self._formula = value
+
+    @classmethod
+    def from_formula(cls, formula, data, *, portfolios=None):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the syntax described in the notes
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        portfolios : array-like, optional
+            Portfolios to be used in the model
+
+        Returns
+        -------
+        model : TradedFactorModel
+            Model instance
+
+        Notes
+        -----
+        The formula can be used in one of two ways.  The first specified only the
+        factors and uses the data provided in ``portfolios`` as the test portfolios.
+        The second specified the portfolio using ``+`` to separate the test portfolios
+        and ``~`` to separate the test portfolios from the factors.
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import french
+        >>> from linearmodels.asset_pricing import TradedFactorModel
+        >>> data = french.load()
+        >>> formula = 'S1M1 + S1M5 + S3M1 + S3M5 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> mod = TradedFactorModel.from_formula(formula, data)
+
+        # Using only factors
+        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
+        >>> formula = 'MktRF + SMB + HML'
+        >>> mod = TradedFactorModel.from_formula(formula, data)
+        """
+        na_action = NAAction(on_NA='raise', NA_types=[])
+        orig_formula = formula
+        if portfolios is not None:
+            factors = dmatrix(formula + ' + 0', data, return_type='dataframe', NA_action=na_action)
+        else:
+            formula = formula.split('~')
+            portfolios = dmatrix(formula[0].strip() + ' + 0', data,
+                                 return_type='dataframe', NA_action=na_action)
+            factors = dmatrix(formula[1].strip() + ' + 0', data,
+                              return_type='dataframe', NA_action=na_action)
+        mod = cls(portfolios, factors)
+        mod.formula = orig_formula
+        return mod
 
     def fit(self, cov_type='robust', debiased=True, **cov_config):
         """
         Estimate model parameters
-        
+
         Parameters
         ----------
         cov_type : str, optional
             Name of covariance estimator
         debiased : bool, optional
-            Flag indicating whether to debias the covariance estimator using 
+            Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
         **cov_config : dict
             Additional covariance-specific options.  See Notes.
-        
+
         Returns
         -------
         results : LinearFactorModelResults
             Results class with parameter estimates, covariance and test statistics
-        
+
         Notes
         -----
-        Supported covariance estiamtors are:
-        
+        Supported covariance estimators are:
+
         * 'robust' - Heteroskedasticity-robust covariance estimator
-        * 'kernel' - Heteroskedasticity and Autocorrelation consistent (HAC) 
+        * 'kernel' - Heteroskedasticity and Autocorrelation consistent (HAC)
           covariance estimator
-          
-        The kernel covariance estimator takes the optional arguments 
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral) 
+
+        The kernel covariance estimator takes the optional arguments
+        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
         # TODO: Homoskedastic covariance
@@ -159,63 +255,134 @@ class TradedFactorModel(object):
 
 
 class LinearFactorModel(TradedFactorModel):
-    r"""Linear factor model estimator 
+    r"""Linear factor model estimator
 
     Parameters
     ----------
     portfolios : array-like
         Test portfolio returns (nobs by nportfolio)
     factors : array-like
-        Priced factorreturns (nobs by nfactor 
+        Priced factor returns (nobs by nfactor)
+    risk_free : bool, optional
+        Flag indicating whether the risk-free rate should be estimated
+        from returns along other risk premia.  If False, the returns are
+        assumed to be excess returns using the correct risk-free rate.
     sigma : array-like, optional
-        Positive definite residual covariance (nportfolio by nportfolio) 
+        Positive definite residual covariance (nportfolio by nportfolio)
 
     Notes
     -----
     GLS estimation using ``sigma`` has not been implemented
-    
+
     Suitable for traded or non-traded factors.
-    
-    Implements a 2-step estimator of risk premia, factor loadings and model 
+
+    Implements a 2-step estimator of risk premia, factor loadings and model
     tests.
-    
-    The first stage model estimated is 
-    
+
+    The first stage model estimated is
+
     .. math::
-    
+
         r_{it}^e = a_i + f_t \beta_i + \epsilon_{it}
-    
-    where :math:`r_{it}^e` is the excess return on test portfolio i and 
+
+    where :math:`r_{it}^e` is the excess return on test portfolio i and
     :math:`f_t` are the traded factor returns.  The parameters :math:`a_i`
     are required to allow non-traded to be tested, but are not economically
     interesting.  These are not reported.
-      
-    The second stage model uses the estimated factor loadings from the first 
-    and is 
-    
+
+    The second stage model uses the estimated factor loadings from the first
+    and is
+
     .. math::
-    
+
         \bar{r}_i^e = \hat{\beta}_i^\prime \lambda + \eta_i
-    
-    where :math:`\bar{r}_i^e` is the average excess return to portfolio i.    
-    
-    The model is tested using the estimated values 
-    :math:`\hat{\alpha}_i=\hat{\eta}_i`.     
+
+    where :math:`\bar{r}_i^e` is the average excess return to portfolio i.
+
+    The model is tested using the estimated values
+    :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
 
-    def __init__(self, portfolios, factors, *, sigma=None):
-        super(LinearFactorModel, self).__init__(portfolios, factors)
+    def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
         self._sigma = sigma
+        self._risk_free = bool(risk_free)
+        super(LinearFactorModel, self).__init__(portfolios, factors)
 
-    def fit(self, excess_returns=True, cov_type='robust', **cov_config):
+    def _validate_data(self):
+        super(LinearFactorModel, self)._validate_data()
+        f = self.factors.ndarray
+        p = self.portfolios.ndarray
+        nrp = (f.shape[1] + int(self._risk_free))
+        if p.shape[0] < nrp:
+            raise ValueError('Must have more observations then factors')
+        if p.shape[1] < nrp:
+            raise ValueError('The number of test portfolio must be at least as '
+                             'large as the number of risk premia, including the '
+                             'risk free rate if estimated.')
+
+    @classmethod
+    def from_formula(cls, formula, data, *, portfolios=None, risk_free=False):
         """
-        Estimate model parameters
-        
         Parameters
         ----------
-        excess_returns : bool, optional
-            Flag indicating whether returns are excess or not.  If False, the 
-            risk-free rate is jointly estimated with the other risk premia.
+        formula : str
+            Patsy formula modified for the syntax described in the notes
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        portfolios : array-like, optional
+            Portfolios to be used in the model. If provided, must use formula
+            syntax containing only factors.
+        risk_free : bool, optional
+            Flag indicating whether the risk-free rate should be estimated
+            from returns along other risk premia.  If False, the returns are
+            assumed to be excess returns using the correct risk-free rate.
+
+        Returns
+        -------
+        model : TradedFactorModel
+            Model instance
+
+        Notes
+        -----
+        The formula can be used in one of two ways.  The first specified only the
+        factors and uses the data provided in ``portfolios`` as the test portfolios.
+        The second specified the portfolio using ``+`` to separate the test portfolios
+        and ``~`` to separate the test portfolios from the factors.
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import french
+        >>> from linearmodels.asset_pricing import LinearFactorModel
+        >>> data = french.load()
+        >>> formula = 'S1M1 + S1M5 + S3M1 + S3M5 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> mod = LinearFactorModel.from_formula(formula, data)
+
+        # Using only factors
+        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
+        >>> formula = 'MktRF + SMB + HML'
+        >>> mod = LinearFactorModel.from_formula(formula, data)
+        """
+        na_action = NAAction(on_NA='raise', NA_types=[])
+        orig_formula = formula
+        if portfolios is not None:
+            factors = dmatrix(formula + ' + 0', data, return_type='dataframe', NA_action=na_action)
+        else:
+            formula = formula.split('~')
+            portfolios = dmatrix(formula[0].strip() + ' + 0', data,
+                                 return_type='dataframe', NA_action=na_action)
+            factors = dmatrix(formula[1].strip() + ' + 0', data,
+                              return_type='dataframe', NA_action=na_action)
+
+        mod = cls(portfolios, factors, risk_free=risk_free)
+        mod.formula = orig_formula
+        return mod
+
+    def fit(self, cov_type='robust', **cov_config):
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
         cov_type : str, optional
             Name of covariance estimator
         **cov_config
@@ -228,13 +395,13 @@ class LinearFactorModel(TradedFactorModel):
 
         Notes
         -----
-        The kernel covariance estimator takes the optional arguments 
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral) 
+        The kernel covariance estimator takes the optional arguments
+        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
         # TODO: Kernel estimator
         # TODO: Refactor commonalities in estimation
-        excess_returns = bool(excess_returns)
+        excess_returns = not self._risk_free
         nrf = int(not excess_returns)
         f = self.factors.ndarray
         nobs, nfactor = f.shape
@@ -272,7 +439,7 @@ class LinearFactorModel(TradedFactorModel):
         S = moments.T @ moments / nobs
         # Jacobian
         G = np.eye(S.shape[0])
-        s1, s2 = 0, (nfactor + 1) * nportfolio,
+        s2 = (nfactor + 1) * nportfolio
         s3 = s2 + (nfactor + nrf)
         fpf = fc.T @ fc / nobs
         G[:s2, :s2] = np.kron(np.eye(nportfolio), fpf)
@@ -333,24 +500,28 @@ class LinearFactorModel(TradedFactorModel):
         return LinearFactorModelResults(res)
 
 
-class LinearFactorModelGMM(TradedFactorModel):
-    r"""GMM estimator of Linear factor models 
+class LinearFactorModelGMM(LinearFactorModel):
+    r"""GMM estimator of Linear factor models
 
     Parameters
     ----------
     portfolios : array-like
         Test portfolio returns (nobs by nportfolio)
     factors : array-like
-        Priced factorreturns (nobs by nfactor 
+        Priced factors values (nobs by nfactor)
+    risk_free : bool, optional
+        Flag indicating whether the risk-free rate should be estimated
+        from returns along other risk premia.  If False, the returns are
+        assumed to be excess returns using the correct risk-free rate.
 
     Notes
     -----
     Suitable for traded or non-traded factors.
 
-    Implements a GMM estimator of risk premia, factor loadings and model 
+    Implements a GMM estimator of risk premia, factor loadings and model
     tests.
 
-    The moments are  
+    The moments are
 
     .. math::
 
@@ -358,44 +529,87 @@ class LinearFactorModelGMM(TradedFactorModel):
         \epsilon_{t}\otimes\left[1\:f_{t}^{\prime}\right]^{\prime}\\
         f_{t}-\mu
         \end{array}\right]
-    
+
     and
-    
+
     .. math::
-    
+
       \epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)
 
-    where :math:`r_{it}^e` is the excess return on test portfolio i and 
-    :math:`f_t` are the traded factor returns.  
-    
-    The model is tested using the optimized objective function using the 
+    where :math:`r_{it}^e` is the excess return on test portfolio i and
+    :math:`f_t` are the traded factor returns.
+
+    The model is tested using the optimized objective function using the
     usual GMM J statistic.
     """
 
-    def __init__(self, factors, portfolios):
-        super(LinearFactorModelGMM, self).__init__(factors, portfolios)
+    def __init__(self, factors, portfolios, *, risk_free=False):
+        super(LinearFactorModelGMM, self).__init__(factors, portfolios, risk_free=risk_free)
 
-    def fit(self, excess_returns=True, center=True, use_cue=False, steps=2, disp=10, max_iter=1000,
+    @classmethod
+    def from_formula(cls, formula, data, *, portfolios=None, risk_free=False):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the syntax described in the notes
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        portfolios : array-like, optional
+            Portfolios to be used in the model. If provided, must use formula
+            syntax containing only factors.
+        risk_free : bool, optional
+            Flag indicating whether the risk-free rate should be estimated
+            from returns along other risk premia.  If False, the returns are
+            assumed to be excess returns using the correct risk-free rate.
+
+        Returns
+        -------
+        model : TradedFactorModel
+            Model instance
+
+        Notes
+        -----
+        The formula can be used in one of two ways.  The first specified only the
+        factors and uses the data provided in ``portfolios`` as the test portfolios.
+        The second specified the portfolio using ``+`` to separate the test portfolios
+        and ``~`` to separate the test portfolios from the factors.
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import french
+        >>> from linearmodels.asset_pricing import LinearFactorModel
+        >>> data = french.load()
+        >>> formula = 'S1M1 + S1M5 + S3M1 + S3M5 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> mod = LinearFactorModel.from_formula(formula, data)
+
+        # Using only factors
+        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
+        >>> formula = 'MktRF + SMB + HML'
+        >>> mod = LinearFactorModel.from_formula(formula, data)
+        """
+        return super(LinearFactorModelGMM, cls).from_formula(formula, data,
+                                                             portfolios=portfolios,
+                                                             risk_free=risk_free)
+
+    def fit(self, center=True, use_cue=False, steps=2, disp=10, max_iter=1000,
             cov_type='robust', debiased=True, **cov_config):
         """
         Estimate model parameters
 
         Parameters
         ----------
-        excess_returns : bool, optional
-            Flag indicating whether returns are excess or not.  If False, the 
-            risk-free rate is jointly estimated with the other risk premia.
         center : bool, optional
-            Flag indicating to center the moment ocnditions before computing
+            Flag indicating to center the moment conditions before computing
             the weighting matrix.
         use_cue : bool, optional
             Flag indicating to use continuously updating estimator
         steps : int, optional
-            Number of steps to use when estimating parameters.  2 corresponds 
+            Number of steps to use when estimating parameters.  2 corresponds
             to the standard efficient gmm estimator. Higher values will
             iterate until convergence or up to the number of steps given
         disp : int, optional
-            Number of iterations between printed update. 0 or negative values 
+            Number of iterations between printed update. 0 or negative values
             suppress iterative output
         max_iter : int, positive, optional
             Maximum number of iterations when minimizing objective
@@ -411,17 +625,18 @@ class LinearFactorModelGMM(TradedFactorModel):
 
         Notes
         -----
-        The kernel covariance estimator takes the optional arguments 
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral) 
+        The kernel covariance estimator takes the optional arguments
+        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
 
         nobs, n = self.portfolios.shape
         k = self.factors.shape[1]
+        excess_returns = not self._risk_free
         nrf = int(not bool(excess_returns))
         # 1. Starting Values - use 2 pass
-        mod = LinearFactorModel(self.portfolios, self.factors)
-        res = mod.fit(excess_returns=excess_returns)
+        mod = LinearFactorModel(self.portfolios, self.factors, risk_free=self._risk_free)
+        res = mod.fit()
         betas = res.betas.values.ravel()
         lam = res.risk_premia.values
         mu = self.factors.ndarray.mean(0)

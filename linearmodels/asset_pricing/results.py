@@ -36,7 +36,6 @@ class LinearFactorModelResults(_SummaryStr):
         """Summary table of model estimation results"""
 
         title = self.name + ' Estimation Summary'
-        mod = self.model
 
         top_left = [('No. Test Portfolios:', len(self._portfolio_names)),
                     ('No. Factors:', len(self._factor_names)),
@@ -221,8 +220,8 @@ class LinearFactorModelResults(_SummaryStr):
 
         Notes
         -----
-        Joint test that all estimated :math:`\hat{\alpha}_i` are zero. 
-        Implemented using a Wald test using the estimated parameter 
+        Joint test that all estimated :math:`\hat{\alpha}_i` are zero.
+        Implemented using a Wald test using the estimated parameter
         covariance.
         """
 
