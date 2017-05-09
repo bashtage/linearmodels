@@ -1,3 +1,5 @@
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
+
 from collections import OrderedDict
 
 import numpy as np
@@ -5,7 +7,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 from numpy.testing import assert_equal
-from pandas.util.testing import assert_frame_equal, assert_series_equal
+
 
 from linearmodels.iv.data import IVData
 

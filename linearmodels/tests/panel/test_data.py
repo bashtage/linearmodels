@@ -1,3 +1,5 @@
+from linearmodels.compat.pandas import assert_frame_equal, assert_panel_equal
+
 from itertools import product
 
 import numpy as np
@@ -6,7 +8,6 @@ import pytest
 import xarray as xr
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas.util.testing import assert_frame_equal, assert_panel_equal
 
 from linearmodels.compat.pandas import is_string_dtype
 from linearmodels.panel.data import PanelData

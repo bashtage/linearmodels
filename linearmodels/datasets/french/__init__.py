@@ -11,7 +11,7 @@ HML      Value Factor
 Mom      Momentum Factor
 RF       Risk-free rate
 NoDur    Industry: Non-durables
-Durbl    Industry: Durables   
+Durbl    Industry: Durables
 Manuf    Industry: Manufacturing
 Enrgy    Industry: Energy
 Chems    Industry: Chemicals
