@@ -5,23 +5,23 @@ from linearmodels.iv.covariance import KERNEL_LOOKUP, kernel_optimal_bandwidth, 
 class HeteroskedasticCovariance(object):
     """
     Heteroskedasticity robust covariance estimator
-    
+
     Parameters
     ----------
     xe : ndarray
         Scores/moment conditionas
     jacobian : ndarray, optional
-        Jacobian.  One and only one of jacobian and inv_jacobian must 
+        Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
     inv_jacobian : ndarray, optional
-        Inverse jacobian.  One and only one of jacobian and inv_jacobian must 
+        Inverse jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
     center : bool, optional
         Falg indicating to center the scores when computing the covariance
     debiased : bool, optional
         Flag indicating to use a debiased estimator
     df : int, optional
-        Degree of freedom value ot use if debiasing 
+        Degree of freedom value ot use if debiasing
     """
 
     def __init__(self, xe, *, jacobian=None, inv_jacobian=None,
@@ -31,8 +31,9 @@ class HeteroskedasticCovariance(object):
         self._jac = jacobian
         self._inv_jac = inv_jacobian
         self._center = center
-        if jacobian is None and inv_jacobian is None:
-            raise ValueError('One of jacobian or inv_jacobian must be provided.')
+        if (jacobian is None and inv_jacobian is None)\
+                or (jacobian is not None and inv_jacobian is not None):
+            raise ValueError('One and only one of jacobian or inv_jacobian must be provided.')
         self._debiased = debiased
         self._df = df
         if jacobian is not None:
@@ -44,7 +45,7 @@ class HeteroskedasticCovariance(object):
     def s(self):
         """
         Score/moment condition covariance
-        
+
         Returns
         -------
         s : ndarray
@@ -81,7 +82,7 @@ class HeteroskedasticCovariance(object):
     def cov(self):
         """
         Compute parameter covariance
-        
+
         Returns
         -------
         c : ndarray
@@ -109,10 +110,10 @@ class KernelCovariance(HeteroskedasticCovariance):
     xe : ndarray
         Scores/moment conditionas
     jacobian : ndarray, optional
-        Jacobian.  One and only one of jacobian and inv_jacobian must 
+        Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
     inv_jacobian : ndarray, optional
-        Inverse jacobian.  One and only one of jacobian and inv_jacobian must 
+        Inverse jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
     kernel : str, optional
         Kernel name. See notes for available kernels.
@@ -181,8 +182,8 @@ class KernelCovariance(HeteroskedasticCovariance):
 
 class HeteroskedasticWeight(object):
     """
-    GMM weighing matrix estimation 
-    
+    GMM weighing matrix estimation
+
     Parameters
     ----------
     moments : ndarray
@@ -198,7 +199,7 @@ class HeteroskedasticWeight(object):
     def w(self, moments):
         """
         Score/moment condition weighting matrix
-        
+
         Parameters
         ----------
         moments : ndarray
@@ -219,8 +220,8 @@ class HeteroskedasticWeight(object):
 
 class KernelWeight(HeteroskedasticWeight):
     """
-    HAC GMM weighing matrix estimation 
-    
+    HAC GMM weighing matrix estimation
+
     Parameters
     ----------
     moments : ndarray

@@ -2,7 +2,9 @@ import os
 
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
-    RandomEffects
+    RandomEffects, FamaMacBeth
+from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM, \
+    TradedFactorModel
 from ._version import get_versions
 
 WARN_ON_MISSING = os.environ.get('LINEARMODELS_WARN_ON_MISSING', True)
@@ -12,7 +14,10 @@ DROP_MISSING = False if DROP_MISSING in ('0', 'False') else True
 
 
 __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS', 'RandomEffects',
-           'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS', 'WARN_ON_MISSING', 'DROP_MISSING']
+           'FamaMacBeth',
+           'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS',
+           'LinearFactorModel','LinearFactorModelGMM', 'TradedFactorModel',
+           'WARN_ON_MISSING', 'DROP_MISSING']
 
 __version__ = get_versions()['version']
 del get_versions
