@@ -4,9 +4,10 @@ from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 from scipy.optimize import minimize
 
-from linearmodels.asset_pricing.results import GMMFactorModelResults, LinearFactorModelResults
-from linearmodels.asset_pricing.covariance import HeteroskedasticCovariance, KernelCovariance, KernelWeight, \
+from linearmodels.asset_pricing.covariance import HeteroskedasticCovariance, KernelCovariance, \
+    KernelWeight, \
     HeteroskedasticWeight
+from linearmodels.asset_pricing.results import GMMFactorModelResults, LinearFactorModelResults
 from linearmodels.iv.data import IVData
 from linearmodels.utility import AttrDict, WaldTestStatistic, has_constant, matrix_rank, \
     missing_warning
@@ -131,9 +132,9 @@ class TradedFactorModel(object):
         >>> data = french.load()
         >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 S5M5 ~ MktRF + SMB + HML'
         >>> mod = TradedFactorModel.from_formula(formula, data)
-        
+
         Using only factors
-        
+
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)
@@ -211,7 +212,8 @@ class TradedFactorModel(object):
             rp_cov_est = HeteroskedasticCovariance(fe, jacobian=np.eye(f.shape[1]), center=False,
                                                    debiased=debiased, df=1)
         elif cov_type == 'kernel':
-            cov_est = KernelCovariance(xe, inv_jacobian=xpxi, center=False, debiased=debiased, df=fc.shape[1],
+            cov_est = KernelCovariance(xe, inv_jacobian=xpxi, center=False, debiased=debiased,
+                                       df=fc.shape[1],
                                        **cov_config)
             bw = cov_est.bandwidth
             _cov_config = {k: v for k, v in cov_config.items()}
@@ -316,8 +318,6 @@ class LinearFactorModel(TradedFactorModel):
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nrp = (f.shape[1] + int(self._risk_free))
-        if p.shape[0] < nrp:
-            raise ValueError('Must have more observations then factors')
         if p.shape[1] < nrp:
             raise ValueError('The number of test portfolio must be at least as '
                              'large as the number of risk premia, including the '
@@ -359,9 +359,9 @@ class LinearFactorModel(TradedFactorModel):
         >>> data = french.load()
         >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 S5M5 ~ MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data)
-        
+
         Using only factors
-        
+
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
@@ -403,7 +403,6 @@ class LinearFactorModel(TradedFactorModel):
         ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        # TODO: Kernel estimator
         # TODO: Refactor commonalities in estimation
         excess_returns = not self._risk_free
         nrf = int(not excess_returns)
@@ -460,12 +459,12 @@ class LinearFactorModel(TradedFactorModel):
         zero_lam = np.r_[[[0]], lam] if excess_returns else np.r_[[[0]], lam[1:]]
         G[s3:, :s2] = np.kron(np.eye(nportfolio), zero_lam.T)
 
+        if cov_type not in ('robust', 'heteroskedastic', 'kernel'):
+            raise ValueError('Unknown weight: {0}'.format(cov_type))
         if cov_type in ('robust', 'heteroskedastic'):
             cov_est = HeteroskedasticCovariance
-        elif cov_type == 'kernel':
+        else:  # 'kernel':
             cov_est = KernelCovariance
-        else:
-            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
         cov_est = cov_est(moments, jacobian=G, center=False,
                           debiased=debiased, df=fc.shape[1], **cov_config)
 
@@ -596,7 +595,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         >>> mod = LinearFactorModel.from_formula(formula, data)
 
         Using only factors
-        
+
         >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
@@ -656,7 +655,6 @@ class LinearFactorModelGMM(LinearFactorModel):
         sv = np.r_[betas, lam, mu][:, None]
         g = self._moments(sv, excess_returns)
         g -= g.mean(0)[None, :] if center else 0
-        # TODO: allow different weights type
         if cov_type not in ('robust', 'heteroskedastic', 'kernel'):
             raise ValueError('Unknown weight: {0}'.format(cov_type))
         if cov_type in ('robust', 'heteroskedastic'):
@@ -678,7 +676,6 @@ class LinearFactorModelGMM(LinearFactorModel):
         last_obj = res.fun
         # 3. Step 2 using step 1 estimates
         if not use_cue:
-            # TODO: Add convergence criteria
             for i in range(steps - 1):
                 g = self._moments(params, excess_returns)
                 w = weight_est.w(g)
