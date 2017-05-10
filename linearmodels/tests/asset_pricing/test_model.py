@@ -218,7 +218,7 @@ def test_unknown_kernel(data):
         mod.fit(cov_type='unknown')
 
 
-def test_all_missing(data):
+def test_all_missing():
     p = np.nan * np.ones((1000, 10))
     f = np.nan * np.ones((1000, 3))
     with pytest.raises(ValueError):
