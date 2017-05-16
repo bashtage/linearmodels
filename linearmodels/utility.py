@@ -38,6 +38,8 @@ def has_constant(x):
     const : bool
         Flag indicating whether x contains a constant or has column span with
         a constant
+    loc : int
+        Column location of constant
     """
     if np.any(np.all(x == 1, axis=0)):
         loc = np.argwhere(np.any(np.all(x == 1, axis=0)))

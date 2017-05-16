@@ -31,6 +31,6 @@ def notebook(request):
 def test_notebook(notebook):
     nb = nbformat.read(notebook, as_version=4)
     ep = ExecutePreprocessor(allow_errors=False,
-                             timeout=20,
+                             timeout=120,
                              kernel_name=kernel_name)
     ep.preprocess(nb, {'metadata': {'path': NOTEBOOK_DIR}})

@@ -306,7 +306,7 @@ Two-stage Least Squares (2SLS)
 The 2SLS estimator is 
 \begin_inset Formula 
 \begin{align*}
-\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)
+\hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)^{-1}\left(X^{\prime}P_{Z}y\right)
 \end{align*}
 
 \end_inset
@@ -324,7 +324,7 @@ Limited Information Maximum Likelihood and k-class Estimators
 The LIML or other k-class estimator is 
 \begin_inset Formula 
 \begin{align*}
-\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)
+\hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)^{-1}\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)
 \end{align*}
 
 \end_inset
@@ -356,7 +356,7 @@ where
  set to 
 \begin_inset Formula 
 \[
-\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+\hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\right]}
 \]
 
 \end_inset
@@ -688,7 +688,7 @@ The kernel covariance estimator is robust to both heteroskedasticity and
  autocorrelation and is defined as 
 \begin_inset Formula 
 \begin{align*}
-\hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+\hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}K\left(\frac{i}{h}\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
 \hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\xi}_{i-j}\hat{\xi}_{i}^{\prime}
 \end{align*}
 
@@ -700,7 +700,7 @@ The kernel covariance estimator is robust to both heteroskedasticity and
 \begin_layout Standard
 \noindent
 where 
-\begin_inset Formula $k\left(i/h\right)$
+\begin_inset Formula $K\left(\frac{i}{h}\right)$
 \end_inset
 
  is a kernel weighting function where 
@@ -962,7 +962,7 @@ GMM covariance depends on the weighting matrix used in estimation and the
  In most applications these are the same and so the inefficient form, 
 \begin_inset Formula 
 \[
-\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\left(\left(\frac{X'Z}{n}\right)WSW\left(\frac{Z'X}{n}\right)\right)\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}
 \]
 
 \end_inset
@@ -975,7 +975,7 @@ GMM covariance depends on the weighting matrix used in estimation and the
 will collapse to the simpler form 
 \begin_inset Formula 
 \[
-\hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+\hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}
 \]
 
 \end_inset
@@ -986,7 +986,7 @@ will collapse to the simpler form
 \begin_layout Standard
 \noindent
 when 
-\begin_inset Formula $W=S$
+\begin_inset Formula $W=S^{-1}$
 \end_inset
 
 .

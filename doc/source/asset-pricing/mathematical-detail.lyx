@@ -605,6 +605,126 @@ dasticity consistent estimator or the HAC estimator in the previous section.
 \end_layout
 
 \begin_layout Subsubsection
+Improved Specification using GLS
+\end_layout
+
+\begin_layout Standard
+TODO: Should 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ use GLS? Probably.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left[\begin{array}{c}
+\epsilon_{t}\otimes\left[1\,f_{t}^{\prime}\right]^{\prime}\\
+f_{t}-\mu\\
+\beta^{\prime}\Sigma^{-1}\left(r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)\right)\\
+r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)-\alpha
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The Jacobian is than 
+\begin_inset Formula 
+\[
+-\left[\begin{array}{cccc}
+I_{N}\otimes f_{c,t}f_{c,t}^{\prime} & 0 & 0 & 0\\
+0 & I_{K} & 0 & 0\\
+G_{13} & -\beta_{c}^{\prime}\Sigma^{-1}\beta & \beta_{c}^{\prime}\Sigma^{-1}\beta_{c} & 0\\
+I_{N}\otimes\left[0\ \left(f_{t}-\mu+\lambda\right)\right] & -\beta & \beta_{c} & I_{N}
+\end{array}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula $\beta_{c}=\left[1_{N}\,\beta\right]$
+\end_inset
+
+.
+ 
+\begin_inset Formula $\lambda=\left[\lambda_{1},\ldots,\lambda_{K}\right]$
+\end_inset
+
+ and so does not include 
+\begin_inset Formula $\lambda_{0}$
+\end_inset
+
+.
+ The final piece has the structure
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+G_{31}=\left[G_{31,1}\ G_{31,2}\:\ldots\ G_{31,N}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+G_{31,i}=\left[0_{\left(K+1\right)}\;\tilde{\beta}_{c,i}^{\prime}\left(f_{t}-\mu+\lambda\right)^{\prime}-\left[\begin{array}{c}
+0_{K}^{\prime}\\
+\tilde{\epsilon}_{it}I_{K}
+\end{array}\right]\right]
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\tilde{\beta}_{c,i}$
+\end_inset
+
+ is row 
+\begin_inset Formula $i$
+\end_inset
+
+ of 
+\begin_inset Formula $\Sigma^{-1}\beta_{c}$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{\epsilon}_{it}$
+\end_inset
+
+ is the element in position 
+\begin_inset Formula $i$
+\end_inset
+
+ of 
+\begin_inset Formula $\tilde{\epsilon}_{t}=\Sigma^{-1}\left(r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)\right)$
+\end_inset
+
+.
+ Each block has a 0 columns corresponding to 
+\begin_inset Formula $c_{i}$
+\end_inset
+
+ and 
+\end_layout
+
+\begin_layout Subsubsection
 The J statistic
 \end_layout
 

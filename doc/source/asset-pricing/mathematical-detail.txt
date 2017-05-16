@@ -132,6 +132,50 @@ rate is 0, all terms of the form :math:`[1_{N}\;\beta]` become
 either the heteroskedasticity consistent estimator or the HAC estimator
 in the previous section.
 
+Improved Specification using GLS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO: Should :math:`\alpha` use GLS? Probably.
+
+.. math::
+
+   \left[\begin{array}{c}
+   \epsilon_{t}\otimes\left[1\,f_{t}^{\prime}\right]^{\prime}\\
+   f_{t}-\mu\\
+   \beta^{\prime}\Sigma^{-1}\left(r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)\right)\\
+   r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)-\alpha
+   \end{array}\right]
+
+The Jacobian is than
+
+.. math::
+
+   -\left[\begin{array}{cccc}
+   I_{N}\otimes f_{c,t}f_{c,t}^{\prime} & 0 & 0 & 0\\
+   0 & I_{K} & 0 & 0\\
+   G_{13} & -\beta_{c}^{\prime}\Sigma^{-1}\beta & \beta_{c}^{\prime}\Sigma^{-1}\beta_{c} & 0\\
+   I_{N}\otimes\left[0\ \left(f_{t}-\mu+\lambda\right)\right] & -\beta & \beta_{c} & I_{N}
+   \end{array}\right]
+
+:math:`\beta_{c}=\left[1_{N}\,\beta\right]`.
+:math:`\lambda=\left[\lambda_{1},\ldots,\lambda_{K}\right]` and so does
+not include :math:`\lambda_{0}`. The final piece has the structure
+
+.. math:: G_{31}=\left[G_{31,1}\ G_{31,2}\:\ldots\ G_{31,N}\right]
+
+.. math::
+
+   G_{31,i}=\left[0_{\left(K+1\right)}\;\tilde{\beta}_{c,i}^{\prime}\left(f_{t}-\mu+\lambda\right)^{\prime}-\left[\begin{array}{c}
+   0_{K}^{\prime}\\
+   \tilde{\epsilon}_{it}I_{K}
+   \end{array}\right]\right]
+
+ where :math:`\tilde{\beta}_{c,i}` is row :math:`i` of
+:math:`\Sigma^{-1}\beta_{c}` and :math:`\tilde{\epsilon}_{it}` is the
+element in position :math:`i` of
+:math:`\tilde{\epsilon}_{t}=\Sigma^{-1}\left(r_{t}-\lambda_{0}-\beta\left(f_{t}-\mu+\tilde{\lambda}\right)\right)`.
+Each block has a 0 columns corresponding to :math:`c_{i}` and
+
 The J statistic
 ~~~~~~~~~~~~~~~
 
