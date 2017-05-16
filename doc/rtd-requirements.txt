@@ -9,5 +9,5 @@ ipython
 nbsphinx
 jupyter
 nbconvert
-sphinx_rtd_theme
+guzzle_sphinx_theme
 nbformat
