@@ -1,0 +1,13 @@
+numpy
+scipy
+pandas>=0.19
+xarray
+patsy
+statsmodels>=0.8
+sphinx
+ipython
+nbsphinx
+jupyter
+nbconvert
+sphinx_rtd_theme
+nbformat
