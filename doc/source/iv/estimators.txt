@@ -60,7 +60,7 @@ The 2SLS estimator is
 .. math::
 
    \begin{aligned}
-   \hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)\left(X^{\prime}P_{Z}y\right)\end{aligned}
+   \hat{\beta}_{2SLS} & =\left(X^{\prime}P_{Z}X\right)^{-1}\left(X^{\prime}P_{Z}y\right)\end{aligned}
 
 Limited Information Maximum Likelihood and k-class Estimators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,14 +70,14 @@ The LIML or other k-class estimator is
 .. math::
 
    \begin{aligned}
-   \hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)\end{aligned}
+   \hat{\beta}_{\kappa} & =\left(X^{\prime}\left(I-\kappa M_{Z}\right)X\right)^{-1}\left(X^{\prime}\left(I-\kappa M_{Z}\right)y\right)\end{aligned}
 
 where :math:`\kappa` is the parameter of the class. When
 :math:`\kappa=1` the 2SLS estimator is recovered. When :math:`\kappa=0`,
 the OLS estimator is recovered. The LIML estimator is recovered when
 :math:`\kappa` set to
 
-.. math:: \hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{z}W\right)^{-\frac{1}{2}}\right]}
+.. math:: \hat{\kappa}=\min\mathrm{eig\left[\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\left(W^{\prime}M_{X_{1}}W\right)\left(W^{\prime}M_{Z}W\right)^{-\frac{1}{2}}\right]}
 
 where :math:`W=\left[y\:X_{2}\right]` and :math:`\mathrm{eig}` returns
 the eigenvalues.
@@ -193,11 +193,11 @@ autocorrelation and is defined as
 .. math::
 
    \begin{aligned}
-   \hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}k\left(i/h\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
+   \hat{B} & =\hat{\Gamma}_{0}+\sum_{i=1}^{n-1}K\left(\frac{i}{h}\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\\
    \hat{\Gamma_{j}} & =n^{-1}\sum_{i=j+1}^{n}\hat{\xi}_{i-j}\hat{\xi}_{i}^{\prime}\end{aligned}
 
-where :math:`k\left(i/h\right)` is a kernel weighting function where
-:math:`h` is the kernel bandwidth.
+where :math:`K\left(\frac{i}{h}\right)` is a kernel weighting function
+where :math:`h` is the kernel bandwidth.
 
 The one-way clustered covariance estimator is defined as
 
@@ -282,13 +282,14 @@ GMM covariance depends on the weighting matrix used in estimation and
 the assumed covariance of the scores. In most applications these are the
 same and so the inefficient form,
 
-.. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}\left(\frac{X'Z}{n}W^{-1}SW^{-1}\frac{Z'X}{n}\right)\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+.. math:: \hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}\left(\left(\frac{X'Z}{n}\right)WSW\left(\frac{Z'X}{n}\right)\right)\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}
 
 will collapse to the simpler form
 
-.. math:: \hat{\Sigma}=n^{-1}\left(\frac{X'Z}{n}W^{-1}\frac{Z'X}{n}\right)^{-1}
+.. math:: \hat{\Sigma}=n^{-1}\left(\left(\frac{X'Z}{n}\right)W\left(\frac{Z'X}{n}\right)\right)^{-1}
 
-when :math:`W=S`. When an unadjusted (homoskedastic) covariance is used,
+when :math:`W=S^{-1}`. When an unadjusted (homoskedastic) covariance is
+used,
 
 .. math:: \hat{S}=\tilde{s}^{2}n^{-1}\sum_{j=1}^{n}z_{j}^{\prime}z_{j}
 
