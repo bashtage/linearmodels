@@ -102,3 +102,6 @@ ENV/
 *.iml
 out
 gen
+
+# Latex
+*.tex
