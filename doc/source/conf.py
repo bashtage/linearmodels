@@ -26,9 +26,6 @@ import linearmodels
 import guzzle_sphinx_theme
 # import sphinx_bootstrap_theme
 # import sphinx_rtd_theme
-
-
-
 # ...
 
 # -- General configuration ------------------------------------------------

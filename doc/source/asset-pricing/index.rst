@@ -58,5 +58,6 @@ implementing hypothesis tests.
    :glob:
 
    examples/examples.ipynb
+   examples/formulas.ipynb
    reference
    mathematical-formula

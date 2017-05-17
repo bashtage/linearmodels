@@ -31,6 +31,12 @@ for nb in notebooks:
         with open(nb, 'r') as nbin:
             nbout.write(nbin.read())
 
+import glob
+bzip_csv_files = []
+for filename in glob.iglob('./linearmodels/datasets/**',recursive=True):
+    if '.csv.bz' in filename:
+        bzip_csv_files.append(filename.replace('./linearmodels/', ''))
+
 setup(
     cmdclass=versioneer.get_cmdclass(),
     name='linearmodels',
@@ -45,6 +51,7 @@ setup(
     long_description=description,
     install_requires=open('requirements.txt').read().split('\n'),
     include_package_data=True,
+    package_data={'linearmodels': bzip_csv_files},
     keywords=['linear models', 'regression', 'instrumental variables', 'IV',
               'panel', 'fixed effects', 'clustered', 'heteroskedasticity',
               'endogeneity', 'instruments', 'statistics',
