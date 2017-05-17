@@ -19,6 +19,11 @@ include Panel regression and instrumental variable estimators:
   - Limited Information Maximum Likelihood
   - k-class Estimators
   - Generalized Method of Moments, also with continuously updating
+- **Factor Asset Pricing Models**:
+  - 2- and 3-step estimation 
+  - Time-series estimation
+  - GMM estimation
+ 
   
 Designed to work equally well with NumPy, Pandas or xarray data.
 
@@ -96,7 +101,8 @@ only the single variable IV estimators are polished.
 
 * Linear Instrumental variable estimation - **complete**
 * Linear Panel model estimation - **complete**
-* Fama-MacBeth regression - *not started*
+* Fama-MacBeth regression - **complete**
+* Linear Factor Asset Pricing - **complete**
 * Linear IV Panel model estimation - *not started*
 * System regression - *not started*
 
@@ -110,7 +116,7 @@ that are being used in the test environment.  It is possible that older versions
 * **Python 3.5+**: extensive use of `@` operator
 * NumPy (1.11+)
 * SciPy (0.17+)
-* Pandas (0.19+)
+* Pandas (0.18+)
 * xarray (0.9+)
 * Statsmodels (0.8+)
 
@@ -121,7 +127,7 @@ that are being used in the test environment.  It is possible that older versions
 ### Documentation
 
 * sphinx
-* sphinx_rtd_theme
+* guzzle_sphinx_theme
 * nbsphinx
 * nbconvert
 * nbformat
