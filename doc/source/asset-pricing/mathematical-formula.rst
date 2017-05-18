@@ -4,8 +4,11 @@
 
 .. rubric:: References
 
-.. [1] Bryzgalova, Svetlana. Spurious factors in linear asset pricing models. Working Paper, 2016.
+Sources used in writing the code include [Bryzgalova]_, [Cochrane]_ and [JagannathanEtAl]_.
 
-.. [2] Cochrane, John H. *Asset Pricing:(Revised Edition)*. Princeton University Press, 2009.
+.. [Bryzgalova] Bryzgalova, Svetlana. "Spurious factors in linear asset pricing models." Working Paper, 2016.
 
-.. [3] Jagannathan, Ravi, Georgios Skoulakis, and Zhenyu Wang. Generalized methods of moments: Applications in finance. *Journal of Business & Economic Statistics* 20, no. 4 (2002): 470-481.
+.. [Cochrane] Cochrane, John H. *Asset Pricing:(Revised Edition)*. Princeton University Press, 2009.
+
+.. [JagannathanEtAl] Jagannathan, Ravi, Georgios Skoulakis, and Zhenyu Wang. "Generalized methods of moments:
+    Applications in finance." *Journal of Business & Economic Statistics* 20, no. 4 (2002): 470-481.

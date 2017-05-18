@@ -60,7 +60,7 @@ install:
 
 script:
   - set -ev
-  - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels ${SKIPSLOW}
+  - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - cd doc && make html && make html && cd ..
   - if [ ${PYTHON} = 3.5 ]; then doctr deploy doc; fi
 
