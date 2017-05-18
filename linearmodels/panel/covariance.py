@@ -9,8 +9,6 @@ __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
            'ClusteredCovariance', 'DriscollKraay', 'CovarianceManager']
 
 
-# TODO: Kernel Covriance w/o X-section dependence
-
 class HomoskedasticCovariance(object):
     r"""
     Homoskedastic covariance estimation
@@ -23,6 +21,8 @@ class HomoskedasticCovariance(object):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
@@ -53,11 +53,12 @@ class HomoskedasticCovariance(object):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
-
-    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0):
+    
+    def __init__(self, y, x, params, entity_ids, time_ids, *, debiased=False, extra_df=0):
         self._y = y
         self._x = x
         self._params = params
+        self._entity_ids = entity_ids
         self._time_ids = time_ids
         self._debiased = debiased
         self._extra_df = extra_df
@@ -67,26 +68,26 @@ class HomoskedasticCovariance(object):
             self._nobs_eff -= self._nvar
         self._scale = self._nobs / self._nobs_eff
         self._name = 'Unadjusted'
-
+    
     @property
     def name(self):
         return self._name
-
+    
     @property
     def eps(self):
         return self._y - self._x @ self._params
-
+    
     @property
     def s2(self):
         eps = self.eps
         return self._scale * float(eps.T @ eps) / self._nobs
-
+    
     @cached_property
     def cov(self):
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
-
+    
     def deferred_cov(self):
         return self.cov
 
@@ -103,6 +104,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
@@ -135,12 +138,12 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
-
-    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0):
-        super(HeteroskedasticCovariance, self).__init__(y, x, params, time_ids, debiased=debiased,
-                                                        extra_df=extra_df)
+    
+    def __init__(self, y, x, params, entity_ids, time_ids, *, debiased=False, extra_df=0):
+        super(HeteroskedasticCovariance, self).__init__(y, x, params, entity_ids, time_ids,
+                                                        debiased=debiased, extra_df=extra_df)
         self._name = 'Robust'
-
+    
     @cached_property
     def cov(self):
         x = self._x
@@ -149,7 +152,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         eps = self.eps
         xe = x * eps
         xeex = self._scale * xe.T @ xe / nobs
-
+        
         out = (xpxi @ xeex @ xpxi) / nobs
         return (out + out.T) / 2
 
@@ -168,6 +171,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
@@ -217,12 +222,12 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where g is the number of distinct groups and n is the number of
     observations.
     """
-
-    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0, clusters=None,
+    
+    def __init__(self, y, x, params, entity_ids, time_ids, *, debiased=False, extra_df=0,
+                 clusters=None,
                  group_debias=False):
-        super(ClusteredCovariance, self).__init__(y, x, params, time_ids,
-                                                  debiased=debiased,
-                                                  extra_df=extra_df)
+        super(ClusteredCovariance, self).__init__(y, x, params, entity_ids, time_ids,
+                                                  debiased=debiased, extra_df=extra_df)
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         clusters = np.asarray(clusters).squeeze()
@@ -235,31 +240,31 @@ class ClusteredCovariance(HomoskedasticCovariance):
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
         self._clusters = clusters
         self._name = 'Clustered'
-
+    
     def _calc_group_debias(self, clusters):
         n = clusters.shape[0]
         ngroups = np.unique(clusters).shape[0]
         return (ngroups / (ngroups - 1)) * ((n - 1) / n)
-
+    
     @cached_property
     def cov(self):
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
-
+        
         eps = self.eps
         xe = x * eps
         if self._clusters.ndim == 1:
             xeex = _cov_cluster(xe, self._clusters)
             if self._group_debias:
                 xeex *= self._calc_group_debias(self._clusters)
-
+        
         else:
             clusters0 = self._clusters[:, 0]
             clusters1 = self._clusters[:, 1]
             xeex0 = _cov_cluster(xe, clusters0)
             xeex1 = _cov_cluster(xe, clusters1)
-
+            
             sort_keys = np.lexsort(self._clusters.T)
             locs = np.arange(self._clusters.shape[0])
             lex_sorted = self._clusters[sort_keys]
@@ -269,14 +274,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
             resort_locs = np.argsort(sorted_locs)
             clusters01 = clusters01[resort_locs]
             xeex01 = _cov_cluster(xe, clusters01)
-
+            
             if self._group_debias:
                 xeex0 *= self._calc_group_debias(clusters0)
                 xeex1 *= self._calc_group_debias(clusters1)
                 xeex01 *= self._calc_group_debias(clusters01)
-
+            
             xeex = xeex0 + xeex1 - xeex01
-
+        
         xeex *= self._scale
         out = (xpxi @ xeex @ xpxi) / nobs
         return (out + out.T) / 2
@@ -294,6 +299,8 @@ class DriscollKraay(HomoskedasticCovariance):
         (entity x time) by variables stacked array of exogenous
     params : ndarray
         variables by 1 array of estimated model parameters
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
     debiased : bool, optional
@@ -342,24 +349,24 @@ class DriscollKraay(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
-
+    
     # TODO: Test
-
-    def __init__(self, y, x, params, time_ids, *, debiased=False, extra_df=0,
+    
+    def __init__(self, y, x, params, entity_ids, time_ids, *, debiased=False, extra_df=0,
                  kernel='newey-west', bandwidth=None):
-        super(DriscollKraay, self).__init__(y, x, params, time_ids, debiased=debiased,
-                                            extra_df=extra_df)
+        super(DriscollKraay, self).__init__(y, x, params, entity_ids, time_ids,
+                                            debiased=debiased, extra_df=extra_df)
         self._name = 'Driscoll-Kraay'
         self._kernel = kernel
         self._bandwidth = bandwidth
-
+    
     @cached_property
     def cov(self):
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
         eps = self.eps
-
+        
         xe = x * eps
         xe = DataFrame(xe, index=self._time_ids.squeeze())
         xe = xe.groupby(level=0).sum()
@@ -371,7 +378,117 @@ class DriscollKraay(HomoskedasticCovariance):
         w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
         xeex = _cov_kernel(xe.values, w) * (xe_nobs / nobs)
         xeex *= self._scale
+        
+        out = (xpxi @ xeex @ xpxi) / nobs
+        return (out + out.T) / 2
 
+
+class ACCovariance(HomoskedasticCovariance):
+    r"""
+    Autocorrelation robust covariance estimation
+
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
+    x : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        variables by 1 array of estimated model parameters
+    entity_ids : ndarray
+        (entity x time) by 1 stacked array of entity ids
+    time_ids : ndarray
+        (entity x time) by 1 stacked array of time ids
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    extra_df : int, optional
+        Additional degrees of freedom consumed by models beyond the number of
+        columns in x, e.g., fixed effects.  Covariance estimators are always
+        adjusted for extra_df irrespective of the setting of debiased
+    kernel : str, options
+        Name of one of the supported kernels
+    bandwidth : int, optional
+        Non-negative integer to use as bandwidth.  If not provided a rule-of-
+        thumb value is used.
+
+    Notes
+    -----
+    Supported kernels:
+
+    * 'bartlett', 'newey-west' - Bartlett's kernel
+    * 'quadratic-spectral', 'qs', 'andrews' - Quadratic-Spectral Kernel
+    * 'parzen', 'gallant' - Parzen kernel
+
+    Bandwidth is set to the common value for the Bartlett kernel if not
+    provided.
+
+    The estimator of the covariance is
+
+    .. math::
+
+        n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}
+
+    where
+
+    .. math::
+
+        \hat{\Sigma}_{xx} = n^{-1}X'X
+
+    and
+
+    .. math::
+      \xi_t & = \sum_{i=1}^{n_t} \epsilon_i x_{i} \\
+      \hat{S}_0 & = \sum_{i=1}^{t} \xi'_t \xi_t \\
+      \hat{S}_j & = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\
+      \hat{S}   & = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j
+
+    where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
+    ``True``. :math:`K(i, bw)` is the kernel weighting function.
+    """
+    
+    # TODO: Docstring
+    
+    def __init__(self, y, x, params, entity_ids, time_ids, *, debiased=False, extra_df=0,
+                 kernel='newey-west', bandwidth=None):
+        super(ACCovariance, self).__init__(y, x, params, entity_ids, time_ids,
+                                           debiased=debiased, extra_df=extra_df)
+        self._name = 'Autocorrelation Rob. Cov.'
+        self._kernel = kernel
+        self._bandwidth = bandwidth
+    
+    def _single_cov(self, xe, bw):
+        nobs = xe.shape[0]
+        w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
+        return _cov_kernel(xe, w)
+    
+    @cached_property
+    def cov(self):
+        x = self._x
+        nobs = x.shape[0]
+        xpxi = inv(x.T @ x / nobs)
+        eps = self.eps
+        
+        time_ids = np.unique(self._time_ids.squeeze())
+        nobs = len(time_ids)
+        bw = self._bandwidth
+        if self._bandwidth is None:
+            bw = int(np.floor(4 * (nobs / 100) ** (2 / 9)))
+        
+        xe = x * eps
+        index = [self._entity_ids.squeeze(), self._time_ids.squeeze()]
+        xe = DataFrame(xe, index=index)
+        xe = xe.sort_index(level=[0, 1])
+        
+        entities = xe.index.levels[0]
+        nentity = len(entities)
+        xeex = np.zeros((xe.shape[1], xe.shape[1]))
+        for entity in entities:
+            _xe = xe.loc[entity].values
+            _bw = max(len(_xe) - 1, bw)
+            xeex += self._single_cov(_xe, _bw)
+        xeex /= nentity
+        xeex *= self._scale
+        
         out = (xpxi @ xeex @ xpxi) / nobs
         return (out + out.T) / 2
 
@@ -383,14 +500,15 @@ class CovarianceManager(object):
                              'robust': HeteroskedasticCovariance,
                              'heteroskedastic': HeteroskedasticCovariance,
                              'clustered': ClusteredCovariance,
-                             'driscollkraay': DriscollKraay,
+                             'driscoll-kraay': DriscollKraay,
                              'dk': DriscollKraay,
-                             'kernel': DriscollKraay}
-
+                             'kernel': ACCovariance,
+                             'ac': ACCovariance}
+    
     def __init__(self, estimator, *cov_estimators):
         self._estimator = estimator
         self._supported = cov_estimators
-
+    
     def __getitem__(self, item):
         if item not in self.COVARIANCE_ESTIMATORS:
             raise KeyError('Unknown covariance estimator type.')
@@ -403,10 +521,10 @@ class CovarianceManager(object):
 
 class FamaMacBethCovariance(HomoskedasticCovariance):
     def __init__(self, y, x, params, all_params, *, debiased=False):
-        super(FamaMacBethCovariance, self).__init__(y, x, params, None, debiased=debiased)
+        super(FamaMacBethCovariance, self).__init__(y, x, params, None, None, debiased=debiased)
         self._all_params = all_params
         self._name = 'Fama-MacBeth Std Cov'
-
+    
     @cached_property
     def cov(self):
         e = self._all_params - self._params.T
@@ -417,18 +535,20 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
 
 class FamaMacBethKernelCovariance(FamaMacBethCovariance):
-    def __init__(self, y, x, params, all_params, *, debiased=False, kernel='newey-west', bandwidth=None):
-        super(FamaMacBethKernelCovariance, self).__init__(y, x, params, all_params, debiased=debiased)
+    def __init__(self, y, x, params, all_params, *, debiased=False, kernel='newey-west',
+                 bandwidth=None):
+        super(FamaMacBethKernelCovariance, self).__init__(y, x, params, all_params,
+                                                          debiased=debiased)
         self._name = 'Fama-MacBeth Kernel Cov'
         self._bandwidth = bandwidth
         self._kernel = kernel
-
+    
     @cached_property
     def cov(self):
         e = self._all_params - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
         nobs = e.shape[0]
-
+        
         bw = self._bandwidth
         if self._bandwidth is None:
             bw = int(np.floor(4 * (nobs / 100) ** (2 / 9)))

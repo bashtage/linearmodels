@@ -28,6 +28,7 @@ def notebook(request):
     return request.param
 
 
+@pytest.mark.slow
 def test_notebook(notebook):
     nb = nbformat.read(notebook, as_version=4)
     ep = ExecutePreprocessor(allow_errors=False,

@@ -958,6 +958,7 @@ def test_other_weighted_smoke(data):
     mod.fit(debiased=False)
 
 
+@pytest.mark.slow
 def test_lsdv_options(data):
     mod = PanelOLS(data.y, data.x, weights=data.w)
     res1 = mod.fit()

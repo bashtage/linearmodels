@@ -53,6 +53,7 @@ def test_traded_model_formula(data, model):
     assert mod2.formula is None
 
 
+@pytest.mark.slow
 def test_non_traded_risk_free(data, non_traded_model):
     mod1 = non_traded_model.from_formula(FORMULA, data.joined, risk_free=True)
     mod2 = non_traded_model(data.portfolios, data.factors, risk_free=True)
