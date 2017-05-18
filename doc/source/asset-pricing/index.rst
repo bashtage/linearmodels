@@ -7,10 +7,11 @@ the return in a set of test portfolio.  The economic hypothesis tested is that
 
 .. math::
 
-    E[r_{it}] = \beta_i \lambda
+    E[r_{it}] = \lambda_0 + \beta_i \lambda
 
 where :math:`\beta_i` is a set of factor loadings and :math:`\lambda` are the
-risk premia associated with the factors.
+risk premia associated with the factors. :math:`\lambda_0` is the risk-free
+rate.
 
 When all of the factors are traded, a simple Seemingly Unrelated Regression
 (SUR) approach can be used to test whether the factors price the test
@@ -41,6 +42,8 @@ has a different distribution,
 where K is the number of factors.
 :class:`~linearmodels.asset_pricing.model.LinearFactorModel` implements this
 two-step estimator.
+:class:`~linearmodels.asset_pricing.model.LinearFactorModelGMM` contains a more
+efficient estimator of the same model using over-identified GMM.
 
 Both estimators can be used with either a heteroskedasticity-robust covariance
 by setting ``cov_type='robust'`` or a HAC covariance estimator using
@@ -57,6 +60,7 @@ implementing hypothesis tests.
    :maxdepth: 1
    :glob:
 
+   introduction
    examples/examples.ipynb
    examples/formulas.ipynb
    reference

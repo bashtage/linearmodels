@@ -360,7 +360,7 @@ Inference is conducted by treating this as a 3-step GMM problem where the
 \[
 g_{t}=\left[\begin{array}{c}
 f_{c,t}\otimes\epsilon_{t}\\
-\beta^{\prime}\left(r_{t}-\left[1_{N}\,\beta\right]\lambda\right)\\
+\left[1_{N}\,\beta\right]^{\prime}\left(r_{t}-\left[1_{N}\,\beta\right]\lambda\right)\\
 r_{t}-\left[1_{N}\,\beta\right]\lambda-\alpha
 \end{array}\right]
 \]
@@ -599,8 +599,8 @@ Improved Specification using GLS
 \[
 \left[\begin{array}{c}
 f_{c,t}\otimes\epsilon_{t}\\
-\beta^{\prime}\Sigma^{-1}\left(r_{t}-\left[1_{N}\,\beta\right]\lambda\right)\\
-r_{t}-\left[1_{N}\,\beta\right]\lambda-\alpha
+\beta_{c}^{\prime}\Sigma^{-1}\left(r_{t}-\beta_{c}\lambda\right)\\
+r_{t}-\beta_{c}\lambda-\alpha
 \end{array}\right]
 \]
 
@@ -614,10 +614,10 @@ r_{t}-\left[1_{N}\,\beta\right]\lambda-\alpha
 The Jacobian is than 
 \begin_inset Formula 
 \[
-\hat{G}=-\left[\begin{array}{cccc}
-I_{N}\otimes\Sigma_{f_{c}} & 0 & 0 & 0\\
-G_{12} & -\hat{\beta}_{c}^{\prime}\Sigma^{-1}\hat{\beta} & \hat{\beta}_{c}^{\prime}\Sigma^{-1}\hat{\beta}_{c} & 0\\
-I_{N}\otimes\left[0\ \tilde{\lambda}\right] & -\hat{\beta} & \hat{\beta}_{c} & I_{N}
+\hat{G}=-\left[\begin{array}{ccc}
+I_{N}\otimes\Sigma_{f_{c}} & 0 & 0\\
+G_{12} & \hat{\beta}_{c}^{\prime}\Sigma^{-1}\hat{\beta}_{c} & 0\\
+I_{N}\otimes\left[0\ \tilde{\lambda}\right] & \hat{\beta}_{c} & I_{N}
 \end{array}\right]
 \]
 
