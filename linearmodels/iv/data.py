@@ -17,7 +17,7 @@ type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
 def convert_columns(s, drop_first):
     if is_categorical(s):
         out = pd.get_dummies(s, drop_first=drop_first)
-        out.columns = [s.name + '.' + c for c in out]
+        out.columns = [str(s.name) + '.' + str(c) for c in out]
         return out
     return s
 

@@ -162,7 +162,7 @@ in the model. The final piece has the structure
 
 .. math:: G_{21}=\left[G_{21,1}\ G_{21,2}\:\ldots\ G_{21,N}\right]
 
-.. math:: G_{21,i}=\left[0_{\left(K+1\right)}\;\tilde{\beta}_{c,i}^{\prime}\lambda^{\prime}-\left[0_{K}\;\bar{u}_{i}I_{K}\right]^{\prime}\right]
+.. math:: G_{21,i}=\left[0_{\left(K+1\right)}\;\tilde{\beta}_{c,i}^{\prime}\tilde{\lambda}^{\prime}-\left[0_{K}\;\bar{u}_{i}I_{K}\right]^{\prime}\right]
 
 where :math:`\tilde{\beta}_{c,i}` is row :math:`i` of
 :math:`\Sigma^{-1}\beta_{c}`,

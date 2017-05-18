@@ -1,8 +1,7 @@
 import numpy as np
-from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
-
+from numpy.testing import assert_allclose
 
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
@@ -152,3 +151,22 @@ def test_invalid_formula(data, model_and_func):
     formula = 'y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]'
     with pytest.raises(SyntaxError):
         model.from_formula(formula, data).fit()
+
+
+def test_categorical(model_and_func):
+    formula = 'y ~ 1 + d + x1'
+    y = np.random.randn(1000)
+    x1 = np.random.randn(1000)
+    d = np.random.randint(0, 4, (1000))
+    d = pd.Categorical(d)
+    data = pd.DataFrame({'y': y, 'x1': x1, 'd': d})
+    data['Intercept'] = 1.0
+    model, func = model_and_func
+    mod = model.from_formula(formula, data)
+    res3 = mod.fit()
+    res2 = func(formula, data).fit()
+    res = model(data.y, data[['Intercept', 'x1', 'd']], None, None).fit()
+
+    assert_allclose(res.rsquared, res2.rsquared)
+    assert_allclose(res2.rsquared, res3.rsquared)
+    assert mod.formula == formula

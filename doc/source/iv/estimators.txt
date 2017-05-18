@@ -347,45 +347,125 @@ Post-estimation
 2SLS and LIML Post-estimation Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sargan
+**Sargan**
 
-basman
+Sargan’s test of over-identifying restrictions examines whether the
+variance of the IV residuals is similar to that of the OLS residuals.
+The test statistic is computed
 
-wu haussman
+.. math:: s=n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/\hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}
 
-wooldridge score
+where :math:`\hat{\epsilon}` are the IV residuals and :math:`M_{Z}` is
+the annihilator matrix using all exogenous variables.\ :math:`\nu` is
+the number of overidentifying restrictions, which is the number of
+instruments minus the number of endogenous variables, :math:`p-k_{2}`.
 
-wooldridge regression
+**Basman**
 
-wooldridge overid
+Basman’s test is a small-sample corrected version of Sargan’s test of
+over-identifying restrictions. It has the same distribution. Let
+:math:`s` be Sargan’s test statistic, then Basman’s test statistic is
 
-anderson rubin
+.. math:: s(n-p)/(n-s)\sim\chi_{v}^{2}
 
-basmann f
+TODO: Remove ME
+
+**Wu-Haussman**
+
+**Wooldridge score**
+
+**Wooldridge regression**
+
+**Wooldridge’s Test of Overidentifying restrictions**
+
+**Anderson-Rubin**
+
+**Basmann’s f**
 
 GMM Post-estimation Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-J-stat
+**J-stat**
 
-C-stat
+**C-stat**
 
 First-stage Estimation Analysis
 -------------------------------
 
-First Stage Results -> partial r2, shea r2, f-stat
+**Partial R2 and Partial F-statistic**
+
+The :math:`R^{2}` is reported after orthogonalizing the instruments from
+included exogenous variables, so that the model estimated is
+
+.. math:: x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}
+
+where :math:`\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}`. The partial
+:math:`F`-statistic is the F-statistic from this regression. It is
+implemented as a standard :math:`F`-statistic when the data is assumed
+to be homoskedastic with an :math:`F_{p_{2},n-p_{2}}` distribution. In
+all other cases, a quadratic form is used with an asymptoic
+:math:`\chi_{p_{2}}^{2}` distribution testing :math:`H_{0}:\gamma=0`.
+
+**Shea’s R2**
+
+Shea’s :math:`R^{2}` is defined as the ratio of the parameter variances
+under OLS and 2SLS estimation standardized by the unexplained variance
+under each,
+
+.. math:: \frac{\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{1-R_{OLS}^{2}}}{\frac{\hat{\sigma}_{IV,\beta_{i}}^{2}}{1-R_{IV}^{2}}}=\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{\hat{\sigma}_{IV,\beta_{i}}^{2}}\times\frac{1-R_{IV}^{2}}{1-R_{OLS}^{2}}
+
+If the estimator under 2SLS was as good as under OLS, both ratios would
+be 1 and Shea’s :math:`R^{2}=1`. On the other hand, the worse the
+:math:`IV` fit in terms of either :math:`R^{2}` or the parameter
+variances, the lower the value reported by Shea’s :math:`R^{2}`.
 
 Kernel Weights and Bandwidth Selection
 --------------------------------------
 
-Kernel weights
+**Kernel weights**
 
-Optimal BW selection
+In all formulas, :math:`m` is the kernel bandwidth parameter.
+
+-  Bartlett
+
+   .. math:: w_{i}=1-\frac{i}{m+1},\,i<m
+
+-  Parzen
+
+   .. math::
+
+      \begin{aligned}
+      z_{i} & =\frac{i}{m+1},\,i<m\\
+      w_{i} & =1-6z_{i}^{2}+6z_{i}^{3},z\leq0.5\\
+      w_{i} & =2(1-z_{i})^{3},z>0.5\end{aligned}
+
+-  Quadratic-Spectral
+
+   .. math::
+
+      \begin{aligned}
+      z_{i} & =\frac{6\pi i}{5m}\\
+      w_{0} & =1\\
+      w_{i} & =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1\end{aligned}
+
+**Optimal BW selection**
 
 Constant Detection
 ------------------
 
-Constant detection
+Whether a model contains a constant or equivalent is tested using three
+tests. These are executed in order and so once a constant is detected,
+the others are not executed. The simplest method to ensure that a
+constant is correctly detected is to include a columns of 1s.
+
+#. A column with only 1.0s
+
+#. A column with a maximum minus minimum equal to 0 and that is not all
+   0s.
+
+#. Whether the rank of :math:`X` is the same as
+   :math:`\left[1_{N}\:X\right]`. If these are the same, then the model
+   contains a constant equivalent (e.g., dummies for all categories).
 
 .. [1]
    If the model contains an implicit constant, e.g., all categories of a
@@ -395,4 +475,4 @@ Constant detection
    excluding one category of dummy.
 
 .. [2]
-   This somewhat non-obvious choice is drive by Stata compatibility.
+   This somewhat non-obvious choice is driven by Stata compatibility.

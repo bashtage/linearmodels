@@ -759,7 +759,7 @@ s except the clustered covariance are rescaled by
 status collapsed
 
 \begin_layout Plain Layout
-This somewhat non-obvious choice is drive by Stata compatibility.
+This somewhat non-obvious choice is driven by Stata compatibility.
 \end_layout
 
 \end_inset
@@ -1178,42 +1178,125 @@ Post-estimation
 
 \begin_layout Standard
 \noindent
-sargan
+
+\series bold
+Sargan
 \end_layout
 
 \begin_layout Standard
 \noindent
-basman
+Sargan's test of over-identifying restrictions examines whether the variance
+ of the IV residuals is similar to that of the OLS residuals.
+ The test statistic is computed 
 \end_layout
 
 \begin_layout Standard
 \noindent
-wu haussman
+\begin_inset Formula 
+\[
+s=n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/\hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \noindent
-wooldridge score
+where 
+\begin_inset Formula $\hat{\epsilon}$
+\end_inset
+
+ are the IV residuals and 
+\begin_inset Formula $M_{Z}$
+\end_inset
+
+ is the annihilator matrix using all exogenous variables.
+\begin_inset Formula $\nu$
+\end_inset
+
+ is the number of overidentifying restrictions, which is the number of instrumen
+ts minus the number of endogenous variables, 
+\begin_inset Formula $p-k_{2}$
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
 \noindent
-wooldridge regression
+
+\series bold
+Basman
 \end_layout
 
 \begin_layout Standard
 \noindent
-wooldridge overid
+Basman's test is a small-sample corrected version of Sargan's test of over-ident
+ifying restrictions.
+ It has the same distribution.
+ Let 
+\begin_inset Formula $s$
+\end_inset
+
+ be Sargan's test statistic, then Basman's test statistic is 
+\begin_inset Formula 
+\[
+s(n-p)/(n-s)\sim\chi_{v}^{2}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \noindent
-anderson rubin
+TODO: Remove ME
 \end_layout
 
 \begin_layout Standard
 \noindent
-basmann f
+
+\series bold
+Wu-Haussman
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Wooldridge score
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Wooldridge regression
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Wooldridge's Test of Overidentifying restrictions
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Anderson-Rubin
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Basmann's f
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1223,11 +1306,15 @@ GMM Post-estimation Results
 
 \begin_layout Standard
 \noindent
+
+\series bold
 J-stat
 \end_layout
 
 \begin_layout Standard
 \noindent
+
+\series bold
 C-stat
 \end_layout
 
@@ -1238,7 +1325,107 @@ First-stage Estimation Analysis
 
 \begin_layout Standard
 \noindent
-First Stage Results -> partial r2, shea r2, f-stat
+
+\series bold
+Partial R2 and Partial F-statistic
+\end_layout
+
+\begin_layout Standard
+\noindent
+The 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is reported after orthogonalizing the instruments from included exogenous
+ variables, so that the model estimated is 
+\begin_inset Formula 
+\[
+x_{2i}=\gamma_{0}+\tilde{z}_{2i}\gamma+\eta_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}$
+\end_inset
+
+.
+ The partial 
+\begin_inset Formula $F$
+\end_inset
+
+-statistic is the F-statistic from this regression.
+ It is implemented as a standard 
+\begin_inset Formula $F$
+\end_inset
+
+-statistic when the data is assumed to be homoskedastic with an 
+\begin_inset Formula $F_{p_{2},n-p_{2}}$
+\end_inset
+
+ distribution.
+ In all other cases, a quadratic form is used with an asymptoic 
+\begin_inset Formula $\chi_{p_{2}}^{2}$
+\end_inset
+
+ distribution testing 
+\begin_inset Formula $H_{0}:\gamma=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Shea's R2
+\end_layout
+
+\begin_layout Standard
+\noindent
+Shea's 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is defined as the ratio of the parameter variances under OLS and 2SLS estimatio
+n standardized by the unexplained variance under each, 
+\begin_inset Formula 
+\[
+\frac{\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{1-R_{OLS}^{2}}}{\frac{\hat{\sigma}_{IV,\beta_{i}}^{2}}{1-R_{IV}^{2}}}=\frac{\hat{\sigma}_{OLS,\beta_{i}}^{2}}{\hat{\sigma}_{IV,\beta_{i}}^{2}}\times\frac{1-R_{IV}^{2}}{1-R_{OLS}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+If the estimator under 2SLS was as good as under OLS, both ratios would
+ be 1 and Shea's 
+\begin_inset Formula $R^{2}=1$
+\end_inset
+
+.
+ On the other hand, the worse the 
+\begin_inset Formula $IV$
+\end_inset
+
+ fit in terms of either 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ or the parameter variances, the lower the value reported by Shea's 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection*
@@ -1248,11 +1435,64 @@ Kernel Weights and Bandwidth Selection
 
 \begin_layout Standard
 \noindent
+
+\series bold
 Kernel weights
 \end_layout
 
 \begin_layout Standard
+In all formulas, 
+\begin_inset Formula $m$
+\end_inset
+
+ is the kernel bandwidth parameter.
+ 
+\end_layout
+
+\begin_layout Itemize
+Bartlett
+\begin_inset Formula 
+\[
+w_{i}=1-\frac{i}{m+1},\,i<m
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Parzen
+\begin_inset Formula 
+\begin{align*}
+z_{i} & =\frac{i}{m+1},\,i<m\\
+w_{i} & =1-6z_{i}^{2}+6z_{i}^{3},z\leq0.5\\
+w_{i} & =2(1-z_{i})^{3},z>0.5
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Quadratic-Spectral
+\begin_inset Formula 
+\begin{align*}
+z_{i} & =\frac{6\pi i}{5m}\\
+w_{0} & =1\\
+w_{i} & =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \noindent
+
+\series bold
 Optimal BW selection
 \end_layout
 
@@ -1263,7 +1503,35 @@ Constant Detection
 
 \begin_layout Standard
 \noindent
-Constant detection
+Whether a model contains a constant or equivalent is tested using three
+ tests.
+ These are executed in order and so once a constant is detected, the others
+ are not executed.
+ The simplest method to ensure that a constant is correctly detected is
+ to include a columns of 1s.
+ 
+\end_layout
+
+\begin_layout Enumerate
+A column with only 1.0s
+\end_layout
+
+\begin_layout Enumerate
+A column with a maximum minus minimum equal to 0 and that is not all 0s.
+\end_layout
+
+\begin_layout Enumerate
+Whether the rank of 
+\begin_inset Formula $X$
+\end_inset
+
+ is the same as 
+\begin_inset Formula $\left[1_{N}\:X\right]$
+\end_inset
+
+.
+ If these are the same, then the model contains a constant equivalent (e.g.,
+ dummies for all categories).
 \end_layout
 
 \end_body

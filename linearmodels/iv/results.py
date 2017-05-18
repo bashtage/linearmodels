@@ -406,7 +406,8 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          n (1- \epsilon'M_{z}\epsilon/\epsilon'\epsilon) \sim \chi^2_{v}
+          n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/
+          \hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}
 
         where :math:`M_{z}` is the annihilator matrix where z is the set of
         instruments and :math:`\hat{\epsilon}` are the residuals from the IV

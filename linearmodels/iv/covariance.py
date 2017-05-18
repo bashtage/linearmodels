@@ -127,9 +127,11 @@ def kernel_weight_quadratic_spectral(bw, n):
 
     .. math::
 
-       z_i & = 6 \pi (i / bw) / 5                                \\
+       z_i & = 6 \pi (i / m) / 5                                \\
        w_0 &  = 1                                                \\
        w_i &  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1
+
+    where m is the bandwidth.
     """
 
     z = arange(n + 1) / bw
