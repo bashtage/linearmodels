@@ -360,34 +360,139 @@ the annihilator matrix using all exogenous variables.\ :math:`\nu` is
 the number of overidentifying restrictions, which is the number of
 instruments minus the number of endogenous variables, :math:`p-k_{2}`.
 
-**Basman**
+**Basmann**
 
-Basman’s test is a small-sample corrected version of Sargan’s test of
+Basmann’s test is a small-sample corrected version of Sargan’s test of
 over-identifying restrictions. It has the same distribution. Let
-:math:`s` be Sargan’s test statistic, then Basman’s test statistic is
+:math:`s` be Sargan’s test statistic, then Basmann’s test statistic is
 
 .. math:: s(n-p)/(n-s)\sim\chi_{v}^{2}
 
-TODO: Remove ME
-
-**Wu-Haussman**
-
 **Wooldridge score**
+
+Wooldridge’s score test of exogeneity examines the magnitude of the
+correlation between the OLS residuals and a an appropriately constructed
+set of residuals of the instruments. Define :math:`e=M_{X}Y` and
+:math:`\nu=M_{X}M_{Z}X_{2}`. Then the test statistic is computed from
+the regression
+
+.. math:: 1=\gamma_{1}\hat{\epsilon}_{1}\hat{v}_{1,i}+\ldots+\gamma_{p}\hat{\epsilon}_{1}\hat{v}_{p,i}+\eta_{i}
+
+as :math:`nR^{2}\sim\chi_{k_{2}}^{2}`.
 
 **Wooldridge regression**
 
+Wooldridge’s regression test of exogeneity is closely related to the
+score test and is generally more powerful. It also inherits robustness
+to heteroskedasticity and/or autocorrelation the comes from the choice
+of covariance estimator used in the model. Define :math:`R=M_{Z}X_{2}`.
+The test is implemented in a regression of
+
+.. math:: Y=X\beta+R\gamma+\eta
+
+as
+
+.. math:: \hat{\gamma}^{\prime}\hat{\Sigma}_{\gamma}^{-1}\gamma^{\prime}\sim\chi_{k_{2}}^{2}
+
+where :math:`\hat{\Sigma}_{\gamma}` is the block of the covariance
+matrix corresponding to the :math:`\gamma` parameters.
+:math:`\hat{\Sigma}` is estimated using the same covariance estimator as
+the model fit.
+
 **Wooldridge’s Test of Overidentifying restrictions**
+
+Wooldridge’s test is a score test examining whether the component of the
+instrument that is uncorrelated with both the included exogenous and the
+fitted exogenous is uncorrelated with the IV residuals. Define
+:math:`\tilde{Z}=M_{\left[X_{1}\:\hat{X}_{2}\right]}Z_{2,1:q}` where
+:math:`\hat{X_{2}}` are the fitted values from the first stage
+regression of the endogenous on all exogenous variables and
+:math:`Z_{2,1:q}` contains any :math:`q` columns of :math:`Z_{2}`,
+:math:`q=p-k_{2}` . The test statistic is computed using a regression of
+1s on the test functions :math:`\hat{\epsilon}_{i}\tilde{z}_{i,j}` for
+:math:`j=1,\ldots,q` which should have expected value 0.
+
+.. math:: 1=\gamma_{1}\hat{\epsilon}_{i}\tilde{z}_{i,1}+\ldots+\gamma_{q}\hat{\epsilon}_{i}\tilde{z}_{i,q}
+
+The test statistic is :math:`nR^{2}\sim\chi_{q}^{2}` from the
+regression.
 
 **Anderson-Rubin**
 
-**Basmann’s f**
+The Andersen-Rubin test of overidentification examines the magnitude of
+the LIML :math:`\hat{\kappa}`\ which should be close to unity when the
+model is not overidentified.
+
+.. math:: n\ln(\hat{\kappa})\sim\chi_{q}^{2}
+
+where :math:`q=p-k_{2}`.
+
+**Basman’s F**
+
+Banmann’s F test of overidentification also examines the magnitude of
+the LIML :math:`\hat{\kappa}`. The test statistic is
+
+.. math:: \hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}
+
+where :math:`q=p-k_{2}`.
+
+**Durbin and Wu-Haussman**
+
+Durbin’s and the Wu-Hausmann tests of exogeneity test of exogeneity is
+depends on the variance of the residuals when come endogenous variables
+are treated as exogenous against the case where they are treated as
+endogenous. Durbin’s test statistic is
+
+.. math::
+
+   \begin{aligned}
+   \delta= & \hat{\epsilon}'_{e}P_{[z,w]}\hat{\epsilon}_{e}-\hat{\epsilon}'_{c}P_{z}\hat{\epsilon}_{c}\\
+   D= & \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}\end{aligned}
+
+and the Wu-Hausmann test statistic is
+
+.. math::
+
+   \begin{aligned}
+   WH= & \frac{\delta/q}{(\hat{\epsilon}'_{e}\hat{\epsilon}_{e}-\delta)/v}\sim F_{q,\nu}\end{aligned}
+
+where :math:`\hat{\epsilon}_{e}` treats the selected set of endogenous
+variables as exogenous (efficient estimate) and
+:math:`\hat{\epsilon}_{c}` is a consistent estimator if these variables
+are endogenous.\ :math:`P_{\left[Z\,W\right]}` is the projection matrix
+containing all exogenous variables including the instrument as well as
+the variables being tested for endogeneity
+:math:`\left(W\right)`.\ :math:`q` is the number of variables being
+tested for exogeneity and :math:`\nu=n-k1-k2-q`.
 
 GMM Post-estimation Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **J-stat**
 
+The J-statistic tests whether the model is over-identified, and is
+defined
+
+.. math:: n\bar{g}'W^{-1}\bar{g}\sim\chi_{q}^{2}
+
+where :math:`\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}` and :math:`W` is
+a consistent estimator of the variance of :math:`\sqrt{n}\bar{g}`. The
+degree of freedom is :math:`q=p-k_{2}`.
+
 **C-stat**
+
+The C-statistic tests exogeneity by treating a the set of endogenous
+variables as exogenous. In practice this means that are included in the
+GMM moment conditions, and so a likelihood-ratio-like test statistic can
+be computed as
+
+.. math:: J_{e}-J_{c}\sim\chi_{m}^{2}
+
+where :math:`J_{e}` is the J-statistic treating the tested variables as
+exogenous and :math:`J_{c}` leaves then as endogenous. The optimal
+weighting matrix is computed from the expanded model (efficient) and
+used to estimate parameters in both models. This ensures that the test
+statistic is positive.
 
 First-stage Estimation Analysis
 -------------------------------
@@ -403,7 +508,7 @@ where :math:`\tilde{Z}_{2}=M_{X_{1}}\tilde{Z}`. The partial
 :math:`F`-statistic is the F-statistic from this regression. It is
 implemented as a standard :math:`F`-statistic when the data is assumed
 to be homoskedastic with an :math:`F_{p_{2},n-p_{2}}` distribution. In
-all other cases, a quadratic form is used with an asymptoic
+all other cases, a quadratic form is used with an asymptotic
 :math:`\chi_{p_{2}}^{2}` distribution testing :math:`H_{0}:\gamma=0`.
 
 **Shea’s R2**
@@ -449,6 +554,8 @@ In all formulas, :math:`m` is the kernel bandwidth parameter.
       w_{i} & =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1\end{aligned}
 
 **Optimal BW selection**
+
+TODO
 
 Constant Detection
 ------------------

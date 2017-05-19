@@ -31,6 +31,7 @@ matrix:
     - PYTHON=3.5
     - NUMPY=1.12
     - SCIPY=0.19
+    - DOCBUILD=true
   - python: 3.5
     env:
     - PYTHON=3.6
@@ -59,10 +60,9 @@ install:
   - python setup.py develop
 
 script:
-  - set -ev
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
-  - cd doc && make html && make html && cd ..
-  - if [ ${PYTHON} = 3.5 ]; then doctr deploy doc; fi
+  - set -e
+  - if [ ${DOCBUILD} ]; then cd doc && make html && make html && cd .. && doctr deploy doc; fi
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi

@@ -532,8 +532,7 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e
-                   - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c \\
+          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c
 
         where :math:`\hat{\epsilon}_e` are the regression residuals from a
         model where ``vars`` are treated as exogenous,
@@ -587,8 +586,7 @@ class IVResults(_CommonIVResults):
 
         .. math ::
 
-          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e
-                   - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c \\
+          \delta & = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e - \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c
 
         where :math:`\hat{\epsilon}_e` are the regression residuals from a
         model where ``vars`` are treated as exogenous,

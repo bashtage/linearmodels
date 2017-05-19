@@ -1229,19 +1229,19 @@ ts minus the number of endogenous variables,
 \noindent
 
 \series bold
-Basman
+Basmann
 \end_layout
 
 \begin_layout Standard
 \noindent
-Basman's test is a small-sample corrected version of Sargan's test of over-ident
-ifying restrictions.
+Basmann's test is a small-sample corrected version of Sargan's test of over-iden
+tifying restrictions.
  It has the same distribution.
  Let 
 \begin_inset Formula $s$
 \end_inset
 
- be Sargan's test statistic, then Basman's test statistic is 
+ be Sargan's test statistic, then Basmann's test statistic is 
 \begin_inset Formula 
 \[
 s(n-p)/(n-s)\sim\chi_{v}^{2}
@@ -1254,21 +1254,47 @@ s(n-p)/(n-s)\sim\chi_{v}^{2}
 
 \begin_layout Standard
 \noindent
-TODO: Remove ME
-\end_layout
-
-\begin_layout Standard
-\noindent
-
-\series bold
-Wu-Haussman
-\end_layout
-
-\begin_layout Standard
-\noindent
 
 \series bold
 Wooldridge score
+\end_layout
+
+\begin_layout Standard
+\noindent
+Wooldridge's score test of exogeneity examines the magnitude of the correlation
+ between the OLS residuals and a an appropriately constructed set of residuals
+ of the instruments.
+ Define 
+\begin_inset Formula $e=M_{X}Y$
+\end_inset
+
+ and 
+\begin_inset Formula $\nu=M_{X}M_{Z}X_{2}$
+\end_inset
+
+.
+ Then the test statistic is computed from the regression
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+1=\gamma_{1}\hat{\epsilon}_{1}\hat{v}_{1,i}+\ldots+\gamma_{p}\hat{\epsilon}_{1}\hat{v}_{p,i}+\eta_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+as 
+\begin_inset Formula $nR^{2}\sim\chi_{k_{2}}^{2}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -1280,9 +1306,127 @@ Wooldridge regression
 
 \begin_layout Standard
 \noindent
+Wooldridge's regression test of exogeneity is closely related to the score
+ test and is generally more powerful.
+ It also inherits robustness to heteroskedasticity and/or autocorrelation
+ the comes from the choice of covariance estimator used in the model.
+ Define 
+\begin_inset Formula $R=M_{Z}X_{2}$
+\end_inset
+
+.
+ The test is implemented in a regression of 
+\begin_inset Formula 
+\[
+Y=X\beta+R\gamma+\eta
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+as
+\begin_inset Formula 
+\[
+\hat{\gamma}^{\prime}\hat{\Sigma}_{\gamma}^{-1}\gamma^{\prime}\sim\chi_{k_{2}}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{\Sigma}_{\gamma}$
+\end_inset
+
+ is the block of the covariance matrix corresponding to the 
+\begin_inset Formula $\gamma$
+\end_inset
+
+ parameters.
+ 
+\begin_inset Formula $\hat{\Sigma}$
+\end_inset
+
+ is estimated using the same covariance estimator as the model fit.
+\end_layout
+
+\begin_layout Standard
+\noindent
 
 \series bold
 Wooldridge's Test of Overidentifying restrictions
+\end_layout
+
+\begin_layout Standard
+\noindent
+Wooldridge's test is a score test examining whether the component of the
+ instrument that is uncorrelated with both the included exogenous and the
+ fitted exogenous is uncorrelated with the IV residuals.
+ Define 
+\begin_inset Formula $\tilde{Z}=M_{\left[X_{1}\:\hat{X}_{2}\right]}Z_{2,1:q}$
+\end_inset
+
+ where 
+\begin_inset Formula $\hat{X_{2}}$
+\end_inset
+
+ are the fitted values from the first stage regression of the endogenous
+ on all exogenous variables and 
+\begin_inset Formula $Z_{2,1:q}$
+\end_inset
+
+ contains any 
+\begin_inset Formula $q$
+\end_inset
+
+ columns of 
+\begin_inset Formula $Z_{2}$
+\end_inset
+
+, 
+\begin_inset Formula $q=p-k_{2}$
+\end_inset
+
+ .
+ The test statistic is computed using a regression of 1s on the test functions
+ 
+\begin_inset Formula $\hat{\epsilon}_{i}\tilde{z}_{i,j}$
+\end_inset
+
+ for 
+\begin_inset Formula $j=1,\ldots,q$
+\end_inset
+
+ which should have expected value 0.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+1=\gamma_{1}\hat{\epsilon}_{i}\tilde{z}_{i,1}+\ldots+\gamma_{q}\hat{\epsilon}_{i}\tilde{z}_{i,q}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The test statistic is 
+\begin_inset Formula $nR^{2}\sim\chi_{q}^{2}$
+\end_inset
+
+ from the regression.
 \end_layout
 
 \begin_layout Standard
@@ -1294,9 +1438,143 @@ Anderson-Rubin
 
 \begin_layout Standard
 \noindent
+\align left
+The Andersen-Rubin test of overidentification examines the magnitude of
+ the LIML 
+\begin_inset Formula $\hat{\kappa}$
+\end_inset
+
+which should be close to unity when the model is not overidentified.
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+\begin_inset Formula 
+\[
+n\ln(\hat{\kappa})\sim\chi_{q}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align left
+where 
+\begin_inset Formula $q=p-k_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
 
 \series bold
-Basmann's f
+Basman's F
+\end_layout
+
+\begin_layout Standard
+\noindent
+Banmann's F test of overidentification also examines the magnitude of the
+ LIML 
+\begin_inset Formula $\hat{\kappa}$
+\end_inset
+
+.
+ The test statistic is 
+\begin_inset Formula 
+\[
+\hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $q=p-k_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Durbin and Wu-Haussman
+\end_layout
+
+\begin_layout Standard
+\noindent
+Durbin's and the Wu-Hausmann tests of exogeneity test of exogeneity is depends
+ on the variance of the residuals when come endogenous variables are treated
+ as exogenous against the case where they are treated as endogenous.
+ Durbin's test statistic is
+\begin_inset Formula 
+\begin{align*}
+\delta= & \hat{\epsilon}'_{e}P_{[z,w]}\hat{\epsilon}_{e}-\hat{\epsilon}'_{c}P_{z}\hat{\epsilon}_{c}\\
+D= & \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and the Wu-Hausmann test statistic is
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\begin{align*}
+WH= & \frac{\delta/q}{(\hat{\epsilon}'_{e}\hat{\epsilon}_{e}-\delta)/v}\sim F_{q,\nu}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{\epsilon}_{e}$
+\end_inset
+
+ treats the selected set of endogenous variables as exogenous (efficient
+ estimate) and 
+\begin_inset Formula $\hat{\epsilon}_{c}$
+\end_inset
+
+ is a consistent estimator if these variables are endogenous.
+\begin_inset Formula $P_{\left[Z\,W\right]}$
+\end_inset
+
+ is the projection matrix containing all exogenous variables including the
+ instrument as well as the variables being tested for endogeneity 
+\begin_inset Formula $\left(W\right)$
+\end_inset
+
+.
+\begin_inset Formula $q$
+\end_inset
+
+ is the number of variables being tested for exogeneity and 
+\begin_inset Formula $\nu=n-k1-k2-q$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1313,9 +1591,78 @@ J-stat
 
 \begin_layout Standard
 \noindent
+The J-statistic tests whether the model is over-identified, and is defined
+ 
+\begin_inset Formula 
+\[
+n\bar{g}'W^{-1}\bar{g}\sim\chi_{q}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\bar{g}=n^{-1}\sum\hat{\epsilon}_{i}z_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $W$
+\end_inset
+
+ is a consistent estimator of the variance of 
+\begin_inset Formula $\sqrt{n}\bar{g}$
+\end_inset
+
+.
+ The degree of freedom is 
+\begin_inset Formula $q=p-k_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\noindent
 
 \series bold
 C-stat
+\end_layout
+
+\begin_layout Standard
+\noindent
+The C-statistic tests exogeneity by treating a the set of endogenous variables
+ as exogenous.
+ In practice this means that are included in the GMM moment conditions,
+ and so a likelihood-ratio-like test statistic can be computed as 
+\begin_inset Formula 
+\[
+J_{e}-J_{c}\sim\chi_{m}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $J_{e}$
+\end_inset
+
+ is the J-statistic treating the tested variables as exogenous and 
+\begin_inset Formula $J_{c}$
+\end_inset
+
+ leaves then as endogenous.
+ The optimal weighting matrix is computed from the expanded model (efficient)
+ and used to estimate parameters in both models.
+ This ensures that the test statistic is positive.
+ 
 \end_layout
 
 \begin_layout Subsection*
@@ -1369,7 +1716,7 @@ where
 \end_inset
 
  distribution.
- In all other cases, a quadratic form is used with an asymptoic 
+ In all other cases, a quadratic form is used with an asymptotic 
 \begin_inset Formula $\chi_{p_{2}}^{2}$
 \end_inset
 
@@ -1441,6 +1788,7 @@ Kernel weights
 \end_layout
 
 \begin_layout Standard
+\noindent
 In all formulas, 
 \begin_inset Formula $m$
 \end_inset
@@ -1494,6 +1842,11 @@ w_{i} & =3(\sin(z_{i})/z_{i}-\cos(z_{i}))/z_{i}^{2},\:i\geq1
 
 \series bold
 Optimal BW selection
+\end_layout
+
+\begin_layout Standard
+\noindent
+TODO
 \end_layout
 
 \begin_layout Subsection*
