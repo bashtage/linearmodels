@@ -305,17 +305,19 @@ class LinearFactorModel(TradedFactorModel):
     The model is tested using the estimated values
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
-
-    # TODO: Doc string for improved
+    # TODO: Doc string for GLS
 
     def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
         self._risk_free = bool(risk_free)
         super(LinearFactorModel, self).__init__(portfolios, factors)
         if sigma is None:
-            self._sigma_inv = self._sigma = np.eye(self.portfolios.shape[1])
+            self._sigma_m12 = self._sigma_inv = self._sigma = np.eye(self.portfolios.shape[1])
         else:
             self._sigma = np.asarray(sigma)
+            vals, vecs = np.linalg.eigh(sigma)
+            self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma)
+
 
     def _validate_data(self):
         super(LinearFactorModel, self)._validate_data()
@@ -328,7 +330,8 @@ class LinearFactorModel(TradedFactorModel):
                              'risk free rate if estimated.')
 
     @classmethod
-    def from_formula(cls, formula, data, *, portfolios=None, risk_free=False):
+    def from_formula(cls, formula, data, *, portfolios=None, risk_free=False,
+                     sigma=None):
         """
         Parameters
         ----------
@@ -343,6 +346,8 @@ class LinearFactorModel(TradedFactorModel):
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
+        sigma : array-like, optional
+            Positive definite residual covariance (nportfolio by nportfolio)
 
         Returns
         -------
@@ -380,8 +385,10 @@ class LinearFactorModel(TradedFactorModel):
                                  return_type='dataframe', NA_action=na_action)
             factors = dmatrix(formula[1].strip() + ' + 0', data,
                               return_type='dataframe', NA_action=na_action)
-
-        mod = cls(portfolios, factors, risk_free=risk_free)
+        if sigma is not None:
+            mod = cls(portfolios, factors, risk_free=risk_free, sigma=sigma)
+        else:
+            mod = cls(portfolios, factors, risk_free=risk_free)
         mod.formula = orig_formula
         return mod
 
@@ -411,9 +418,9 @@ class LinearFactorModel(TradedFactorModel):
         and ``bandwidth`` (a positive integer).
         """
         # TODO: Refactor commonalities in estimation
+        # TODO: Verify GLS implementation
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
-        nrf = int(not excess_returns)
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nport = p.shape[1]
@@ -428,7 +435,8 @@ class LinearFactorModel(TradedFactorModel):
             betas = b.T.copy()
             betas[:, 0] = 1.0
 
-        lam = np.linalg.lstsq(betas, p.mean(0)[:, None])[0]
+        sigma_m12 = self._sigma_m12
+        lam = np.linalg.lstsq(sigma_m12 @ betas, sigma_m12 @ p.mean(0)[:, None])[0]
         expected = betas @ lam
         pricing_errors = p - expected.T
         # Moments
