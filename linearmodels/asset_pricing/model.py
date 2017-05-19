@@ -305,6 +305,7 @@ class LinearFactorModel(TradedFactorModel):
     The model is tested using the estimated values
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
+
     # TODO: Doc string for GLS
 
     def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
@@ -317,7 +318,6 @@ class LinearFactorModel(TradedFactorModel):
             vals, vecs = np.linalg.eigh(sigma)
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma)
-
 
     def _validate_data(self):
         super(LinearFactorModel, self)._validate_data()
@@ -457,8 +457,8 @@ class LinearFactorModel(TradedFactorModel):
         # VCV
         full_vcv = cov_est.cov
         alpha_vcv = full_vcv[s2:, s2:]
-        stat = float(alphas.T @ np.linalg.inv(alpha_vcv) @ alphas)
-        jstat = WaldTestStatistic(stat, 'All alphas are 0', nport - nf,
+        stat = float(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas)
+        jstat = WaldTestStatistic(stat, 'All alphas are 0', nport - nf - nrf,
                                   name='J-statistic')
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
@@ -513,9 +513,7 @@ class LinearFactorModel(TradedFactorModel):
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
         excess_returns = not self._risk_free
-        bc = b = betas
-        if not excess_returns:
-            b = betas[:, 1:]
+        bc = betas
         sigma_inv = self._sigma_inv
 
         jac = np.eye((nport * (nf + 1)) + (nf + nrf) + nport)
@@ -523,14 +521,15 @@ class LinearFactorModel(TradedFactorModel):
         jac[:s1, :s1] = np.kron(np.eye(nport), fpf)
 
         b_tilde = sigma_inv @ bc
+        alpha_tilde = sigma_inv @ alphas
         _lam = lam if excess_returns else lam[1:]
         for i in range(nport):
             block = np.zeros((nf + nrf, nf + 1))
             block[:, 1:] = b_tilde[[i]].T @ _lam.T
-            block[nrf:, 1:] -= alphas[i] * np.eye(nf)
+            block[nrf:, 1:] -= alpha_tilde[i] * np.eye(nf)
             jac[s1:s2, (i * (nf + 1)):((i + 1) * (nf + 1))] = block
-
-        zero_lam = np.r_[[[0]],_lam]
+        jac[s1:s2, s1:s2] = bc.T @ sigma_inv @ bc
+        zero_lam = np.r_[[[0]], _lam]
         jac[s2:s3, :s1] = np.kron(np.eye(nport), zero_lam.T)
         jac[s2:s3, s1:s2] = bc
 
@@ -753,12 +752,14 @@ class LinearFactorModelGMM(LinearFactorModel):
                           df=self.factors.shape[1], **cov_config)
 
         full_vcv = cov_est.cov
-        rp = params[(n * k):(n * k + k + nrf)]
-        rp_cov = full_vcv[(n * k):(n * k + k + nrf), (n * k):(n * k + k + nrf)]
-        alphas = g.mean(0)[0:(n * (k + 1)):(k + 1), None]
-        alpha_vcv = s[0:(n * (k + 1)):(k + 1), 0:(n * (k + 1)):(k + 1)] / nobs
+        sel = slice((n * k), (n * k + k + nrf))
+        rp = params[sel]
+        rp_cov = full_vcv[sel, sel]
+        sel = slice(0, (n * (k + 1)), (k + 1))
+        alphas = g.mean(0)[sel, None]
+        alpha_vcv = s[sel, sel] / nobs
         stat = self._j(params, excess_returns, w)
-        jstat = WaldTestStatistic(stat, 'All alphas are 0', n, name='J-statistic')
+        jstat = WaldTestStatistic(stat, 'All alphas are 0', n - k - nrf, name='J-statistic')
 
         # R2 calculation
         betas = np.reshape(params[:(n * k)], (n, k))

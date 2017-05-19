@@ -31,3 +31,13 @@ def generate_data(nfactor=3, nportfolio=25, nobs=1000, premia=None, output='pand
                                   index=index)
 
     return AttrDict(factors=factors, portfolios=portfolios)
+
+
+def get_all(res):
+    attrs = dir(res)
+    for attr_name in attrs:
+        if attr_name.startswith('_'):
+            continue
+        attr = getattr(res, attr_name)
+        if callable(attr):
+            attr()

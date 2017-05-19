@@ -50,4 +50,3 @@ def test_center(data):
     hw2 = HeteroskedasticWeight(data.moments, center=False)
 
     assert np.any(hw.w(data.moments) != hw2.w(data.moments))
-

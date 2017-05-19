@@ -16,10 +16,8 @@ DROP_MISSING = False if DROP_MISSING in ('0', 'False') else True
 __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS', 'RandomEffects',
            'FamaMacBeth',
            'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS',
-           'LinearFactorModel','LinearFactorModelGMM', 'TradedFactorModel',
+           'LinearFactorModel', 'LinearFactorModelGMM', 'TradedFactorModel',
            'WARN_ON_MISSING', 'DROP_MISSING']
 
 __version__ = get_versions()['version']
 del get_versions
-
-# TODO: Finish documentation for IV estimators
