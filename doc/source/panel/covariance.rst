@@ -29,3 +29,21 @@ Driscoll-Kraay HAC Estimator
 .. autoclass:: DriscollKraay
    :members:
    :inherited-members:
+
+AC Robust Estimator
+===================
+.. autoclass:: ACCovariance
+   :members:
+   :inherited-members:
+
+Fama-MacBeth Covariance Estimator
+=================================
+.. autoclass:: FamaMacBethCovariance
+   :members:
+   :inherited-members:
+
+Fama-MacBeth HAC Covariance Estimator
+=====================================
+.. autoclass:: FamaMacBethKernelCovariance
+   :members:
+   :inherited-members:

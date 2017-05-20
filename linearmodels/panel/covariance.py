@@ -2,7 +2,8 @@ import numpy as np
 from numpy.linalg import inv
 from pandas import DataFrame
 
-from linearmodels.iv.covariance import CLUSTER_ERR, KERNEL_LOOKUP, _cov_cluster, _cov_kernel
+from linearmodels.iv.covariance import CLUSTER_ERR, KERNEL_LOOKUP, _cov_cluster, _cov_kernel, \
+    kernel_optimal_bandwidth
 from linearmodels.utility import cached_property
 
 __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
@@ -71,24 +72,29 @@ class HomoskedasticCovariance(object):
 
     @property
     def name(self):
+        """Covariance estimator name"""
         return self._name
 
     @property
     def eps(self):
+        """Model residuals"""
         return self._y - self._x @ self._params
 
     @property
     def s2(self):
+        """Error variance"""
         eps = self.eps
         return self._scale * float(eps.T @ eps) / self._nobs
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
 
     def deferred_cov(self):
+        """Covariance calculation deferred until executed"""
         return self.cov
 
 
@@ -146,6 +152,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -248,6 +255,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -362,6 +370,7 @@ class DriscollKraay(HomoskedasticCovariance):
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -413,6 +422,8 @@ class ACCovariance(HomoskedasticCovariance):
 
     Notes
     -----
+    Estimator is robust to autocorrelation but no cross-sectional correlation.
+
     Supported kernels:
 
     * 'bartlett', 'newey-west' - Bartlett's kernel
@@ -437,10 +448,13 @@ class ACCovariance(HomoskedasticCovariance):
     and
 
     .. math::
-      \xi_t & = \sum_{i=1}^{n_t} \epsilon_i x_{i} \\
-      \hat{S}_0 & = \sum_{i=1}^{t} \xi'_t \xi_t \\
-      \hat{S}_j & = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\
-      \hat{S}   & = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j
+
+      \xi_t & = \epsilon_{it} x_{it} \\
+      \hat{S} & = n / (N(n-df))  \sum_{i=1}^N S_i \\
+      \hat{S}_i & = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\
+      \hat{S}_{i0} & = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\
+      \hat{S}_{ij} & = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}
+
 
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
@@ -463,6 +477,7 @@ class ACCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
         xpxi = inv(x.T @ x / nobs)
@@ -502,8 +517,9 @@ class CovarianceManager(object):
                              'clustered': ClusteredCovariance,
                              'driscoll-kraay': DriscollKraay,
                              'dk': DriscollKraay,
-                             'kernel': ACCovariance,
-                             'ac': ACCovariance}
+                             'kernel': DriscollKraay,
+                             'ac': ACCovariance,
+                             'autocorrelated': ACCovariance}
 
     def __init__(self, estimator, *cov_estimators):
         self._estimator = estimator
@@ -520,6 +536,28 @@ class CovarianceManager(object):
 
 
 class FamaMacBethCovariance(HomoskedasticCovariance):
+    """
+    Heteroskedasticty robust covariance estimator for Fama-MacBeth
+
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
+    x : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        (variables by 1) array of estimated model parameters
+    all_params : ndarray
+        (nobs by variables) array of all estimated model parameters
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+
+    Notes
+    -----
+    Covariance is the sample covariance of the set of all estimated
+    parameters.
+    """
+
     def __init__(self, y, x, params, all_params, *, debiased=False):
         super(FamaMacBethCovariance, self).__init__(y, x, params, None, None, debiased=debiased)
         self._all_params = all_params
@@ -527,6 +565,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     @cached_property
     def cov(self):
+        """Estimated covariance"""
         e = self._all_params - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
         nobs = e.shape[0]
@@ -535,6 +574,32 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
 
 class FamaMacBethKernelCovariance(FamaMacBethCovariance):
+    """
+    HAC estimator for Fama-MacBeth estimator
+
+    Parameters
+    ----------
+    y : ndarray
+        (entity x time) by 1 stacked array of dependent
+    x : ndarray
+        (entity x time) by variables stacked array of exogenous
+    params : ndarray
+        (variables by 1) array of estimated model parameters
+    all_params : ndarray
+        (nobs by variables) array of all estimated model parameters
+    debiased : bool, optional
+        Flag indicating whether to debias the estimator
+    kernel : str, options
+        Name of one of the supported kernels
+    bandwidth : int, optional
+        Non-negative integer to use as bandwidth.  If not provided a rule-of-
+        thumb value is used.
+
+    Notes
+    -----
+    Covariance is a Kernel covariance of all estimated parameters.
+    """
+
     def __init__(self, y, x, params, all_params, *, debiased=False, kernel='newey-west',
                  bandwidth=None):
         super(FamaMacBethKernelCovariance, self).__init__(y, x, params, all_params,
@@ -544,14 +609,23 @@ class FamaMacBethKernelCovariance(FamaMacBethCovariance):
         self._kernel = kernel
 
     @cached_property
+    def bandwidth(self):
+        """Estimator bandwidth"""
+        if self._bandwidth is None:
+            e = self._all_params - self._params.T
+            e = e[np.all(np.isfinite(e), 1)]
+            stde = np.sum(e / e.std(0)[None, :], 1)
+            self._bandwidth = kernel_optimal_bandwidth(stde, self._kernel)
+        return self._bandwidth
+
+    @cached_property
     def cov(self):
+        """Estimated covariance"""
         e = self._all_params - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
         nobs = e.shape[0]
 
-        bw = self._bandwidth
-        if self._bandwidth is None:
-            bw = int(np.floor(4 * (nobs / 100) ** (2 / 9)))
+        bw = self.bandwidth
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
         cov = _cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))

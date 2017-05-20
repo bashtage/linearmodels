@@ -79,7 +79,7 @@ def test_linear_model_parameters(data):
     # 3, 2
     jac[-nport:, (nport * (nf + 1)):(nport * (nf + 1)) + nf] = b
     # 3, 3: already done since eye
-    mod_jac = mod._jacobian(b, lam, alphas, pricing_errors)
+    mod_jac = mod._jacobian(b, lam, alphas)
     assert_allclose(mod_jac[:block1], jac[:block1])
     assert_allclose(mod_jac[block1:block2, :block1], jac[block1:block2, :block1])
     assert_allclose(mod_jac[block1:block2, block1:block2], jac[block1:block2, block1:block2])
@@ -183,7 +183,7 @@ def test_linear_model_parameters_risk_free(data):
     # 3, 2
     jac[-nport:, (nport * (nf + 1)):(nport * (nf + 1)) + nf + 1] = bc
     # 3, 3: already done since eye
-    mod_jac = mod._jacobian(bc, lam, alphas, pricing_errors)
+    mod_jac = mod._jacobian(bc, lam, alphas)
     assert_allclose(mod_jac[:block1], jac[:block1])
     assert_allclose(mod_jac[block1:block2, :block1], jac[block1:block2, :block1])
     assert_allclose(mod_jac[block1:block2, block1:block2], jac[block1:block2, block1:block2])
@@ -286,7 +286,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     # 3, 2
     jac[-nport:, (nport * (nf + 1)):(nport * (nf + 1)) + nf + 1] = bc
     # 3, 3: already done since eye
-    mod_jac = mod._jacobian(bc, lam, alphas, pricing_errors)
+    mod_jac = mod._jacobian(bc, lam, alphas)
     assert_allclose(mod_jac[:block1], jac[:block1])
     assert_allclose(mod_jac[block1:block2, :block1], jac[block1:block2, :block1])
     assert_allclose(mod_jac[block1:block2, block1:block2], jac[block1:block2, block1:block2])

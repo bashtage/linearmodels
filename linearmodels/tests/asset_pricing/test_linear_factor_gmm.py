@@ -77,12 +77,18 @@ def test_linear_model_gmm_smoke_risk_free(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors, risk_free=True)
     res = mod.fit(cov_type='robust', disp=10)
     get_all(res)
+    str(res._cov_est)
+    res._cov_est.__repr__()
+    str(res._cov_est.config)
 
 
 def test_linear_model_gmm_kernel_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type='kernel', disp=10)
     get_all(res)
+    str(res._cov_est)
+    res._cov_est.__repr__()
+    str(res._cov_est.config)
 
 
 def test_linear_model_gmm_kernel_bandwidth_smoke(data):

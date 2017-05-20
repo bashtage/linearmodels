@@ -1,3 +1,6 @@
+"""
+Linear factor models for applications in asset pricing
+"""
 import numpy as np
 from numpy.linalg import pinv
 from patsy.highlevel import dmatrix
@@ -183,8 +186,6 @@ class TradedFactorModel(object):
         ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        # TODO: Homoskedastic covariance
-
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         nportfolio = p.shape[1]
@@ -306,9 +307,6 @@ class LinearFactorModel(TradedFactorModel):
     The model is tested using the estimated values
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
-
-    # TODO: Doc string for GLS
-
     def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
         self._risk_free = bool(risk_free)
         super(LinearFactorModel, self).__init__(portfolios, factors)
@@ -418,7 +416,6 @@ class LinearFactorModel(TradedFactorModel):
         ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
-        # TODO: Refactor commonalities in estimation
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         f = self.factors.ndarray
@@ -443,7 +440,7 @@ class LinearFactorModel(TradedFactorModel):
         alphas = pricing_errors.mean(0)[:, None]
         moments = self._moments(eps, betas, lam, alphas, pricing_errors)
         # Jacobian
-        jacobian = self._jacobian(betas, lam, alphas, pricing_errors)
+        jacobian = self._jacobian(betas, lam, alphas)
 
         if cov_type not in ('robust', 'heteroskedastic', 'kernel'):
             raise ValueError('Unknown weight: {0}'.format(cov_type))
@@ -509,7 +506,7 @@ class LinearFactorModel(TradedFactorModel):
 
         return nobs, nf, nport, nrf, s1, s2, s3
 
-    def _jacobian(self, betas, lam, alphas, pricing_errors):
+    def _jacobian(self, betas, lam, alphas):
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
@@ -720,11 +717,11 @@ class LinearFactorModelGMM(LinearFactorModel):
                        options={'disp': bool(disp), 'maxiter': max_iter})
         params = res.x
         last_obj = res.fun
-        iter = 1
+        iters = 1
         # 3. Step 2 using step 1 estimates
         if not use_cue:
-            for i in range(steps - 1):
-                iter += 1
+            while iters < steps:
+                iters += 1
                 g = self._moments(params, excess_returns)
                 w = weight_est.w(g)
                 args = (excess_returns, w)
@@ -793,7 +790,7 @@ class LinearFactorModelGMM(LinearFactorModel):
                        param_names=param_names, portfolio_names=self.portfolios.cols,
                        factor_names=self.factors.cols, name=self._name,
                        cov_type=cov_type, model=self, nobs=nobs, rp_names=rp_names,
-                       iter=iter, cov_est=cov_est)
+                       iter=iters, cov_est=cov_est)
 
         return GMMFactorModelResults(res)
 

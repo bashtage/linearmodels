@@ -1,3 +1,6 @@
+"""
+Covariance estimators for linear factor models
+"""
 from numpy.linalg import inv
 from linearmodels.iv.covariance import KERNEL_LOOKUP, kernel_optimal_bandwidth, _cov_kernel
 
@@ -113,7 +116,7 @@ class HeteroskedasticCovariance(object):
 
 class KernelCovariance(HeteroskedasticCovariance):
     """
-    Heteroskedasticity robust covariance estimator
+    Heteroskedasticity-autocorrelation (HAC) robust covariance estimator
 
     Parameters
     ----------

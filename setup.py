@@ -58,9 +58,10 @@ setup(
               'statistical inference', 'econometrics'],
     zip_safe=False,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Financial and Insurance Industry',
+        'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'License :: OSI Approved',

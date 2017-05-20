@@ -1,3 +1,6 @@
+"""
+Results for linear factor models
+"""
 import datetime as dt
 
 import numpy as np
@@ -44,8 +47,7 @@ class LinearFactorModelResults(_SummaryStr):
                     ('Date:', self._datetime.strftime('%a, %b %d %Y')),
                     ('Time:', self._datetime.strftime('%H:%M:%S')),
                     ('Cov. Estimator:', self._cov_type),
-                    ('', '')
-                    ]
+                    ('', '')]
 
         j_stat = _str(self.j_statistic.stat)
         j_pval = pval_format(self.j_statistic.pval)
@@ -57,8 +59,7 @@ class LinearFactorModelResults(_SummaryStr):
                      ('Distribution:', j_dist),
                      ('', ''),
                      ('', ''),
-                     ('', ''),
-                     ]
+                     ('', '')]
 
         stubs = []
         vals = []

@@ -4,3 +4,4 @@ copy /Y mathematical-detail.rst mathematical-detail-pre.txt
 del mathematical-detail.rst
 python -c "open('mathematical-detail.txt','w').write(''.join(open('mathematical-detail-pre.txt').readlines()[3:]))"
 del mathematical-detail-pre.txt
+del mathematical-detail.tex

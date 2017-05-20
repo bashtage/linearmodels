@@ -9,4 +9,5 @@ Module Reference
 
    models
    results
+   covariance
 

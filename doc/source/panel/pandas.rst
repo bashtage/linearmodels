@@ -1,10 +1,12 @@
 .. _panel-pandas-differences:
 
-Comparison with pandas PanelOLS
-===============================
+Comparison with pandas PanelOLS and FamaMacBeth
+===============================================
 
-pandas deprecated ``PanelOLS`` (``pandas.stats.plm.PanelOLS``) in 0.18 and
-dropped it in 0.20.  :class:`linearmodels.panel.model.PanelOLS` provides
+pandas deprecated ``PanelOLS`` (``pandas.stats.plm.PanelOLS``) and
+``FamaMacBeth`` (``pandas.stats.plm.FamaMacBeth``)  in 0.18 and
+dropped it in 0.20.  :class:`linearmodels.panel.model.PanelOLS`
+and :class:`linearmodels.panel.model.FamaMacBeth`  provide
 a similar set of functionality with a few notable differences:
 
 1. When using a MultiIndex DataFrame, this package expects the MultiIndex

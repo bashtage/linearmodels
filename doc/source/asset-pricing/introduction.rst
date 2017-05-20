@@ -49,19 +49,21 @@ prior to estimation.
                           LinearFactorModel Estimation Summary
     ================================================================================
     No. Test Portfolios:                  6   R-squared:                      0.8879
-    No. Factors:                          3   J-statistic:                    30.694
+    No. Factors:                          3   J-statistic:                    39.109
     No. Observations:                   819   P-value                         0.0000
-    Date:                  Thu, May 18 2017   Distribution:                  chi2(3)
-    Time:                          22:23:54
+    Date:                  Sun, May 21 2017   Distribution:                  chi2(3)
+    Time:                          21:18:56
     Cov. Estimator:                  kernel
 
                                 Risk Premia Estimates
     ==============================================================================
                 Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
     ------------------------------------------------------------------------------
-    MktRF          0.0060     0.0113     0.5305     0.5958     -0.0162      0.0282
-    SMB            0.0001     0.0081     0.0178     0.9858     -0.0157      0.0160
-    HML            0.0045     0.0032     1.4041     0.1603     -0.0018      0.0108
+    MktRF          0.0060     0.0016     3.7381     0.0002      0.0029      0.0092
+    SMB            0.0001     0.0011     0.1281     0.8980     -0.0021      0.0023
+    HML            0.0045     0.0012     3.7904     0.0002      0.0022      0.0068
     ==============================================================================
 
+    Covariance estimator:
+    KernelCovariance, Kernel: bartlett, Bandwidth: 4
     See full_summary for complete results
