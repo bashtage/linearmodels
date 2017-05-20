@@ -752,6 +752,7 @@ class LinearFactorModelGMM(LinearFactorModel):
                           df=self.factors.shape[1], **cov_config)
 
         full_vcv = cov_est.cov
+        self._testing = {'s': cov_est.s}
         sel = slice((n * k), (n * k + k + nrf))
         rp = params[sel]
         rp_cov = full_vcv[sel, sel]
