@@ -31,7 +31,7 @@ class HeteroskedasticCovariance(object):
         self._jac = jacobian
         self._inv_jac = inv_jacobian
         self._center = center
-        if (jacobian is None and inv_jacobian is None)\
+        if (jacobian is None and inv_jacobian is None) \
                 or (jacobian is not None and inv_jacobian is not None):
             raise ValueError('One and only one of jacobian or inv_jacobian must be provided.')
         self._debiased = debiased
@@ -40,6 +40,16 @@ class HeteroskedasticCovariance(object):
             self._square = jacobian.shape[0] == jacobian.shape[1]
         else:
             self._square = inv_jacobian.shape[0] == inv_jacobian.shape[1]
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        return self.__str__() + ', id: {0}'.format(hex(id(self)))
+
+    @property
+    def config(self):
+        return {'type': self.__class__.__name__}
 
     @property
     def s(self):
@@ -141,6 +151,18 @@ class KernelCovariance(HeteroskedasticCovariance):
         if bandwidth is not None:
             if bandwidth < 0:
                 raise ValueError('bandwidth must be non-negative.')
+
+    def __str__(self):
+        descr = ', Kernel: {0}, Bandwidth: {1}'.format(self._kernel,
+                                                       self.bandwidth)
+        return self.__class__.__name__ + descr
+
+    @property
+    def config(self):
+        out = super(KernelCovariance, self).config
+        out['kernel'] = self._kernel
+        out['bandwidth'] = self.bandwidth
+        return out
 
     @property
     def kernel(self):

@@ -252,7 +252,8 @@ class TradedFactorModel(object):
                        rsquared=r2, total_ss=total_ss, residual_ss=residual_ss,
                        param_names=param_names, portfolio_names=self.portfolios.cols,
                        factor_names=self.factors.cols, name=self._name,
-                       cov_type=cov_type, model=self, nobs=nobs, rp_names=self.factors.cols)
+                       cov_type=cov_type, model=self, nobs=nobs, rp_names=self.factors.cols,
+                       cov_est=cov_est)
 
         return LinearFactorModelResults(res)
 
@@ -418,7 +419,6 @@ class LinearFactorModel(TradedFactorModel):
         and ``bandwidth`` (a positive integer).
         """
         # TODO: Refactor commonalities in estimation
-        # TODO: Verify GLS implementation
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         excess_returns = not self._risk_free
         f = self.factors.ndarray
@@ -493,7 +493,8 @@ class LinearFactorModel(TradedFactorModel):
                        rsquared=r2, total_ss=total_ss, residual_ss=residual_ss,
                        param_names=param_names, portfolio_names=self.portfolios.cols,
                        factor_names=factor_names, name=self._name,
-                       cov_type=cov_type, model=self, nobs=nobs, rp_names=rp_names)
+                       cov_type=cov_type, model=self, nobs=nobs, rp_names=rp_names,
+                       cov_est=cov_est)
 
         return LinearFactorModelResults(res)
 
@@ -719,9 +720,11 @@ class LinearFactorModelGMM(LinearFactorModel):
                        options={'disp': bool(disp), 'maxiter': max_iter})
         params = res.x
         last_obj = res.fun
+        iter = 1
         # 3. Step 2 using step 1 estimates
         if not use_cue:
             for i in range(steps - 1):
+                iter += 1
                 g = self._moments(params, excess_returns)
                 w = weight_est.w(g)
                 args = (excess_returns, w)
@@ -735,6 +738,7 @@ class LinearFactorModelGMM(LinearFactorModel):
                 if np.abs(obj - last_obj) < 1e-6:
                     break
                 last_obj = obj
+
         else:
             args = (excess_returns, weight_est)
             obj = self._j_cue
@@ -752,7 +756,6 @@ class LinearFactorModelGMM(LinearFactorModel):
                           df=self.factors.shape[1], **cov_config)
 
         full_vcv = cov_est.cov
-        self._testing = {'s': cov_est.s}
         sel = slice((n * k), (n * k + k + nrf))
         rp = params[sel]
         rp_cov = full_vcv[sel, sel]
@@ -789,7 +792,8 @@ class LinearFactorModelGMM(LinearFactorModel):
                        rsquared=r2, total_ss=total_ss, residual_ss=residual_ss,
                        param_names=param_names, portfolio_names=self.portfolios.cols,
                        factor_names=self.factors.cols, name=self._name,
-                       cov_type=cov_type, model=self, nobs=nobs, rp_names=rp_names)
+                       cov_type=cov_type, model=self, nobs=nobs, rp_names=rp_names,
+                       iter=iter, cov_est=cov_est)
 
         return GMMFactorModelResults(res)
 

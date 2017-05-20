@@ -30,6 +30,7 @@ class LinearFactorModelResults(_SummaryStr):
         self._cols = ['alpha'] + ['{0}'.format(f) for f in self._factor_names]
         self._rp_names = res.rp_names
         self._alpha_vcv = res.alpha_vcv
+        self._cov_est = res.cov_est
 
     @property
     def summary(self):
@@ -110,7 +111,9 @@ class LinearFactorModelResults(_SummaryStr):
                             headers=header,
                             title=title)
         smry.tables.append(table)
-        smry.add_extra_txt(['See full_summary for complete results'])
+        smry.add_extra_txt(['Covariance estimator:',
+                            str(self._cov_est),
+                            'See full_summary for complete results'])
 
         return smry
 
@@ -201,7 +204,7 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def cov_estimator(self):
         """Type of covariance estimator used to compute covariance"""
-        return self._cov_type
+        return str(self._cov_est)
 
     @property
     def cov(self):
@@ -262,6 +265,7 @@ class LinearFactorModelResults(_SummaryStr):
 class GMMFactorModelResults(LinearFactorModelResults):
     def __init__(self, res):
         super(GMMFactorModelResults, self).__init__(res)
+        self._iter = res.iter
 
     @property
     def std_errors(self):
@@ -273,3 +277,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
         se = np.r_[ase, se[:nloadings]]
         se = se.reshape((nportfolio, nfactor))
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
+
+    def iterations(self):
+        """Number of steps in GMM estimation"""
+        return self._iter
