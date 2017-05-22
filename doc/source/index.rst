@@ -1,6 +1,13 @@
 Linear Model Estimation
 =======================
 
+.. note::
+
+  `Stable documentation <https://bashtage.github.io/linearmodels/doc/>`_ for the latest release
+  is located at `doc <https://bashtage.github.io/linearmodels/doc/>`_.
+  Documentation for `recent developments <https://bashtage.github.io/linearmodels/devel/>`_
+  is located at `devel <https://bashtage.github.io/linearmodels/devel/>`_.
+
 Estimation and inference in some common linear models:
 
 **Models for panel data**

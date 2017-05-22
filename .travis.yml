@@ -56,8 +56,6 @@ before_install:
   - pip install sphinx --upgrade
   - export PYTHONHASHSEED=0
   - export MKL_NUM_THREADS=1
-  - if [[ ${TRAVIS_TAG} ]]; then export DOCTR_PUSH_TYPE="--no-require-master"; fi
-  - echo ${DOCTR_PUSH_TYPE}
 
 install:
   - python setup.py develop
@@ -65,7 +63,8 @@ install:
 script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - set -e
-  - if [ ${DOCBUILD} ]; then cd doc && make html && make html && cd .. && doctr deploy doc ${DOCTR_PUSH_TYPE}; fi
+  - if [[ ${DOCBUILD} ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
+  - if [[ ${TRAVIS_TAG}  && ${DOCBUILD} ]]; then doctr deploy doc --no-require-master; fi
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi

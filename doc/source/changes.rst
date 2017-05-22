@@ -5,6 +5,7 @@ Version 3.0
 ===========
 * Added Fama-MacBeth estimator for panels
 * Added linear factor models for asset pricing applications
+
   * Time-series estimation using traded factors
   * 2- and 3-step estimation using OLS
   * GMM Estimation
