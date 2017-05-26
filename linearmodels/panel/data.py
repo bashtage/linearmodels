@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame, Panel, Series
-from xarray import DataArray
 
 from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
     is_string_like, is_numeric_dtype, is_datetime64_any_dtype
@@ -80,10 +79,12 @@ class PanelData(object):
             x = x.dataframe
         self._original = x
 
-        if isinstance(x, DataArray):
-            if x.ndim not in (2, 3):
-                raise ValueError('Only 2-d or 3-d DataArrays are supported')
-            x = x.to_pandas()
+        if not isinstance(x, (Series, DataFrame, Panel, ndarray)):
+            from xarray import DataArray
+            if isinstance(x, DataArray):
+                if x.ndim not in (2, 3):
+                    raise ValueError('Only 2-d or 3-d DataArrays are supported')
+                x = x.to_pandas()
 
         if isinstance(x, Series) and isinstance(x.index, pd.MultiIndex):
             x = DataFrame(x)
