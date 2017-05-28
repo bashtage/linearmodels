@@ -141,7 +141,8 @@ class PooledOLS(object):
             frame.columns = ['weight']
             return PanelData(frame)
 
-        frame = self.dependent.panel.iloc[0].copy()
+        frame = pd.DataFrame(columns=self.dependent.entities,
+                             index=self.dependent.time)
         nobs, nentity = self.exog.nobs, self.exog.nentity
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):

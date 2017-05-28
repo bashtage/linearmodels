@@ -766,7 +766,7 @@ def test_panel_other_incorrect_size(data):
     x = mod.exog.dataframe
     cats = pd.DataFrame(mod.dependent.entity_ids, index=mod.dependent.index)
     cats = PanelData(cats)
-    cats = cats.panel.iloc[:, :, :cats.panel.shape[2] // 2]
+    cats = cats.dataframe.iloc[:cats.dataframe.shape[0] // 2, :]
 
     with pytest.raises(ValueError):
         PanelOLS(y, x, other_effects=cats)
@@ -878,7 +878,7 @@ def test_cluster_smoke(data):
         mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True, clusters=c1,
                 debiased=False)
     with pytest.raises(ValueError):
-        clusters = c1.panel.iloc[:, :, :c1.panel.shape[2] // 2]
+        clusters = c1.dataframe.iloc[:c1.dataframe.shape[0] // 2]
         mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
 
 

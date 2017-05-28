@@ -41,7 +41,7 @@ def test_numpy_3d():
     n, t, k = 11, 7, 3
     x = np.random.random((k, t, n))
     dh = PanelData(x)
-    assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
+    assert_equal(x, dh.values3d)
     assert dh.nentity == n
     assert dh.nobs == t
     assert dh.nvar == k
@@ -51,7 +51,6 @@ def test_numpy_3d():
     vars = ['x.{0}'.format(i) for i in range(k)]
     expected = pd.Panel(np.reshape(x, (k, t, n)), items=vars,
                         major_axis=obs, minor_axis=items)
-    assert_panel_equal(dh.panel, expected)
     expected_frame = expected.swapaxes(1, 2).to_frame()
     expected_frame.index.levels[0].name = 'entity'
     expected_frame.index.levels[1].name = 'time'
@@ -69,21 +68,11 @@ def test_numpy_2d():
     n, t, k = 11, 7, 1
     x = np.random.random((t, n))
     dh = PanelData(x)
-    assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
     assert dh.nentity == n
     assert dh.nobs == t
     assert dh.nvar == k
     assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
-    items = ['entity.{0}'.format(i) for i in range(n)]
-    obs = [i for i in range(t)]
-    vars = ['x']
-    expected = pd.Panel(np.reshape(x, (k, t, n)), items=vars,
-                        major_axis=obs, minor_axis=items)
-    assert_panel_equal(dh.panel, expected)
-    expected_frame = expected.swapaxes(1, 2).to_frame()
-    expected_frame.index.levels[0].name = 'entity'
-    expected_frame.index.levels[1].name = 'time'
-    assert_frame_equal(dh.dataframe, expected_frame)
+    assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
 
 
 def test_pandas_panel():
@@ -100,7 +89,6 @@ def test_pandas_panel():
     assert_equal(dh.values3d, x.values)
     expected = np.reshape(x.swapaxes(0, 2).values, (n * t, k))
     assert_equal(dh.values2d, expected)
-    assert_panel_equal(x, dh.panel)
     expected_frame = x.swapaxes(1, 2).to_frame()
     expected_frame.index.levels[0].name = 'entity'
     expected_frame.index.levels[1].name = 'time'
@@ -688,7 +676,7 @@ def test_general_weighted_demean_oneway(panel):
     wd = np.sqrt(w.values2d) * d
     wy = np.sqrt(w.values2d) * y.values2d
     dm1 = wy - wd @ np.linalg.lstsq(wd, wy)[0]
-    assert_allclose(dm1, dm2.values2d)
+    assert_allclose(dm1, dm2.values2d, atol=1e-14)
 
 
 def test_general_unit_weighted_demean_twoway(panel):

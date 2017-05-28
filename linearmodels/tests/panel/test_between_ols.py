@@ -249,8 +249,13 @@ def test_2way_cluster(data):
 
     res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
 
+    dep = dep.reindex(list(res.resids.index))
+    exog = exog.reindex(list(res.resids.index))
+
     ols = IV2SLS(dep, exog, None, None)
     ols_clusters = clusters.groupby(level=0).max()
+    ols_clusters = ols_clusters.reindex(list(res.resids.index))
+
     ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 

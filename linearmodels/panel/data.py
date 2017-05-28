@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pandas as pd
 from numpy import ndarray
@@ -8,6 +10,69 @@ from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
 from linearmodels.utility import ensure_unique_column
 
 __all__ = ['PanelData']
+
+
+class _Panel(object):
+    """
+    Convert a MI DataFrame to a 3-d structure where columns are items
+
+    Parameters
+    ----------
+    df : DataFrame
+        Multiindex DataFrame containing floats
+
+    Notes
+    -----
+    Contains the logic needed to transform a MI DataFrame with 2 levels
+    into a minimal pandas Panel-like object
+    """
+
+    def __init__(self, df):
+        self._items = df.columns
+        index = df.index
+        self._major_axis = pd.Series(index.levels[1][index.labels[1]]).unique()
+        self._minor_axis = pd.Series(index.levels[0][index.labels[0]]).unique()
+        full_index = list(product(self._minor_axis, self._major_axis))
+        self._full_index = pd.MultiIndex.from_tuples(full_index)
+        new_df = df.copy().loc[self._full_index]
+        self._frame = new_df
+        i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
+        self._shape = (i, j, k)
+        self._values = np.swapaxes(np.reshape(new_df.values.copy().T, (i, k, j)), 1, 2)
+
+    @classmethod
+    def from_array(cls, values, items, major_axis, minor_axis):
+        index = list(product(minor_axis, major_axis))
+        index = pd.MultiIndex.from_tuples(index)
+        i, j, k = len(items), len(major_axis), len(minor_axis)
+        values = np.swapaxes(values.copy(), 0, 2).ravel()
+        values = np.reshape(values, ((j * k), i))
+
+        df = pd.DataFrame(values, index=index, columns=items)
+        return cls(df)
+
+    @property
+    def shape(self):
+        return self._shape
+
+    @property
+    def items(self):
+        return self._items
+
+    @property
+    def major_axis(self):
+        return self._major_axis
+
+    @property
+    def minor_axis(self):
+        return self._minor_axis
+
+    @property
+    def values(self):
+        return self._values
+
+    def to_frame(self):
+        return self._frame
 
 
 def convert_columns(s, drop_first):
@@ -103,19 +168,22 @@ class PanelData(object):
             else:
                 self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
         elif isinstance(x, ndarray):
-            if not 2 <= x.ndim <= 3:
+            if x.ndim not in (2, 3):
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:
                 x = x[None, :, :]
 
             k, t, n = x.shape
-            variables = [var_name] if k == 1 else [var_name + '.{0}'.format(i) for i in range(k)]
-            entities = ['entity.{0}'.format(i) for i in range(n)]
+            var_str = var_name + '.{0:0>' + str(int(np.log10(k) + .01)) + '}'
+            variables = [var_name] if k == 1 else [var_str.format(i) for i in range(k)]
+            entity_str = 'entity.{0:0>' + str(int(np.log10(n) + .01)) + '}'
+            entities = [entity_str.format(i) for i in range(n)]
             time = list(range(t))
             x = x.astype(np.float64)
-            panel = Panel(x, items=variables, major_axis=time,
-                          minor_axis=entities)
-            self._frame = panel.swapaxes(1, 2).to_frame(filter_observations=False)
+            panel = _Panel.from_array(x, items=variables, major_axis=time,
+                                      minor_axis=entities)
+            self._fake_panel = panel
+            self._frame = panel.to_frame()
         else:
             raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
                             'supported.')
@@ -135,7 +203,7 @@ class PanelData(object):
     @property
     def panel(self):
         """pandas Panel view of data"""
-        return self._frame.to_panel().swapaxes(1, 2)
+        return _Panel(self._frame)
 
     @property
     def dataframe(self):
@@ -413,6 +481,7 @@ class PanelData(object):
         out = DataFrame(count.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
         out = out.loc[reindex].astype(np.int64)
+        out.index.name = group
         return out
 
     @property
