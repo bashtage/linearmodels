@@ -7,7 +7,8 @@ import xarray as xr
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.model import AbsorbingEffectError, AmbiguityError, PanelOLS
+from linearmodels.panel.model import (AbsorbingEffectError, AmbiguityError,
+                                      PanelOLS)
 from linearmodels.tests.panel._utility import generate_data, lsdv
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]

@@ -1,11 +1,12 @@
 import functools
 from collections import OrderedDict
+from collections.abc import MutableMapping
 
 import numpy as np
 from numpy import NaN, ceil, diag, isnan, log10, sqrt
 from numpy.linalg import eigh, matrix_rank
-from scipy.stats import chi2, f
 from pandas import DataFrame, Series, concat
+from scipy.stats import chi2, f
 
 
 class MissingValueWarning(Warning):
@@ -15,15 +16,84 @@ class MissingValueWarning(Warning):
 missing_value_warning_msg = """
 Inputs contain missing values. Dropping rows with missing observations."""
 
+OrderedDict
 
-class AttrDict(dict):
+
+class AttrDict(MutableMapping):
     """
-    Dictionary-like object that exposes keys as attributes
+    Ordered dictionary-like object that exposes keys as attributes
     """
+
+    def update(self, *args, **kwargs):
+        self.__ordered_dict__.update(*args, **kwargs)
+
+    def clear(self):
+        self.__ordered_dict__.clear()
+
+    def copy(self):
+        ad = AttrDict()
+        for key in self.__ordered_dict__.keys():
+            ad[key] = self.__ordered_dict__[key]
+        return ad
+
+    def keys(self):
+        return self.__ordered_dict__.keys()
+
+    def items(self):
+        return self.__ordered_dict__.items()
+
+    def values(self):
+        return self.__ordered_dict__.values()
+
+    def pop(self, key, default=None):
+        return self.__ordered_dict__.pop(key, default)
+
+    def __len__(self):
+        return self.__ordered_dict__.__len__()
+
+    def __repr__(self):
+        out = self.__ordered_dict__.__str__()
+        return 'Attr' + out[7:]
+
+    def __str__(self):
+        return self.__repr__()
 
     def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+        self.__dict__['__ordered_dict__'] = OrderedDict(*args, **kwargs)
+
+    def __contains__(self, item):
+        return self.__ordered_dict__.__contains__(item)
+
+    def __getitem__(self, item):
+        return self.__ordered_dict__[item]
+
+    def __setitem__(self, key, value):
+        if key == '__ordered_dict__':
+            raise KeyError(key + ' is invalid')
+        self.__ordered_dict__[key] = value
+
+    def __delitem__(self, key):
+        del self.__ordered_dict__[key]
+
+    def __getattr__(self, item):
+        if item not in self.__ordered_dict__:
+            raise AttributeError
+        return self.__ordered_dict__[item]
+
+    def __setattr__(self, key, value):
+        if key == '__ordered_dict__':
+            raise AttributeError(key + ' is invalid')
+        self.__ordered_dict__[key] = value
+
+    def __delattr__(self, name):
+        del self.__ordered_dict__[name]
+
+    def __dir__(self):
+        return sorted(set(super(AttrDict, self).__dir__() +
+                          list(self.__ordered_dict__.keys())))
+
+    def __iter__(self):
+        return self.__ordered_dict__.__iter__()
 
 
 def has_constant(x):

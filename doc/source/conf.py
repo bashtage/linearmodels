@@ -22,8 +22,11 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 from distutils.version import LooseVersion
-import linearmodels
+
 import guzzle_sphinx_theme
+
+import linearmodels
+
 # import sphinx_bootstrap_theme
 # import sphinx_rtd_theme
 # ...

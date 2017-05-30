@@ -1,7 +1,7 @@
 import os
 import subprocess
-from os.path import join
 from collections import OrderedDict
+from os.path import join
 
 STATA_PATH = join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.exe')
 

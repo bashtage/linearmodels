@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from linearmodels.formula import between_ols, first_difference_ols, panel_ols, pooled_ols, \
-    random_effects
-from linearmodels.panel.model import BetweenOLS, FirstDifferenceOLS, PanelOLS, PooledOLS, \
-    RandomEffects
+from linearmodels.formula import (between_ols, first_difference_ols, panel_ols,
+                                  pooled_ols, random_effects)
+from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
+                                      PooledOLS, RandomEffects)
 from linearmodels.tests.panel._utility import generate_data
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]

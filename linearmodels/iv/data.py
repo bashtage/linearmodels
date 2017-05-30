@@ -6,8 +6,9 @@ import copy
 import numpy as np
 import pandas as pd
 
-from linearmodels.compat.pandas import is_categorical, is_categorical_dtype,  \
-    is_numeric_dtype, is_string_dtype, is_string_like
+from linearmodels.compat.pandas import (is_categorical, is_categorical_dtype,
+                                        is_numeric_dtype, is_string_dtype,
+                                        is_string_like)
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
@@ -65,7 +66,10 @@ class IVData(object):
 
             self._ndarray = x.astype(np.float64)
             index = list(range(x.shape[0]))
-            cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
+            if x.shape[1] == 1:
+                cols = [var_name]
+            else:
+                cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
             self._pandas = pd.DataFrame(x, index=index, columns=cols)
             self._labels = {0: index, 1: cols}
 

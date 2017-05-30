@@ -3,8 +3,10 @@ import pandas as pd
 from numpy.testing import assert_allclose
 from scipy import stats
 
-from linearmodels.utility import InapplicableTestStatistic, InvalidTestStatistic, \
-    WaldTestStatistic, cached_property, has_constant, inv_sqrth, ensure_unique_column
+from linearmodels.utility import (InapplicableTestStatistic,
+                                  InvalidTestStatistic, WaldTestStatistic,
+                                  cached_property, ensure_unique_column,
+                                  has_constant, inv_sqrth)
 
 
 def test_hasconstant():

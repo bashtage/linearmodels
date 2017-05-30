@@ -1,10 +1,10 @@
-from linearmodels.compat.pandas import assert_frame_equal
-
 import pandas as pd
 import pytest
 
-from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM, \
-    TradedFactorModel
+from linearmodels.asset_pricing.model import (LinearFactorModel,
+                                              LinearFactorModelGMM,
+                                              TradedFactorModel)
+from linearmodels.compat.pandas import assert_frame_equal
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 FORMULA_FACTORS = 'factor_1 + factor_2 + factor_3'

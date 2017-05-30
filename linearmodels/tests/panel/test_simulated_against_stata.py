@@ -6,7 +6,8 @@ import pytest
 from numpy.testing import assert_allclose
 
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS, RandomEffects
+from linearmodels.panel.model import (BetweenOLS, PanelOLS, PooledOLS,
+                                      RandomEffects)
 from linearmodels.tests.panel.results import parse_stata_results
 from linearmodels.utility import AttrDict
 
@@ -59,6 +60,7 @@ def data(request):
     return AttrDict(fit=fit, model=spec_mod, model_options=mod_options, y=y, x=x,
                     stata=STATA_RESULTS[request.param], fit_options=fit_options,
                     model_name=model, vcv=vcv, weights=weights, missing=missing)
+
 
 # TODO: pvals, r2o, r2
 

@@ -6,7 +6,8 @@ from numpy.testing import assert_allclose
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
-from linearmodels.tests.panel._utility import assert_results_equal, generate_data
+from linearmodels.tests.panel._utility import (assert_results_equal,
+                                               generate_data)
 
 
 @pytest.fixture(params=['numpy', 'pandas', 'xarray'])

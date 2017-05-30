@@ -1,6 +1,6 @@
 import pytest
 
-from linearmodels.iv.model import IVGMMCUE, IV2SLS, IVLIML, IVGMM
+from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.tests.iv._utility import generate_data
 
 

@@ -1,0 +1,57 @@
+
+Memory efficient calculation
+============================
+
+The parameter estimates in the SUR model can are
+
+.. math:: \left(X^{\prime}\Omega^{-1}X\right)^{-1}\left(X^{\prime}\Omega^{-1}Y\right)^{-1}
+
+where
+
+.. math::
+
+   \Omega^{-1}=\left[\begin{array}{cccc}
+   \sigma^{11}I_{T} & \sigma^{12}I_{T} & \ldots & \sigma^{1k}I_{T}\\
+   \sigma^{21}I_{T} & \sigma^{22}I_{T} & \dots & \sigma^{2k}I_{T}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}I_{T} & \sigma^{k2}I_{T} & \dots & \sigma^{kk}I_{T}
+   \end{array}\right]
+
+where :math:`\sigma^{ij}=\left[\Sigma^{-1}\right]_{ij}`. Since :math:`X`
+is block diagonal,
+
+.. math::
+
+   X^{\prime}\Omega^{-1}=\left[\begin{array}{cccc}
+   \sigma^{11}X_{1}^{\prime} & \sigma^{12}X_{1}^{\prime} & \ldots & \sigma^{1k}X_{1}^{\prime}\\
+   \sigma^{21}X_{2}^{\prime} & \sigma^{22}X_{2}^{\prime} & \dots & \sigma^{2k}X_{2}^{\prime}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}X_{k}^{\prime} & \sigma^{k2}X_{k}^{\prime} & \dots & \sigma^{kk}X_{k}^{\prime}
+   \end{array}\right]
+
+and
+
+.. math::
+
+   X^{\prime}\Omega^{-1}X=\left[\begin{array}{cccc}
+   \sigma^{11}X_{1}^{\prime}X_{1} & \sigma^{12}X_{1}^{\prime}X_{2} & \ldots & \sigma^{1k}X_{1}^{\prime}X_{k}\\
+   \sigma^{21}X_{2}^{\prime}X_{1} & \sigma^{22}X_{2}^{\prime}X_{2} & \dots & \sigma^{2k}X_{2}^{\prime}X_{k}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}X_{k}^{\prime}X_{1} & \sigma^{k2}X_{k}^{\prime}X_{2} & \dots & \sigma^{kk}X_{k}^{\prime}X_{k}
+   \end{array}\right]
+
+Similarly
+
+.. math::
+
+   X^{\prime}\Omega^{-1}Y=\left[\begin{array}{c}
+   \sigma^{11}X_{1}^{\prime}Y_{1}+\sigma^{12}X_{1}^{\prime}Y_{2}+\ldots\sigma^{1k}X_{1}^{\prime}Y_{k}\\
+   \sigma^{21}X_{2}^{\prime}Y_{1}+\sigma^{22}X_{2}^{\prime}Y_{2}+\dots+\sigma^{2k}X_{2}^{\prime}Y_{k}\\
+   \vdots\\
+   \sigma^{k2}X_{k}^{\prime}Y_{1}+\sigma^{k2}X_{k}^{\prime}Y_{2}+\dots+\sigma^{kk}X_{k}^{\prime}Y_{k}
+   \end{array}\right]
+
+This suggests that constructing the high dimensional :math:`\Omega^{-1}`
+can be avoided and many needless multiplications can be avoided by
+directly computing these two components and the solution can be found
+using ``solve``.

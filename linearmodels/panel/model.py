@@ -4,13 +4,19 @@ from numpy.linalg import lstsq, matrix_rank
 from patsy.highlevel import ModelDesc, dmatrices
 from patsy.missing import NAAction
 
-from linearmodels.panel.covariance import ACCovariance, ClusteredCovariance, CovarianceManager, \
-    DriscollKraay, FamaMacBethCovariance, FamaMacBethKernelCovariance, HeteroskedasticCovariance, \
-    HomoskedasticCovariance
+from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
+                                           CovarianceManager, DriscollKraay,
+                                           FamaMacBethCovariance,
+                                           FamaMacBethKernelCovariance,
+                                           HeteroskedasticCovariance,
+                                           HomoskedasticCovariance)
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.results import PanelEffectsResults, PanelResults, RandomEffectsResults
-from linearmodels.utility import AttrDict, InapplicableTestStatistic, InvalidTestStatistic, \
-    WaldTestStatistic, ensure_unique_column, has_constant, missing_warning
+from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
+                                        RandomEffectsResults)
+from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
+                                  InvalidTestStatistic, WaldTestStatistic,
+                                  ensure_unique_column, has_constant,
+                                  missing_warning)
 
 
 class AbsorbingEffectError(Exception):

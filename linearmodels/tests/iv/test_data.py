@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
-
 from collections import OrderedDict
 
 import numpy as np
@@ -8,7 +6,7 @@ import pytest
 import xarray as xr
 from numpy.testing import assert_equal
 
-
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.iv.data import IVData
 
 
@@ -29,7 +27,7 @@ class TestDataHandler(object):
         x = np.empty(10)
         xdh = IVData(x)
         assert xdh.ndim == 2
-        assert xdh.cols == ['x.0']
+        assert xdh.cols == ['x']
         assert xdh.rows == list(np.arange(10))
         assert_equal(xdh.ndarray, x[:, None])
         df = pd.DataFrame(x[:, None], columns=xdh.cols, index=xdh.rows)

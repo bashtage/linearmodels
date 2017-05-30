@@ -9,7 +9,8 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.compat.statsmodels import Summary
-from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format
+from linearmodels.utility import (_str, _SummaryStr, cached_property,
+                                  pval_format)
 
 
 class LinearFactorModelResults(_SummaryStr):
@@ -274,7 +275,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
         se = np.sqrt(np.diag(self._cov))
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape
-        nloadings = nportfolio * (nfactor-1)
+        nloadings = nportfolio * (nfactor - 1)
         se = np.r_[ase, se[:nloadings]]
         se = se.reshape((nportfolio, nfactor))
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)

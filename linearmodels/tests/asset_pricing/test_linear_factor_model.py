@@ -4,8 +4,8 @@ from numpy.testing import assert_allclose
 from scipy import stats
 
 from linearmodels.asset_pricing.model import LinearFactorModel
-from linearmodels.iv.covariance import kernel_optimal_bandwidth, kernel_weight_bartlett, \
-    _cov_kernel
+from linearmodels.iv.covariance import (_cov_kernel, kernel_optimal_bandwidth,
+                                        kernel_weight_bartlett)
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
 

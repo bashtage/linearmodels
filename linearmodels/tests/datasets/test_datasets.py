@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from linearmodels.datasets import birthweight, card, fertility, jobtraining, \
-    meps, mroz, wage, wage_panel, french
+from linearmodels.datasets import (birthweight, card, fertility, french,
+                                   jobtraining, meps, mroz, wage, wage_panel)
 
 DATASETS = [birthweight, card, fertility, jobtraining, meps, mroz, wage,
             wage_panel, french]
