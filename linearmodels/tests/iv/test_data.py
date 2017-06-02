@@ -108,8 +108,6 @@ class TestDataHandler(object):
             IVData(np.empty((1, 1, 1)))
         with pytest.raises(ValueError):
             IVData(np.empty((10, 2, 2)))
-        with pytest.raises(ValueError):
-            IVData(pd.Panel(np.empty((10, 2, 2))))
         with pytest.raises(TypeError):
             class a(object):
                 @property
