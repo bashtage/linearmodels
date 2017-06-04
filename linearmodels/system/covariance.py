@@ -1,7 +1,7 @@
-from numpy import eye, zeros_like
+from numpy import eye, zeros_like, ones, vstack, sqrt, zeros
 from numpy.linalg import inv
 
-from linearmodels.system._utility import blocked_inner_prod
+from linearmodels.system._utility import blocked_inner_prod, blocked_diag_product
 
 
 class HomoskedasticCovariance(object):
@@ -19,6 +19,8 @@ class HomoskedasticCovariance(object):
     gls : bool
         Flag indicating to compute the GLS covariance estimator.  If False,
         assume OLS was used
+    debiased : bool
+        Flag indicating to apply a small sample adjustment
 
     Notes
     -----
@@ -37,17 +39,31 @@ class HomoskedasticCovariance(object):
 
     """
 
-    def __init__(self, x, eps, sigma, *, gls=False):
+    def __init__(self, x, eps, sigma, *, gls=False, debiased=False):
         self._eps = eps
         self._x = x
         self._nobs = eps.shape[0]
         self._k = len(x)
         self._sigma = sigma
         self._gls = gls
+        self._debiased = debiased
 
     @property
     def sigma(self):
+        """Error covariance"""
         return self._sigma
+
+    def _adjustment(self):
+        if not self._debiased:
+            return 1.0
+        k = list(map(lambda s: s.shape[1], self._x))
+        nobs = self._x[0].shape[0]
+        adj = []
+        for i in range(len(k)):
+            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        adj = vstack(adj)
+        adj = sqrt(adj)
+        return adj @ adj.T
 
     def _mvreg_cov(self):
         x = self._x
@@ -77,10 +93,12 @@ class HomoskedasticCovariance(object):
 
     @property
     def cov(self):
+        """Parameter covariance"""
+        adj = self._adjustment()
         if self._gls:
-            return self._gls_cov()
+            return adj * self._gls_cov()
         else:
-            return self._mvreg_cov()
+            return adj * self._mvreg_cov()
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
@@ -98,6 +116,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     gls : bool
         Flag indicating to compute the GLS covariance estimator.  If False,
         assume OLS was used
+    debiased : bool
+        Flag indicating to apply a small sample adjustment
 
     Notes
     -----
@@ -121,8 +141,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     """
 
-    def __init__(self, x, eps, sigma, gls=False):
-        super(HeteroskedasticCovariance, self).__init__(x, eps, sigma, gls=gls)
+    # TODO: Groupby time period before computing xeex
+    def __init__(self, x, eps, sigma, gls=False, debiased=False):
+        super(HeteroskedasticCovariance, self).__init__(x, eps, sigma,
+                                                        gls=gls,
+                                                        debiased=debiased)
 
     def _cov(self, gls):
         x = self._x
@@ -134,10 +157,15 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         xpx = blocked_inner_prod(x, weights)
         xpxi = inv(xpx)
 
-        xe = []
-        for i in range(k):
-            xe.append(x[i] * eps[:, [i]])
-        xeex = blocked_inner_prod(xe, weights)
+        bigx = blocked_diag_product(x, weights)
+        nobs = eps.shape[0]
+        e = eps.T.ravel()[:, None]
+        bigxe = bigx * e
+        m = bigx.shape[1]
+        xeex = zeros((m, m))
+        for i in range(nobs):
+            xe = bigxe[i:k * nobs: nobs].sum(0)[None, :]
+            xeex += xe.T @ xe
 
         cov = xpxi @ xeex @ xpxi
         cov = (cov + cov.T) / 2

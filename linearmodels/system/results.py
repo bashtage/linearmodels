@@ -25,6 +25,13 @@ class _CommonResults(_SummaryStr):
         self._index = results.index
         self._iter = results.iter
         self._cov_type = results.cov_type
+        self._tss = results.total_ss
+        self._rss = results.resid_ss
+
+    @property
+    def method(self):
+        """Estimation method"""
+        return self._method
 
     @property
     def cov(self):
@@ -79,6 +86,22 @@ class _CommonResults(_SummaryStr):
         """Coefficient of determination (R**2)"""
         return self._r2
 
+    @property
+    def total_ss(self):
+        """Total sum of squares"""
+        return self._tss
+
+    @property
+    def model_ss(self):
+        """Residual sum of squares"""
+        return self._tss - self._rss
+
+    @property
+    def resid_ss(self):
+        """Residual sum of squares"""
+        return self._rss
+
+
 
 class SURResults(_CommonResults):
     """
@@ -95,6 +118,7 @@ class SURResults(_CommonResults):
         self._individual = AttrDict()
         for key in results.individual:
             self._individual[key] = SUREquationResult(results.individual[key])
+        self._sigma = results.sigma
 
     @property
     def summary(self):
@@ -125,6 +149,11 @@ class SURResults(_CommonResults):
         """Weighted estimated residuals"""
         return DataFrame(self._wresid, index=self._index, columns=self.equation_labels)
 
+    @property
+    def sigma(self):
+        """Estimated residual covariance"""
+        return self._sigma
+
 
 class SUREquationResult(_CommonResults):
     def __init__(self, results):
@@ -132,6 +161,7 @@ class SUREquationResult(_CommonResults):
         self._eq_label = results.eq_label
         self._dependent = results.dependent
         self._f_statistic = results.f_stat
+        self._r2a = results.r2a
 
     @property
     def equation_label(self):
@@ -184,3 +214,8 @@ class SUREquationResult(_CommonResults):
     def wresids(self):
         """Weighted estimated residuals"""
         return Series(self._wresid.squeeze(), index=self._index, name='wresid')
+
+    @property
+    def rsquared_adj(self):
+        """Sample-size adjusted coefficient of determination (R**2)"""
+        return self._r2a

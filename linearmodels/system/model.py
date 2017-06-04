@@ -330,20 +330,29 @@ class SUR(object):
         return beta, eps
 
     @staticmethod
-    def _f_stat(stats):
+    def _f_stat(stats, debiased):
         cov = stats.cov
-        k = cov.shape[0]
+        nvar = k = cov.shape[0]
         sel = list(range(k))
         if stats.has_constant:
             sel.pop(stats.constant_loc)
         cov = cov[sel][:, sel]
         params = stats.params[sel]
         stat = float(params.T @ inv(cov) @ params)
+        df = params.shape[0]
+        nobs = stats.nobs
         null = 'All parameters ex. constant are zero'
         name = 'Equation F-statistic'
-        return WaldTestStatistic(stat, null=null, df=params.shape[0], name=name)
 
-    def _multivariate_ls_finalize(self, beta, eps, cov_type):
+        if debiased:
+            wald = WaldTestStatistic(stat / df, null, df, nobs - nvar,
+                                     name=name)
+        else:
+            return WaldTestStatistic(stat, null=null, df=df, name=name)
+
+        return wald
+
+    def _multivariate_ls_finalize(self, beta, eps, cov_type, **cov_config):
         nobs = eps.shape[0]
         sigma = eps.T @ eps / nobs
         k = len(self._dependent)
@@ -354,10 +363,11 @@ class SUR(object):
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
-        cov = cov_est(x, eps, sigma, gls=False).cov
+        cov = cov_est(x, eps, sigma, gls=False, **cov_config).cov
 
         individual = AttrDict()
         loc = 0
+        debiased = cov_config.get('debiased', False)
         for i in range(k):
             stats = AttrDict()
             stats['eq_label'] = self._eq_labels[i]
@@ -380,7 +390,7 @@ class SUR(object):
             stats['nobs'] = e.shape[0]
             stats['df_model'] = df
             stats['resid_ss'] = float(e.T @ e)
-            stats['debiased'] = False  # TODO: Fix
+            stats['debiased'] = debiased
 
             ye = y
             cons = int(self.has_constant.iloc[i])
@@ -392,7 +402,7 @@ class SUR(object):
             stats['has_constant'] = bool(cons)
             stats['constant_loc'] = self._constant_loc[i]
             stats['cov'] = cov[loc:loc + df, loc:loc + df]
-            stats['f_stat'] = self._f_stat(stats)
+            stats['f_stat'] = self._f_stat(stats, debiased)
             names = self._param_names[loc:loc + df]
             offset = len(stats.dependent) + 1
             stats['param_names'] = [n[offset:] for n in names]
@@ -412,7 +422,7 @@ class SUR(object):
         results['param_names'] = self._param_names
         results['cov'] = cov
         results['sigma'] = sigma
-        results['debiased'] = False  # TODO: Enable later
+        results['debiased'] = debiased
 
         total_ss = resid_ss = 0.0
         resid = []
@@ -423,11 +433,13 @@ class SUR(object):
 
         resid = hstack(resid)
         results['r2'] = 1.0 - resid_ss / total_ss
+        results['resid_ss'] = resid_ss
+        results['total_ss'] = total_ss
         results['resid'] = resid
         results['wresid'] = resid
         return SURResults(results)
 
-    def _gls_finalize(self, beta, sigma, gls_eps, eps, cov_type, iter_count):
+    def _gls_finalize(self, beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config):
         k = len(self._dependent)
 
         # Covariance estimation
@@ -436,9 +448,9 @@ class SUR(object):
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
-        gls_eps = reshape(gls_eps, (gls_eps.shape[0] // k, k))
-        eps = reshape(eps, (eps.shape[0] // k, k))
-        cov = cov_est(x, gls_eps, sigma, gls=True).cov
+        gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
+        eps = reshape(eps, (k, eps.shape[0] // k)).T
+        cov = cov_est(x, gls_eps, sigma, gls=True, **cov_config).cov
 
         # TODO: Pass in, DRY
         sigma_m12 = inv_matrix_sqrt(sigma)
@@ -450,6 +462,7 @@ class SUR(object):
 
         individual = AttrDict()
         loc = 0
+        debiased = cov_config.get('debiased', False)
         for i in range(k):
             stats = AttrDict()
             stats['eq_label'] = self._eq_labels[i]
@@ -471,7 +484,7 @@ class SUR(object):
             stats['df_model'] = df
             stats['resid'] = eps[:, [i]]
             stats['resid_ss'] = float(e.T @ e)
-            stats['debiased'] = False  # TODO: Fix
+            stats['debiased'] = debiased
 
             cons = int(self.has_constant.iloc[i])
             if cons:
@@ -485,7 +498,7 @@ class SUR(object):
             stats['has_constant'] = bool(cons)
             stats['constant_loc'] = self._constant_loc[i]
             stats['cov'] = cov[loc:loc + df, loc:loc + df]
-            stats['f_stat'] = self._f_stat(stats)
+            stats['f_stat'] = self._f_stat(stats, debiased)
             names = self._param_names[loc:loc + df]
             offset = len(stats.dependent) + 1
             stats['param_names'] = [n[offset:] for n in names]
@@ -507,19 +520,24 @@ class SUR(object):
         results['param_names'] = self._param_names
         results['cov'] = cov
         results['sigma'] = sigma
-        results['debiased'] = False  # TODO: Enable later
+        results['debiased'] = debiased
 
         total_ss = resid_ss = 0.0
         resid = []
+        wresid = []
         for key in individual:
             total_ss += individual[key].total_ss
             resid_ss += individual[key].resid_ss
             resid.append(individual[key].resid)
+            wresid.append(individual[key].wresid)
 
         resid = hstack(resid)
+        wresid = hstack(wresid)
         results['r2'] = 1.0 - resid_ss / total_ss
+        results['resid_ss'] = resid_ss
+        results['total_ss'] = total_ss
         results['resid'] = resid
-        results['wresid'] = resid
+        results['wresid'] = wresid
 
         return SURResults(results)
 
@@ -564,7 +582,7 @@ class SUR(object):
         return beta, eps, sigma
 
     def fit(self, *, use_gls=True, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
-            cov_type='robust'):
+            cov_type='robust', **cov_config):
         """
         Estimate model parameters
 
@@ -589,6 +607,10 @@ class SUR(object):
             * 'robust', 'heteroskedastic' - Heteroskedasticit robust
               covariance estimator
 
+        **cov_config
+            Additional parameters to pass to covariance estimator. All
+            estimators support debiased which employs a small-sample adjustment
+
         Returns
         -------
         results : SURResults
@@ -604,7 +626,7 @@ class SUR(object):
         total_cols = ci[-1]
         beta0, eps = self._multivariate_ls_fit()
         if not use_gls or self._common_exog:
-            return self._multivariate_ls_finalize(beta0, eps, cov_type)
+            return self._multivariate_ls_finalize(beta0, eps, cov_type, **cov_config)
 
         beta_hist = [beta0]
         nobs = eps.shape[0]
@@ -628,7 +650,7 @@ class SUR(object):
         x = blocked_diag_product(xs, eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, gls_eps, eps, cov_type, iter_count)
+        return self._gls_finalize(beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config)
 
     @property
     def constraints(self):
