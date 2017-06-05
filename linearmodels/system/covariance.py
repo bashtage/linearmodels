@@ -141,7 +141,6 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     """
 
-    # TODO: Groupby time period before computing xeex
     def __init__(self, x, eps, sigma, gls=False, debiased=False):
         super(HeteroskedasticCovariance, self).__init__(x, eps, sigma,
                                                         gls=gls,

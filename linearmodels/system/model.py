@@ -118,11 +118,11 @@ class SUR(object):
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
     """
-    
+
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
             raise TypeError('dependent must be a dictionary-like')
-        
+
         # Ensure nearly deterministic equation ordering
         if not isinstance(equations, OrderedDict):
             pairs = [(str(key), key) for key in equations]
@@ -131,7 +131,7 @@ class SUR(object):
             for key, value in pairs:
                 ordered_eqn[value] = equations[value]
             equations = ordered_eqn
-        
+
         self._equations = equations
         self._sigma = asarray(sigma) if sigma is not None else None
         self._param_names = []
@@ -143,14 +143,14 @@ class SUR(object):
         self._wy = []
         self._wx = []
         self._w = []
-        
+
         self._weights = []
         self._constraints = []
         self._constant_loc = None
         self._has_constant = None
         self._common_exog = False
         self._validate_data()
-    
+
     def _validate_data(self):
         ids = []
         for i, key in enumerate(self._equations):
@@ -167,7 +167,7 @@ class SUR(object):
                 else:
                     dep = self._dependent[-1].ndarray
                     self._weights.append(IVData(ones_like(dep)))
-            
+
             elif isinstance(eq_data, dict):
                 self._dependent.append(IVData(eq_data['dependent'], var_name=dep_name))
                 ids.append(id(eq_data['exog']))
@@ -177,11 +177,11 @@ class SUR(object):
                 else:
                     dep = self._dependent[-1].ndarray
                     self._weights.append(IVData(ones_like(dep)))
-            
+
             else:
                 msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
                 raise TypeError(msg)
-        
+
         self._common_exog = len(set(ids)) == 1
         constant = []
         constant_loc = []
@@ -203,7 +203,7 @@ class SUR(object):
         self._has_constant = Series(constant,
                                     index=[d.cols[0] for d in self._dependent])
         self._constant_loc = constant_loc
-        
+
         for dep, exog, w in zip(self._dependent, self._exog, self._weights):
             y = dep.ndarray
             x = exog.ndarray
@@ -215,12 +215,12 @@ class SUR(object):
             self._x.append(x)
             self._wy.append(y * w_sqrt)
             self._wx.append(x * w_sqrt)
-    
+
     @property
     def has_constant(self):
         """Vector indicating which equations contain constants"""
         return self._has_constant
-    
+
     @classmethod
     def multivariate_ls(cls, dependent, exog):
         """
@@ -262,7 +262,7 @@ class SUR(object):
         for col in dependent.pandas:
             equations[col] = (dependent.pandas[[col]], exog.pandas)
         return cls(equations)
-    
+
     @classmethod
     def from_formula(cls, formula, data, *, sigma=None, weights=None):
         """
@@ -314,7 +314,7 @@ class SUR(object):
         na_action = NAAction(on_NA='raise', NA_types=[])
         if not isinstance(formula, (Mapping, str)):
             raise TypeError('formula must be a string or dictionary-like')
-        
+
         missing_weight_keys = []
         eqns = OrderedDict()
         if isinstance(formula, Mapping):
@@ -331,7 +331,7 @@ class SUR(object):
                         missing_weight_keys.append(key)
             _missing_weights(missing_weight_keys)
             return SUR(eqns, sigma=sigma)
-        
+
         formula = formula.replace('\n', ' ').strip()
         parts = formula.split('}')
         for i, part in enumerate(parts):
@@ -359,11 +359,11 @@ class SUR(object):
                     eqns[key]['weights'] = weights[key]
                 else:
                     missing_weight_keys.append(key)
-        
+
         _missing_weights(missing_weight_keys)
-        
+
         return SUR(eqns, sigma=sigma)
-    
+
     def _multivariate_ls_fit(self):
         wy, wx = self._wy, self._wx
         k = len(wx)
@@ -380,7 +380,7 @@ class SUR(object):
         beta = vstack(beta0)
         eps = hstack(eps)
         return beta, eps
-    
+
     @staticmethod
     def _f_stat(stats, debiased):
         cov = stats.cov
@@ -395,207 +395,185 @@ class SUR(object):
         nobs = stats.nobs
         null = 'All parameters ex. constant are zero'
         name = 'Equation F-statistic'
-        
+
         if debiased:
             wald = WaldTestStatistic(stat / df, null, df, nobs - nvar,
                                      name=name)
         else:
             return WaldTestStatistic(stat, null=null, df=df, name=name)
-        
+
         return wald
-    
+
     def _multivariate_ls_finalize(self, beta, eps, cov_type, **cov_config):
         nobs = eps.shape[0]
         sigma = eps.T @ eps / nobs
         k = len(self._wx)
-        
+
         # Covariance estimation
         if cov_type == 'unadjusted':
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
         cov = cov_est(self._wx, eps, sigma, gls=False, **cov_config).cov
-        
+
         individual = AttrDict()
         loc = 0
         debiased = cov_config.get('debiased', False)
         for i in range(k):
-            stats = AttrDict()
-            stats['eq_label'] = self._eq_labels[i]
-            stats['dependent'] = self._dependent[i].cols[0]
-            stats['method'] = 'OLS'
-            stats['cov_type'] = cov_type
-            stats['index'] = self._dependent[i].rows
-            stats['iter'] = 0
-            
+            cons = int(self.has_constant.iloc[i])
+            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
+                                               cov_type, 0, debiased, cons)
+            wy = wye = self._wy[i]
             w = self._w[i]
-            wy = self._wy[i]
-            wx = self._wx[i]
-            nobs, df = wx.shape
-            b = beta[loc:loc + df]
-            stats['params'] = b
-            
-            e = eps[:, [i]]
-            
-            stats['resid'] = e
-            stats['wresid'] = e
-            stats['nobs'] = e.shape[0]
-            stats['df_model'] = df
-            stats['resid_ss'] = float(e.T @ e)
-            stats['debiased'] = debiased
-            
-            wye = wy
             cons = int(self.has_constant.iloc[i])
             if cons:
                 wc = np.ones_like(wy) * np.sqrt(w)
                 wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
-                
             stats['total_ss'] = float(wye.T @ wye)
-            stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
-            stats['r2a'] = 1.0 - (stats.resid_ss / (nobs - df)) / (stats.total_ss / (nobs - cons))
-            stats['has_constant'] = bool(cons)
-            stats['constant_loc'] = self._constant_loc[i]
-            stats['cov'] = cov[loc:loc + df, loc:loc + df]
-            stats['f_stat'] = self._f_stat(stats, debiased)
-            names = self._param_names[loc:loc + df]
-            offset = len(stats.dependent) + 1
-            stats['param_names'] = [n[offset:] for n in names]
+            stats = self._individual_r2(stats)
+
             key = self._eq_labels[i]
             individual[key] = stats
-            
-            loc += df
+
+        nobs = eps.size
+        results = self._common_results(beta, cov, 'OLS', 0, nobs, cov_type,
+                                       sigma, individual, debiased)
+        results['wresid'] = results.resid
+
+        return SURResults(results)
+
+    def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
+                              cov_type, iter_count, debiased, constant):
+        loc = 0
+        for i in range(index):
+            loc += self._wx[i].shape[1]
+        i = index
+        stats = AttrDict()
+        stats['eq_label'] = self._eq_labels[i]
+        stats['dependent'] = self._dependent[i].cols[0]
+        stats['method'] = method
+        stats['cov_type'] = cov_type
+        stats['index'] = self._dependent[i].rows
+        stats['iter'] = iter_count
+
+        wxi = self._wx[i]
+        nobs, df = wxi.shape
+        b = beta[loc:loc + df]
+
+        stats['params'] = b
+        e = wresid[:, [i]]
+        stats['wresid'] = e
+        stats['nobs'] = e.shape[0]
+        stats['df_model'] = df
+        stats['resid'] = resid[:, [i]]
+        stats['resid_ss'] = float(e.T @ e)
+        stats['debiased'] = debiased
+
+        cons = int(self.has_constant.iloc[i])
+        stats['has_constant'] = bool(cons)
+        stats['constant_loc'] = self._constant_loc[i]
+        stats['cov'] = cov[loc:loc + df, loc:loc + df]
+        stats['f_stat'] = self._f_stat(stats, debiased)
+        names = self._param_names[loc:loc + df]
+        offset = len(stats.dependent) + 1
+        stats['param_names'] = [n[offset:] for n in names]
+
+        return stats
+
+    def _individual_r2(self, stats):
+        nobs = stats.nobs
+        df = stats.df_model
+        cons = stats.has_constant
+        stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
+        stats['r2a'] = 1.0 - (stats.resid_ss / (nobs - df)) / (stats.total_ss / (nobs - cons))
+
+        return stats
+
+    def _common_results(self, beta, cov, method, iter_count, nobs, cov_type,
+                        sigma, individual, debiased):
         results = AttrDict()
-        results['method'] = 'OLS'
-        results['iter'] = 0
+        results['method'] = method
+        results['iter'] = iter_count
+        results['nobs'] = nobs
         results['cov_type'] = cov_type
         results['index'] = self._dependent[0].rows
-        results['nobs'] = prod(eps.shape)
+        results['sigma'] = sigma
         results['individual'] = individual
         results['params'] = beta
         results['df_model'] = beta.shape[0]
         results['param_names'] = self._param_names
         results['cov'] = cov
-        results['sigma'] = sigma
         results['debiased'] = debiased
-        
+
         total_ss = resid_ss = 0.0
         resid = []
         for key in individual:
             total_ss += individual[key].total_ss
             resid_ss += individual[key].resid_ss
             resid.append(individual[key].resid)
-        
         resid = hstack(resid)
-        results['r2'] = 1.0 - resid_ss / total_ss
+
         results['resid_ss'] = resid_ss
         results['total_ss'] = total_ss
+        results['r2'] = 1.0 - results.resid_ss / results.total_ss
         results['resid'] = resid
-        results['wresid'] = resid
-        return SURResults(results)
-    
+
+        return results
+
     def _gls_finalize(self, beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config):
         # TODO: Switch to weighted terms
-        k = len(self._dependent)
-        
+        wy = self._wy
+        wx = self._wx
+        w = self._w
+        k = len(self._wy)
+
         # Covariance estimation
-        x = [ex.ndarray for ex in self._exog]
         if cov_type == 'unadjusted':
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
         gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = reshape(eps, (k, eps.shape[0] // k)).T
-        cov = cov_est(x, gls_eps, sigma, gls=True, **cov_config).cov
-        
+        cov = cov_est(wx, gls_eps, sigma, gls=True, **cov_config).cov
+
         # TODO: Pass in, DRY
         sigma_m12 = inv_matrix_sqrt(sigma)
-        ys = [dep.ndarray for dep in self._dependent]
-        cs = [ones_like(dep.ndarray) for dep in self._dependent]
-        block_y = blocked_column_product(ys, sigma_m12)
-        block_c = blocked_diag_product(cs, sigma_m12)
-        const_gls_eps = block_y - block_c @ lstsq(block_c, block_y)[0]
-        
+        wcs = [ones_like(wy[i]) * np.sqrt(w[i]) for i in range(k)]
+        block_wy = blocked_column_product(wy, sigma_m12)
+        block_wc = blocked_diag_product(wcs, sigma_m12)
+        const_gls_eps = block_wy - block_wc @ lstsq(block_wc, block_wy)[0]
+
         individual = AttrDict()
-        loc = 0
+        nobs = eps.shape[0]
         debiased = cov_config.get('debiased', False)
         for i in range(k):
-            stats = AttrDict()
-            stats['eq_label'] = self._eq_labels[i]
-            stats['dependent'] = self._dependent[i].cols[0]
-            stats['method'] = 'GLS'
-            stats['cov_type'] = cov_type
-            stats['index'] = self._dependent[i].rows
-            stats['iter'] = iter_count
-            
-            x = self._exog[i].ndarray
-            nobs, df = x.shape
-            b = beta[loc:loc + df]
-            
-            stats['params'] = b
-            sel = slice(i * nobs, (i + 1) * nobs)
-            e = gls_eps[:, [i]]
-            stats['wresid'] = e
-            stats['nobs'] = e.shape[0]
-            stats['df_model'] = df
-            stats['resid'] = eps[:, [i]]
-            stats['resid_ss'] = float(e.T @ e)
-            stats['debiased'] = debiased
-            
             cons = int(self.has_constant.iloc[i])
+            stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
+                                               'GLS', cov_type, iter_count,
+                                               debiased, cons)
+            sel = slice(i * nobs, (i + 1) * nobs)
+            # TODO: Fix this? Probably not
             if cons:
                 ye = const_gls_eps[sel]
             else:
-                ye = block_y[sel]
-            
+                ye = block_wy[sel]
             stats['total_ss'] = float(ye.T @ ye)
-            stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
-            stats['r2a'] = 1.0 - (stats.resid_ss / (nobs - df)) / (stats.total_ss / (nobs - cons))
-            stats['has_constant'] = bool(cons)
-            stats['constant_loc'] = self._constant_loc[i]
-            stats['cov'] = cov[loc:loc + df, loc:loc + df]
-            stats['f_stat'] = self._f_stat(stats, debiased)
-            names = self._param_names[loc:loc + df]
-            offset = len(stats.dependent) + 1
-            stats['param_names'] = [n[offset:] for n in names]
+            stats = self._individual_r2(stats)
+
             key = self._eq_labels[i]
             individual[key] = stats
-            
-            loc += df
-        
-        results = AttrDict()
-        results['method'] = 'GLS'
-        results['cov_type'] = cov_type
-        results['iter'] = iter_count
-        results['index'] = self._dependent[0].rows
-        results['nobs'] = block_y.shape[0]
-        results['sigma'] = sigma
-        results['individual'] = individual
-        results['params'] = beta
-        results['df_model'] = beta.shape[0]
-        results['param_names'] = self._param_names
-        results['cov'] = cov
-        results['sigma'] = sigma
-        results['debiased'] = debiased
-        
-        total_ss = resid_ss = 0.0
-        resid = []
+
+        nobs = eps.size
+        results = self._common_results(beta, cov, 'GLS', iter_count, nobs,
+                                       cov_type, sigma, individual, debiased)
         wresid = []
         for key in individual:
-            total_ss += individual[key].total_ss
-            resid_ss += individual[key].resid_ss
-            resid.append(individual[key].resid)
             wresid.append(individual[key].wresid)
-        
-        resid = hstack(resid)
         wresid = hstack(wresid)
-        results['r2'] = 1.0 - resid_ss / total_ss
-        results['resid_ss'] = resid_ss
-        results['total_ss'] = total_ss
-        results['resid'] = resid
         results['wresid'] = wresid
-        
+
         return SURResults(results)
-    
+
     def _gls_estimate(self, eps, nobs, total_cols, k, ci, full_cov):
         sigma = self._sigma
         if sigma is None:
@@ -619,7 +597,7 @@ class SUR(object):
             for j in range(k):
                 sy += sigma_inv[i, j] * self._wy[j]
             xpy[ci[i]:ci[i + 1]] = self._wx[i].T @ sy
-        
+
         beta = solve(xpx, xpy)
         loc = 0
 
@@ -630,20 +608,22 @@ class SUR(object):
             kx = wx.shape[1]
             epss.append(wy - wx @ beta[loc:loc + kx])
             loc += kx
-        
+
         eps = hstack(epss)
-        
+
         return beta, eps, sigma
-    
-    def fit(self, *, use_gls=True, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
+
+    def fit(self, *, method=None, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
             cov_type='robust', **cov_config):
         """
         Estimate model parameters
 
         Parameters
         ----------
-        use_gls : bool
-            Flag indicating whether to use gls
+        method : {None, 'gls', 'ols'}
+            Estimation method.  Default auto selects based on regressors,
+            using OLS only if all regressors are identical. The other two
+            arguments force the use of GLS or OLS.
         full_cov : bool
             Flag indicating whether to utilize information in correlations
             when estimating the model with GLS
@@ -679,9 +659,9 @@ class SUR(object):
         ci = cumsum(col_sizes)
         total_cols = ci[-1]
         beta0, eps = self._multivariate_ls_fit()
-        if not use_gls or self._common_exog:
+        if (self._common_exog and method is None) or method == 'ols':
             return self._multivariate_ls_finalize(beta0, eps, cov_type, **cov_config)
-        
+
         beta_hist = [beta0]
         nobs = eps.shape[0]
         iter_count = 0
@@ -692,25 +672,23 @@ class SUR(object):
             delta = beta_hist[-1] - beta_hist[-2]
             delta = sqrt(np.mean(delta ** 2))
             iter_count += 1
-        
+
         sigma_m12 = inv_matrix_sqrt(sigma)
-        ys = [dep.ndarray for dep in self._dependent]
-        xs = [exog.ndarray for exog in self._exog]
-        y = blocked_column_product(ys, sigma_m12)
-        x = blocked_diag_product(xs, sigma_m12)
-        gls_eps = y - x @ beta
-        
-        y = blocked_column_product(ys, eye(k))
-        x = blocked_diag_product(xs, eye(k))
+        wy = blocked_column_product(self._wy, sigma_m12)
+        wx = blocked_diag_product(self._wx, sigma_m12)
+        gls_eps = wy - wx @ beta
+
+        y = blocked_column_product(self._y, eye(k))
+        x = blocked_diag_product(self._x, eye(k))
         eps = y - x @ beta
-        
+
         return self._gls_finalize(beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config)
-    
+
     @property
     def constraints(self):
         """Model constraints"""
         return self._constraints
-    
+
     def add_constraints(self, constraints):
         """
         Parameters
@@ -720,11 +698,11 @@ class SUR(object):
         """
         raise NotImplementedError
         self._constraints.append(constraints)
-    
+
     def reset_constraints(self):
         """Remove all model constraints"""
         self._constraints = []
-    
+
     @property
     def param_names(self):
         """Model parameter names"""

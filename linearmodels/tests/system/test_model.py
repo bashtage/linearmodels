@@ -99,9 +99,9 @@ def test_smoke(data):
     mod = SUR(data)
     res = mod.fit()
     res = mod.fit(cov_type='unadjusted')
-    res = mod.fit(cov_type='unadjusted', use_gls=False)
+    res = mod.fit(cov_type='unadjusted', method='ols')
     res = mod.fit(full_cov=False)
-    
+
     get_res(res)
 
 
@@ -110,23 +110,23 @@ def test_errors():
         SUR([])
     with pytest.raises(TypeError):
         SUR({'a': 'absde', 'b': 12345})
-    
+
     moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
                      'exog': np.random.standard_normal((100, 5))}}
     with pytest.raises(ValueError):
         mod = SUR(moddata)
         mod.fit(cov_type='unknown')
-    
+
     moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
                      'exog': np.random.standard_normal((101, 5))}}
     with pytest.raises(ValueError):
         SUR(moddata)
-    
+
     moddata = {'a': {'dependent': np.random.standard_normal((10, 1)),
                      'exog': np.random.standard_normal((10, 20))}}
     with pytest.raises(ValueError):
         SUR(moddata)
-    
+
     x = np.random.standard_normal((100, 2))
     x = np.c_[x, x]
     moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
@@ -140,10 +140,10 @@ def test_mv_reg_smoke(mvreg_data):
     mod = SUR.multivariate_ls(dependent, exog)
     res = mod.fit()
     res = mod.fit(cov_type='unadjusted')
-    res = mod.fit(cov_type='unadjusted', use_gls=False)
+    res = mod.fit(cov_type='unadjusted', method='ols')
     assert res.method == 'OLS'
     res = mod.fit(full_cov=False)
-    
+
     get_res(res)
 
 
@@ -153,18 +153,18 @@ def test_formula_smoke():
     formula = {'eq1': 'y1 ~ 1 + x1', 'eq2': 'y2 ~ 1 + x2'}
     mod = SUR.from_formula(formula, data)
     res = mod.fit()
-    
+
     formula = '{y1 ~ 1 + x1} {y2 ~ 1 + x2}'
     mod = SUR.from_formula(formula, data)
     res = mod.fit(cov_type='heteroskedastic')
-    
+
     formula = '''
     {y1 ~ 1 + x1}
     {y2 ~ 1 + x2}
     '''
     mod = SUR.from_formula(formula, data)
     res = mod.fit(cov_type='heteroskedastic')
-    
+
     formula = '''
     {eq.a:y1 ~ 1 + x1}
     {second: y2 ~ 1 + x2}
@@ -185,7 +185,7 @@ def test_mv_ols_equivalence(mvreg_data):
     res = mod.fit(cov_type='unadjusted')
     keys = res.equation_labels
     assert res.method == 'OLS'
-    
+
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
         ols_res = ols_mod.fit(cov_type='unadjusted', debiased=False)
@@ -199,7 +199,7 @@ def test_mv_ols_equivalence_robust(mvreg_data):
     mod = SUR.multivariate_ls(dependent, exog)
     res = mod.fit(cov_type='robust')
     keys = res.equation_labels
-    
+
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
         ols_res = ols_mod.fit(cov_type='robust', debiased=False)
@@ -212,7 +212,7 @@ def test_mv_ols_equivalence_debiased(mvreg_data):
     mod = SUR.multivariate_ls(dependent, exog)
     res = mod.fit(cov_type='unadjusted', debiased=True)
     keys = res.equation_labels
-    
+
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
         ols_res = ols_mod.fit(cov_type='unadjusted', debiased=True)
@@ -225,7 +225,7 @@ def test_mv_ols_equivalence_hetero_debiased(mvreg_data):
     mod = SUR.multivariate_ls(dependent, exog)
     res = mod.fit(cov_type='robust', debiased=True)
     keys = res.equation_labels
-    
+
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
         ols_res = ols_mod.fit(cov_type='robust', debiased=True)
@@ -238,7 +238,7 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
     mv_mod = SUR.multivariate_ls(dependent, exog)
     mv_res = mv_mod.fit()
     keys = mv_res.equation_labels
-    
+
     ad = AttrDict()
     for i in range(dependent.shape[1]):
         key = 'dependent.{0}'.format(i)
@@ -246,27 +246,27 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
         ad[key] = {'dependent': df,
                    'exog': exog.copy()}
     gls_mod = SUR(ad, sigma=np.eye(len(ad)))
-    gls_res = gls_mod.fit(use_gls=True)
+    gls_res = gls_mod.fit(method='gls')
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
-    
+
     mv_res = mv_mod.fit(cov_type='robust')
-    gls_res = gls_mod.fit(cov_type='robust', use_gls=True)
+    gls_res = gls_mod.fit(cov_type='robust', method='gls')
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
-    
+
     mv_res = mv_mod.fit(cov_type='robust', debiased=True)
-    gls_res = gls_mod.fit(cov_type='robust', use_gls=True, debiased=True)
+    gls_res = gls_mod.fit(cov_type='robust', method='gls', debiased=True)
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
@@ -278,7 +278,7 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
     mv_mod = SUR.multivariate_ls(dependent, exog)
     mv_res = mv_mod.fit()
     keys = mv_res.equation_labels
-    
+
     ad = AttrDict()
     for i in range(dependent.shape[1]):
         key = 'dependent.{0}'.format(i)
@@ -286,27 +286,27 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
         ad[key] = {'dependent': df,
                    'exog': exog.copy()}
     gls_mod = SUR(ad)
-    gls_res = gls_mod.fit(use_gls=False)
+    gls_res = gls_mod.fit(method='ols')
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
-    
+
     mv_res = mv_mod.fit(cov_type='robust')
-    gls_res = gls_mod.fit(cov_type='robust', use_gls=False)
+    gls_res = gls_mod.fit(cov_type='robust', method='ols')
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
-    
+
     mv_res = mv_mod.fit(cov_type='robust', debiased=True)
-    gls_res = gls_mod.fit(cov_type='robust', use_gls=False, debiased=True)
+    gls_res = gls_mod.fit(cov_type='robust', method='ols', debiased=True)
     check_results(mv_res, gls_res)
-    
+
     for i in range(dependent.shape[1]):
         mv_res_eq = mv_res.equations[keys[i]]
         gls_res_eq = gls_res.equations[keys[i]]
@@ -315,20 +315,33 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 
 def test_ols_against_gls(data):
     mod = SUR(data)
-    res = mod.fit()
+    res = mod.fit(method='gls')
     sigma = res.sigma
     sigma_m12 = inv_matrix_sqrt(sigma)
     key = list(data.keys())[0]
+
     if isinstance(data[key], Mapping):
         y = [data[key]['dependent'] for key in data]
         x = [data[key]['exog'] for key in data]
+        try:
+            w = [data[key]['weights'] for key in data]
+        except KeyError:
+            w = [np.ones_like(data[key]['dependent']) for key in data]
     else:
         y = [data[key][0] for key in data]
         x = [data[key][1] for key in data]
-    
-    y = blocked_column_product(y, sigma_m12)
-    x = blocked_diag_product(x, sigma_m12)
-    ols_res = OLS(y, x).fit(debiased=False)
+        try:
+            w = [data[key][2] for key in data]
+        except IndexError:
+            w = [np.ones_like(data[key][0]) for key in data]
+
+    wy = [_y * np.sqrt(_w / _w.mean()) for _y, _w in zip(y, w)]
+    wx = [_x * np.sqrt(_w / _w.mean()) for _x, _w in zip(x, w)]
+
+    wy = blocked_column_product(wy, sigma_m12)
+    wx = blocked_diag_product(wx, sigma_m12)
+
+    ols_res = OLS(wy, wx).fit(debiased=False)
     assert_allclose(res.params, ols_res.params)
     if not any(mod.has_constant) and res.method == 'GLS':
         # R2 only same w/o constant
