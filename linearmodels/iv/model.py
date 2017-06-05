@@ -4,7 +4,7 @@ Instrumental variable estimators
 from __future__ import absolute_import, division, print_function
 
 from numpy import (any, array, asarray, average, c_, isscalar, logical_not,
-                   ones, sqrt)
+                   ones, sqrt, nanmean)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series
 from scipy.optimize import minimize
@@ -120,7 +120,7 @@ class IVLIML(object):
         weights = IVData(weights).ndarray
         if any(weights <= 0):
             raise ValueError('weights must be strictly positive.')
-        weights = weights / weights.mean()
+        weights = weights / nanmean(weights)
         self.weights = IVData(weights, var_name='weights', nobs=nobs)
 
         self._drop_locs = self._drop_missing()
