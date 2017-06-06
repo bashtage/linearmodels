@@ -1,3 +1,4 @@
+import numpy as np
 from numpy import diag, sqrt
 from pandas import DataFrame, Series
 from scipy import stats
@@ -75,9 +76,9 @@ class _CommonResults(_SummaryStr):
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
         if self.debiased:
-            pvals = 2 - 2 * stats.t.cdf(abs(self.tstats), self._df_resid)
+            pvals = 2 - 2 * stats.t.cdf(np.abs(self.tstats), self._df_resid)
         else:
-            pvals = 2 - 2 * stats.norm.cdf(abs(self.tstats))
+            pvals = 2 - 2 * stats.norm.cdf(np.abs(self.tstats))
 
         return Series(pvals, index=self._param_names, name='pvalue')
 
@@ -100,7 +101,6 @@ class _CommonResults(_SummaryStr):
     def resid_ss(self):
         """Residual sum of squares"""
         return self._rss
-
 
 
 class SURResults(_CommonResults):

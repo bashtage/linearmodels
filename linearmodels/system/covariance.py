@@ -11,7 +11,7 @@ class HomoskedasticCovariance(object):
     Parameters
     ----------
     x : list of ndarray
-        ndependent element list of regressor
+        List of regressor arrays (ndependent)
     eps : ndarray
         Model residuals, ndependent by nobs
     sigma : ndarray

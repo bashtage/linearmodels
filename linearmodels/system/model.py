@@ -14,8 +14,8 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 from collections import Mapping, OrderedDict
 
 import numpy as np
-from numpy import asarray, cumsum, diag, eye, hstack, inf, nanmean, ones_like, prod, reshape, sqrt, \
-    vstack, zeros
+from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
+                   ones_like, reshape, sqrt, vstack, zeros)
 from numpy.linalg import inv, lstsq, solve
 from pandas import Series
 from patsy.highlevel import dmatrices
@@ -417,21 +417,18 @@ class SUR(object):
         cov = cov_est(self._wx, eps, sigma, gls=False, **cov_config).cov
 
         individual = AttrDict()
-        loc = 0
         debiased = cov_config.get('debiased', False)
         for i in range(k):
-            cons = int(self.has_constant.iloc[i])
-            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
-                                               cov_type, 0, debiased, cons)
             wy = wye = self._wy[i]
             w = self._w[i]
             cons = int(self.has_constant.iloc[i])
             if cons:
                 wc = np.ones_like(wy) * np.sqrt(w)
                 wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
-            stats['total_ss'] = float(wye.T @ wye)
-            stats = self._individual_r2(stats)
+            total_ss = float(wye.T @ wye)
 
+            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
+                                               cov_type, 0, debiased, cons, total_ss)
             key = self._eq_labels[i]
             individual[key] = stats
 
@@ -443,7 +440,8 @@ class SUR(object):
         return SURResults(results)
 
     def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
-                              cov_type, iter_count, debiased, constant):
+                              cov_type, iter_count, debiased, constant, total_ss):
+        # TODO: Reorg and clean, comment
         loc = 0
         for i in range(index):
             loc += self._wx[i].shape[1]
@@ -459,15 +457,22 @@ class SUR(object):
         wxi = self._wx[i]
         nobs, df = wxi.shape
         b = beta[loc:loc + df]
+        e = wresid[:, [i]]
+        nobs = e.shape[0]
+        df_c = (nobs - constant)
+        df_r = (nobs - df)
 
         stats['params'] = b
-        e = wresid[:, [i]]
         stats['wresid'] = e
-        stats['nobs'] = e.shape[0]
+        stats['nobs'] = nobs
         stats['df_model'] = df
         stats['resid'] = resid[:, [i]]
         stats['resid_ss'] = float(e.T @ e)
+        stats['total_ss'] = total_ss
         stats['debiased'] = debiased
+        stats['has_constant'] = bool(constant)
+        stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
+        stats['r2a'] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
 
         cons = int(self.has_constant.iloc[i])
         stats['has_constant'] = bool(cons)
@@ -477,16 +482,7 @@ class SUR(object):
         names = self._param_names[loc:loc + df]
         offset = len(stats.dependent) + 1
         stats['param_names'] = [n[offset:] for n in names]
-
-        return stats
-
-    def _individual_r2(self, stats):
-        nobs = stats.nobs
-        df = stats.df_model
-        cons = stats.has_constant
-        stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
-        stats['r2a'] = 1.0 - (stats.resid_ss / (nobs - df)) / (stats.total_ss / (nobs - cons))
-
+        
         return stats
 
     def _common_results(self, beta, cov, method, iter_count, nobs, cov_type,
@@ -520,8 +516,8 @@ class SUR(object):
 
         return results
 
-    def _gls_finalize(self, beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config):
-        # TODO: Switch to weighted terms
+    def _gls_finalize(self, beta, sigma, sigma_m12, gls_eps, eps, cov_type,
+                      iter_count, **cov_config):
         wy = self._wy
         wx = self._wx
         w = self._w
@@ -536,8 +532,6 @@ class SUR(object):
         eps = reshape(eps, (k, eps.shape[0] // k)).T
         cov = cov_est(wx, gls_eps, sigma, gls=True, **cov_config).cov
 
-        # TODO: Pass in, DRY
-        sigma_m12 = inv_matrix_sqrt(sigma)
         wcs = [ones_like(wy[i]) * np.sqrt(w[i]) for i in range(k)]
         block_wy = blocked_column_product(wy, sigma_m12)
         block_wc = blocked_diag_product(wcs, sigma_m12)
@@ -548,18 +542,17 @@ class SUR(object):
         debiased = cov_config.get('debiased', False)
         for i in range(k):
             cons = int(self.has_constant.iloc[i])
-            stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
-                                               'GLS', cov_type, iter_count,
-                                               debiased, cons)
+
             sel = slice(i * nobs, (i + 1) * nobs)
-            # TODO: Fix this? Probably not
             if cons:
                 ye = const_gls_eps[sel]
             else:
                 ye = block_wy[sel]
-            stats['total_ss'] = float(ye.T @ ye)
-            stats = self._individual_r2(stats)
-
+            total_ss = float(ye.T @ ye)
+            stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
+                                               'GLS', cov_type, iter_count,
+                                               debiased, cons, total_ss)
+             
             key = self._eq_labels[i]
             individual[key] = stats
 
@@ -682,7 +675,8 @@ class SUR(object):
         x = blocked_diag_product(self._x, eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, gls_eps, eps, cov_type, iter_count, **cov_config)
+        return self._gls_finalize(beta, sigma, sigma_m12, gls_eps, eps,
+                                  cov_type, iter_count, **cov_config)
 
     @property
     def constraints(self):
@@ -696,8 +690,8 @@ class SUR(object):
         constraints :
             Constraints to add to the model
         """
-        raise NotImplementedError
         self._constraints.append(constraints)
+        raise NotImplementedError
 
     def reset_constraints(self):
         """Remove all model constraints"""
