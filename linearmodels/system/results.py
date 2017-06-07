@@ -45,6 +45,7 @@ class _CommonResults(_SummaryStr):
         """Type of covariance estimator used to compute covariance"""
         return self._cov_type
 
+    @property
     def iterations(self):
         """Number of iterations of the GLS executed"""
         return self._iter
