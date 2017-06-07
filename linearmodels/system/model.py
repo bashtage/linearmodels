@@ -15,20 +15,20 @@ from collections import Mapping, OrderedDict
 
 import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
-                   ones_like, reshape, sqrt, vstack, zeros)
+                   ones_like, reshape, sqrt, zeros)
 from numpy.linalg import inv, lstsq, solve
-from pandas import Series
+from pandas import DataFrame, Series
 from patsy.highlevel import dmatrices
 from patsy.missing import NAAction
 
 from linearmodels.iv.data import IVData
-from linearmodels.system._utility import (blocked_column_product, blocked_inner_prod,
-                                          blocked_diag_product, inv_matrix_sqrt)
+from linearmodels.system._utility import blocked_column_product, blocked_diag_product, \
+    blocked_inner_prod, inv_matrix_sqrt
 from linearmodels.system.covariance import (HeteroskedasticCovariance,
                                             HomoskedasticCovariance)
 from linearmodels.system.results import SURResults
 from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
-                                  matrix_rank)
+                                  matrix_rank, missing_warning)
 
 __all__ = ['SUR']
 
@@ -122,8 +122,6 @@ class SUR(object):
     # TODO: 1. GLS estimation w/ constraints
     # TODO: 2. Homosk cov with constraints
     # TODO: 3. Heterosk cov with constraints
-    # TODO: 4. Verify constraints are valid when set
-    # TODO: 5. Drop missing/warn
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
             raise TypeError('dependent must be a dictionary-like')
@@ -186,7 +184,7 @@ class SUR(object):
             else:
                 msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
                 raise TypeError(msg)
-
+        self._drop_missing()
         self._common_exog = len(set(ids)) == 1
         constant = []
         constant_loc = []
@@ -220,6 +218,23 @@ class SUR(object):
             self._x.append(x)
             self._wy.append(y * w_sqrt)
             self._wx.append(x * w_sqrt)
+
+    def _drop_missing(self):
+        k = len(self._dependent)
+        nobs = self._dependent[0].shape[0]
+        missing = np.zeros(nobs, dtype=np.bool)
+
+        for i in range(k):
+            missing |= self._dependent[i].isnull
+            missing |= self._exog[i].isnull
+            missing |= self._weights[i].isnull
+
+        if np.any(missing):
+            missing_warning(missing)
+            for i in range(k):
+                self._dependent[i].drop(missing)
+                self._exog[i].drop(missing)
+                self._weights[i].drop(missing)
 
     @property
     def has_constant(self):
@@ -313,6 +328,7 @@ class SUR(object):
         >>> mod = SUR.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
+        
         >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
         >>> mod = SUR.from_formula(formula, data)
         """
@@ -369,7 +385,7 @@ class SUR(object):
 
         return SUR(eqns, sigma=sigma)
 
-    def _constrained_multivariate_ls_fit(self):
+    def _multivariate_ls_fit(self):
         wy, wx = self._wy, self._wx
         k = len(wx)
         xpx = blocked_inner_prod(wx, eye(len(wx)))
@@ -389,10 +405,13 @@ class SUR(object):
             cxpx, cxpy = xpx, xpy
 
         params = solve(cxpx, cxpy)
-        beta = params
-        if self.constraints is not None:
+
+        if self.constraints is None:
+            beta = params
+            lam = np.array([])
+        else:
             beta = params[:-m]
-            lam = params[-m:]  # TODO: Do something with lam
+            lam = params[-m:]
         loc = 0
         eps = []
         for i in range(k):
@@ -402,25 +421,7 @@ class SUR(object):
             loc += nb
         eps = hstack(eps)
 
-        return beta, eps
-
-    def _multivariate_ls_fit(self):
-        return self._constrained_multivariate_ls_fit()
-        wy, wx = self._wy, self._wx
-        k = len(wx)
-        eps = []
-        total_cols = 0
-        ci = [0]
-        beta0 = []
-        for i in range(k):
-            total_cols += wx[i].shape[1]
-            ci.append(total_cols)
-            b = lstsq(wx[i], wy[i])[0]
-            eps.append(wy[i] - wx[i] @ b)
-            beta0.append(b)
-        beta = vstack(beta0)
-        eps = hstack(eps)
-        return beta, eps
+        return beta, eps, lam
 
     @staticmethod
     def _f_stat(stats, debiased):
@@ -481,19 +482,23 @@ class SUR(object):
 
     def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
                               cov_type, iter_count, debiased, constant, total_ss):
-        # TODO: Reorg and clean, comment
         loc = 0
         for i in range(index):
             loc += self._wx[i].shape[1]
         i = index
         stats = AttrDict()
+        # Static properties
         stats['eq_label'] = self._eq_labels[i]
         stats['dependent'] = self._dependent[i].cols[0]
         stats['method'] = method
         stats['cov_type'] = cov_type
         stats['index'] = self._dependent[i].rows
         stats['iter'] = iter_count
+        stats['debiased'] = debiased
+        stats['has_constant'] = bool(constant)
+        stats['constant_loc'] = self._constant_loc[i]
 
+        # Parameters, errors and measures of fit
         wxi = self._wx[i]
         nobs, df = wxi.shape
         b = beta[loc:loc + df]
@@ -503,25 +508,22 @@ class SUR(object):
         df_r = (nobs - df)
 
         stats['params'] = b
+        stats['cov'] = cov[loc:loc + df, loc:loc + df]
         stats['wresid'] = e
         stats['nobs'] = nobs
         stats['df_model'] = df
         stats['resid'] = resid[:, [i]]
         stats['resid_ss'] = float(e.T @ e)
         stats['total_ss'] = total_ss
-        stats['debiased'] = debiased
-        stats['has_constant'] = bool(constant)
         stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
         stats['r2a'] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
 
-        cons = int(self.has_constant.iloc[i])
-        stats['has_constant'] = bool(cons)
-        stats['constant_loc'] = self._constant_loc[i]
-        stats['cov'] = cov[loc:loc + df, loc:loc + df]
-        stats['f_stat'] = self._f_stat(stats, debiased)
         names = self._param_names[loc:loc + df]
         offset = len(stats.dependent) + 1
         stats['param_names'] = [n[offset:] for n in names]
+
+        # F-statistic
+        stats['f_stat'] = self._f_stat(stats, debiased)
 
         return stats
 
@@ -687,7 +689,7 @@ class SUR(object):
         col_sizes = [0] + list(map(lambda v: v.ndarray.shape[1], self._exog))
         col_idx = cumsum(col_sizes)
         total_cols = col_idx[-1]
-        beta, eps = self._multivariate_ls_fit()
+        beta, eps, lam = self._multivariate_ls_fit()
         nobs = eps.shape[0]
         sigma = eps.T @ eps / nobs
         if (self._common_exog and method is None) or method == 'ols':
@@ -718,11 +720,20 @@ class SUR(object):
 
     @property
     def constraints(self):
-        """Model constraints, (r, q)"""
+        """
+        Model constraints
+        
+        Returns
+        -------
+        r : DataFrame
+            Constraint matrix. nconstraints by nparameters
+        q : Series
+            Constraint values (nconstraints)
+        """
         return self._constraints
 
     def add_constraints(self, r, q=None):
-        """
+        r"""
         Parameters
         ----------
         r : DataFrame
@@ -736,7 +747,7 @@ class SUR(object):
 
         .. math ::
 
-            r beta = q
+            r \beta = q
 
         The property `param_names` can be used to determine the order of
         parameters.
@@ -745,7 +756,21 @@ class SUR(object):
             q = Series(np.zeros(r.shape[0]), index=r.index)
         r = r.astype(np.float64)
         q = q.astype(np.float64)
+        self._verify_constraints(r, q)
         self._constraints = (r, q)
+
+    def _verify_constraints(self, r, q):
+        pn = self._param_names
+        if not isinstance(r, DataFrame) or not isinstance(q, Series):
+            raise TypeError('Constraint inputs must be DataFrame (r) and Series (q)')
+        if r.shape[1] != len(pn) or r.shape[0] != q.shape[0]:
+            raise ValueError('Constraint inputs do not have the required shape')
+        rq = np.c_[r.values, q.values[:, None]]
+        qr = np.linalg.qr(rq)
+        if not np.all(np.any(qr[1], 1)):
+            raise ValueError('Constraints must be non-redundant')
+        if not np.all(np.any(qr[1, :-1], 1)):
+            raise ValueError('Some of the constraints are infeasible')
 
     def reset_constraints(self):
         """Remove all model constraints"""
@@ -753,5 +778,12 @@ class SUR(object):
 
     @property
     def param_names(self):
-        """Model parameter names"""
+        """
+        Model parameter names
+        
+        Returns
+        -------
+        names : list[str]
+            Normalized, unique model parameter names
+        """
         return self._param_names

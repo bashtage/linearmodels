@@ -9,22 +9,26 @@ Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmo
 include Panel regression and instrumental variable estimators:
  
 - **Panel models**:
-  - Fixed effects (maximum two-way)
-  - First difference regression
-  - Between estimator for panel data
-  - Pooled regression for panel data
-  - Fama-MacBeth estimation of panel models
-- **Instrumental Variable estimators**
-  - Two-stage Least Squares
-  - Limited Information Maximum Likelihood
-  - k-class Estimators
-  - Generalized Method of Moments, also with continuously updating
-- **Factor Asset Pricing Models**:
-  - 2- and 3-step estimation 
-  - Time-series estimation
-  - GMM estimation
- 
+    - Fixed effects (maximum two-way)
+    - First difference regression
+    - Between estimator for panel data
+    - Pooled regression for panel data
+    - Fama-MacBeth estimation of panel models
   
+- **Instrumental Variable estimators**
+    - Two-stage Least Squares
+    - Limited Information Maximum Likelihood
+    - k-class Estimators
+    - Generalized Method of Moments, also with continuously updating
+
+- **Factor Asset Pricing Models**:
+    - 2- and 3-step estimation 
+    - Time-series estimation
+    - GMM estimation
+
+- **System Regression**:
+    - Seemingly Unrelated Regression (SUR/SURE)
+       
 Designed to work equally well with NumPy, Pandas or xarray data.
 
 ### Panel models
@@ -90,9 +94,10 @@ python setup.py install
 
 ## Documentation
 
-[Documentation](https://bashtage.github.io/linearmodels/doc) is automatically built using 
-[doctr](https://github.com/drdoctr/doctr) on every successful build of master. The documentation 
-is still rough but should improve quickly. 
+[Stable Documentation](https://bashtage.github.io/linearmodels/doc) is built on every tagged 
+version using [doctr](https://github.com/drdoctr/doctr). 
+[Development Documentation](https://bashtage.github.io/linearmodels/devel) is automatically 
+built on every successful build of master. 
 
 ## Plan and status
 
@@ -103,8 +108,9 @@ only the single variable IV estimators are polished.
 * Linear Panel model estimation - **complete**
 * Fama-MacBeth regression - **complete**
 * Linear Factor Asset Pricing - **complete**
+* System regression - **partially complete** (3SLS not started)
 * Linear IV Panel model estimation - *not started*
-* System regression - *not started*
+
 
 ## Requirements
 
@@ -116,9 +122,9 @@ that are being used in the test environment.  It is possible that older versions
 * **Python 3.5+**: extensive use of `@` operator
 * NumPy (1.11+)
 * SciPy (0.17+)
-* Pandas (0.18+)
+* pandas (0.18+)
 * xarray (0.9+)
-* Statsmodels (0.8+)
+* statsmodels (0.8+)
 
 ### Testing
 
