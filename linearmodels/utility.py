@@ -69,7 +69,7 @@ class AttrDict(MutableMapping):
 
     def __setitem__(self, key, value):
         if key == '__ordered_dict__':
-            raise KeyError(key + ' is invalid')
+            raise KeyError(key + ' is reserved and cannot be set.')
         self.__ordered_dict__[key] = value
 
     def __delitem__(self, key):
@@ -89,8 +89,9 @@ class AttrDict(MutableMapping):
         del self.__ordered_dict__[name]
 
     def __dir__(self):
-        return sorted(set(super(AttrDict, self).__dir__() +
-                          list(self.__ordered_dict__.keys())))
+        out = super(AttrDict, self).__dir__() + list(self.__ordered_dict__.keys())
+        out = filter(lambda s: isinstance(s, str) and s.isidentifier(), out)
+        return sorted(set(out))
 
     def __iter__(self):
         return self.__ordered_dict__.__iter__()
