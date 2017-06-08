@@ -73,9 +73,9 @@ class TradedFactorModel(object):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
-            missing_warning(missing)
             self.portfolios.drop(missing)
             self.factors.drop(missing)
+        missing_warning(missing)
 
         return missing
 

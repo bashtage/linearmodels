@@ -189,8 +189,9 @@ class PooledOLS(object):
         missing = (np.any(np.isnan(y), axis=1) |
                    np.any(np.isnan(x), axis=1) |
                    np.any(np.isnan(w), axis=1))
+
+        missing_warning(all_missing ^ missing)
         if np.any(missing):
-            missing_warning(all_missing ^ missing)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)

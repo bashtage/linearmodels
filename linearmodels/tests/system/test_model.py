@@ -41,8 +41,6 @@ def check_results(res1, res2):
     assert_allclose(res1.params, res2.params)
     assert_allclose(res1.rsquared, res2.rsquared)
     assert_allclose(res1.cov, res2.cov)
-    if not np.allclose(res1.pvalues, res2.pvalues, atol=1e-6):
-        print('Help')
     assert_allclose(res1.pvalues, res2.pvalues, atol=1e-6)
     assert_allclose(res1.resids, res2.resids)
     assert_allclose(res1.wresids, res2.wresids)

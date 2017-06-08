@@ -256,13 +256,13 @@ class IVLIML(object):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
-            missing_warning(missing)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.endog.drop(missing)
             self.instruments.drop(missing)
             self.weights.drop(missing)
 
+        missing_warning(missing)
         return missing
 
     @staticmethod

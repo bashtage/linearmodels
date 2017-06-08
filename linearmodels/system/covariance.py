@@ -124,17 +124,6 @@ class HomoskedasticCovariance(object):
         cov = (cov + cov.T) / 2
         return cov
 
-    def _efficient_gls_cov(self):
-        x = self._x
-        sigma = self.sigma
-
-        cov = blocked_inner_prod(x, inv(sigma))
-        cov = (cov + cov.T) / 2
-        cov = inv(cov)
-        cov = (cov + cov.T) / 2
-
-        return cov
-
     @property
     def cov(self):
         """Parameter covariance"""

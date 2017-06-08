@@ -1,13 +1,36 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 from scipy import stats
 
+import linearmodels
 from linearmodels.utility import (InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
                                   cached_property, ensure_unique_column,
-                                  has_constant, inv_sqrth, AttrDict)
+                                  has_constant, inv_sqrth, AttrDict,
+                                  missing_warning)
+
+
+def test_missing_warning():
+    missing = np.zeros(500, dtype=np.bool)
+    with warnings.catch_warnings(record=True) as w:
+        missing_warning(missing)
+        assert len(w) == 0
+
+    missing[0] = True
+    with warnings.catch_warnings(record=True) as w:
+        missing_warning(missing)
+        assert len(w) == 1
+
+    original = linearmodels.WARN_ON_MISSING
+    linearmodels.WARN_ON_MISSING = False
+    with warnings.catch_warnings(record=True) as w:
+        missing_warning(missing)
+        assert len(w) == 0
+    linearmodels.WARN_ON_MISSING = original
 
 
 def test_hasconstant():
@@ -132,12 +155,12 @@ def test_attr_dict():
 
     items = ad.items()
     assert (1, 1) in items
-    assert (('a',2), ('a',2)) in items
+    assert (('a', 2), ('a', 2)) in items
     assert len(items) == 2
 
     values = ad.values()
     assert 1 in values
-    assert ('a',2) in values
+    assert ('a', 2) in values
     assert len(values) == 2
 
     ad2 = AttrDict()
@@ -174,4 +197,3 @@ def test_attr_dict():
 
     ad.clear()
     assert list(ad.keys()) == []
-
