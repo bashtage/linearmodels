@@ -5,5 +5,7 @@ System Regression Models
    :maxdepth: 1
    :glob:
 
+   examples/examples.ipynb
+   examples/formulas.ipynb
    reference
    mathematical-formula

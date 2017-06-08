@@ -56,6 +56,7 @@ Estimation and inference in some common linear models:
    plan
    contributing
    changes
+   references
 
 
 Indices and tables

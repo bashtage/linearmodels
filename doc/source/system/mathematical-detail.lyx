@@ -75,8 +75,340 @@
 
 \begin_body
 
+\begin_layout Section*
+Formulas and Mathematical Detail
+\end_layout
+
+\begin_layout Subsection*
+Seemingly Unrelated Regression (SUR/SURE)
+\end_layout
+
+\begin_layout Standard
+\noindent
+Seemingly unrelated regression is a system regression estimator which jointly
+ estimates multiple models.
+ This allows joint hypothesis testing of parameters across models since
+ the parameter covariance is robust to correlation of residuals across models.
+ It can also lead to more precise parameter estimates if some residuals
+ are conditionally homoskedastic and regressors differ across equations.
+ 
+\end_layout
+
 \begin_layout Subsubsection*
-Memory efficient calculation
+\noindent
+Basic Notation
+\end_layout
+
+\begin_layout Standard
+\noindent
+Assume 
+\begin_inset Formula $K$
+\end_inset
+
+ series are observed for 
+\begin_inset Formula $N$
+\end_inset
+
+ time periods.
+ Denote the stacked observations of series 
+\begin_inset Formula $i$
+\end_inset
+
+ as 
+\begin_inset Formula $Y_{i}$
+\end_inset
+
+ and its corresponding regressor matrix 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+.
+ The complete model spanning all series can be specified as 
+\begin_inset Formula 
+\begin{align*}
+Y & =X\beta+\epsilon\\
+\left[\begin{array}{c}
+Y_{1}\\
+Y_{2}\\
+\vdots\\
+Y_{K}
+\end{array}\right] & =\left[\begin{array}{cccc}
+X_{1} & 0 & 0 & 0\\
+0 & X_{2} & 0 & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & 0 & X_{N}
+\end{array}\right]\left[\begin{array}{c}
+\beta_{1}\\
+\beta_{2}\\
+\vdots\\
+\beta_{K}
+\end{array}\right]+\left[\begin{array}{c}
+\epsilon_{1}\\
+\epsilon_{2}\\
+\vdots\\
+\epsilon_{K}
+\end{array}\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The OLS estimator of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is then 
+\begin_inset Formula 
+\[
+\hat{\beta}=\left(X^{\prime}X\right)^{-1}X^{\prime}Y.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+A GLS estimator can be similarly defined as 
+\begin_inset Formula 
+\[
+\hat{\beta}_{GLS}=\left(X^{\prime}\Omega X\right)^{-1}X^{\prime}\Omega^{-1}Y
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\Omega=I_{N}\otimes\Sigma$
+\end_inset
+
+ is the joint covariance of the residuals.
+ In practice 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ is not known as so a feasible GLS (FGLS) is implemented in two steps.
+ The first uses OLS to estimate 
+\begin_inset Formula $\hat{\epsilon}$
+\end_inset
+
+ and then estimates the residual covariance as 
+\begin_inset Formula 
+\[
+\hat{\Sigma}=N^{-1}\left[\begin{array}{cccc}
+\hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right]^{\prime}\left[\begin{array}{cccc}
+\hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right].
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The feasible GLS estimator is then 
+\begin_inset Formula 
+\[
+\hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{\Omega}=I_{N}\otimes\hat{\Sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+Covariance Estimation
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Homoskedastic Data
+\end_layout
+
+\begin_layout Standard
+\noindent
+When residuals are assumed to be homoskedastic, the covariance can be consistent
+ly estimated by 
+\begin_inset Formula 
+\[
+\left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-\frac{1}{2}}\hat{\Omega}\Delta^{-\frac{1}{2}}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ is the weighting matrix used in the parameter estimator.
+ For example, in OLS 
+\begin_inset Formula $\Delta=I_{NK}$
+\end_inset
+
+ while in FGLS
+\begin_inset Formula $\Delta=I_{N}\otimes\hat{\Sigma}$
+\end_inset
+
+.
+ The estimator supports using FGLS with an assumption that 
+\begin_inset Formula $\hat{\Sigma}$
+\end_inset
+
+ is diagonal or using a user-specified value of 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+.
+ When the FGLS estimator is used, this simplifies to 
+\begin_inset Formula 
+\[
+\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Heteroskedastic Data
+\end_layout
+
+\begin_layout Standard
+\noindent
+When residuals are heteroskedastic, the covariance can be consistently estimated
+ by 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left(X^{\prime}\Delta^{-1}X\right)^{-1}\hat{S}\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{S}$
+\end_inset
+
+ is a covariance estimator that is clustered by time.
+ Define the matrix of scores as 
+\begin_inset Formula 
+\[
+\hat{g}=\left[\begin{array}{c}
+\hat{g}_{1}\\
+\hat{g}_{2}\\
+\vdots\\
+\hat{g}_{N}
+\end{array}\right]=\Delta^{-\frac{1}{2}}X\odot\left(\hat{\epsilon}\iota_{M}^{\prime}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\iota_{M}$
+\end_inset
+
+ is a vector of ones with 
+\begin_inset Formula $M$
+\end_inset
+
+ elements where 
+\begin_inset Formula $M$
+\end_inset
+
+ is the number of columns in 
+\begin_inset Formula $X$
+\end_inset
+
+ and 
+\begin_inset Formula $\odot$
+\end_inset
+
+ is element by element multiplication.
+ The clustered-by-time score covariance estimator is then 
+\begin_inset Formula 
+\[
+\hat{S}=N^{-1}\sum_{i=1}^{N}\Psi_{i}^{\prime}\Psi_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula 
+\[
+\Psi_{i}=\sum_{j=1}^{K}\hat{g}_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+is the sum of the scores across models 
+\begin_inset Formula $\left(j\right)$
+\end_inset
+
+ that have the same observation index 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ This estimator allows arbitrary correlation of residuals with the same
+ observation index.
+ 
+\end_layout
+
+\begin_layout Subsection*
+Memory efficient calculations
 \end_layout
 
 \begin_layout Standard

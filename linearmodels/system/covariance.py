@@ -1,7 +1,7 @@
-from numpy import eye, zeros_like, ones, vstack, sqrt, zeros
+from numpy import eye, zeros_like, ones, vstack, sqrt, zeros, hstack
 from numpy.linalg import inv
 
-from linearmodels.system._utility import blocked_inner_prod, blocked_diag_product
+from linearmodels.system._utility import blocked_inner_prod, blocked_diag_product, inv_matrix_sqrt
 
 
 class HomoskedasticCovariance(object):
@@ -81,6 +81,50 @@ class HomoskedasticCovariance(object):
         return cov
 
     def _gls_cov(self):
+        x = self._x
+        sigma = self.sigma
+        nobs = self._eps.shape[0]
+        k = len(self._x)
+
+        xpx = blocked_inner_prod(x, inv(sigma))
+        xpxi = inv(xpx)
+        epe = self._eps.T @ self._eps / nobs
+        sigma_m12 = inv_matrix_sqrt(sigma)
+        bigx = blocked_diag_product(x, sigma_m12)
+        cols = list(map(lambda s: s.shape[1], x))
+        # TODO: Put into a function to test directly
+        blocks = []
+        for i in range(k):
+            x_row = bigx[i * nobs:(i + 1) * nobs]
+            row = []
+            loc = 0
+            for j in range(k):
+                row.append(x_row[:, loc:loc + cols[j]])
+                loc += cols[j]
+            blocks.append(row)
+
+        wblocks = [[None for _ in range(k)] for __ in range(k)]
+        for i in range(k):
+            for j in range(k):
+                wblocks[i][j] = zeros_like(blocks[i][j])
+                for n in range(k):
+                    wblocks[i][j] += epe[i, n] * blocks[n][j]
+
+        xeex = [[None for _ in range(k)] for __ in range(k)]
+        for i in range(k):
+            for j in range(k):
+                xeex[i][j] = zeros((cols[i], cols[j]))
+                for n in range(k):
+                    # Reverse index on left since left is transposed
+                    xeex[i][j] += blocks[n][i].T @ wblocks[n][j]
+
+        xeex = vstack([hstack([xeex[i][j] for j in range(k)]) for i in range(k)])
+
+        cov = xpxi @ xeex @ xpxi
+        cov = (cov + cov.T) / 2
+        return cov
+
+    def _efficient_gls_cov(self):
         x = self._x
         sigma = self.sigma
 
