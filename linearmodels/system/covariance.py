@@ -1,7 +1,8 @@
-from numpy import eye, zeros_like, ones, vstack, sqrt, zeros, hstack
+from numpy import eye, hstack, ones, sqrt, vstack, zeros, zeros_like
 from numpy.linalg import inv
 
-from linearmodels.system._utility import blocked_inner_prod, blocked_diag_product, inv_matrix_sqrt
+from linearmodels.system._utility import blocked_diag_product, blocked_full_inner_product, \
+    blocked_inner_prod, inv_matrix_sqrt
 
 
 class HomoskedasticCovariance(object):
@@ -16,11 +17,13 @@ class HomoskedasticCovariance(object):
         Model residuals, ndependent by nobs
     sigma : ndarray
         Covariance matrix estimator of eps
-    gls : bool
+    gls : bool, optional
         Flag indicating to compute the GLS covariance estimator.  If False,
         assume OLS was used
-    debiased : bool
+    debiased : bool, optional
         Flag indicating to apply a small sample adjustment
+    constraints : {None, LinearConstraint}, optional
+        Constraints used in estimation, if any
 
     Notes
     -----
@@ -38,8 +41,8 @@ class HomoskedasticCovariance(object):
         (X'X)^{-1}(X'\Omega X)(X'X)^{-1}
 
     """
-
-    def __init__(self, x, eps, sigma, *, gls=False, debiased=False):
+    
+    def __init__(self, x, eps, sigma, *, gls=False, debiased=False, constraints=None):
         self._eps = eps
         self._x = x
         self._nobs = eps.shape[0]
@@ -47,12 +50,13 @@ class HomoskedasticCovariance(object):
         self._sigma = sigma
         self._gls = gls
         self._debiased = debiased
-
+        self._constraints = constraints
+    
     @property
     def sigma(self):
         """Error covariance"""
         return self._sigma
-
+    
     def _adjustment(self):
         if not self._debiased:
             return 1.0
@@ -64,66 +68,52 @@ class HomoskedasticCovariance(object):
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
-
+    
     def _mvreg_cov(self):
         x = self._x
-        k = len(x)
-        sigma = self.sigma
-        xeex = blocked_inner_prod(x, sigma)
-        xpxi = zeros_like(xeex)
-        loc = 0
-        for i in range(k):
-            ki = x[i].shape[1]
-            xpxi[loc:loc + ki, loc: loc + ki] = inv(x[i].T @ x[i])
-            loc += ki
-        cov = xpxi @ xeex @ xpxi
+        nobs = self._eps.shape[0]
+        epe = self._eps.T @ self._eps / nobs
+
+        xeex = blocked_inner_prod(x, epe)
+        xpx = blocked_inner_prod(self._x, eye(len(x)))
+
+        if self._constraints is None:
+            xpxi = inv(xpx)
+            cov = xpxi @ xeex @ xpxi
+        else:
+            cons = self._constraints
+            xpx = cons.t.T @ xpx @ cons.t
+            xpxi = inv(xpx)
+            xeex = cons.t.T @ xeex @ cons.t
+            cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
+    
         cov = (cov + cov.T) / 2
         return cov
-
+    
     def _gls_cov(self):
         x = self._x
-        sigma = self.sigma
         nobs = self._eps.shape[0]
-        k = len(self._x)
-
-        xpx = blocked_inner_prod(x, inv(sigma))
-        xpxi = inv(xpx)
         epe = self._eps.T @ self._eps / nobs
+        sigma = self._sigma
         sigma_m12 = inv_matrix_sqrt(sigma)
-        bigx = blocked_diag_product(x, sigma_m12)
-        cols = list(map(lambda s: s.shape[1], x))
-        # TODO: Put into a function to test directly
-        blocks = []
-        for i in range(k):
-            x_row = bigx[i * nobs:(i + 1) * nobs]
-            row = []
-            loc = 0
-            for j in range(k):
-                row.append(x_row[:, loc:loc + cols[j]])
-                loc += cols[j]
-            blocks.append(row)
-
-        wblocks = [[None for _ in range(k)] for __ in range(k)]
-        for i in range(k):
-            for j in range(k):
-                wblocks[i][j] = zeros_like(blocks[i][j])
-                for n in range(k):
-                    wblocks[i][j] += epe[i, n] * blocks[n][j]
-
-        xeex = [[None for _ in range(k)] for __ in range(k)]
-        for i in range(k):
-            for j in range(k):
-                xeex[i][j] = zeros((cols[i], cols[j]))
-                for n in range(k):
-                    # Reverse index on left since left is transposed
-                    xeex[i][j] += blocks[n][i].T @ wblocks[n][j]
-
-        xeex = vstack([hstack([xeex[i][j] for j in range(k)]) for i in range(k)])
-
-        cov = xpxi @ xeex @ xpxi
+        sigma_inv = inv(sigma)
+        
+        xpx = blocked_inner_prod(x, sigma_inv)
+        xo_m12 = blocked_diag_product(x, sigma_m12)
+        xeex = blocked_full_inner_product(xo_m12, epe)
+        if self._constraints is None:
+            xpxi = inv(xpx)
+            cov = xpxi @ xeex @ xpxi
+        else:
+            cons = self._constraints
+            xpx = cons.t.T @ xpx @ cons.t
+            xpxi = inv(xpx)
+            xeex = cons.t.T @ xeex @ cons.t
+            cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
+    
         cov = (cov + cov.T) / 2
         return cov
-
+    
     @property
     def cov(self):
         """Parameter covariance"""
@@ -173,12 +163,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     where :math:`\hat{S}` is a estimator of the model scores.
 
     """
-
-    def __init__(self, x, eps, sigma, gls=False, debiased=False):
+    
+    def __init__(self, x, eps, sigma, gls=False, debiased=False, constraints=None):
         super(HeteroskedasticCovariance, self).__init__(x, eps, sigma,
                                                         gls=gls,
-                                                        debiased=debiased)
-
+                                                        debiased=debiased,
+                                                        constraints=constraints)
+    
     def _cov(self, gls):
         x = self._x
         eps = self._eps
@@ -187,8 +178,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         inv_sigma = inv(sigma)
         weights = inv_sigma if gls else eye(k)
         xpx = blocked_inner_prod(x, weights)
-        xpxi = inv(xpx)
-
+        
         bigx = blocked_diag_product(x, weights)
         nobs = eps.shape[0]
         e = eps.T.ravel()[:, None]
@@ -198,13 +188,22 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         for i in range(nobs):
             xe = bigxe[i:k * nobs: nobs].sum(0)[None, :]
             xeex += xe.T @ xe
-
-        cov = xpxi @ xeex @ xpxi
+        
+        if self._constraints is None:
+            xpxi = inv(xpx)
+            cov = xpxi @ xeex @ xpxi
+        else:
+            cons = self._constraints
+            xpx = cons.t.T @ xpx @ cons.t
+            xpxi = inv(xpx)
+            xeex = cons.t.T @ xeex @ cons.t
+            cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
+    
         cov = (cov + cov.T) / 2
         return cov
-
+    
     def _mvreg_cov(self):
         return self._cov(False)
-
+    
     def _gls_cov(self):
         return self._cov(True)

@@ -365,9 +365,11 @@ def test_constraint_setting(data):
     q = Series([0, 1], index=r.index)
     
     mod.add_constraints(r)
-    res = mod.fit(method='ols')
+    mod.fit(method='ols')
+    res = mod.fit(method='ols', cov_type='unadjusted')
     assert_allclose(r.values @ res.params.values[:, None], np.zeros((2, 1)), atol=1e-8)
-    res = mod.fit(method='gls')
+    mod.fit(method='gls')
+    res = mod.fit(method='gls', cov_type='unadjusted')
     assert_allclose(r.values @ res.params.values[:, None], np.zeros((2, 1)), atol=1e-8)
     
     mod.add_constraints(r, q)
@@ -420,13 +422,12 @@ def test_contrains_reset(data):
     r = concat([c1, c2], 1).T
     q = Series([0, 1], index=r.index)
     mod.add_constraints(r, q)
-    r1, q1 = mod.constraints
-    assert_allclose(r.values, r1.values)
-    assert_allclose(q.values, q1.values)
+    cons = mod.constraints
+    assert_allclose(cons.r.values, r.values)
+    assert_allclose(cons.q.values, q.values)
     mod.reset_constraints()
-    r1, q1 = mod.constraints
-    assert r1 is None
-    assert q1 is None
+    cons = mod.constraints
+    assert cons is None
 
 
 def test_missing(data):
