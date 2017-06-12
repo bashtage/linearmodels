@@ -175,10 +175,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         eps = self._eps
         k = len(x)
         sigma = self.sigma
-        inv_sigma = inv(sigma)
-        weights = inv_sigma if gls else eye(k)
+        weights = inv(sigma) if gls else eye(k)
         xpx = blocked_inner_prod(x, weights)
 
+        weights = inv_matrix_sqrt(sigma) if gls else eye(k)
         bigx = blocked_diag_product(x, weights)
         nobs = eps.shape[0]
         e = eps.T.ravel()[:, None]
@@ -186,7 +186,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         m = bigx.shape[1]
         xeex = zeros((m, m))
         for i in range(nobs):
-            xe = bigxe[i:k * nobs: nobs].sum(0)[None, :]
+            xe = bigxe[i::nobs].sum(0)[None, :]
             xeex += xe.T @ xe
 
         if self._constraints is None:
