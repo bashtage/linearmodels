@@ -7,7 +7,7 @@ from numpy import NaN, ceil, diag, isnan, log10, sqrt
 from numpy.linalg import eigh, matrix_rank
 from pandas import DataFrame, Series, concat
 from scipy.stats import chi2, f
-
+from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 class MissingValueWarning(Warning):
     pass
@@ -473,3 +473,32 @@ def missing_warning(missing):
     if linearmodels.WARN_ON_MISSING:
         import warnings
         warnings.warn(missing_value_warning_msg, MissingValueWarning)
+
+
+
+
+def param_table(results, title, pad_bottom=False):
+    """Formatted standard parameter table"""
+    param_data = np.c_[results.params.values[:, None],
+                       results.std_errors.values[:, None],
+                       results.tstats.values[:, None],
+                       results.pvalues.values[:, None],
+                       results.conf_int()]
+    data = []
+    for row in param_data:
+        txt_row = []
+        for i, v in enumerate(row):
+            f = _str
+            if i == 3:
+                f = pval_format
+            txt_row.append(f(v))
+        data.append(txt_row)
+    header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+    table_stubs = list(results.params.index)
+    if pad_bottom:
+        # Append blank row for spacing
+        data.append([''] * 6)
+        table_stubs += ['']
+
+    return SimpleTable(data, stubs=table_stubs, txt_fmt=fmt_params,
+                       headers=header, title=title)

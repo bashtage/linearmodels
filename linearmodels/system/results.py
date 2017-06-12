@@ -1,11 +1,13 @@
+import datetime as dt
 import numpy as np
 from numpy import diag, sqrt
 from pandas import DataFrame, Series
 from scipy import stats
-from statsmodels.iolib.summary import SimpleTable
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
 from linearmodels.compat.statsmodels import Summary
-from linearmodels.utility import AttrDict, _SummaryStr, cached_property
+from linearmodels.utility import (AttrDict, _SummaryStr, cached_property,
+                                  _str, param_table, pval_format)
 
 __all__ = ['SURResults', 'SUREquationResult']
 
@@ -28,6 +30,7 @@ class _CommonResults(_SummaryStr):
         self._cov_type = results.cov_type
         self._tss = results.total_ss
         self._rss = results.resid_ss
+        self._datetime = dt.datetime.now()
 
     @property
     def method(self):
@@ -103,6 +106,48 @@ class _CommonResults(_SummaryStr):
         """Residual sum of squares"""
         return self._rss
 
+    @property
+    def nobs(self):
+        """Number of observations"""
+        return self._nobs
+
+    @property
+    def df_resid(self):
+        """Residual degree of freedom"""
+        return self._df_resid
+
+    @property
+    def df_model(self):
+        """Model degree of freedom"""
+        return self._df_model
+
+    def conf_int(self, level=0.95):
+        """
+        Confidence interval construction
+
+        Parameters
+        ----------
+        level : float
+            Confidence level for interval
+
+        Returns
+        -------
+        ci : DataFrame
+            Confidence interval of the form [lower, upper] for each parameters
+
+        Notes
+        -----
+        Uses a t(df_resid) if ``debiased`` is True, else normal.
+        """
+        ci_quantiles = [(1 - level) / 2, 1 - (1 - level) / 2]
+        if self._debiased:
+            q = stats.t.ppf(ci_quantiles, self.df_resid)
+        else:
+            q = stats.norm.ppf(ci_quantiles)
+        q = q[None, :]
+        ci = self.params[:, None] + self.std_errors[:, None] * q
+        return DataFrame(ci, index=self._param_names, columns=['lower', 'upper'])
+
 
 class SURResults(_CommonResults):
     """
@@ -120,15 +165,16 @@ class SURResults(_CommonResults):
         for key in results.individual:
             self._individual[key] = SUREquationResult(results.individual[key])
         self._sigma = results.sigma
+        self._model = results.model
+        self._constraints = results.constraints
+        self._num_constraints = 'None'
+        if results.constraints is not None:
+            self._num_constraints = str(results.constraints.r.shape[0])
 
     @property
-    def summary(self):
-        """Model summary"""
-        smry = Summary()
-        table = SimpleTable(['No summary yet'])
-        smry.tables.append(table)
-
-        return smry
+    def model(self):
+        """Model used in estimation"""
+        return self._model
 
     @property
     def equations(self):
@@ -155,8 +201,69 @@ class SURResults(_CommonResults):
         """Estimated residual covariance"""
         return self._sigma
 
+    @property
+    def summary(self):
+        """Model summary"""
+        title = 'System ' + self._method + ' Estimation Summary'
+
+        top_left = [('Estimator:', self._method),
+                    ('No. Equations.:', str(len(self.equation_labels))),
+                    ('No. Observations:', str(self.resids.shape[0])),
+                    ('Date:', self._datetime.strftime('%a, %b %d %Y')),
+                    ('Time:', self._datetime.strftime('%H:%M:%S')),
+                    ('', ''),
+                    ('', '')]
+
+        top_right = [('Overall R-squared:', _str(self.rsquared)),
+                     ('Cov. Estimator:', self._cov_type),
+                     ('Num. Constraints: ', self._num_constraints),
+                     ('', ''),
+                     ('', ''),
+                     ('', ''),
+                     ('', '')]
+
+        stubs = []
+        vals = []
+        for stub, val in top_left:
+            stubs.append(stub)
+            vals.append([val])
+        table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
+
+        # create summary table instance
+        smry = Summary()
+        # Top Table
+        # Parameter table
+        fmt = fmt_2cols
+        fmt['data_fmts'][1] = '%10s'
+
+        top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
+        stubs = []
+        vals = []
+        for stub, val in top_right:
+            stubs.append(stub)
+            vals.append([val])
+        table.extend_right(SimpleTable(vals, stubs=stubs))
+        smry.tables.append(table)
+
+        for eqlabel in self.equation_labels:
+            results = self.equations[eqlabel]
+            dep_name = results.dependent
+            title = 'Equation: {0}, Dependent Variable: {1}'.format(eqlabel, dep_name)
+            smry.tables.append(param_table(results, title, pad_bottom=True))
+
+        return smry
+
 
 class SUREquationResult(_CommonResults):
+    """
+    Results from a single equation of a Seemingly Unrelated Regression
+
+    Parameters
+    ----------
+    results : AttrDict
+        Dictionary of model estimation results
+    """
+
     def __init__(self, results):
         super(SUREquationResult, self).__init__(results)
         self._eq_label = results.eq_label
@@ -172,14 +279,53 @@ class SUREquationResult(_CommonResults):
     @property
     def dependent(self):
         """Name of dependent variable"""
-        return self._eq_label
+        return self._dependent
 
     @property
     def summary(self):
         """Equation summary"""
+        title = self._method + ' Estimation Summary'
+
+        top_left = [('Eq. Label:', self.equation_label),
+                    ('Dep. Variable:', self.dependent),
+                    ('Estimator:', self._method),
+                    ('No. Observations:', self.nobs),
+                    ('Date:', self._datetime.strftime('%a, %b %d %Y')),
+                    ('Time:', self._datetime.strftime('%H:%M:%S')),
+
+                    ('', '')]
+
+        top_right = [('R-squared:', _str(self.rsquared)),
+                     ('Adj. R-squared:', _str(self.rsquared_adj)),
+                     ('Cov. Estimator:', self._cov_type),
+                     ('F-statistic:', _str(self.f_statistic.stat)),
+                     ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
+                     ('Distribution:', str(self.f_statistic.dist_name)),
+                     ('', '')]
+
+        stubs = []
+        vals = []
+        for stub, val in top_left:
+            stubs.append(stub)
+            vals.append([val])
+        table = SimpleTable(vals, txt_fmt=fmt_2cols, title=title, stubs=stubs)
+
+        # create summary table instance
         smry = Summary()
-        table = SimpleTable(['No summary yet'])
+        # Top Table
+        # Parameter table
+        fmt = fmt_2cols
+        fmt['data_fmts'][1] = '%10s'
+
+        top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
+        stubs = []
+        vals = []
+        for stub, val in top_right:
+            stubs.append(stub)
+            vals.append([val])
+        table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
+        smry.tables.append(param_table(self, 'Parameter Estimates', pad_bottom=True))
 
         return smry
 
