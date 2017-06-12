@@ -41,7 +41,7 @@ class HomoskedasticCovariance(object):
         (X'X)^{-1}(X'\Omega X)(X'X)^{-1}
 
     """
-    
+
     def __init__(self, x, eps, sigma, *, gls=False, debiased=False, constraints=None):
         self._eps = eps
         self._x = x
@@ -51,12 +51,12 @@ class HomoskedasticCovariance(object):
         self._gls = gls
         self._debiased = debiased
         self._constraints = constraints
-    
+
     @property
     def sigma(self):
         """Error covariance"""
         return self._sigma
-    
+
     def _adjustment(self):
         if not self._debiased:
             return 1.0
@@ -68,7 +68,7 @@ class HomoskedasticCovariance(object):
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
-    
+
     def _mvreg_cov(self):
         x = self._x
         nobs = self._eps.shape[0]
@@ -86,10 +86,10 @@ class HomoskedasticCovariance(object):
             xpxi = inv(xpx)
             xeex = cons.t.T @ xeex @ cons.t
             cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
-    
+
         cov = (cov + cov.T) / 2
         return cov
-    
+
     def _gls_cov(self):
         x = self._x
         nobs = self._eps.shape[0]
@@ -97,7 +97,7 @@ class HomoskedasticCovariance(object):
         sigma = self._sigma
         sigma_m12 = inv_matrix_sqrt(sigma)
         sigma_inv = inv(sigma)
-        
+
         xpx = blocked_inner_prod(x, sigma_inv)
         xo_m12 = blocked_diag_product(x, sigma_m12)
         xeex = blocked_full_inner_product(xo_m12, epe)
@@ -110,10 +110,10 @@ class HomoskedasticCovariance(object):
             xpxi = inv(xpx)
             xeex = cons.t.T @ xeex @ cons.t
             cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
-    
+
         cov = (cov + cov.T) / 2
         return cov
-    
+
     @property
     def cov(self):
         """Parameter covariance"""
@@ -163,13 +163,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     where :math:`\hat{S}` is a estimator of the model scores.
 
     """
-    
+
     def __init__(self, x, eps, sigma, gls=False, debiased=False, constraints=None):
         super(HeteroskedasticCovariance, self).__init__(x, eps, sigma,
                                                         gls=gls,
                                                         debiased=debiased,
                                                         constraints=constraints)
-    
+
     def _cov(self, gls):
         x = self._x
         eps = self._eps
@@ -178,7 +178,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         inv_sigma = inv(sigma)
         weights = inv_sigma if gls else eye(k)
         xpx = blocked_inner_prod(x, weights)
-        
+
         bigx = blocked_diag_product(x, weights)
         nobs = eps.shape[0]
         e = eps.T.ravel()[:, None]
@@ -188,7 +188,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         for i in range(nobs):
             xe = bigxe[i:k * nobs: nobs].sum(0)[None, :]
             xeex += xe.T @ xe
-        
+
         if self._constraints is None:
             xpxi = inv(xpx)
             cov = xpxi @ xeex @ xpxi
@@ -198,12 +198,12 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             xpxi = inv(xpx)
             xeex = cons.t.T @ xeex @ cons.t
             cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
-    
+
         cov = (cov + cov.T) / 2
         return cov
-    
+
     def _mvreg_cov(self):
         return self._cov(False)
-    
+
     def _gls_cov(self):
         return self._cov(True)

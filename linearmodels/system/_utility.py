@@ -55,7 +55,7 @@ def blocked_diag_product(x, s):
         row = np.hstack(row)
         out.append(row)
     out = np.vstack(out)
-    
+
     return out
 
 
@@ -88,18 +88,18 @@ def blocked_inner_prod(x, s):
     cum_width = cumsum([0] + widths)
     total = sum(widths)
     out = zeros((total, total))
-    
+
     for i in range(k):
         xi = x[i]
         sel_i = slice(cum_width[i], cum_width[i + 1])
         s_ii = s[i, i]
         prod = s_ii * (xi.T @ xi)
         out[sel_i, sel_i] = prod
-    
+
     # Short circuit if identity
     if np.all((s - diag(diag(s))) == 0.0):
         return out
-    
+
     for i in range(k):
         xi = x[i]
         sel_i = slice(cum_width[i], cum_width[i + 1])
@@ -111,7 +111,7 @@ def blocked_inner_prod(x, s):
             out[sel_i, sel_j] = prod
             if i != j:
                 out[sel_j, sel_i] = prod.T
-    
+
     return out
 
 
@@ -123,15 +123,15 @@ def blocked_full_inner_product(x, s):
             Array of shape KT by KT
         s : ndarray
             Array of shape K by K
-    
+
     Notes
     -----
     Compuptes the quantity
-    
+
     .. math ::
-    
+
         x^\prime (s \otimes I_T)x
-    
+
     """
     k = s.shape[0]
     t = x.shape[0] // k
@@ -152,13 +152,36 @@ def inv_matrix_sqrt(s):
 
 
 class LinearConstraint(object):
-    # TODO: Docs
-    # TODO: Test
+    r"""
+    Linear constraint for regression estimation
+
+    Parameters
+    ----------
+    r : {ndarray, DataFrame}
+        Restriction loading matrix
+    q : {ndarray, Series}
+        Restriction value
+    num_params : int, optional
+        Number of model parameter.  Used to test for correctness
+    require_pandas : bool, optional
+        Flag indicating whether r and q must be pandas
+
+    Notes
+    -----
+    Used to impose the constraints
+
+    .. math ::
+
+        r \beta = q
+    """
+
     def __init__(self, r, q=None, num_params=None, require_pandas=True):
         if not isinstance(r, (pd.DataFrame, np.ndarray)):
             raise TypeError('r must be an array or DataFrame')
         elif require_pandas and not isinstance(r, pd.DataFrame):
             raise TypeError('r must be a DataFrame')
+        if r.ndim != 2:
+            raise ValueError('r must be 2-dimensional')
         r_pd = pd.DataFrame(r)
         ra = np.asarray(r, dtype=np.float64)
         self._r_pd = r_pd
@@ -176,13 +199,13 @@ class LinearConstraint(object):
         self._t = self._l = self._a = None
         self._num_params = num_params
         self._verify_constraints()
-    
+
     def __repr__(self):
         return self.__str__() + '\nid: ' + str(hex(id(self)))
-    
+
     def __str__(self):
         return 'Linear Constraint with {0} constraints'.format(self._ra.shape[0])
-    
+
     def _verify_constraints(self):
         r = self._ra
         q = self._qa
@@ -198,7 +221,7 @@ class LinearConstraint(object):
         qr = np.linalg.qr(rq)
         if matrix_rank(qr[1][:, :-1]) != matrix_rank(qr[1]):
             raise ValueError('One or more constraints are infeasible')
-    
+
     def _compute_transform(self):
         r = self._ra
         c, k = r.shape
@@ -211,27 +234,61 @@ class LinearConstraint(object):
         q = self._qa[:, None]
         a = q.T @ inv(l.T @ r.T) @ l.T
         self._t, self._l, self._a = t, l, a
-    
+
     @property
     def r(self):
+        """Constrain loading matrix"""
         return self._r_pd
-    
+
     @property
     def t(self):
+        """
+        Constraint transformation matrix
+
+        Returns
+        -------
+        t : ndarray
+            Constraint transformation matrix
+
+        Notes
+        -----
+        Constrained regressors are constructed as x @ t
+        """
         if self._t is None:
             self._compute_transform()
         return self._t
-    
+
     @property
     def a(self):
+        """
+        Transformed constraint target
+
+        Returns
+        -------
+        a : ndarray
+            Transformed target
+
+        Notes
+        -----
+        Has two uses.  The first is to translate the restricted parameters
+        back to the full parameter vector using
+
+        .. math ::
+
+           beta = t  beta_c + ^\prime
+
+        Also used in estimation or restricted model to demean the dependent
+        variable
+
+        .. math ::
+
+            \tilde{y} = y - x  a^\prime
+        """
         if self._a is None:
             self._compute_transform()
         return self._a
-    
-    @property
-    def r(self):
-        return self._r_pd
-    
+
     @property
     def q(self):
+        """Constrain target values"""
         return self._q_pd

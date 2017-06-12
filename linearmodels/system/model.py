@@ -119,9 +119,6 @@ class SUR(object):
     where :math:`\Sigma` is the covariance matrix of the residuals.
     """
     
-    # TODO: 1. GLS estimation w/ constraints
-    # TODO: 2. Homosk cov with constraints
-    # TODO: 3. Heterosk cov with constraints
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
             raise TypeError('dependent must be a dictionary-like')
@@ -332,7 +329,7 @@ class SUR(object):
         >>> mod = SUR.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
-        
+
         >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
         >>> mod = SUR.from_formula(formula, data)
         """
@@ -393,12 +390,14 @@ class SUR(object):
         wy, wx = self._wy, self._wx
         k = len(wx)
         if self.constraints is not None:
-            # TODO: Could be made more memory efficient
             cons = self.constraints
             x = blocked_diag_product(wx, eye(len(wx)))
             y = np.vstack(wy)
             xt = x @ cons.t
+            # TODO: Make more memory efficient
+            # Replace with t.T @ xpx @ t
             xpx = xt.T @ xt
+            # Replace with t.T @ xpy - t.T @ xpx @ a.T
             xpy = xt.T @ (y - x @ cons.a.T)
             paramsc = np.linalg.solve(xpx, xpy)
             params = cons.t @ paramsc + cons.a.T
@@ -739,7 +738,7 @@ class SUR(object):
     def constraints(self):
         """
         Model constraints
-        
+
         Returns
         -------
         cons : LinearConstraint
@@ -778,7 +777,7 @@ class SUR(object):
     def param_names(self):
         """
         Model parameter names
-        
+
         Returns
         -------
         names : list[str]
