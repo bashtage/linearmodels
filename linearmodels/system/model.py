@@ -55,9 +55,10 @@ class SUR(object):
     ----------
     equations : dict
         Dictionary-like structure containing dependent and exogenous variable
-        values.  Each element must be either a tuple of the form (dependent,
+        values.  Each key is an equations label and must be a string. Each
+        value must be either a tuple of the form (dependent,
         exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
-        the optional key 'weights'
+        the optional key 'weights'.
     sigma : array-like
         Pre-specified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -122,6 +123,9 @@ class SUR(object):
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
             raise TypeError('dependent must be a dictionary-like')
+        for key in equations:
+            if not isinstance(key, str):
+                raise ValueError('Equation lebels (keys) must be strings')
         
         # Ensure nearly deterministic equation ordering
         if not isinstance(equations, OrderedDict):
@@ -192,8 +196,8 @@ class SUR(object):
         self._common_exog = len(set(ids)) == 1
         constant = []
         constant_loc = []
-        for lhs, rhs in zip(self._dependent, self._exog):
-            self._param_names.extend([lhs.cols[0] + '_' + col for col in rhs.cols])
+        for lhs, rhs, label in zip(self._dependent, self._exog, self._eq_labels):
+            self._param_names.extend([label + '_' + col for col in rhs.cols])
             rhs_a = rhs.ndarray
             lhs_a = lhs.ndarray
             if lhs_a.shape[0] <= rhs_a.shape[1]:
@@ -519,10 +523,11 @@ class SUR(object):
         stats['r2a'] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
         
         names = self._param_names[loc:loc + df]
-        offset = len(stats.dependent) + 1
+        offset = len(stats.eq_label) + 1
         stats['param_names'] = [n[offset:] for n in names]
         
         # F-statistic
+        # TODO: What to do if there is a constraint?  InvalidTestStatistic
         stats['f_stat'] = self._f_stat(stats, debiased)
         
         return stats
@@ -555,6 +560,8 @@ class SUR(object):
         results['total_ss'] = total_ss
         results['r2'] = 1.0 - results.resid_ss / results.total_ss
         results['resid'] = resid
+        results['constraints'] = self._constraints
+        results['model'] = self
         
         return results
     
@@ -586,6 +593,7 @@ class SUR(object):
         individual = AttrDict()
         nobs = eps.shape[0]
         debiased = cov_config.get('debiased', False)
+        method = 'Iterative GLS' if iter_count > 1 else 'GLS'
         for i in range(k):
             cons = int(self.has_constant.iloc[i])
             
@@ -596,7 +604,7 @@ class SUR(object):
                 ye = block_wy[sel]
             total_ss = float(ye.T @ ye)
             stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
-                                               'GLS', cov_type, iter_count,
+                                               method, cov_type, iter_count,
                                                debiased, cons, total_ss)
             
             key = self._eq_labels[i]
@@ -604,7 +612,7 @@ class SUR(object):
         
         # Populate results dictionary
         nobs = eps.size
-        results = self._common_results(beta, cov, 'GLS', iter_count, nobs,
+        results = self._common_results(beta, cov, method, iter_count, nobs,
                                        cov_type, sigma, individual, debiased)
         
         # wresid is different between GLS and OLS
