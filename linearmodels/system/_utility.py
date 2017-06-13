@@ -227,6 +227,8 @@ class LinearConstraint(object):
         c, k = r.shape
         m = eye(k) - r.T @ inv(r @ r.T) @ r
         vals, vecs = np.linalg.eig(m)
+        vals = np.real(vals)
+        vecs = np.real(vecs)
         idx = np.argsort(vals)[::-1]
         vals = vals[idx]
         vecs = vecs[:, idx]
