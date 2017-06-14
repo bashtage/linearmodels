@@ -450,7 +450,6 @@ class SUR(object):
         return wald
     
     def _multivariate_ls_finalize(self, beta, eps, sigma, cov_type, **cov_config):
-        nobs = eps.shape[0]
         k = len(self._wx)
         
         # Covariance estimation
@@ -458,7 +457,7 @@ class SUR(object):
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
-        cov = cov_est(self._wx, eps, sigma, gls=False,
+        cov = cov_est(self._wx, eps, sigma, sigma, gls=False,
                       constraints=self._constraints, **cov_config).cov
         
         individual = AttrDict()
@@ -565,8 +564,8 @@ class SUR(object):
         
         return results
     
-    def _gls_finalize(self, beta, sigma, sigma_m12, gls_eps, eps, cov_type,
-                      iter_count, **cov_config):
+    def _gls_finalize(self, beta, sigma, full_sigma, sigma_m12, gls_eps, eps,
+                      cov_type, iter_count, **cov_config):
         """Collect results to return after GLS estimation"""
         wy = self._wy
         wx = self._wx
@@ -580,7 +579,7 @@ class SUR(object):
             cov_est = HeteroskedasticCovariance
         gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = reshape(eps, (k, eps.shape[0] // k)).T
-        cov = cov_est(wx, gls_eps, sigma, gls=True,
+        cov = cov_est(wx, gls_eps, sigma, full_sigma, gls=True,
                       constraints=self._constraints, **cov_config).cov
         
         # Const-only residual estimatio for TSS
@@ -715,7 +714,7 @@ class SUR(object):
         total_cols = col_idx[-1]
         beta, eps = self._multivariate_ls_fit()
         nobs = eps.shape[0]
-        sigma = eps.T @ eps / nobs
+        full_sigma = sigma = eps.T @ eps / nobs
         if (self._common_exog and method is None) or method == 'ols':
             return self._multivariate_ls_finalize(beta, eps, sigma, cov_type, **cov_config)
         
@@ -739,8 +738,8 @@ class SUR(object):
         x = blocked_diag_product(self._x, eye(k))
         eps = y - x @ beta
         
-        return self._gls_finalize(beta, sigma, sigma_m12, gls_eps, eps,
-                                  cov_type, iter_count, **cov_config)
+        return self._gls_finalize(beta, sigma, full_sigma, sigma_m12, gls_eps,
+                                  eps, cov_type, iter_count, **cov_config)
     
     @property
     def constraints(self):

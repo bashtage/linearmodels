@@ -42,12 +42,13 @@ class HomoskedasticCovariance(object):
 
     """
 
-    def __init__(self, x, eps, sigma, *, gls=False, debiased=False, constraints=None):
+    def __init__(self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None):
         self._eps = eps
         self._x = x
         self._nobs = eps.shape[0]
         self._k = len(x)
         self._sigma = sigma
+        self._full_sigma = full_sigma
         self._gls = gls
         self._debiased = debiased
         self._constraints = constraints
@@ -92,15 +93,13 @@ class HomoskedasticCovariance(object):
 
     def _gls_cov(self):
         x = self._x
-        nobs = self._eps.shape[0]
-        epe = self._eps.T @ self._eps / nobs
         sigma = self._sigma
         sigma_m12 = inv_matrix_sqrt(sigma)
         sigma_inv = inv(sigma)
 
         xpx = blocked_inner_prod(x, sigma_inv)
-        xo_m12 = blocked_diag_product(x, sigma_m12)
-        xeex = blocked_full_inner_product(xo_m12, epe)
+        # Handles case where sigma_inv is not inverse of full_sigma
+        xeex = blocked_inner_prod(x, sigma_inv @ self._full_sigma @ sigma_inv)
         if self._constraints is None:
             xpxi = inv(xpx)
             cov = xpxi @ xeex @ xpxi
@@ -164,8 +163,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     """
 
-    def __init__(self, x, eps, sigma, gls=False, debiased=False, constraints=None):
-        super(HeteroskedasticCovariance, self).__init__(x, eps, sigma,
+    def __init__(self, x, eps, sigma, full_sigma, gls=False, debiased=False, constraints=None):
+        super(HeteroskedasticCovariance, self).__init__(x, eps, sigma, full_sigma,
                                                         gls=gls,
                                                         debiased=debiased,
                                                         constraints=constraints)
