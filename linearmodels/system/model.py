@@ -28,7 +28,7 @@ from linearmodels.system.covariance import (HeteroskedasticCovariance,
                                             HomoskedasticCovariance)
 from linearmodels.system.results import SURResults
 from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
-                                  matrix_rank, missing_warning)
+                                  matrix_rank, missing_warning, InvalidTestStatistic)
 
 __all__ = ['SUR']
 
@@ -435,12 +435,17 @@ class SUR(object):
             sel.pop(stats.constant_loc)
         cov = cov[sel][:, sel]
         params = stats.params[sel]
-        stat = float(params.T @ inv(cov) @ params)
         df = params.shape[0]
         nobs = stats.nobs
         null = 'All parameters ex. constant are zero'
         name = 'Equation F-statistic'
-        
+        try:
+            stat = float(params.T @ inv(cov) @ params)
+
+        except np.linalg.LinAlgError:
+            return InvalidTestStatistic('Covariance is singular, possibly due '
+                                        'to constraints.', name=name)
+
         if debiased:
             wald = WaldTestStatistic(stat / df, null, df, nobs - nvar,
                                      name=name)
@@ -526,7 +531,6 @@ class SUR(object):
         stats['param_names'] = [n[offset:] for n in names]
         
         # F-statistic
-        # TODO: What to do if there is a constraint?  InvalidTestStatistic
         stats['f_stat'] = self._f_stat(stats, debiased)
         
         return stats
