@@ -62,7 +62,7 @@ def get_res(res):
                 get_res(value[key])
 
 
-@pytest.fixture(scope='module', params=params, ids=ids)
+@pytest.fixture(params=params, ids=ids)
 def data(request):
     p, const, rho, common_exog, included_weights, output_dict = request.param
     if common_exog and isinstance(p, list):
@@ -542,11 +542,6 @@ def test_against_direct_model(data):
         y.append(data[keys[i]]['dependent'])
         x.append(data[keys[i]]['exog'])
 
-    missing = False
-    for xv, yv in zip(x, y):
-        missing = missing or np.any(np.isnan(xv)) or np.any(np.isnan(yv))
-    if missing:
-        return
     direct = simple_sur(y, x)
     mod = SUR(data_copy)
     res = mod.fit(method='ols')
