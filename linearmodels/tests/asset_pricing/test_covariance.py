@@ -39,6 +39,8 @@ def test_no_jacobian(data):
 def test_alt_jacobians(data):
     hc = HeteroskedasticCovariance(data.moments, jacobian=data.inv_jacobian)
     assert_allclose(hc.inv_jacobian, data.inv_jacobian)
+    hc = HeteroskedasticCovariance(data.moments, inv_jacobian=data.inv_jacobian)
+    assert_allclose(hc.jacobian, np.eye(10))
 
 
 def test_center(data):

@@ -12,7 +12,7 @@ from linearmodels.iv.model import _OLS as OLS
 from linearmodels.system._utility import blocked_column_product, blocked_diag_product, \
     inv_matrix_sqrt
 from linearmodels.system.model import SUR
-from linearmodels.tests.system._utility import generate_data
+from linearmodels.tests.system._utility import generate_data, simple_sur
 from linearmodels.utility import AttrDict
 
 p = [3, [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]]
@@ -520,3 +520,37 @@ def test_formula_partial_weights():
     assert_allclose(mod._w[0], expected / expected.mean())
     expected = weights.values[:, [0]]
     assert_allclose(mod._w[1], expected / expected.mean())
+
+
+def test_invalid_equation_labels(data):
+    data = {i: data[key] for i, key in enumerate(data)}
+    with pytest.raises(ValueError):
+        SUR(data)
+
+
+def test_against_direct_model(data):
+    keys = list(data.keys())
+    if not isinstance(data[keys[0]], Mapping):
+        return
+    if 'weights' in data[keys[0]]:
+        return
+    y = []
+    x = []
+    data_copy = OrderedDict()
+    for i in range(min(3, len(data))):
+        data_copy[keys[i]] = data[keys[i]]
+        y.append(data[keys[i]]['dependent'])
+        x.append(data[keys[i]]['exog'])
+
+    missing = False
+    for xv, yv in zip(x, y):
+        missing = missing or np.any(np.isnan(xv)) or np.any(np.isnan(yv))
+    if missing:
+        return
+    direct = simple_sur(y, x)
+    mod = SUR(data_copy)
+    res = mod.fit(method='ols')
+    assert_allclose(res.params.values[:, None], direct.beta0)
+
+    res = mod.fit(method='gls')
+    assert_allclose(res.params.values[:, None], direct.beta1)
