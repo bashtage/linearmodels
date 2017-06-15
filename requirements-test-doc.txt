@@ -6,3 +6,5 @@ nbsphinx
 jupyter
 nbconvert
 nbformat
+matplotlib
+seaborn
