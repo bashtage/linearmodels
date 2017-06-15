@@ -6,7 +6,8 @@ import pytest
 
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import FirstDifferenceOLS
-from linearmodels.tests.panel._utility import assert_results_equal, generate_data
+from linearmodels.tests.panel._utility import (assert_results_equal,
+                                               generate_data)
 
 missing = [0.0, 0.20]
 datatypes = ['numpy', 'pandas', 'xarray']

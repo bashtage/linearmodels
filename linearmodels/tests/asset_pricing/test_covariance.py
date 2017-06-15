@@ -2,8 +2,10 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.asset_pricing.covariance import KernelCovariance, KernelWeight, \
-    HeteroskedasticCovariance, HeteroskedasticWeight
+from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
+                                                   HeteroskedasticWeight,
+                                                   KernelCovariance,
+                                                   KernelWeight)
 from linearmodels.utility import AttrDict
 
 

@@ -5,6 +5,7 @@ try:
                                   is_string_dtype, is_categorical_dtype,
                                   is_datetime64_any_dtype)
 
+
     # From pandas 0.20.1
     def is_string_like(obj):
         """
@@ -20,13 +21,11 @@ try:
             Whether `obj` is a string or not.
         """
         return isinstance(obj, str)
-        
+
 except ImportError:  # pragma: no cover
     from pandas.core.common import (is_string_dtype, is_numeric_dtype,
                                     is_categorical, is_categorical_dtype,
                                     is_datetime64_any_dtype, is_string_like)
-
-
 
 try:
     from pandas.testing import assert_frame_equal, assert_series_equal

@@ -10,7 +10,7 @@ Linear Model Estimation
 
 Estimation and inference in some common linear models:
 
-**Models for panel data**
+**Panel Data Models**
 
 * Fixed Effects (:class:`~linearmodels.panel.model.PanelOLS`)
 * Random Effects (:class:`~linearmodels.panel.model.RandomEffects`)
@@ -19,12 +19,19 @@ Estimation and inference in some common linear models:
 * Pooled OLS (:class:`~linearmodels.panel.model.PooledOLS`)
 * Fama-MacBeth Estimation (:class:`~linearmodels.panel.model.FamaMacBeth`)
 
-**Single equation instrumental variables (IV) models**
+
+**Single equation Instrumental Variables (IV) models**
 
 * Two-stage least squares (:class:`~linearmodels.iv.model.IV2SLS`)
 * Limited Information ML (LIML) (:class:`~linearmodels.iv.model.IVLIML`)
 * Generalized Method of Moments (GMM) (:class:`~linearmodels.iv.model.IVGMM`)
 * Continuously Updating GMM (:class:`~linearmodels.iv.model.IVGMMCUE`)
+
+
+**System Regression Estimators**
+
+* Seemingly Unrelated Regression (:class:`~linearmodels.system.model.SUR`)
+
 
 **Asset Pricing Model Estimation and Testing**
 
@@ -35,6 +42,7 @@ Estimation and inference in some common linear models:
 * Linear factor model (1-step SUR, only for traded factors)
   (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
@@ -43,10 +51,12 @@ Estimation and inference in some common linear models:
    iv/index
    panel/index
    asset-pricing/index
+   system/index
    utility
    plan
    contributing
    changes
+   references
 
 
 Indices and tables

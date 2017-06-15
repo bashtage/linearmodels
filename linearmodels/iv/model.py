@@ -3,22 +3,25 @@ Instrumental variable estimators
 """
 from __future__ import absolute_import, division, print_function
 
-from numpy import any, array, asarray, average, c_, isscalar, logical_not, ones, sqrt
+from numpy import (any, array, asarray, average, c_, isscalar, logical_not,
+                   ones, sqrt, nanmean)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import parse_formula
-from linearmodels.iv.covariance import (HeteroskedasticCovariance,
-                                        HomoskedasticCovariance, KernelCovariance,
-                                        ClusteredCovariance)
+from linearmodels.iv.covariance import (ClusteredCovariance,
+                                        HeteroskedasticCovariance,
+                                        HomoskedasticCovariance,
+                                        KernelCovariance)
 from linearmodels.iv.data import IVData
 from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  HomoskedasticWeightMatrix, IVGMMCovariance,
-                                 KernelWeightMatrix, OneWayClusteredWeightMatrix)
+                                 KernelWeightMatrix,
+                                 OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.utility import WaldTestStatistic, has_constant, inv_sqrth, \
-    missing_warning
+from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
+                                  missing_warning)
 
 __all__ = ['COVARIANCE_ESTIMATORS', 'WEIGHT_MATRICES', 'IVGMM', 'IVLIML', 'IV2SLS',
            'IVGMMCUE', '_OLS']
@@ -117,7 +120,7 @@ class IVLIML(object):
         weights = IVData(weights).ndarray
         if any(weights <= 0):
             raise ValueError('weights must be strictly positive.')
-        weights = weights / weights.mean()
+        weights = weights / nanmean(weights)
         self.weights = IVData(weights, var_name='weights', nobs=nobs)
 
         self._drop_locs = self._drop_missing()
@@ -253,13 +256,13 @@ class IVLIML(object):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
-            missing_warning(missing)
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.endog.drop(missing)
             self.instruments.drop(missing)
             self.weights.drop(missing)
 
+        missing_warning(missing)
         return missing
 
     @staticmethod
@@ -417,7 +420,7 @@ class IVLIML(object):
         test_stat = test_params.T @ inv(test_cov) @ test_params
         test_stat = float(test_stat)
         nobs, nvar = self._x.shape
-        null = 'All parameters ex. constant not zero'
+        null = 'All parameters ex. constant are zero'
         name = 'Model F-statistic'
         df = test_params.shape[0]
         if debiased:

@@ -1,10 +1,11 @@
-from linearmodels.compat.pandas import assert_frame_equal
-
+import numpy as np
 import pandas as pd
 import pytest
 
-from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM, \
-    TradedFactorModel
+from linearmodels.asset_pricing.model import (LinearFactorModel,
+                                              LinearFactorModelGMM,
+                                              TradedFactorModel)
+from linearmodels.compat.pandas import assert_frame_equal
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 FORMULA_FACTORS = 'factor_1 + factor_2 + factor_3'
@@ -26,7 +27,8 @@ def non_traded_model(request):
 
 @pytest.fixture(scope='module')
 def data(request):
-    out = generate_data(nportfolio=10, output='pandas')
+    premia = np.array([.1,.1,.1])
+    out = generate_data(nportfolio=10, output='pandas', alpha=True, premia=premia)
     out['joined'] = pd.concat([out.factors, out.portfolios], 1)
     return out
 

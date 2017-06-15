@@ -8,7 +8,8 @@ from numpy.testing import assert_allclose
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
-from linearmodels.tests.panel._utility import assert_results_equal, generate_data
+from linearmodels.tests.panel._utility import (assert_results_equal,
+                                               generate_data)
 from linearmodels.utility import AttrDict
 
 missing = [0.0, 0.02, 0.20]

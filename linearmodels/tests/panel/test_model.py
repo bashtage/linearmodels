@@ -7,7 +7,8 @@ import xarray as xr
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.model import AbsorbingEffectError, AmbiguityError, PanelOLS
+from linearmodels.panel.model import (AbsorbingEffectError, AmbiguityError,
+                                      PanelOLS)
 from linearmodels.tests.panel._utility import generate_data, lsdv
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
@@ -174,7 +175,6 @@ def test_absorbing_effect(data):
         PanelOLS(data.y, x, entity_effects=True).fit()
 
 
-@pytest.mark.skip(reason='Pandas Panel produces an extra dep warning')
 def test_all_missing(data):
     y = PanelData(data.y)
     x = PanelData(data.x)
@@ -183,5 +183,5 @@ def test_all_missing(data):
     x.drop(missing)
     import warnings
     with warnings.catch_warnings(record=True) as w:
-        PanelOLS(y.panel, x.panel).fit()
+        PanelOLS(y.dataframe, x.dataframe).fit()
         assert len(w) == 0

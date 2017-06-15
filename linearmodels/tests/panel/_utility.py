@@ -1,11 +1,10 @@
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
-
 import numpy as np
 import pandas as pd
 import xarray as xr
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
 
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.utility import AttrDict
 
 

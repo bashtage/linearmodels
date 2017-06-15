@@ -2,9 +2,9 @@ import glob
 import os
 import sys
 
-from setuptools import setup, find_packages
-
 import versioneer
+
+from setuptools import find_packages, setup
 
 if sys.version_info < (3, 5):
     sys.exit('Requires Python 3.5 or later due to use of @ operator.')
@@ -31,7 +31,6 @@ for nb in notebooks:
         with open(nb, 'r') as nbin:
             nbout.write(nbin.read())
 
-import glob
 bzip_csv_files = []
 for filename in glob.iglob('./linearmodels/datasets/**',recursive=True):
     if '.csv.bz' in filename:

@@ -3,3 +3,4 @@ pandas
 xarray
 scipy
 patsy
+statsmodels

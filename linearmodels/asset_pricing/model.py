@@ -7,12 +7,15 @@ from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 from scipy.optimize import minimize
 
-from linearmodels.asset_pricing.covariance import HeteroskedasticCovariance, \
-    HeteroskedasticWeight, KernelCovariance, KernelWeight
-from linearmodels.asset_pricing.results import GMMFactorModelResults, LinearFactorModelResults
+from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
+                                                   HeteroskedasticWeight,
+                                                   KernelCovariance,
+                                                   KernelWeight)
+from linearmodels.asset_pricing.results import (GMMFactorModelResults,
+                                                LinearFactorModelResults)
 from linearmodels.iv.data import IVData
-from linearmodels.utility import AttrDict, WaldTestStatistic, has_constant, matrix_rank, \
-    missing_warning
+from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
+                                  matrix_rank, missing_warning)
 
 
 def callback_factory(obj, args, disp=1):
@@ -70,9 +73,9 @@ class TradedFactorModel(object):
             if all(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
-            missing_warning(missing)
             self.portfolios.drop(missing)
             self.factors.drop(missing)
+        missing_warning(missing)
 
         return missing
 
@@ -307,6 +310,7 @@ class LinearFactorModel(TradedFactorModel):
     The model is tested using the estimated values
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
+
     def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
         self._risk_free = bool(risk_free)
         super(LinearFactorModel, self).__init__(portfolios, factors)

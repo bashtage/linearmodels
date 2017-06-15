@@ -1,5 +1,3 @@
-from linearmodels.compat.statsmodels import Summary
-
 import datetime as dt
 
 import numpy as np
@@ -8,8 +6,10 @@ from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
+from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.utility import _SummaryStr, _str, cached_property, pval_format, _ModelComparison
+from linearmodels.utility import (_ModelComparison, _str, _SummaryStr,
+                                  cached_property, pval_format)
 
 __all__ = ['PanelResults', 'PanelEffectsResults', 'RandomEffectsResults']
 

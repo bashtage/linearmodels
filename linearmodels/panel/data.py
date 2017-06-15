@@ -5,8 +5,10 @@ import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 
-from linearmodels.compat.pandas import is_categorical, is_string_dtype, \
-    is_string_like, is_numeric_dtype, is_datetime64_any_dtype
+from linearmodels.compat.pandas import (is_categorical,
+                                        is_datetime64_any_dtype,
+                                        is_numeric_dtype, is_string_dtype,
+                                        is_string_like)
 from linearmodels.utility import ensure_unique_column
 
 __all__ = ['PanelData']
@@ -193,7 +195,7 @@ class PanelData(object):
 
         time_index = Series(self._frame.index.levels[1])
         if not (is_numeric_dtype(time_index.dtype) or
-                is_datetime64_any_dtype(time_index.dtype)):
+                    is_datetime64_any_dtype(time_index.dtype)):
             raise ValueError('The index on the time dimension must be either '
                              'numeric or date-like')
         self._k, self._t, self._n = self.panel.shape

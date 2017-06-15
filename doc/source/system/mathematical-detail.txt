@@ -1,0 +1,182 @@
+
+Formulas and Mathematical Detail
+================================
+
+Seemingly Unrelated Regression (SUR/SURE)
+-----------------------------------------
+
+Seemingly unrelated regression is a system regression estimator which
+jointly estimates multiple models. This allows joint hypothesis testing
+of parameters across models since the parameter covariance is robust to
+correlation of residuals across models. It can also lead to more precise
+parameter estimates if some residuals are conditionally homoskedastic
+and regressors differ across equations.
+
+Basic Notation
+~~~~~~~~~~~~~~
+
+Assume :math:`K` series are observed for :math:`N` time periods. Denote
+the stacked observations of series :math:`i` as :math:`Y_{i}` and its
+corresponding regressor matrix :math:`X_{i}`. The complete model
+spanning all series can be specified as
+
+.. math::
+
+   \begin{aligned}
+   Y & =X\beta+\epsilon\\
+   \left[\begin{array}{c}
+   Y_{1}\\
+   Y_{2}\\
+   \vdots\\
+   Y_{K}
+   \end{array}\right] & =\left[\begin{array}{cccc}
+   X_{1} & 0 & 0 & 0\\
+   0 & X_{2} & 0 & 0\\
+   \vdots & \vdots & \ddots & \vdots\\
+   0 & 0 & 0 & X_{N}
+   \end{array}\right]\left[\begin{array}{c}
+   \beta_{1}\\
+   \beta_{2}\\
+   \vdots\\
+   \beta_{K}
+   \end{array}\right]+\left[\begin{array}{c}
+   \epsilon_{1}\\
+   \epsilon_{2}\\
+   \vdots\\
+   \epsilon_{K}
+   \end{array}\right].\end{aligned}
+
+The OLS estimator of :math:`\beta` is then
+
+.. math:: \hat{\beta}=\left(X^{\prime}X\right)^{-1}X^{\prime}Y.
+
+A GLS estimator can be similarly defined as
+
+.. math:: \hat{\beta}_{GLS}=\left(X^{\prime}\Omega X\right)^{-1}X^{\prime}\Omega^{-1}Y
+
+where :math:`\Omega=I_{N}\otimes\Sigma` is the joint covariance of the
+residuals. In practice :math:`\Sigma` is not known as so a feasible GLS
+(FGLS) is implemented in two steps. The first uses OLS to estimate
+:math:`\hat{\epsilon}` and then estimates the residual covariance as
+
+.. math::
+
+   \hat{\Sigma}=N^{-1}\left[\begin{array}{cccc}
+   \hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right]^{\prime}\left[\begin{array}{cccc}
+   \hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right].
+
+The feasible GLS estimator is then
+
+.. math:: \hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
+
+where :math:`\hat{\Omega}=I_{N}\otimes\hat{\Sigma}`.
+
+Covariance Estimation
+~~~~~~~~~~~~~~~~~~~~~
+
+**Homoskedastic Data**
+
+When residuals are assumed to be homoskedastic, the covariance can be
+consistently estimated by
+
+.. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-\frac{1}{2}}\hat{\Omega}\Delta^{-\frac{1}{2}}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+
+where :math:`\Delta` is the weighting matrix used in the parameter
+estimator. For example, in OLS :math:`\Delta=I_{NK}` while in
+FGLS\ :math:`\Delta=I_{N}\otimes\hat{\Sigma}`. The estimator supports
+using FGLS with an assumption that :math:`\hat{\Sigma}` is diagonal or
+using a user-specified value of :math:`\Sigma`. When the FGLS estimator
+is used, this simplifies to
+
+.. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}
+
+**Heteroskedastic Data**
+
+When residuals are heteroskedastic, the covariance can be consistently
+estimated by
+
+.. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}\hat{S}\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+
+where :math:`\hat{S}` is a covariance estimator that is clustered by
+time. Define the matrix of scores as
+
+.. math::
+
+   \hat{g}=\left[\begin{array}{c}
+   \hat{g}_{1}\\
+   \hat{g}_{2}\\
+   \vdots\\
+   \hat{g}_{N}
+   \end{array}\right]=\Delta^{-\frac{1}{2}}X\odot\left(\hat{\epsilon}\iota_{M}^{\prime}\right)
+
+where :math:`\iota_{M}` is a vector of ones with :math:`M` elements
+where :math:`M` is the number of columns in :math:`X` and :math:`\odot`
+is element by element multiplication. The clustered-by-time score
+covariance estimator is then
+
+.. math:: \hat{S}=N^{-1}\sum_{i=1}^{N}\Psi_{i}^{\prime}\Psi_{i}
+
+where
+
+.. math:: \Psi_{i}=\sum_{j=1}^{K}\hat{g}_{ij}
+
+is the sum of the scores across models :math:`\left(j\right)` that have
+the same observation index :math:`i`. This estimator allows arbitrary
+correlation of residuals with the same observation index.
+
+Memory efficient calculations
+-----------------------------
+
+The parameter estimates in the SUR model can are
+
+.. math:: \left(X^{\prime}\Omega^{-1}X\right)^{-1}\left(X^{\prime}\Omega^{-1}Y\right)^{-1}
+
+where
+
+.. math::
+
+   \Omega^{-1}=\left[\begin{array}{cccc}
+   \sigma^{11}I_{T} & \sigma^{12}I_{T} & \ldots & \sigma^{1k}I_{T}\\
+   \sigma^{21}I_{T} & \sigma^{22}I_{T} & \dots & \sigma^{2k}I_{T}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}I_{T} & \sigma^{k2}I_{T} & \dots & \sigma^{kk}I_{T}
+   \end{array}\right]
+
+where :math:`\sigma^{ij}=\left[\Sigma^{-1}\right]_{ij}`. Since :math:`X`
+is block diagonal,
+
+.. math::
+
+   X^{\prime}\Omega^{-1}=\left[\begin{array}{cccc}
+   \sigma^{11}X_{1}^{\prime} & \sigma^{12}X_{1}^{\prime} & \ldots & \sigma^{1k}X_{1}^{\prime}\\
+   \sigma^{21}X_{2}^{\prime} & \sigma^{22}X_{2}^{\prime} & \dots & \sigma^{2k}X_{2}^{\prime}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}X_{k}^{\prime} & \sigma^{k2}X_{k}^{\prime} & \dots & \sigma^{kk}X_{k}^{\prime}
+   \end{array}\right]
+
+and
+
+.. math::
+
+   X^{\prime}\Omega^{-1}X=\left[\begin{array}{cccc}
+   \sigma^{11}X_{1}^{\prime}X_{1} & \sigma^{12}X_{1}^{\prime}X_{2} & \ldots & \sigma^{1k}X_{1}^{\prime}X_{k}\\
+   \sigma^{21}X_{2}^{\prime}X_{1} & \sigma^{22}X_{2}^{\prime}X_{2} & \dots & \sigma^{2k}X_{2}^{\prime}X_{k}\\
+   \vdots & \vdots & \ddots & \vdots\\
+   \sigma^{k2}X_{k}^{\prime}X_{1} & \sigma^{k2}X_{k}^{\prime}X_{2} & \dots & \sigma^{kk}X_{k}^{\prime}X_{k}
+   \end{array}\right]
+
+Similarly
+
+.. math::
+
+   X^{\prime}\Omega^{-1}Y=\left[\begin{array}{c}
+   \sigma^{11}X_{1}^{\prime}Y_{1}+\sigma^{12}X_{1}^{\prime}Y_{2}+\ldots\sigma^{1k}X_{1}^{\prime}Y_{k}\\
+   \sigma^{21}X_{2}^{\prime}Y_{1}+\sigma^{22}X_{2}^{\prime}Y_{2}+\dots+\sigma^{2k}X_{2}^{\prime}Y_{k}\\
+   \vdots\\
+   \sigma^{k2}X_{k}^{\prime}Y_{1}+\sigma^{k2}X_{k}^{\prime}Y_{2}+\dots+\sigma^{kk}X_{k}^{\prime}Y_{k}
+   \end{array}\right]
+
+This suggests that constructing the high dimensional :math:`\Omega^{-1}`
+can be avoided and many needless multiplications can be avoided by
+directly computing these two components and the solution can be found
+using ``solve``.

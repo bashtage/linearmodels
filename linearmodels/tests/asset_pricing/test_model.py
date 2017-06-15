@@ -5,8 +5,9 @@ import statsmodels.api as sm
 from numpy.testing import assert_allclose, assert_equal
 from scipy import stats
 
-from linearmodels.asset_pricing.model import LinearFactorModel, LinearFactorModelGMM, \
-    TradedFactorModel
+from linearmodels.asset_pricing.model import (LinearFactorModel,
+                                              LinearFactorModelGMM,
+                                              TradedFactorModel)
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import _OLS
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
