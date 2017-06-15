@@ -56,12 +56,18 @@ def test_fama_macbeth(data):
                 val()
 
 
+def test_unknown_cov_type(data):
+    with pytest.raises(ValueError):
+        FamaMacBeth(data.y, data.x).fit(cov_type='unknown')
+
+
 def test_fama_macbeth_kernel_smoke(data):
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel')
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='bartlett')
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='newey-west')
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='parzen')
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='qs')
+    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', bandwidth=3)
     res = FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='andrews')
 
     d = dir(res)

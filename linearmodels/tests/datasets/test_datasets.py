@@ -1,11 +1,11 @@
 import pandas as pd
 import pytest
 
-from linearmodels.datasets import (birthweight, card, fertility, french,
-                                   jobtraining, meps, mroz, wage, wage_panel)
+from linearmodels.datasets import (birthweight, card, fertility, french, fringe,
+                                   jobtraining, meps, mroz, munnell, wage, wage_panel)
 
-DATASETS = [birthweight, card, fertility, jobtraining, meps, mroz, wage,
-            wage_panel, french]
+DATASETS = [birthweight, card, fertility, french, fringe,
+            jobtraining, meps, mroz, munnell, wage, wage_panel]
 ids = list(map(lambda x: x.__name__.split('.')[-1], DATASETS))
 
 
