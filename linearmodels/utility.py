@@ -9,6 +9,7 @@ from pandas import DataFrame, Series, concat
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
+
 class MissingValueWarning(Warning):
     pass
 
@@ -113,7 +114,7 @@ def has_constant(x):
         Column location of constant
     """
     if np.any(np.all(x == 1, axis=0)):
-        loc = np.argwhere(np.any(np.all(x == 1, axis=0)))
+        loc = np.argwhere(np.all(x == 1, axis=0))
         return True, int(loc)
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
@@ -473,8 +474,6 @@ def missing_warning(missing):
     if linearmodels.WARN_ON_MISSING:
         import warnings
         warnings.warn(missing_value_warning_msg, MissingValueWarning)
-
-
 
 
 def param_table(results, title, pad_bottom=False):

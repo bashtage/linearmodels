@@ -127,7 +127,6 @@ def test_linear_constraint_errors():
     r[0, 0] = r[1, 1] = 1
     r_df = pd.DataFrame(r)
     q = np.zeros(2)
-    q_s = pd.Series(q)
     with pytest.raises(TypeError):
         LinearConstraint(r)
     with pytest.raises(TypeError):
@@ -153,4 +152,4 @@ def test_linear_constraint_repr():
     assert isinstance(lc.r, pd.DataFrame)
     assert np.all(lc.r == np.eye(10))
 
-#TODO: One complex constrain test of equivalence
+# TODO: One complex constrain test of equivalence

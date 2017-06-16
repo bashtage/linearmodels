@@ -50,7 +50,9 @@ def check_results(res1, res2):
         assert_allclose(res1.rsquared_adj, res2.rsquared_adj)
     if hasattr(res1, 'f_statistic'):
         assert_allclose(res1.f_statistic.stat, res2.f_statistic.stat)
-        assert_allclose(res1.f_statistic.pval, res2.f_statistic.pval)
+        if res2.f_statistic.df_denom is None:
+            # Do not test case of F dist due to DOF differences
+            assert_allclose(res1.f_statistic.pval, res2.f_statistic.pval)
 
 
 def get_res(res):
@@ -345,12 +347,6 @@ def test_ols_against_gls(data):
 
     ols_res = OLS(wy, wx).fit(debiased=False)
     assert_allclose(res.params, ols_res.params)
-    if not any(mod.has_constant) and res.method == 'GLS':
-        # R2 only same w/o constant
-        # Only GLS is implemented when common regressor used!
-        assert_allclose(res.total_ss, ols_res.total_ss)
-        assert_allclose(res.resid_ss, ols_res.resid_ss)
-        assert_allclose(res.rsquared, ols_res.rsquared)
 
 
 def test_constraint_setting(data):
@@ -448,7 +444,7 @@ def test_formula_errors():
     data = DataFrame(np.random.standard_normal((500, 4)),
                      columns=['y1', 'y2', 'x1', 'x2'])
     with pytest.raises(TypeError):
-        mod = SUR.from_formula(np.ones(10), data)
+        SUR.from_formula(np.ones(10), data)
 
 
 def test_formula_repeated_key():
