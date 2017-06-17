@@ -5,7 +5,6 @@ try:
                                   is_string_dtype, is_categorical_dtype,
                                   is_datetime64_any_dtype)
 
-
     # From pandas 0.20.1
     def is_string_like(obj):
         """

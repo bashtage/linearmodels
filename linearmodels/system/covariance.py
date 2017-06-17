@@ -1,8 +1,7 @@
-from numpy import eye, hstack, ones, sqrt, vstack, zeros, zeros_like
+from numpy import eye, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
-from linearmodels.system._utility import blocked_diag_product, blocked_full_inner_product, \
-    blocked_inner_prod, inv_matrix_sqrt
+from linearmodels.system._utility import blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
 
 
 class HomoskedasticCovariance(object):
@@ -59,23 +58,13 @@ class HomoskedasticCovariance(object):
         return self._sigma
 
     def _adjustment(self):
-        if not self._debiased:
-            return 1.0
-        k = list(map(lambda s: s.shape[1], self._x))
-        nobs = self._x[0].shape[0]
-        adj = []
-        for i in range(len(k)):
-            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
-        adj = vstack(adj)
-        adj = sqrt(adj)
-        return adj @ adj.T
+        # Sigma is pre-debiased
+        return 1.0
 
     def _mvreg_cov(self):
         x = self._x
-        nobs = self._eps.shape[0]
-        epe = self._eps.T @ self._eps / nobs
 
-        xeex = blocked_inner_prod(x, epe)
+        xeex = blocked_inner_prod(x, self._sigma)
         xpx = blocked_inner_prod(self._x, eye(len(x)))
 
         if self._constraints is None:
@@ -94,7 +83,6 @@ class HomoskedasticCovariance(object):
     def _gls_cov(self):
         x = self._x
         sigma = self._sigma
-        sigma_m12 = inv_matrix_sqrt(sigma)
         sigma_inv = inv(sigma)
 
         xpx = blocked_inner_prod(x, sigma_inv)
@@ -206,3 +194,15 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def _gls_cov(self):
         return self._cov(True)
+
+    def _adjustment(self):
+        if not self._debiased:
+            return 1.0
+        k = list(map(lambda s: s.shape[1], self._x))
+        nobs = self._x[0].shape[0]
+        adj = []
+        for i in range(len(k)):
+            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        adj = vstack(adj)
+        adj = sqrt(adj)
+        return adj @ adj.T
