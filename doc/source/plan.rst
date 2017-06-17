@@ -34,6 +34,7 @@ Asset Pricing
 * GMM Linear Asset Pricing Model Estimation - :class:`linearmodels.asset_pricing.model.LinearFactorModelGMM`
 * Linear Asset Pricing Model Estimation for Traded Factors - :class:`linearmodels.asset_pricing.model.TradedFactorModel`
 
+
 Instrumental Variable Estimators
 ********************************
 
@@ -41,3 +42,16 @@ Not Implemented
 ~~~~~~~~~~~~~~~
 * 2SLS
 * GMM
+* 3SLS
+
+
+System Estimation
+=================
+* Seemingly Unrelated Regression (SUR) Estimator - :class:`linearmodels.system.SUR`
+
+Instrumental Variable Estimators
+********************************
+
+Not Implemented
+~~~~~~~~~~~~~~~
+* 3SLS

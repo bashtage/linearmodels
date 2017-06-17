@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+
+Since Version 3.0
+=================
+* Added Seemingly Unrelated Regression (SUR) Estimator
+
 Version 3.0
 ===========
 * Added Fama-MacBeth estimator for panels
