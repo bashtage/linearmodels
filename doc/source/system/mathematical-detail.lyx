@@ -253,7 +253,7 @@ When residuals are assumed to be homoskedastic, the covariance can be consistent
 ly estimated by 
 \begin_inset Formula 
 \[
-\left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-\frac{1}{2}}\hat{\Omega}\Delta^{-\frac{1}{2}}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+\left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-1}\hat{\Omega}\Delta^{-1}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
 \]
 
 \end_inset
@@ -273,7 +273,7 @@ where
 \end_inset
 
  while in FGLS
-\begin_inset Formula $\Delta=I_{N}\otimes\hat{\Sigma}$
+\begin_inset Formula $\Delta=\hat{\Omega}$
 \end_inset
 
 .
@@ -407,6 +407,101 @@ is the sum of the scores across models
  
 \end_layout
 
+\begin_layout Standard
+\noindent
+
+\series bold
+Debiased Estimators
+\end_layout
+
+\begin_layout Standard
+\noindent
+When the debiased flag is set, a small sample adjustment if applied so that
+ element 
+\begin_inset Formula $ij$
+\end_inset
+
+ of 
+\begin_inset Formula $\hat{\Sigma}$
+\end_inset
+
+ is scaled by 
+\begin_inset Formula 
+\[
+\frac{T}{\sqrt{\left(T-P_{i}\right)\left(T-P_{j}\right)}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Other Statistics
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+Goodness of fit
+\end_layout
+
+\begin_layout Standard
+\noindent
+The reported 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is always for the data, or weighted data is weights are used, for either
+ OLS or GLS.
+ The means that the reported 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ for the GLS estimator may be negative
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series bold
+F statistics
+\end_layout
+
+\begin_layout Standard
+\noindent
+When the debiased covariance estimator is used (small sample adjustment)
+ the reported 
+\begin_inset Formula $F$
+\end_inset
+
+ statistics use 
+\begin_inset Formula $K\left(T-\bar{P}\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $\bar{P}=K^{-1}\sum_{i=1}^{K}P_{i}$
+\end_inset
+
+ where 
+\begin_inset Formula $P_{i}$
+\end_inset
+
+ is the number of variables including the constant in model 
+\begin_inset Formula $i$
+\end_inset
+
+.
+ When models include restrictions it may be the case that the covariance
+ is singular.
+ When this occurs, the 
+\begin_inset Formula $F$
+\end_inset
+
+ statistic cannot be calculated.
+\end_layout
+
 \begin_layout Subsection*
 Memory efficient calculations
 \end_layout
@@ -519,6 +614,19 @@ solve
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+TODO: Explain restrictions
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body

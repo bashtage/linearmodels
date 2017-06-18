@@ -230,7 +230,6 @@ class LinearConstraint(object):
         vals = np.real(vals)
         vecs = np.real(vecs)
         idx = np.argsort(vals)[::-1]
-        vals = vals[idx]
         vecs = vecs[:, idx]
         t, l = vecs[:, :k - c], vecs[:, k - c:]
         q = self._qa[:, None]

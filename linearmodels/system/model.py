@@ -17,7 +17,7 @@ import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
                    ones_like, reshape, sqrt, zeros)
 from numpy.linalg import inv, solve
-from pandas import DataFrame, Series
+from pandas import Series
 from patsy.highlevel import dmatrices
 from patsy.missing import NAAction
 
@@ -569,7 +569,7 @@ class SUR(object):
 
         return results
 
-    def _gls_finalize(self, beta, sigma, full_sigma, sigma_m12, gls_eps, eps,
+    def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps,
                       cov_type, iter_count, **cov_config):
         """Collect results to return after GLS estimation"""
         wx = self._wx
@@ -746,7 +746,7 @@ class SUR(object):
         x = blocked_diag_product(self._x, eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, full_sigma, sigma_m12, gls_eps,
+        return self._gls_finalize(beta, sigma, full_sigma, gls_eps,
                                   eps, cov_type, iter_count, **cov_config)
 
     @property

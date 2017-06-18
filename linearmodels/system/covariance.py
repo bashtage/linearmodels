@@ -1,7 +1,8 @@
 from numpy import eye, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
-from linearmodels.system._utility import blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
+from linearmodels.system._utility import (blocked_diag_product, blocked_inner_prod,
+                                          inv_matrix_sqrt)
 
 
 class HomoskedasticCovariance(object):

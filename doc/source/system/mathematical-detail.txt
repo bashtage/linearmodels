@@ -79,14 +79,14 @@ Covariance Estimation
 When residuals are assumed to be homoskedastic, the covariance can be
 consistently estimated by
 
-.. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-\frac{1}{2}}\hat{\Omega}\Delta^{-\frac{1}{2}}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
+.. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-1}\hat{\Omega}\Delta^{-1}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}
 
 where :math:`\Delta` is the weighting matrix used in the parameter
 estimator. For example, in OLS :math:`\Delta=I_{NK}` while in
-FGLS\ :math:`\Delta=I_{N}\otimes\hat{\Sigma}`. The estimator supports
-using FGLS with an assumption that :math:`\hat{\Sigma}` is diagonal or
-using a user-specified value of :math:`\Sigma`. When the FGLS estimator
-is used, this simplifies to
+FGLS\ :math:`\Delta=\hat{\Omega}`. The estimator supports using FGLS
+with an assumption that :math:`\hat{\Sigma}` is diagonal or using a
+user-specified value of :math:`\Sigma`. When the FGLS estimator is used,
+this simplifies to
 
 .. math:: \left(X^{\prime}\Delta^{-1}X\right)^{-1}
 
@@ -123,6 +123,32 @@ where
 is the sum of the scores across models :math:`\left(j\right)` that have
 the same observation index :math:`i`. This estimator allows arbitrary
 correlation of residuals with the same observation index.
+
+**Debiased Estimators**
+
+When the debiased flag is set, a small sample adjustment if applied so
+that element :math:`ij` of :math:`\hat{\Sigma}` is scaled by
+
+.. math:: \frac{T}{\sqrt{\left(T-P_{i}\right)\left(T-P_{j}\right)}}.
+
+Other Statistics
+~~~~~~~~~~~~~~~~
+
+**Goodness of fit**
+
+The reported :math:`R^{2}` is always for the data, or weighted data is
+weights are used, for either OLS or GLS. The means that the reported
+:math:`R^{2}` for the GLS estimator may be negative
+
+**F statistics**
+
+When the debiased covariance estimator is used (small sample adjustment)
+the reported :math:`F` statistics use :math:`K\left(T-\bar{P}\right)`
+where :math:`\bar{P}=K^{-1}\sum_{i=1}^{K}P_{i}` where :math:`P_{i}` is
+the number of variables including the constant in model :math:`i`. When
+models include restrictions it may be the case that the covariance is
+singular. When this occurs, the :math:`F` statistic cannot be
+calculated.
 
 Memory efficient calculations
 -----------------------------
