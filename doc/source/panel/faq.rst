@@ -3,7 +3,7 @@
 Implementation Choices
 ----------------------
 
-While the implmentation of the panel estimators is similar to Stata, there
+While the implementation of the panel estimators is similar to Stata, there
 are some differenced worth noting.
 
 Clustered Covariance with Fixed Effects
@@ -26,6 +26,6 @@ the actual model fit, after adjusting the data for:
 
 * weights (all estimators)
 * effects (:class:`~linearmodels.panel.model.PanelOLS`)
-* recentering (:class:`~linearmodels.panel.model.RandomEffects`)
+* re-centering (:class:`~linearmodels.panel.model.RandomEffects`)
 * within entity aggregation (:class:`~linearmodels.panel.model.BetweenOLS`)
 * differencing (:class:`~linearmodels.panel.model.FirstDifferenceOLS`)

@@ -6,7 +6,7 @@ Introduction
 Panel data includes observations on multiple entities -- individuals, firms,
 countries -- over multiple time periods.  In most classical applications of
 panel data the number of entities, N, is large and the number of time periods,
-T, is small (often between 2 and 5).  Most asymptoic theory for these
+T, is small (often between 2 and 5).  Most asymptotic theory for these
 estimators has been developed under an assumption that N will diverge while
 T is fixed.
 
@@ -54,7 +54,7 @@ other estimators and can be used to model 2 effects (e.g., entity and time
 effects).
 
 Model specification is similar to `statsmodels <http://www.statsmodels.org/>`_.
-This example rrun sa fixed effect regression on a panel of the wages of working
+This example estimates a fixed effect regression on a panel of the wages of working
 men modeling teh log wage as a function of squared experience, a dummy if the
 man is married and a dummy indicating if the man is a union member.
 

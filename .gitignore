@@ -68,6 +68,7 @@ instance/
 # Sphinx documentation
 doc/_build/
 doc/**/*.ipynb
+doc/source/system/**/*.png
 
 # PyBuilder
 target/

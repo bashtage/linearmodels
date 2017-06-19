@@ -31,6 +31,19 @@ for nb in notebooks:
         with open(nb, 'r') as nbin:
             nbout.write(nbin.read())
 
+images = glob.glob('examples/*.png')
+for image in images:
+    fname = os.path.split(image)[-1]
+    folder, _ = fname.split('_')
+    outdir = outfile = os.path.join('doc', 'source', folder, 'examples')
+    if not os.path.exists(outdir):
+        os.makedirs(outdir, exist_ok=True)
+    outfile = os.path.join(outdir, fname)
+    with open(outfile, 'wb') as imageout:
+        with open(image, 'rb') as imagein:
+            imageout.write(imagein.read())
+
+
 bzip_csv_files = []
 for filename in glob.iglob('./linearmodels/datasets/**',recursive=True):
     if '.csv.bz' in filename:

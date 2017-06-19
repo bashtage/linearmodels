@@ -14,8 +14,8 @@ References
 .. [CamEtAl] Cameron, A. Colin, Jonah B. Gelbach, and Douglas L. Miller. "Robust inference with
     multiway clustering." *Journal of Business & Economic Statistics* 29, no. 2 (2011): 238-249.
 
-.. [CamTri05] Cameron, A. Colin, and Pravin K. Trivedi. *Microeconometrics: methods and
-    applications*. Cambridge university press, 2005.
+.. [CamTri05] Cameron, A. Colin, and Pravin K. Trivedi. *Microeconometrics: methods and applications*.
+    Cambridge university press, 2005.
 
 .. [CamTri09] Cameron, Adrian Colin, and Pravin K. Trivedi. *Microeconometrics using stata*.
     Vol. 5. College Station, TX: Stata press, 2009.
