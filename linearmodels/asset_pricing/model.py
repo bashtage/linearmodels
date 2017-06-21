@@ -314,6 +314,7 @@ class LinearFactorModel(TradedFactorModel):
     def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
         self._risk_free = bool(risk_free)
         super(LinearFactorModel, self).__init__(portfolios, factors)
+        self._validate_additional_data()
         if sigma is None:
             self._sigma_m12 = self._sigma_inv = self._sigma = np.eye(self.portfolios.shape[1])
         else:
@@ -322,8 +323,7 @@ class LinearFactorModel(TradedFactorModel):
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma)
 
-    def _validate_data(self):
-        super(LinearFactorModel, self)._validate_data()
+    def _validate_additional_data(self):
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nrp = (f.shape[1] + int(self._risk_free))

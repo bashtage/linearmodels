@@ -23,7 +23,7 @@ notebooks = glob.glob('examples/*.ipynb')
 for nb in notebooks:
     fname = os.path.split(nb)[-1]
     folder, nbname = fname.split('_')
-    outdir = outfile = os.path.join('doc', 'source', folder, 'examples')
+    outdir = os.path.join('doc', 'source', folder, 'examples')
     if not os.path.exists(outdir):
         os.makedirs(outdir, exist_ok=True)
     outfile = os.path.join(outdir, nbname)
@@ -35,7 +35,7 @@ images = glob.glob('examples/*.png')
 for image in images:
     fname = os.path.split(image)[-1]
     folder, _ = fname.split('_')
-    outdir = outfile = os.path.join('doc', 'source', folder, 'examples')
+    outdir = os.path.join('doc', 'source', folder, 'examples')
     if not os.path.exists(outdir):
         os.makedirs(outdir, exist_ok=True)
     outfile = os.path.join(outdir, fname)
