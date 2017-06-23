@@ -408,16 +408,15 @@ class SUR(object):
         k = len(wx)
         if self.constraints is not None:
             cons = self.constraints
-            x = blocked_diag_product(wx, eye(len(wx)))
-            y = np.vstack(wy)
-            xt = x @ cons.t
-            # TODO: Make more memory efficient
-            # Replace with t.T @ xpx @ t
-            xpx = xt.T @ xt
-            # Replace with t.T @ xpy - t.T @ xpx @ a.T
-            xpy = xt.T @ (y - x @ cons.a.T)
-            paramsc = np.linalg.solve(xpx, xpy)
-            params = cons.t @ paramsc + cons.a.T
+            xpx_full = blocked_inner_prod(wx, eye(len(wx)))
+            xpy = []
+            for i in range(k):
+                xpy.append(wx[i].T @ wy[i])
+            xpy = np.vstack(xpy)
+            xpy = cons.t.T @ xpy - cons.t.T @ xpx_full @ cons.a.T
+            xpx = cons.t.T @ xpx_full @ cons.t
+            params_c = np.linalg.solve(xpx, xpy)
+            params = cons.t @ params_c + cons.a.T
         else:
             xpx = blocked_inner_prod(wx, eye(len(wx)))
             xpy = []

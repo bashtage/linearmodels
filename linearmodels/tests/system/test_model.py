@@ -13,7 +13,7 @@ from linearmodels.system._utility import blocked_column_product, blocked_diag_pr
     inv_matrix_sqrt
 from linearmodels.system.model import SUR
 from linearmodels.tests.system._utility import generate_data, simple_sur
-from linearmodels.utility import AttrDict
+from linearmodels.utility import AttrDict, InvalidTestStatistic
 
 p = [3, [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]]
 const = [True, False]
@@ -545,3 +545,22 @@ def test_against_direct_model(data):
 
     res = mod.fit(method='gls')
     assert_allclose(res.params.values[:, None], direct.beta1)
+
+
+def test_restricted_f_statistic():
+    data = generate_data(k=2, p=2)
+    mod = SUR(data)
+    r = DataFrame(np.zeros((1, 6)), columns=mod.param_names)
+    r.iloc[0, 1] = 1.0
+    mod.add_constraints(r)
+    res = mod.fit()
+    eqn = res.equations[res.equation_labels[0]]
+    assert isinstance(eqn.f_statistic, InvalidTestStatistic)
+
+
+def test_model_repr(data):
+    mod = SUR(data)
+    repr = mod.__repr__()
+    assert str(len(data)) in repr
+    assert str(hex(id(mod))) in repr
+    assert 'Seemingly Unrelated Regression (SUR)' in repr
