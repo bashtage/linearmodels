@@ -196,3 +196,17 @@ def test_all_missing():
     f = np.nan * np.ones((1000, 3))
     with pytest.raises(ValueError):
         TradedFactorModel(p, f)
+
+
+def test_repr(data):
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    assert 'LinearFactorModelGMM' in mod.__repr__()
+    assert str(data.portfolios.shape[1]) + ' test portfolios' in mod.__repr__()
+    assert str(data.factors.shape[1]) + ' factors' in mod.__repr__()
+    mod = LinearFactorModel(data.portfolios, data.factors, risk_free=True)
+    assert 'LinearFactorModel' in mod.__repr__()
+    assert 'Estimated risk-free' in mod.__repr__()
+    assert 'True' in mod.__repr__()
+    mod = TradedFactorModel(data.portfolios, data.factors)
+    assert 'TradedFactorModel' in mod.__repr__()
+    assert str(hex(id(mod))) in mod.__repr__()

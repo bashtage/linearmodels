@@ -12,6 +12,7 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
 from collections import Mapping, OrderedDict
+import textwrap
 
 import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
@@ -154,6 +155,18 @@ class SUR(object):
         self._has_constant = None
         self._common_exog = False
         self._validate_data()
+
+    def __repr__(self):
+        return self.__str__() + '\nid: {0}'.format(hex(id(self)))
+
+    def __str__(self):
+        out = 'Seemingly Unrelated Regression (SUR), '
+        out += '{0} Equations:\n'.format(len(self._y))
+        eqns = ', '.join(self._equations.keys())
+        out += '\n'.join(textwrap.wrap(eqns, 70))
+        if self._common_exog:
+            out += '\nCommon Exogenous Variables'
+        return out
 
     def _validate_data(self):
         ids = []
