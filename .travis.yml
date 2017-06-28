@@ -1,13 +1,10 @@
 language: python
 
-sudo: false
+dist: trusty
+sudo: required
 
 git:
   depth: 1000
-
-addons:
-  apt_packages:
-    - pandoc
 
 env:
   global:
@@ -40,6 +37,7 @@ matrix:
     - SCIPY=0.19
 
 before_install:
+  - sudo apt-get install -y pandoc
   - git fetch --tags
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
   - chmod +x miniconda3.sh
