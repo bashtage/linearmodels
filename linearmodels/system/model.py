@@ -11,8 +11,8 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
-from collections import Mapping, OrderedDict
 import textwrap
+from collections import Mapping, OrderedDict
 
 import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
@@ -288,9 +288,10 @@ class SUR(object):
         A simple CAP-M can be estimated as a multivariate regression
 
         >>> from linearmodels.datasets import french
+        >>> from linearmodels.system import SUR
         >>> data = french.load()
         >>> portfolios = data[['S1V1','S1V5','S5V1','S5V5']]
-        >>> factors = data['MktRf'].copy()
+        >>> factors = data[['MktRF']].copy()
         >>> factors['alpha'] = 1
         >>> mod = SUR.multivariate_ls(portfolios, factors)
         """
@@ -337,6 +338,10 @@ class SUR(object):
         The simplest format uses standard Patsy formulas for each equation
         in a dictionary.  Best practice is to use an Ordered Dictionary
 
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=['y1', 'x1_1', 'y2', 'x2_1'])
+        >>> from linearmodels.system import SUR
         >>> formula = {'eq1': 'y1 ~ 1 + x1_1', 'eq2': 'y2 ~ 1 + x2_1'}
         >>> mod = SUR.from_formula(formula, data)
 

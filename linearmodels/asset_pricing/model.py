@@ -144,7 +144,7 @@ class TradedFactorModel(object):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import TradedFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
         >>> mod = TradedFactorModel.from_formula(formula, data)
 
         Using only factors
@@ -386,7 +386,7 @@ class LinearFactorModel(TradedFactorModel):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import LinearFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data)
 
         Using only factors
@@ -652,7 +652,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import LinearFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 S5M5 ~ MktRF + SMB + HML'
+        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data)
 
         Using only factors

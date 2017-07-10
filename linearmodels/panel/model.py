@@ -399,7 +399,7 @@ class PooledOLS(object):
         Examples
         --------
         >>> from linearmodels import PooledOLS
-        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', data)
+        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
@@ -706,7 +706,7 @@ class PanelOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', data)
+        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', panel_data)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
         """
         na_action = NAAction(on_NA='raise', NA_types=[])
@@ -1284,7 +1284,7 @@ class BetweenOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import BetweenOLS
-        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', data)
+        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
         return super(BetweenOLS, cls).from_formula(formula, data, weights=weights)
@@ -1386,7 +1386,7 @@ class FirstDifferenceOLS(PooledOLS):
         >>> from linearmodels import FirstDifferenceOLS
         >>> mod = FirstDifferenceOLS(y, x)
         >>> res = mod.fit(cov_type='robust')
-        >>> res = mod.fit(cov_type='cluster', cluster_entity=True)
+        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
 
         Notes
         -----
@@ -1490,7 +1490,7 @@ class FirstDifferenceOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
-        >>> mod = FirstDifferenceOLS.from_formula('y ~ 1 + x1', data)
+        >>> mod = FirstDifferenceOLS.from_formula('y ~ x1', panel_data)
         >>> res = mod.fit()
         """
         return super(FirstDifferenceOLS, cls).from_formula(formula, data, weights=weights)
@@ -1554,7 +1554,7 @@ class RandomEffects(PooledOLS):
         Examples
         --------
         >>> from linearmodels import RandomEffects
-        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', data)
+        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
         return super(RandomEffects, cls).from_formula(formula, data, weights=weights)
