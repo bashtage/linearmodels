@@ -205,7 +205,7 @@ If the heteroskedasticity robust estimator is used,
 
 \begin_layout Standard
 \noindent
-If the HAC estiamtor is used, 
+If the HAC estimator is used, 
 \begin_inset Formula 
 \begin{align*}
 \hat{S} & =T^{-1}\left\{ \hat{\Gamma}_{0}+\sum_{i=1}^{bw}K\left(\frac{i}{bw}\right)\left(\hat{\Gamma}_{i}+\hat{\Gamma}_{i}^{\prime}\right)\right\} \\

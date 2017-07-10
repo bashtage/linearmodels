@@ -35,7 +35,7 @@ If the heteroskedasticity robust estimator is used,
 
 .. math:: \hat{S}=T^{-1}\sum_{t=1}^{T}g_{t}g_{t}^{\prime}.
 
-If the HAC estiamtor is used,
+If the HAC estimator is used,
 
 .. math::
 
