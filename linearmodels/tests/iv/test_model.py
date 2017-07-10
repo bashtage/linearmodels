@@ -270,8 +270,8 @@ def test_model_missing(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
 
-    vars = [data.dep, data.exog, data.endog, data.instr]
-    missing = list(map(lambda x: np.any(np.isnan(x), 1), vars))
+    var_names = [data.dep, data.exog, data.endog, data.instr]
+    missing = list(map(lambda x: np.any(np.isnan(x), 1), var_names))
     missing = np.any(np.c_[missing], 0)
     not_missing = missing.shape[0] - missing.sum()
     assert res.nobs == not_missing

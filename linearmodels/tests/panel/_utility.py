@@ -80,10 +80,10 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     if datatype in ('pandas', 'xarray'):
         entities = ['firm' + str(i) for i in range(n)]
         time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
-        vars = ['x' + str(i) for i in range(k)]
+        var_names = ['x' + str(i) for i in range(k)]
         y = pd.DataFrame(y, index=time, columns=entities)
         w = pd.DataFrame(w, index=time, columns=entities)
-        x = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+        x = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
         c = pd.Panel(c, items=cats, major_axis=time, minor_axis=entities)
         vc1 = pd.Panel(vc1, items=vcats[:1], major_axis=time, minor_axis=entities)
         vc2 = pd.Panel(vc2, items=vcats, major_axis=time, minor_axis=entities)
@@ -102,7 +102,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 
 
-def assert_results_equal(res1, res2, n=None, test_fit=True, test_df=True, test_resids=True):
+def assert_results_equal(res1, res2, test_fit=True, test_df=True):
     n = min(res1.params.shape[0], res2.params.shape[0])
 
     assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])

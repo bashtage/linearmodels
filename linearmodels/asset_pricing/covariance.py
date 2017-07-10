@@ -123,7 +123,7 @@ class KernelCovariance(HeteroskedasticCovariance):
     Parameters
     ----------
     xe : ndarray
-        Scores/moment conditionas
+        Scores/moment conditions
     jacobian : ndarray, optional
         Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided

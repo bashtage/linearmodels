@@ -126,7 +126,7 @@ class SUR(object):
             raise TypeError('dependent must be a dictionary-like')
         for key in equations:
             if not isinstance(key, str):
-                raise ValueError('Equation lebels (keys) must be strings')
+                raise ValueError('Equation labels (keys) must be strings')
 
         # Ensure nearly deterministic equation ordering
         if not isinstance(equations, OrderedDict):

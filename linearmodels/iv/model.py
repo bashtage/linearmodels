@@ -963,6 +963,8 @@ class IVGMMCUE(IVGMM):
             Regressand matrix (nobs by 1)
         z : ndarray
             Instrument matrix (nobs by ninstr)
+        display : bool
+            Flag indicating whether to display iterative optimizer output
 
         Returns
         -------

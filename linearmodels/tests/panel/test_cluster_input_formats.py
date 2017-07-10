@@ -49,7 +49,7 @@ def test_string_input(data):
     prim = ['a', 'b', 'c', 'd', 'e']
     for i in range(2):
         name = 'effect.' + str(i)
-        temp[name] = pd.Series(np.random.choice(prim, size=(nt)), index=y.index, name=name)
+        temp[name] = pd.Series(np.random.choice(prim, size=nt), index=y.index, name=name)
     effects = pd.DataFrame(temp, index=y.index)
     mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
@@ -60,7 +60,7 @@ def test_string_input(data):
 
     for i, c in enumerate(clusters.T):
         name = 'effect.' + str(i)
-        temp[name] = pd.Series(np.random.choice(prim, size=(nt)), index=y.index, name=name)
+        temp[name] = pd.Series(np.random.choice(prim, size=nt), index=y.index, name=name)
     clusters = pd.DataFrame(temp, index=y.index)
     mod.fit(cov_type='clustered', clusters=clusters)
 
@@ -89,11 +89,10 @@ def test_integer_input(data):
 def test_mixed_input(data):
     y = PanelData(data.y)
     nt = y.values2d.shape[0]
-    effects = np.random.randint(0, 5, size=(nt))
+    effects = np.random.randint(0, 5, size=nt)
     prim = ['a', 'b', 'c', 'd', 'e']
-    temp = {}
-    temp['effect.0'] = pd.Categorical(pd.Series(effects, index=y.index))
-    temp['effect.1'] = pd.Series(np.random.choice(prim, size=(nt)), index=y.index)
+    temp = {'effect.0': pd.Categorical(pd.Series(effects, index=y.index)),
+            'effect.1': pd.Series(np.random.choice(prim, size=nt), index=y.index)}
     effects = pd.DataFrame(temp, index=y.index)
     mod = PanelOLS(data.y, data.x, other_effects=effects)
     mod.fit()
@@ -101,7 +100,7 @@ def test_mixed_input(data):
     clusters = np.random.randint(0, y.shape[2] // 2, size=(nt, 2))
     temp = {}
     prim = list(map(lambda s: ''.join(s), list(product(ascii_lowercase, ascii_lowercase))))
-    temp['var.cluster.0'] = pd.Series(np.random.choice(prim, size=(nt)), index=y.index)
+    temp['var.cluster.0'] = pd.Series(np.random.choice(prim, size=nt), index=y.index)
     temp['var.cluster.1'] = pd.Series(clusters[:, 1], index=y.index)
     clusters = pd.DataFrame(temp, index=y.index)
     mod.fit(cov_type='clustered', clusters=clusters)

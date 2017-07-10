@@ -60,7 +60,7 @@ class IVData(object):
             raise ValueError(dim_err.format(var_name, xndim))
 
         if isinstance(x, np.ndarray):
-            x = x.astype(np.float64)
+            x = x.astype(dtype=np.float64)
             if xndim == 1:
                 x.shape = (x.shape[0], -1)
 

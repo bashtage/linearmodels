@@ -109,7 +109,7 @@ def test_c_stat_smoke(data):
 
 def test_linear_restriction(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
-    nvar = len((res.params))
+    nvar = len(res.params)
     q = np.eye(nvar)
     ts = res.test_linear_constraint(q, np.zeros(nvar))
     p = res.params.values[:, None]

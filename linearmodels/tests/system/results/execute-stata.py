@@ -16,7 +16,6 @@ STATA_PATH = os.path.join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.
 OUTFILE = os.path.join(os.getcwd(), 'stata-sur-results.txt')
 
 header = [r'use "C:\git\linearmodels\linearmodels\tests\system\results\simulated-sur.dta", clear']
-outcmds = []
 
 all_stats = 'estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) stats('
 stats = ['chi2_{0}', 'F_{0}', 'p_{0}', 'df_m{0}', 'mss_{0}', 'r2_{0}', 'rss_{0}']
@@ -67,7 +66,7 @@ for i, dataset in enumerate((data, common_data, missing_data)):
 
 outcmds = {}
 key_bases = ['basic', 'common', 'missing']
-for key_base, cmd in zip(key_bases,cmds):
+for key_base, cmd in zip(key_bases, cmds):
     base = 'sureg ' + cmd
     ss = base + ', small dfk'
     comp = cmd.replace('(', '').strip().split(')')[:-1]

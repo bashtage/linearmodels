@@ -71,10 +71,10 @@ def test_missing(data, model):
     get_all(res)
 
 
-def test_missing_clustered(data, model):
+def test_missing_clustered(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     with pytest.raises(ValueError):
-        res = mod.fit(cov_type='clustered', clusters=data.clusters)
+        mod.fit(cov_type='clustered', clusters=data.clusters)
     res = mod.fit(cov_type='clustered', clusters=data.clusters_clean)
     mod = IV2SLS(data.dep_clean, data.exog_clean,
                  data.endog_clean, data.instr_clean)

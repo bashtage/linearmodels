@@ -101,9 +101,9 @@ def mvreg_data(request):
 
 def test_smoke(data):
     mod = SUR(data)
-    res = mod.fit()
-    res = mod.fit(cov_type='unadjusted')
-    res = mod.fit(cov_type='unadjusted', method='ols')
+    mod.fit()
+    mod.fit(cov_type='unadjusted')
+    mod.fit(cov_type='unadjusted', method='ols')
     res = mod.fit(full_cov=False)
 
     get_res(res)
@@ -142,8 +142,8 @@ def test_errors():
 def test_mv_reg_smoke(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
-    res = mod.fit()
-    res = mod.fit(cov_type='unadjusted')
+    mod.fit()
+    mod.fit(cov_type='unadjusted')
     res = mod.fit(cov_type='unadjusted', method='ols')
     assert res.method == 'OLS'
     res = mod.fit(full_cov=False)

@@ -67,7 +67,7 @@ def data(request):
 
 def test_params(data):
     model_params = data.fit
-    stata_params = (data.stata.params.param)
+    stata_params = data.stata.params.param
     assert_allclose(stata_params.values, model_params.params.squeeze())
 
 

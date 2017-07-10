@@ -4,3 +4,12 @@ xarray
 scipy
 patsy
 statsmodels
+pytest>=3
+sphinx
+guzzle_sphinx_theme
+ipython
+nbsphinx
+nbconvert
+nbformat
+matplotlib
+seaborn

@@ -107,12 +107,12 @@ class TestDataHandler(object):
         with pytest.raises(ValueError):
             IVData(np.empty((10, 2, 2)))
         with pytest.raises(TypeError):
-            class a(object):
+            class AnotherClass(object):
                 @property
                 def ndim(self):
                     return 2
 
-            IVData(a())
+            IVData(AnotherClass())
 
     def test_string_cat_equiv(self):
         s1 = pd.Series(['a', 'b', 'a', 'b', 'c', 'd', 'a', 'b'])

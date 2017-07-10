@@ -8,7 +8,6 @@ from linearmodels.utility import AttrDict
 filename = 'stata-sur-results.txt'
 
 cwd = os.path.split(os.path.abspath(__file__))[0]
-results = open(os.path.join(cwd, filename))
 
 with open(os.path.join(cwd, filename), 'r') as results_file:
     results = results_file.readlines()
@@ -75,8 +74,8 @@ def process_variance(variance):
         new.append(key + '_' + line)
     sio = StringIO(''.join(new))
     values = pd.read_csv(sio, sep='\t', index_col=0)
-    values.index = [i.replace('__','_') for i in values.index]
-    values.columns = [c.replace(':','_').replace('__', '_') for c in values.columns]
+    values.index = [i.replace('__', '_') for i in values.index]
+    values.columns = [c.replace(':', '_').replace('__', '_') for c in values.columns]
     return values
 
 

@@ -249,7 +249,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._clusters = clusters
         self._name = 'Clustered'
 
-    def _calc_group_debias(self, clusters):
+    @staticmethod
+    def _calc_group_debias(clusters):
         n = clusters.shape[0]
         ngroups = np.unique(clusters).shape[0]
         return (ngroups / (ngroups - 1)) * ((n - 1) / n)

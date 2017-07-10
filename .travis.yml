@@ -52,7 +52,7 @@ before_install:
   - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} xarray statsmodels matplotlib seaborn
   - source activate linearmodels-test
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
-  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx sphinx_rtd_theme doctr nbsphinx guzzle_sphinx_theme -q
+  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx doctr nbsphinx guzzle_sphinx_theme -q
   - pip install --upgrade --no-deps sphinx
   - pip install sphinx
   - export PYTHONHASHSEED=0

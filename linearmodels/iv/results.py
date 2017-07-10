@@ -319,16 +319,16 @@ class OLSResults(_SummaryStr):
         return smry
 
     def test_linear_constraint(self, restriction, value):
-        """
+        r"""
         Test linear equality constraints using a Wald test
 
         Parameters
         ----------
         restriction : {ndarray, DataFrame}
             q by nvar array containing linear weights to apply to parameters
-            when formin the restrictions.
+            when forming the restrictions.
         value : {ndarray, Series}
-            q element array containing the restircted values
+            q element array containing the restricted values
 
         Returns
         -------
@@ -476,20 +476,20 @@ class IVResults(_CommonIVResults):
         stat = s * (nobs - nz) / (nobs - s)
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
-    def _endogeneity_setup(self, vars=None):
+    def _endogeneity_setup(self, var_names=None):
         """Setup function for some endogeneity iv"""
-        if vars is not None and not isinstance(vars, list):
-            vars = [vars]
+        if var_names is not None and not isinstance(var_names, list):
+            var_names = [var_names]
         nobs = self.model.dependent.shape[0]
         e2 = self.resids.values
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
-        if vars is None:
+        if var_names is None:
             assumed_exog = self.model.endog.ndarray
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
             still_endog = empty((nobs, 0))
         else:
-            assumed_exog = self.model.endog.pandas[vars].values
-            ex = [c for c in self.model.endog.cols if c not in vars]
+            assumed_exog = self.model.endog.pandas[var_names].values
+            ex = [c for c in self.model.endog.cols if c not in var_names]
             still_endog = self.model.endog.pandas[ex].values
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
         ntested = assumed_exog.shape[1]
@@ -506,13 +506,13 @@ class IVResults(_CommonIVResults):
         e2 = proj(e2, self.model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
-    def durbin(self, vars=None):
+    def durbin(self, variables=None):
         r"""
         Durbin's test of exogeneity
 
         Parameters
         ----------
-        vars : list(str), optional
+        variables : list(str), optional
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -550,10 +550,10 @@ class IVResults(_CommonIVResults):
         where :math:`q` is the number of variables tested.
         """
         null = 'All endogenous variables are exogenous'
-        if vars is not None:
-            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+        if variables is not None:
+            null = 'Variables {0} are exogenous'.format(', '.join(variables))
 
-        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(vars)
+        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(variables)
         stat = e1.T @ e1 - e2.T @ e2
         stat /= (e0.T @ e0) / nobs
 
@@ -561,13 +561,13 @@ class IVResults(_CommonIVResults):
         df = ntested
         return WaldTestStatistic(float(stat), null, df, name=name)
 
-    def wu_hausman(self, vars=None):
+    def wu_hausman(self, variables=None):
         r"""
         Wu-Hausman test of exogeneity
 
         Parameters
         ----------
-        vars : list(str), optional
+        variables : list(str), optional
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -607,10 +607,10 @@ class IVResults(_CommonIVResults):
         :math:`F_{q, v}` distribution.
         """
         null = 'All endogenous variables are exogenous'
-        if vars is not None:
-            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+        if variables is not None:
+            null = 'Variables {0} are exogenous'.format(', '.join(variables))
 
-        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(vars)
+        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(variables)
 
         df = ntested
         df_denom = nobs - nexog - nendog - ntested
@@ -891,13 +891,13 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._j_stat
 
-    def c_stat(self, vars=None):
+    def c_stat(self, variables=None):
         r"""
         C-test of endogeneity
 
         Parameters
         ----------
-        vars : list(str), optional
+        variables : list(str), optional
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -939,18 +939,18 @@ class IVGMMResults(_CommonIVResults):
         """
         dependent, instruments = self.model.dependent, self.model.instruments
         exog, endog = self.model.exog, self.model.endog
-        if vars is None:
+        if variables is None:
             exog_e = c_[exog.ndarray, endog.ndarray]
             nobs = exog_e.shape[0]
             endog_e = empty((nobs, 0))
             null = 'All endogenous variables are exogenous'
         else:
-            if not isinstance(vars, list):
-                vars = [vars]
-            exog_e = c_[exog.ndarray, endog.pandas[vars].values]
-            ex = [c for c in endog.pandas if c not in vars]
+            if not isinstance(variables, list):
+                variables = [variables]
+            exog_e = c_[exog.ndarray, endog.pandas[variables].values]
+            ex = [c for c in endog.pandas if c not in variables]
             endog_e = endog.pandas[ex].values
-            null = 'Variables {0} are exogenous'.format(', '.join(vars))
+            null = 'Variables {0} are exogenous'.format(', '.join(variables))
         from linearmodels.iv import IVGMM
         mod = IVGMM(dependent, exog_e, endog_e, instruments)
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
@@ -1030,21 +1030,20 @@ class FirstStageResults(_SummaryStr):
         out = OrderedDict()
         individual_results = self.individual
         for col in endog.pandas:
-            inner = {}
-            inner['rsquared'] = individual_results[col].rsquared
             y = w * endog.pandas[[col]].values
             ey = y - px @ y
             mod = _OLS(ey, ez)
             res = mod.fit(cov_type=self._cov_type, **self._cov_config)
-            inner['partial.rsquared'] = res.rsquared
             params = res.params.values
             params = params[:, None]
             stat = params.T @ inv(res.cov) @ params
             stat = float(stat.squeeze())
             w_test = WaldTestStatistic(stat, null='', df=params.shape[0])
-            inner['f.stat'] = w_test.stat
-            inner['f.pval'] = w_test.pval
-            inner['f.dist'] = w_test.dist_name
+            inner = {'rsquared': individual_results[col].rsquared,
+                     'partial.rsquared': res.rsquared,
+                     'f.stat': w_test.stat,
+                     'f.pval': w_test.pval,
+                     'f.dist': w_test.dist_name}
             out[col] = Series(inner)
         out = DataFrame(out).T
 

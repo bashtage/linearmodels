@@ -46,7 +46,7 @@ def test_linear_model_parameters(data):
     assert_allclose(moments, mod_moments)
 
     m = moments.shape[1]
-    jac = np.eye((m))
+    jac = np.eye(m)
     block1 = p.shape[1] * (f.shape[1] + 1)
     # 1,1
 
@@ -150,7 +150,7 @@ def test_linear_model_parameters_risk_free(data):
     assert_allclose(moments, mod_moments)
 
     m = moments.shape[1]
-    jac = np.eye((m))
+    jac = np.eye(m)
     block1 = p.shape[1] * (f.shape[1] + 1)
     # 1,1
 
@@ -251,7 +251,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(moments, mod_moments)
 
     m = moments.shape[1]
-    jac = np.eye((m))
+    jac = np.eye(m)
     block1 = p.shape[1] * (f.shape[1] + 1)
     # 1,1
 

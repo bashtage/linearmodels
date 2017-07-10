@@ -47,8 +47,8 @@ def test_numpy_3d():
     assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
     items = ['entity.{0}'.format(i) for i in range(n)]
     obs = [i for i in range(t)]
-    vars = ['x.{0}'.format(i) for i in range(k)]
-    expected = pd.Panel(np.reshape(x, (k, t, n)), items=vars,
+    var_names = ['x.{0}'.format(i) for i in range(k)]
+    expected = pd.Panel(np.reshape(x, (k, t, n)), items=var_names,
                         major_axis=obs, minor_axis=items)
     expected_frame = expected.swapaxes(1, 2).to_frame()
     expected_frame.index.levels[0].name = 'entity'
@@ -742,9 +742,9 @@ def test_original_unmodified(data):
 def test_incorrect_time_axis():
     x = np.random.randn(3, 3, 1000)
     entities = ['entity.{0}'.format(i) for i in range(1000)]
-    time = ['time.{0}' for i in range(3)]
-    vars = ['var.{0}' for i in range(3)]
-    p = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+    time = ['time.{0}'.format(i) for i in range(3)]
+    var_names = ['var.{0}'.format(i) for i in range(3)]
+    p = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
     with pytest.raises(ValueError):
         PanelData(p)
     df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
@@ -756,8 +756,8 @@ def test_incorrect_time_axis():
         PanelData(da)
 
     time = [1, pd.datetime(1960, 1, 1), 'a']
-    vars = ['var.{0}' for i in range(3)]
-    p = pd.Panel(x, items=vars, major_axis=time, minor_axis=entities)
+    var_names = ['var.{0}'.format(i) for i in range(3)]
+    p = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
     with pytest.raises(ValueError):
         PanelData(p)
     df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()

@@ -17,8 +17,6 @@ class MissingValueWarning(Warning):
 missing_value_warning_msg = """
 Inputs contain missing values. Dropping rows with missing observations."""
 
-OrderedDict
-
 
 class AttrDict(MutableMapping):
     """
@@ -165,7 +163,7 @@ class WaldTestStatistic(object):
     df : int
         Degree of freedom.
     df_denom : int, optional
-        Numerator degree of freedome.  If provided, uses an
+        Numerator degree of freedom.  If provided, uses an
         F(df, df_denom) distribution.
     name : str, optional
         Name of test
@@ -303,7 +301,7 @@ class InapplicableTestStatistic(WaldTestStatistic):
         return msg.format(name=name, reason=self._reason)
 
 
-# cahced_property taken from bottle.py
+# cached_property taken from bottle.py
 # Copyright (c) 2016, Marcel Hellkamp.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy

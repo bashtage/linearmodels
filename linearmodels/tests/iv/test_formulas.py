@@ -157,7 +157,7 @@ def test_categorical(model_and_func):
     formula = 'y ~ 1 + d + x1'
     y = np.random.randn(1000)
     x1 = np.random.randn(1000)
-    d = np.random.randint(0, 4, (1000))
+    d = np.random.randint(0, 4, 1000)
     d = pd.Categorical(d)
     data = pd.DataFrame({'y': y, 'x1': x1, 'd': d})
     data['Intercept'] = 1.0
