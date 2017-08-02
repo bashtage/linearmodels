@@ -33,7 +33,7 @@ matrix:
   - python: 3.5
     env:
     - PYTHON=3.6
-    - NUMPY=1.12
+    - NUMPY=1.13
     - SCIPY=0.19
 
 before_install:
@@ -50,7 +50,7 @@ before_install:
   - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} xarray statsmodels matplotlib seaborn
   - source activate linearmodels-test
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
-  - pip install pytest coverage pytest-cov codecov pytest-xdist sphinx doctr nbsphinx guzzle_sphinx_theme -q
+  - pip install pytest coverage pytest-cov codecov sphinx doctr nbsphinx guzzle_sphinx_theme -q
   - pip install --upgrade --no-deps sphinx
   - pip install sphinx
   - export PYTHONHASHSEED=0
@@ -60,7 +60,7 @@ install:
   - python setup.py develop
 
 script:
-  - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
+  - pytest --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - set -e
   - if [[ ${DOCBUILD} ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
   - if [[ ${TRAVIS_TAG}  && ${DOCBUILD} ]]; then doctr deploy doc --no-require-master; fi
