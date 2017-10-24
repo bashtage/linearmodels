@@ -29,12 +29,14 @@ matrix:
     - PYTHON=3.5
     - NUMPY=1.12
     - SCIPY=0.19
-    - DOCBUILD=true
+
   - python: 3.5
     env:
     - PYTHON=3.6
     - NUMPY=1.13
     - SCIPY=0.19
+    - XARRAY=true
+    - DOCBUILD=true
 
 before_install:
   - sudo apt-get install -y pandoc
@@ -46,9 +48,10 @@ before_install:
   - conda config --set always_yes true
   - conda update conda
   # Install packages
-  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} xarray statsmodels matplotlib seaborn
-  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} xarray statsmodels matplotlib seaborn
+  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} statsmodels matplotlib seaborn
+  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} statsmodels matplotlib seaborn
   - source activate linearmodels-test
+  - if [[ ${XARRAY} = true ]]; then conda install xarray; fi
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
   - pip install pytest coverage pytest-cov codecov sphinx doctr nbsphinx guzzle_sphinx_theme -q
   - pip install --upgrade --no-deps sphinx
@@ -62,7 +65,7 @@ install:
 script:
   - pytest --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - set -e
-  - if [[ ${DOCBUILD} ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
+  - if [[ ${DOCBUILD} = true  ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
   - if [[ ${TRAVIS_TAG}  && ${DOCBUILD} ]]; then doctr deploy doc --no-require-master; fi
 
 after_success:

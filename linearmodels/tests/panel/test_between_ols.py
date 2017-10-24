@@ -7,15 +7,15 @@ from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data)
+                                               generate_data, datatypes)
 
 
-@pytest.fixture(params=['numpy', 'pandas', 'xarray'])
+@pytest.fixture(params=datatypes)
 def data(request):
     return generate_data(0.0, request.param)
 
 
-@pytest.fixture(params=['numpy', 'pandas', 'xarray'])
+@pytest.fixture(params=datatypes)
 def missing_data(request):
     return generate_data(0.20, request.param)
 

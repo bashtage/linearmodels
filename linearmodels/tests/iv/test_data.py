@@ -3,8 +3,13 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from numpy.testing import assert_equal
+
+try:
+    import xarray as xr
+    MISSING_XARRAY = False
+except ImportError:
+    MISSING_XARRAY = True
 
 from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.iv.data import IVData
@@ -60,6 +65,7 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 1)
 
+    @pytest.mark.skipif(MISSING_XARRAY, reason='xarray not installed')
     def test_xarray_1d(self):
         x_np = np.random.randn(10)
         x = xr.DataArray(x_np)
@@ -80,6 +86,7 @@ class TestDataHandler(object):
         expected = pd.DataFrame(x_np[:, None], columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
+    @pytest.mark.skipif(MISSING_XARRAY, reason='xarray not installed')
     def test_xarray_2d(self):
         x_np = np.random.randn(10, 2)
         x = xr.DataArray(x_np)

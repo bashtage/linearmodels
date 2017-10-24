@@ -7,10 +7,9 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
-from linearmodels.tests.panel._utility import generate_data
+from linearmodels.tests.panel._utility import generate_data, datatypes
 
 missing = [0.0, 0.20]
-datatypes = ['numpy', 'pandas', 'xarray']
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 

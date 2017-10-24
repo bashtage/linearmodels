@@ -3,16 +3,16 @@ from itertools import product
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import (AbsorbingEffectError, AmbiguityError,
                                       PanelOLS)
-from linearmodels.tests.panel._utility import generate_data, lsdv
+from linearmodels.tests.panel._utility import generate_data, lsdv, datatypes
+
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
-TYPES = ['numpy', 'pandas', 'xarray']
+TYPES = datatypes
 
 
 @pytest.fixture(params=list(product(PERC_MISSING, TYPES)),
@@ -134,16 +134,15 @@ def test_panel_lsdv(data):
 
 
 def test_incorrect_weight_shape(data):
-    if isinstance(data.w, xr.DataArray):
-        return
-
     w = data.w
     if isinstance(w, pd.DataFrame):
         w = w.iloc[:3]
         w = pd.Panel({'weights': w})
-    else:
+    elif isinstance(w, np.ndarray):
         w = w[:3]
         w = w[None, :, :]
+    else:  # xarray
+        return
 
     with pytest.raises(ValueError):
         PanelOLS(data.y, data.x, weights=w)

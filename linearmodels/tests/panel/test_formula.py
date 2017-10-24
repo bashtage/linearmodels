@@ -8,10 +8,10 @@ from linearmodels.formula import (between_ols, first_difference_ols, panel_ols,
                                   pooled_ols, random_effects)
 from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
                                       PooledOLS, RandomEffects)
-from linearmodels.tests.panel._utility import generate_data
+from linearmodels.tests.panel._utility import generate_data, datatypes
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
-TYPES = ['numpy', 'pandas', 'xarray']
+TYPES = datatypes
 
 
 @pytest.fixture(params=list(product(PERC_MISSING, TYPES)),

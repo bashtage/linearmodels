@@ -11,7 +11,7 @@ from linearmodels.compat.pandas import (is_categorical, is_categorical_dtype,
                                         is_string_like)
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
-type_err = 'Only ndarrays, DataArrays and Series and DataFrames are permitted'
+type_err = 'Only ndarrays, DataArrays and Series and DataFrames are supported'
 
 
 def convert_columns(s, drop_first):
@@ -101,7 +101,10 @@ class IVData(object):
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
 
         else:
-            import xarray as xr
+            try:
+                import xarray as xr
+            except ImportError:
+                raise TypeError(type_err)
             if isinstance(x, xr.DataArray):
                 if x.ndim == 1:
                     x = xr.concat([x], dim=var_name).transpose()

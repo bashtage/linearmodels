@@ -3,17 +3,15 @@ from itertools import product
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from numpy.testing import assert_allclose
 
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data)
+                                               generate_data, datatypes)
 
 missing = [0.0, 0.20]
-datatypes = ['numpy', 'pandas', 'xarray']
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
@@ -59,12 +57,13 @@ def test_diff_data_size(data):
     if isinstance(data.x, pd.Panel):
         x = data.x.iloc[:, :, :-1]
         y = data.y
-    elif isinstance(data.x, xr.DataArray):
-        x = data.x[:, :-1]
-        y = data.y[:, :-1]
-    else:
+    elif isinstance(data.x, np.ndarray):
         x = data.x
         y = data.y[:-1]
+    else:  # xr.DataArray:
+        x = data.x[:, :-1]
+        y = data.y[:, :-1]
+
     with pytest.raises(ValueError):
         PooledOLS(y, x)
 
@@ -174,7 +173,8 @@ def test_cov_equiv_cluster(data):
     x.index = y.index
     clusters = mod.reformat_clusters(data.vc1)
     ols_mod = IV2SLS(y, x, None, None)
-    res2 = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe, debiased=False)
+    res2 = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe,
+                       debiased=False)
     assert_results_equal(res, res2)
 
 

@@ -5,6 +5,13 @@ import sys
 import pytest
 
 try:
+    import xarray
+
+    MISSING_XARRAY = False
+except ImportError:
+    MISSING_XARRAY = True
+
+try:
     import jupyter_client
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
@@ -15,6 +22,7 @@ kernels = jupyter_client.kernelspec.find_kernel_specs()
 kernel_name = 'python%s' % sys.version_info.major
 
 head, _ = os.path.split(__file__)
+NOTEBOOKS_USING_XARRAY = ['panel_data-formats.ipynb']
 NOTEBOOK_DIR = os.path.abspath(os.path.join(head, '..', '..', 'examples'))
 
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, '*.ipynb')))
@@ -30,6 +38,10 @@ def notebook(request):
 
 @pytest.mark.slow
 def test_notebook(notebook):
+    nb_name = os.path.split(notebook)[-1]
+    if MISSING_XARRAY and nb_name in NOTEBOOKS_USING_XARRAY:
+        pytest.skip('xarray is required to test {0}'.format(notebook))
+
     nb = nbformat.read(notebook, as_version=4)
     ep = ExecutePreprocessor(allow_errors=False,
                              timeout=120,

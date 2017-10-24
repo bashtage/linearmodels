@@ -7,10 +7,9 @@ import pytest
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import FirstDifferenceOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data)
+                                               generate_data, datatypes)
 
 missing = [0.0, 0.20]
-datatypes = ['numpy', 'pandas', 'xarray']
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 
