@@ -1,12 +1,18 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
-
+try:
+    import xarray
+    MISSING_XARRAY = False
+except ImportError:
+    MISSING_XARRAY = True
 from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.utility import AttrDict
 
+datatypes = ['numpy', 'pandas']
+if not MISSING_XARRAY:
+    datatypes += ['xarray']
 
 def lsdv(y: pd.DataFrame, x: pd.DataFrame, has_const=False, entity=False, time=False,
          general=None):
@@ -89,6 +95,7 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
         vc2 = pd.Panel(vc2, items=vcats, major_axis=time, minor_axis=entities)
 
     if datatype == 'xarray':
+        import xarray as xr
         x = xr.DataArray(x)
         y = xr.DataArray(y)
         w = xr.DataArray(w)

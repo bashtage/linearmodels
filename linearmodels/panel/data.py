@@ -147,11 +147,14 @@ class PanelData(object):
         self._original = x
 
         if not isinstance(x, (Series, DataFrame, Panel, ndarray)):
-            from xarray import DataArray
-            if isinstance(x, DataArray):
-                if x.ndim not in (2, 3):
-                    raise ValueError('Only 2-d or 3-d DataArrays are supported')
-                x = x.to_pandas()
+            try:
+                from xarray import DataArray
+                if isinstance(x, DataArray):
+                    if x.ndim not in (2, 3):
+                        raise ValueError('Only 2-d or 3-d DataArrays are supported')
+                    x = x.to_pandas()
+            except ImportError:
+                pass
 
         if isinstance(x, Series) and isinstance(x.index, pd.MultiIndex):
             x = DataFrame(x)
@@ -188,7 +191,7 @@ class PanelData(object):
             self._frame = panel.to_frame()
         else:
             raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
-                            'supported.')
+                            'are supported')
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
             self._frame = self._frame.astype(np.float64)

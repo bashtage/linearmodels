@@ -6,10 +6,9 @@ from numpy.testing import assert_allclose
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
-from linearmodels.tests.panel._utility import generate_data
+from linearmodels.tests.panel._utility import generate_data, datatypes
 
 missing = [0.0, 0.20]
-datatypes = ['numpy', 'pandas', 'xarray']
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))

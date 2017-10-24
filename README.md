@@ -123,8 +123,8 @@ that are being used in the test environment.  It is possible that older versions
 * NumPy (1.11+)
 * SciPy (0.17+)
 * pandas (0.18+)
-* xarray (0.9+)
 * statsmodels (0.8+)
+* xarray (0.9+, optional)
 
 ### Testing
 

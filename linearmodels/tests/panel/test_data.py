@@ -1,20 +1,25 @@
+from linearmodels.compat.pandas import (assert_frame_equal, assert_panel_equal,
+                                        is_string_dtype)
+
 from itertools import product
 
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
+try:
+    import xarray as xr
+except ImportError:
+    pass
 
-from linearmodels.compat.pandas import (assert_frame_equal, assert_panel_equal,
-                                        is_string_dtype)
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
-from linearmodels.tests.panel._utility import generate_data
+from linearmodels.tests.panel._utility import generate_data, datatypes, \
+    MISSING_XARRAY
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
-TYPES = ['numpy', 'pandas', 'xarray']
+TYPES = datatypes
 
 
 @pytest.fixture(params=list(product(PERC_MISSING, TYPES)),
@@ -126,21 +131,25 @@ def test_existing_panel_data():
     assert_frame_equal(dh.dataframe, dh2.dataframe)
 
 
+@pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')
 def test_xarray_2d():
     n, t = 11, 7
     x = np.random.random((t, n))
     x = xr.DataArray(x, dims=('time', 'entity'),
-                     coords={'entity': list('firm.' + str(i) for i in range(n))})
+                     coords={
+                         'entity': list('firm.' + str(i) for i in range(n))})
     dh = PanelData(x)
     assert_equal(dh.values2d, np.reshape(x.values.T, (n * t, 1)))
 
 
+@pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')
 def test_xarray_3d():
     n, t, k = 11, 7, 13
     x = np.random.random((k, t, n))
     x = xr.DataArray(x, dims=('var', 'time', 'entity'),
-                     coords={'entity': list('firm.' + str(i) for i in range(n)),
-                             'var': list('x.' + str(i) for i in range(k))})
+                     coords={
+                         'entity': list('firm.' + str(i) for i in range(n)),
+                         'var': list('x.' + str(i) for i in range(k))})
     dh = PanelData(x)
     assert_equal(np.reshape(x.values.T, (n * t, k)), dh.values2d)
 
@@ -186,10 +195,14 @@ def test_incorrect_dataframe():
 
 
 def test_incorrect_types():
-    with pytest.raises(ValueError):
-        PanelData(xr.DataArray(np.random.randn(10)))
     with pytest.raises(TypeError):
         PanelData(list(np.random.randn(10)))
+
+
+@pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')
+def test_incorrect_types_xarray():
+    with pytest.raises(ValueError):
+        PanelData(xr.DataArray(np.random.randn(10)))
 
 
 def test_ids(panel):
@@ -456,11 +469,13 @@ def test_demean_simple_weighted(data):
     w.dataframe.iloc[:, 0] = 1
     unweighted_entity_demean = x.demean('entity')
     weighted_entity_demean = x.demean('entity', weights=w)
-    assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
+    assert_allclose(unweighted_entity_demean.dataframe,
+                    weighted_entity_demean.dataframe)
 
     unweighted_entity_demean = x.demean('time')
     weighted_entity_demean = x.demean('time', weights=w)
-    assert_allclose(unweighted_entity_demean.dataframe, weighted_entity_demean.dataframe)
+    assert_allclose(unweighted_entity_demean.dataframe,
+                    weighted_entity_demean.dataframe)
 
 
 def test_demean_weighted(data):
@@ -643,7 +658,8 @@ def test_general_unit_weighted_demean_oneway(panel):
     dm3 = y.general_demean(g)
     assert_allclose(dm3.values2d, dm2.values2d)
 
-    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
+    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape),
+                               index=y.index))
     dm2 = y.general_demean(g, weights)
     dm3 = y.general_demean(g)
     g = pd.Categorical(g.dataframe.iloc[:, 0])
@@ -655,7 +671,8 @@ def test_general_unit_weighted_demean_oneway(panel):
 
 def test_general_weighted_demean_oneway(panel):
     y = PanelData(panel)
-    weights = pd.DataFrame(np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
+    weights = pd.DataFrame(
+        np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
 
     dm1 = y.demean('entity', weights=w)
@@ -668,7 +685,8 @@ def test_general_weighted_demean_oneway(panel):
     dm2 = y.general_demean(g, w)
     assert_allclose(dm1.values2d, dm2.values2d)
 
-    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape), index=y.index))
+    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape),
+                               index=y.index))
     dm2 = y.general_demean(g, w)
     g = pd.Categorical(g.dataframe.iloc[:, 0])
     d = pd.get_dummies(g)
@@ -681,14 +699,16 @@ def test_general_weighted_demean_oneway(panel):
 def test_general_unit_weighted_demean_twoway(panel):
     np.random.seed(12345)
     y = PanelData(panel)
-    weights = pd.DataFrame(np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
+    weights = pd.DataFrame(
+        np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
 
     dm1 = y.demean('both', weights=w)
     g = pd.DataFrame(y.entity_ids, index=y.index)
     g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
     dm2 = y.general_demean(g, weights=w)
-    assert_allclose(dm1.values2d - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
+    assert_allclose(dm1.values2d - dm2.values2d, np.zeros_like(dm2.values2d),
+                    atol=1e-7)
 
     g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g, weights=w)
@@ -710,7 +730,8 @@ def test_original_unmodified(data):
     mod = PanelOLS(data.y, data.x, weights=data.w)
     mod.fit(debiased=True)
     if isinstance(data.y, (pd.DataFrame, pd.Panel)):
-        for after, before in ((data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
+        for after, before in (
+                (data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
             if isinstance(before, pd.DataFrame):
                 assert_frame_equal(before, after)
             else:
@@ -729,14 +750,14 @@ def test_original_unmodified(data):
         assert_frame_equal(mi_df_w, pre_w)
         assert_frame_equal(mi_df_y, pre_y)
         assert_frame_equal(mi_df_x, pre_x)
-    elif isinstance(data.y, xr.DataArray):
-        xr.testing.assert_identical(data.y, pre_y)
-        xr.testing.assert_identical(data.w, pre_w)
-        xr.testing.assert_identical(data.x, pre_x)
-    else:
+    elif isinstance(data.y, np.ndarray):
         assert_allclose(data.y, pre_y)
         assert_allclose(data.x, pre_x)
         assert_allclose(data.w, pre_w)
+    else:
+        xr.testing.assert_identical(data.y, pre_y)
+        xr.testing.assert_identical(data.w, pre_w)
+        xr.testing.assert_identical(data.x, pre_x)
 
 
 def test_incorrect_time_axis():
@@ -750,10 +771,6 @@ def test_incorrect_time_axis():
     df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
     with pytest.raises(ValueError):
         PanelData(df)
-    da = xr.DataArray(x, coords={'entities': entities, 'time': time, 'vars': vars},
-                      dims=['vars', 'time', 'entities'])
-    with pytest.raises(ValueError):
-        PanelData(da)
 
     time = [1, pd.datetime(1960, 1, 1), 'a']
     var_names = ['var.{0}'.format(i) for i in range(3)]
@@ -763,7 +780,21 @@ def test_incorrect_time_axis():
     df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
     with pytest.raises(ValueError):
         PanelData(df)
-    da = xr.DataArray(x, coords={'entities': entities, 'time': time, 'vars': vars},
+
+
+@pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')
+def test_incorrect_time_axis_xarray():
+    entities = ['entity.{0}'.format(i) for i in range(1000)]
+    time = ['time.{0}'.format(i) for i in range(3)]
+    x = np.random.randn(3, 3, 1000)
+    da = xr.DataArray(x, coords={'entities': entities, 'time': time,
+                                 'vars': vars},
+                      dims=['vars', 'time', 'entities'])
+    with pytest.raises(ValueError):
+        PanelData(da)
+
+    da = xr.DataArray(x, coords={'entities': entities, 'time': time,
+                                 'vars': vars},
                       dims=['vars', 'time', 'entities'])
     with pytest.raises(ValueError):
         PanelData(da)
