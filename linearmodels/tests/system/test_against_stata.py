@@ -9,6 +9,8 @@ from linearmodels.tests.system.results.generate_data import basic_data, missing_
 from linearmodels.system import SUR
 from linearmodels.utility import AttrDict
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 
 @pytest.fixture(scope='module', params=list(stata_results.keys()))
 def model_data(request):

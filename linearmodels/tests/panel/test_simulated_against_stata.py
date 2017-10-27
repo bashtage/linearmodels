@@ -11,6 +11,8 @@ from linearmodels.panel.model import (BetweenOLS, PanelOLS, PooledOLS,
 from linearmodels.tests.panel.results import parse_stata_results
 from linearmodels.utility import AttrDict
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 STATA_RESULTS = parse_stata_results.data()
 MODELS = {'between': BetweenOLS, 'fixed_effect': PanelOLS, 'pooled': PooledOLS,
           'random_effect': RandomEffects}

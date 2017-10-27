@@ -6,6 +6,8 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
 from linearmodels.tests.panel._utility import generate_data, datatypes
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 missing = [0.0, 0.20]
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))

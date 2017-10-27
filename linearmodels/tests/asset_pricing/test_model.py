@@ -12,6 +12,7 @@ from linearmodels.iv.data import IVData
 from linearmodels.iv.model import _OLS
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
 @pytest.fixture(params=['numpy', 'pandas'])
 def data(request):

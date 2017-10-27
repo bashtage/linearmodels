@@ -267,7 +267,9 @@ def test_model_missing(data):
     data.exog[::13, :] = np.nan
     data.endog[::23, :] = np.nan
     data.instr[::29, :] = np.nan
-    mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    with warnings.catch_warnings(record=True) as w:
+        mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
+    assert len(w) == 1
     res = mod.fit()
 
     var_names = [data.dep, data.exog, data.endog, data.instr]
