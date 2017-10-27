@@ -1,0 +1,1411 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Estimation Results &#8212; linearmodels 4.1 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Instrumental Variable Covariance Estimation" href="covariance.html" />
+    <link rel="prev" title="Estimation Methods" href="methods.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="methods.html" title="Estimation Methods"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.1</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Instrumental Variable Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/basic-examples.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/advanced-examples.html">Further Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Instrumental Variable Estimation</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Estimation Results</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="estimation-results">
+<span id="iv-module-reference-results"></span><h1>Estimation Results<a class="headerlink" href="#estimation-results" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="linearmodels.iv.results.IVResults">
+<em class="property">class </em><code class="descname">IVResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results from IV estimation</p>
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.anderson_rubin">
+<code class="descname">anderson_rubin</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.anderson_rubin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.anderson_rubin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Anderson-Rubin test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The Anderson-Rubin test examines whether the value of <span class="math">\(\kappa\)</span>
+computed for the LIML estimator is sufficiently close to one to
+indicate the model is not overidentified. The test statistic is</p>
+<div class="math">
+\[n \ln(\hat{\kappa}) \sim \chi^2_{q}\]</div>
+<p>where <span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.basmann">
+<code class="descname">basmann</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.basmann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basmann’s test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Requires more instruments than endogenous variables</p>
+<p>Tests is a small-sample version of Sargan’s test that has the same
+distribution.</p>
+<div class="math">
+\[s (n - n_{instr}) / (n - s) \sim \chi^2_{v}\]</div>
+<p>where <span class="math">\(n_{instr}\)</span> is the number of instruments, <span class="math">\(n_{exog}\)</span>
+is the number of exogenous regressors and <span class="math">\(n_{endog}\)</span> is the
+number of endogenous regressors.  The degree of freedom is the
+difference between the number of instruments and the number of
+endogenous regressors.</p>
+<div class="math">
+\[v = n_{instr} - n_{exog}\]</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.basmann_f">
+<code class="descname">basmann_f</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.basmann_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basmann’s F test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Banmann’s F test examines whether the value of <span class="math">\(\kappa\)</span>
+computed for the LIML estimator is sufficiently close to one to
+indicate the model is not overidentified. The test statistic is</p>
+<div class="math">
+\[\hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}\]</div>
+<p>where <span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.cov_config">
+<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter values from covariance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of covariance estimator used to compute covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.cov_type">
+<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance estimator used</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.debiased">
+<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.debiased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVResults.durbin">
+<code class="descname">durbin</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.durbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Durbin’s test of exogeneity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Test statistic is difference between sum of squared OLS and sum of
+squared IV residuals where each set of residuals has been projected
+onto the set of instruments in teh IV model.</p>
+<p>Start by defining</p>
+<div class="math">
+\[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
+           \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c\]</div>
+<p>where <span class="math">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
+model where <code class="docutils literal"><span class="pre">vars</span></code> are treated as exogenous,
+<span class="math">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
+leaving <code class="docutils literal"><span class="pre">vars</span></code> as endogenous, <span class="math">\(P_{[z,w]}\)</span> is a projection
+matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
+<code class="docutils literal"><span class="pre">vars</span></code>, and <span class="math">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
+<p>The test statistic is then</p>
+<div class="math">
+\[\delta / (\hat{\epsilon}'_e\hat{\epsilon}_e) / n \sim \chi^2_{q}\]</div>
+<p>where <span class="math">\(q\)</span> is the number of variables tested.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model F-statistic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Despite name, always implemented using a quadratic-form test based on
+estimated parameter covariance. Default is to use a chi2 distribution
+to compute p-values. If <code class="docutils literal"><span class="pre">debiased</span></code> is True, divides statistic by
+number of parameters tested and uses an F-distribution.</p>
+<p>This version of the F-statistic directly uses the model covariance
+estimator and so is robust against the same specification issues.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.first_stage">
+<code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.first_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>First stage regression results</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.kappa">
+<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.kappa" title="Permalink to this definition">¶</a></dt>
+<dd><p>k-class estimator value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.method">
+<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method used to estimate model parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.rsquared_adj">
+<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.sargan">
+<code class="descname">sargan</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.sargan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.sargan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sargan test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Requires more instruments than endogenous variables</p>
+<p>Tests the ratio of re-projected IV regression residual variance to
+variance of the IV residuals.</p>
+<div class="math">
+\[n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/
+\hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}\]</div>
+<p>where <span class="math">\(M_{z}\)</span> is the annihilator matrix where z is the set of
+instruments and <span class="math">\(\hat{\epsilon}\)</span> are the residuals from the IV
+estimator.  The degree of freedom is the difference between the number
+of instruments and the number of endogenous regressors.</p>
+<div class="math">
+\[v = n_{instr} - n_{exog}\]</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVResults.test_linear_constraint">
+<code class="descname">test_linear_constraint</code><span class="sig-paren">(</span><em>restriction</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.test_linear_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test linear equality constraints using a Wald test</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em>) – q by nvar array containing linear weights to apply to parameters
+when forming the restrictions.</li>
+<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em>) – q element array containing the restricted values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Hypothesis test examines whether <span class="math">\(H_0:C\theta=v\)</span> where the
+matrix C is <code class="docutils literal"><span class="pre">restriction</span></code> and v is <code class="docutils literal"><span class="pre">value</span></code>. The test statistic
+has a <span class="math">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.wooldridge_overid">
+<code class="descname">wooldridge_overid</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wooldridge_overid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_overid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wooldridge’s score test of overidentification</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Wooldridge’s test examines whether there is correlation between the
+model residuals and the component of the instruments that is
+orthogonal to the endogenous variables. Define <span class="math">\(\tilde{z}\)</span>
+to be the residuals of the instruments regressed on the exogenous
+variables and the first-stage fitted values of the endogenous
+variables.  The test is computed as a regression</p>
+<div class="math">
+\[1 = \gamma_1 \hat{\epsilon}_i \tilde{z}_{i,1} + \ldots +
+    \gamma_q \hat{\epsilon}_i \tilde{z}_{i,q}\]</div>
+<p>where <span class="math">\(q = n_{instr} - n_{endog}\)</span>.  The test is a
+<span class="math">\(n\times R^2 \sim \chi^2_{q}\)</span>.</p>
+<p>The order of the instruments does not affect this test.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.wooldridge_regression">
+<code class="descname">wooldridge_regression</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wooldridge_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wooldridge’s regression test of exogeneity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Wooldridge’s test examines whether there is correlation between the
+components of the endogenous variables that cannot be explained by
+the instruments and the OLS regression residuals.</p>
+<p>The test is implemented as an OLS where</p>
+<div class="math">
+\[y_i = x_{1i}\beta_i + x_{2i}\beta_2 + \hat{e}_i\gamma + \epsilon_i\]</div>
+<p>where <span class="math">\(x_{1i}\)</span> are the exogenous regressors, <span class="math">\(x_{2i}\)</span> are
+the  endogenous regressors and <span class="math">\(\hat{e}_{i}\)</span> are the residuals
+from regressing the endogenous variables on the exogenous variables
+and instruments. The null is <span class="math">\(\gamma=0\)</span> and is implemented
+using a Wald test.  The covariance estimator used in the test is
+identical to the covariance estimator used with <code class="docutils literal"><span class="pre">fit</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.wooldridge_score">
+<code class="descname">wooldridge_score</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wooldridge_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wooldridge’s score test of exogeneity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Wooldridge’s test examines whether there is correlation between the
+errors produced when the endogenous variable are treated as
+exogenous so that the model can be fit by OLS, and the component of
+the endogenous variables that cannot be explained by the instruments.</p>
+<p>The test is implemented using a regression,</p>
+<div class="math">
+\[1 = \gamma_1 \hat{\epsilon}_1 \hat{v}_{1,i} + \ldots
+  + \gamma_p \hat{\epsilon}_1 \hat{v}_{p,i} + \eta_i\]</div>
+<p>where <span class="math">\(\hat{v}_{j,i}\)</span> is the residual from regressing endogenous
+variable <span class="math">\(x_j\)</span> on the exogenous variables and instruments.</p>
+<p>The test is a <span class="math">\(n\times R^2 \sim \chi^2_{p}\)</span>.</p>
+<p>Implemented using the expression in Wooldridge (2002), Eq. 6.19</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted estimated residuals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVResults.wu_hausman">
+<code class="descname">wu_hausman</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wu_hausman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wu_hausman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wu-Hausman test of exogeneity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Test statistic is difference between sum of squared OLS and sum of
+squared IV residuals where each set of residuals has been projected
+onto the set of instruments in teh IV model.</p>
+<p>Start by defining</p>
+<div class="math">
+\[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
+           \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c\]</div>
+<p>where <span class="math">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
+model where <code class="docutils literal"><span class="pre">vars</span></code> are treated as exogenous,
+<span class="math">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
+leaving <code class="docutils literal"><span class="pre">vars</span></code> as endogenous, <span class="math">\(P_{[z,w]}\)</span> is a projection
+matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
+<code class="docutils literal"><span class="pre">vars</span></code>, and <span class="math">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
+<p>The test statistic is then</p>
+<div class="math">
+\[\frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}\]</div>
+<p>where <span class="math">\(q\)</span> is the number of variables iv,
+<span class="math">\(v = n - n_{endog} - n_{exog} - q\)</span>. The test statistic has a
+<span class="math">\(F_{q, v}\)</span> distribution.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.results.IVGMMResults">
+<em class="property">class </em><code class="descname">IVGMMResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results from GMM estimation of IV models</p>
+<dl class="method">
+<dt id="linearmodels.iv.results.IVGMMResults.c_stat">
+<code class="descname">c_stat</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults.c_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.c_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>C-test of endogeneity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The C statistic iv the difference between the model estimated by
+assuming one or more of the endogenous variables is actually
+exogenous.  The test is implemented as the difference between the
+J statistic s of two GMM estimations where both use the same weighting
+matrix.  The use of a common weighting matrix is required for the C
+statistic to be positive.</p>
+<p>The first model is a estimated uses GMM estimation where one or more
+of the endogenous variables are assumed to be endogenous.  The model
+would be relatively efficient if the assumption were true, and two
+quantities are computed, the J statistic, <span class="math">\(J_e\)</span>, and the
+moment weighting matrix, <span class="math">\(W_e\)</span>.</p>
+<p>WLOG assume the q variables tested are in the final q positions so that
+the first <span class="math">\(n_{exog} + n_{instr}\)</span> rows and columns correspond to
+the moment conditions in the original model. The second J statistic is
+computed using parameters estimated using the original moment
+conditions along with the upper left block of <span class="math">\(W_e\)</span>.  Denote this
+values as <span class="math">\(J_c\)</span> where the c is used to indicate consistent.</p>
+<p>The test statistic is then</p>
+<div class="math">
+\[J_e - J_c \sim \chi^2_{m}\]</div>
+<p>where <span class="math">\(m\)</span> is the number of variables whose exogeneity is being
+tested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVGMMResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.cov_config">
+<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter values from covariance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of covariance estimator used to compute covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.cov_type">
+<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance estimator used</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.debiased">
+<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.debiased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model F-statistic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Despite name, always implemented using a quadratic-form test based on
+estimated parameter covariance. Default is to use a chi2 distribution
+to compute p-values. If <code class="docutils literal"><span class="pre">debiased</span></code> is True, divides statistic by
+number of parameters tested and uses an F-distribution.</p>
+<p>This version of the F-statistic directly uses the model covariance
+estimator and so is robust against the same specification issues.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.first_stage">
+<code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.first_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>First stage regression results</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.iterations">
+<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.iterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterations used in GMM estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.j_stat">
+<code class="descname">j_stat</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.j_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>J-test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>j</strong> – J statistic  test of overidentifying restrictions</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The J statistic  iv whether the moment conditions are sufficiently
+close to zero to indicate that the model is not overidentified. The
+statistic is defined as</p>
+<div class="math">
+\[n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q\]</div>
+<p>where <span class="math">\(\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i\)</span> where
+<span class="math">\(z_i\)</span> includes both the exogenous variables and instruments and
+<span class="math">\(\hat{\epsilon}_i\)</span> are the model residuals. <span class="math">\(W\)</span> is a consistent
+estimator of the variance of <span class="math">\(\sqrt{n}\bar{g}\)</span>. The degree of
+freedom is <span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.kappa">
+<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.kappa" title="Permalink to this definition">¶</a></dt>
+<dd><p>k-class estimator value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.method">
+<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method used to estimate model parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.rsquared_adj">
+<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.IVGMMResults.test_linear_constraint">
+<code class="descname">test_linear_constraint</code><span class="sig-paren">(</span><em>restriction</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.test_linear_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test linear equality constraints using a Wald test</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em>) – q by nvar array containing linear weights to apply to parameters
+when forming the restrictions.</li>
+<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em>) – q element array containing the restricted values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Hypothesis test examines whether <span class="math">\(H_0:C\theta=v\)</span> where the
+matrix C is <code class="docutils literal"><span class="pre">restriction</span></code> and v is <code class="docutils literal"><span class="pre">value</span></code>. The test statistic
+has a <span class="math">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.weight_config">
+<code class="descname">weight_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighting matrix configuration used in estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.weight_matrix">
+<code class="descname">weight_matrix</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weight matrix used in the final-step GMM estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.weight_type">
+<code class="descname">weight_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighting matrix method used in estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVGMMResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted estimated residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.results.OLSResults">
+<em class="property">class </em><code class="descname">OLSResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="linearmodels.iv.results.OLSResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.cov_config">
+<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter values from covariance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of covariance estimator used to compute covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.cov_type">
+<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance estimator used</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.debiased">
+<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.debiased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model F-statistic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Despite name, always implemented using a quadratic-form test based on
+estimated parameter covariance. Default is to use a chi2 distribution
+to compute p-values. If <code class="docutils literal"><span class="pre">debiased</span></code> is True, divides statistic by
+number of parameters tested and uses an F-distribution.</p>
+<p>This version of the F-statistic directly uses the model covariance
+estimator and so is robust against the same specification issues.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.kappa">
+<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.kappa" title="Permalink to this definition">¶</a></dt>
+<dd><p>k-class estimator value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.method">
+<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method used to estimate model parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.pvalues">
+<code class="descname">pvalues</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.pvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.rsquared_adj">
+<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.results.OLSResults.test_linear_constraint">
+<code class="descname">test_linear_constraint</code><span class="sig-paren">(</span><em>restriction</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.test_linear_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.test_linear_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test linear equality constraints using a Wald test</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em>) – q by nvar array containing linear weights to apply to parameters
+when forming the restrictions.</li>
+<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em>) – q element array containing the restricted values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Hypothesis test examines whether <span class="math">\(H_0:C\theta=v\)</span> where the
+matrix C is <code class="docutils literal"><span class="pre">restriction</span></code> and v is <code class="docutils literal"><span class="pre">value</span></code>. The test statistic
+has a <span class="math">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.OLSResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted estimated residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="linearmodels.iv.results.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare the results of multiple models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>comparison</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.results.IVModelComparison" title="linearmodels.iv.results.IVModelComparison">IVModelComparison</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.results.IVModelComparison">
+<em class="property">class </em><code class="descname">IVModelComparison</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comparison of multiple models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance estimator descriptions</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.estimator_method">
+<code class="descname">estimator_method</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation methods</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>F-statistics and P-values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.rsquared_adj">
+<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample-size adjusted coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model comparison</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.IVModelComparison.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-stats for all models</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.results.FirstStageResults">
+<em class="property">class </em><code class="descname">FirstStageResults</code><span class="sig-paren">(</span><em>dep</em>, <em>exog</em>, <em>endog</em>, <em>instr</em>, <em>weights</em>, <em>cov_type</em>, <em>cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#FirstStageResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>First stage estimation results and diagnostics</p>
+<dl class="attribute">
+<dt id="linearmodels.iv.results.FirstStageResults.diagnostics">
+<code class="descname">diagnostics</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#FirstStageResults.diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post estimation diagnostics of first-stage fit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>res</strong> – DataFrame where each endogenous variable appears as a row and
+the columns contain alternative measures.  The columns are:<ul class="simple">
+<li>rsquared - R-squared from regression of endogenous on exogenous
+and instruments</li>
+<li>partial.rsquared - R-squared from regression of the exogenous
+variable on instruments where both the exogenous variable and
+the instrument have been orthogonalized to the exogenous
+regressors in the model.</li>
+<li>f.stat - Test that all coefficients are zero in the model
+used to estimate the partial R-squared. Uses a standard F-test
+when the covariance estimator is unadjusted - otherwise uses a
+Wald test statistic with a chi2 distribution.</li>
+<li>f.pval - P-value of the test that all coefficients are zero
+in the model used to estimate the partial R-squared</li>
+<li>f.dist - Distribution of f.stat</li>
+<li>shea.rsquared - Shea’s r-squared which measures the correlation
+between the projected and orthogonalized instrument on the
+orthogonalized endogenous regressor where the orthogonalization
+is with respect to the other included variables in the model.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.FirstStageResults.individual">
+<code class="descname">individual</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#FirstStageResults.individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Individual model results from first-stage regressions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>res</strong> – Dictionary containing first stage estimation results. Keys are
+the variable names of the endogenous regressors.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.results.FirstStageResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of first-stage estimation results</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="methods.html" title="previous chapter (use the left arrow)">Estimation Methods</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="covariance.html" title="next chapter (use the right arrow)">Instrumental Variable Covariance Estimation</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="methods.html" title="Estimation Methods"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,2072 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Examples &#8212; linearmodels 4.1+25.g434bbd6 documentation</title>
+    <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.1+25.g434bbd6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Using formulas to specify models" href="formulas.html" />
+    <link rel="prev" title="System Regression Models" href="../index.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="formulas.html" title="Using formulas to specify models"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="System Regression Models"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../index.html" class="text-logo">linearmodels 4.1 (+25, g434bbd6)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../index.html">Docs</a></li>
+              
+                <li><a href="../index.html">System Regression Models</a></li>
+              
+              <li>Examples</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Examples">
+<h1>Examples<a class="headerlink" href="#Examples" title="Permalink to this headline">¶</a></h1>
+<p>System regression simultaneously estimates multiple models. This has
+three distinct advantages:</p>
+<ul class="simple">
+<li>Joint inference across models</li>
+<li>Linear restrictions can be imposed on the parameters across different
+models</li>
+<li>Improved precision of parameter estimates (depending on the model
+specification and data)</li>
+</ul>
+<p>There are <span class="math">\(K\)</span> models and each model can be expressed in vector
+notation as</p>
+<div class="math">
+\[Y_i = X_i\beta_i + \epsilon_i\]</div>
+<p>so that the set of models can be expressed as</p>
+<div class="math">
+\[Y = X\beta + \epsilon\]</div>
+<p>where <span class="math">\(Y\)</span> is a column vector that stacks the vectors <span class="math">\(Y_i\)</span>
+for <span class="math">\(i=1,2,\ldots,K\)</span>, <span class="math">\(X\)</span> is a block-diagonal matrix where
+the i-th block is <span class="math">\(X_i\)</span>, <span class="math">\(\beta\)</span> is a stacked vector of the
+<span class="math">\(K\)</span> <span class="math">\(\beta_i\)</span>s and <span class="math">\(\epsilon\)</span> is similarly comprised
+of the stacked columns of <span class="math">\(\epsilon_i\)</span>.</p>
+<p>The model can be estimated using OLS with the usual estimator</p>
+<div class="math">
+\[\hat{\beta}_{OLS} = \left(X^\prime X\right)^{-1}X^\prime Y.\]</div>
+<p>Since there are multiple series, a GLS estimator that accounts for the
+cross-sectional heteroskedasticity as well as the correlation of
+residuals can be estimated</p>
+<div class="math">
+\[\hat{\beta}_{GLS} = \left(X^\prime \Omega^{-1} X\right)^{-1}X^\prime  \Omega^{-1} Y\]</div>
+<p>where <span class="math">\(\Omega^{-1} = \Sigma^{-1} \otimes I_{T}\)</span>,
+<span class="math">\(\Sigma_{ij}\)</span> is the covariance between <span class="math">\(\epsilon_i\)</span> and
+<span class="math">\(\epsilon_j\)</span> and <span class="math">\(T\)</span> is the number of observations. The GLS
+estimator is only beneficial when the regressors in different models
+differ and when residuals are correlated. There GLS estimates are
+identical to the multivariate OLS estimates when all regressors are
+common.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># Common libraries</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/site-packages/statsmodels/compat/pandas.py:56: FutureWarning: The pandas.core.datetools module is deprecated and will be removed in a future version. Please use the pandas.tseries module instead.
+  from pandas.core import datetools
+</pre></div></div>
+</div>
+<div class="section" id="Data">
+<h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
+<p>Two data sets will be used. The first is from Munnell which looks at the
+effect of capital on state GDP. This example follows the example in
+Chapter 10 in recent editions of Greene’s <em>Econometric Analysis</em>.</p>
+<p>The data is state-level but the model is estimated in region. The first
+step is to aggregate the data by region. All capital measures are summed
+and the unemployment rate is averaged using weights proportional to the
+total employment in each state.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">munnell</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">munnell</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<span class="n">regions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;GF&#39;</span><span class="p">:[</span><span class="s1">&#39;AL&#39;</span><span class="p">,</span> <span class="s1">&#39;FL&#39;</span><span class="p">,</span> <span class="s1">&#39;LA&#39;</span><span class="p">,</span> <span class="s1">&#39;MS&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;MW&#39;</span><span class="p">:[</span><span class="s1">&#39;IL&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">,</span> <span class="s1">&#39;KY&#39;</span><span class="p">,</span> <span class="s1">&#39;MI&#39;</span><span class="p">,</span> <span class="s1">&#39;MN&#39;</span><span class="p">,</span> <span class="s1">&#39;OH&#39;</span><span class="p">,</span> <span class="s1">&#39;WI&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;MA&#39;</span><span class="p">:[</span><span class="s1">&#39;DE&#39;</span><span class="p">,</span> <span class="s1">&#39;MD&#39;</span><span class="p">,</span> <span class="s1">&#39;NJ&#39;</span><span class="p">,</span> <span class="s1">&#39;NY&#39;</span><span class="p">,</span> <span class="s1">&#39;PA&#39;</span><span class="p">,</span> <span class="s1">&#39;VA&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;MT&#39;</span> <span class="p">:[</span><span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;MT&#39;</span><span class="p">,</span> <span class="s1">&#39;ND&#39;</span><span class="p">,</span> <span class="s1">&#39;SD&#39;</span><span class="p">,</span> <span class="s1">&#39;WY&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;NE&#39;</span> <span class="p">:[</span><span class="s1">&#39;CT&#39;</span><span class="p">,</span> <span class="s1">&#39;ME&#39;</span><span class="p">,</span> <span class="s1">&#39;MA&#39;</span><span class="p">,</span> <span class="s1">&#39;NH&#39;</span><span class="p">,</span> <span class="s1">&#39;RI&#39;</span><span class="p">,</span> <span class="s1">&#39;VT&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;SO&#39;</span> <span class="p">:[</span><span class="s1">&#39;GA&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">,</span> <span class="s1">&#39;SC&#39;</span><span class="p">,</span> <span class="s1">&#39;TN&#39;</span><span class="p">,</span> <span class="s1">&#39;WV&#39;</span><span class="p">,</span> <span class="s1">&#39;AR&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;SW&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AZ&#39;</span><span class="p">,</span> <span class="s1">&#39;NV&#39;</span><span class="p">,</span> <span class="s1">&#39;NM&#39;</span><span class="p">,</span> <span class="s1">&#39;TX&#39;</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;CN&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">,</span> <span class="s1">&#39;IA&#39;</span><span class="p">,</span><span class="s1">&#39;KS&#39;</span><span class="p">,</span> <span class="s1">&#39;MO&#39;</span><span class="p">,</span><span class="s1">&#39;NE&#39;</span><span class="p">,</span><span class="s1">&#39;OK&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;WC&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span><span class="s1">&#39;OR&#39;</span><span class="p">,</span><span class="s1">&#39;WA&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">map_region</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">key</span>
+
+
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;REGION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ST_ABB</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">map_region</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;TOTAL_EMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;REGION&#39;</span><span class="p">,</span><span class="s1">&#39;YR&#39;</span><span class="p">])[</span><span class="s1">&#39;EMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;EMP_SHARE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">EMP</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">TOTAL_EMP</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;WEIGHED_UNEMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">EMP_SHARE</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">UNEMP</span>
+</pre></div>
+</div>
+</div>
+<p>A <code class="docutils literal"><span class="pre">groupby</span></code> transformation is used to aggregate the data, and finally
+all values except the unemployment rate are logged.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">grouped</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;REGION&#39;</span><span class="p">,</span><span class="s1">&#39;YR&#39;</span><span class="p">])</span>
+<span class="n">agg_data</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[[</span><span class="s1">&#39;GSP&#39;</span><span class="p">,</span><span class="s1">&#39;PC&#39;</span><span class="p">,</span><span class="s1">&#39;HWY&#39;</span><span class="p">,</span><span class="s1">&#39;WATER&#39;</span><span class="p">,</span><span class="s1">&#39;UTIL&#39;</span><span class="p">,</span><span class="s1">&#39;EMP&#39;</span><span class="p">,</span><span class="s1">&#39;WEIGHED_UNEMP&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GSP&#39;</span><span class="p">,</span><span class="s1">&#39;PC&#39;</span><span class="p">,</span><span class="s1">&#39;HWY&#39;</span><span class="p">,</span><span class="s1">&#39;WATER&#39;</span><span class="p">,</span><span class="s1">&#39;UTIL&#39;</span><span class="p">,</span><span class="s1">&#39;EMP&#39;</span><span class="p">]:</span>
+    <span class="n">agg_data</span><span class="p">[</span><span class="s1">&#39;ln&#39;</span><span class="o">+</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">agg_data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+<span class="n">agg_data</span><span class="p">[</span><span class="s1">&#39;UNEMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg_data</span><span class="o">.</span><span class="n">WEIGHED_UNEMP</span>
+<span class="n">agg_data</span><span class="p">[</span><span class="s1">&#39;Intercept&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Basic-Usage">
+<h2>Basic Usage<a class="headerlink" href="#Basic-Usage" title="Permalink to this headline">¶</a></h2>
+<p>Seemingly Unrelated Models are fairly complex and each equation could
+have a different number of regressors. As a result, it isn’t possibly to
+use standard <code class="docutils literal"><span class="pre">pandas</span></code> or <code class="docutils literal"><span class="pre">numpy</span></code> data structures, and so
+dictionaries (or technically dictionary-like objects) are used. In
+practice, it is strongly recommended to use a <code class="docutils literal"><span class="pre">OrderedDictionary</span></code> from
+the <code class="docutils literal"><span class="pre">collections</span></code> module. This ensures that equation order will be
+preserved. In addition, the dictionary must have the following
+structure:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">keys</span></code> <strong>must be strings</strong> and will be used as equation labels</li>
+<li>The value associated with each key must be either a dictionary or a
+tuple.</li>
+<li>When a dictionary is used, it must have two keys, <code class="docutils literal"><span class="pre">dependent</span></code> and
+<code class="docutils literal"><span class="pre">exog</span></code>. It can optionally have a third key <code class="docutils literal"><span class="pre">weights</span></code> which
+provides weights to use in the regression.</li>
+<li>When a tuple is used, it must have two elements and takes the form
+<code class="docutils literal"><span class="pre">(dependent,</span> <span class="pre">exog)</span></code>. It can optionally contains weights in which
+case it takes the form <code class="docutils literal"><span class="pre">(dependent,</span> <span class="pre">exog,</span> <span class="pre">weights)</span></code>.</li>
+</ul>
+<p>This example uses the dictionary syntax to contain the data for each
+region and uses the region identified as the equation label.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="n">mod_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="s1">&#39;SW&#39;</span><span class="p">,</span><span class="s1">&#39;WC&#39;</span><span class="p">,</span><span class="s1">&#39;MT&#39;</span><span class="p">,</span><span class="s1">&#39;NE&#39;</span><span class="p">,</span><span class="s1">&#39;MA&#39;</span><span class="p">,</span><span class="s1">&#39;SO&#39;</span><span class="p">,</span><span class="s1">&#39;MW&#39;</span><span class="p">,</span><span class="s1">&#39;CN&#39;</span><span class="p">]:</span>
+    <span class="n">region_data</span> <span class="o">=</span> <span class="n">agg_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
+    <span class="n">dependent</span> <span class="o">=</span> <span class="n">region_data</span><span class="o">.</span><span class="n">lnGSP</span>
+    <span class="n">exog</span> <span class="o">=</span> <span class="n">region_data</span><span class="p">[[</span><span class="s1">&#39;Intercept&#39;</span><span class="p">,</span> <span class="s1">&#39;lnPC&#39;</span><span class="p">,</span> <span class="s1">&#39;lnHWY&#39;</span><span class="p">,</span> <span class="s1">&#39;lnWATER&#39;</span><span class="p">,</span> <span class="s1">&#39;lnUTIL&#39;</span><span class="p">,</span> <span class="s1">&#39;lnEMP&#39;</span><span class="p">,</span> <span class="s1">&#39;UNEMP&#39;</span><span class="p">]]</span>
+    <span class="n">mod_data</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">dependent</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Fitting the model is virtually identical to fitting any other model with
+the exception of the special data structure required.</p>
+<p>The fitting options here ensure that the homoskedastic covariance
+estimator are used (<code class="docutils literal"><span class="pre">cov_type='unadjusted'</span></code>) and that a small sample
+adjustment is applied. By default, GLS is used (this can be overridden
+using <code class="docutils literal"><span class="pre">method='ols'</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="kn">import</span> <span class="n">SUR</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">mod_data</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>One of the requirements for there to be an efficiency gain in a SUR is
+that the residuals are correlated. A heatmap is used to inspect this
+correlation, which is substantial and varies by region.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">cov</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">sigma</span>
+<span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">sigma</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">])</span>
+<span class="n">regions</span> <span class="o">=</span>  <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="n">corr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cov</span> <span class="o">/</span> <span class="p">(</span><span class="n">std</span> <span class="err">@</span> <span class="n">std</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">regions</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">regions</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">corr</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;{:0.3f}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/system_examples_examples_11_0.png" src="../../_images/system_examples_examples_11_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<style  type="text/css" >
+</style>
+<table id="T_cbe66e74_d623_11e7_8578_42010a140062" >
+<thead>    <tr>
+        <th class="blank level0" ></th>
+        <th class="col_heading level0 col0" >GF</th>
+        <th class="col_heading level0 col1" >SW</th>
+        <th class="col_heading level0 col2" >WC</th>
+        <th class="col_heading level0 col3" >MT</th>
+        <th class="col_heading level0 col4" >NE</th>
+        <th class="col_heading level0 col5" >MA</th>
+        <th class="col_heading level0 col6" >SO</th>
+        <th class="col_heading level0 col7" >MW</th>
+        <th class="col_heading level0 col8" >CN</th>
+    </tr></thead>
+<tbody>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col0" class="data row0 col0" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col1" class="data row0 col1" >0.173</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col2" class="data row0 col2" >0.447</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col3" class="data row0 col3" >-0.547</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col4" class="data row0 col4" >0.525</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col5" class="data row0 col5" >0.425</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col6" class="data row0 col6" >0.763</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col7" class="data row0 col7" >0.167</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row0_col8" class="data row0 col8" >0.325</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col0" class="data row1 col0" >0.173</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col1" class="data row1 col1" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col2" class="data row1 col2" >0.697</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col3" class="data row1 col3" >-0.290</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col4" class="data row1 col4" >0.489</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col5" class="data row1 col5" >0.132</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col6" class="data row1 col6" >0.314</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col7" class="data row1 col7" >0.565</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row1_col8" class="data row1 col8" >0.119</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col0" class="data row2 col0" >0.447</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col1" class="data row2 col1" >0.697</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col2" class="data row2 col2" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col3" class="data row2 col3" >-0.537</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col4" class="data row2 col4" >0.343</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col5" class="data row2 col5" >0.130</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col6" class="data row2 col6" >0.505</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col7" class="data row2 col7" >0.574</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row2_col8" class="data row2 col8" >0.037</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col0" class="data row3 col0" >-0.547</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col1" class="data row3 col1" >-0.290</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col2" class="data row3 col2" >-0.537</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col3" class="data row3 col3" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col4" class="data row3 col4" >-0.241</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col5" class="data row3 col5" >-0.322</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col6" class="data row3 col6" >-0.351</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col7" class="data row3 col7" >-0.058</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row3_col8" class="data row3 col8" >0.091</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col0" class="data row4 col0" >0.525</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col1" class="data row4 col1" >0.489</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col2" class="data row4 col2" >0.343</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col3" class="data row4 col3" >-0.241</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col4" class="data row4 col4" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col5" class="data row4 col5" >0.259</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col6" class="data row4 col6" >0.783</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col7" class="data row4 col7" >0.269</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row4_col8" class="data row4 col8" >0.200</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col0" class="data row5 col0" >0.425</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col1" class="data row5 col1" >0.132</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col2" class="data row5 col2" >0.130</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col3" class="data row5 col3" >-0.322</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col4" class="data row5 col4" >0.259</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col5" class="data row5 col5" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col6" class="data row5 col6" >0.388</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col7" class="data row5 col7" >-0.037</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row5_col8" class="data row5 col8" >0.713</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col0" class="data row6 col0" >0.763</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col1" class="data row6 col1" >0.314</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col2" class="data row6 col2" >0.505</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col3" class="data row6 col3" >-0.351</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col4" class="data row6 col4" >0.783</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col5" class="data row6 col5" >0.388</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col6" class="data row6 col6" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col7" class="data row6 col7" >0.366</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row6_col8" class="data row6 col8" >0.350</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col0" class="data row7 col0" >0.167</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col1" class="data row7 col1" >0.565</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col2" class="data row7 col2" >0.574</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col3" class="data row7 col3" >-0.058</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col4" class="data row7 col4" >0.269</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col5" class="data row7 col5" >-0.037</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col6" class="data row7 col6" >0.366</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col7" class="data row7 col7" >1.000</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row7_col8" class="data row7 col8" >0.298</td>
+    </tr>    <tr>
+        <th id="T_cbe66e74_d623_11e7_8578_42010a140062level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col0" class="data row8 col0" >0.325</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col1" class="data row8 col1" >0.119</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col2" class="data row8 col2" >0.037</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col3" class="data row8 col3" >0.091</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col4" class="data row8 col4" >0.200</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col5" class="data row8 col5" >0.713</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col6" class="data row8 col6" >0.350</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col7" class="data row8 col7" >0.298</td>
+        <td id="T_cbe66e74_d623_11e7_8578_42010a140062row8_col8" class="data row8 col8" >1.000</td>
+    </tr></tbody>
+</table></div>
+</div>
+<p>These values can be seen to be identical to the reported results in the
+existing example from Greene.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display_png</span>
+<span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-2.png&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/system_examples_examples_13_0.png" src="../../_images/system_examples_examples_13_0.png" />
+</div>
+</div>
+<p>The full result is fairly long and so here I only print the first 33
+lines which show results for two regions. By default it reports all
+estimates along with the usual measures of precision.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">as_text</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="mi">33</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.9937
+No. Equations.:                     9   Cov. Estimator:             unadjusted
+No. Observations:                  17   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:28
+
+
+                   Equation: GF, Dependent Variable: lnGSP
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      12.310     2.2513     5.4680     0.0000      7.8976      16.723
+lnPC          -0.2010     0.1424    -1.4117     0.1580     -0.4800      0.0780
+lnHWY         -1.8856     0.5169    -3.6480     0.0003     -2.8987     -0.8725
+lnWATER        0.1785     0.0607     2.9399     0.0033      0.0595      0.2975
+lnUTIL         1.1898     0.3744     3.1774     0.0015      0.4559      1.9237
+lnEMP          0.9533     0.0847     11.252     0.0000      0.7872      1.1193
+UNEMP         -0.0031     0.0021    -1.5007     0.1334     -0.0072      0.0009
+                   Equation: SW, Dependent Variable: lnGSP
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      4.0831     0.9979     4.0918     0.0000      2.1273      6.0389
+lnPC           0.0766     0.0858     0.8929     0.3719     -0.0916      0.2449
+lnHWY         -0.1312     0.1279    -1.0258     0.3050     -0.3819      0.1195
+lnWATER       -0.1360     0.0611    -2.2240     0.0261     -0.2558     -0.0161
+lnUTIL         0.5216     0.1107     4.7102     0.0000      0.3045      0.7386
+lnEMP          0.5387     0.0849     6.3439     0.0000      0.3723      0.7051
+UNEMP         -0.0156     0.0025    -6.2950     0.0000     -0.0205     -0.0108
+                   Equation: WC, Dependent Variable: lnGSP
+==============================================================================
+</pre></div></div>
+</div>
+<p>Individual results are contained in a dictionary located at the
+attribute <code class="docutils literal"><span class="pre">equations</span></code> and can be accessed using equation labels
+(available using the attribute <code class="docutils literal"><span class="pre">equation_labels</span></code>). Additional
+information about the model is presented in this view. The West Coast
+results are show.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="s1">&#39;WC&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                            GLS Estimation Summary
+==============================================================================
+Eq. Label:                         WC   R-squared:                      0.9937
+Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9900
+Estimator:                        GLS   Cov. Estimator:             unadjusted
+No. Observations:                  17   F-statistic:                    2862.4
+Date:                Thu, Nov 30 2017   P-value (F-stat)                0.0000
+Time:                        23:11:28   Distribution:                  chi2(6)
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      1.9602     3.4542     0.5675     0.5704     -4.8100      8.7303
+lnPC           0.1699     0.0919     1.8500     0.0643     -0.0101      0.3500
+lnHWY          0.1317     0.1138     1.1569     0.2473     -0.0914      0.3547
+lnWATER       -0.3470     0.1733    -2.0020     0.0453     -0.6867     -0.0073
+lnUTIL         0.0895     0.4642     0.1928     0.8471     -0.8204      0.9994
+lnEMP          1.0696     0.1708     6.2634     0.0000      0.7349      1.4043
+UNEMP         -0.0060     0.0042    -1.4180     0.1562     -0.0143      0.0023
+
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+<p>The current version of the model doesn’t facilitate cross equation
+comparisons and so this is manually implemented here.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="c1"># TODO: Implement method to compare across equations</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">:</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">equation_labels</span>
+<span class="n">params</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;{:0.3f}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<style  type="text/css" >
+</style>
+<table id="T_cbfbf406_d623_11e7_8578_42010a140062" >
+<thead>    <tr>
+        <th class="blank level0" ></th>
+        <th class="col_heading level0 col0" >Intercept</th>
+        <th class="col_heading level0 col1" >lnPC</th>
+        <th class="col_heading level0 col2" >lnHWY</th>
+        <th class="col_heading level0 col3" >lnWATER</th>
+        <th class="col_heading level0 col4" >lnUTIL</th>
+        <th class="col_heading level0 col5" >lnEMP</th>
+        <th class="col_heading level0 col6" >UNEMP</th>
+    </tr></thead>
+<tbody>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col0" class="data row0 col0" >12.310</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col1" class="data row0 col1" >-0.201</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col2" class="data row0 col2" >-1.886</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col3" class="data row0 col3" >0.178</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col4" class="data row0 col4" >1.190</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col5" class="data row0 col5" >0.953</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row0_col6" class="data row0 col6" >-0.003</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col0" class="data row1 col0" >4.083</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col1" class="data row1 col1" >0.077</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col2" class="data row1 col2" >-0.131</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col3" class="data row1 col3" >-0.136</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col4" class="data row1 col4" >0.522</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col5" class="data row1 col5" >0.539</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row1_col6" class="data row1 col6" >-0.016</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col0" class="data row2 col0" >1.960</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col1" class="data row2 col1" >0.170</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col2" class="data row2 col2" >0.132</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col3" class="data row2 col3" >-0.347</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col4" class="data row2 col4" >0.090</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col5" class="data row2 col5" >1.070</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row2_col6" class="data row2 col6" >-0.006</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col0" class="data row3 col0" >3.463</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col1" class="data row3 col1" >-0.115</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col2" class="data row3 col2" >0.180</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col3" class="data row3 col3" >0.262</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col4" class="data row3 col4" >-0.330</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col5" class="data row3 col5" >1.079</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row3_col6" class="data row3 col6" >-0.001</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col0" class="data row4 col0" >-12.294</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col1" class="data row4 col1" >0.118</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col2" class="data row4 col2" >0.934</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col3" class="data row4 col3" >-0.557</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col4" class="data row4 col4" >-0.290</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col5" class="data row4 col5" >2.494</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row4_col6" class="data row4 col6" >0.020</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col0" class="data row5 col0" >-18.616</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col1" class="data row5 col1" >-0.311</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col2" class="data row5 col2" >3.060</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col3" class="data row5 col3" >-0.109</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col4" class="data row5 col4" >-1.659</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col5" class="data row5 col5" >2.186</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row5_col6" class="data row5 col6" >0.018</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col0" class="data row6 col0" >3.162</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col1" class="data row6 col1" >-0.063</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col2" class="data row6 col2" >-0.641</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col3" class="data row6 col3" >-0.081</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col4" class="data row6 col4" >0.281</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col5" class="data row6 col5" >1.620</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row6_col6" class="data row6 col6" >0.008</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col0" class="data row7 col0" >-9.258</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col1" class="data row7 col1" >0.096</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col2" class="data row7 col2" >1.612</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col3" class="data row7 col3" >0.694</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col4" class="data row7 col4" >-0.340</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col5" class="data row7 col5" >-0.062</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row7_col6" class="data row7 col6" >-0.031</td>
+    </tr>    <tr>
+        <th id="T_cbfbf406_d623_11e7_8578_42010a140062level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col0" class="data row8 col0" >-3.405</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col1" class="data row8 col1" >0.295</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col2" class="data row8 col2" >0.934</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col3" class="data row8 col3" >0.539</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col4" class="data row8 col4" >0.003</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col5" class="data row8 col5" >-0.321</td>
+        <td id="T_cbfbf406_d623_11e7_8578_42010a140062row8_col6" class="data row8 col6" >-0.029</td>
+    </tr></tbody>
+</table></div>
+</div>
+<p>These results can be compared to the results in Greene – they are
+unsurprisingly identical.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-1.png&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/system_examples_examples_21_0.png" src="../../_images/system_examples_examples_21_0.png" />
+</div>
+</div>
+<p>The GLS estimation method requires stronger assumptions for parameter
+estimates to be consistent. If these are violated then it might be the
+case that OLS is still consistent (in some sense) and so OLS can be used
+by passing <code class="docutils literal"><span class="pre">method='ols'</span></code> when calling <code class="docutils literal"><span class="pre">fit</span></code>.</p>
+<p>These results can be compared to Greene’s table – they are identical
+except the final value which seems to have a small typo.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">res_ols</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">:</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_ols</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">r2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_ols</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">equation_labels</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">T</span>
+<span class="n">params</span><span class="p">[</span><span class="s1">&#39;R2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r2</span>
+<span class="n">params</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;{:0.3f}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<style  type="text/css" >
+</style>
+<table id="T_cc04d544_d623_11e7_8578_42010a140062" >
+<thead>    <tr>
+        <th class="blank level0" ></th>
+        <th class="col_heading level0 col0" >Intercept</th>
+        <th class="col_heading level0 col1" >lnPC</th>
+        <th class="col_heading level0 col2" >lnHWY</th>
+        <th class="col_heading level0 col3" >lnWATER</th>
+        <th class="col_heading level0 col4" >lnUTIL</th>
+        <th class="col_heading level0 col5" >lnEMP</th>
+        <th class="col_heading level0 col6" >UNEMP</th>
+        <th class="col_heading level0 col7" >R2</th>
+    </tr></thead>
+<tbody>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col0" class="data row0 col0" >11.567</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col1" class="data row0 col1" >0.002</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col2" class="data row0 col2" >-2.029</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col3" class="data row0 col3" >0.101</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col4" class="data row0 col4" >1.358</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col5" class="data row0 col5" >0.805</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col6" class="data row0 col6" >-0.007</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row0_col7" class="data row0 col7" >0.997</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col0" class="data row1 col0" >3.028</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col1" class="data row1 col1" >0.164</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col2" class="data row1 col2" >-0.075</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col3" class="data row1 col3" >-0.169</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col4" class="data row1 col4" >0.637</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col5" class="data row1 col5" >0.362</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col6" class="data row1 col6" >-0.017</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row1_col7" class="data row1 col7" >0.998</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col0" class="data row2 col0" >3.590</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col1" class="data row2 col1" >0.295</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col2" class="data row2 col2" >0.174</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col3" class="data row2 col3" >-0.226</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col4" class="data row2 col4" >-0.214</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col5" class="data row2 col5" >0.917</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col6" class="data row2 col6" >-0.008</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row2_col7" class="data row2 col7" >0.994</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col0" class="data row3 col0" >6.378</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col1" class="data row3 col1" >-0.153</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col2" class="data row3 col2" >-0.123</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col3" class="data row3 col3" >0.306</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col4" class="data row3 col4" >-0.533</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col5" class="data row3 col5" >1.344</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col6" class="data row3 col6" >0.005</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row3_col7" class="data row3 col7" >0.999</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col0" class="data row4 col0" >-13.730</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col1" class="data row4 col1" >-0.020</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col2" class="data row4 col2" >0.662</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col3" class="data row4 col3" >-0.969</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col4" class="data row4 col4" >-0.107</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col5" class="data row4 col5" >3.380</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col6" class="data row4 col6" >0.034</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row4_col7" class="data row4 col7" >0.985</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col0" class="data row5 col0" >-22.855</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col1" class="data row5 col1" >-0.378</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col2" class="data row5 col2" >3.348</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col3" class="data row5 col3" >-0.264</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col4" class="data row5 col4" >-1.778</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col5" class="data row5 col5" >2.673</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col6" class="data row5 col6" >0.026</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row5_col7" class="data row5 col7" >0.986</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col0" class="data row6 col0" >3.927</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col1" class="data row6 col1" >0.043</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col2" class="data row6 col2" >-0.773</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col3" class="data row6 col3" >-0.035</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col4" class="data row6 col4" >0.140</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col5" class="data row6 col5" >1.665</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col6" class="data row6 col6" >0.008</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row6_col7" class="data row6 col7" >0.994</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col0" class="data row7 col0" >-9.111</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col1" class="data row7 col1" >0.233</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col2" class="data row7 col2" >1.604</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col3" class="data row7 col3" >0.717</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col4" class="data row7 col4" >-0.356</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col5" class="data row7 col5" >-0.259</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col6" class="data row7 col6" >-0.034</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row7_col7" class="data row7 col7" >0.989</td>
+    </tr>    <tr>
+        <th id="T_cc04d544_d623_11e7_8578_42010a140062level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col0" class="data row8 col0" >-5.621</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col1" class="data row8 col1" >0.386</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col2" class="data row8 col2" >1.267</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col3" class="data row8 col3" >0.546</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col4" class="data row8 col4" >-0.108</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col5" class="data row8 col5" >-0.475</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col6" class="data row8 col6" >-0.031</td>
+        <td id="T_cc04d544_d623_11e7_8578_42010a140062row8_col7" class="data row8 col7" >0.995</td>
+    </tr></tbody>
+</table></div>
+</div>
+<p>The parameter estimates for one coefficient – unemployment – can be
+compared across the two estimation methods.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">params</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res_ols</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span> <span class="n">res_ols</span><span class="o">.</span><span class="n">std_errors</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span>
+ <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span> <span class="n">res</span><span class="o">.</span><span class="n">std_errors</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">]],</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">params</span><span class="o">.</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OLS&#39;</span><span class="p">,</span> <span class="s1">&#39;OLS se&#39;</span><span class="p">,</span> <span class="s1">&#39;GLS&#39;</span><span class="p">,</span> <span class="s1">&#39;GLS se&#39;</span><span class="p">]</span>
+<span class="n">params</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">regions</span>
+<span class="n">params</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>OLS</th>
+      <th>OLS se</th>
+      <th>GLS</th>
+      <th>GLS se</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GF</th>
+      <td>0.002124</td>
+      <td>0.301235</td>
+      <td>-0.200966</td>
+      <td>0.142355</td>
+    </tr>
+    <tr>
+      <th>SW</th>
+      <td>0.163546</td>
+      <td>0.165995</td>
+      <td>0.076637</td>
+      <td>0.085831</td>
+    </tr>
+    <tr>
+      <th>WC</th>
+      <td>0.294855</td>
+      <td>0.205417</td>
+      <td>0.169950</td>
+      <td>0.091865</td>
+    </tr>
+    <tr>
+      <th>MT</th>
+      <td>-0.152601</td>
+      <td>0.084031</td>
+      <td>-0.114834</td>
+      <td>0.048489</td>
+    </tr>
+    <tr>
+      <th>NE</th>
+      <td>-0.020407</td>
+      <td>0.285621</td>
+      <td>0.118316</td>
+      <td>0.131329</td>
+    </tr>
+    <tr>
+      <th>MA</th>
+      <td>-0.377570</td>
+      <td>0.167307</td>
+      <td>-0.310861</td>
+      <td>0.080893</td>
+    </tr>
+    <tr>
+      <th>SO</th>
+      <td>0.042818</td>
+      <td>0.279472</td>
+      <td>-0.063212</td>
+      <td>0.104344</td>
+    </tr>
+    <tr>
+      <th>MW</th>
+      <td>0.233403</td>
+      <td>0.206248</td>
+      <td>0.095886</td>
+      <td>0.101564</td>
+    </tr>
+    <tr>
+      <th>CN</th>
+      <td>0.385885</td>
+      <td>0.211083</td>
+      <td>0.294570</td>
+      <td>0.090104</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The parameters and their standard errors match those reported in Greene.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-3.png&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/system_examples_examples_27_0.png" src="../../_images/system_examples_examples_27_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Estimation-Options">
+<h2>Estimation Options<a class="headerlink" href="#Estimation-Options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Iterative-GLS">
+<h3>Iterative GLS<a class="headerlink" href="#Iterative-GLS" title="Permalink to this headline">¶</a></h3>
+<p>These next examples use data on fringe benefits from F. Vella (1993), “A
+Simple Estimator for Simultaneous Models with Censored Endogenous
+Regressors” which appears in Wooldridge (2002). The model consists of
+two equations, one for hourly wage and the other for hourly benefits.
+The initial model uses the same regressors in both equations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">fringe</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fringe</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
+<span class="n">fdata</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+F. Vella (1993), &#34;A Simple Estimator for Simultaneous Models with Censored
+Endogenous Regressors,&#34; International Economic Review 34, 441-457.
+
+annearn                  annual earnings, $
+hrearn                   hourly earnings, $
+exper                    years work experience
+age                      age in years
+depends                  number of dependents
+married                  =1 if married
+tenure                   years with current employer
+educ                     years schooling
+nrtheast                 =1 if live in northeast
+nrthcen                  =1 if live in north central
+south                    =1 if live in south
+male                     =1 if male
+white                    =1 if white
+union                    =1 if union member
+office                   =1 if office worker
+annhrs                   annual hours worked
+ind1                     =1 if industry == 1
+ind2                     =1 if industry == 2
+ind3                     =1 if industry == 3
+ind4                     =1 if industry == 4
+ind5                     =1 if industry == 5
+ind6                     =1 if industry == 6
+ind7                     =1 if industry == 7
+ind8                     =1 if industry == 8
+ind9                     =1 if industry == 9
+vacdays                  $ value of vac days
+sicklve                  $ value of sick leave
+insur                    $ value of employee insur
+pension                  $ value of employee pension
+annbens                  vacdays+sicklve+insur+pension
+hrbens                   hourly benefits, $
+annhrssq                 annhrs^2
+beratio                  annbens/annearn
+lannhrs                  log(annhrs)
+tenuresq                 tenure^2
+expersq                  exper^2
+lannearn                 log(annearn)
+peratio                  pension/annearn
+vserat                   (vacdays+sicklve)/annearn
+
+</pre></div></div>
+</div>
+<p>The estimated model is reported as “System OLS Estimation” since when
+all regressors are identical, OLS is used since GLS brings no efficiency
+gains. OLS will be used when the data structure containing the exogenous
+regressors in each equations is the same (i.e., <code class="docutils literal"><span class="pre">id(exog)</span></code> is the same
+for all equations).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span><span class="s1">&#39;tenuresq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;south&#39;</span><span class="p">,</span><span class="s1">&#39;nrtheast&#39;</span><span class="p">,</span><span class="s1">&#39;nrthcen&#39;</span><span class="p">,</span><span class="s1">&#39;married&#39;</span><span class="p">,</span><span class="s1">&#39;white&#39;</span><span class="p">,</span><span class="s1">&#39;male&#39;</span><span class="p">]])</span>
+<span class="n">fmod_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrearn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog</span><span class="p">}</span>
+<span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrbens&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrbens</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog</span><span class="p">}</span>
+<span class="n">fmod</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">fmod_data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System OLS Estimation Summary
+==============================================================================
+Estimator:                        OLS   Overall R-squared:              0.2087
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -2.6321     1.2153    -2.1658     0.0303     -5.0141     -0.2502
+educ           0.4588     0.0684     6.7085     0.0000      0.3248      0.5929
+exper         -0.0758     0.0567    -1.3367     0.1813     -0.1870      0.0354
+expersq        0.0040     0.0012     3.4274     0.0006      0.0017      0.0063
+tenure         0.1101     0.0829     1.3276     0.1843     -0.0524      0.2726
+tenuresq      -0.0051     0.0032    -1.5640     0.1178     -0.0114      0.0013
+union          0.8080     0.4035     2.0026     0.0452      0.0172      1.5988
+south         -0.4566     0.5459    -0.8365     0.4029     -1.5265      0.6132
+nrtheast      -1.1508     0.5993    -1.9201     0.0548     -2.3254      0.0239
+nrthcen       -0.6363     0.5501    -1.1565     0.2475     -1.7145      0.4420
+married        0.6424     0.4134     1.5540     0.1202     -0.1678      1.4526
+white          1.1409     0.6054     1.8844     0.0595     -0.0458      2.3275
+male           1.7847     0.3938     4.5322     0.0000      1.0129      2.5565
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.8897     0.1453    -6.1225     0.0000     -1.1746     -0.6049
+educ           0.0768     0.0082     9.3896     0.0000      0.0608      0.0928
+exper          0.0226     0.0068     3.3259     0.0009      0.0093      0.0359
+expersq       -0.0005     0.0001    -3.3965     0.0007     -0.0007     -0.0002
+tenure         0.0536     0.0099     5.4011     0.0000      0.0341      0.0730
+tenuresq      -0.0012     0.0004    -3.0014     0.0027     -0.0019     -0.0004
+union          0.3659     0.0482     7.5839     0.0000      0.2713      0.4605
+south         -0.0227     0.0653    -0.3476     0.7282     -0.1506      0.1052
+nrtheast      -0.0567     0.0717    -0.7918     0.4285     -0.1972      0.0837
+nrthcen       -0.0380     0.0658    -0.5776     0.5635     -0.1669      0.0909
+married        0.0579     0.0494     1.1706     0.2418     -0.0390      0.1547
+white          0.0902     0.0724     1.2453     0.2130     -0.0517      0.2321
+male           0.2683     0.0471     5.6985     0.0000      0.1760      0.3606
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
+</pre></div></div>
+</div>
+<p>The estimator can be forced to use GLS by setting <code class="docutils literal"><span class="pre">method='gls'</span></code>. As
+can be seen below, the parameter estimates and standard errors do not
+change even though two-stage GLS is used. The <span class="math">\(R^2\)</span> <strong>does
+change</strong> since the left-hand side variable is transformed by the GLS
+weighting before estimation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;gls&#39;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.2087
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -2.6321     1.2153    -2.1658     0.0303     -5.0141     -0.2502
+educ           0.4588     0.0684     6.7085     0.0000      0.3248      0.5929
+exper         -0.0758     0.0567    -1.3367     0.1813     -0.1870      0.0354
+expersq        0.0040     0.0012     3.4274     0.0006      0.0017      0.0063
+tenure         0.1101     0.0829     1.3276     0.1843     -0.0524      0.2726
+tenuresq      -0.0051     0.0032    -1.5640     0.1178     -0.0114      0.0013
+union          0.8080     0.4035     2.0026     0.0452      0.0172      1.5988
+south         -0.4566     0.5459    -0.8365     0.4029     -1.5265      0.6132
+nrtheast      -1.1508     0.5993    -1.9201     0.0548     -2.3254      0.0239
+nrthcen       -0.6363     0.5501    -1.1565     0.2475     -1.7145      0.4420
+married        0.6424     0.4134     1.5540     0.1202     -0.1678      1.4526
+white          1.1409     0.6054     1.8844     0.0595     -0.0458      2.3275
+male           1.7847     0.3938     4.5322     0.0000      1.0129      2.5565
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.8897     0.1453    -6.1225     0.0000     -1.1746     -0.6049
+educ           0.0768     0.0082     9.3896     0.0000      0.0608      0.0928
+exper          0.0226     0.0068     3.3259     0.0009      0.0093      0.0359
+expersq       -0.0005     0.0001    -3.3965     0.0007     -0.0007     -0.0002
+tenure         0.0536     0.0099     5.4011     0.0000      0.0341      0.0730
+tenuresq      -0.0012     0.0004    -3.0014     0.0027     -0.0019     -0.0004
+union          0.3659     0.0482     7.5839     0.0000      0.2713      0.4605
+south         -0.0227     0.0653    -0.3476     0.7282     -0.1506      0.1052
+nrtheast      -0.0567     0.0717    -0.7918     0.4285     -0.1972      0.0837
+nrthcen       -0.0380     0.0658    -0.5776     0.5635     -0.1669      0.0909
+married        0.0579     0.0494     1.1706     0.2418     -0.0390      0.1547
+white          0.0902     0.0724     1.2453     0.2130     -0.0517      0.2321
+male           0.2683     0.0471     5.6985     0.0000      0.1760      0.3606
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+<p>The regressors must differ in order to see gains to GLS. Here
+insignificant variables are dropped from each equation so that the
+regressors will no longer be identical. The typical standard error is
+marginally smaller, although this might be due to dropping regressors.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">exog_earn</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;nrtheast&#39;</span><span class="p">,</span><span class="s1">&#39;white&#39;</span><span class="p">]])</span>
+<span class="n">exog_bens</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span><span class="s1">&#39;tenuresq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;male&#39;</span><span class="p">]])</span>
+<span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrearn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog_earn</span><span class="p">}</span>
+<span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrbens&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrbens</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog_bens</span><span class="p">}</span>
+<span class="n">fmod</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">fmod_data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.1685
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -2.5240     1.0857    -2.3246     0.0201     -4.6520     -0.3959
+educ           0.5000     0.0685     7.2987     0.0000      0.3657      0.6342
+exper         -0.0212     0.0522    -0.4058     0.6849     -0.1234      0.0811
+expersq        0.0032     0.0011     2.8776     0.0040      0.0010      0.0055
+union          1.1043     0.3928     2.8116     0.0049      0.3345      1.8741
+nrtheast      -0.5343     0.4305    -1.2411     0.2146     -1.3780      0.3095
+white          1.1320     0.5845     1.9368     0.0528     -0.0136      2.2776
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.8231     0.1176    -7.0021     0.0000     -1.0535     -0.5927
+educ           0.0791     0.0080     9.8927     0.0000      0.0634      0.0948
+exper          0.0260     0.0066     3.9114     0.0001      0.0130      0.0390
+expersq       -0.0005     0.0001    -3.8469     0.0001     -0.0008     -0.0003
+tenure         0.0494     0.0094     5.2409     0.0000      0.0309      0.0679
+tenuresq      -0.0010     0.0004    -2.6275     0.0086     -0.0017     -0.0002
+union          0.3766     0.0475     7.9259     0.0000      0.2835      0.4698
+male           0.2141     0.0433     4.9413     0.0000      0.1292      0.2990
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+<p>The standard method to estimate models uses two steps. The first uses
+OLS to estimate the parameters so that the residual covariance can be
+estimated. The second stage uses the estimated covariance to estimate
+the model via GLS. Iterative GLS can be used to continue these
+iterations using the most recent step to estimate the residual
+covariance and then re-estimating the parameters using GLS. This option
+can be used by setting <code class="docutils literal"><span class="pre">iterate=True</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">fmod_res</span> <span class="o">=</span> <span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">iterate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fmod_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                   System Iterative GLS Estimation Summary
+==============================================================================
+Estimator:              Iterative GLS   Overall R-squared:              0.1685
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -2.5147     1.0858    -2.3161     0.0206     -4.6428     -0.3867
+educ           0.5001     0.0685     7.3004     0.0000      0.3658      0.6344
+exper         -0.0211     0.0522    -0.4044     0.6859     -0.1233      0.0811
+expersq        0.0032     0.0011     2.8760     0.0040      0.0010      0.0055
+union          1.1043     0.3928     2.8115     0.0049      0.3345      1.8741
+nrtheast      -0.5314     0.4305    -1.2342     0.2171     -1.3752      0.3124
+white          1.1191     0.5845     1.9145     0.0556     -0.0266      2.2648
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.8223     0.1176    -6.9947     0.0000     -1.0527     -0.5919
+educ           0.0792     0.0080     9.9004     0.0000      0.0635      0.0948
+exper          0.0260     0.0066     3.9213     0.0001      0.0130      0.0390
+expersq       -0.0005     0.0001    -3.8528     0.0001     -0.0008     -0.0003
+tenure         0.0492     0.0094     5.2189     0.0000      0.0307      0.0677
+tenuresq      -0.0010     0.0004    -2.6025     0.0093     -0.0017     -0.0002
+union          0.3771     0.0475     7.9364     0.0000      0.2840      0.4703
+male           0.2107     0.0433     4.8627     0.0000      0.1258      0.2956
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+<p>The number of GLS iterations can be verified using the <code class="docutils literal"><span class="pre">iterations</span></code>
+attribute of the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">fmod_res</span><span class="o">.</span><span class="n">iterations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[20]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Alternative-Covariance-Estimators">
+<h3>Alternative Covariance Estimators<a class="headerlink" href="#Alternative-Covariance-Estimators" title="Permalink to this headline">¶</a></h3>
+<p>The estimator supports heteroskedasticity robust covariance estimation b
+setting <code class="docutils literal"><span class="pre">cov_type='robust'</span></code>. The estimator allows for arbitrary
+correlation across series with the same time index but not correlation
+across time periods, which is the same assumption as in the unadjusted
+estimator. The main difference is that this estimator will correct
+standard errors for dependence between regressors (or squared
+regressors) and squared residuals.</p>
+<p>In the fringe benefit model there are some large differences between
+standard errors computed using the the homoskedastic covariance
+estimator and the heteroskedasticity robust covariance estimator (e.g.,
+<code class="docutils literal"><span class="pre">exper</span></code>).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">fres_het</span> <span class="o">=</span> <span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fres_het</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.1685
+No. Equations.:                     2   Cov. Estimator:                 robust
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -2.5240     0.8703    -2.9002     0.0037     -4.2297     -0.8183
+educ           0.5000     0.0809     6.1765     0.0000      0.3413      0.6586
+exper         -0.0212     0.2270    -0.0932     0.9257     -0.4661      0.4237
+expersq        0.0032     0.0059     0.5507     0.5819     -0.0083      0.0148
+union          1.1043     0.2857     3.8647     0.0001      0.5443      1.6644
+nrtheast      -0.5343     0.5273    -1.0132     0.3110     -1.5678      0.4992
+white          1.1320     0.4921     2.3002     0.0214      0.1674      2.0966
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.8231     0.1082    -7.6087     0.0000     -1.0352     -0.6111
+educ           0.0791     0.0081     9.7768     0.0000      0.0632      0.0949
+exper          0.0260     0.0059     4.3675     0.0000      0.0143      0.0376
+expersq       -0.0005     0.0001    -4.2494     0.0000     -0.0008     -0.0003
+tenure         0.0494     0.0097     5.0775     0.0000      0.0303      0.0685
+tenuresq      -0.0010     0.0004    -2.4121     0.0159     -0.0018     -0.0002
+union          0.3766     0.0514     7.3342     0.0000      0.2760      0.4773
+male           0.2141     0.0397     5.3975     0.0000      0.1363      0.2918
+==============================================================================
+
+Covariance Estimator:
+Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Pre-specified-Residual-Covariance-Estimators">
+<h2>Pre-specified Residual Covariance Estimators<a class="headerlink" href="#Pre-specified-Residual-Covariance-Estimators" title="Permalink to this headline">¶</a></h2>
+<p>The GLS estimator can be used with a user specified covariance. This
+example uses and equi-correlation covariance in the state GDP model. The
+estimator must be used when constructing the model through the <code class="docutils literal"><span class="pre">sigma</span></code>
+keyword argument.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">avg_corr</span> <span class="o">=</span> <span class="p">(</span><span class="n">corr</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">81</span><span class="o">/</span><span class="mi">72</span><span class="p">)</span>
+<span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span> <span class="o">*</span> <span class="n">avg_corr</span>  <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">avg_corr</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">sigma_pre</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">std</span> <span class="err">@</span> <span class="n">std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="n">mod_pre_sigma</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">mod_data</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_pre</span><span class="p">)</span>
+<span class="n">res_pre</span> <span class="o">=</span> <span class="n">mod_pre_sigma</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res_pre</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="s1">&#39;GF&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                            GLS Estimation Summary
+==============================================================================
+Eq. Label:                         GF   R-squared:                      0.9966
+Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9945
+Estimator:                        GLS   Cov. Estimator:             unadjusted
+No. Observations:                  17   F-statistic:                    549.95
+Date:                Thu, Nov 30 2017   P-value (F-stat)                0.0000
+Time:                        23:11:29   Distribution:                  F(6,90)
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      7.9753     4.3819     1.8200     0.0988     -1.7883      17.739
+lnPC           0.1011     0.2727     0.3708     0.7185     -0.5065      0.7087
+lnHWY         -0.9882     1.0313    -0.9582     0.3606     -3.2862      1.3098
+lnWATER        0.0791     0.1134     0.6971     0.5016     -0.1736      0.3318
+lnUTIL         0.5160     0.7720     0.6685     0.5190     -1.2040      2.2361
+lnEMP          0.8494     0.1426     5.9557     0.0001      0.5316      1.1671
+UNEMP         -0.0057     0.0034    -1.6466     0.1307     -0.0134      0.0020
+
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: True, GLS: True)
+</pre></div></div>
+</div>
+<div class="section" id="Diagonal-Residual-Covariance">
+<h3>Diagonal Residual Covariance<a class="headerlink" href="#Diagonal-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
+<p>The default assumption is that there can be arbitrary correlation
+between series. The model can be estimated assuming no correlation but
+different variance by setting the keyword argument <code class="docutils literal"><span class="pre">full_cov=False</span></code> in
+the <code class="docutils literal"><span class="pre">fit</span></code> method. This is only useful when there are cross-equation
+parameter restrictions.</p>
+</div>
+</div>
+<div class="section" id="Cross-Equation-Restrictions">
+<h2>Cross-Equation Restrictions<a class="headerlink" href="#Cross-Equation-Restrictions" title="Permalink to this headline">¶</a></h2>
+<p>One of the more useful features of using a SUR to estimate a system is
+the ability to impose constraints on parameters across equations. Here
+only linear constraints of the form</p>
+<div class="math">
+\[r \beta = q\]</div>
+<p>are supported. Linear constraints are entered by passing a <code class="docutils literal"><span class="pre">DataFrame</span></code>
+with the shape number of constraints by number of parameters. The number
+and name of parameters can be seen by inspecting the <code class="docutils literal"><span class="pre">param_names</span></code>
+attribute of a model. Below are the parameter names from the state GDP
+model which consist of the equation label, an underscore, and the
+variable name. This ensures uniqueness.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">mod</span><span class="o">.</span><span class="n">param_names</span><span class="p">[:</span><span class="mi">14</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[23]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>[&#39;GF_Intercept&#39;,
+ &#39;GF_lnPC&#39;,
+ &#39;GF_lnHWY&#39;,
+ &#39;GF_lnWATER&#39;,
+ &#39;GF_lnUTIL&#39;,
+ &#39;GF_lnEMP&#39;,
+ &#39;GF_UNEMP&#39;,
+ &#39;SW_Intercept&#39;,
+ &#39;SW_lnPC&#39;,
+ &#39;SW_lnHWY&#39;,
+ &#39;SW_lnWATER&#39;,
+ &#39;SW_lnUTIL&#39;,
+ &#39;SW_lnEMP&#39;,
+ &#39;SW_UNEMP&#39;]
+</pre></div>
+</div>
+</div>
+<p>The example of a parameter constraint will enforce a common value of the
+coefficient of unemployment in all equations. This restriction takes the
+form</p>
+<div class="math">
+\[\beta_{unemp,i} - \beta_{unemp,j} = 0\]</div>
+<p>where in all examples i is the first series and j is one of the 8
+others. In total there are 8 restrictions.</p>
+<p>The construction of the restriction array and the non-zero columns are
+shown below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">param_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rest{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">r</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+<span class="n">r</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">13</span><span class="p">::</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">6</span><span class="p">::</span><span class="mi">7</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+       GF_UNEMP  SW_UNEMP  WC_UNEMP  MT_UNEMP  NE_UNEMP  MA_UNEMP  SO_UNEMP  \
+rest0      -1.0       1.0       0.0       0.0       0.0       0.0       0.0
+rest1      -1.0       0.0       1.0       0.0       0.0       0.0       0.0
+rest2      -1.0       0.0       0.0       1.0       0.0       0.0       0.0
+rest3      -1.0       0.0       0.0       0.0       1.0       0.0       0.0
+rest4      -1.0       0.0       0.0       0.0       0.0       1.0       0.0
+rest5      -1.0       0.0       0.0       0.0       0.0       0.0       1.0
+rest6      -1.0       0.0       0.0       0.0       0.0       0.0       0.0
+rest7      -1.0       0.0       0.0       0.0       0.0       0.0       0.0
+
+       MW_UNEMP  CN_UNEMP
+rest0       0.0       0.0
+rest1       0.0       0.0
+rest2       0.0       0.0
+rest3       0.0       0.0
+rest4       0.0       0.0
+rest5       0.0       0.0
+rest6       1.0       0.0
+rest7       0.0       1.0
+</pre></div></div>
+</div>
+<p>The constraint can be added to an existing model using the
+<code class="docutils literal"><span class="pre">add_constraint</span></code> method. This method requires one input, <code class="docutils literal"><span class="pre">r</span></code> and
+optionally <code class="docutils literal"><span class="pre">q</span></code>. if <code class="docutils literal"><span class="pre">q</span></code> is not provided, it is set to 0.</p>
+<p>Here the constraint is added, the model is estimated, and the parameters
+for unemployment are displayed. They all have the same value.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">mod</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="n">constrained_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">constrained_res</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">6</span><span class="p">::</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[25]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>GF_UNEMP   -0.005801
+SW_UNEMP   -0.005801
+WC_UNEMP   -0.005801
+MT_UNEMP   -0.005801
+NE_UNEMP   -0.005801
+MA_UNEMP   -0.005801
+SO_UNEMP   -0.005801
+MW_UNEMP   -0.005801
+CN_UNEMP   -0.005801
+Name: params, dtype: float64
+</pre></div>
+</div>
+</div>
+<div class="section" id="Pooling-using-constraints">
+<h3>Pooling using constraints<a class="headerlink" href="#Pooling-using-constraints" title="Permalink to this headline">¶</a></h3>
+<p>More complicated constraints can be used to produce interesting models.
+Using the same idea as the previous set of constraints, a pooled SUR
+(excluding the constant) is constructed by restricting all coefficients
+to have the same value. Here the form of the restriction is</p>
+<div class="math">
+\[\beta_{var,0} - \beta_{var,j} = 0\]</div>
+<p>so that the restriction is identical to the previous, only applied to
+all variables excluding the constant.</p>
+<p>Here the estimated from the first two equations are shown. ALl
+coefficients except the intercept are identical across equations.</p>
+<p><strong>Note</strong>: When linear constraints are imposed, the parameter covariance
+matrix will be singular. Caution is needed to ensure test statistics are
+meaningful.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+        <span class="n">r2</span><span class="p">[</span><span class="n">loc</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="n">r2</span><span class="p">[</span><span class="n">loc</span><span class="p">,</span><span class="mi">7</span><span class="o">*</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">loc</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">r2</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r2</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">param_names</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">reset_constraints</span><span class="p">()</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="n">pooled_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pooled_res</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">as_text</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="mi">33</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.9777
+No. Equations.:                     9   Cov. Estimator:                 robust
+No. Observations:                  17   Num. Constraints:                   48
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                   Equation: GF, Dependent Variable: lnGSP
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      0.2732     0.2159     1.2656     0.2057     -0.1499      0.6963
+lnPC           0.3639     0.0205     17.763     0.0000      0.3238      0.4041
+lnHWY          0.3103     0.0279     11.141     0.0000      0.2557      0.3649
+lnWATER        0.0805     0.0109     7.3615     0.0000      0.0591      0.1020
+lnUTIL        -0.1733     0.0166    -10.466     0.0000     -0.2057     -0.1408
+lnEMP          0.6142     0.0248     24.752     0.0000      0.5655      0.6628
+UNEMP         -0.0128     0.0006    -22.939     0.0000     -0.0139     -0.0117
+                   Equation: SW, Dependent Variable: lnGSP
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Intercept      0.2869     0.2201     1.3034     0.1924     -0.1445      0.7183
+lnPC           0.3639     0.0205     17.763     0.0000      0.3238      0.4041
+lnHWY          0.3103     0.0279     11.141     0.0000      0.2557      0.3649
+lnWATER        0.0805     0.0109     7.3615     0.0000      0.0591      0.1020
+lnUTIL        -0.1733     0.0166    -10.466     0.0000     -0.2057     -0.1408
+lnEMP          0.6142     0.0248     24.752     0.0000      0.5655      0.6628
+UNEMP         -0.0128     0.0006    -22.939     0.0000     -0.0139     -0.0117
+                   Equation: WC, Dependent Variable: lnGSP
+==============================================================================
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Multivariate-OLS">
+<h2>Multivariate OLS<a class="headerlink" href="#Multivariate-OLS" title="Permalink to this headline">¶</a></h2>
+<p>One final feature worth demonstrating is a simple interface for
+specifying multivariate OLS models. These models have the same
+regressors and so it is possible to specify them with two arrays. The
+first is a <span class="math">\(T\)</span> by <span class="math">\(K\)</span> array of dependent variables where
+each column contains a dependent variable. The second contains the
+common exogenous regressors.</p>
+<p>This example shows how a CAPM can be estimated as a MV OLS.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
+<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="s1">&#39;MktRF&#39;</span><span class="p">]])</span>
+<span class="n">mv_ols</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">multivariate_ls</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1V1&#39;</span><span class="p">,</span><span class="s1">&#39;S1V3&#39;</span><span class="p">,</span><span class="s1">&#39;S1V5&#39;</span><span class="p">,</span><span class="s1">&#39;S5V1&#39;</span><span class="p">,</span><span class="s1">&#39;S5V3&#39;</span><span class="p">,</span><span class="s1">&#39;S5V5&#39;</span><span class="p">]],</span> <span class="n">factors</span><span class="p">)</span>
+<span class="n">mv_ols_res</span> <span class="o">=</span> <span class="n">mv_ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mv_ols_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System OLS Estimation Summary
+==============================================================================
+Estimator:                        OLS   Overall R-squared:              0.6564
+No. Equations.:                     6   Cov. Estimator:             unadjusted
+No. Observations:                 819   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                   Equation: S1V1, Dependent Variable: S1V1
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.0020     0.0017    -1.1608     0.2457     -0.0054      0.0014
+MktRF          1.3736     0.0403     34.101     0.0000      1.2947      1.4526
+                   Equation: S1V3, Dependent Variable: S1V3
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0048     0.0012     4.0973     0.0000      0.0025      0.0072
+MktRF          1.0711     0.0276     38.879     0.0000      1.0171      1.1251
+                   Equation: S1V5, Dependent Variable: S1V5
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0082     0.0013     6.5142     0.0000      0.0057      0.0106
+MktRF          1.0538     0.0293     36.019     0.0000      0.9965      1.1111
+                   Equation: S5V1, Dependent Variable: S5V1
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0032     0.0005     5.8787     0.0000      0.0021      0.0042
+MktRF          0.9861     0.0126     78.376     0.0000      0.9615      1.0108
+                   Equation: S5V3, Dependent Variable: S5V3
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0052     0.0007     7.4953     0.0000      0.0039      0.0066
+MktRF          0.8472     0.0162     52.204     0.0000      0.8154      0.8790
+                   Equation: S5V5, Dependent Variable: S5V5
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0051     0.0011     4.5167     0.0000      0.0029      0.0073
+MktRF          0.9851     0.0263     37.515     0.0000      0.9337      1.0366
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
+</pre></div></div>
+</div>
+<div class="section" id="Using-GLS-with-common-regressors">
+<h3>Using GLS with common regressors<a class="headerlink" href="#Using-GLS-with-common-regressors" title="Permalink to this headline">¶</a></h3>
+<p>As noted previously, forcing GLS has no effect (except on changing the
+<span class="math">\(R^2\)</span>). This can be seen below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="n">mv_ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gls&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.6564
+No. Equations.:                     6   Cov. Estimator:             unadjusted
+No. Observations:                 819   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:29
+
+
+                   Equation: S1V1, Dependent Variable: S1V1
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const         -0.0020     0.0017    -1.1608     0.2457     -0.0054      0.0014
+MktRF          1.3736     0.0403     34.101     0.0000      1.2947      1.4526
+                   Equation: S1V3, Dependent Variable: S1V3
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0048     0.0012     4.0973     0.0000      0.0025      0.0072
+MktRF          1.0711     0.0276     38.879     0.0000      1.0171      1.1251
+                   Equation: S1V5, Dependent Variable: S1V5
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0082     0.0013     6.5142     0.0000      0.0057      0.0106
+MktRF          1.0538     0.0293     36.019     0.0000      0.9965      1.1111
+                   Equation: S5V1, Dependent Variable: S5V1
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0032     0.0005     5.8787     0.0000      0.0021      0.0042
+MktRF          0.9861     0.0126     78.376     0.0000      0.9615      1.0108
+                   Equation: S5V3, Dependent Variable: S5V3
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0052     0.0007     7.4953     0.0000      0.0039      0.0066
+MktRF          0.8472     0.0162     52.204     0.0000      0.8154      0.8790
+                   Equation: S5V5, Dependent Variable: S5V5
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.0051     0.0011     4.5167     0.0000      0.0029      0.0073
+MktRF          0.9851     0.0263     37.515     0.0000      0.9337      1.0366
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="../index.html" title="previous chapter (use the left arrow)">System Regression Models</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="formulas.html" title="next chapter (use the right arrow)">Using formulas to specify models</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="formulas.html" title="Using formulas to specify models"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="System Regression Models"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

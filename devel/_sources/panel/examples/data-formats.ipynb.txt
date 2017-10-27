@@ -1,0 +1,265 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "# Data Formats for Panel Data Analysis\n",
+    "\n",
+    "There are two primary methods to express data:\n",
+    "\n",
+    "  * MultiIndex DataFrames where the outer index is the entity and the inner is the time index.  This requires using pandas.\n",
+    "  * 3D structures were dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index.  It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Multi Index DataFrames\n",
+    "The most precise data format to use is a MultiIndex `DataFrame`.  This is the most precise since only single columns can preserve all types within a panel.  For example, it is not possible to span a single Categorical variable across multiple columns when using a pandas `Panel`. \n",
+    "\n",
+    "This example uses the jobtraining example to format a MultiIndex `DataFrame` using the `set_index` command. The entity index is known as fcode and the time index is year."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.datasets import jobtraining\n",
+    "data = jobtraining.load()\n",
+    "print(data.head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here `set_index` is used to set the multi index using the firm code (entity) and year (time)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mi_data = data.set_index(['fcode', 'year'])\n",
+    "print(mi_data.head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The `MultiIndex` `DataFrame` can be used to initialized the model.  When only referencing a single series, the `MultiIndex` `Series` representation can be used."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels import PanelOLS\n",
+    "mod = PanelOLS(mi_data.lscrap, mi_data.hrsemp, entity_effects=True)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## pandas Panels and DataFrames\n",
+    "An alternative formal is to use pandas Panels ad DataFrames.  Panels should be formatted with `items` containing distinct variables, `major_axis` holding the time dimension and `minor_axis` holding the entity index.  Here we transform the MultiIndex DataFrame to a panel to demonstrate this format.\n",
+    "\n",
+    "A single index DataFrame can also be used and is treated as being a single item slice of a Panel, and so the items should contain the time series dimension and the columns should contain entities. Note that using the `DataFrame` version loses information about variable names, which is not usually desirable."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "panel = mi_data[['lscrap','hrsemp']].to_panel().swapaxes(1,2)\n",
+    "lscrap = panel['lscrap']\n",
+    "hrsemp = panel['hrsemp']\n",
+    "panel"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "When using panels, it is best to input the panel which requires selecting using `[[`_var_`]]` so ensure that the variable(s) selected still has 3 dimensions.  This retains information about variable name."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = PanelOLS(panel[['lscrap']], panel[['hrsemp']], entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using DataFrames removes this information and so the generic _Dep_ and _Exog_ are used."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = PanelOLS(lscrap, hrsemp, entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## NumPy arrays\n",
+    "NumPy arrays are treated identically to pandas Panel and single index DataFrames.  In particular, using `panel.values` and `df.values` will produce identical results.  The main difference between NumPy and pandas is that NumPy loses all label information."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = PanelOLS(lscrap.values, hrsemp.values, entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## xarray DataArrays\n",
+    "\n",
+    "xarray is a relatively new entrant into the set of packages used for data structures.  The data structures provided by ``xarray`` are relevant in the context of panel models since pandas `Panel` is scheduled for removal in the futures, and so the only 3d data format that will remain viable is an `xarray` `DataArray`. `DataArray`s are similar to pandas `Panel` although `DataArrays` use some difference notation.  In principle it is possible to express the same information in a `DataArray` as one can in a `Panel`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "da = panel.to_xarray()\n",
+    "da"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = PanelOLS(da.loc[['lscrap']], da.loc[['hrsemp']], entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Conversion of Categorical and Strings to Dummies\n",
+    "Categorical or string variables are treated as factors and so are converted to dummies. The first category is always dropped.  If this is not desirable, you should manually convert the data to dummies before estimating a model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "year_str = mi_data.reset_index()[['year']].astype('str')\n",
+    "year_cat = pd.Categorical(year_str.iloc[:,0])\n",
+    "year_str.index = mi_data.index\n",
+    "year_cat.index = mi_data.index\n",
+    "mi_data['year_str'] = year_str\n",
+    "mi_data['year_cat'] = year_cat"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here year has been converted to a string which is then used in the model to produce year dummies."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print('Exogenous variables')\n",
+    "print(mi_data[['hrsemp','year_str']].head())\n",
+    "print(mi_data[['hrsemp','year_str']].dtypes)\n",
+    "\n",
+    "res = PanelOLS(mi_data[['lscrap']], mi_data[['hrsemp','year_str']], entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using ``categorical``s has the same effect."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print('Exogenous variables')\n",
+    "print(mi_data[['hrsemp','year_cat']].head())\n",
+    "print(mi_data[['hrsemp','year_cat']].dtypes)\n",
+    "\n",
+    "res = PanelOLS(mi_data[['lscrap']], mi_data[['hrsemp','year_cat']], entity_effects=True).fit()\n",
+    "print(res)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

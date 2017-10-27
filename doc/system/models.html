@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>System Regression Estimators &#8212; linearmodels 4.1 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Estimation Results" href="results.html" />
+    <link rel="prev" title="Module Reference" href="reference.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.1</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">System Regression Models</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>System Regression Estimators</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.system.model">
+<span id="system-regression-estimators"></span><span id="system-models-module-reference-models"></span><h1>System Regression Estimators<a class="headerlink" href="#module-linearmodels.system.model" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="seemingly-unrelated-regression-sur-sure">
+<h2>Seemingly Unrelated Regression (SUR/SURE)<a class="headerlink" href="#seemingly-unrelated-regression-sur-sure" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.system.model.SUR">
+<em class="property">class </em><code class="descname">SUR</code><span class="sig-paren">(</span><em>equations</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Seemingly unrelated regression estimation (SUR/SURE)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing dependent and exogenous variable
+values.  Each key is an equations label and must be a string. Each
+value must be either a tuple of the form (dependent,
+exog, [weights]) or a dictionary with keys ‘dependent’ and ‘exog’ and
+the optional key ‘weights’.</li>
+<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+provided, FGLS is implemented based on an estimate of sigma.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Estimates a set of regressions which are seemingly unrelated in the sense
+that separate estimation would lead to consistent parameter estimates.
+Each equation is of the form</p>
+<div class="math">
+\[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
+<p>where k denotes the equation and i denoted the observation index. By
+stacking vertically arrays of dependent and placing the exogenous
+variables into a block diagonal array, the entire system can be compactly
+expressed as</p>
+<div class="math">
+\[Y = X\beta + \epsilon\]</div>
+<p>where</p>
+<div class="math">
+\[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
+<p>and</p>
+<div class="math">
+\[\begin{split}X = \left[\begin{array}{cccc}
+         X_1 &amp; 0 &amp; \ldots &amp; 0 \\
+         0 &amp; X_2 &amp; \dots &amp; 0 \\
+         \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+         0 &amp; 0 &amp; \dots &amp; X_K
+    \end{array}\right]\end{split}\]</div>
+<p>The system OLS estimator is</p>
+<div class="math">
+\[\hat{\beta}_{OLS} = (X'X)^{-1}X'Y\]</div>
+<p>When certain conditions are satisfied, a GLS estimator of the form</p>
+<div class="math">
+\[\hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y\]</div>
+<p>can improve accuracy of coefficient estimates where</p>
+<div class="math">
+\[\Omega = I_n \otimes \Sigma\]</div>
+<p>where <span class="math">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<p>SUR is a special case of 3SLS where there are no endogenous regressors and
+no instruments.</p>
+<dl class="method">
+<dt id="linearmodels.system.model.SUR.add_constraints">
+<code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</li>
+<li><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Constraints are of the form</p>
+<div class="math">
+\[r \beta = q\]</div>
+<p>The property <cite>param_names</cite> can be used to determine the order of
+parameters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.SUR.constraints">
+<code class="descname">constraints</code><a class="headerlink" href="#linearmodels.system.model.SUR.constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model constraints</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cons</strong> – Constraint object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">LinearConstraint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.model.SUR.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>method=None</em>, <em>full_cov=True</em>, <em>iterate=False</em>, <em>iter_limit=100</em>, <em>tol=1e-06</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
+using OLS only if all regressors are identical. The other two
+arguments force the use of GLS or OLS.</li>
+<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+when estimating the model with GLS</li>
+<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+iterations have been completed</li>
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+<ul>
+<li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
+<li>’robust’, ‘heteroskedastic’ - Heteroskedasticit robust
+covariance estimator</li>
+</ul>
+</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
+estimators support debiased which employs a small-sample adjustment</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.system.model.SUR.from_formula">
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>sigma=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a SUR using the formula interface</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
+the dictionary represents a single equation. See Notes for a
+description of the accepted syntax</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
+<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+not provided, FGLS is implemented based on an estimate of sigma.</li>
+<li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
+weights.  Each entry must have the same number of observations as
+data.  If an equation label is not a key weights, the weights will
+be set to unity</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Models can be specified in one of two ways. The first uses curly
+braces to encapsulate equations.  The second uses a dictionary
+where each key is an equation name.</p>
+<p class="rubric">Examples</p>
+<p>The simplest format uses standard Patsy formulas for each equation
+in a dictionary.  Best practice is to use an Ordered Dictionary</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="k">import</span> <span class="n">SUR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eq1&#39;</span><span class="p">:</span> <span class="s1">&#39;y1 ~ 1 + x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;eq2&#39;</span><span class="p">:</span> <span class="s1">&#39;y2 ~ 1 + x2_1&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The second format uses curly braces {} to surround distinct equations</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is also possible to include equation labels when using curly braces</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.SUR.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.system.model.SUR.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector indicating which equations contain constants</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.system.model.SUR.multivariate_ls">
+<em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR.multivariate_ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR.multivariate_ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface for specification of multivariate regression models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
+<li><strong>exog</strong> (<em>array-like</em>) – nobs by nvar array of exogenous regressors common to all models</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Utility function to simplify the construction of multivariate
+regression models which all use the same regressors. Constructs
+the dictionary of equations from the variables using the common
+exogenous variable.</p>
+<p class="rubric">Examples</p>
+<p>A simple CAP-M can be estimated as a multivariate regression</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="k">import</span> <span class="n">SUR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1V1&#39;</span><span class="p">,</span><span class="s1">&#39;S1V5&#39;</span><span class="p">,</span><span class="s1">&#39;S5V1&#39;</span><span class="p">,</span><span class="s1">&#39;S5V5&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;MktRF&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factors</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">multivariate_ls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.SUR.param_names">
+<code class="descname">param_names</code><a class="headerlink" href="#linearmodels.system.model.SUR.param_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model parameter names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.model.SUR.reset_constraints">
+<code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.reset_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all model constraints</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="three-stage-least-squares-3sls">
+<h2>Three-Stage Least Squares (3SLS)<a class="headerlink" href="#three-stage-least-squares-3sls" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.system.model.IV3SLS">
+<em class="property">class </em><code class="descname">IV3SLS</code><span class="sig-paren">(</span><em>equations</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Three-stage Least Squares (3SLS) Estimator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
+and instrumental variables.  Each key is an equations label and must
+be a string. Each value must be either a tuple of the form (dependent,
+exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
+‘exog’.  The dictionary may contain optional keys for ‘endog’,
+‘instruments’, and ‘weights’. Endogenous and/or Instrument can be empty
+if all variables in an equation are exogenous.</li>
+<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+provided, FGLS is implemented based on an estimate of sigma.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Estimates a set of regressions which are seemingly unrelated in the sense
+that separate estimation would lead to consistent parameter estimates.
+Each equation is of the form</p>
+<div class="math">
+\[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
+<p>where k denotes the equation and i denoted the observation index. By
+stacking vertically arrays of dependent and placing the exogenous
+variables into a block diagonal array, the entire system can be compactly
+expressed as</p>
+<div class="math">
+\[Y = X\beta + \epsilon\]</div>
+<p>where</p>
+<div class="math">
+\[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
+<p>and</p>
+<div class="math">
+\[\begin{split}X = \left[\begin{array}{cccc}
+         X_1 &amp; 0 &amp; \ldots &amp; 0 \\
+         0 &amp; X_2 &amp; \dots &amp; 0 \\
+         \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+         0 &amp; 0 &amp; \dots &amp; X_K
+    \end{array}\right]\end{split}\]</div>
+<p>The system instrumental variable (IV) estimator is</p>
+<div class="math">
+\[\begin{split}\hat{\beta}_{IV} &amp; = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
+                 &amp; = (\hat{X}'\hat{X})^{-1}\hat{X}'Y\end{split}\]</div>
+<p>where <span class="math">\(\hat{X} = Z(Z'Z)^{-1}Z'X\)</span> and.  When certain conditions are
+satisfied, a GLS estimator of the form</p>
+<div class="math">
+\[\hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y\]</div>
+<p>can improve accuracy of coefficient estimates where</p>
+<div class="math">
+\[\Omega = I_n \otimes \Sigma\]</div>
+<p>where <span class="math">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<dl class="method">
+<dt id="linearmodels.system.model.IV3SLS.add_constraints">
+<code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.add_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</li>
+<li><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Constraints are of the form</p>
+<div class="math">
+\[r \beta = q\]</div>
+<p>The property <cite>param_names</cite> can be used to determine the order of
+parameters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.IV3SLS.constraints">
+<code class="descname">constraints</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model constraints</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cons</strong> – Constraint object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">LinearConstraint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.model.IV3SLS.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>method=None</em>, <em>full_cov=True</em>, <em>iterate=False</em>, <em>iter_limit=100</em>, <em>tol=1e-06</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
+using OLS only if all regressors are identical. The other two
+arguments force the use of GLS or OLS.</li>
+<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+when estimating the model with GLS</li>
+<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+iterations have been completed</li>
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+<ul>
+<li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
+<li>’robust’, ‘heteroskedastic’ - Heteroskedasticit robust
+covariance estimator</li>
+</ul>
+</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
+estimators support debiased which employs a small-sample adjustment</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.system.model.IV3SLS.from_formula">
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>sigma=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a 3SLS using the formula interface</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
+the dictionary represents a single equation. See Notes for a
+description of the accepted syntax</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
+<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+not provided, FGLS is implemented based on an estimate of sigma.</li>
+<li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
+weights.  Each entry must have the same number of observations as
+data.  If an equation label is not a key weights, the weights will
+be set to unity</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Models can be specified in one of two ways. The first uses curly
+braces to encapsulate equations.  The second uses a dictionary
+where each key is an equation name.</p>
+<p class="rubric">Examples</p>
+<p>The simplest format uses standard Patsy formulas for each equation
+in a dictionary.  Best practice is to use an Ordered Dictionary</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z1&#39;</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="k">import</span> <span class="n">IV3SLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eq1&#39;</span><span class="p">:</span> <span class="s1">&#39;y1 ~ 1 + x1_1 + [x1_2 ~ z1]&#39;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="s1">&#39;eq2&#39;</span><span class="p">:</span> <span class="s1">&#39;y2 ~ 1 + x2_1 + [x2_2 ~ z2]&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The second format uses curly braces {} to surround distinct equations</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is also possible to include equation labels when using curly braces</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.IV3SLS.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector indicating which equations contain constants</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.system.model.IV3SLS.multivariate_ls">
+<em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>endog=None</em>, <em>instruments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.multivariate_ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.multivariate_ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface for specification of multivariate IV models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
+<li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
+<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nengod array of endogenous regressors common to all models</li>
+<li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>At least one of exog or endog must be provided.</p>
+<p>Utility function to simplify the construction of multivariate IV
+models which all use the same regressors and instruments. Constructs
+the dictionary of equations from the variables using the common
+exogenous, endogenous and instrumental variables.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.IV3SLS.param_names">
+<code class="descname">param_names</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.param_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model parameter names</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.model.IV3SLS.reset_constraints">
+<code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.reset_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.reset_constraints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all model constraints</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="reference.html" title="previous chapter (use the left arrow)">Module Reference</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="results.html" title="next chapter (use the right arrow)">Estimation Results</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

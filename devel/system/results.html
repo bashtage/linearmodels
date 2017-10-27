@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Estimation Results &#8212; linearmodels 4.1+25.g434bbd6 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.1+25.g434bbd6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="System Regression Estimator Covariance Estimation" href="covariance.html" />
+    <link rel="prev" title="System Regression Estimators" href="models.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="System Regression Estimator Covariance Estimation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="System Regression Estimators"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.1 (+25, g434bbd6)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">System Regression Models</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Estimation Results</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.system.results">
+<span id="estimation-results"></span><span id="system-models-module-reference-results"></span><h1>Estimation Results<a class="headerlink" href="#module-linearmodels.system.results" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="linearmodels.system.results.SystemResults">
+<em class="property">class </em><code class="descname">SystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results from Seemingly Unrelated Regression Estimators</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>AttrDict</em>) – Dictionary of model estimation results</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="linearmodels.system.results.SystemResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.SystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of covariance estimator used to compute covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.debiased">
+<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.debiased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.equation_labels">
+<code class="descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Individual equation labels</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.equations">
+<code class="descname">equations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Individual equation results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.iterations">
+<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.iterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of iterations of the GLS executed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.method">
+<code class="descname">method</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.model">
+<code class="descname">model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model used in estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.sigma">
+<code class="descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residual covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model summary</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted estimated residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.system.results.GMMSystemResults">
+<em class="property">class </em><code class="descname">GMMSystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#GMMSystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="linearmodels.system.results.GMMSystemResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of covariance estimator used to compute covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.debiased">
+<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.debiased" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.equation_labels">
+<code class="descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Individual equation labels</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.equations">
+<code class="descname">equations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Individual equation results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.iterations">
+<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.iterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of iterations of the GLS executed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.j_stat">
+<code class="descname">j_stat</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.j_stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>J-test of overidentifying restrictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>j</strong> – J statistic  test of overidentifying restrictions</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The J statistic tests whether the moment conditions are sufficiently
+close to zero to indicate that the model is not overidentified. The
+statistic is defined as</p>
+<div class="math">
+\[n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q\]</div>
+<p>where <span class="math">\(\bar{g}\)</span> is the average of the moment conditiona and
+<span class="math">\(W\)</span> is a consistent estimator of the variance of
+<span class="math">\(\sqrt{n}\bar{g}\)</span>. The degree of freedom is
+<span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.method">
+<code class="descname">method</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.model">
+<code class="descname">model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model used in estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.sigma">
+<code class="descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated residual covariance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model summary</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.w">
+<code class="descname">w</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>GMM weight matrix used in estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.weight_config">
+<code class="descname">weight_config</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weight configuration options used in GMM estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.weight_type">
+<code class="descname">weight_type</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of weighting used in GMM estimation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted estimated residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="models.html" title="previous chapter (use the left arrow)">System Regression Estimators</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="covariance.html" title="next chapter (use the right arrow)">System Regression Estimator Covariance Estimation</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="System Regression Estimator Covariance Estimation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="System Regression Estimators"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Using Formulas\n",
+    "\n",
+    "The asset pricing model estimators all all formulas.  Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard Patsy syntax needs to be modified. There are two methods to use formulas.  The first specified both the test portfolio and the factors.  The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.\n",
+    "\n",
+    "## Available Syntax \n",
+    "\n",
+    "### Test Portfolios and Factors\n",
+    "\n",
+    "The first syntax can be expressed as\n",
+    "\n",
+    "```\n",
+    "'port1 + port2 + port3 + port4 + ... + portN ~ factor1 + ... + factorK'\n",
+    "```\n",
+    "\n",
+    "so that both the test portfolios and the factors are separated using `+`.  The two sets are separated using the usual separator between left-hand side and right-hand side variables, `~`.\n",
+    "\n",
+    "### Factors Only\n",
+    "\n",
+    "The second syntax specifies only factors and uses the keyword argument `portfolios` to pass the matrix of portfolio returns.\n",
+    "\n",
+    "```\n",
+    "formula = 'factor1 + ... + factorK'\n",
+    "LinearFactorModel.from_formula(formula, portfolios=portfolios)\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Import data and transform to be excess returns\n",
+    "\n",
+    "The data used comes from Ken French's [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.datasets import french\n",
+    "data = french.load()\n",
+    "print(french.DESCR)\n",
+    "data.iloc[:,6:] = data.iloc[:,6:].values - data[['RF']].values"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## First Syntax\n",
+    "\n",
+    "This example shows the first syntax.  The test portfolios are a combination of the industry, size-value, and size-momentum sorted portfolios.  The factors are the market, value and momentum factors.  This model is not adequate to price the assets."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import LinearFactorModel, TradedFactorModel\n",
+    "\n",
+    "formula = 'NoDur + Chems + S1V1 + S5V5 + S1M1 + S5M5 ~ MktRF + HML + Mom'\n",
+    "mod = LinearFactorModel.from_formula(formula, data)\n",
+    "res = mod.fit(cov_type='kernel', kernel='parzen', bandwidth=20)\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Second Syntax\n",
+    "\n",
+    "The second syntax contains *only* the factors and omits the test portfolios.  The test portfolios are passed as an array or `DataFrame` using a keyword input. This syntax simplifies experimenting with alternative factors when there are many test portfolios.  This model also appears to be inadequate, even allowing the risk-free rate to be a free parameter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ports = ['S{0}V{1}'.format(i, j) for i in (1,3,5) for j in (1,3,5)]\n",
+    "ports += ['S{0}M{1}'.format(i, j) for i in (1,3,5) for j in (1,3,5)]\n",
+    "portfolios = data[ports]\n",
+    "formula = 'MktRF + HML + Mom'\n",
+    "mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios, risk_free=True)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Comparing results\n",
+    "\n",
+    "To verify the results, the model is estimated using the standard interface.  The J-statistic and $R^2$ are identical. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "portfolios = data[ports]\n",
+    "factors = data[['MktRF', 'HML', 'Mom']]\n",
+    "mod = LinearFactorModel(portfolios, factors, risk_free=True)\n",
+    "print(mod.fit())"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}

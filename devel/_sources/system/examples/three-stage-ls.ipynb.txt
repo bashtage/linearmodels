@@ -1,0 +1,267 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Three-stage Least Squares (3SLS)\n",
+    "\n",
+    "This example demonstrates how a system of simultaneous equations can be jointly estimated using three-stage least squares (3SLS).  The simultaneous equations model the wage and number of hours worked.  The two equations are \n",
+    "\n",
+    "$$\n",
+    "\\begin{eqnarray}\n",
+    "hours & = & \\beta_0 + \\beta_1 \\ln(wage) + \\beta_2 educ + \\beta_3 age + \\beta_4 kidslt6 + \\beta_5 nwifeinc + \\epsilon^h_i \n",
+    "\\\\\n",
+    "\\ln(wage) & = & \\gamma_0 + \\gamma_1 hours + \\gamma_2 educ + \\gamma_3 educ^2 + \\gamma_4 exper + \\epsilon^w_i \n",
+    "\\end{eqnarray}\n",
+    "$$\n",
+    "\n",
+    "Each equation has a single exogenous variables.  The instruments for the endogenous variables are the regressors that appear in one equation but not the other. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data\n",
+    "\n",
+    "The data set is the MORZ data set from Wooldridge (2002)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.datasets import mroz\n",
+    "data = mroz.load()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Here the relevant variables are selected and missing observations are dropped to avoid warnings."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "data = data[['hours','educ','age','kidslt6','nwifeinc','lwage','exper','expersq']]\n",
+    "data = data.dropna()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The main models are imported:\n",
+    "\n",
+    "* `IV2SLS` - single equation 2-stage least squares\n",
+    "* `IV3SLS` - system estimation using instrumental variables\n",
+    "* `SUR` - system estimation without endogenous variables\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels import IV2SLS, IV3SLS, SUR, IVSystemGMM"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Formulas\n",
+    "\n",
+    "These examples use the formula interface.  This is usually simpler when models have exogenous regressors, endogenous regressors and instruments.  The syntax is the same as in the 2SLS models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hours = 'hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]'\n",
+    "\n",
+    "hours_mod = IV2SLS.from_formula(hours, data)\n",
+    "hours_res = hours_mod.fit(cov_type='unadjusted')\n",
+    "print(hours_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The $\\ln$ wage model can be similarly specified and estimated"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lwage = 'lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]'\n",
+    "\n",
+    "lwage_mod = IV2SLS.from_formula(lwage, data)\n",
+    "lwage_res = lwage_mod.fit(cov_type='unadjusted')\n",
+    "print(lwage_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A system can be specified using a dictionary for formulas.  The dictionary keys are used as equation labels. Aside from this simple change, the syntax is identical.  \n",
+    "\n",
+    "Here the model is estimated using `method='ols'` which will just simultaneously estimate the two equations but will produce estimates that are identical to separate equations. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "equations = dict(hours=hours, lwage=lwage)\n",
+    "system_2sls = IV3SLS.from_formula(equations, data)\n",
+    "system_2sls_res = system_2sls.fit(method='ols', cov_type='unadjusted')\n",
+    "print(system_2sls_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using `method='gls'` will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes.  This is due to the structure of the problem."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "equations = dict(hours=hours, lwage=lwage)\n",
+    "system_3sls = IV3SLS.from_formula(equations, data)\n",
+    "system_3sls_res = system_3sls.fit(method='gls', cov_type='unadjusted')\n",
+    "print(system_3sls_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Direct Model Specification\n",
+    "\n",
+    "The model can be directly specified using a dictionary of dictionaries where the inner dictionaries contain the 4 components of the model:\n",
+    "\n",
+    "* dependent - The dependent variable\n",
+    "* exog - Exogenous regressors\n",
+    "* endog - Endogenous regressors\n",
+    "* instruments - Instrumental variables\n",
+    "\n",
+    "The estimates are the same.  This interface is more useful for programatically generating and estimating models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hours = {'dependent': data[['hours']],\n",
+    "         'exog': data[['educ','age','kidslt6','nwifeinc']],\n",
+    "         'endog': data[['lwage']],\n",
+    "         'instruments': data[['exper','expersq']]}\n",
+    "\n",
+    "lwage = {'dependent': data[['lwage']],\n",
+    "         'exog': data[['educ','exper','expersq']],\n",
+    "         'endog': data[['hours']],\n",
+    "         'instruments': data[['age','kidslt6','nwifeinc']]}\n",
+    "\n",
+    "equations = dict(hours=hours, lwage=lwage)\n",
+    "system_3sls = IV3SLS(equations)\n",
+    "system_3sls_res = system_3sls.fit(cov_type='unadjusted')\n",
+    "print(system_3sls_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# System GMM Estimation\n",
+    "\n",
+    "System GMM is an alternative to 3SLS estimation. It is the natural extension to GMM estimation of IV models.  It makes weaker assumptions about instruments than 3SLS does. In particular, instruments are assumed exogenous on an equation-by-equation basis rather than the 3SLS assumption that all instruments are exogenous in all equations. \n",
+    "\n",
+    "The system GMM estimator is similar to the 3SLS estimator except that it requires making a choice about the moment weighting estimator.  Valid options for the weighting estimator are `'unadjusted'` or `'homoskedastic'` which assumes that residuals are conditionally homoskedastic or `'robust'` or `'heteroskedastic'` which allows for conditional heteroskedasticity. \n",
+    "\n",
+    "The System GMM estimator also supports iterative application where it is possible to iterate until convergence.  \n",
+    "\n",
+    "Here the examples make use of the same data as in the 3SLS example and only use the formula interface. The default uses 2-step (efficient) GMM."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "equations = dict(hours='hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]', \n",
+    "                 lwage='lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]')\n",
+    "system_gmm = IVSystemGMM.from_formula(equations, data, weight_type='unadjusted')\n",
+    "system_gmm_res = system_gmm.fit(cov_type='unadjusted')\n",
+    "print(system_gmm_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Robust weighting can be used by setting the `weight_type`.  The number of iterations can be set using `iter_limit`. Overall the parameters do not meaningfully change. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "system_gmm = IVSystemGMM.from_formula(equations, data, weight_type='robust')\n",
+    "system_gmm_res = system_gmm.fit(cov_type='robust', iter_limit=100)\n",
+    "print('Number of iterations: ' + str(system_gmm_res.iterations))\n",
+    "print(system_gmm_res)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

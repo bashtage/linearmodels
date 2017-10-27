@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.1+25.g434bbd6 documentation</title>
+    <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.1+25.g434bbd6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Module Reference" href="../reference.html" />
+    <link rel="prev" title="Using formulas to specify models" href="formulas.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reference.html" title="Module Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="formulas.html" title="Using formulas to specify models"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../index.html" class="text-logo">linearmodels 4.1 (+25, g434bbd6)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../index.html">Docs</a></li>
+              
+                <li><a href="../index.html">System Regression Models</a></li>
+              
+              <li>Three-stage Least Squares (3SLS)</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Three-stage-Least-Squares-(3SLS)">
+<h1>Three-stage Least Squares (3SLS)<a class="headerlink" href="#Three-stage-Least-Squares-(3SLS)" title="Permalink to this headline">¶</a></h1>
+<p>This example demonstrates how a system of simultaneous equations can be
+jointly estimated using three-stage least squares (3SLS). The
+simultaneous equations model the wage and number of hours worked. The
+two equations are</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \beta_4 kidslt6 + \beta_5 nwifeinc + \epsilon^h_i
+\\
+\ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 educ^2 + \gamma_4 exper + \epsilon^w_i
+\end{eqnarray}\end{split}\]</div>
+<p>Each equation has a single exogenous variables. The instruments for the
+endogenous variables are the regressors that appear in one equation but
+not the other.</p>
+<div class="section" id="Data">
+<h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
+<p>The data set is the MORZ data set from Wooldridge (2002).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">mroz</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Here the relevant variables are selected and missing observations are
+dropped to avoid warnings.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;hours&#39;</span><span class="p">,</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;kidslt6&#39;</span><span class="p">,</span><span class="s1">&#39;nwifeinc&#39;</span><span class="p">,</span><span class="s1">&#39;lwage&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">]]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The main models are imported:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">IV2SLS</span></code> - single equation 2-stage least squares</li>
+<li><code class="docutils literal"><span class="pre">IV3SLS</span></code> - system estimation using instrumental variables</li>
+<li><code class="docutils literal"><span class="pre">SUR</span></code> - system estimation without endogenous variables</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IV3SLS</span><span class="p">,</span> <span class="n">SUR</span><span class="p">,</span> <span class="n">IVSystemGMM</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Formulas">
+<h2>Formulas<a class="headerlink" href="#Formulas" title="Permalink to this headline">¶</a></h2>
+<p>These examples use the formula interface. This is usually simpler when
+models have exogenous regressors, endogenous regressors and instruments.
+The syntax is the same as in the 2SLS models.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">hours</span> <span class="o">=</span> <span class="s1">&#39;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&#39;</span>
+
+<span class="n">hours_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">hours</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">hours_res</span> <span class="o">=</span> <span class="n">hours_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">hours_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          IV-2SLS Estimation Summary
+==============================================================================
+Dep. Variable:                  hours   R-squared:                      0.1903
+Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
+No. Observations:                 428   F-statistic:                    399.30
+Date:                Thu, Nov 30 2017   P-value (F-stat)                0.0000
+Time:                        23:11:36   Distribution:                  chi2(5)
+Cov. Estimator:            unadjusted
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -99.299     48.997    -2.0266     0.0427     -195.33     -3.2666
+age            19.429     6.2770     3.0952     0.0020      7.1261      31.732
+kidslt6       -51.616     183.96    -0.2806     0.7790     -412.18      308.95
+nwifeinc      -11.445     6.6787    -1.7137     0.0866     -24.535      1.6449
+lwage          1626.3     472.19     3.4442     0.0006      700.85      2551.8
+==============================================================================
+
+Endogenous: lwage
+Instruments: exper, expersq
+Unadjusted Covariance (Homoskedastic)
+Debiased: False
+</pre></div></div>
+</div>
+<p>The <span class="math">\(\ln\)</span> wage model can be similarly specified and estimated</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">lwage</span> <span class="o">=</span> <span class="s1">&#39;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&#39;</span>
+
+<span class="n">lwage_mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">lwage</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">lwage_res</span> <span class="o">=</span> <span class="n">lwage_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lwage_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          IV-2SLS Estimation Summary
+==============================================================================
+Dep. Variable:                  lwage   R-squared:                      0.7582
+Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
+No. Observations:                 428   F-statistic:                    1362.4
+Date:                Thu, Nov 30 2017   P-value (F-stat)                0.0000
+Time:                        23:11:36   Distribution:                  chi2(4)
+Cov. Estimator:            unadjusted
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0875     0.0162     5.3892     0.0000      0.0557      0.1193
+exper          0.0524     0.0299     1.7501     0.0801     -0.0063      0.1110
+expersq       -0.0009     0.0006    -1.4898     0.1363     -0.0021      0.0003
+hours         -0.0003     0.0003    -0.8666     0.3862     -0.0009      0.0004
+==============================================================================
+
+Endogenous: hours
+Instruments: age, kidslt6, nwifeinc
+Unadjusted Covariance (Homoskedastic)
+Debiased: False
+</pre></div></div>
+</div>
+<p>A system can be specified using a dictionary for formulas. The
+dictionary keys are used as equation labels. Aside from this simple
+change, the syntax is identical.</p>
+<p>Here the model is estimated using <code class="docutils literal"><span class="pre">method='ols'</span></code> which will just
+simultaneously estimate the two equations but will produce estimates
+that are identical to separate equations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_2sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">system_2sls_res</span> <span class="o">=</span> <span class="n">system_2sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_2sls_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System OLS Estimation Summary
+==============================================================================
+Estimator:                        OLS   Overall R-squared:              0.1903
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 428   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:36
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -99.299     48.997    -2.0266     0.0427     -195.33     -3.2666
+age            19.429     6.2770     3.0952     0.0020      7.1261      31.732
+kidslt6       -51.616     183.96    -0.2806     0.7790     -412.18      308.95
+nwifeinc      -11.445     6.6787    -1.7137     0.0866     -24.535      1.6449
+lwage          1626.3     472.19     3.4442     0.0006      700.85      2551.8
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0875     0.0162     5.3892     0.0000      0.0557      0.1193
+exper          0.0524     0.0299     1.7501     0.0801     -0.0063      0.1110
+expersq       -0.0009     0.0006    -1.4898     0.1363     -0.0021      0.0003
+hours         -0.0003     0.0003    -0.8666     0.3862     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
+</pre></div></div>
+</div>
+<p>Using <code class="docutils literal"><span class="pre">method='gls'</span></code> will use GLS estimates which can be more
+efficient than the usual estimates. Here only the first equation
+changes. This is due to the structure of the problem.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;gls&#39;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.0120
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 428   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:36
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -109.90     48.052    -2.2870     0.0222     -204.08     -15.716
+age            13.651     5.5456     2.4617     0.0138      2.7822      24.521
+kidslt6       -196.61     170.04    -1.1563     0.2476     -529.88      136.66
+nwifeinc      -6.4136     5.4646    -1.1736     0.2405     -17.124      4.2969
+lwage          1872.7     461.13     4.0611     0.0000      968.88      2776.5
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0859     0.0159     5.3864     0.0000      0.0546      0.1171
+exper          0.0550     0.0295     1.8622     0.0626     -0.0029      0.1128
+expersq       -0.0010     0.0006    -1.7539     0.0794     -0.0022      0.0001
+hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Direct-Model-Specification">
+<h2>Direct Model Specification<a class="headerlink" href="#Direct-Model-Specification" title="Permalink to this headline">¶</a></h2>
+<p>The model can be directly specified using a dictionary of dictionaries
+where the inner dictionaries contain the 4 components of the model:</p>
+<ul class="simple">
+<li>dependent - The dependent variable</li>
+<li>exog - Exogenous regressors</li>
+<li>endog - Endogenous regressors</li>
+<li>instruments - Instrumental variables</li>
+</ul>
+<p>The estimates are the same. This interface is more useful for
+programatically generating and estimating models.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">hours</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;hours&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;kidslt6&#39;</span><span class="p">,</span><span class="s1">&#39;nwifeinc&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;endog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;lwage&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;instruments&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">]]}</span>
+
+<span class="n">lwage</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;lwage&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;endog&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;hours&#39;</span><span class="p">]],</span>
+         <span class="s1">&#39;instruments&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="s1">&#39;kidslt6&#39;</span><span class="p">,</span><span class="s1">&#39;nwifeinc&#39;</span><span class="p">]]}</span>
+
+<span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">,</span> <span class="n">lwage</span><span class="o">=</span><span class="n">lwage</span><span class="p">)</span>
+<span class="n">system_3sls</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
+<span class="n">system_3sls_res</span> <span class="o">=</span> <span class="n">system_3sls</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_3sls_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.0120
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 428   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:36
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -109.90     48.052    -2.2870     0.0222     -204.08     -15.716
+age            13.651     5.5456     2.4617     0.0138      2.7822      24.521
+kidslt6       -196.61     170.04    -1.1563     0.2476     -529.88      136.66
+nwifeinc      -6.4136     5.4646    -1.1736     0.2405     -17.124      4.2969
+lwage          1872.7     461.13     4.0611     0.0000      968.88      2776.5
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0859     0.0159     5.3864     0.0000      0.0546      0.1171
+exper          0.0550     0.0295     1.8622     0.0626     -0.0029      0.1128
+expersq       -0.0010     0.0006    -1.7539     0.0794     -0.0022      0.0001
+hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="System-GMM-Estimation">
+<h1>System GMM Estimation<a class="headerlink" href="#System-GMM-Estimation" title="Permalink to this headline">¶</a></h1>
+<p>System GMM is an alternative to 3SLS estimation. It is the natural
+extension to GMM estimation of IV models. It makes weaker assumptions
+about instruments than 3SLS does. In particular, instruments are assumed
+exogenous on an equation-by-equation basis rather than the 3SLS
+assumption that all instruments are exogenous in all equations.</p>
+<p>The system GMM estimator is similar to the 3SLS estimator except that it
+requires making a choice about the moment weighting estimator. Valid
+options for the weighting estimator are <code class="docutils literal"><span class="pre">'unadjusted'</span></code> or
+<code class="docutils literal"><span class="pre">'homoskedastic'</span></code> which assumes that residuals are conditionally
+homoskedastic or <code class="docutils literal"><span class="pre">'robust'</span></code> or <code class="docutils literal"><span class="pre">'heteroskedastic'</span></code> which allows for
+conditional heteroskedasticity.</p>
+<p>The System GMM estimator also supports iterative application where it is
+possible to iterate until convergence.</p>
+<p>Here the examples make use of the same data as in the 3SLS example and
+only use the formula interface. The default uses 2-step (efficient) GMM.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="s1">&#39;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&#39;</span><span class="p">,</span>
+                 <span class="n">lwage</span><span class="o">=</span><span class="s1">&#39;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&#39;</span><span class="p">)</span>
+<span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                 System 2-Step System GMM Estimation Summary
+==============================================================================
+Estimator:          2-Step System GMM   Overall R-squared:              0.0121
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 428   Num. Constraints:                 None
+Date:                Thu, Nov 30 2017
+Time:                        23:11:36
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -109.89     48.038    -2.2876     0.0222     -204.05     -15.741
+age            13.653     5.5440     2.4626     0.0138      2.7868      24.519
+kidslt6       -196.57     169.99    -1.1564     0.2475     -529.74      136.60
+nwifeinc      -6.4149     5.4631    -1.1742     0.2403     -17.122      4.2925
+lwage          1872.6     461.00     4.0621     0.0000      969.08      2776.2
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0859     0.0159     5.3866     0.0000      0.0546      0.1171
+exper          0.0550     0.0295     1.8623     0.0626     -0.0029      0.1128
+expersq       -0.0010     0.0006    -1.7540     0.0794     -0.0022      0.0001
+hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+GMM Homoskedastic (Unadjusted) Covariance
+Weight Estimator:
+Homoskedastic (Unadjusted) Weighting (Debiased: False, Center: False)
+</pre></div></div>
+</div>
+<p>Robust weighting can be used by setting the <code class="docutils literal"><span class="pre">weight_type</span></code>. The number
+of iterations can be set using <code class="docutils literal"><span class="pre">iter_limit</span></code>. Overall the parameters do
+not meaningfully change.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of iterations: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="o">.</span><span class="n">iterations</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of iterations: 20
+                 System Iterative System GMM Estimation Summary
+================================================================================
+Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
+No. Equations.:                       2   Cov. Estimator:                 robust
+No. Observations:                   428   Num. Constraints:                 None
+Date:                  Thu, Nov 30 2017
+Time:                          23:11:36
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -118.31     57.508    -2.0572     0.0397     -231.02     -5.5947
+age            15.027     5.9903     2.5086     0.0121      3.2864      26.768
+kidslt6       -227.22     216.54    -1.0493     0.2940     -651.64      197.20
+nwifeinc      -8.2578     5.3146    -1.5538     0.1202     -18.674      2.1587
+lwage          1933.5     592.77     3.2618     0.0011      771.69      3095.3
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0967     0.0190     5.0999     0.0000      0.0595      0.1338
+exper          0.0720     0.0363     1.9840     0.0473      0.0009      0.1430
+expersq       -0.0013     0.0007    -1.8475     0.0647     -0.0028   8.133e-05
+hours         -0.0005     0.0004    -1.2298     0.2188     -0.0013      0.0003
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+GMM Heteroskedastic (Robust) Covariance
+Weight Estimator:
+Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
+</pre></div></div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="formulas.html" title="previous chapter (use the left arrow)">Using formulas to specify models</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../reference.html" title="next chapter (use the right arrow)">Module Reference</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reference.html" title="Module Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="formulas.html" title="Using formulas to specify models"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

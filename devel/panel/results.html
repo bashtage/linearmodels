@@ -1,0 +1,1175 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Estimation Results &#8212; linearmodels 4.1+25.g434bbd6 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.1+25.g434bbd6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Panel Model Covariance Estimators" href="covariance.html" />
+    <link rel="prev" title="Models for Panel Data" href="models.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Panel Model Covariance Estimators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="Models for Panel Data"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.1 (+25, g434bbd6)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Panel Data Model Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/data-formats.html">Data Formats for Panel Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html">Implementation Choices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Panel Data Model Estimation</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Estimation Results</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.panel.results">
+<span id="estimation-results"></span><span id="panel-module-reference-results"></span><h1>Estimation Results<a class="headerlink" href="#module-linearmodels.panel.results" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fixed-effect-models">
+<h2>Fixed Effect Models<a class="headerlink" href="#fixed-effect-models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.panel.results.PanelEffectsResults">
+<em class="property">class </em><code class="descname">PanelEffectsResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results container for panel data models that include effects</p>
+<dl class="method">
+<dt id="linearmodels.panel.results.PanelEffectsResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nvar plus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.entity_info">
+<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per entity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.estimated_effects">
+<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated effects</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.f_pooled">
+<code class="descname">f_pooled</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_pooled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that included effects are jointly zero.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_pooled</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Joint test that all included effects are zero.  Only correct under an
+assumption of homoskedasticity.</p>
+<p>The test statistic is defined as</p>
+<div class="math">
+\[F = \frac{(RSS_{pool}-RSS_{effect})/(df_{pool}-df_{effect})}{RSS_{effect}/df_{effect}}\]</div>
+<p>where <span class="math">\(RSS_{pool}\)</span> is the residual sum of squares from a no-
+effect (pooled) model. <span class="math">\(RSS_{effect}\)</span> is the residual sum of
+squares from a model with effects.  <span class="math">\(df_{pool}\)</span> is the residual
+degree of freedom in the pooled regression and <span class="math">\(df_{effect}\)</span> is
+the residual degree of freedom from the model with effects. The test
+has an <span class="math">\(F_{k,df_{effect}}\)</span> distribution where
+<span class="math">\(k=df_{pool}-df_{effect}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Classical F-stat that is only correct under an assumption of
+homoskedasticity.  The test statistic is defined as</p>
+<div class="math">
+\[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
+<p>where <span class="math">\(RSS_R\)</span> is the restricted sum of squares from the model
+where the coefficients on all exog variables is zero, excluding a
+constant if one was included. <span class="math">\(RSS_U\)</span> is the unrestricted
+residual sum of squares.  k is the number of non-constant regressors
+in the model and <span class="math">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math">\(F_{k,df_U}\)</span> distribution.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.f_statistic_robust">
+<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Implemented as a Wald test using the estimated parameter covariance,
+and so inherits any robustness that the choice of covariance estimator
+provides.</p>
+<div class="math">
+\[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
+<p>where <span class="math">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+parameters, also excluding the constant.  The test statistic is
+distributed as <span class="math">\(\chi^2_{k}\)</span> where k is the number of non-
+constant parameters.</p>
+<p>If <code class="docutils literal"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
+number of restrictions and inference is made using an <span class="math">\(F_{k,df}\)</span>
+distribution where df is the residual degree of freedom from the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.included_effects">
+<code class="descname">included_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.included_effects" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of effects included in the model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.loglik">
+<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log-likelihood of model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.name">
+<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations used to estimate the model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.other_info">
+<code class="descname">other_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.other_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per group for other effects</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model Coefficient of determination</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_between">
+<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Between Coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The between rsquared measures the fit of the time-averaged dependent
+variable on the time averaged dependent variables.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive">
+<code class="descname">rsquared_inclusive</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model Coefficient of determination including fit of included effects</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_overall">
+<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overall coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The overall rsquared measures the fit of the dependent
+variable on the dependent variables ignoring any included effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_within">
+<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<dd><p>Within coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Within coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The within rsquared measures the fit of the dependent purged of entity
+effects on the exogenous purged of entity effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.time_info">
+<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per time interval</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.variance_decomposition">
+<code class="descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposition of total variance into effects and residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted model residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="random-effects-models">
+<h2>Random Effects Models<a class="headerlink" href="#random-effects-models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.panel.results.RandomEffectsResults">
+<em class="property">class </em><code class="descname">RandomEffectsResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#RandomEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results container for random effect panel data models</p>
+<dl class="method">
+<dt id="linearmodels.panel.results.RandomEffectsResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.cov">
+<code class="descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nvar plus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.entity_info">
+<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per entity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Classical F-stat that is only correct under an assumption of
+homoskedasticity.  The test statistic is defined as</p>
+<div class="math">
+\[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
+<p>where <span class="math">\(RSS_R\)</span> is the restricted sum of squares from the model
+where the coefficients on all exog variables is zero, excluding a
+constant if one was included. <span class="math">\(RSS_U\)</span> is the unrestricted
+residual sum of squares.  k is the number of non-constant regressors
+in the model and <span class="math">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math">\(F_{k,df_U}\)</span> distribution.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.f_statistic_robust">
+<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Implemented as a Wald test using the estimated parameter covariance,
+and so inherits any robustness that the choice of covariance estimator
+provides.</p>
+<div class="math">
+\[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
+<p>where <span class="math">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+parameters, also excluding the constant.  The test statistic is
+distributed as <span class="math">\(\chi^2_{k}\)</span> where k is the number of non-
+constant parameters.</p>
+<p>If <code class="docutils literal"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
+number of restrictions and inference is made using an <span class="math">\(F_{k,df}\)</span>
+distribution where df is the residual degree of freedom from the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.loglik">
+<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log-likelihood of model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.name">
+<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations used to estimate the model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model Coefficient of determination</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_between">
+<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Between Coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The between rsquared measures the fit of the time-averaged dependent
+variable on the time averaged dependent variables.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_overall">
+<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overall coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The overall rsquared measures the fit of the dependent
+variable on the dependent variables ignoring any included effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_within">
+<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<dd><p>Within coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Within coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The within rsquared measures the fit of the dependent purged of entity
+effects on the exogenous purged of entity effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.theta">
+<code class="descname">theta</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Values used in generalized demeaning</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.time_info">
+<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per time interval</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.variance_decomposition">
+<code class="descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposition of total variance into effects and residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted model residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="all-other-models">
+<h2>All other Models<a class="headerlink" href="#all-other-models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.panel.results.PanelResults">
+<em class="property">class </em><code class="descname">PanelResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Results container for panel data models that do not include effects</p>
+<dl class="method">
+<dt id="linearmodels.panel.results.PanelResults.conf_int">
+<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confidence interval construction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.cov">
+<code class="descname">cov</code><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated covariance of parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.df_model">
+<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nvar plus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.df_resid">
+<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual degree of freedom</p>
+<p class="rubric">Notes</p>
+<p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.entity_info">
+<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per entity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Classical F-stat that is only correct under an assumption of
+homoskedasticity.  The test statistic is defined as</p>
+<div class="math">
+\[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
+<p>where <span class="math">\(RSS_R\)</span> is the restricted sum of squares from the model
+where the coefficients on all exog variables is zero, excluding a
+constant if one was included. <span class="math">\(RSS_U\)</span> is the unrestricted
+residual sum of squares.  k is the number of non-constant regressors
+in the model and <span class="math">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math">\(F_{k,df_U}\)</span> distribution.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.f_statistic_robust">
+<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joint test of significance for non-constant regressors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f_stat</strong> – Statistic value, distribution and p-value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Implemented as a Wald test using the estimated parameter covariance,
+and so inherits any robustness that the choice of covariance estimator
+provides.</p>
+<div class="math">
+\[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
+<p>where <span class="math">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+parameters, also excluding the constant.  The test statistic is
+distributed as <span class="math">\(\chi^2_{k}\)</span> where k is the number of non-
+constant parameters.</p>
+<p>If <code class="docutils literal"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
+number of restrictions and inference is made using an <span class="math">\(F_{k,df}\)</span>
+distribution where df is the residual degree of freedom from the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.loglik">
+<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.loglik" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log-likelihood of model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.model_ss">
+<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.name">
+<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of observations used to estimate the model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.pvalues">
+<code class="descname">pvalues</code><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.pvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal"><span class="pre">debiased</span></code> is True, else normal</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.resid_ss">
+<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.resids">
+<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model residuals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model Coefficient of determination</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.rsquared_between">
+<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Between Coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The between rsquared measures the fit of the time-averaged dependent
+variable on the time averaged dependent variables.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.rsquared_overall">
+<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overall coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Between coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The overall rsquared measures the fit of the dependent
+variable on the dependent variables ignoring any included effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.rsquared_within">
+<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<dd><p>Within coefficient of determination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rsquared</strong> – Within coefficient of determination</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The within rsquared measures the fit of the dependent purged of entity
+effects on the exogenous purged of entity effects.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.s2">
+<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Residual variance estimator</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.std_errors">
+<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated parameter standard errors</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model estimation results</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.time_info">
+<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.time_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics on observations per time interval</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.total_ss">
+<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total sum of squares</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-statistics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.wresids">
+<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighted model residuals</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="comparing-multiple-models">
+<h2>Comparing Multiple Models<a class="headerlink" href="#comparing-multiple-models" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="linearmodels.panel.results.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare the results of multiple models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>comparison</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.panel.results.PanelModelComparison" title="linearmodels.panel.results.PanelModelComparison">PanelModelComparison</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.panel.results.PanelModelComparison">
+<em class="property">class </em><code class="descname">PanelModelComparison</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison" title="Permalink to this definition">¶</a></dt>
+<dd><p>Comparison of multiple models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.cov_estimator">
+<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance estimator descriptions</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.estimator_method">
+<code class="descname">estimator_method</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation methods</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.f_statistic">
+<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
+<dd><p>F-statistics and P-values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.params">
+<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.pvalues">
+<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter p-vals for all models</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.rsquared">
+<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.rsquared_between">
+<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.rsquared_overall">
+<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.rsquared_within">
+<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficients of determination (R**2)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.summary">
+<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary table of model comparison</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelModelComparison.tstats">
+<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter t-stats for all models</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="models.html" title="previous chapter (use the left arrow)">Models for Panel Data</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="covariance.html" title="next chapter (use the right arrow)">Panel Model Covariance Estimators</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Panel Model Covariance Estimators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="Models for Panel Data"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

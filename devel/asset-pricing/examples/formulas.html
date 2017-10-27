@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Using Formulas &#8212; linearmodels 4.1+25.g434bbd6 documentation</title>
+    <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.1+25.g434bbd6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Module Reference" href="../reference.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reference.html" title="Module Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Linear Factor Models for Asset Pricing</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../index.html" class="text-logo">linearmodels 4.1 (+25, g434bbd6)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Linear Factor Models for Asset Pricing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using Formulas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../index.html">Docs</a></li>
+              
+                <li><a href="../index.html">Linear Factor Models for Asset Pricing</a></li>
+              
+              <li>Using Formulas</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Using-Formulas">
+<h1>Using Formulas<a class="headerlink" href="#Using-Formulas" title="Permalink to this headline">¶</a></h1>
+<p>The asset pricing model estimators all all formulas. Since the models
+have multiple dependent variables (test portfolios) as well as multiple
+independent variables (factors), the standard Patsy syntax needs to be
+modified. There are two methods to use formulas. The first specified
+both the test portfolio and the factors. The second specifies only the
+factors and the test portfolios are passed using an optional keyword
+argument. The second syntax exists since in many models the number of
+test portfolios might be large and interest is usually in modifying the
+factors.</p>
+<div class="section" id="Available-Syntax">
+<h2>Available Syntax<a class="headerlink" href="#Available-Syntax" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Test-Portfolios-and-Factors">
+<h3>Test Portfolios and Factors<a class="headerlink" href="#Test-Portfolios-and-Factors" title="Permalink to this headline">¶</a></h3>
+<p>The first syntax can be expressed as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;port1 + port2 + port3 + port4 + ... + portN ~ factor1 + ... + factorK&#39;</span>
+</pre></div>
+</div>
+<p>so that both the test portfolios and the factors are separated using
+<code class="docutils literal"><span class="pre">+</span></code>. The two sets are separated using the usual separator between
+left-hand side and right-hand side variables, <code class="docutils literal"><span class="pre">~</span></code>.</p>
+</div>
+<div class="section" id="Factors-Only">
+<h3>Factors Only<a class="headerlink" href="#Factors-Only" title="Permalink to this headline">¶</a></h3>
+<p>The second syntax specifies only factors and uses the keyword argument
+<code class="docutils literal"><span class="pre">portfolios</span></code> to pass the matrix of portfolio returns.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;factor1 + ... + factorK&#39;</span>
+<span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">portfolios</span><span class="o">=</span><span class="n">portfolios</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Import-data-and-transform-to-be-excess-returns">
+<h2>Import data and transform to be excess returns<a class="headerlink" href="#Import-data-and-transform-to-be-excess-returns" title="Permalink to this headline">¶</a></h2>
+<p>The data used comes from Ken French’s
+<a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a>
+and includes 4 factor returns, the excess market, the size factor, the
+value factor and the momentum factor. The available test portfolios
+include the 12 industry portfolios, a subset of the size-value two way
+sort, and a subset of the size-momentum two way sort.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">french</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;RF&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Data from Ken French&#39;s data library
+http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html
+
+dates    Year and Month of Return
+MktRF    Market Factor
+SMB      Size Factor
+HML      Value Factor
+Mom      Momentum Factor
+RF       Risk-free rate
+NoDur    Industry: Non-durables
+Durbl    Industry: Durables
+Manuf    Industry: Manufacturing
+Enrgy    Industry: Energy
+Chems    Industry: Chemicals
+BusEq    Industry: Business Equipment
+Telcm    Industry: Telecoms
+Utils    Industry: Utilities
+Shops    Industry: Retail
+Hlth     Industry: Health care
+Money    Industry: Finance
+Other    Industry: Other
+S1V1     Small firms, low value
+S1V3     Small firms, medium value
+S1V5     Small firms, high value
+S3V1     Size 3, value 1
+S3V3     Size 3, value 3
+S3V5     Size 3, value 5
+S5V1     Large firms, Low value
+S5V3     Large firms, medium value
+S5V5     Large Firms, High value
+S1M1     Small firms, losers
+S1M3     Small firms, neutral
+S1M5     Small firms, winners
+S3M1     Size 3, momentum 1
+S3M3     Size 3, momentum 3
+S3M5     Size 3, momentum 5
+S5M1     Large firms, losers
+S5M3     Large firms, neutral
+S5M5     Large firms, winners
+
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="First-Syntax">
+<h2>First Syntax<a class="headerlink" href="#First-Syntax" title="Permalink to this headline">¶</a></h2>
+<p>This example shows the first syntax. The test portfolios are a
+combination of the industry, size-value, and size-momentum sorted
+portfolios. The factors are the market, value and momentum factors. This
+model is not adequate to price the assets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.asset_pricing</span> <span class="kn">import</span> <span class="n">LinearFactorModel</span><span class="p">,</span> <span class="n">TradedFactorModel</span>
+
+<span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;NoDur + Chems + S1V1 + S5V5 + S1M1 + S5M5 ~ MktRF + HML + Mom&#39;</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;kernel&#39;</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;parzen&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                      LinearFactorModel Estimation Summary
+================================================================================
+No. Test Portfolios:                  6   R-squared:                      0.7229
+No. Factors:                          3   J-statistic:                    19.369
+No. Observations:                   819   P-value                         0.0002
+Date:                  Thu, Nov 30 2017   Distribution:                  chi2(3)
+Time:                          23:10:50
+Cov. Estimator:                  kernel
+
+                            Risk Premia Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+MktRF          0.0056     0.0013     4.2180     0.0000      0.0030      0.0082
+HML            0.0044     0.0014     3.1971     0.0014      0.0017      0.0070
+Mom            0.0081     0.0020     4.0554     0.0001      0.0042      0.0119
+==============================================================================
+
+Covariance estimator:
+KernelCovariance, Kernel: parzen, Bandwidth: 20
+See full_summary for complete results
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Second-Syntax">
+<h2>Second Syntax<a class="headerlink" href="#Second-Syntax" title="Permalink to this headline">¶</a></h2>
+<p>The second syntax contains <em>only</em> the factors and omits the test
+portfolios. The test portfolios are passed as an array or <code class="docutils literal"><span class="pre">DataFrame</span></code>
+using a keyword input. This syntax simplifies experimenting with
+alternative factors when there are many test portfolios. This model also
+appears to be inadequate, even allowing the risk-free rate to be a free
+parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">ports</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S{0}V{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="n">ports</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;S{0}M{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">ports</span><span class="p">]</span>
+<span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;MktRF + HML + Mom&#39;</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="o">=</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                      LinearFactorModel Estimation Summary
+================================================================================
+No. Test Portfolios:                 18   R-squared:                      0.7723
+No. Factors:                          3   J-statistic:                    86.389
+No. Observations:                   819   P-value                         0.0000
+Date:                  Thu, Nov 30 2017   Distribution:                 chi2(14)
+Time:                          23:10:50
+Cov. Estimator:                  robust
+
+                            Risk Premia Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+risk_free      0.0024     0.0040     0.5940     0.5525     -0.0055      0.0103
+MktRF          0.0050     0.0044     1.1337     0.2569     -0.0036      0.0136
+HML            0.0042     0.0010     4.0918     0.0000      0.0022      0.0063
+Mom            0.0081     0.0014     5.7058     0.0000      0.0053      0.0109
+==============================================================================
+
+Covariance estimator:
+HeteroskedasticCovariance
+See full_summary for complete results
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Comparing-results">
+<h2>Comparing results<a class="headerlink" href="#Comparing-results" title="Permalink to this headline">¶</a></h2>
+<p>To verify the results, the model is estimated using the standard
+interface. The J-statistic and <span class="math">\(R^2\)</span> are identical.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">ports</span><span class="p">]</span>
+<span class="n">factors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;MktRF&#39;</span><span class="p">,</span> <span class="s1">&#39;HML&#39;</span><span class="p">,</span> <span class="s1">&#39;Mom&#39;</span><span class="p">]]</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                      LinearFactorModel Estimation Summary
+================================================================================
+No. Test Portfolios:                 18   R-squared:                      0.7723
+No. Factors:                          3   J-statistic:                    86.389
+No. Observations:                   819   P-value                         0.0000
+Date:                  Thu, Nov 30 2017   Distribution:                 chi2(14)
+Time:                          23:10:51
+Cov. Estimator:                  robust
+
+                            Risk Premia Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+risk_free      0.0024     0.0040     0.5940     0.5525     -0.0055      0.0103
+MktRF          0.0050     0.0044     1.1337     0.2569     -0.0036      0.0136
+HML            0.0042     0.0010     4.0918     0.0000      0.0022      0.0063
+Mom            0.0081     0.0014     5.7058     0.0000      0.0053      0.0109
+==============================================================================
+
+Covariance estimator:
+HeteroskedasticCovariance
+See full_summary for complete results
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="examples.html" title="previous chapter (use the left arrow)">Examples</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../reference.html" title="next chapter (use the right arrow)">Module Reference</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../reference.html" title="Module Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1+25.g434bbd6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>
