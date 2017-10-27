@@ -10,6 +10,8 @@ from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
                                       PooledOLS, RandomEffects)
 from linearmodels.tests.panel._utility import generate_data, datatypes
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
 

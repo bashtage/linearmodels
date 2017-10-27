@@ -11,6 +11,8 @@ from linearmodels.panel.model import PooledOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
                                                generate_data, datatypes)
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 missing = [0.0, 0.20]
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))

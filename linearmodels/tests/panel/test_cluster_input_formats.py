@@ -9,6 +9,8 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import generate_data, datatypes
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 missing = [0.0, 0.20]
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))

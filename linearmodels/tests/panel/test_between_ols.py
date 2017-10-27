@@ -9,6 +9,7 @@ from linearmodels.panel.model import BetweenOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
                                                generate_data, datatypes)
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
 @pytest.fixture(params=datatypes)
 def data(request):

@@ -5,6 +5,7 @@ from pandas.util.testing import assert_series_equal
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.utility import AttrDict
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
 @pytest.fixture(scope='module', params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
 def model(request):

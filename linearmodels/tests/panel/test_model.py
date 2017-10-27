@@ -10,6 +10,7 @@ from linearmodels.panel.model import (AbsorbingEffectError, AmbiguityError,
                                       PanelOLS)
 from linearmodels.tests.panel._utility import generate_data, lsdv, datatypes
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
@@ -174,6 +175,7 @@ def test_absorbing_effect(data):
         PanelOLS(data.y, x, entity_effects=True).fit()
 
 
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_all_missing(data):
     y = PanelData(data.y)
     x = PanelData(data.x)
@@ -183,4 +185,4 @@ def test_all_missing(data):
     import warnings
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()
-        assert len(w) == 0
+    assert len(w) == 0

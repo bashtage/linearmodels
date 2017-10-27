@@ -18,6 +18,8 @@ from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import generate_data, datatypes, \
     MISSING_XARRAY
 
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
 
