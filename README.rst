@@ -31,6 +31,7 @@ and instrumental variable estimators:
 -  **System Regression**:
 
    -  Seemingly Unrelated Regression (SUR/SURE)
+   -  Three-Stage Least Squares (3SLS)
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 

@@ -9,7 +9,7 @@ from linearmodels.compat.statsmodels import Summary
 from linearmodels.utility import (AttrDict, _SummaryStr, cached_property,
                                   _str, param_table, pval_format)
 
-__all__ = ['SURResults', 'SUREquationResult']
+__all__ = ['SystemResults', 'SystemEquationResult']
 
 
 class _CommonResults(_SummaryStr):
@@ -149,7 +149,7 @@ class _CommonResults(_SummaryStr):
         return DataFrame(ci, index=self._param_names, columns=['lower', 'upper'])
 
 
-class SURResults(_CommonResults):
+class SystemResults(_CommonResults):
     """
     Results from Seemingly Unrelated Regression Estimators
 
@@ -160,10 +160,10 @@ class SURResults(_CommonResults):
     """
 
     def __init__(self, results):
-        super(SURResults, self).__init__(results)
+        super(SystemResults, self).__init__(results)
         self._individual = AttrDict()
         for key in results.individual:
-            self._individual[key] = SUREquationResult(results.individual[key])
+            self._individual[key] = SystemEquationResult(results.individual[key])
         self._sigma = results.sigma
         self._model = results.model
         self._constraints = results.constraints
@@ -254,7 +254,7 @@ class SURResults(_CommonResults):
         return smry
 
 
-class SUREquationResult(_CommonResults):
+class SystemEquationResult(_CommonResults):
     """
     Results from a single equation of a Seemingly Unrelated Regression
 
@@ -265,7 +265,7 @@ class SUREquationResult(_CommonResults):
     """
 
     def __init__(self, results):
-        super(SUREquationResult, self).__init__(results)
+        super(SystemEquationResult, self).__init__(results)
         self._eq_label = results.eq_label
         self._dependent = results.dependent
         self._f_statistic = results.f_stat

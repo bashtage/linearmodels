@@ -893,7 +893,6 @@ class IVGMMCUE(IVGMM):
 
         Examples
         --------
-        >>> import numpy as np
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVGMMCUE
         >>> data = wage.load()

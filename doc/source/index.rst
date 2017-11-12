@@ -22,15 +22,16 @@ Estimation and inference in some common linear models:
 
 **Single equation Instrumental Variables (IV) models**
 
-* Two-stage least squares (:class:`~linearmodels.iv.model.IV2SLS`)
-* Limited Information ML (LIML) (:class:`~linearmodels.iv.model.IVLIML`)
-* Generalized Method of Moments (GMM) (:class:`~linearmodels.iv.model.IVGMM`)
-* Continuously Updating GMM (:class:`~linearmodels.iv.model.IVGMMCUE`)
+* Two-stage least squares (2SLS, :class:`~linearmodels.iv.model.IV2SLS`)
+* Limited Information ML (LIML, :class:`~linearmodels.iv.model.IVLIML`)
+* Generalized Method of Moments (GMM, :class:`~linearmodels.iv.model.IVGMM`)
+* Continuously Updating GMM (CUE-GMM, :class:`~linearmodels.iv.model.IVGMMCUE`)
 
 
 **System Regression Estimators**
 
-* Seemingly Unrelated Regression (:class:`~linearmodels.system.model.SUR`)
+* Seemingly Unrelated Regression (SUR, :class:`~linearmodels.system.model.SUR`)
+* Three-stage Least Squares (3SLS, :class:`~linearmodels.system.model.IV3SLS`)
 
 
 **Asset Pricing Model Estimation and Testing**

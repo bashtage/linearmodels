@@ -1,3 +1,3 @@
-from linearmodels.system.model import SUR
+from linearmodels.system.model import SUR, IV3SLS
 
-__all__ = ['SUR']
+__all__ = ['SUR', 'IV3SLS']

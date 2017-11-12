@@ -5,8 +5,8 @@
 
 
 
-Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmodels.org) to 
-include Panel regression and instrumental variable estimators:
+Linear (regression) models for Python.  Extends [statsmodels](http://www.statsmodels.org) with 
+Panel regression, instrumental variable estimators and system estimators:
  
 - **Panel models**:
     - Fixed effects (maximum two-way)
@@ -28,6 +28,7 @@ include Panel regression and instrumental variable estimators:
 
 - **System Regression**:
     - Seemingly Unrelated Regression (SUR/SURE)
+    - Three-Stage Least Squares (3SLS)
        
 Designed to work equally well with NumPy, Pandas or xarray data.
 

@@ -11,3 +11,9 @@ Seemingly Unrelated Regression (SUR/SURE)
 .. autoclass:: SUR
    :members:
    :inherited-members:
+
+Three-Stage Least Squares (3SLS)
+================================
+.. autoclass:: IV3SLS
+   :members:
+   :inherited-members:

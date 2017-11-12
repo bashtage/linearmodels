@@ -62,8 +62,15 @@ with a dependent and exogenous (stored as a :class:`dict` with keys
    tenure         0.0316     0.0039     8.1254     0.0000      0.0240      0.0393
 
    ==============================================================================
-   SURResults, id: 0x282ca8f7b70
+   SystemResults, id: 0x282ca8f7b70
 
+
+
+In addition to SUR, the system module also contain an estimator for the Three-stage Least
+Squares (:class:`~linearmodels.system.model.IV3SLS`) Estimator.  3SLS is a generalization of
+SUR which allows variables to be either exogenous or endogenous, and when there are endogenous
+variables, for instruments to be used.  SUR is a special case of 3SLS where there are no
+endogenous variables or instruments. 3SLS allows systems of IV equations to be jointly estimated.
 
 .. toctree::
    :maxdepth: 1

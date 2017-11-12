@@ -177,7 +177,7 @@ The OLS estimator of
 A GLS estimator can be similarly defined as 
 \begin_inset Formula 
 \[
-\hat{\beta}_{GLS}=\left(X^{\prime}\Omega X\right)^{-1}X^{\prime}\Omega^{-1}Y
+\hat{\beta}_{GLS}=\left(X^{\prime}\Omega^{-1}X\right)^{-1}X^{\prime}\Omega^{-1}Y
 \]
 
 \end_inset
@@ -219,7 +219,7 @@ where
 The feasible GLS estimator is then 
 \begin_inset Formula 
 \[
-\hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
+\hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}^{-1}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
 \]
 
 \end_inset
@@ -230,7 +230,7 @@ The feasible GLS estimator is then
 \begin_layout Standard
 \noindent
 where 
-\begin_inset Formula $\hat{\Omega}=I_{N}\otimes\hat{\Sigma}$
+\begin_inset Formula $\hat{\Omega}=\hat{\Sigma}\otimes I_{N}$
 \end_inset
 
 .
@@ -623,6 +623,150 @@ status open
 \begin_layout Plain Layout
 TODO: Explain restrictions
 \end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Three Stage Least Squares (3SLS)
+\end_layout
+
+\begin_layout Standard
+\noindent
+Three-stage least squares extends SUR to the case of endogenous variables.
+ It is the system extension of two-stage least squares (2SLS).
+ Like SUR, 3SLS jointly estimates multiple models which allows joint hypothesis
+ testing of parameters.
+ It can also lead to more precise parameter estimates if some residuals
+ are conditionally homoskedastic and regressors differ across equations.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Basic Notation
+\end_layout
+
+\begin_layout Standard
+\noindent
+Assume 
+\begin_inset Formula $K$
+\end_inset
+
+ series are observed for 
+\begin_inset Formula $N$
+\end_inset
+
+ time periods.
+ Denote the stacked observations of series 
+\begin_inset Formula $i$
+\end_inset
+
+ as 
+\begin_inset Formula $Y_{i}$
+\end_inset
+
+ and its corresponding regressor matrix 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+.
+ The complete model spanning all series can be specified as 
+\begin_inset Formula 
+\begin{align*}
+Y & =X\beta+\epsilon\\
+\left[\begin{array}{c}
+Y_{1}\\
+Y_{2}\\
+\vdots\\
+Y_{K}
+\end{array}\right] & =\left[\begin{array}{cccc}
+X_{1} & 0 & 0 & 0\\
+0 & X_{2} & 0 & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & 0 & X_{N}
+\end{array}\right]\left[\begin{array}{c}
+\beta_{1}\\
+\beta_{2}\\
+\vdots\\
+\beta_{K}
+\end{array}\right]+\left[\begin{array}{c}
+\epsilon_{1}\\
+\epsilon_{2}\\
+\vdots\\
+\epsilon_{K}
+\end{array}\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+ contains both exogenous and endogenous variables.
+ For each equation denote the available instruments as 
+\begin_inset Formula $Z_{i}$
+\end_inset
+
+.
+ The instrument include both exogenous regressors and excluded instrumental
+ variables.
+ Define the fitted values of the exogenous variables as 
+\begin_inset Formula 
+\[
+\hat{X}_{i}=Z\left(Z^{\prime}Z\right)^{-1}Z^{\prime}X.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The IV estimator of 
+\begin_inset Formula $\beta$
+\end_inset
+
+ is then 
+\begin_inset Formula 
+\[
+\hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula 
+\[
+\hat{X}=\left[\begin{array}{cccc}
+\hat{X}_{1} & 0 & 0 & 0\\
+0 & \hat{X}_{2} & 0 & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & 0 & \hat{X}_{N}
+\end{array}\right]
+\]
+
+\end_inset
+
+A GLS estimator can be similarly defined as 
+\begin_inset Formula 
+\[
+\hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y
+\]
 
 \end_inset
 

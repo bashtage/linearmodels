@@ -6,6 +6,6 @@ Estimation Results
 .. module:: linearmodels.system.results
    :synopsis: Results for system regression estimators
 
-.. autoclass:: SURResults
+.. autoclass:: SystemResults
    :members:
    :inherited-members:

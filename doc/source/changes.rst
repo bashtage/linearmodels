@@ -5,6 +5,7 @@ Change Log
 Since Version 3.0
 =================
 * Added Seemingly Unrelated Regression (SUR) Estimator
+* Added Three-stage Least Squares (3SLS) Estimator
 
 Version 3.0
 ===========
