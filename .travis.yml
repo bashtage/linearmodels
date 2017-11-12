@@ -21,20 +21,20 @@ matrix:
     env:
     - PYTHON=3.5
     - NUMPY=1.11
-    - SCIPY=0.17
-    - PANDAS="pandas=0.18"
-    - SKIPSLOW="--skip-slow"
+    - SCIPY=0.18
+    - PANDAS=0.19
   - python: 3.5
     env:
     - PYTHON=3.5
     - NUMPY=1.12
     - SCIPY=0.19
-
+    - PANDAS=0.20
   - python: 3.5
     env:
     - PYTHON=3.6
     - NUMPY=1.13
-    - SCIPY=0.19
+    - SCIPY=1.0
+    - PANDAS=0.21
     - XARRAY=true
     - DOCBUILD=true
 
@@ -48,8 +48,8 @@ before_install:
   - conda config --set always_yes true
   - conda update conda
   # Install packages
-  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} statsmodels matplotlib seaborn
-  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} ${PANDAS} statsmodels matplotlib seaborn
+  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
+  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
   - source activate linearmodels-test
   - if [[ ${XARRAY} = true ]]; then conda install xarray; fi
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat

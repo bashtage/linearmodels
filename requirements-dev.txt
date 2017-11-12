@@ -1,9 +1,10 @@
-numpy
-pandas
-xarray
-scipy
+numpy>=1.11
+pandas>= 0.19
+scipy>=0.18
 patsy
-statsmodels
+statsmodels>=0.8
+xarray>=0.9
+patsy
 pytest>=3
 sphinx
 guzzle_sphinx_theme
