@@ -216,7 +216,7 @@ class LinearConstraint(object):
                 raise ValueError('r is incompatible with the number of model '
                                  'parameters')
         rq = np.c_[r, q[:, None]]
-        if matrix_rank(rq) < rq.shape[0]:
+        if not np.all(np.isfinite(rq)) or matrix_rank(rq) < rq.shape[0]:
             raise ValueError('Constraints must be non-redundant')
         qr = np.linalg.qr(rq)
         if matrix_rank(qr[1][:, :-1]) != matrix_rank(qr[1]):
