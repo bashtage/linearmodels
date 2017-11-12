@@ -134,10 +134,10 @@ is possible that older versions work.
 
 -  **Python 3.5+**: extensive use of ``@`` operator
 -  NumPy (1.11+)
--  SciPy (0.17+)
--  pandas (0.18+)
--  xarray (0.9+)
+-  SciPy (0.18+)
+-  pandas (0.19+)
 -  statsmodels (0.8+)
+-  xarray (0.9+, optional)
 
 Testing
 ~~~~~~~
