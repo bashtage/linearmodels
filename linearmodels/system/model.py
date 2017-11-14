@@ -16,28 +16,38 @@ from collections import Mapping, OrderedDict
 
 import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
-                   ones_like, reshape, sqrt, zeros)
+                   ones, ones_like, reshape, sqrt, zeros)
 from numpy.linalg import inv, solve
 from pandas import Series
-from patsy.highlevel import dmatrices
-from patsy.missing import NAAction
 
 from linearmodels.iv.data import IVData
+from linearmodels.iv._utility import parse_formula
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
     blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
 from linearmodels.system.covariance import (HeteroskedasticCovariance,
                                             HomoskedasticCovariance)
-from linearmodels.system.results import SURResults
-from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
-                                  matrix_rank, missing_warning, InvalidTestStatistic)
+from linearmodels.system.results import SystemResults
+from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
+                                  matrix_rank, missing_warning)
 
-__all__ = ['SUR']
+__all__ = ['SUR', 'IV3SLS']
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys 'dependent'
 and 'exog' or a 2-element tuple of he form (dependent, exog).
 equations[{key}] was {type}
 """
+
+
+def _to_ordered_dict(equations):
+    if not isinstance(equations, OrderedDict):
+        keys = [key for key in equations]
+        keys = sorted(keys)
+        ordered_eqn = OrderedDict()
+        for key in keys:
+            ordered_eqn[key] = equations[key]
+        equations = ordered_eqn
+    return equations
 
 
 def _missing_weights(keys):
@@ -48,18 +58,20 @@ def _missing_weights(keys):
     warnings.warn(msg, UserWarning)
 
 
-class SUR(object):
+class IV3SLS(object):
     r"""
-    Seemingly unrelated regression estimation (SUR/SURE)
+    Three-stage Least Squares (3SLS) Estimator
 
     Parameters
     ----------
     equations : dict
-        Dictionary-like structure containing dependent and exogenous variable
-        values.  Each key is an equations label and must be a string. Each
-        value must be either a tuple of the form (dependent,
-        exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
-        the optional key 'weights'.
+        Dictionary-like structure containing dependent, exogenous, endogenous
+        and instrumental variables.  Each key is an equations label and must
+        be a string. Each value must be either a tuple of the form (dependent,
+        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
+        'exog'.  The dictionary may contain optional keys for 'endog',
+        'instruments', and 'weights'. Endogenous and/or Instrument can be empty
+        if all variables in an equation are exogenous.
     sigma : array-like
         Pre-specified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -67,7 +79,7 @@ class SUR(object):
     Notes
     -----
     Estimates a set of regressions which are seemingly unrelated in the sense
-    that separate estimation would lead to consistent parameter estiamtes.
+    that separate estimation would lead to consistent parameter estimates.
     Each equation is of the form
 
     .. math::
@@ -100,42 +112,38 @@ class SUR(object):
                  0 & 0 & \dots & X_K
             \end{array}\right]
 
-    The system OLS estimator is
+    The system instrumental variable (IV) estimator is
 
     .. math::
 
-        \hat{\beta}_{OLS} = (X'X)^{-1}X'Y
+        \hat{\beta}_{IV} & = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
+                         & = (\hat{X}'\hat{X})^{-1}\hat{X}'Y
 
-    When certain conditions are satisfied, a GLS estimator of the form
+    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X` and.  When certain conditions are
+    satisfied, a GLS estimator of the form
 
     .. math::
 
-        \hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y
+        \hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y
 
     can improve accuracy of coefficient estimates where
 
     .. math::
 
-        \Omega = \Sigma \otimes I_n
+        \Omega = I_n \otimes \Sigma
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
     """
 
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
-            raise TypeError('dependent must be a dictionary-like')
+            raise TypeError('equations must be a dictionary-like')
         for key in equations:
             if not isinstance(key, str):
                 raise ValueError('Equation labels (keys) must be strings')
 
         # Ensure nearly deterministic equation ordering
-        if not isinstance(equations, OrderedDict):
-            pairs = [(str(key), key) for key in equations]
-            pairs = sorted(pairs, key=lambda p: p[0])
-            ordered_eqn = OrderedDict()
-            for key, value in pairs:
-                ordered_eqn[value] = equations[value]
-            equations = ordered_eqn
+        equations = _to_ordered_dict(equations)
 
         self._equations = equations
         self._sigma = asarray(sigma) if sigma is not None else None
@@ -143,30 +151,25 @@ class SUR(object):
         self._eq_labels = []
         self._dependent = []
         self._exog = []
+        self._instr = []
+        self._endog = []
+
         self._y = []
         self._x = []
         self._wy = []
         self._wx = []
         self._w = []
+        self._z = []
+        self._wz = []
 
         self._weights = []
         self._constraints = None
         self._constant_loc = None
         self._has_constant = None
         self._common_exog = False
+        self._model_name = 'Three Stage Least Squares (3SLS)'
+
         self._validate_data()
-
-    def __repr__(self):
-        return self.__str__() + '\nid: {0}'.format(hex(id(self)))
-
-    def __str__(self):
-        out = 'Seemingly Unrelated Regression (SUR), '
-        out += '{0} Equations:\n'.format(len(self._y))
-        eqns = ', '.join(self._equations.keys())
-        out += '\n'.join(textwrap.wrap(eqns, 70))
-        if self._common_exog:
-            out += '\nCommon Exogenous Variables'
-        return out
 
     def _validate_data(self):
         ids = []
@@ -175,67 +178,112 @@ class SUR(object):
             eq_data = self._equations[key]
             dep_name = 'dependent_' + str(i)
             exog_name = 'exog_' + str(i)
+            endog_name = 'endog_' + str(i)
+            instr_name = 'instr_' + str(i)
             if isinstance(eq_data, (tuple, list)):
-                self._dependent.append(IVData(eq_data[0], var_name=dep_name))
-                ids.append(id(eq_data[1]))
+                dep = IVData(eq_data[0], var_name=dep_name)
+                self._dependent.append(dep)
+                current_id = id(eq_data[1])
                 self._exog.append(IVData(eq_data[1], var_name=exog_name))
-                if len(eq_data) == 3:
-                    self._weights.append(IVData(eq_data[2]))
+                endog = IVData(eq_data[2], var_name=endog_name, nobs=dep.shape[0])
+                if endog.shape[1] > 0:
+                    current_id = (current_id, id(eq_data[2]))
+                ids.append(current_id)
+                self._endog.append(endog)
+
+                self._instr.append(IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0]))
+                if len(eq_data) == 5:
+                    self._weights.append(IVData(eq_data[4]))
                 else:
                     dep = self._dependent[-1].ndarray
                     self._weights.append(IVData(ones_like(dep)))
 
             elif isinstance(eq_data, dict):
-                self._dependent.append(IVData(eq_data['dependent'], var_name=dep_name))
-                ids.append(id(eq_data['exog']))
+                dep = IVData(eq_data['dependent'], var_name=dep_name)
+                self._dependent.append(dep)
+                current_id = id(eq_data['exog'])
+
                 self._exog.append(IVData(eq_data['exog'], var_name=exog_name))
+                endog = eq_data.get('endog', None)
+                endog = IVData(endog, var_name=endog_name, nobs=dep.shape[0])
+                self._endog.append(endog)
+                if 'endog' in eq_data:
+                    current_id = (current_id, id(eq_data['endog']))
+                ids.append(current_id)
+
+                instr = eq_data.get('instruments', None)
+                instr = IVData(instr, var_name=instr_name, nobs=dep.shape[0])
+                self._instr.append(instr)
+
                 if 'weights' in eq_data:
                     self._weights.append(IVData(eq_data['weights']))
                 else:
-                    dep = self._dependent[-1].ndarray
-                    self._weights.append(IVData(ones_like(dep)))
-
+                    self._weights.append(IVData(ones(dep.shape)))
             else:
                 msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
                 raise TypeError(msg)
-        for lhs, rhs in zip(self._dependent, self._exog):
-            rhs_a = rhs.ndarray
-            lhs_a = lhs.ndarray
-            if lhs_a.shape[0] != rhs_a.shape[0]:
-                raise ValueError('Dependent and exogenous do not have the same'
-                                 ' number of observations')
+        self._has_instruments = False
+        for instr in self._instr:
+            self._has_instruments = self._has_instruments or (instr.shape[1] > 1)
+
+        for i, comps in enumerate(zip(self._dependent, self._exog, self._endog, self._instr)):
+            shapes = list(map(lambda a: a.shape[0], comps))
+            if min(shapes) != max(shapes):
+                raise ValueError('Dependent, exogenous, endogenous and '
+                                 'instruments do not have the same number of '
+                                 'observations in eq {eq}'.format(eq=self._eq_labels[i]))
 
         self._drop_missing()
         self._common_exog = len(set(ids)) == 1
+        if self._common_exog:
+            # Common exog requires weights are also equal
+            w0 = self._weights[0].ndarray
+            for w in self._weights:
+                self._common_exog = self._common_exog and np.all(w.ndarray == w0)
         constant = []
         constant_loc = []
-        for lhs, rhs, label in zip(self._dependent, self._exog, self._eq_labels):
-            self._param_names.extend([label + '_' + col for col in rhs.cols])
-            rhs_a = rhs.ndarray
-            lhs_a = lhs.ndarray
-            if lhs_a.shape[0] <= rhs_a.shape[1]:
-                raise ValueError('Fewer observations than variables')
-            if matrix_rank(rhs_a) < rhs_a.shape[1]:
-                raise ValueError('Exogenous variable arrays are not all full '
-                                 'rank')
-            const, const_loc = has_constant(rhs_a)
-            constant.append(const)
-            constant_loc.append(const_loc)
-        self._has_constant = Series(constant,
-                                    index=[d.cols[0] for d in self._dependent])
-        self._constant_loc = constant_loc
 
-        for dep, exog, w in zip(self._dependent, self._exog, self._weights):
+        for dep, exog, endog, instr, w, label in zip(self._dependent, self._exog, self._endog,
+                                                     self._instr, self._weights,
+                                                     self._eq_labels):
             y = dep.ndarray
-            x = exog.ndarray
+            x = np.concatenate([exog.ndarray, endog.ndarray], 1)
+            z = np.concatenate([exog.ndarray, instr.ndarray], 1)
             w = w.ndarray
             w = w / nanmean(w)
             w_sqrt = np.sqrt(w)
             self._w.append(w)
             self._y.append(y)
             self._x.append(x)
+            self._z.append(z)
             self._wy.append(y * w_sqrt)
             self._wx.append(x * w_sqrt)
+            self._wz.append(z * w_sqrt)
+            cols = list(exog.cols) + list(endog.cols)
+            self._param_names.extend([label + '_' + col for col in cols])
+            if y.shape[0] <= x.shape[1]:
+                raise ValueError('Fewer observations than variables in '
+                                 'equation {eq}'.format(eq=label))
+            if matrix_rank(x) < x.shape[1]:
+                raise ValueError('Equation {eq} regressor array is not full '
+                                 'rank'.format(eq=label))
+            if x.shape[1] > z.shape[1]:
+                raise ValueError('Equation {eq} has fewer instruments than '
+                                 'endogenous variables.'.format(eq=label))
+            if z.shape[1] > z.shape[0]:
+                raise ValueError('Fewer observations than instruments in '
+                                 'equation {eq}'.format(eq=label))
+            if matrix_rank(z) < z.shape[1]:
+                raise ValueError('Equation {eq} instrument array is full '
+                                 'rank'.format(eq=label))
+
+        for lhs, rhs, label in zip(self._y, self._x, self._eq_labels):
+            const, const_loc = has_constant(rhs)
+            constant.append(const)
+            constant_loc.append(const_loc)
+        self._has_constant = Series(constant,
+                                    index=[d.cols[0] for d in self._dependent])
+        self._constant_loc = constant_loc
 
     def _drop_missing(self):
         k = len(self._dependent)
@@ -245,6 +293,8 @@ class SUR(object):
         for i in range(k):
             missing |= self._dependent[i].isnull
             missing |= self._exog[i].isnull
+            missing |= self._endog[i].isnull
+            missing |= self._instr[i].isnull
             missing |= self._weights[i].isnull
 
         missing_warning(missing)
@@ -252,7 +302,230 @@ class SUR(object):
             for i in range(k):
                 self._dependent[i].drop(missing)
                 self._exog[i].drop(missing)
+                self._endog[i].drop(missing)
+                self._instr[i].drop(missing)
                 self._weights[i].drop(missing)
+
+    def __repr__(self):
+        return self.__str__() + '\nid: {0}'.format(hex(id(self)))
+
+    def __str__(self):
+        out = self._model_name + ', '
+        out += '{0} Equations:\n'.format(len(self._y))
+        eqns = ', '.join(self._equations.keys())
+        out += '\n'.join(textwrap.wrap(eqns, 70))
+        if self._common_exog:
+            out += '\nCommon Exogenous Variables'
+        return out
+
+    def fit(self, *, method=None, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
+            cov_type='robust', **cov_config):
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        method : {None, 'gls', 'ols'}
+            Estimation method.  Default auto selects based on regressors,
+            using OLS only if all regressors are identical. The other two
+            arguments force the use of GLS or OLS.
+        full_cov : bool
+            Flag indicating whether to utilize information in correlations
+            when estimating the model with GLS
+        iterate : bool
+            Flag indicating to iterate GLS until convergence of iter limit
+            iterations have been completed
+        iter_limit : int
+            Maximum number of iterations for iterative GLS
+        tol : float
+            Tolerance to use when checking for convergence in iterative GLS
+        cov_type : str
+            Name of covariance estimator. Valid options are
+
+            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
+            * 'robust', 'heteroskedastic' - Heteroskedasticit robust
+              covariance estimator
+
+        **cov_config
+            Additional parameters to pass to covariance estimator. All
+            estimators support debiased which employs a small-sample adjustment
+
+        Returns
+        -------
+        results : SystemResults
+            Estimation results
+        """
+        cov_type = cov_type.lower()
+        if cov_type not in ('unadjusted', 'robust', 'homoskedastic', 'heteroskedastic'):
+            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+        cov_type = 'unadjusted' if cov_type in ('unadjusted', 'homoskedastic') else 'robust'
+        k = len(self._dependent)
+        col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
+        col_idx = cumsum(col_sizes)
+        total_cols = col_idx[-1]
+        self._construct_xhat()
+        beta, eps = self._multivariate_ls_fit()
+        nobs = eps.shape[0]
+        debiased = cov_config.get('debiased', False)
+        full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
+        if (self._common_exog and method is None and self._constraints is None) or method == 'ols':
+            return self._multivariate_ls_finalize(beta, eps, sigma, cov_type, **cov_config)
+
+        beta_hist = [beta]
+        nobs = eps.shape[0]
+        iter_count = 0
+        delta = inf
+        while ((iter_count < iter_limit and iterate) or iter_count == 0) and delta >= tol:
+            beta, eps, sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
+                                                  full_cov, debiased)
+            beta_hist.append(beta)
+            delta = beta_hist[-1] - beta_hist[-2]
+            delta = sqrt(np.mean(delta ** 2))
+            iter_count += 1
+
+        sigma_m12 = inv_matrix_sqrt(sigma)
+        wy = blocked_column_product(self._wy, sigma_m12)
+        wx = blocked_diag_product(self._wx, sigma_m12)
+        gls_eps = wy - wx @ beta
+
+        y = blocked_column_product(self._y, eye(k))
+        x = blocked_diag_product(self._x, eye(k))
+        eps = y - x @ beta
+
+        return self._gls_finalize(beta, sigma, full_sigma, gls_eps,
+                                  eps, cov_type, iter_count, **cov_config)
+
+    def _multivariate_ls_fit(self):
+        wy, wx, wxhat = self._wy, self._wx, self._wxhat
+        k = len(wxhat)
+        if self.constraints is not None:
+            cons = self.constraints
+            xpx_full = blocked_inner_prod(wxhat, eye(len(wxhat)))
+            xpy = []
+            for i in range(k):
+                xpy.append(wxhat[i].T @ wy[i])
+            xpy = np.vstack(xpy)
+            xpy = cons.t.T @ xpy - cons.t.T @ xpx_full @ cons.a.T
+            xpx = cons.t.T @ xpx_full @ cons.t
+            params_c = np.linalg.solve(xpx, xpy)
+            params = cons.t @ params_c + cons.a.T
+        else:
+            xpx = blocked_inner_prod(wxhat, eye(len(wxhat)))
+            xpy = []
+            for i in range(k):
+                xpy.append(wxhat[i].T @ wy[i])
+            xpy = np.vstack(xpy)
+            xpx, xpy = xpx, xpy
+            params = solve(xpx, xpy)
+
+        beta = params
+        loc = 0
+        eps = []
+        for i in range(k):
+            nb = wx[i].shape[1]
+            b = beta[loc:loc + nb]
+            eps.append(wy[i] - wx[i] @ b)
+            loc += nb
+        eps = hstack(eps)
+
+        return beta, eps
+
+    def _construct_xhat(self):
+        k = len(self._x)
+        self._xhat = []
+        self._wxhat = []
+        for i in range(k):
+            x, z = self._x[i], self._z[i]
+            if z.shape == x.shape and np.all(z == x):
+                # OLS, no instruments
+                self._xhat.append(x)
+                self._wxhat.append(self._wx[i])
+            else:
+                delta = np.linalg.lstsq(z, x)[0]
+                xhat = z @ delta
+                self._xhat.append(xhat)
+                w = self._w[i]
+                self._wxhat.append(xhat * np.sqrt(w))
+
+    def _gls_estimate(self, eps, nobs, total_cols, ci, full_cov, debiased):
+        """Core estimation routine for iterative GLS"""
+        wy, wx, wxhat = self._wy, self._wx, self._wxhat
+        sigma = self._sigma
+        if sigma is None:
+            sigma = eps.T @ eps / nobs
+            sigma *= self._sigma_scale(debiased)
+
+        if not full_cov:
+            sigma = diag(diag(sigma))
+        sigma_inv = inv(sigma)
+
+        k = len(wy)
+        if self.constraints is not None:
+            cons = self.constraints
+            sigma_m12 = inv_matrix_sqrt(sigma)
+            x = blocked_diag_product(wxhat, sigma_m12)
+            y = blocked_column_product(wy, sigma_m12)
+            xt = x @ cons.t
+            xpx = xt.T @ xt
+            xpy = xt.T @ (y - x @ cons.a.T)
+            paramsc = solve(xpx, xpy)
+            params = cons.t @ paramsc + cons.a.T
+        else:
+            xpx = blocked_inner_prod(wxhat, sigma_inv)
+            xpy = zeros((total_cols, 1))
+            for i in range(k):
+                sy = zeros((nobs, 1))
+                for j in range(k):
+                    sy += sigma_inv[i, j] * wy[j]
+                xpy[ci[i]:ci[i + 1]] = wxhat[i].T @ sy
+
+            params = solve(xpx, xpy)
+
+        beta = params
+
+        loc = 0
+        for j in range(k):
+            _wx = wx[j]
+            _wy = wy[j]
+            kx = _wx.shape[1]
+            eps[:, [j]] = _wy - _wx @ beta[loc:loc + kx]
+            loc += kx
+
+        return beta, eps, sigma
+
+    def _multivariate_ls_finalize(self, beta, eps, sigma, cov_type, **cov_config):
+        k = len(self._wx)
+
+        # Covariance estimation
+        if cov_type == 'unadjusted':
+            cov_est = HomoskedasticCovariance
+        else:
+            cov_est = HeteroskedasticCovariance
+        cov = cov_est(self._wxhat, eps, sigma, sigma, gls=False,
+                      constraints=self._constraints, **cov_config).cov
+
+        individual = AttrDict()
+        debiased = cov_config.get('debiased', False)
+        for i in range(k):
+            wy = wye = self._wy[i]
+            w = self._w[i]
+            cons = int(self.has_constant.iloc[i])
+            if cons:
+                wc = np.ones_like(wy) * np.sqrt(w)
+                wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
+            total_ss = float(wye.T @ wye)
+
+            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
+                                               cov_type, 0, debiased, cons, total_ss)
+            key = self._eq_labels[i]
+            individual[key] = stats
+
+        nobs = eps.size
+        results = self._common_results(beta, cov, 'OLS', 0, nobs, cov_type,
+                                       sigma, individual, debiased)
+        results['wresid'] = results.resid
+
+        return SystemResults(results)
 
     @property
     def has_constant(self):
@@ -260,51 +533,51 @@ class SUR(object):
         return self._has_constant
 
     @classmethod
-    def multivariate_ls(cls, dependent, exog):
+    def multivariate_ls(cls, dependent, exog=None, endog=None, instruments=None):
         """
-        Interface for specification of multivariate regression models
+        Interface for specification of multivariate IV models
 
         Parameters
         ----------
         dependent : array-like
             nobs by ndep array of dependent variables
-        exog : array-like
-            nobs by nvar array of exogenous regressors common to all models
+        exog : array-like, optional
+            nobs by nexog array of exogenous regressors common to all models
+        endog : array-like, optional
+            nobs by nengod array of endogenous regressors common to all models
+        instruments : array-like, optional
+            nobs by ninstr array of instruments to use in all equations
 
         Returns
         -------
-        model : SUR
+        model : IV3SLS
             Model instance
 
         Notes
         -----
-        Utility function to simplify the construction of multivariate
-        regression models which all use the same regressors. Constructs
+        At least one of exog or endog must be provided.
+        
+        Utility function to simplify the construction of multivariate IV
+        models which all use the same regressors and instruments. Constructs
         the dictionary of equations from the variables using the common
-        exogenous variable.
-
-        Examples
-        --------
-        A simple CAP-M can be estimated as a multivariate regression
-
-        >>> from linearmodels.datasets import french
-        >>> from linearmodels.system import SUR
-        >>> data = french.load()
-        >>> portfolios = data[['S1V1','S1V5','S5V1','S5V5']]
-        >>> factors = data[['MktRF']].copy()
-        >>> factors['alpha'] = 1
-        >>> mod = SUR.multivariate_ls(portfolios, factors)
+        exogenous, endogenous and instrumental variables.
         """
         equations = OrderedDict()
         dependent = IVData(dependent, var_name='dependent')
+        if exog is None and endog is None:
+            raise ValueError('At least one of exog or endog must be provided')
         exog = IVData(exog, var_name='exog')
+        endog = IVData(endog, var_name='endog', nobs=dependent.shape[0])
+        instr = IVData(instruments, var_name='instruments', nobs=dependent.shape[0])
         for col in dependent.pandas:
-            equations[col] = (dependent.pandas[[col]], exog.pandas)
+            equations[col] = (dependent.pandas[[col]], exog.pandas, endog.pandas, instr.pandas)
         return cls(equations)
 
     @classmethod
     def from_formula(cls, formula, data, *, sigma=None, weights=None):
         """
+        Specify a 3SLS using the formula interface
+
         Parameters
         ----------
         formula : {str, dict-like}
@@ -324,7 +597,7 @@ class SUR(object):
 
         Returns
         -------
-        model : SUR
+        model : IV3SLS
             Model instance
 
         Notes
@@ -340,22 +613,23 @@ class SUR(object):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=['y1', 'x1_1', 'y2', 'x2_1'])
-        >>> from linearmodels.system import SUR
-        >>> formula = {'eq1': 'y1 ~ 1 + x1_1', 'eq2': 'y2 ~ 1 + x2_1'}
-        >>> mod = SUR.from_formula(formula, data)
+        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
+        >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
+        >>> from linearmodels.system import IV3SLS
+        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
+        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
+        >>> mod = IV3SLS.from_formula(formula, data)
 
         The second format uses curly braces {} to surround distinct equations
 
-        >>> formula = '{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}'
-        >>> mod = SUR.from_formula(formula, data)
+        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IV3SLS.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
-        >>> mod = SUR.from_formula(formula, data)
+        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IV3SLS.from_formula(formula, data)
         """
-        na_action = NAAction(on_NA='raise', NA_types=[])
         if not isinstance(formula, (Mapping, str)):
             raise TypeError('formula must be a string or dictionary-like')
 
@@ -365,16 +639,16 @@ class SUR(object):
             for key in formula:
                 f = formula[key]
                 f = '~ 0 +'.join(f.split('~'))
-                dep, exog = dmatrices(f, data, return_type='dataframe',
-                                      NA_action=na_action)
-                eqns[key] = {'dependent': dep, 'exog': exog}
+                dep, exog, endog, instr = parse_formula(f, data)
+                eqns[key] = {'dependent': dep, 'exog': exog, 'endog': endog,
+                             'instruments': instr}
                 if weights is not None:
                     if key in weights:
                         eqns[key]['weights'] = weights[key]
                     else:
                         missing_weight_keys.append(key)
             _missing_weights(missing_weight_keys)
-            return SUR(eqns, sigma=sigma)
+            return cls(eqns, sigma=sigma)
 
         formula = formula.replace('\n', ' ').strip()
         parts = formula.split('}')
@@ -389,15 +663,15 @@ class SUR(object):
                 key = base_key = base_key.strip()
                 part = part.strip()
             f = '~ 0 +'.join(part.split('~'))
-            dep, exog = dmatrices(f, data, return_type='dataframe',
-                                  NA_action=na_action)
+            dep, exog, endog, instr = parse_formula(f, data)
             if base_key is None:
                 base_key = key = f.split('~')[0].strip()
             count = 0
             while key in eqns:
                 key = base_key + '.{0}'.format(count)
                 count += 1
-            eqns[key] = {'dependent': dep, 'exog': exog}
+            eqns[key] = {'dependent': dep, 'exog': exog, 'endog': endog,
+                         'instruments': instr}
             if weights is not None:
                 if key in weights:
                     eqns[key]['weights'] = weights[key]
@@ -406,42 +680,7 @@ class SUR(object):
 
         _missing_weights(missing_weight_keys)
 
-        return SUR(eqns, sigma=sigma)
-
-    def _multivariate_ls_fit(self):
-        wy, wx = self._wy, self._wx
-        k = len(wx)
-        if self.constraints is not None:
-            cons = self.constraints
-            xpx_full = blocked_inner_prod(wx, eye(len(wx)))
-            xpy = []
-            for i in range(k):
-                xpy.append(wx[i].T @ wy[i])
-            xpy = np.vstack(xpy)
-            xpy = cons.t.T @ xpy - cons.t.T @ xpx_full @ cons.a.T
-            xpx = cons.t.T @ xpx_full @ cons.t
-            params_c = np.linalg.solve(xpx, xpy)
-            params = cons.t @ params_c + cons.a.T
-        else:
-            xpx = blocked_inner_prod(wx, eye(len(wx)))
-            xpy = []
-            for i in range(k):
-                xpy.append(wx[i].T @ wy[i])
-            xpy = np.vstack(xpy)
-            xpx, xpy = xpx, xpy
-            params = solve(xpx, xpy)
-
-        beta = params
-        loc = 0
-        eps = []
-        for i in range(k):
-            nb = wx[i].shape[1]
-            b = beta[loc:loc + nb]
-            eps.append(wy[i] - wx[i] @ b)
-            loc += nb
-        eps = hstack(eps)
-
-        return beta, eps
+        return cls(eqns, sigma=sigma)
 
     def _f_stat(self, stats, debiased):
         cov = stats.cov
@@ -471,40 +710,6 @@ class SUR(object):
             return WaldTestStatistic(stat, null=null, df=df, name=name)
 
         return wald
-
-    def _multivariate_ls_finalize(self, beta, eps, sigma, cov_type, **cov_config):
-        k = len(self._wx)
-
-        # Covariance estimation
-        if cov_type == 'unadjusted':
-            cov_est = HomoskedasticCovariance
-        else:
-            cov_est = HeteroskedasticCovariance
-        cov = cov_est(self._wx, eps, sigma, sigma, gls=False,
-                      constraints=self._constraints, **cov_config).cov
-
-        individual = AttrDict()
-        debiased = cov_config.get('debiased', False)
-        for i in range(k):
-            wy = wye = self._wy[i]
-            w = self._w[i]
-            cons = int(self.has_constant.iloc[i])
-            if cons:
-                wc = np.ones_like(wy) * np.sqrt(w)
-                wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
-            total_ss = float(wye.T @ wye)
-
-            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
-                                               cov_type, 0, debiased, cons, total_ss)
-            key = self._eq_labels[i]
-            individual[key] = stats
-
-        nobs = eps.size
-        results = self._common_results(beta, cov, 'OLS', 0, nobs, cov_type,
-                                       sigma, individual, debiased)
-        results['wresid'] = results.resid
-
-        return SURResults(results)
 
     def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
                               cov_type, iter_count, debiased, constant, total_ss):
@@ -634,7 +839,7 @@ class SUR(object):
         wresid = hstack(wresid)
         results['wresid'] = wresid
 
-        return SURResults(results)
+        return SystemResults(results)
 
     def _sigma_scale(self, debiased):
         if not debiased:
@@ -643,128 +848,6 @@ class SUR(object):
         scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
         scales = np.sqrt(nobs / scales)
         return scales[:, None] @ scales[None, :]
-
-    def _gls_estimate(self, eps, nobs, total_cols, ci, full_cov, debiased):
-        """Core estimation routine for iterative GLS"""
-        wx, wy = self._wx, self._wy
-        sigma = self._sigma
-        if sigma is None:
-            sigma = eps.T @ eps / nobs
-            sigma *= self._sigma_scale(debiased)
-
-        if not full_cov:
-            sigma = diag(diag(sigma))
-        sigma_inv = inv(sigma)
-
-        k = len(wy)
-        if self.constraints is not None:
-            cons = self.constraints
-            sigma_m12 = inv_matrix_sqrt(sigma)
-            x = blocked_diag_product(wx, sigma_m12)
-            y = blocked_column_product(wy, sigma_m12)
-            xt = x @ cons.t
-            xpx = xt.T @ xt
-            xpy = xt.T @ (y - x @ cons.a.T)
-            paramsc = solve(xpx, xpy)
-            params = cons.t @ paramsc + cons.a.T
-        else:
-            xpx = blocked_inner_prod(wx, sigma_inv)
-            xpy = zeros((total_cols, 1))
-            for i in range(k):
-                sy = zeros((nobs, 1))
-                for j in range(k):
-                    sy += sigma_inv[i, j] * wy[j]
-                xpy[ci[i]:ci[i + 1]] = wx[i].T @ sy
-
-            params = solve(xpx, xpy)
-
-        beta = params
-
-        loc = 0
-        for j in range(k):
-            _wx = wx[j]
-            _wy = wy[j]
-            kx = _wx.shape[1]
-            eps[:, [j]] = _wy - _wx @ beta[loc:loc + kx]
-            loc += kx
-
-        return beta, eps, sigma
-
-    def fit(self, *, method=None, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
-            cov_type='robust', **cov_config):
-        """
-        Estimate model parameters
-
-        Parameters
-        ----------
-        method : {None, 'gls', 'ols'}
-            Estimation method.  Default auto selects based on regressors,
-            using OLS only if all regressors are identical. The other two
-            arguments force the use of GLS or OLS.
-        full_cov : bool
-            Flag indicating whether to utilize information in correlations
-            when estimating the model with GLS
-        iterate : bool
-            Flag indicating to iterate GLS until convergence of iter limit
-            iterations have been completed
-        iter_limit : int
-            Maximum number of iterations for iterative GLS
-        tol : float
-            Tolerance to use when checking for convergence in iterative GLS
-        cov_type : str
-            Name of covariance estimator. Valid options are
-
-            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
-            * 'robust', 'heteroskedastic' - Heteroskedasticit robust
-              covariance estimator
-
-        **cov_config
-            Additional parameters to pass to covariance estimator. All
-            estimators support debiased which employs a small-sample adjustment
-
-        Returns
-        -------
-        results : SURResults
-            Estimation results
-        """
-        cov_type = cov_type.lower()
-        if cov_type not in ('unadjusted', 'robust', 'homoskedastic', 'heteroskedastic'):
-            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
-        cov_type = 'unadjusted' if cov_type in ('unadjusted', 'homoskedastic') else 'robust'
-        k = len(self._dependent)
-        col_sizes = [0] + list(map(lambda v: v.ndarray.shape[1], self._exog))
-        col_idx = cumsum(col_sizes)
-        total_cols = col_idx[-1]
-        beta, eps = self._multivariate_ls_fit()
-        nobs = eps.shape[0]
-        debiased = cov_config.get('debiased', False)
-        full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
-        if (self._common_exog and method is None and self._constraints is None) or method == 'ols':
-            return self._multivariate_ls_finalize(beta, eps, sigma, cov_type, **cov_config)
-
-        beta_hist = [beta]
-        nobs = eps.shape[0]
-        iter_count = 0
-        delta = inf
-        while ((iter_count < iter_limit and iterate) or iter_count == 0) and delta >= tol:
-            beta, eps, sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
-                                                  full_cov, debiased)
-            beta_hist.append(beta)
-            delta = beta_hist[-1] - beta_hist[-2]
-            delta = sqrt(np.mean(delta ** 2))
-            iter_count += 1
-
-        sigma_m12 = inv_matrix_sqrt(sigma)
-        wy = blocked_column_product(self._wy, sigma_m12)
-        wx = blocked_diag_product(self._wx, sigma_m12)
-        gls_eps = wy - wx @ beta
-
-        y = blocked_column_product(self._y, eye(k))
-        x = blocked_diag_product(self._x, eye(k))
-        eps = y - x @ beta
-
-        return self._gls_finalize(beta, sigma, full_sigma, gls_eps,
-                                  eps, cov_type, iter_count, **cov_config)
 
     @property
     def constraints(self):
@@ -816,3 +899,200 @@ class SUR(object):
             Normalized, unique model parameter names
         """
         return self._param_names
+
+
+class SUR(IV3SLS):
+    r"""
+    Seemingly unrelated regression estimation (SUR/SURE)
+
+    Parameters
+    ----------
+    equations : dict
+        Dictionary-like structure containing dependent and exogenous variable
+        values.  Each key is an equations label and must be a string. Each
+        value must be either a tuple of the form (dependent,
+        exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
+        the optional key 'weights'.
+    sigma : array-like
+        Pre-specified residual covariance to use in GLS estimation. If not
+        provided, FGLS is implemented based on an estimate of sigma.
+
+    Notes
+    -----
+    Estimates a set of regressions which are seemingly unrelated in the sense
+    that separate estimation would lead to consistent parameter estimates.
+    Each equation is of the form
+
+    .. math::
+
+        y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}
+
+    where k denotes the equation and i denoted the observation index. By
+    stacking vertically arrays of dependent and placing the exogenous
+    variables into a block diagonal array, the entire system can be compactly
+    expressed as
+
+    .. math::
+
+        Y = X\beta + \epsilon
+
+    where
+
+    .. math::
+
+        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+
+    and
+
+    .. math::
+
+        X = \left[\begin{array}{cccc}
+                 X_1 & 0 & \ldots & 0 \\
+                 0 & X_2 & \dots & 0 \\
+                 \vdots & \vdots & \ddots & \vdots \\
+                 0 & 0 & \dots & X_K
+            \end{array}\right]
+
+    The system OLS estimator is
+
+    .. math::
+
+        \hat{\beta}_{OLS} = (X'X)^{-1}X'Y
+
+    When certain conditions are satisfied, a GLS estimator of the form
+
+    .. math::
+
+        \hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y
+
+    can improve accuracy of coefficient estimates where
+
+    .. math::
+
+        \Omega = I_n \otimes \Sigma
+
+    where :math:`\Sigma` is the covariance matrix of the residuals.
+
+    SUR is a special case of 3SLS where there are no endogenous regressors and
+    no instruments.
+    """
+
+    def __init__(self, equations, *, sigma=None):
+        if not isinstance(equations, Mapping):
+            raise TypeError('equations must be a dictionary-like')
+        for key in equations:
+            if not isinstance(key, str):
+                raise ValueError('Equation labels (keys) must be strings')
+        reformatted = equations.__class__()
+        for key in equations:
+            eqn = equations[key]
+            if isinstance(eqn, tuple):
+                if len(eqn) == 3:
+                    w = eqn[-1]
+                    eqn = eqn[:2]
+                    eqn = eqn + (None, None) + (w,)
+                else:
+                    eqn = eqn + (None, None)
+            reformatted[key] = eqn
+        super(SUR, self).__init__(reformatted, sigma=sigma)
+        self._model_name = 'Seemingly Unrelated Regression (SUR)'
+
+    @classmethod
+    def multivariate_ls(cls, dependent, exog):
+        """
+        Interface for specification of multivariate regression models
+
+        Parameters
+        ----------
+        dependent : array-like
+            nobs by ndep array of dependent variables
+        exog : array-like
+            nobs by nvar array of exogenous regressors common to all models
+
+        Returns
+        -------
+        model : SUR
+            Model instance
+
+        Notes
+        -----
+        Utility function to simplify the construction of multivariate
+        regression models which all use the same regressors. Constructs
+        the dictionary of equations from the variables using the common
+        exogenous variable.
+
+        Examples
+        --------
+        A simple CAP-M can be estimated as a multivariate regression
+
+        >>> from linearmodels.datasets import french
+        >>> from linearmodels.system import SUR
+        >>> data = french.load()
+        >>> portfolios = data[['S1V1','S1V5','S5V1','S5V5']]
+        >>> factors = data[['MktRF']].copy()
+        >>> factors['alpha'] = 1
+        >>> mod = SUR.multivariate_ls(portfolios, factors)
+        """
+        equations = OrderedDict()
+        dependent = IVData(dependent, var_name='dependent')
+        exog = IVData(exog, var_name='exog')
+        for col in dependent.pandas:
+            equations[col] = (dependent.pandas[[col]], exog.pandas)
+        return cls(equations)
+
+    @classmethod
+    def from_formula(cls, formula, data, *, sigma=None, weights=None):
+        """
+        Specify a SUR using the formula interface
+
+        Parameters
+        ----------
+        formula : {str, dict-like}
+            Either a string or a dictionary of strings where each value in
+            the dictionary represents a single equation. See Notes for a
+            description of the accepted syntax
+        data : DataFrame
+            Frame containing named variables
+        sigma : array-like
+            Pre-specified residual covariance to use in GLS estimation. If
+            not provided, FGLS is implemented based on an estimate of sigma.
+        weights : dict-like
+            Dictionary like object (e.g. a DataFrame) containing variable
+            weights.  Each entry must have the same number of observations as
+            data.  If an equation label is not a key weights, the weights will
+            be set to unity
+
+        Returns
+        -------
+        model : SUR
+            Model instance
+
+        Notes
+        -----
+        Models can be specified in one of two ways. The first uses curly
+        braces to encapsulate equations.  The second uses a dictionary
+        where each key is an equation name.
+
+        Examples
+        --------
+        The simplest format uses standard Patsy formulas for each equation
+        in a dictionary.  Best practice is to use an Ordered Dictionary
+
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=['y1', 'x1_1', 'y2', 'x2_1'])
+        >>> from linearmodels.system import SUR
+        >>> formula = {'eq1': 'y1 ~ 1 + x1_1', 'eq2': 'y2 ~ 1 + x2_1'}
+        >>> mod = SUR.from_formula(formula, data)
+
+        The second format uses curly braces {} to surround distinct equations
+
+        >>> formula = '{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}'
+        >>> mod = SUR.from_formula(formula, data)
+
+        It is also possible to include equation labels when using curly braces
+
+        >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
+        >>> mod = SUR.from_formula(formula, data)
+        """
+        return super(SUR, cls).from_formula(formula, data, sigma=sigma, weights=weights)

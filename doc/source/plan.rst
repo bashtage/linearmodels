@@ -51,7 +51,4 @@ System Estimation
 
 Instrumental Variable Estimators
 ********************************
-
-Not Implemented
-~~~~~~~~~~~~~~~
-* 3SLS
+* Three-stage LEast Squares (3SLS) Estimator - :class:`linearmodels.system.IV3SLS`

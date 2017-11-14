@@ -52,7 +52,7 @@ The OLS estimator of :math:`\beta` is then
 
 A GLS estimator can be similarly defined as
 
-.. math:: \hat{\beta}_{GLS}=\left(X^{\prime}\Omega X\right)^{-1}X^{\prime}\Omega^{-1}Y
+.. math:: \hat{\beta}_{GLS}=\left(X^{\prime}\Omega^{-1}X\right)^{-1}X^{\prime}\Omega^{-1}Y
 
 where :math:`\Omega=I_{N}\otimes\Sigma` is the joint covariance of the
 residuals. In practice :math:`\Sigma` is not known as so a feasible GLS
@@ -67,9 +67,9 @@ residuals. In practice :math:`\Sigma` is not known as so a feasible GLS
 
 The feasible GLS estimator is then
 
-.. math:: \hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
+.. math:: \hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}^{-1}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y
 
-where :math:`\hat{\Omega}=I_{N}\otimes\hat{\Sigma}`.
+where :math:`\hat{\Omega}=\hat{\Sigma}\otimes I_{N}`.
 
 Covariance Estimation
 ~~~~~~~~~~~~~~~~~~~~~
@@ -206,3 +206,73 @@ This suggests that constructing the high dimensional :math:`\Omega^{-1}`
 can be avoided and many needless multiplications can be avoided by
 directly computing these two components and the solution can be found
 using ``solve``.
+
+Three Stage Least Squares (3SLS)
+--------------------------------
+
+Three-stage least squares extends SUR to the case of endogenous
+variables. It is the system extension of two-stage least squares (2SLS).
+Like SUR, 3SLS jointly estimates multiple models which allows joint
+hypothesis testing of parameters. It can also lead to more precise
+parameter estimates if some residuals are conditionally homoskedastic
+and regressors differ across equations.
+
+Basic Notation
+~~~~~~~~~~~~~~
+
+Assume :math:`K` series are observed for :math:`N` time periods. Denote
+the stacked observations of series :math:`i` as :math:`Y_{i}` and its
+corresponding regressor matrix :math:`X_{i}`. The complete model
+spanning all series can be specified as
+
+.. math::
+
+   \begin{aligned}
+   Y & =X\beta+\epsilon\\
+   \left[\begin{array}{c}
+   Y_{1}\\
+   Y_{2}\\
+   \vdots\\
+   Y_{K}
+   \end{array}\right] & =\left[\begin{array}{cccc}
+   X_{1} & 0 & 0 & 0\\
+   0 & X_{2} & 0 & 0\\
+   \vdots & \vdots & \ddots & \vdots\\
+   0 & 0 & 0 & X_{N}
+   \end{array}\right]\left[\begin{array}{c}
+   \beta_{1}\\
+   \beta_{2}\\
+   \vdots\\
+   \beta_{K}
+   \end{array}\right]+\left[\begin{array}{c}
+   \epsilon_{1}\\
+   \epsilon_{2}\\
+   \vdots\\
+   \epsilon_{K}
+   \end{array}\right].\end{aligned}
+
+where :math:`X_{i}` contains both exogenous and endogenous variables.
+For each equation denote the available instruments as :math:`Z_{i}`. The
+instrument include both exogenous regressors and excluded instrumental
+variables. Define the fitted values of the exogenous variables as
+
+.. math:: \hat{X}_{i}=Z\left(Z^{\prime}Z\right)^{-1}Z^{\prime}X.
+
+The IV estimator of :math:`\beta` is then
+
+.. math:: \hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y.
+
+where
+
+.. math::
+
+   \hat{X}=\left[\begin{array}{cccc}
+   \hat{X}_{1} & 0 & 0 & 0\\
+   0 & \hat{X}_{2} & 0 & 0\\
+   \vdots & \vdots & \ddots & \vdots\\
+   0 & 0 & 0 & \hat{X}_{N}
+   \end{array}\right]
+
+ A GLS estimator can be similarly defined as
+
+.. math:: \hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y

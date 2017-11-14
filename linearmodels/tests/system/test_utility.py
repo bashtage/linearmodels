@@ -1,10 +1,10 @@
 import numpy as np
-import pytest
 import pandas as pd
+import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.system._utility import blocked_column_product, blocked_diag_product, \
-    blocked_inner_prod, inv_matrix_sqrt, LinearConstraint
+from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
+    blocked_diag_product, blocked_full_inner_product, blocked_inner_prod, inv_matrix_sqrt
 
 
 @pytest.fixture(params=(3, np.arange(1, 6)), ids=['common-size', 'different-size'])
@@ -14,7 +14,7 @@ def data(request):
     p = request.param
     if np.isscalar(p):
         p = p * np.ones(k, dtype=np.int64)
-
+    
     x = [np.random.randn(t, p[i]) for i in range(k)]
     y = [np.random.randn(t, 1) for _ in range(k)]
     sigma = 0.5 * np.eye(k) + 0.5 * np.ones((5, 5))
@@ -108,7 +108,7 @@ def test_linear_constraint():
     assert np.all(lc.t[:2] == 0)
     assert np.all(np.sum(lc.t, 1)[2:] == 1)
     assert np.all(lc.a == 0)
-
+    
     x = np.random.randn(200, 5)
     y = np.random.randn(200, 1)
     xt = x @ lc.t
@@ -117,7 +117,7 @@ def test_linear_constraint():
     b = np.linalg.lstsq(x[:, 2:], y)[0]
     e = y - x[:, 2:] @ b
     assert_allclose(ec.T @ ec, e.T @ e)
-
+    
     lc = LinearConstraint(r, require_pandas=False)
     assert np.all(lc.a == 0)
 
@@ -151,5 +151,17 @@ def test_linear_constraint_repr():
     assert lc.q.shape == (10,)
     assert isinstance(lc.r, pd.DataFrame)
     assert np.all(lc.r == np.eye(10))
+
+
+def test_blocked_full_inner_product():
+    k = 3
+    t = 100
+    kt = k * t
+    x = np.random.randn(kt, kt)
+    s = np.eye(k) + 1.0
+    i = np.eye(t)
+    blocked = blocked_full_inner_product(x, s)
+    direct = x.T @ np.kron(s, i) @ x
+    assert_allclose(blocked, direct)
 
 # TODO: One complex constrain test of equivalence
