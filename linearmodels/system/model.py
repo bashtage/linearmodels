@@ -804,7 +804,7 @@ class IV3SLS(object):
             cov_est = HeteroskedasticCovariance
         gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = reshape(eps, (k, eps.shape[0] // k)).T
-        cov = cov_est(wx, gls_eps, sigma, full_sigma, gls=True,
+        cov = cov_est(self._wxhat, gls_eps, sigma, full_sigma, gls=True,
                       constraints=self._constraints, **cov_config).cov
 
         # Repackage results for individual equations
