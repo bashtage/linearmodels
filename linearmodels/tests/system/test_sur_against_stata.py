@@ -1,17 +1,18 @@
 from collections import OrderedDict
-import pytest
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.tests.system.results.parse_stata_results import stata_results
-from linearmodels.tests.system.results.generate_data import basic_data, missing_data, common_data
 from linearmodels.system import SUR
+from linearmodels.tests.system.results.generate_data import basic_data, common_data, missing_data
+from linearmodels.tests.system.results.parse_stata_results import stata_results
 from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
-
+print(list(stata_results.keys()))
 @pytest.fixture(scope='module', params=list(stata_results.keys()))
 def model_data(request):
     key = request.param
@@ -50,12 +51,12 @@ def model_data(request):
         r.iloc[0, widths[0]] = 1.0
         r.iloc[1, widths[0] + widths[1]] = 1.0
         constraint = r
-
+    
     mod = SUR(rekeyed_data)
     if constraint is not None:
         mod.add_constraints(constraint)
     res = mod.fit(**cov_kwds)
-
+    
     return AttrDict(data=rekeyed_data, cov_kwds=cov_kwds, model_type=model_type,
                     stata_result=stata_result, key=key, constraint=constraint,
                     mod=mod, res=res)

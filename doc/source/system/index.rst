@@ -78,5 +78,6 @@ endogenous variables or instruments. 3SLS allows systems of IV equations to be j
 
    examples/examples.ipynb
    examples/formulas.ipynb
+   examples/three-stage-ls.ipynb
    reference
    mathematical-formula

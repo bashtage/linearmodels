@@ -4,8 +4,8 @@ Linear Models
 |Build Status| |codecov|
 
 Linear (regression) models for Python. Extends
-`statsmodels <http://www.statsmodels.org>`__ to include Panel regression
-and instrumental variable estimators:
+`statsmodels <http://www.statsmodels.org>`__ with Panel regression,
+instrumental variable estimators and system estimators:
 
 -  **Panel models**:
 
