@@ -1,6 +1,10 @@
 Change Log
 ----------
 
+Since Version 4.0
+=================
+* Re-release to fix PyPi errors
+
 Version 4.0
 ===========
 * Added Seemingly Unrelated Regression (SUR) Estimator
