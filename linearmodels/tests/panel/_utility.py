@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
+
 try:
-    import xarray
+    import xarray  # flake8: noqa
+
     MISSING_XARRAY = False
 except ImportError:
     MISSING_XARRAY = True
@@ -13,6 +15,7 @@ from linearmodels.utility import AttrDict
 datatypes = ['numpy', 'pandas']
 if not MISSING_XARRAY:
     datatypes += ['xarray']
+
 
 def lsdv(y: pd.DataFrame, x: pd.DataFrame, has_const=False, entity=False, time=False,
          general=None):

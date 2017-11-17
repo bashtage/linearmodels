@@ -556,7 +556,7 @@ class IV3SLS(object):
         Notes
         -----
         At least one of exog or endog must be provided.
-        
+
         Utility function to simplify the construction of multivariate IV
         models which all use the same regressors and instruments. Constructs
         the dictionary of equations from the variables using the common
@@ -794,7 +794,6 @@ class IV3SLS(object):
     def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps,
                       cov_type, iter_count, **cov_config):
         """Collect results to return after GLS estimation"""
-        wx = self._wx
         k = len(self._wy)
 
         # Covariance estimation

@@ -7,6 +7,7 @@ from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
+
 @pytest.fixture(scope='module', params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
 def model(request):
     return request.param

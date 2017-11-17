@@ -11,6 +11,7 @@ from linearmodels.tests.panel._utility import (assert_results_equal,
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
+
 @pytest.fixture(params=datatypes)
 def data(request):
     return generate_data(0.0, request.param)

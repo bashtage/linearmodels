@@ -14,6 +14,7 @@ from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
+
 @pytest.fixture(params=['numpy', 'pandas'])
 def data(request):
     return generate_data(nportfolio=10, output=request.param)

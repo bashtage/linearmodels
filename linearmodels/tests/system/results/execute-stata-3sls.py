@@ -75,7 +75,7 @@ methods = ('3sls', '2sls', 'ols', 'sur', '3sls ireg3')
 
 with open('three-sls.do', 'w') as stata_file:
     stata_file.write('\n\n'.join(header))
-    
+
     for method in methods:
         stata_file.write(SEP.format(method=method, outfile=OUTFILE))
         stata_file.write('\n\n'.join([CMD.format(method=method), output]))

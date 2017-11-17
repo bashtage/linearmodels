@@ -60,6 +60,7 @@ def test_tstats(fit):
         stata_val = stata.params[dep].loc[variable, 'tstat']
         assert_allclose(stata_val, val, rtol=rtol)
 
+
 def test_pval(fit):
     stata, result, rtol = fit
     for idx in result.pvalues.index:
@@ -70,6 +71,7 @@ def test_pval(fit):
         variable = '_cons' if variable == 'const' else variable
         stata_val = stata.params[dep].loc[variable, 'pval']
         assert_allclose(1 + stata_val, 1 + val, rtol=rtol)
+
 
 def test_sigma(fit):
     stata, result, rtol = fit
