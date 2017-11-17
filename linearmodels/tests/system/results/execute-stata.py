@@ -89,15 +89,18 @@ constraint 2 [{y0}]{x0} = [{y2}]{x2}
     outcmds[key_base + '-ss'] = ss
     outcmds[key_base + '-constrained'] = cons
 
+sep = """
+file open myfile using {outfile}, write append \n
+file write myfile  "#################!{key}!####################" _n \n
+file close myfile\n
+"""
 with open('sur.do', 'w') as stata_file:
     stata_file.write('\n'.join(header) + '\n')
     for outcmd in outcmds:
-        stata_file.write('file open myfile using {outfile}, write append \n'.format(outfile=OUTFILE))
-        stata_file.write('file write myfile  "#################!{key}!####################" _n \n'.format(key=outcmd))
-        stata_file.write('file close myfile\n')
+        stata_file.write(sep.format(outfile=OUTFILE, key=outcmd))
         stata_file.write(outcmds[outcmd] + '\n')
         stata_file.write('\n{0}\n\n'.format(output))
-        stata_file.write('\n'*5)
+        stata_file.write('\n' * 5)
 
 if os.path.exists(OUTFILE):
     os.unlink(OUTFILE)

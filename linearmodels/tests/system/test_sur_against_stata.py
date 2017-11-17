@@ -1,15 +1,18 @@
 from collections import OrderedDict
-import pytest
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.tests.system.results.parse_stata_results import stata_results
-from linearmodels.tests.system.results.generate_data import basic_data, missing_data, common_data
 from linearmodels.system import SUR
+from linearmodels.tests.system.results.generate_data import basic_data, common_data, missing_data
+from linearmodels.tests.system.results.parse_stata_results import stata_results
 from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+
+print(list(stata_results.keys()))
 
 
 @pytest.fixture(scope='module', params=list(stata_results.keys()))

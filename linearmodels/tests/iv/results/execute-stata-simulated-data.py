@@ -11,8 +11,9 @@ use {dtafile}, clear \n
 tsset time \n
 """.format(dtafile=dtafile)
 
-model = """
-ivregress {method} {depvar} {exog_var} ({endog_var} = {instr}) {weight_opt}, {variance_option} {other_option}
+model = r"""
+ivregress {method} {depvar} {exog_var} \\\
+   ({endog_var} = {instr}) {weight_opt}, {variance_option} {other_option}
 """
 
 methods = ['2sls', 'liml', 'gmm']

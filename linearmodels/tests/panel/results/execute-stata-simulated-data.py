@@ -43,12 +43,14 @@ xtset firm_id time \n
 
 _sep = '#################!{config}-{ending}!####################'
 endings = ['', '_light', '_heavy']
-vars = ['y', 'x1', 'x2', 'x3', 'x4', 'x5']
+variables = ['y', 'x1', 'x2', 'x3', 'x4', 'x5']
 
 results = """
 estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) """
 
-results += """stats(rss df_m df_r r2 rmse mss r2_a ll ll_0 tss N df_b r2_w df_a F F_f Tbar g_min rho sigma sigma_e r2_b r2_o corr sigma_u N_g g_max g_avg, fmt(%13.12g)) unstack append
+results += r"""
+stats(rss df_m df_r r2 rmse mss r2_a ll ll_0 tss N df_b r2_w df_a F F_f Tbar g_min rho \\\
+      sigma sigma_e r2_b r2_o corr sigma_u N_g g_max g_avg, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
 file write myfile "********* Variance *************" _n
 file close myfile
@@ -72,7 +74,7 @@ with open('simulated-results.do', 'w') as stata:
     for config in configs:
         descr = configs[config]
         for ending in endings:
-            _vars = ' '.join([v + ending for v in vars])
+            _vars = ' '.join([v + ending for v in variables])
             command = config.format(vars=_vars)
             sep = _sep.format(config=descr, ending=ending)
             stata.write(section_header.format(outfile=outfile, separator=sep))

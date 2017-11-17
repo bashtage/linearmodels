@@ -14,7 +14,7 @@ def data(request):
     p = request.param
     if np.isscalar(p):
         p = p * np.ones(k, dtype=np.int64)
-    
+
     x = [np.random.randn(t, p[i]) for i in range(k)]
     y = [np.random.randn(t, 1) for _ in range(k)]
     sigma = 0.5 * np.eye(k) + 0.5 * np.ones((5, 5))
@@ -108,7 +108,7 @@ def test_linear_constraint():
     assert np.all(lc.t[:2] == 0)
     assert np.all(np.sum(lc.t, 1)[2:] == 1)
     assert np.all(lc.a == 0)
-    
+
     x = np.random.randn(200, 5)
     y = np.random.randn(200, 1)
     xt = x @ lc.t
@@ -117,7 +117,7 @@ def test_linear_constraint():
     b = np.linalg.lstsq(x[:, 2:], y)[0]
     e = y - x[:, 2:] @ b
     assert_allclose(ec.T @ ec, e.T @ e)
-    
+
     lc = LinearConstraint(r, require_pandas=False)
     assert np.all(lc.a == 0)
 

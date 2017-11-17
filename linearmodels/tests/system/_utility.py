@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from linearmodels.utility import AttrDict
 
@@ -73,7 +74,7 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
         corr = np.eye(_p + _en + _instr + 1)
         corr[_p:_p + _en, _p:_p + _en] = kappa * np.eye(_en)
         corr[_p:_p + _en, -1] = np.sqrt(1 - kappa ** 2) * np.ones(_en)
-        corr[_p + _en:_p + _en + _instr, _p:_p + _en] = beta * np.ones((_instr,_en))
+        corr[_p + _en:_p + _en + _instr, _p:_p + _en] = beta * np.ones((_instr, _en))
         val = np.sqrt(1 - beta ** 2) / _instr * np.eye(_instr)
         corr[_p + _en:_p + _en + _instr, _p + _en:_p + _en + _instr] = val
         if common_exog:
@@ -81,7 +82,7 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
             common_shocks = common_shocks if common_shocks is not None else shocks
         else:
             shocks = np.random.standard_normal((n, total))
-        shocks = np.concatenate([shocks, eps[:, count:count + 1]],1)
+        shocks = np.concatenate([shocks, eps[:, count:count + 1]], 1)
         variables = shocks @ corr.T
         x = variables[:, :_p + _en]
         exog = variables[:, :_p]
@@ -170,6 +171,7 @@ def simple_3sls(y, x, z):
     eps = np.hstack(eps)
     nobs = eps.shape[0]
     sigma = eps.T @ eps / nobs
+    out['sigma'] = sigma
     omega = np.kron(sigma, np.eye(nobs))
     omegainv = np.linalg.inv(omega)
     by = np.vstack([y[i] for i in range(k)])
@@ -194,8 +196,63 @@ def simple_3sls(y, x, z):
     eps = []
     for i in range(k):
         k = x[i].shape[1]
-        b = beta1[idx:idx+k]
+        b = beta1[idx:idx + k]
         eps.append(y[i] - x[i] @ b)
         idx += k
+
+    eps = np.hstack(eps)
+    nobs = eps.shape[0]
+    sigma = eps.T @ eps / nobs
     out['eps'] = eps
+    out['cov'] = np.linalg.inv(bx.T @ omegainv @ bx)
+
     return out
+
+
+def convert_to_pandas(a, base):
+    if a.ndim == 1:
+        return pd.Series(a, name=base)
+    k = a.shape[1]
+    cols = [base + '_{0}'.format(i) for i in range(k)]
+    return pd.DataFrame(a, columns=cols)
+
+
+def generate_simultaneous_data(n=500, nsystem=3, nexog=3, ninstr=2, const=True, seed=1234):
+    np.random.seed(seed)
+    k = nexog + nsystem * ninstr
+    beta = np.random.chisquare(3, (k, nsystem)) / 3
+    gam = np.random.standard_normal((nsystem, nsystem)) / np.sqrt(3)
+    gam.flat[::nsystem + 1] = 1.0
+    x = np.random.standard_normal((n, k))
+    for i in range(nsystem):
+        mask = np.zeros(k)
+        mask[:nexog] = 1.0
+        mask[nexog + i * ninstr: nexog + (i + 1) * ninstr] = 1.0
+        beta[:, i] *= mask
+    if const:
+        x = np.concatenate([np.ones((n, 1)), x], 1)
+        beta = np.concatenate([np.arange(1, nsystem + 1)[None, :], beta], 0)
+    eps = np.random.standard_normal((n, nsystem))
+    eps = 0.5 * np.random.standard_normal((n, 1)) + np.sqrt(1 - 0.5 ** 2) * eps
+    gaminv = np.linalg.inv(gam)
+    y = x @ beta @ gaminv + eps @ gaminv
+    eqns = {}
+    deps = convert_to_pandas(y, 'dependent')
+    exogs = convert_to_pandas(x, 'exog')
+    if const:
+        exogs.columns = ['const'] + list(exogs.columns[1:])
+    for i in range(nsystem):
+        dep = deps.iloc[:, i]
+        idx = sorted(set(range(nsystem)).difference([i]))
+        endog = deps.iloc[:, idx]
+
+        drop = np.arange(nexog + i * ninstr, nexog + (i + 1) * ninstr)
+        drop += const
+
+        ex_idx = list(range(const + nexog)) + list(drop)
+        exog = exogs.iloc[:, ex_idx]
+        idx = set(range(const + nexog, x.shape[1]))
+        instr = convert_to_pandas(x[:, sorted(idx.difference(drop))], 'instruments')
+        eqn = dict(dependent=dep, exog=exog, endog=endog, instruments=instr)
+        eqns[dep.name] = eqn
+    return eqns
