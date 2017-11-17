@@ -5,7 +5,8 @@ Linear Models
 
 Linear (regression) models for Python. Extends
 `statsmodels <http://www.statsmodels.org>`__ with Panel regression,
-instrumental variable estimators and system estimators:
+instrumental variable estimators, system estimators and models for
+estimating asset prices:
 
 -  **Panel models**:
 
@@ -120,8 +121,9 @@ polished.
 -  Linear Panel model estimation - **complete**
 -  Fama-MacBeth regression - **complete**
 -  Linear Factor Asset Pricing - **complete**
--  System regression - **partially complete** (3SLS not started)
+-  System regression - **complete**
 -  Linear IV Panel model estimation - *not started*
+-  Dynamic Panel model estimation - *not started*
 
 Requirements
 ------------
