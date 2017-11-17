@@ -35,14 +35,13 @@ Asset Pricing
 * Linear Asset Pricing Model Estimation for Traded Factors - :class:`linearmodels.asset_pricing.model.TradedFactorModel`
 
 
-Instrumental Variable Estimators
-********************************
+Dynamic Panel Data Models
+*************************
+Planned but not implemented
 
-Not Implemented
-~~~~~~~~~~~~~~~
-* 2SLS
-* GMM
-* 3SLS
+Panel Instrumental Variable Estimators
+**************************************
+Planned but not implemented
 
 
 System Estimation
@@ -52,3 +51,4 @@ System Estimation
 Instrumental Variable Estimators
 ********************************
 * Three-stage LEast Squares (3SLS) Estimator - :class:`linearmodels.system.IV3SLS`
+* GMM Estimation - planned but not implemented
