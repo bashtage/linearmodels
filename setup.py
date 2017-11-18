@@ -62,10 +62,20 @@ for image in images:
         with open(image, 'rb') as imagein:
             imageout.write(imagein.read())
 
-bzip_csv_files = []
+additional_files = []
 for filename in glob.iglob('./linearmodels/datasets/**', recursive=True):
     if '.csv.bz' in filename:
-        bzip_csv_files.append(filename.replace('./linearmodels/', ''))
+        additional_files.append(filename.replace('./linearmodels/', ''))
+
+for filename in glob.iglob('./linearmodels/tests/**', recursive=True):
+    if '.txt' in filename:
+        additional_files.append(filename.replace('./linearmodels/', ''))
+    if '.csv' in filename:
+        additional_files.append(filename.replace('./linearmodels/', ''))
+
+for filename in glob.iglob('./examples/**', recursive=True):
+    if '.png' in filename:
+        additional_files.append(filename)
 
 setup(
     cmdclass=versioneer.get_cmdclass(),
@@ -81,7 +91,7 @@ setup(
     long_description=description,
     install_requires=open('requirements.txt').read().split('\n'),
     include_package_data=True,
-    package_data={'linearmodels': bzip_csv_files},
+    package_data={'linearmodels': additional_files},
     keywords=['linear models', 'regression', 'instrumental variables', 'IV',
               'panel', 'fixed effects', 'clustered', 'heteroskedasticity',
               'endogeneity', 'instruments', 'statistics',
