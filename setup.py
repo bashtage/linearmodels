@@ -2,20 +2,39 @@ import glob
 import os
 import sys
 
-import versioneer
-
 from setuptools import find_packages, setup
+
+import versioneer
 
 if sys.version_info < (3, 5):
     sys.exit('Requires Python 3.5 or later due to use of @ operator.')
 
 try:
-    import pypandoc
+    markdown = os.stat('README.md').st_mtime
+    if os.path.exists('README.rst'):
+        rst = os.stat('README.rst').st_mtime
+    else:
+        rst = markdown - 1
 
-    description = pypandoc.convert('README.md', 'rst')
-    with open('README.rst', 'w') as rst:
-        rst.write(description)
+    if rst >= markdown:
+        with open('README.rst', 'r') as rst:
+            description = rst.read()
+    else:
+        import pypandoc
+
+        osx_line_ending = '\r'
+        windows_line_ending = '\r\n'
+        linux_line_ending = '\n'
+
+        description = pypandoc.convert('README.md', 'rst')
+        description = description.replace(windows_line_ending, linux_line_ending)
+        description = description.replace(osx_line_ending, linux_line_ending)
+        with open('README.rst', 'w') as rst:
+            rst.write(description)
+
 except (ImportError, OSError):
+    import warnings
+    warnings.warn("Unable to convert README.md to README.rst", UserWarning)
     description = open('README.md').read()
 
 # Copy over notebooks from examples to docs for build
@@ -43,9 +62,8 @@ for image in images:
         with open(image, 'rb') as imagein:
             imageout.write(imagein.read())
 
-
 bzip_csv_files = []
-for filename in glob.iglob('./linearmodels/datasets/**',recursive=True):
+for filename in glob.iglob('./linearmodels/datasets/**', recursive=True):
     if '.csv.bz' in filename:
         bzip_csv_files.append(filename.replace('./linearmodels/', ''))
 

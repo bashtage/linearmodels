@@ -82,14 +82,15 @@ author = 'Kevin Sheppard'
 # The short X.Y version.
 # The short X.Y version.
 version = LooseVersion(linearmodels.__version__)
-if len(version.version) > 2:
-    version = linearmodels.__version__.split('.')[:3]
-    version = '.'.join(version).split('+')
-    tag = ' (+' + version[1] + ')'
-    tag = ', '.join(tag.split('.'))
-    version = version[0] + tag
+if '+' in version.version:
+    version = linearmodels.__version__.split('+')
+    commits, tag = version[1].split('.')
+    version = version[0]
+    tag = ' (+' + commits + ', ' + tag + ')'
+    version = version + tag
 else:
     version = linearmodels.__version__
+
 # The full version, including alpha/beta/rc tags.
 release = linearmodels.__version__
 

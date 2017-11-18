@@ -1,13 +1,13 @@
-global-include *.csv *.py *.dta *.ipynb
+global-include *.csv *.py *.dta *.ipynb *.png
 
 include versioneer.py
 include linearmodels/_version.py
 include README.rst
 include README.md
 include requirements.txt
-include requirements-test-doc.txt
+include requirements-dev.txt
 include examples/*.ipynb
 recursive-include doc/source *
-recursive-include linearmodels/iv/tests *
+recursive-include linearmodels/tests *
 recursive-include linearmodels/datasets *
 recursive-include examples *
