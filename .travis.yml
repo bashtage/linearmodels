@@ -12,30 +12,32 @@ env:
     - COVERAGE=true
     - SKIPSLOW=""
     - DOCTR_PUSH_TYPE=""
+    - XARRAY=
     - secure: "aCm98s/mNxRSoTEhpIgfvRKzzJKdDkm/9TufIvgWvnkeiyDQqZwoqRVDIikZ+v6mkFeu7dr7BBojyPXnhkhji+SkNFz5ArtEqahJTvIZhP2nWgktlQSWkaC2Q5GyCWPhdQag/ImYbM4RK1WvtIVcSL7GPL0jLTgFDXY6/Hdl0eQY7kfWtojxIZUJShxn9IPfXE3gGQeWHEOL7SkZ3+8KxBJAUzrdd9J32PiHWZb5BcUupTQcW29ajoco4q1fdL/xPu3GZnys8EClorHxnPptQWfGGlnoJ79Q6H7Jhw6BGIj2fDCG9qX4boEH2zvH8ZKlbuTvMeVcBiLxPE8BpRmx2drX2kDyUo5ywVwA0W/7zsZ2YUYEyHEYL+cr4WVFdoDpwwPKaHOTp8F4Q+lQgkvxZbSlO6dUEMLNxnltgujAAdiaRJKLd2CwA85RjqYGLkMzTqBgYhH+p+7wB6jK8EJgoqxU3k98LfaeqyhsPrdWsxVLleLVAvzhXpNilQfX4NBPf+DYsn9NeyXYzp85H9p+J8DGJMJ42kBdP1r/cz1Y44SrGZhlk1MhLhb+uX7kV7nnmcW87NYoGSr52S5vNVL9iSU980SzJ08wOZwxwkKXOqgEJtMqdHsEuqY9jSQ2m/xAdarpxBsDD+Pw2gPfar+R8Lcptep50pMPFMgddDWV2f4="
 
 matrix:
   fast_finish: true
   include:
-  - python: 2.7
+  - python: 3.6
     env:
     - PYTHON=3.5
     - NUMPY=1.11
     - SCIPY=0.18
     - PANDAS=0.19
-  - python: 3.5
+  - python: 3.6
     env:
     - PYTHON=3.5
     - NUMPY=1.12
     - SCIPY=0.19
     - PANDAS=0.20
-  - python: 3.5
+    - XARRAY=0.9
+  - python: 3.6
     env:
     - PYTHON=3.6
     - NUMPY=1.13
     - SCIPY=1.0
     - PANDAS=0.21
-    - XARRAY=true
+    - XARRAY=0.10
     - DOCBUILD=true
 
 before_install:
@@ -51,7 +53,7 @@ before_install:
   - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
   - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
   - source activate linearmodels-test
-  - if [[ ${XARRAY} = true ]]; then conda install xarray; fi
+  - if [[ ! -z ${XARRAY} ]]; then conda install xarray=${XARRAY}; fi
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat
   - pip install pytest pytest-xdist coverage pytest-cov codecov sphinx doctr nbsphinx guzzle_sphinx_theme -q
   - pip install --upgrade --no-deps sphinx
