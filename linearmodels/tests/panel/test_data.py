@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
+
 try:
     import xarray as xr
 except ImportError:
@@ -786,9 +787,10 @@ def test_incorrect_time_axis():
 
 @pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')
 def test_incorrect_time_axis_xarray():
+    x = np.random.randn(3, 3, 1000)
     entities = ['entity.{0}'.format(i) for i in range(1000)]
     time = ['time.{0}'.format(i) for i in range(3)]
-    x = np.random.randn(3, 3, 1000)
+    vars = ['x.{0}'.format(i) for i in range(3)]
     da = xr.DataArray(x, coords={'entities': entities, 'time': time,
                                  'vars': vars},
                       dims=['vars', 'time', 'entities'])

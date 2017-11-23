@@ -231,10 +231,10 @@ class LinearConstraint(object):
         vecs = np.real(vecs)
         idx = np.argsort(vals)[::-1]
         vecs = vecs[:, idx]
-        t, l = vecs[:, :k - c], vecs[:, k - c:]
+        t, left = vecs[:, :k - c], vecs[:, k - c:]
         q = self._qa[:, None]
-        a = q.T @ inv(l.T @ r.T) @ l.T
-        self._t, self._l, self._a = t, l, a
+        a = q.T @ inv(left.T @ r.T) @ left.T
+        self._t, self._l, self._a = t, left, a
 
     @property
     def r(self):
