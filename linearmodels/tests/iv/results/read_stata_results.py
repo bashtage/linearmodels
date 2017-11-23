@@ -49,7 +49,7 @@ def parse_block(block):
             try:
                 float(line[0])
                 params[-1].append(line[0])
-            except:
+            except ValueError:
                 pass
     params = pd.DataFrame(params, columns=['variable', 'params', 'tstats'])
     params = repl_const(params.set_index('variable'))

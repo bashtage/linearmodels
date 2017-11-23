@@ -1,3 +1,6 @@
+from linearmodels.compat.pandas import (assert_frame_equal, assert_panel_equal,
+                                        is_string_dtype)
+
 from itertools import product
 
 import numpy as np
@@ -5,9 +8,6 @@ import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-
-from linearmodels.compat.pandas import (assert_frame_equal, assert_panel_equal,
-                                        is_string_dtype)
 
 try:
     import xarray as xr
