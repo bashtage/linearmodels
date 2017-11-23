@@ -27,6 +27,7 @@ instrumental variable estimators and system estimators:
 
    -  Seemingly Unrelated Regression (SUR/SURE)
    -  Three-Stage Least Squares (3SLS)
+   -  System Estimation using Generalized Method of Moments (GMM)
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 """
@@ -38,7 +39,7 @@ from linearmodels.asset_pricing.model import (LinearFactorModel,
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML, _OLS
 from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
                                       PooledOLS, RandomEffects, FamaMacBeth)
-from linearmodels.system import SUR, IV3SLS
+from linearmodels.system import SUR, IV3SLS, IVSystemGMM
 from ._version import get_versions
 
 OLS = _OLS
@@ -51,7 +52,7 @@ __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
            'RandomEffects',
            'FamaMacBeth',
            'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS', 'OLS',
-           'SUR', 'IV3SLS',
+           'SUR', 'IV3SLS', 'IVSystemGMM'
            'LinearFactorModel', 'LinearFactorModelGMM', 'TradedFactorModel',
            'WARN_ON_MISSING', 'DROP_MISSING']
 

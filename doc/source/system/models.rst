@@ -17,3 +17,9 @@ Three-Stage Least Squares (3SLS)
 .. autoclass:: IV3SLS
    :members:
    :inherited-members:
+
+Generalized Method of Moments (GMM) Estimation of Systems
+=========================================================
+.. autoclass:: IVSystemGMM
+   :members:
+   :inherited-members:

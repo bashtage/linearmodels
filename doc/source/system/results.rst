@@ -9,3 +9,7 @@ Estimation Results
 .. autoclass:: SystemResults
    :members:
    :inherited-members:
+
+.. autoclass:: GMMSystemResults
+   :members:
+   :inherited-members:

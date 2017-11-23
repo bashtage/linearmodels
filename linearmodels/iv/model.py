@@ -1,8 +1,6 @@
 """
 Instrumental variable estimators
 """
-from __future__ import absolute_import, division, print_function
-
 from numpy import (any, array, asarray, average, c_, isscalar, logical_not,
                    ones, sqrt, nanmean)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
@@ -753,7 +751,7 @@ class IVGMM(IVLIML):
         _params = params = sv.fit().params.values[:, None]
         # _params = params = self.estimate_parameters(wx, wy, wz, wmat)
 
-        iters, norm = 1, 10 * tol
+        iters, norm = 1, 10 * tol + 1
         while iters < iter_limit and norm > tol:
             eps = wy - wx @ params
             wmat = inv(weight_matrix(wx, wz, eps))

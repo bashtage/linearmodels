@@ -12,8 +12,6 @@ from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
-print(list(stata_results.keys()))
-
 
 @pytest.fixture(scope='module', params=list(stata_results.keys()))
 def model_data(request):

@@ -126,7 +126,7 @@ def blocked_full_inner_product(x, s):
 
     Notes
     -----
-    Compuptes the quantity
+    Computes the quantity
 
     .. math ::
 
