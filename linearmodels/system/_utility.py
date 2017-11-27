@@ -115,6 +115,43 @@ def blocked_inner_prod(x, s):
     return out
 
 
+def blocked_cross_prod(x, z, s):
+    """
+    Parameters
+    ----------
+    x : list of ndarray
+        k-element list of arrays to use as the left side of the cross-product
+    z : list of ndarray
+        k-element list of arrays to use as the right side of the cross-product
+    s : ndarray
+        Weighting matrix (k by k)
+
+    Returns
+    -------
+    xp : ndarray
+        Weighted cross product constructed from x and s
+
+    Notes
+    -----
+    Memory efficient implementation of high-dimensional cross product
+
+    .. math::
+
+      X'(S \otimes I_n)Z
+
+    where n is the number of observations in the sample
+    """
+    k = len(x)
+    xp = []
+    for i in range(k):
+        row = []
+        for j in range(k):
+            s_ij = s[i, j]
+            row.append(s_ij * (x[i].T @ z[j]))
+        xp.append(np.concatenate(row, 1))
+    return np.concatenate(xp, 0)
+
+
 def blocked_full_inner_product(x, s):
     """
     Parameters

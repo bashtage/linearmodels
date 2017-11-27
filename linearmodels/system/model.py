@@ -23,7 +23,7 @@ from pandas import Series
 from linearmodels.iv._utility import parse_formula
 from linearmodels.iv.data import IVData
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
-    blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
+    blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt, blocked_cross_prod
 from linearmodels.system.covariance import (HeteroskedasticCovariance,
                                             HomoskedasticCovariance, GMMHomoskedasticCovariance,
                                             GMMHeteroskedasticCovariance)
@@ -1248,15 +1248,8 @@ class IVSystemGMM(IV3SLS):
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
-                nvar = sum(map(lambda a: a.shape[1], wx))
-                ninstr = sum(map(lambda a: a.shape[1], wz))
-                xpz = np.zeros((nvar, ninstr))
-                n = m = 0
-                for i in range(k):
-                    _x, _z = wx[i], wz[i]
-                    xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
-                    n += _x.shape[1]
-                    m += _z.shape[1]
+                xpz = blocked_cross_prod(wx, wz, eye(k))
+                xpz = xpz / nobs
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
             norm = delta.T @ vinv @ delta
@@ -1298,16 +1291,7 @@ class IVSystemGMM(IV3SLS):
     @staticmethod
     def _blocked_gmm(x, y, z, *, w=None):
         k = len(x)
-        nvar = sum(map(lambda a: a.shape[1], x))
-        ninstr = sum(map(lambda a: a.shape[1], z))
-        xpz = np.zeros((nvar, ninstr))
-        n = m = 0
-        for i in range(k):
-            _x, _z = x[i], z[i]
-            xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
-            n += _x.shape[1]
-            m += _z.shape[1]
-
+        xpz = blocked_cross_prod(x, z, eye(k))
         wi = np.linalg.inv(w)
         xpz_wi_zpx = xpz @ wi @ xpz.T
         zpy = []

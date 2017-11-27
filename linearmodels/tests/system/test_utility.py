@@ -4,7 +4,8 @@ import pytest
 from numpy.testing import assert_allclose
 
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
-    blocked_diag_product, blocked_full_inner_product, blocked_inner_prod, inv_matrix_sqrt
+    blocked_cross_prod, blocked_diag_product, blocked_full_inner_product, blocked_inner_prod, \
+    inv_matrix_sqrt
 
 
 @pytest.fixture(params=(3, np.arange(1, 6)), ids=['common-size', 'different-size'])
@@ -163,5 +164,33 @@ def test_blocked_full_inner_product():
     blocked = blocked_full_inner_product(x, s)
     direct = x.T @ np.kron(s, i) @ x
     assert_allclose(blocked, direct)
+
+
+def test_blocked_outer_product():
+    nobs = 200
+    k = 3
+    x = [np.random.standard_normal((nobs, k)) for _ in range(k)]
+    z = [np.random.standard_normal((nobs, k + 2)) for _ in range(k)]
+    scale = np.linspace(1, 2, k)
+    s = np.ones(k) * (scale[:, None] @ scale[None, :]) + np.diag(np.arange(1, k + 1))
+    actual = blocked_cross_prod(x, z, s)
+    _x = []
+    _z = []
+    for i in range(k):
+        xrow = []
+        zrow = []
+        for j in range(k):
+            if i == j:
+                xrow.append(x[i])
+                zrow.append(z[i])
+            else:
+                xrow.append(np.zeros((nobs, k)))
+                zrow.append(np.zeros((nobs, k + 2)))
+        _x.append(np.concatenate(xrow, 1))
+        _z.append(np.concatenate(zrow, 1))
+    _x = np.concatenate(_x, 0)
+    _z = np.concatenate(_z, 0)
+    desired = _x.T @ np.kron(s, np.eye(nobs)) @ _z
+    assert_allclose(actual, desired)
 
 # TODO: One complex constrain test of equivalence
