@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from numpy import sqrt, array, repeat, empty
+from numpy import array, empty, repeat, sqrt
 
 from linearmodels.system._utility import blocked_inner_prod
 
@@ -42,12 +42,16 @@ class HomoskedasticWeightMatrix(object):
         nobs = eps.shape[0]
         eps = eps - eps.mean(0)
         sigma = eps.T @ eps / nobs
-        scale = self._debias_scale(nobs, x)
+        scale = 1.0
+        if self._debiased:
+            k = array(list(map(lambda a: a.shape[1], x)))[:, None]
+            k = sqrt(k)
+            scale = nobs / (nobs - k @ k.T)
         sigma *= scale
 
         return sigma
 
-    def weight_matrix(self, x, z, eps, *, sigma=None):
+    def weight_matrix(self, x, z, eps, sigma):
         """
         Parameters
         ----------
@@ -57,6 +61,8 @@ class HomoskedasticWeightMatrix(object):
             List of containing instruments for each equation in the system
         eps : ndarray
             Model errors (nobs by neqn)
+        sigma : ndarray
+            Fixed covariance of model errors
 
         Returns
         -------
@@ -64,8 +70,6 @@ class HomoskedasticWeightMatrix(object):
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
-        if sigma is None:
-            sigma = self.sigma(eps, x)
         w = blocked_inner_prod(z, sigma) / nobs
         return w
 

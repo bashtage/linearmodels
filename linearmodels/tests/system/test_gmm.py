@@ -1,13 +1,14 @@
 from collections import OrderedDict
+from itertools import product
+
+import numpy as np
+import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
-import numpy as np
-from linearmodels.utility import AttrDict
-from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
-from linearmodels.system import IVSystemGMM
 
-from itertools import product
-import pandas as pd
+from linearmodels.system import IVSystemGMM
+from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
+from linearmodels.utility import AttrDict
 
 params = list(product([1, 2], [True, False]))
 
@@ -113,7 +114,6 @@ def test_formula_equivalence_weights(data):
         eqn_copy[key] = eqn
 
     mod = IVSystemGMM(eqn_copy, weight_type='unadjusted')
-    formula = []
     df = []
     formulas = OrderedDict()
     for i, key in enumerate(data.eqns):
@@ -144,3 +144,43 @@ def test_formula_equivalence_weights(data):
     res = mod.fit(cov_type='unadjusted')
     formula_res = formula_mod.fit(cov_type='unadjusted')
     assert_allclose(res.params, formula_res.params)
+
+
+def test_weight_options(data):
+    mod = IVSystemGMM(data.eqns, weight_type='unadjusted', debiased=True)
+    res = mod.fit(cov_type='unadjusted')
+    assert res.weight_config == {'debiased': True}
+    assert res.weight_type == 'unadjusted'
+    base_res = IVSystemGMM(data.eqns, weight_type='unadjusted').fit(cov_type='unadjusted')
+    assert np.all(np.diag(res.w) >= np.diag(base_res.w))
+
+
+def test_no_constant_smoke():
+    eqns = generate_3sls_data_v2(k=3, const=False)
+    mod = IVSystemGMM(eqns)
+    mod.fit()
+
+
+def test_unknown_weight_type(data):
+    with pytest.raises(ValueError):
+        IVSystemGMM(data.eqns, weight_type='unknown')
+
+
+def test_unknown_cov_type(data):
+    mod = IVSystemGMM(data.eqns)
+    with pytest.raises(ValueError):
+        mod.fit(cov_type='unknown')
+    with pytest.raises(ValueError):
+        mod.fit(cov_type=3)
+
+
+def test_initial_weight_matrix(data):
+    mod = IVSystemGMM(data.eqns)
+    z = [np.concatenate([data.eqns[key].exog, data.eqns[key].instruments], 1)
+         for key in data.eqns]
+    z = np.concatenate(z, 1)
+    ze = z + np.random.standard_normal(size=z.shape)
+    w0 = ze.T @ ze / ze.shape[0]
+    res0 = mod.fit(initial_weight=w0, iter_limit=1)
+    res = mod.fit(iter_limit=1)
+    assert np.any(res0.params != res.params)
