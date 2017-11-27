@@ -2,7 +2,7 @@ from numpy import eye, ones, sqrt, vstack, zeros, empty
 from numpy.linalg import inv
 
 from linearmodels.system._utility import (blocked_diag_product, blocked_inner_prod,
-                                          inv_matrix_sqrt)
+                                          inv_matrix_sqrt, blocked_cross_prod)
 
 
 class HomoskedasticCovariance(object):
@@ -252,16 +252,7 @@ class GMMHomoskedasticCovariance(object):
         x, z = self._x, self._z
         k = len(x)
         nobs = x[0].shape[0]
-        nvar = sum(map(lambda a: a.shape[1], x))
-        ninstr = sum(map(lambda a: a.shape[1], z))
-        xpz = zeros((nvar, ninstr))
-        n = m = 0
-        # TODO: Add blocked cross-product
-        for i in range(k):
-            _x, _z = x[i], z[i]
-            xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
-            n += _x.shape[1]
-            m += _z.shape[1]
+        xpz = blocked_cross_prod(x, z, eye(k))
         xpz /= nobs
         wi = inv(self._w)
         xpz_wi_zpx = xpz @ wi @ xpz.T
