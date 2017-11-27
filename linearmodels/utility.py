@@ -499,3 +499,39 @@ def param_table(results, title, pad_bottom=False):
 
     return SimpleTable(data, stubs=table_stubs, txt_fmt=fmt_params,
                        headers=header, title=title)
+
+
+def format_wide(s, cols):
+    """
+    Parameters
+    ----------
+    s : List[str]
+        List of strings to format
+    cols : int
+        Number of columns in output
+
+    Returns
+    -------
+    formatted : List[List[str]]
+        Joined list:
+    """
+    lines = []
+    line = ''
+    for i, val in enumerate(s):
+        if line == '':
+            line = val
+            if i + 1 != len(s):
+                line += ', '
+        else:
+            temp = line + val
+            if i + 1 != len(s):
+                temp += ', '
+            if len(temp) > cols:
+                lines.append([line])
+                line = val
+                if i + 1 != len(s):
+                    line += ', '
+            else:
+                line = temp
+    lines.append([line])
+    return lines

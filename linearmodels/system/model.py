@@ -23,12 +23,12 @@ from pandas import Series
 from linearmodels.iv._utility import parse_formula
 from linearmodels.iv.data import IVData
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
-    blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt, blocked_cross_prod
-from linearmodels.system.covariance import (HeteroskedasticCovariance,
-                                            HomoskedasticCovariance, GMMHomoskedasticCovariance,
-                                            GMMHeteroskedasticCovariance)
+    blocked_cross_prod, blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
+from linearmodels.system.covariance import (GMMHeteroskedasticCovariance,
+                                            GMMHomoskedasticCovariance, HeteroskedasticCovariance,
+                                            HomoskedasticCovariance)
 from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix
-from linearmodels.system.results import SystemResults, GMMSystemResults
+from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
                                   matrix_rank, missing_warning)
 
@@ -503,8 +503,9 @@ class IV3SLS(object):
             cov_est = HomoskedasticCovariance
         else:
             cov_est = HeteroskedasticCovariance
-        cov = cov_est(self._wxhat, eps, sigma, sigma, gls=False,
-                      constraints=self._constraints, **cov_config).cov
+        cov_est = cov_est(self._wxhat, eps, sigma, sigma, gls=False,
+                          constraints=self._constraints, **cov_config)
+        cov = cov_est.cov
 
         individual = AttrDict()
         debiased = cov_config.get('debiased', False)
@@ -516,9 +517,8 @@ class IV3SLS(object):
                 wc = np.ones_like(wy) * np.sqrt(w)
                 wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
             total_ss = float(wye.T @ wye)
-
             stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
-                                               cov_type, 0, debiased, cons, total_ss)
+                                               cov_type, cov_est, 0, debiased, cons, total_ss)
             key = self._eq_labels[i]
             individual[key] = stats
 
@@ -526,6 +526,7 @@ class IV3SLS(object):
         results = self._common_results(beta, cov, 'OLS', 0, nobs, cov_type,
                                        sigma, individual, debiased)
         results['wresid'] = results.resid
+        results['cov_estimator'] = cov_est
 
         return SystemResults(results)
 
@@ -714,7 +715,8 @@ class IV3SLS(object):
         return wald
 
     def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
-                              cov_type, iter_count, debiased, constant, total_ss):
+                              cov_type, cov_est, iter_count, debiased, constant, total_ss,
+                              *, weight_est=None):
         loc = 0
         for i in range(index):
             loc += self._wx[i].shape[1]
@@ -723,8 +725,12 @@ class IV3SLS(object):
         # Static properties
         stats['eq_label'] = self._eq_labels[i]
         stats['dependent'] = self._dependent[i].cols[0]
+        stats['instruments'] = self._instr[i].cols if self._instr[i].shape[1] > 0 else None
+        stats['endog'] = self._endog[i].cols if self._endog[i].shape[1] > 0 else None
         stats['method'] = method
         stats['cov_type'] = cov_type
+        stats['cov_estimator'] = cov_est
+        stats['weight_estimator'] = weight_est
         stats['index'] = self._dependent[i].rows
         stats['iter'] = iter_count
         stats['debiased'] = debiased
@@ -805,8 +811,9 @@ class IV3SLS(object):
             cov_est = HeteroskedasticCovariance
         gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = reshape(eps, (k, eps.shape[0] // k)).T
-        cov = cov_est(self._wxhat, gls_eps, sigma, full_sigma, gls=True,
-                      constraints=self._constraints, **cov_config).cov
+        cov_est = cov_est(self._wxhat, gls_eps, sigma, full_sigma, gls=True,
+                          constraints=self._constraints, **cov_config)
+        cov = cov_est.cov
 
         # Repackage results for individual equations
         individual = AttrDict()
@@ -822,9 +829,8 @@ class IV3SLS(object):
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
             stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
-                                               method, cov_type, iter_count,
+                                               method, cov_type, cov_est, iter_count,
                                                debiased, cons, total_ss)
-
             key = self._eq_labels[i]
             individual[key] = stats
 
@@ -839,6 +845,7 @@ class IV3SLS(object):
             wresid.append(individual[key].wresid)
         wresid = hstack(wresid)
         results['wresid'] = wresid
+        results['cov_estimator'] = cov_est
 
         return SystemResults(results)
 
@@ -1172,6 +1179,7 @@ class IVSystemGMM(IV3SLS):
 
     where :math:`W` is a positive definite weighting matrix.
     """
+
     def __init__(self, equations, *, sigma=None, weight_type='robust', **weight_config):
         super().__init__(equations, sigma=sigma)
         self._weight_type = weight_type
@@ -1284,9 +1292,8 @@ class IVSystemGMM(IV3SLS):
             loc += nb
         eps = hstack(eps)
         iters += 1
-
         return self._finalize_results(beta, cov.cov, weps, eps, w, sigma,
-                                      cov_type, iters, cov_config)
+                                      iters - 1, cov_type, cov_config, cov)
 
     @staticmethod
     def _blocked_gmm(x, y, z, *, w=None):
@@ -1302,15 +1309,15 @@ class IVSystemGMM(IV3SLS):
         return np.linalg.solve(xpz_wi_zpx, xpz_wi_zpy)
 
     def _finalize_results(self, beta, cov, weps, eps, wmat, sigma,
-                          cov_type, iter_count, cov_config):
+                          iter_count, cov_type, cov_config, cov_est):
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
         # Repackage results for individual equations
         individual = AttrDict()
         debiased = cov_config.get('debiased', False)
-        method = '{0}-Step GMM'.format(iter_count)
+        method = '{0}-Step System GMM'.format(iter_count)
         if iter_count > 2:
-            method = 'Iterative GMM'
+            method = 'Iterative System GMM'
         for i in range(k):
             cons = int(self.has_constant.iloc[i])
 
@@ -1321,8 +1328,9 @@ class IVSystemGMM(IV3SLS):
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
             stats = self._common_indiv_results(i, beta, cov, weps, eps,
-                                               method, cov_type, iter_count,
-                                               debiased, cons, total_ss)
+                                               method, cov_type, cov_est,
+                                               iter_count, debiased, cons, total_ss,
+                                               weight_est=self._weight_est)
 
             key = self._eq_labels[i]
             individual[key] = stats
@@ -1341,6 +1349,8 @@ class IVSystemGMM(IV3SLS):
         results['wmat'] = wmat
         results['weight_type'] = self._weight_type
         results['weight_config'] = self._weight_config
+        results['cov_estimator'] = cov_est
+        results['weight_estimator'] = self._weight_est
 
         return GMMSystemResults(results)
 

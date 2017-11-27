@@ -1,6 +1,7 @@
 from numpy import eye, ones, sqrt, vstack, zeros, empty
 from numpy.linalg import inv
 
+from linearmodels.utility import AttrDict
 from linearmodels.system._utility import (blocked_diag_product, blocked_inner_prod,
                                           inv_matrix_sqrt, blocked_cross_prod)
 
@@ -52,6 +53,21 @@ class HomoskedasticCovariance(object):
         self._gls = gls
         self._debiased = debiased
         self._constraints = constraints
+        self._name = 'Homoskedastic (Unadjusted) Covariance'
+        self._str_extra = AttrDict(Debiased=self._debiased, GLS=self._gls)
+
+    def __str__(self):
+        out = self._name
+        extra = []
+        for key in self._str_extra:
+            extra.append(': '.join([key, str(self._str_extra[key])]))
+        if extra:
+            out += ' (' + ', '.join(extra) + ')'
+        return out
+
+    def __repr__(self):
+        out = self.__str__()
+        return out + ', id: {0}'.format(hex(id(self)))
 
     @property
     def sigma(self):
@@ -157,6 +173,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
                                                         gls=gls,
                                                         debiased=debiased,
                                                         constraints=constraints)
+        self._name = 'Heteroskedastic (Robust) Covariance'
 
     def _cov(self, gls):
         x = self._x
@@ -245,6 +262,21 @@ class GMMHomoskedasticCovariance(object):
         self._eps = eps
         self._sigma = sigma
         self._w = w
+        self._name = 'Heteroskedastic (Robust) Covariance'
+        self._str_extra = {}
+
+    def __str__(self):
+        out = self._name
+        extra = []
+        for key in self._str_extra:
+            extra.append(': '.join([key, str(self._str_extra[key])]))
+        if extra:
+            out += ' (' + ','.join(extra) + ')'
+        return out
+
+    def __repr__(self):
+        out = self.__str__()
+        return out + ', id: {0}'.format(hex(id(self)))
 
     @property
     def cov(self):
@@ -305,6 +337,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     def __init__(self, x, z, eps, w, *, sigma=None):
         super().__init__(x, z, eps, w, sigma=sigma)
+        self._name = 'Heteroskedastic (Robust) Covariance'
 
     def _omega(self):
         eps = self._eps

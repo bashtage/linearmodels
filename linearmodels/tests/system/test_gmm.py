@@ -184,3 +184,23 @@ def test_initial_weight_matrix(data):
     res0 = mod.fit(initial_weight=w0, iter_limit=1)
     res = mod.fit(iter_limit=1)
     assert np.any(res0.params != res.params)
+
+
+def test_summary(data):
+    mod = IVSystemGMM(data.eqns)
+    res = mod.fit()
+    assert 'Instruments' in res.summary.as_text()
+    assert 'Weight Estimator' in res.summary.as_text()
+    for eq in res.equations:
+        assert 'Weight Estimator' in res.equations[eq].summary.as_text()
+        assert 'Instruments' in res.equations[eq].summary.as_text()
+
+    res = mod.fit(iter_limit=10)
+    if res.iterations > 2:
+        assert 'Iterative System GMM' in res.summary.as_text()
+
+
+def test_summary_homoskedastic(data):
+    mod = IVSystemGMM(data.eqns, weight_type='unadjusted')
+    res = mod.fit(cov_type='homoskedastic')
+    assert 'Homoskedastic (Unadjusted) Weighting' in res.summary.as_text()

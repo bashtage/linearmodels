@@ -285,7 +285,7 @@ def generate_3sls_data_v2(n=500, k=3, nexog=3, nendog=2, ninstr=3, const=True, r
         if const:
             x = np.hstack([np.ones((n, 1)), x])
             exog = np.hstack([np.ones((n, 1)), exog])
-        dep = x @ params + eps
+        dep = x @ params + eps + nendog * np.random.standard_normal((n, 1))
         eqn = AttrDict(dependent=dep, exog=exog, endog=endog, instruments=instr,
                        params=params)
         eqns['eqn.{0}'.format(i)] = eqn
