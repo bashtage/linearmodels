@@ -9,7 +9,7 @@ from linearmodels.compat.statsmodels import Summary
 from linearmodels.utility import (AttrDict, _SummaryStr, cached_property,
                                   _str, param_table, pval_format)
 
-__all__ = ['SystemResults', 'SystemEquationResult']
+__all__ = ['SystemResults', 'SystemEquationResult', 'GMMSystemResults']
 
 
 class _CommonResults(_SummaryStr):
@@ -366,3 +366,26 @@ class SystemEquationResult(_CommonResults):
     def rsquared_adj(self):
         """Sample-size adjusted coefficient of determination (R**2)"""
         return self._r2a
+
+
+class GMMSystemResults(SystemResults):
+    def __init__(self, results):
+        super(GMMSystemResults, self).__init__(results)
+        self._wmat = results.wmat
+        self._weight_type = results.weight_type
+        self._weight_config = results.weight_config
+
+    @property
+    def w(self):
+        """GMM weight matrix used in estimation"""
+        return self._wmat
+
+    @property
+    def weight_type(self):
+        """Type of weighting used in GMM estimation"""
+        return self._weight_type
+
+    @property
+    def weight_config(self):
+        """Weight configuration options used in GMM estimation"""
+        return self._weight_config

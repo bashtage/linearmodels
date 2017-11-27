@@ -58,6 +58,11 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
     en = atleast_k_elem(en, k)
     instr = atleast_k_elem(instr, k)
 
+    params = []
+    for i in range(k):
+        _p = p[i]
+        _en = en[i]
+        params.append(np.random.chisquare(1, (const + _p + _en, 1)))
     eps = np.random.standard_normal((n, k))
     eps *= np.sqrt(1 - rho ** 2)
     eps += rho * np.random.standard_normal((n, 1))
@@ -69,7 +74,7 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
 
     count = 0
     common_shocks = []
-    for _p, _en, _instr in zip(p, en, instr):
+    for i, _p, _en, _instr in zip(range(k), p, en, instr):
         total = _p + _en + _instr
         corr = np.eye(_p + _en + _instr + 1)
         corr[_p:_p + _en, _p:_p + _en] = kappa * np.eye(_en)
@@ -94,14 +99,14 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
             x = np.c_[np.ones((n, 1)), x]
             exog = np.c_[np.ones((n, 1)), exog]
         assert np.linalg.matrix_rank(x) == x.shape[1]
-        params = np.random.chisquare(1, (const + _p + _en, 1))
-        dep = x @ params + e
+
+        dep = x @ params[i] + e
         if included_weights:
             w = np.random.chisquare(5, (n, 1)) / 5
         if _en == 0:
             endog = None
         if _instr == 0:
-            _instr = None
+            instr = None
         if output_dict:
             data['equ.{0}'.format(count)] = {'dependent': dep, 'exog': exog,
                                              'endog': endog, 'instruments': instr}
@@ -256,3 +261,104 @@ def generate_simultaneous_data(n=500, nsystem=3, nexog=3, ninstr=2, const=True, 
         eqn = dict(dependent=dep, exog=exog, endog=endog, instruments=instr)
         eqns[dep.name] = eqn
     return eqns
+
+
+def generate_3sls_data_v2(n=500, k=3, nexog=3, nendog=2, ninstr=3, const=True, rho=0.5, seed=1234):
+    np.random.seed(seed)
+    eqns = AttrDict()
+    for i in range(k):
+        exog_instr = np.random.standard_normal((n, ninstr + nexog))
+        f = np.random.standard_normal((n, 1))
+        exog_instr = np.sqrt(rho) * f + np.sqrt(1 - rho) * exog_instr
+        exog = exog_instr[:, :nexog]
+        instr = exog_instr[:, nexog:]
+        eps = np.random.standard_normal((n, 1))
+        endog = np.empty((n, nendog))
+        for j in range(nendog):
+            c = np.random.chisquare(2, (ninstr + nexog, 1)) / 2
+            scale = np.arange(1, ninstr + nexog + 1) / (ninstr + nexog)
+            scale = scale / scale.sum()
+            c = c * scale[:, None]
+            endog[:, [j]] = exog_instr @ c + eps + np.random.standard_normal((n, 1))
+        params = np.arange(1, nendog + nexog + const + 1)[:, None]
+        x = np.hstack([exog, endog])
+        if const:
+            x = np.hstack([np.ones((n, 1)), x])
+            exog = np.hstack([np.ones((n, 1)), exog])
+        dep = x @ params + eps
+        eqn = AttrDict(dependent=dep, exog=exog, endog=endog, instruments=instr,
+                       params=params)
+        eqns['eqn.{0}'.format(i)] = eqn
+
+    return eqns
+
+
+def simple_gmm(y, x, z, robust=True, steps=2):
+    y = np.vstack(y)
+    k = len(x)
+    nobs = x[0].shape[0]
+    kx = sum(map(lambda a: a.shape[1], x))
+    kz = sum(map(lambda a: a.shape[1], z))
+    _x = np.zeros((k * nobs, kx))
+    idx = 0
+    for i in range(len(x)):
+        _k = x[i].shape[1]
+        _x[nobs * i:nobs * (i + 1), idx:idx + _k] = x[i]
+        idx += _k
+    x = _x
+
+    idx = 0
+    _z = np.zeros((k * nobs, kz))
+    for i in range(len(z)):
+        _k = z[i].shape[1]
+        _z[nobs * i:nobs * (i + 1), idx:idx + _k] = z[i]
+        idx += _k
+    z = _z
+
+    w0 = z.T @ z / nobs
+    base = x.T @ z @ np.linalg.inv(w0) @ z.T
+    beta = beta0 = np.linalg.solve(base @ x, base @ y)
+
+    eps = y - x @ beta
+
+    sigma = None
+    if robust:
+        ze = z * eps
+        zeez = np.zeros((kz, kz))
+        for i in range(nobs):
+            g = ze[i::nobs].sum(0)[None, :]
+            zeez += g.T @ g
+        w = zeez / nobs
+    else:
+        e = np.reshape(eps, (k, nobs)).T
+        e = e - e.mean(0)
+        sigma = e.T @ e / nobs
+        omega = np.kron(sigma, np.eye(nobs))
+        w = z.T @ omega @ z / nobs
+
+    wi = np.linalg.inv(w)
+    base = x.T @ z @ wi @ z.T
+    beta1 = np.linalg.solve(base @ x, base @ y)
+    if robust:
+        if steps > 1:
+            eps = y - x @ beta1
+        ze = z * eps
+        zeez = np.zeros((kz, kz))
+        for i in range(nobs):
+            g = ze[i::nobs].sum(0)[None, :]
+            zeez += g.T @ g
+        omega = zeez / nobs
+    else:
+        omega = np.kron(sigma, np.eye(nobs))
+        omega = z.T @ omega @ z / nobs
+
+    if steps == 1:
+        wi = np.linalg.inv(w0)
+    xpz = x.T @ z / nobs
+    a = np.linalg.inv(xpz @ wi @ xpz.T)
+    b = xpz @ wi @ omega @ wi @ xpz.T
+    cov = a @ b @ a.T / nobs
+    cov = (cov + cov.T) / 2
+
+    return AttrDict(beta0=beta0.ravel(), beta1=beta1.ravel(), w0=w0,
+                    w1=w, sigma=sigma, cov=cov)

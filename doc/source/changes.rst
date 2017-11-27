@@ -4,6 +4,7 @@ Change Log
 Since Version 4.0
 =================
 * Re-release to fix PyPi errors
+* Added System GMM estimator
 
 Version 4.0
 ===========

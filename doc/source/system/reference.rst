@@ -10,4 +10,5 @@ Module Reference
    models
    results
    covariance
+   gmm-weights
 

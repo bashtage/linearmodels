@@ -33,6 +33,7 @@ estimating asset prices:
 
    -  Seemingly Unrelated Regression (SUR/SURE)
    -  Three-Stage Least Squares (3SLS)
+   -  Generalized Method of Moments (GMM) System Estimation
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 

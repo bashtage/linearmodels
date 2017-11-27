@@ -1,4 +1,4 @@
-from numpy import eye, ones, sqrt, vstack, zeros
+from numpy import eye, ones, sqrt, vstack, zeros, empty
 from numpy.linalg import inv
 
 from linearmodels.system._utility import (blocked_diag_product, blocked_inner_prod,
@@ -207,3 +207,127 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
+
+
+class GMMHomoskedasticCovariance(object):
+    r"""
+    Covariance estimator for IV system estimation with homoskedasitc data
+
+    Parameters
+    ----------
+    x : List[ndarray]
+        List containing the model regressors for each equation in the system
+    z : List[ndarray]
+        List containing the model instruments for each equation in the system
+    eps : ndarray
+        nobs by neq array of residuals where each column corresponds an
+        equation in the system
+    w : ndarray
+        Weighting matrix used in estimation
+    sigma : ndarray, optional
+        Residual covariance used in estimation
+
+    Notes
+    -----
+    The covariance is estimated by
+
+    .. math::
+
+      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}
+
+    where :math:`\Omega = W = Z'(\Sigma \otimes I_n)Z` where m is the number of
+    moments in the system
+    """
+
+    def __init__(self, x, z, eps, w, *, sigma=None):
+        self._x = x
+        self._z = z
+        self._eps = eps
+        self._sigma = sigma
+        self._w = w
+
+    @property
+    def cov(self):
+        """Parameter covariance"""
+        x, z = self._x, self._z
+        k = len(x)
+        nobs = x[0].shape[0]
+        nvar = sum(map(lambda a: a.shape[1], x))
+        ninstr = sum(map(lambda a: a.shape[1], z))
+        xpz = zeros((nvar, ninstr))
+        n = m = 0
+        # TODO: Add blocked cross-product
+        for i in range(k):
+            _x, _z = x[i], z[i]
+            xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
+            n += _x.shape[1]
+            m += _z.shape[1]
+        xpz /= nobs
+        wi = inv(self._w)
+        xpz_wi_zpx = xpz @ wi @ xpz.T
+
+        omega = self._omega()
+        xpz_wi_omega_wi_zpx = xpz @ wi @ omega @ wi @ xpz.T
+        xpz_wi_zpxi = inv(xpz_wi_zpx)
+        cov = xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi / nobs
+        cov = (cov + cov.T) / 2
+        return cov
+
+    def _omega(self):
+        z = self._z
+        nobs = z[0].shape[0]
+        sigma = self._sigma
+        omega = blocked_inner_prod(z, sigma)
+        omega /= nobs
+
+        return omega
+
+
+class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
+    r"""
+    Covariance estimator for IV system estimation with homoskedasitc data
+
+    Parameters
+    ----------
+    x : List[ndarray]
+        List containing the model regressors for each equation in the system
+    z : List[ndarray]
+        List containing the model instruments for each equation in the system
+    eps : ndarray
+        nobs by neq array of residuals where each column corresponds an
+        equation in the system
+    w : ndarray
+        Weighting matrix used in estimation
+    sigma : ndarray, optional
+        Residual covariance used in estimation
+
+    Notes
+    -----
+    The covariance is estimated by
+
+    .. math::
+
+      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}
+
+    where :math:`\Omega` is the covariance of the moment conditions.
+    """
+
+    def __init__(self, x, z, eps, w, *, sigma=None):
+        super().__init__(x, z, eps, w, sigma=sigma)
+
+    def _omega(self):
+        eps = self._eps
+        z = self._z
+        k = len(z)
+        k_total = sum(map(lambda a: a.shape[1], z))
+        nobs = z[0].shape[0]
+        loc = 0
+        ze = empty((nobs, k_total))
+        for i in range(k):
+            kz = z[i].shape[1]
+            ze[:, loc:loc + kz] = z[i] * eps[:, [i]]
+            loc += kz
+        nobs = z[0].shape[0]
+        omega = ze.T @ ze / nobs
+
+        return omega

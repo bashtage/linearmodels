@@ -17,3 +17,15 @@ Heteroskedastic Covariance Estimation
 .. autoclass:: HeteroskedasticCovariance
    :members:
    :inherited-members:
+
+GMM Homoskedastic Covariance Estimation
+=======================================
+.. autoclass:: GMMHomoskedasticCovariance
+   :members:
+   :inherited-members:
+
+GMM Heteroskedastic Covariance Estimation
+=========================================
+.. autoclass:: GMMHeteroskedasticCovariance
+   :members:
+   :inherited-members:

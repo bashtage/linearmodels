@@ -83,7 +83,9 @@ author = 'Kevin Sheppard'
 # The short X.Y version.
 version = LooseVersion(linearmodels.__version__)
 if '+' in version.version:
-    version = linearmodels.__version__.split('+')
+    version = linearmodels.__version__
+    version = version.replace('.dirty', '')
+    version = version.split('+')
     commits, tag = version[1].split('.')
     version = version[0]
     tag = ' (+' + commits + ', ' + tag + ')'

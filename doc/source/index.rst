@@ -32,6 +32,7 @@ Estimation and inference in some common linear models:
 
 * Seemingly Unrelated Regression (SUR, :class:`~linearmodels.system.model.SUR`)
 * Three-stage Least Squares (3SLS, :class:`~linearmodels.system.model.IV3SLS`)
+* Generalized Method of Moments System Estimator (GMM, :class:`~linearmodels.system.model.IVSystemGMM`)
 
 
 **Asset Pricing Model Estimation and Testing**

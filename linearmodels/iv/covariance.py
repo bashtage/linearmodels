@@ -1,8 +1,6 @@
 """
 Covariance estimation for 2SLS and LIML IV estimators
 """
-from __future__ import absolute_import, division, print_function
-
 from numpy import (arange, argsort, asarray, ceil, cos, empty, int64, ones, pi,
                    r_, sin, sum, unique, where, zeros)
 from numpy.linalg import inv, pinv

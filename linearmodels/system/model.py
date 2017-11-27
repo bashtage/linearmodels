@@ -20,17 +20,19 @@ from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
 from numpy.linalg import inv, solve
 from pandas import Series
 
-from linearmodels.iv.data import IVData
 from linearmodels.iv._utility import parse_formula
+from linearmodels.iv.data import IVData
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
     blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
 from linearmodels.system.covariance import (HeteroskedasticCovariance,
-                                            HomoskedasticCovariance)
-from linearmodels.system.results import SystemResults
+                                            HomoskedasticCovariance, GMMHomoskedasticCovariance,
+                                            GMMHeteroskedasticCovariance)
+from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix
+from linearmodels.system.results import SystemResults, GMMSystemResults
 from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
                                   matrix_rank, missing_warning)
 
-__all__ = ['SUR', 'IV3SLS']
+__all__ = ['SUR', 'IV3SLS', 'IVSystemGMM']
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys 'dependent'
@@ -130,7 +132,7 @@ class IV3SLS(object):
 
     .. math::
 
-        \Omega = I_n \otimes \Sigma
+        \Omega = \Sigma \otimes I_n
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
     """
@@ -198,7 +200,7 @@ class IV3SLS(object):
                     dep = self._dependent[-1].ndarray
                     self._weights.append(IVData(ones_like(dep)))
 
-            elif isinstance(eq_data, dict):
+            elif isinstance(eq_data, (dict, Mapping)):
                 dep = IVData(eq_data['dependent'], var_name=dep_name)
                 self._dependent.append(dep)
                 current_id = id(eq_data['exog'])
@@ -968,7 +970,7 @@ class SUR(IV3SLS):
 
     .. math::
 
-        \Omega = I_n \otimes \Sigma
+        \Omega = \Sigma \otimes I_n
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
 
@@ -1095,3 +1097,335 @@ class SUR(IV3SLS):
         >>> mod = SUR.from_formula(formula, data)
         """
         return super(SUR, cls).from_formula(formula, data, sigma=sigma, weights=weights)
+
+
+class IVSystemGMM(IV3SLS):
+    r"""
+    System Generalized Method of Moments (GMM) estimation of linear IV models
+
+    Parameters
+    ----------
+    equations : dict
+        Dictionary-like structure containing dependent, exogenous, endogenous
+        and instrumental variables.  Each key is an equations label and must
+        be a string. Each value must be either a tuple of the form (dependent,
+        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
+        'exog'.  The dictionary may contain optional keys for 'endog',
+        'instruments', and 'weights'. Endogenous and/or Instrument can be empty
+        if all variables in an equation are exogenous.
+    sigma : array-like
+        Pre-specified residual covariance to use in GLS estimation. If not
+        provided, FGLS is implemented based on an estimate of sigma. Only used
+        if weight_type is 'unadjusted'
+    weight_type : str
+        Name of moment condition weight function to use in the GMM estimation
+    **weight_config
+        Additional keyword arguments to pass to the moment condition weight
+        function
+
+    Notes
+    -----
+    Estimates a linear model using GMM. Each equation is of the form
+
+    .. math::
+
+        y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}
+
+    where k denotes the equation and i denoted the observation index. By
+    stacking vertically arrays of dependent and placing the exogenous
+    variables into a block diagonal array, the entire system can be compactly
+    expressed as
+
+    .. math::
+
+        Y = X\beta + \epsilon
+
+    where
+
+    .. math::
+
+        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+
+    and
+
+    .. math::
+
+        X = \left[\begin{array}{cccc}
+                 X_1 & 0 & \ldots & 0 \\
+                 0 & X_2 & \dots & 0 \\
+                 \vdots & \vdots & \ddots & \vdots \\
+                 0 & 0 & \dots & X_K
+            \end{array}\right]
+
+    The system GMM estimator uses the moment condition
+
+    .. math::
+
+        z_{ij}(y_{ij} - x_{ij}\beta_j) = 0
+
+    where j indexes the equation. The estimator for the coefficients is given
+    by
+
+    .. math::
+
+        \hat{\beta}_{GMM} & = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\
+
+    where :math:`W` is a positive definite weighting matrix.
+    """
+    def __init__(self, equations, *, sigma=None, weight_type='robust', **weight_config):
+        super().__init__(equations, sigma=sigma)
+        self._weight_type = weight_type
+        self._weight_config = weight_config
+
+        if weight_type == 'robust':
+            self._weight_est = HeteroskedasticWeightMatrix(**weight_config)
+        elif weight_type == 'unadjusted':
+            self._weight_est = HomoskedasticWeightMatrix(**weight_config)
+        else:
+            raise ValueError('Unknown estimator for weight_type')
+
+    def fit(self, *, iter_limit=2, tol=1e-6, initial_weight=None,
+            cov_type='robust', **cov_config):
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        iter_limit : int
+            Maximum number of iterations for iterative GLS
+        tol : float
+            Tolerance to use when checking for convergence in iterative GLS
+        initial_weight : ndarray, optional
+            Initial weighting matrix to use in the first step. If not
+            specified, uses the average outer-product of the set containing
+            the exogenous variables and instruments.
+        cov_type : str
+            Name of covariance estimator. Valid options are
+
+            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
+            * 'robust', 'heteroskedastic' - Heteroskedasticit robust
+              covariance estimator
+
+        **cov_config
+            Additional parameters to pass to covariance estimator. All
+            estimators support debiased which employs a small-sample adjustment
+
+        Returns
+        -------
+        results : SystemResults
+            Estimation results
+        """
+        cov_type = cov_type.lower()
+        if cov_type not in ('unadjusted', 'robust', 'homoskedastic', 'heteroskedastic'):
+            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+        cov_type = 'unadjusted' if cov_type in ('unadjusted', 'homoskedastic') else 'robust'
+        # Parameter estimation
+        wx, wy, wz = self._wx, self._wy, self._wz
+        k = len(wx)
+        nobs = wx[0].shape[0]
+        k_total = sum(map(lambda a: a.shape[1], wz))
+        if initial_weight is None:
+            w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
+        else:
+            w = initial_weight
+        beta_last = beta = self._blocked_gmm(wx, wy, wz, w=w)
+        eps = []
+        loc = 0
+        for i in range(k):
+            nb = wx[i].shape[1]
+            b = beta[loc:loc + nb]
+            eps.append(wy[i] - wx[i] @ b)
+            loc += nb
+        eps = hstack(eps)
+        sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
+        vinv = None
+        iters = 1
+        norm = 10 * tol + 1
+        while iters < iter_limit and norm > tol:
+            sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
+            w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
+            beta = self._blocked_gmm(wx, wy, wz, w=w)
+            delta = beta_last - beta
+            if vinv is None:
+                winv = np.linalg.inv(w)
+                nvar = sum(map(lambda a: a.shape[1], wx))
+                ninstr = sum(map(lambda a: a.shape[1], wz))
+                xpz = np.zeros((nvar, ninstr))
+                n = m = 0
+                for i in range(k):
+                    _x, _z = wx[i], wz[i]
+                    xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
+                    n += _x.shape[1]
+                    m += _z.shape[1]
+                v = (xpz @ winv @ xpz.T) / nobs
+                vinv = inv(v)
+            norm = delta.T @ vinv @ delta
+            beta_last = beta
+
+            eps = []
+            loc = 0
+            for i in range(k):
+                nb = wx[i].shape[1]
+                b = beta[loc:loc + nb]
+                eps.append(wy[i] - wx[i] @ b)
+                loc += nb
+            eps = hstack(eps)
+            iters += 1
+
+        # TODO: What about constraints?  Can probably handle in same way
+        if cov_type.lower() in ('unadjusted', 'homoskedastic'):
+            cov_est = GMMHomoskedasticCovariance
+        elif cov_type.lower() in ('robust', 'heteroskedastic'):
+            cov_est = GMMHeteroskedasticCovariance
+        else:
+            raise ValueError('Unknown cov_type')
+
+        cov = cov_est(wx, wz, eps, w, sigma=sigma)
+
+        weps = eps
+        eps = []
+        loc = 0
+        x, y = self._x, self._y
+        for i in range(k):
+            nb = x[i].shape[1]
+            b = beta[loc:loc + nb]
+            eps.append(y[i] - x[i] @ b)
+            loc += nb
+        eps = hstack(eps)
+        iters += 1
+
+        return self._finalize_results(beta, cov.cov, weps, eps, w, sigma,
+                                      cov_type, iters, cov_config)
+
+    @staticmethod
+    def _blocked_gmm(x, y, z, *, w=None):
+        k = len(x)
+        nvar = sum(map(lambda a: a.shape[1], x))
+        ninstr = sum(map(lambda a: a.shape[1], z))
+        xpz = np.zeros((nvar, ninstr))
+        n = m = 0
+        for i in range(k):
+            _x, _z = x[i], z[i]
+            xpz[n:n + _x.shape[1], m:m + _z.shape[1]] = _x.T @ _z
+            n += _x.shape[1]
+            m += _z.shape[1]
+
+        wi = np.linalg.inv(w)
+        xpz_wi_zpx = xpz @ wi @ xpz.T
+        zpy = []
+        for i in range(k):
+            zpy.append(z[i].T @ y[i])
+        zpy = np.vstack(zpy)
+        xpz_wi_zpy = xpz @ wi @ zpy
+        return np.linalg.solve(xpz_wi_zpx, xpz_wi_zpy)
+
+    def _finalize_results(self, beta, cov, weps, eps, wmat, sigma,
+                          cov_type, iter_count, cov_config):
+        """Collect results to return after GLS estimation"""
+        k = len(self._wy)
+        # Repackage results for individual equations
+        individual = AttrDict()
+        debiased = cov_config.get('debiased', False)
+        method = '{0}-Step GMM'.format(iter_count)
+        if iter_count > 2:
+            method = 'Iterative GMM'
+        for i in range(k):
+            cons = int(self.has_constant.iloc[i])
+
+            if cons:
+                c = np.sqrt(self._w[i])
+                ye = self._wy[i] - c @ np.linalg.lstsq(c, self._wy[i])[0]
+            else:
+                ye = self._wy[i]
+            total_ss = float(ye.T @ ye)
+            stats = self._common_indiv_results(i, beta, cov, weps, eps,
+                                               method, cov_type, iter_count,
+                                               debiased, cons, total_ss)
+
+            key = self._eq_labels[i]
+            individual[key] = stats
+
+        # Populate results dictionary
+        nobs = eps.size
+        results = self._common_results(beta, cov, method, iter_count, nobs,
+                                       cov_type, sigma, individual, debiased)
+
+        # wresid is different between GLS and OLS
+        wresid = []
+        for key in individual:
+            wresid.append(individual[key].wresid)
+        wresid = hstack(wresid)
+        results['wresid'] = wresid
+        results['wmat'] = wmat
+        results['weight_type'] = self._weight_type
+        results['weight_config'] = self._weight_config
+
+        return GMMSystemResults(results)
+
+    @classmethod
+    def from_formula(cls, formula, data, *, weights=None, weight_type='robust', **weight_config):
+        """
+        Specify a 3SLS using the formula interface
+
+        Parameters
+        ----------
+        formula : {str, dict-like}
+            Either a string or a dictionary of strings where each value in
+            the dictionary represents a single equation. See Notes for a
+            description of the accepted syntax
+        data : DataFrame
+            Frame containing named variables
+        weights : dict-like
+            Dictionary like object (e.g. a DataFrame) containing variable
+            weights.  Each entry must have the same number of observations as
+            data.  If an equation label is not a key weights, the weights will
+            be set to unity
+        weight_type : str
+            Name of moment condition weight function to use in the GMM
+            estimation. Valid options are:
+
+            * 'unadjusted', 'homoskedastic' - Assume moments are homoskedastic
+            * 'robust', 'heteroskedastic' - Allow for heteroskedasticity
+
+        **weight_config
+            Additional keyword arguments to pass to the moment condition weight
+            function
+
+        Returns
+        -------
+        model : IVSystemGMM
+            Model instance
+
+        Notes
+        -----
+        Models can be specified in one of two ways. The first uses curly
+        braces to encapsulate equations.  The second uses a dictionary
+        where each key is an equation name.
+
+        Examples
+        --------
+        The simplest format uses standard Patsy formulas for each equation
+        in a dictionary.  Best practice is to use an Ordered Dictionary
+
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
+        >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
+        >>> from linearmodels.system import IVSystemGMM
+        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
+        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
+        >>> mod = IVSystemGMM.from_formula(formula, data)
+
+        The second format uses curly braces {} to surround distinct equations
+
+        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IVSystemGMM.from_formula(formula, data)
+
+        It is also possible to include equation labels when using curly braces
+
+        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IVSystemGMM.from_formula(formula, data)
+        """
+        mod = super().from_formula(formula, data, weights=weights)
+        equations = mod._equations
+        return cls(equations, weight_type=weight_type, **weight_config)
