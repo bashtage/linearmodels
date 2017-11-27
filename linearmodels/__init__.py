@@ -52,7 +52,7 @@ __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
            'RandomEffects',
            'FamaMacBeth',
            'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS', 'OLS',
-           'SUR', 'IV3SLS', 'IVSystemGMM'
+           'SUR', 'IV3SLS', 'IVSystemGMM',
            'LinearFactorModel', 'LinearFactorModelGMM', 'TradedFactorModel',
            'WARN_ON_MISSING', 'DROP_MISSING']
 

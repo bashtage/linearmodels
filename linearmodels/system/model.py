@@ -1215,7 +1215,7 @@ class IVSystemGMM(IV3SLS):
         results : SystemResults
             Estimation results
         """
-        cov_type = cov_type.lower()
+        cov_type = str(cov_type).lower()
         if cov_type not in ('unadjusted', 'robust', 'homoskedastic', 'heteroskedastic'):
             raise ValueError('Unknown cov_type: {0}'.format(cov_type))
         cov_type = 'unadjusted' if cov_type in ('unadjusted', 'homoskedastic') else 'robust'
@@ -1275,10 +1275,8 @@ class IVSystemGMM(IV3SLS):
         # TODO: What about constraints?  Can probably handle in same way
         if cov_type.lower() in ('unadjusted', 'homoskedastic'):
             cov_est = GMMHomoskedasticCovariance
-        elif cov_type.lower() in ('robust', 'heteroskedastic'):
+        else:  # cov_type.lower() in ('robust', 'heteroskedastic'):
             cov_est = GMMHeteroskedasticCovariance
-        else:
-            raise ValueError('Unknown cov_type')
 
         cov = cov_est(wx, wz, eps, w, sigma=sigma)
 
