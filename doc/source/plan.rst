@@ -45,9 +45,9 @@ Planned but not implemented
 
 System Estimation
 =================
-* Seemingly Unrelated Regression (SUR) Estimator - :class:`linearmodels.system.SUR`
+* Seemingly Unrelated Regression (SUR) Estimator - :class:`linearmodels.system.model.SUR`
 
 Instrumental Variable Estimators
 ********************************
-* Three-stage Least Squares (3SLS) Estimator - :class:`linearmodels.system.IV3SLS`
-* Generalized Method of Moments (GMM) System Estimation - :class:`linearmodels.system.IVSystemGMM`
+* Three-stage Least Squares (3SLS) Estimator - :class:`linearmodels.system.model.IV3SLS`
+* Generalized Method of Moments (GMM) System Estimation - :class:`linearmodels.system.model.IVSystemGMM`
