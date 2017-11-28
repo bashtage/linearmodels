@@ -252,7 +252,7 @@ class GMMHomoskedasticCovariance(object):
 
       (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}
 
-    where :math:`\Omega = W = Z'(\Sigma \otimes I_n)Z` where m is the number of
+    where :math:`\Omega = W = Z'(\Sigma \otimes I_N)Z` where m is the number of
     moments in the system
     """
 

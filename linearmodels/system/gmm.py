@@ -25,7 +25,7 @@ class HomoskedasticWeightMatrix(object):
 
     .. math::
 
-      Z'(\Sigma \otimes I_n)Z
+      Z'(\Sigma \otimes I_N)Z
 
     where :math:`Z` is a block diagonal matrix containing both the exogenous
     regressors and instruments and :math:`\Sigma` is the covariance of the

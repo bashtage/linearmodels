@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -136,7 +142,7 @@ Y_{K}
 X_{1} & 0 & 0 & 0\\
 0 & X_{2} & 0 & 0\\
 \vdots & \vdots & \ddots & \vdots\\
-0 & 0 & 0 & X_{N}
+0 & 0 & 0 & X_{K}
 \end{array}\right]\left[\begin{array}{c}
 \beta_{1}\\
 \beta_{2}\\
@@ -188,7 +194,7 @@ A GLS estimator can be similarly defined as
 \begin_layout Standard
 \noindent
 where 
-\begin_inset Formula $\Omega=I_{N}\otimes\Sigma$
+\begin_inset Formula $\Omega=\Sigma\otimes I_{N}$
 \end_inset
 
  is the joint covariance of the residuals.
@@ -236,7 +242,7 @@ where
 .
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection*
 Covariance Estimation
 \end_layout
 
@@ -686,7 +692,7 @@ Y_{K}
 X_{1} & 0 & 0 & 0\\
 0 & X_{2} & 0 & 0\\
 \vdots & \vdots & \ddots & \vdots\\
-0 & 0 & 0 & X_{N}
+0 & 0 & 0 & X_{K}
 \end{array}\right]\left[\begin{array}{c}
 \beta_{1}\\
 \beta_{2}\\
@@ -722,7 +728,7 @@ where
  Define the fitted values of the exogenous variables as 
 \begin_inset Formula 
 \[
-\hat{X}_{i}=Z\left(Z^{\prime}Z\right)^{-1}Z^{\prime}X.
+\hat{X}_{i}=Z_{i}\left(Z_{i}^{\prime}Z_{i}\right)^{-1}Z_{i}^{\prime}X_{i}.
 \]
 
 \end_inset
@@ -739,7 +745,7 @@ The IV estimator of
  is then 
 \begin_inset Formula 
 \[
-\hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y.
+\hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y
 \]
 
 \end_inset
@@ -757,15 +763,304 @@ where
 0 & \hat{X}_{2} & 0 & 0\\
 \vdots & \vdots & \ddots & \vdots\\
 0 & 0 & 0 & \hat{X}_{N}
-\end{array}\right]
+\end{array}\right].
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 A GLS estimator can be similarly defined as 
 \begin_inset Formula 
 \[
-\hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y
+\hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Inference is identical to the SUR replacing 
+\begin_inset Formula $X$
+\end_inset
+
+ with 
+\begin_inset Formula $\hat{X}$
+\end_inset
+
+ where model residuals are estiamted using 
+\begin_inset Formula $X$
+\end_inset
+
+ and 
+\begin_inset Formula $Y$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection*
+System Generalized Method of Moments (GMM)
+\end_layout
+
+\begin_layout Standard
+\noindent
+The system GMM estimator uses a set of moment conditions of the form 
+\begin_inset Formula 
+\begin{align*}
+E\left[g_{i}\right] & =0,i=1,\ldots,T\\
+E\left[\begin{array}{c}
+g_{1i}\\
+g_{2i}\\
+\vdots\\
+g_{Ki}
+\end{array}\right] & =0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $g_{ji}=z_{ji}^{\prime}\left(y_{ji}-x_{ji}\beta\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $j$
+\end_inset
+
+ is the equation index, 
+\begin_inset Formula $z_{ji}$
+\end_inset
+
+ is a set of instruments for equation 
+\begin_inset Formula $j$
+\end_inset
+
+ at time period i and 
+\begin_inset Formula $x_{ji}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{ji}$
+\end_inset
+
+ are similarly defined.
+ Define 
+\begin_inset Formula 
+\[
+g_{N}\left(\beta\right)=N^{-1}\sum_{i=1}^{N}g_{i}\left(\beta\right),
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+then the parameters are estimated to minimize 
+\begin_inset Formula 
+\[
+\min_{\beta}g_{N}\left(\beta\right)^{\prime}W^{-1}g_{N}\left(\beta\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The solution to this minimization problem is 
+\begin_inset Formula 
+\[
+\hat{\beta}=\left(X^{\prime}ZW^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}ZW^{-1}Z^{\prime}Y\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula $W$
+\end_inset
+
+ is the moment weighting matrix and for efficiency should be set to the
+ covariance of the moment conditions.
+ In practice a 2-step estimator is required since estimators of 
+\begin_inset Formula $W$
+\end_inset
+
+ depend on 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ In the first step, 
+\begin_inset Formula $W=N^{-1}Z^{\prime}Z$
+\end_inset
+
+ is used to construct an initial estimate of 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+.
+ This would be efficient if residuals were homoskedastic and uncorrelated.
+ This choice will produce estimates that are identical to system 2SLS.
+ Using the initial parameter estimated, the covariance of the moment conditions
+ is computed used one of two forms using the estimated model residuals 
+\begin_inset Formula $\hat{\epsilon}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Homoskedastic Weighting
+\end_layout
+
+\begin_layout Standard
+\noindent
+When residuals are assumed to be conditionally homoskedastic, then 
+\begin_inset Formula 
+\[
+\hat{W}=N^{-1}Z^{\prime}\left(\hat{\Sigma}\otimes I_{N}\right)Z
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{\Sigma}$
+\end_inset
+
+is the 
+\begin_inset Formula $K$
+\end_inset
+
+ by 
+\begin_inset Formula $K$
+\end_inset
+
+ covariance of the model residuals.
+ This specification assumes that residuals are not correlated across observation
+ index (only across models)
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Heteroskedastic Weighting
+\end_layout
+
+\begin_layout Standard
+\noindent
+When residuals are heteroskedastic, the weighting matrix is estimated from
+ 
+\begin_inset Formula 
+\[
+\hat{W}=N^{-1}\sum\hat{g}_{i}\hat{g}_{i}^{\prime}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+which allows cross-sectional depdnence but no dependence across observation
+ index.
+ 
+\end_layout
+
+\begin_layout Standard
+\noindent
+The efficient estimates are computed using the same expression only with
+ 
+\begin_inset Formula $\hat{W}$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+\hat{\beta}=\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}Y\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Both weighting estimators can be centered which will enforce an exact mean
+ 0 to the moment conditions.
+ When models are over-identified, this can improve accuracy of 2-step estiamtors.
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Parameter Covariance
+\end_layout
+
+\begin_layout Standard
+\noindent
+Covariance estimators are available for either homoskedastic or heteroskedastic
+ data.
+ The only difference is in how the covariance of the moments is computed.
+ In either case, the parameter covariance can be estimated by 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+\widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\hat{\Omega}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The covariance of the scores 
+\begin_inset Formula $\hat{\Omega}$
+\end_inset
+
+ estimated using either the homoskedastic weighting formula or the heteroskedast
+ic weighting formula immediately above.
+ This allow the choice of weighting matrix to be set separately from the
+ score covariance estimator, although in most cases these should be the
+ same, and so the covariance of the estimated parameters will simplify to
+ 
+\begin_inset Formula 
+\[
+\widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.
 \]
 
 \end_inset

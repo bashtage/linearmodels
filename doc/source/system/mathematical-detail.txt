@@ -33,7 +33,7 @@ spanning all series can be specified as
    X_{1} & 0 & 0 & 0\\
    0 & X_{2} & 0 & 0\\
    \vdots & \vdots & \ddots & \vdots\\
-   0 & 0 & 0 & X_{N}
+   0 & 0 & 0 & X_{K}
    \end{array}\right]\left[\begin{array}{c}
    \beta_{1}\\
    \beta_{2}\\
@@ -54,7 +54,7 @@ A GLS estimator can be similarly defined as
 
 .. math:: \hat{\beta}_{GLS}=\left(X^{\prime}\Omega^{-1}X\right)^{-1}X^{\prime}\Omega^{-1}Y
 
-where :math:`\Omega=I_{N}\otimes\Sigma` is the joint covariance of the
+where :math:`\Omega=\Sigma\otimes I_{N}` is the joint covariance of the
 residuals. In practice :math:`\Sigma` is not known as so a feasible GLS
 (FGLS) is implemented in two steps. The first uses OLS to estimate
 :math:`\hat{\epsilon}` and then estimates the residual covariance as
@@ -72,7 +72,7 @@ The feasible GLS estimator is then
 where :math:`\hat{\Omega}=\hat{\Sigma}\otimes I_{N}`.
 
 Covariance Estimation
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 **Homoskedastic Data**
 
@@ -238,7 +238,7 @@ spanning all series can be specified as
    X_{1} & 0 & 0 & 0\\
    0 & X_{2} & 0 & 0\\
    \vdots & \vdots & \ddots & \vdots\\
-   0 & 0 & 0 & X_{N}
+   0 & 0 & 0 & X_{K}
    \end{array}\right]\left[\begin{array}{c}
    \beta_{1}\\
    \beta_{2}\\
@@ -256,11 +256,11 @@ For each equation denote the available instruments as :math:`Z_{i}`. The
 instrument include both exogenous regressors and excluded instrumental
 variables. Define the fitted values of the exogenous variables as
 
-.. math:: \hat{X}_{i}=Z\left(Z^{\prime}Z\right)^{-1}Z^{\prime}X.
+.. math:: \hat{X}_{i}=Z_{i}\left(Z_{i}^{\prime}Z_{i}\right)^{-1}Z_{i}^{\prime}X_{i}.
 
 The IV estimator of :math:`\beta` is then
 
-.. math:: \hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y.
+.. math:: \hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y
 
 where
 
@@ -271,8 +271,104 @@ where
    0 & \hat{X}_{2} & 0 & 0\\
    \vdots & \vdots & \ddots & \vdots\\
    0 & 0 & 0 & \hat{X}_{N}
-   \end{array}\right]
+   \end{array}\right].
 
- A GLS estimator can be similarly defined as
+A GLS estimator can be similarly defined as
 
-.. math:: \hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y
+.. math:: \hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y.
+
+Inference is identical to the SUR replacing :math:`X` with
+:math:`\hat{X}` where model residuals are estiamted using :math:`X` and
+:math:`Y`.
+
+System Generalized Method of Moments (GMM)
+------------------------------------------
+
+The system GMM estimator uses a set of moment conditions of the form
+
+.. math::
+
+   \begin{aligned}
+   E\left[g_{i}\right] & =0,i=1,\ldots,T\\
+   E\left[\begin{array}{c}
+   g_{1i}\\
+   g_{2i}\\
+   \vdots\\
+   g_{Ki}
+   \end{array}\right] & =0\end{aligned}
+
+where :math:`g_{ji}=z_{ji}^{\prime}\left(y_{ji}-x_{ji}\beta\right)`
+where :math:`j` is the equation index, :math:`z_{ji}` is a set of
+instruments for equation :math:`j` at time period i and :math:`x_{ji}`
+and :math:`y_{ji}` are similarly defined. Define
+
+.. math:: g_{N}\left(\beta\right)=N^{-1}\sum_{i=1}^{N}g_{i}\left(\beta\right),
+
+then the parameters are estimated to minimize
+
+.. math:: \min_{\beta}g_{N}\left(\beta\right)^{\prime}W^{-1}g_{N}\left(\beta\right).
+
+The solution to this minimization problem is
+
+.. math:: \hat{\beta}=\left(X^{\prime}ZW^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}ZW^{-1}Z^{\prime}Y\right).
+
+:math:`W` is the moment weighting matrix and for efficiency should be
+set to the covariance of the moment conditions. In practice a 2-step
+estimator is required since estimators of :math:`W` depend on
+:math:`\beta`. In the first step, :math:`W=N^{-1}Z^{\prime}Z` is used to
+construct an initial estimate of :math:`\hat{\beta}`. This would be
+efficient if residuals were homoskedastic and uncorrelated. This choice
+will produce estimates that are identical to system 2SLS. Using the
+initial parameter estimated, the covariance of the moment conditions is
+computed used one of two forms using the estimated model residuals
+:math:`\hat{\epsilon}`.
+
+Homoskedastic Weighting
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When residuals are assumed to be conditionally homoskedastic, then
+
+.. math:: \hat{W}=N^{-1}Z^{\prime}\left(\hat{\Sigma}\otimes I_{N}\right)Z
+
+where :math:`\hat{\Sigma}`\ is the :math:`K` by :math:`K` covariance of
+the model residuals. This specification assumes that residuals are not
+correlated across observation index (only across models)
+
+Heteroskedastic Weighting
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When residuals are heteroskedastic, the weighting matrix is estimated
+from
+
+.. math:: \hat{W}=N^{-1}\sum\hat{g}_{i}\hat{g}_{i}^{\prime}
+
+which allows cross-sectional depdnence but no dependence across
+observation index.
+
+The efficient estimates are computed using the same expression only with
+:math:`\hat{W}`,
+
+.. math:: \hat{\beta}=\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}Y\right).
+
+Both weighting estimators can be centered which will enforce an exact
+mean 0 to the moment conditions. When models are over-identified, this
+can improve accuracy of 2-step estiamtors.
+
+Parameter Covariance
+~~~~~~~~~~~~~~~~~~~~
+
+Covariance estimators are available for either homoskedastic or
+heteroskedastic data. The only difference is in how the covariance of
+the moments is computed. In either case, the parameter covariance can be
+estimated by
+
+.. math:: \widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\hat{\Omega}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.
+
+The covariance of the scores :math:`\hat{\Omega}` estimated using either
+the homoskedastic weighting formula or the heteroskedastic weighting
+formula immediately above. This allow the choice of weighting matrix to
+be set separately from the score covariance estimator, although in most
+cases these should be the same, and so the covariance of the estimated
+parameters will simplify to
+
+.. math:: \widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.

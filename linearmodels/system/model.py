@@ -132,7 +132,7 @@ class IV3SLS(object):
 
     .. math::
 
-        \Omega = \Sigma \otimes I_n
+        \Omega = \Sigma \otimes I_N
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
     """
@@ -983,7 +983,7 @@ class SUR(IV3SLS):
 
     .. math::
 
-        \Omega = \Sigma \otimes I_n
+        \Omega = \Sigma \otimes I_N
 
     where :math:`\Sigma` is the covariance matrix of the residuals.
 

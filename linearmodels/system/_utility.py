@@ -137,7 +137,7 @@ def blocked_cross_prod(x, z, s):
 
     .. math::
 
-      X'(S \otimes I_n)Z
+      X'(S \otimes I_N)Z
 
     where n is the number of observations in the sample
     """
@@ -167,7 +167,7 @@ def blocked_full_inner_product(x, s):
 
     .. math ::
 
-        x^\prime (s \otimes I_T)x
+        x^\prime (S \otimes I_N)x
 
     """
     k = s.shape[0]
