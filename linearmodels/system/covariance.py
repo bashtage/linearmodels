@@ -262,7 +262,7 @@ class GMMHomoskedasticCovariance(object):
         self._eps = eps
         self._sigma = sigma
         self._w = w
-        self._name = 'Heteroskedastic (Robust) Covariance'
+        self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
         self._str_extra = {}
 
     def __str__(self):
@@ -337,7 +337,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     def __init__(self, x, z, eps, w, *, sigma=None):
         super().__init__(x, z, eps, w, sigma=sigma)
-        self._name = 'Heteroskedastic (Robust) Covariance'
+        self._name = 'GMM Heteroskedastic (Robust) Covariance'
 
     def _omega(self):
         eps = self._eps
