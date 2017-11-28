@@ -148,7 +148,13 @@ class IV3SLS(object):
         equations = _to_ordered_dict(equations)
 
         self._equations = equations
-        self._sigma = asarray(sigma) if sigma is not None else None
+        self._sigma = None
+        if sigma is not None:
+            self._sigma = asarray(sigma)
+            k = len(self._equations)
+            if self._sigma.shape != (k, k):
+                raise ValueError('sigma must be a square matrix with dimensions '
+                                 'equal to the number of equations')
         self._param_names = []
         self._eq_labels = []
         self._dependent = []
@@ -1185,9 +1191,15 @@ class IVSystemGMM(IV3SLS):
         self._weight_type = weight_type
         self._weight_config = weight_config
 
-        if weight_type == 'robust':
+        if weight_type not in ('unadjusted', 'homoskedastic') and sigma is not None:
+            import warnings
+            warnings.warn('sigma has been provided but the estimated weight '
+                          'matrix not unadjusted (homoskedastic).  sigma will '
+                          'be ignored.', UserWarning)
+
+        if weight_type in ('robust', 'heteroskedastic'):
             self._weight_est = HeteroskedasticWeightMatrix(**weight_config)
-        elif weight_type == 'unadjusted':
+        elif weight_type in ('unadjusted', 'homoskedastic'):
             self._weight_est = HomoskedasticWeightMatrix(**weight_config)
         else:
             raise ValueError('Unknown estimator for weight_type')
@@ -1220,7 +1232,7 @@ class IVSystemGMM(IV3SLS):
 
         Returns
         -------
-        results : SystemResults
+        results : GMMSystemResults
             Estimation results
         """
         cov_type = str(cov_type).lower()

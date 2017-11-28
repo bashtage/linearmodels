@@ -263,15 +263,9 @@ class GMMHomoskedasticCovariance(object):
         self._sigma = sigma
         self._w = w
         self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
-        self._str_extra = {}
 
     def __str__(self):
         out = self._name
-        extra = []
-        for key in self._str_extra:
-            extra.append(': '.join([key, str(self._str_extra[key])]))
-        if extra:
-            out += ' (' + ','.join(extra) + ')'
         return out
 
     def __repr__(self):

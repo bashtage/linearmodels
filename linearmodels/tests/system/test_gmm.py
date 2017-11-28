@@ -147,12 +147,18 @@ def test_formula_equivalence_weights(data):
 
 
 def test_weight_options(data):
-    mod = IVSystemGMM(data.eqns, weight_type='unadjusted', debiased=True)
+    mod = IVSystemGMM(data.eqns, weight_type='unadjusted', debiased=True, center=True)
     res = mod.fit(cov_type='unadjusted')
-    assert res.weight_config == {'debiased': True}
+    assert res.weight_config == {'debiased': True, 'center': True}
     assert res.weight_type == 'unadjusted'
+    assert 'Debiased: True' in str(res.summary)
+    assert str(hex(id(res._weight_estimtor))) in res._weight_estimtor.__repr__()
+    assert res._weight_estimtor.config == {'debiased': True, 'center': True}
     base_res = IVSystemGMM(data.eqns, weight_type='unadjusted').fit(cov_type='unadjusted')
     assert np.all(np.diag(res.w) >= np.diag(base_res.w))
+
+    mod = IVSystemGMM(data.eqns, weight_type='robust', debiased=True)
+    res = mod.fit(cov_type='robust')
 
 
 def test_no_constant_smoke():
@@ -201,6 +207,34 @@ def test_summary(data):
 
 
 def test_summary_homoskedastic(data):
-    mod = IVSystemGMM(data.eqns, weight_type='unadjusted')
-    res = mod.fit(cov_type='homoskedastic')
+    mod = IVSystemGMM(data.eqns, weight_type='unadjusted', debiased=True)
+    res = mod.fit(cov_type='homoskedastic', debiased='True')
     assert 'Homoskedastic (Unadjusted) Weighting' in res.summary.as_text()
+
+
+def test_fixed_sigma(data):
+    mod = IVSystemGMM(data.eqns, weight_type='unadjusted')
+    res = mod.fit(cov_type='unadjusted')
+    k = len(data.eqns)
+    b = np.random.standard_normal((k, 1))
+    sigma = b @ b.T + np.diag(np.ones(k))
+    mod_sigma = IVSystemGMM(data.eqns, weight_type='unadjusted', sigma=sigma)
+    res_sigma = mod_sigma.fit()
+    assert np.any(res.params != res_sigma.params)
+    assert np.any(res.sigma != res_sigma.sigma)
+
+
+def test_incorrect_sigma_shape(data):
+    k = len(data.eqns)
+    b = np.random.standard_normal((k + 2, 1))
+    sigma = b @ b.T + np.diag(np.ones(k + 2))
+    with pytest.raises(ValueError):
+        IVSystemGMM(data.eqns, weight_type='unadjusted', sigma=sigma)
+
+
+def test_invalid_sigma_usage(data):
+    k = len(data.eqns)
+    b = np.random.standard_normal((k, 1))
+    sigma = b @ b.T + np.diag(np.ones(k))
+    with pytest.warns(UserWarning):
+        IVSystemGMM(data.eqns, weight_type='robust', sigma=sigma)

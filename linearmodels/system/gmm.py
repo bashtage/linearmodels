@@ -91,15 +91,6 @@ class HomoskedasticWeightMatrix(object):
         w = blocked_inner_prod(z, sigma) / nobs
         return w
 
-    def _debias_scale(self, nobs, x):
-        if not self._debiased:
-            return 1
-        nvar = array(list(map(lambda a: a.shape[1], x)))
-        nvar = repeat(nvar, nvar)
-        nvar = sqrt(nvar)[:, None]
-        scale = nobs / (nobs - nvar @ nvar.T)
-        return scale
-
     @property
     def config(self):
         """
@@ -175,7 +166,17 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
         w = ze.T @ ze / nobs
-        scale = self._debias_scale(nobs, x)
+        scale = self._debias_scale(nobs, x, z)
         w *= scale
 
         return w
+
+    def _debias_scale(self, nobs, x, z):
+        if not self._debiased:
+            return 1
+        nvar = array(list(map(lambda a: a.shape[1], x)))
+        ninstr = array(list(map(lambda a: a.shape[1], z)))
+        nvar = repeat(nvar, ninstr)
+        nvar = sqrt(nvar)[:, None]
+        scale = nobs / (nobs - nvar @ nvar.T)
+        return scale
