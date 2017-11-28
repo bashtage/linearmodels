@@ -4,6 +4,7 @@ Covariance and weight estimation for GMM IV estimators
 from numpy import array, empty, repeat, sqrt
 
 from linearmodels.system._utility import blocked_inner_prod
+from linearmodels.utility import AttrDict
 
 
 class HomoskedasticWeightMatrix(object):
@@ -37,6 +38,23 @@ class HomoskedasticWeightMatrix(object):
         self._center = center
         self._debiased = debiased
         self._bandwidth = 0
+        self._name = 'Homoskedastic (Unadjusted) Weighting'
+
+    def __str__(self):
+        out = self._name
+        extra = []
+        for key in self._str_extra:
+            extra.append(': '.join([key, str(self._str_extra[key])]))
+        if extra:
+            out += ' (' + ', '.join(extra) + ')'
+        return out
+
+    def __repr__(self):
+        return self.__str__() + ', id: {0}'.format(hex(id(self)))
+
+    @property
+    def _str_extra(self):
+        return AttrDict(Debiased=self._debiased, Center=self._center)
 
     def sigma(self, eps, x):
         nobs = eps.shape[0]
@@ -126,6 +144,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def __init__(self, center=False, debiased=False):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
+        self._name = 'Heteroskedastic (Robust) Weighting'
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """

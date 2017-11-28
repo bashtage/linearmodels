@@ -7,11 +7,9 @@ from numpy.testing import assert_allclose
 from scipy import stats
 
 import linearmodels
-from linearmodels.utility import (InapplicableTestStatistic,
-                                  InvalidTestStatistic, WaldTestStatistic,
-                                  cached_property, ensure_unique_column,
-                                  has_constant, inv_sqrth, AttrDict,
-                                  missing_warning)
+from linearmodels.utility import (AttrDict, InapplicableTestStatistic, InvalidTestStatistic,
+                                  WaldTestStatistic, cached_property, ensure_unique_column,
+                                  format_wide, has_constant, inv_sqrth, missing_warning)
 
 
 def test_missing_warning():
@@ -197,3 +195,10 @@ def test_attr_dict():
 
     ad.clear()
     assert list(ad.keys()) == []
+
+
+def test_format_wide():
+    k = 26
+    inputs = [chr(65 + i) * (20 + i) for i in range(k)]
+    out = format_wide(inputs, 80)
+    assert max(map(lambda v: len(v), out)) <= 80

@@ -1,4 +1,5 @@
 import datetime as dt
+
 import numpy as np
 from numpy import diag, sqrt
 from pandas import DataFrame, Series
@@ -6,8 +7,8 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
 from linearmodels.compat.statsmodels import Summary
-from linearmodels.utility import (AttrDict, _SummaryStr, cached_property,
-                                  _str, param_table, pval_format)
+from linearmodels.utility import (AttrDict, _SummaryStr, _str, cached_property, format_wide,
+                                  param_table, pval_format)
 
 __all__ = ['SystemResults', 'SystemEquationResult', 'GMMSystemResults']
 
@@ -31,6 +32,7 @@ class _CommonResults(_SummaryStr):
         self._tss = results.total_ss
         self._rss = results.resid_ss
         self._datetime = dt.datetime.now()
+        self._cov_estimator = results.cov_estimator
 
     @property
     def method(self):
@@ -170,6 +172,7 @@ class SystemResults(_CommonResults):
         self._num_constraints = 'None'
         if results.constraints is not None:
             self._num_constraints = str(results.constraints.r.shape[0])
+        self._weight_estimtor = results.get('weight_estimator', None)
 
     @property
     def model(self):
@@ -245,11 +248,26 @@ class SystemResults(_CommonResults):
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
 
-        for eqlabel in self.equation_labels:
+        for i, eqlabel in enumerate(self.equation_labels):
+            last_row = i == (len(self.equation_labels) - 1)
             results = self.equations[eqlabel]
             dep_name = results.dependent
             title = 'Equation: {0}, Dependent Variable: {1}'.format(eqlabel, dep_name)
-            smry.tables.append(param_table(results, title, pad_bottom=True))
+            pad_bottom = results.instruments is not None and not last_row
+            smry.tables.append(param_table(results, title, pad_bottom=pad_bottom))
+            if results.instruments:
+                formatted = format_wide(results.instruments, 80)
+                if not last_row:
+                    formatted.append([' '])
+                smry.tables.append(SimpleTable(formatted, headers=['Instruments']))
+        extra_text = ['Covariance Estimator:']
+        for line in str(self._cov_estimator).split('\n'):
+            extra_text.append(line)
+        if self._weight_estimtor:
+            extra_text.append('Weight Estimator:')
+            for line in str(self._weight_estimtor).split('\n'):
+                extra_text.append(line)
+        smry.add_extra_txt(extra_text)
 
         return smry
 
@@ -270,6 +288,9 @@ class SystemEquationResult(_CommonResults):
         self._dependent = results.dependent
         self._f_statistic = results.f_stat
         self._r2a = results.r2a
+        self._instruments = results.instruments
+        self._endog = results.endog
+        self._weight_estimator = results.get('weight_estimator', None)
 
     @property
     def equation_label(self):
@@ -280,6 +301,11 @@ class SystemEquationResult(_CommonResults):
     def dependent(self):
         """Name of dependent variable"""
         return self._dependent
+
+    @property
+    def instruments(self):
+        """Instruments used in estimation.  None if all variables assumed exogenous."""
+        return self._instruments
 
     @property
     def summary(self):
@@ -326,6 +352,23 @@ class SystemEquationResult(_CommonResults):
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
         smry.tables.append(param_table(self, 'Parameter Estimates', pad_bottom=True))
+
+        extra_text = []
+        instruments = self._instruments
+        if instruments:
+            endog = self._endog
+            extra_text = []
+            extra_text.append('Endogenous: ' + ', '.join(endog))
+            extra_text.append('Instruments: ' + ', '.join(instruments))
+
+        extra_text.append('Covariance Estimator:')
+        for line in str(self._cov_estimator).split('\n'):
+            extra_text.append(line)
+        if self._weight_estimator:
+            extra_text.append('Weight Estimator:')
+            for line in str(self._weight_estimator).split('\n'):
+                extra_text.append(line)
+        smry.add_extra_txt(extra_text)
 
         return smry
 
