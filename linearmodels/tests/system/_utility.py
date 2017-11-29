@@ -339,6 +339,7 @@ def simple_gmm(y, x, z, robust=True, steps=2):
     wi = np.linalg.inv(w)
     base = x.T @ z @ wi @ z.T
     beta1 = np.linalg.solve(base @ x, base @ y)
+
     if robust:
         if steps > 1:
             eps = y - x @ beta1
@@ -360,5 +361,8 @@ def simple_gmm(y, x, z, robust=True, steps=2):
     cov = a @ b @ a.T / nobs
     cov = (cov + cov.T) / 2
 
+    ze = z * eps
+    g_bar = ze.sum(0) / nobs
+    j_stat = nobs * g_bar @ wi @ g_bar
     return AttrDict(beta0=beta0.ravel(), beta1=beta1.ravel(), w0=w0,
-                    w1=w, sigma=sigma, cov=cov)
+                    w1=w, sigma=sigma, cov=cov, j_stat=j_stat)

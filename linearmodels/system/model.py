@@ -1363,6 +1363,7 @@ class IVSystemGMM(IV3SLS):
         results['weight_config'] = self._weight_config
         results['cov_estimator'] = cov_est
         results['weight_estimator'] = self._weight_est
+        results['j_stat'] = self._j_statistic(beta, wmat)
 
         return GMMSystemResults(results)
 
@@ -1433,3 +1434,44 @@ class IVSystemGMM(IV3SLS):
         mod = super().from_formula(formula, data, weights=weights)
         equations = mod._equations
         return cls(equations, weight_type=weight_type, **weight_config)
+
+    def _j_statistic(self, params, weight_mat):
+        """
+        J stat and test
+
+        Parameters
+        ----------
+        params : ndarray
+            Estimated model parameters
+        weight_mat : ndarray
+            Weighting matrix used in estimation of the parameters
+
+        Returns
+        -------
+        stat : WaldTestStatistic
+            Test statistic
+
+        Notes
+        -----
+        Assumes that the efficient weighting matrix has been used.  Using
+        other weighting matrices will not produce the correct test.
+        """
+        y, x, z = self._wy, self._wx, self._wz
+        k = len(x)
+        ze = []
+        idx = 0
+        for i in range(k):
+            kx = x[i].shape[1]
+            beta = params[idx:idx + kx]
+            eps = y[i] - x[i] @ beta
+            ze.append(z[i] * eps)
+            idx += kx
+        ze = np.concatenate(ze, 1)
+        g_bar = ze.mean(0)
+        nobs = x[0].shape[0]
+        stat = float(nobs * g_bar.T @ np.linalg.inv(weight_mat) @ g_bar.T)
+        null = 'Expected moment conditions are equal to 0'
+        ninstr = sum(map(lambda a: a.shape[1], z))
+        nvar = sum(map(lambda a: a.shape[1], x))
+
+        return WaldTestStatistic(stat, null, ninstr - nvar)

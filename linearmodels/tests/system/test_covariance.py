@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
-from linearmodels.system.covariance import HeteroskedasticCovariance, HomoskedasticCovariance, \
-    GMMHeteroskedasticCovariance, GMMHomoskedasticCovariance
+
+from linearmodels.system.covariance import GMMHeteroskedasticCovariance, \
+    GMMHomoskedasticCovariance, HeteroskedasticCovariance, HomoskedasticCovariance
 from linearmodels.tests.system._utility import generate_3sls_data_v2
 
 covs = [HeteroskedasticCovariance, HomoskedasticCovariance]
@@ -28,7 +29,7 @@ def gmm_cov(request):
     eqns = generate_3sls_data_v2(k=3)
     est = request.param[0]
     name = request.param[1]
-    sigma = full_sigma = np.eye(3)
+    sigma = np.eye(3)
     x = [eqns[key].exog for key in eqns]
     z = [np.concatenate([eqns[key].exog, eqns[key].instruments], 1) for key in eqns]
     kz = sum(map(lambda a: a.shape[1], z))
@@ -44,6 +45,7 @@ def test_str_repr(cov):
     assert name in est.__repr__()
     assert str(hex(id(est))) in est.__repr__()
     assert 'Debiased: True' in str(est)
+
 
 def test_gmm_str_repr(gmm_cov):
     est, name = gmm_cov
