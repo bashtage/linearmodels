@@ -41,7 +41,7 @@ def data(request):
 def test_params(data):
     mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
     res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
-    simple = simple_gmm(data.y, data.x, data.z, data.robust)
+    simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
     if data.steps == 1:
         beta = simple.beta0
     else:
@@ -52,7 +52,7 @@ def test_params(data):
 def test_weights(data):
     mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
     res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
-    simple = simple_gmm(data.y, data.x, data.z, data.robust)
+    simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
     w = simple.w0 if data.steps == 1 else simple.w1
     assert_allclose(res.w, w, rtol=1e-4)
 
@@ -60,7 +60,7 @@ def test_weights(data):
 def test_cov(data):
     mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
     res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
-    simple = simple_gmm(data.y, data.x, data.z, data.robust, data.steps)
+    simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
     assert_allclose(res.cov.values, simple.cov)
 
 
@@ -238,3 +238,10 @@ def test_invalid_sigma_usage(data):
     sigma = b @ b.T + np.diag(np.ones(k))
     with pytest.warns(UserWarning):
         IVSystemGMM(data.eqns, weight_type='robust', sigma=sigma)
+
+
+def test_j_statistic_direct(data):
+    mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
+    res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
+    simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
+    assert_allclose(res.j_stat.stat, simple.j_stat, rtol=1e-4)

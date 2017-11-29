@@ -875,7 +875,7 @@ class IVGMMResults(_CommonIVResults):
 
         Notes
         -----
-        The J statistic  iv whether the moment conditions are sufficiently
+        The J statistic tests whether the moment conditions are sufficiently
         close to zero to indicate that the model is not overidentified. The
         statistic is defined as
 

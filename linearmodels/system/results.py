@@ -417,6 +417,7 @@ class GMMSystemResults(SystemResults):
         self._wmat = results.wmat
         self._weight_type = results.weight_type
         self._weight_config = results.weight_config
+        self._j_stat = results.j_stat
 
     @property
     def w(self):
@@ -432,3 +433,30 @@ class GMMSystemResults(SystemResults):
     def weight_config(self):
         """Weight configuration options used in GMM estimation"""
         return self._weight_config
+
+    @property
+    def j_stat(self):
+        r"""
+        J-test of overidentifying restrictions
+
+        Returns
+        -------
+        j : WaldTestStatistic
+            J statistic  test of overidentifying restrictions
+
+        Notes
+        -----
+        The J statistic tests whether the moment conditions are sufficiently
+        close to zero to indicate that the model is not overidentified. The
+        statistic is defined as
+
+        .. math ::
+
+          n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q
+
+        where :math:`\bar{g}` is the average of the moment conditiona and
+        :math:`W` is a consistent estimator of the variance of
+        :math:`\sqrt{n}\bar{g}`. The degree of freedom is
+        :math:`q = n_{instr} - n_{endog}`.
+        """
+        return self._j_stat
