@@ -245,3 +245,15 @@ def test_j_statistic_direct(data):
     res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
     simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
     assert_allclose(res.j_stat.stat, simple.j_stat, rtol=1e-4)
+
+
+def test_linear_constraint(data):
+    mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
+    p = mod.param_names
+    r = pd.DataFrame(np.zeros((1, len(p))), index=[0], columns=p)
+    r.iloc[0, 1::6] = 1
+    q = pd.Series([6])
+    mod.add_constraints(r, q)
+
+    res = mod.fit()
+    assert_allclose(res.params.iloc[1::6].sum(), 6)
