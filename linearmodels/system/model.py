@@ -60,6 +60,47 @@ def _missing_weights(keys):
     warnings.warn(msg, UserWarning)
 
 
+def _parameters_from_xprod(xpx, xpy, constraints=None):
+    """
+    Estimate regression parameters from cross produces
+
+    Parameters
+    ----------
+    xpx : ndarray
+        Cross product measuring variation in x (nvar by nvar)
+    xpy : ndarray
+        Cross produce measuring covariation between x and y (nvar by 1)
+    constraints : LinearConstraint, optional
+        Constraints to use in estimation
+
+    Returns
+    -------
+    params : ndarray
+        Estimated parameters (nvar by 1)
+
+    Notes
+    -----
+    xpx and xpy can be any form similar to the two inputs into the usual
+    parameter estimator for a linear regression. In particular, many
+    estimators can be written as
+
+    .. math::
+
+        (x^\prime w x)^{-1}(x^\prime w y)
+
+    for some weight matrix :math:`w`.
+    """
+    if constraints is not None:
+        cons = constraints
+        xpy = cons.t.T @ xpy - cons.t.T @ xpx @ cons.a.T
+        xpx = cons.t.T @ xpx @ cons.t
+        params_c = solve(xpx, xpy)
+        params = cons.t @ params_c + cons.a.T
+    else:
+        params = solve(xpx, xpy)
+    return params
+
+
 class IV3SLS(object):
     r"""
     Three-stage Least Squares (3SLS) Estimator
@@ -406,27 +447,14 @@ class IV3SLS(object):
     def _multivariate_ls_fit(self):
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
-        if self.constraints is not None:
-            cons = self.constraints
-            xpx_full = blocked_inner_prod(wxhat, eye(len(wxhat)))
-            xpy = []
-            for i in range(k):
-                xpy.append(wxhat[i].T @ wy[i])
-            xpy = np.vstack(xpy)
-            xpy = cons.t.T @ xpy - cons.t.T @ xpx_full @ cons.a.T
-            xpx = cons.t.T @ xpx_full @ cons.t
-            params_c = np.linalg.solve(xpx, xpy)
-            params = cons.t @ params_c + cons.a.T
-        else:
-            xpx = blocked_inner_prod(wxhat, eye(len(wxhat)))
-            xpy = []
-            for i in range(k):
-                xpy.append(wxhat[i].T @ wy[i])
-            xpy = np.vstack(xpy)
-            xpx, xpy = xpx, xpy
-            params = solve(xpx, xpy)
 
-        beta = params
+        xpx = blocked_inner_prod(wxhat, eye(len(wxhat)))
+        xpy = []
+        for i in range(k):
+            xpy.append(wxhat[i].T @ wy[i])
+        xpy = np.vstack(xpy)
+        beta = _parameters_from_xprod(xpx, xpy, constraints=self.constraints)
+
         loc = 0
         eps = []
         for i in range(k):
@@ -468,28 +496,16 @@ class IV3SLS(object):
         sigma_inv = inv(sigma)
 
         k = len(wy)
-        if self.constraints is not None:
-            cons = self.constraints
-            sigma_m12 = inv_matrix_sqrt(sigma)
-            x = blocked_diag_product(wxhat, sigma_m12)
-            y = blocked_column_product(wy, sigma_m12)
-            xt = x @ cons.t
-            xpx = xt.T @ xt
-            xpy = xt.T @ (y - x @ cons.a.T)
-            paramsc = solve(xpx, xpy)
-            params = cons.t @ paramsc + cons.a.T
-        else:
-            xpx = blocked_inner_prod(wxhat, sigma_inv)
-            xpy = zeros((total_cols, 1))
-            for i in range(k):
-                sy = zeros((nobs, 1))
-                for j in range(k):
-                    sy += sigma_inv[i, j] * wy[j]
-                xpy[ci[i]:ci[i + 1]] = wxhat[i].T @ sy
 
-            params = solve(xpx, xpy)
+        xpx = blocked_inner_prod(wxhat, sigma_inv)
+        xpy = zeros((total_cols, 1))
+        for i in range(k):
+            sy = zeros((nobs, 1))
+            for j in range(k):
+                sy += sigma_inv[i, j] * wy[j]
+            xpy[ci[i]:ci[i + 1]] = wxhat[i].T @ sy
 
-        beta = params
+        beta = _parameters_from_xprod(xpx, xpy, constraints=self.constraints)
 
         loc = 0
         for j in range(k):
@@ -1248,7 +1264,7 @@ class IVSystemGMM(IV3SLS):
             w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
         else:
             w = initial_weight
-        beta_last = beta = self._blocked_gmm(wx, wy, wz, w=w)
+        beta_last = beta = self._blocked_gmm(wx, wy, wz, w=w, constraints=self.constraints)
         eps = []
         loc = 0
         for i in range(k):
@@ -1264,7 +1280,7 @@ class IVSystemGMM(IV3SLS):
         while iters < iter_limit and norm > tol:
             sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
             w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
-            beta = self._blocked_gmm(wx, wy, wz, w=w)
+            beta = self._blocked_gmm(wx, wy, wz, w=w, constraints=self.constraints)
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
@@ -1285,7 +1301,7 @@ class IVSystemGMM(IV3SLS):
             eps = hstack(eps)
             iters += 1
 
-        # TODO: What about constraints?  Can probably handle in same way
+        # TODO: Add constraints to covariance estimators
         if cov_type.lower() in ('unadjusted', 'homoskedastic'):
             cov_est = GMMHomoskedasticCovariance
         else:  # cov_type.lower() in ('robust', 'heteroskedastic'):
@@ -1308,7 +1324,7 @@ class IVSystemGMM(IV3SLS):
                                       iters - 1, cov_type, cov_config, cov)
 
     @staticmethod
-    def _blocked_gmm(x, y, z, *, w=None):
+    def _blocked_gmm(x, y, z, *, w=None, constraints=None):
         k = len(x)
         xpz = blocked_cross_prod(x, z, eye(k))
         wi = np.linalg.inv(w)
@@ -1318,7 +1334,9 @@ class IVSystemGMM(IV3SLS):
             zpy.append(z[i].T @ y[i])
         zpy = np.vstack(zpy)
         xpz_wi_zpy = xpz @ wi @ zpy
-        return np.linalg.solve(xpz_wi_zpx, xpz_wi_zpy)
+        params = _parameters_from_xprod(xpz_wi_zpx, xpz_wi_zpy, constraints=constraints)
+
+        return params
 
     def _finalize_results(self, beta, cov, weps, eps, wmat, sigma,
                           iter_count, cov_type, cov_config, cov_est):
