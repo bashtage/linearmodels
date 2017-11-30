@@ -10,7 +10,7 @@ from linearmodels.iv.covariance import (KERNEL_LOOKUP, _cov_kernel,
 class _HACMixin(object):
 
     def __init__(self):
-        self._bandwidth = None
+        self._bandwidth = None  # pragma: no cover
 
     @property
     def kernel(self):

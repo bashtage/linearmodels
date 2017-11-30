@@ -402,10 +402,7 @@ class LinearFactorModel(TradedFactorModel):
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         factors, portfolios, formula = cls._prepare_data_from_formula(formula, data, portfolios)
-        if sigma is not None:
-            mod = cls(portfolios, factors, risk_free=risk_free, sigma=sigma)
-        else:
-            mod = cls(portfolios, factors, risk_free=risk_free)
+        mod = cls(portfolios, factors, risk_free=risk_free, sigma=sigma)
         mod.formula = formula
         return mod
 

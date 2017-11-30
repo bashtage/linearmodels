@@ -220,6 +220,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     sigma_inv = np.linalg.inv(sigma)
 
     mod = LinearFactorModel(data.portfolios, data.factors, risk_free=True, sigma=sigma)
+    assert 'using GLS' in str(mod)
     res = mod.fit()
     f = mod.factors.ndarray
     p = mod.portfolios.ndarray
