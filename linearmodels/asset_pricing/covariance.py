@@ -7,6 +7,49 @@ from linearmodels.iv.covariance import (KERNEL_LOOKUP, _cov_kernel,
                                         kernel_optimal_bandwidth)
 
 
+class _HACMixin(object):
+
+    def __init__(self):
+        self._bandwidth = None
+
+    @property
+    def kernel(self):
+        """Kernel used in estimation"""
+        return self._kernel
+
+    @property
+    def bandwidth(self):
+        """Bandwidth used in estimation"""
+        if self._bandwidth is None:
+            moments = self._moments
+            m = moments / moments.std(0)[None, :]
+            m = m.sum(1)
+            bw = kernel_optimal_bandwidth(m, kernel=self.kernel)
+            self._bandwidth = int(bw)
+
+        return self._bandwidth
+
+    def _check_kernel(self, kernel):
+        self._kernel = kernel.lower()
+        if self._kernel not in KERNEL_LOOKUP:
+            raise ValueError('Unknown kernel')
+
+    def _check_bandwidth(self, bandwidth):
+        self._bandwidth = bandwidth
+        if bandwidth is not None:
+            if bandwidth < 0:
+                raise ValueError('bandwidth must be non-negative.')
+
+    def _kernel_cov(self, z):
+        nobs = z.shape[0]
+        bw = self.bandwidth
+        kernel = self._kernel
+        kernel = KERNEL_LOOKUP[kernel]
+        weights = kernel(bw, nobs - 1)
+        out = _cov_kernel(z, weights)
+        return (out + out.T) / 2
+
+
 class HeteroskedasticCovariance(object):
     """
     Heteroskedasticity robust covariance estimator
@@ -32,7 +75,7 @@ class HeteroskedasticCovariance(object):
     def __init__(self, xe, *, jacobian=None, inv_jacobian=None,
                  center=True, debiased=False, df=0):
 
-        self._xe = xe
+        self._moments = self._xe = xe
         self._jac = jacobian
         self._inv_jac = inv_jacobian
         self._center = center
@@ -116,7 +159,7 @@ class HeteroskedasticCovariance(object):
         return out
 
 
-class KernelCovariance(HeteroskedasticCovariance):
+class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     """
     Heteroskedasticity-autocorrelation (HAC) robust covariance estimator
 
@@ -149,13 +192,8 @@ class KernelCovariance(HeteroskedasticCovariance):
                                                inv_jacobian=inv_jacobian,
                                                center=center,
                                                debiased=debiased, df=df)
-        self._kernel = kernel.lower()
-        if self._kernel not in KERNEL_LOOKUP:
-            raise ValueError('Unknown kernel')
-        self._bandwidth = bandwidth
-        if bandwidth is not None:
-            if bandwidth < 0:
-                raise ValueError('bandwidth must be non-negative.')
+        self._check_kernel(kernel)
+        self._check_bandwidth(bandwidth)
 
     def __str__(self):
         descr = ', Kernel: {0}, Bandwidth: {1}'.format(self._kernel,
@@ -170,23 +208,6 @@ class KernelCovariance(HeteroskedasticCovariance):
         return out
 
     @property
-    def kernel(self):
-        """Kernel used in estimation"""
-        return self._kernel
-
-    @property
-    def bandwidth(self):
-        """Bandwidth used in estimation"""
-        if self._bandwidth is None:
-            xe = self._xe
-            x = xe / xe.std(0)[None, :]
-            x = x.sum(1)
-            bw = kernel_optimal_bandwidth(x, kernel=self.kernel)
-            self._bandwidth = int(bw)
-
-        return self._bandwidth
-
-    @property
     def s(self):
         """
         Score/moment condition covariance
@@ -197,12 +218,7 @@ class KernelCovariance(HeteroskedasticCovariance):
             Covariance of the scores or moment conditions
         """
         xe = self._xe
-        nobs = xe.shape[0]
-        bw = self.bandwidth
-        kernel = self._kernel
-        kernel = KERNEL_LOOKUP[kernel]
-        weights = kernel(bw, nobs - 1)
-        out = _cov_kernel(xe, weights)
+        out = self._kernel_cov(xe)
 
         return (out + out.T) / 2
 
@@ -245,7 +261,7 @@ class HeteroskedasticWeight(object):
         return inv((out + out.T) / 2.0)
 
 
-class KernelWeight(HeteroskedasticWeight):
+class KernelWeight(HeteroskedasticWeight, _HACMixin):
     """
     HAC GMM weighing matrix estimation
 
@@ -264,30 +280,8 @@ class KernelWeight(HeteroskedasticWeight):
 
     def __init__(self, moments, center=True, kernel='bartlett', bandwidth=None):
         super(KernelWeight, self).__init__(moments, center=center)
-        self._kernel = kernel.lower()
-        if self._kernel not in KERNEL_LOOKUP:
-            raise ValueError('Unknown kernel')
-        self._bandwidth = bandwidth
-        if bandwidth is not None:
-            if bandwidth < 0:
-                raise ValueError('bandwidth must be non-negative.')
-
-    @property
-    def kernel(self):
-        """Kernel used in estimation"""
-        return self._kernel
-
-    @property
-    def bandwidth(self):
-        """Bandwidth used in estimation"""
-        if self._bandwidth is None:
-            moments = self._moments
-            m = moments / moments.std(0)[None, :]
-            m = m.sum(1)
-            bw = kernel_optimal_bandwidth(m, kernel=self.kernel)
-            self._bandwidth = int(bw)
-
-        return self._bandwidth
+        self._check_kernel(kernel)
+        self._check_bandwidth(bandwidth)
 
     def w(self, moments):
         """
@@ -305,11 +299,6 @@ class KernelWeight(HeteroskedasticWeight):
         """
         if self._center:
             moments = moments - moments.mean(0)[None, :]
-        nobs = moments.shape[0]
-        bw = self.bandwidth
-        kernel = self._kernel
-        kernel = KERNEL_LOOKUP[kernel]
-        weights = kernel(bw, nobs - 1)
-        out = _cov_kernel(moments, weights)
+        out = self._kernel_cov(moments)
 
-        return inv((out + out.T) / 2.0)
+        return inv(out)
