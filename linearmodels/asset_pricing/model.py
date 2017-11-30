@@ -115,6 +115,21 @@ class TradedFactorModel(object):
     def formula(self, value):
         self._formula = value
 
+    @staticmethod
+    def _prepare_data_from_formula(formula, data, portfolios):
+        na_action = NAAction(on_NA='raise', NA_types=[])
+        orig_formula = formula
+        if portfolios is not None:
+            factors = dmatrix(formula + ' + 0', data, return_type='dataframe', NA_action=na_action)
+        else:
+            formula = formula.split('~')
+            portfolios = dmatrix(formula[0].strip() + ' + 0', data,
+                                 return_type='dataframe', NA_action=na_action)
+            factors = dmatrix(formula[1].strip() + ' + 0', data,
+                              return_type='dataframe', NA_action=na_action)
+
+        return factors, portfolios, orig_formula
+
     @classmethod
     def from_formula(cls, formula, data, *, portfolios=None):
         """
@@ -153,18 +168,9 @@ class TradedFactorModel(object):
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
-        na_action = NAAction(on_NA='raise', NA_types=[])
-        orig_formula = formula
-        if portfolios is not None:
-            factors = dmatrix(formula + ' + 0', data, return_type='dataframe', NA_action=na_action)
-        else:
-            formula = formula.split('~')
-            portfolios = dmatrix(formula[0].strip() + ' + 0', data,
-                                 return_type='dataframe', NA_action=na_action)
-            factors = dmatrix(formula[1].strip() + ' + 0', data,
-                              return_type='dataframe', NA_action=na_action)
+        factors, portfolios, formula = cls._prepare_data_from_formula(formula, data, portfolios)
         mod = cls(portfolios, factors)
-        mod.formula = orig_formula
+        mod.formula = formula
         return mod
 
     def fit(self, cov_type='robust', debiased=True, **cov_config):
@@ -395,21 +401,12 @@ class LinearFactorModel(TradedFactorModel):
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
-        na_action = NAAction(on_NA='raise', NA_types=[])
-        orig_formula = formula
-        if portfolios is not None:
-            factors = dmatrix(formula + ' + 0', data, return_type='dataframe', NA_action=na_action)
-        else:
-            formula = formula.split('~')
-            portfolios = dmatrix(formula[0].strip() + ' + 0', data,
-                                 return_type='dataframe', NA_action=na_action)
-            factors = dmatrix(formula[1].strip() + ' + 0', data,
-                              return_type='dataframe', NA_action=na_action)
+        factors, portfolios, formula = cls._prepare_data_from_formula(formula, data, portfolios)
         if sigma is not None:
             mod = cls(portfolios, factors, risk_free=risk_free, sigma=sigma)
         else:
             mod = cls(portfolios, factors, risk_free=risk_free)
-        mod.formula = orig_formula
+        mod.formula = formula
         return mod
 
     def fit(self, cov_type='robust', debiased=True, **cov_config):
@@ -560,11 +557,11 @@ class LinearFactorModel(TradedFactorModel):
         f = self.factors.ndarray
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         fc = np.c_[np.ones((nobs, 1)), f]
-        # Moments
         f_rep = np.tile(fc, (1, nport))
         eps_rep = np.tile(eps, (nf + 1, 1))
         eps_rep = np.reshape(eps_rep.T, (nport * (nf + 1), nobs)).T
 
+        # Moments
         g1 = f_rep * eps_rep
         g2 = pricing_errors @ sigma_inv @ betas
         g3 = pricing_errors - alphas.T
