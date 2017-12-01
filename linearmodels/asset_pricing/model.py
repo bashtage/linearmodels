@@ -655,9 +655,10 @@ class LinearFactorModelGMM(LinearFactorModel):
         >>> formula = 'MktRF + SMB + HML'
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
-        return super(LinearFactorModelGMM, cls).from_formula(formula, data,
-                                                             portfolios=portfolios,
-                                                             risk_free=risk_free)
+        factors, portfolios, formula = cls._prepare_data_from_formula(formula, data, portfolios)
+        mod = cls(portfolios, factors, risk_free=risk_free)
+        mod.formula = formula
+        return mod
 
     def fit(self, center=True, use_cue=False, steps=2, disp=10, max_iter=1000,
             cov_type='robust', debiased=True, **cov_config):
