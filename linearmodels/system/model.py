@@ -1491,5 +1491,6 @@ class IVSystemGMM(IV3SLS):
         null = 'Expected moment conditions are equal to 0'
         ninstr = sum(map(lambda a: a.shape[1], z))
         nvar = sum(map(lambda a: a.shape[1], x))
+        ncons = 0 if self.constraints is None else self.constraints.r.shape[0]
 
-        return WaldTestStatistic(stat, null, ninstr - nvar)
+        return WaldTestStatistic(stat, null, ninstr - (nvar - ncons))
