@@ -3,6 +3,8 @@ Covariance and weight estimation for GMM IV estimators
 """
 from numpy import array, empty, repeat, sqrt
 
+from linearmodels.iv.covariance import kernel_optimal_bandwidth
+from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.system._utility import blocked_inner_prod
 from linearmodels.utility import AttrDict
 
@@ -180,3 +182,57 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         nvar = sqrt(nvar)[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
+
+
+class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
+    def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None):
+        super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
+        self._name = 'Kernel (HAC) Weighting'
+        self._check_kernel(kernel)
+        self._check_bandwidth(bandwidth)
+
+    def weight_matrix(self, x, z, eps, *, sigma=None):
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        weight : ndarray
+            Covariance of GMM moment conditions.
+        """
+        nobs = x[0].shape[0]
+        k = len(x)
+        k_total = sum(map(lambda a: a.shape[1], z))
+        ze = empty((nobs, k_total))
+        loc = 0
+        for i in range(k):
+            e = eps[:, [i]]
+            zk = z[i].shape[1]
+            ze[:, loc:loc + zk] = z[i] * e
+            loc += zk
+        mu = ze.mean(axis=0) if self._center else 0
+        ze -= mu
+        self._optimal_bandwidth(ze)
+        w = self._kernel_cov(ze)
+        scale = self._debias_scale(nobs, x, z)
+        w *= scale
+
+        return w
+
+    def _optimal_bandwidth(self, moments):
+        """Compute optimal bandwidth used in estimation"""
+        m = moments / moments.std(0)[None, :]
+        m = m.sum(1)
+        self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
+        return self._bandwidth
+
+    @property
+    def bandwidth(self):
+        return self._bandwidth

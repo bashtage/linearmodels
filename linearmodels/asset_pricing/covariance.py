@@ -11,6 +11,7 @@ class _HACMixin(object):
 
     def __init__(self):
         self._bandwidth = None  # pragma: no cover
+        self._moments = None  # pragma: no cover
 
     @property
     def kernel(self):
@@ -25,7 +26,7 @@ class _HACMixin(object):
             m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             bw = kernel_optimal_bandwidth(m, kernel=self.kernel)
-            self._bandwidth = int(bw)
+            self._bandwidth = bw
 
         return self._bandwidth
 

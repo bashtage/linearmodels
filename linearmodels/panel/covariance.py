@@ -385,7 +385,7 @@ class DriscollKraay(HomoskedasticCovariance):
         xe_nobs = xe.shape[0]
         bw = self._bandwidth
         if self._bandwidth is None:
-            bw = int(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
+            bw = np.floor(4 * (xe_nobs / 100) ** (2 / 9))
         w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
         xeex = _cov_kernel(xe.values, w) * (xe_nobs / nobs)
         xeex *= self._scale
@@ -489,7 +489,7 @@ class ACCovariance(HomoskedasticCovariance):
         nobs = len(time_ids)
         bw = self._bandwidth
         if self._bandwidth is None:
-            bw = int(np.floor(4 * (nobs / 100) ** (2 / 9)))
+            bw = np.floor(4 * (nobs / 100) ** (2 / 9))
 
         xe = x * eps
         index = [self._entity_ids.squeeze(), self._time_ids.squeeze()]

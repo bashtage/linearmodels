@@ -26,8 +26,10 @@ from linearmodels.system._utility import LinearConstraint, blocked_column_produc
     blocked_cross_prod, blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
 from linearmodels.system.covariance import (GMMHeteroskedasticCovariance,
                                             GMMHomoskedasticCovariance, HeteroskedasticCovariance,
-                                            HomoskedasticCovariance, KernelCovariance)
-from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix
+                                            HomoskedasticCovariance, KernelCovariance,
+                                            GMMKernelCovariance)
+from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix, \
+    KernelWeightMatrix
 from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
                                   matrix_rank, missing_warning)
@@ -50,6 +52,14 @@ COV_TYPES = {'unadjusted': 'unadjusted',
 COV_EST = {'unadjusted': HomoskedasticCovariance,
            'robust': HeteroskedasticCovariance,
            'kernel': KernelCovariance}
+
+GMM_W_EST = {'unadjusted': HomoskedasticWeightMatrix,
+             'robust': HeteroskedasticWeightMatrix,
+             'kernel': KernelWeightMatrix}
+
+GMM_COV_EST = {'unadjusted': GMMHomoskedasticCovariance,
+               'robust': GMMHeteroskedasticCovariance,
+               'kernel': GMMKernelCovariance}
 
 
 def _to_ordered_dict(equations):
@@ -1219,18 +1229,16 @@ class IVSystemGMM(IV3SLS):
         self._weight_type = weight_type
         self._weight_config = weight_config
 
+        if weight_type not in COV_TYPES:
+            raise ValueError('Unknown estimator for weight_type')
+
         if weight_type not in ('unadjusted', 'homoskedastic') and sigma is not None:
             import warnings
             warnings.warn('sigma has been provided but the estimated weight '
                           'matrix not unadjusted (homoskedastic).  sigma will '
                           'be ignored.', UserWarning)
-
-        if weight_type in ('robust', 'heteroskedastic'):
-            self._weight_est = HeteroskedasticWeightMatrix(**weight_config)
-        elif weight_type in ('unadjusted', 'homoskedastic'):
-            self._weight_est = HomoskedasticWeightMatrix(**weight_config)
-        else:
-            raise ValueError('Unknown estimator for weight_type')
+        weight_type = COV_TYPES[weight_type]
+        self._weight_est = GMM_W_EST[weight_type](**weight_config)
 
     def fit(self, *, iter_limit=2, tol=1e-6, initial_weight=None,
             cov_type='robust', **cov_config):
@@ -1263,10 +1271,8 @@ class IVSystemGMM(IV3SLS):
         results : GMMSystemResults
             Estimation results
         """
-        cov_type = str(cov_type).lower()
-        if cov_type not in ('unadjusted', 'robust', 'homoskedastic', 'heteroskedastic'):
+        if cov_type not in COV_TYPES:
             raise ValueError('Unknown cov_type: {0}'.format(cov_type))
-        cov_type = 'unadjusted' if cov_type in ('unadjusted', 'homoskedastic') else 'robust'
         # Parameter estimation
         wx, wy, wz = self._wx, self._wy, self._wz
         k = len(wx)
@@ -1314,11 +1320,8 @@ class IVSystemGMM(IV3SLS):
             iters += 1
 
         # TODO: Add constraints to covariance estimators
-        if cov_type.lower() in ('unadjusted', 'homoskedastic'):
-            cov_est = GMMHomoskedasticCovariance
-        else:  # cov_type.lower() in ('robust', 'heteroskedastic'):
-            cov_est = GMMHeteroskedasticCovariance
-
+        cov_type = COV_TYPES[cov_type]
+        cov_est = GMM_COV_EST[cov_type]
         cov = cov_est(wx, wz, eps, w, sigma=sigma)
 
         weps = eps

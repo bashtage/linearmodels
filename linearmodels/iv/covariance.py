@@ -534,7 +534,7 @@ class KernelCovariance(HomoskedasticCovariance):
             scores = xhat_e @ sel
             bw = kernel_optimal_bandwidth(scores, kernel)
 
-        self._bandwidth = bw = int(bw)
+        self._bandwidth = bw = bw
         w = self._kernels[kernel](bw, nobs - 1)
 
         s = _cov_kernel(xhat_e, w)

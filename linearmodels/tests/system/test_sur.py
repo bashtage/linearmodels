@@ -585,10 +585,22 @@ def test_mv_ols_hac_smoke(kernel_options):
                          included_weights=False, output_dict=True)
     mod = SUR(data)
     res = mod.fit(cov_type='kernel', **kernel_options)
-    if np.any(np.isnan(res.tstats)):
-        res = mod.fit(cov_type='kernel', **kernel_options)
     assert 'Kernel (HAC) ' in str(res)
     assert 'Kernel: {0}'.format(kernel_options['kernel']) in str(res)
     if kernel_options['bandwidth'] == 0:
         res_base = mod.fit(cov_type='robust', debiased=kernel_options['debiased'])
         assert_allclose(res.tstats, res_base.tstats)
+
+
+def test_invalid_kernel_options(kernel_options):
+    data = generate_data(p=3, const=True, rho=0.8, common_exog=False,
+                         included_weights=False, output_dict=True)
+    mod = SUR(data)
+    with pytest.raises(TypeError):
+        ko = {k: v for k, v in kernel_options.items()}
+        ko['bandwidth'] = 'None'
+        mod.fit(cov_type='kernel', **ko)
+    with pytest.raises(TypeError):
+        ko = {k: v for k, v in kernel_options.items()}
+        ko['kernel'] = 1
+        mod.fit(cov_type='kernel', **ko)

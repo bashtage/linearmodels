@@ -424,3 +424,63 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         omega = ze.T @ ze / nobs
 
         return omega
+
+
+class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
+    r"""
+    Covariance estimator for IV system estimation with homoskedasitc data
+
+    Parameters
+    ----------
+    x : List[ndarray]
+        List containing the model regressors for each equation in the system
+    z : List[ndarray]
+        List containing the model instruments for each equation in the system
+    eps : ndarray
+        nobs by neq array of residuals where each column corresponds an
+        equation in the system
+    w : ndarray
+        Weighting matrix used in estimation
+    sigma : ndarray, optional
+        Residual covariance used in estimation
+    kernel : str, optional
+        Name of kernel to use.  Supported kernels include:
+
+          * 'bartlett', 'newey-west' : Bartlett's kernel
+          * 'parzen', 'gallant' : Parzen's kernel
+          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+
+    bandwidth : float, optional
+        Bandwidth to use for the kernel.  If not provided the optimal
+        bandwidth will be estimated.
+
+    Notes
+    -----
+    The covariance is estimated by
+
+    .. math::
+
+      (X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}
+
+    where :math:`\Omega` is the covariance of the moment conditions.
+    """
+
+    def __init__(self, x, z, eps, w, *, sigma=None, kernel='bartlett', bandwidth=None):
+        super().__init__(x, z, eps, w, sigma=sigma)
+        self._name = 'GMM Kernel (HAC) Covariance'
+        self._check_bandwidth(bandwidth)
+        self._check_kernel(kernel)
+
+        k = len(z)
+        k_total = sum(map(lambda a: a.shape[1], z))
+        nobs = z[0].shape[0]
+        loc = 0
+        ze = empty((nobs, k_total))
+        for i in range(k):
+            kz = z[i].shape[1]
+            ze[:, loc:loc + kz] = z[i] * eps[:, [i]]
+            loc += kz
+        self._moments = ze
+
+    def _omega(self):
+        return self._kernel_cov(self._moments)

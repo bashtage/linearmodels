@@ -257,3 +257,9 @@ def test_linear_constraint(data):
 
     res = mod.fit()
     assert_allclose(res.params.iloc[1::6].sum(), 6)
+
+
+def test_kernel_smoke(data):
+    mod = IVSystemGMM(data.eqns, weight_type='kernel', debiased=True)
+    res = mod.fit(cov_type='kernel', debiased='True')
+    assert 'Kernel (HAC) Weighting' in res.summary.as_text()
