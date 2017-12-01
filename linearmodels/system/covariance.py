@@ -1,9 +1,10 @@
-from numpy import eye, ones, sqrt, vstack, zeros, empty
+from numpy import empty, eye, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
+from linearmodels.asset_pricing.covariance import _HACMixin
+from linearmodels.system._utility import (blocked_cross_prod, blocked_diag_product,
+                                          blocked_inner_prod)
 from linearmodels.utility import AttrDict
-from linearmodels.system._utility import (blocked_diag_product, blocked_inner_prod,
-                                          inv_matrix_sqrt, blocked_cross_prod)
 
 
 class HomoskedasticCovariance(object):
@@ -40,7 +41,6 @@ class HomoskedasticCovariance(object):
     .. math::
 
         (X'X)^{-1}(X'\Omega X)(X'X)^{-1}
-
     """
 
     def __init__(self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None):
@@ -164,8 +164,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         (X'X)^{-1}\hat{S}(X'X)^{-1}
 
-    where :math:`\hat{S}` is a estimator of the model scores.
-
+    where :math:`\hat{S}` is a estimator of the covariance of the model scores.
     """
 
     def __init__(self, x, eps, sigma, full_sigma, gls=False, debiased=False, constraints=None):
@@ -175,24 +174,30 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
                                                         constraints=constraints)
         self._name = 'Heteroskedastic (Robust) Covariance'
 
-    def _cov(self, gls):
-        x = self._x
-        eps = self._eps
         k = len(x)
-        sigma = self.sigma
         weights = inv(sigma) if gls else eye(k)
-        xpx = blocked_inner_prod(x, weights)
-
-        weights = inv_matrix_sqrt(sigma) if gls else eye(k)
         bigx = blocked_diag_product(x, weights)
         nobs = eps.shape[0]
         e = eps.T.ravel()[:, None]
         bigxe = bigx * e
         m = bigx.shape[1]
-        xeex = zeros((m, m))
+        xe = zeros((nobs, m))
         for i in range(nobs):
-            xe = bigxe[i::nobs].sum(0)[None, :]
-            xeex += xe.T @ xe
+            xe[i, :] = bigxe[i::nobs].sum(0)[None, :]
+        self._moments = xe
+
+    def _xeex(self):
+        nobs = self._moments.shape[0]
+        return self._moments.T @ self._moments / nobs
+
+    def _cov(self, gls):
+        x = self._x
+        nobs = x[0].shape[0]
+        k = len(x)
+        sigma = self.sigma
+        weights = inv(sigma) if gls else eye(k)
+        xpx = blocked_inner_prod(x, weights) / nobs
+        xeex = self._xeex()
 
         if self._constraints is None:
             xpxi = inv(xpx)
@@ -205,7 +210,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             cov = cons.t @ (xpxi @ xeex @ xpxi) @ cons.t.T
 
         cov = (cov + cov.T) / 2
-        return cov
+        return cov / nobs
 
     def _mvreg_cov(self):
         return self._cov(False)
@@ -224,6 +229,76 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
+
+
+class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
+    r"""
+    Kernel (HAC) covariance estimation for system regression
+
+    Parameters
+    ----------
+    x : list of ndarray
+        ndependent element list of regressor
+    eps : ndarray
+        Model residuals, ndependent by nobs
+    sigma : ndarray
+        Covariance matrix estimator of eps
+    gls : bool
+        Flag indicating to compute the GLS covariance estimator.  If False,
+        assume OLS was used
+    debiased : bool
+        Flag indicating to apply a small sample adjustment
+    kernel : str, optional
+        Name of kernel to use.  Supported kernels include:
+
+          * 'bartlett', 'newey-west' : Bartlett's kernel
+          * 'parzen', 'gallant' : Parzen's kernel
+          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+
+    bandwidth : float, optional
+        Bandwidth to use for the kernel.  If not provided the optimal
+        bandwidth will be estimated.
+
+    Notes
+    -----
+    If GLS is used, the covariance is estimated by
+
+    .. math::
+
+        (X'\Omega^{-1}X)^{-1}\tilde{S}(X'\Omega^{-1}X)^{-1}
+
+    where X is a block diagonal matrix of exogenous variables and where
+    :math:`\tilde{S}` is a estimator of the covariance of the model scores
+    based on the model residuals and the weighted X matrix :math:`\Omega^{-1/2}X`.
+
+    When GLS is not used, the covariance is estimated by
+
+    .. math::
+
+        (X'X)^{-1}\hat{S}(X'X)^{-1}
+
+    where :math:`\hat{S}` is a estimator of the covariance of the model scores.
+
+    See Also
+    --------
+    linearmodels.iv.covariance.kernel_weight_bartlett,
+    linearmodels.iv.covariance.kernel_weight_parzen,
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
+    """
+
+    def __init__(self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None,
+                 kernel='bartlett', bandwidth=None):
+        super(KernelCovariance, self).__init__(x, eps, sigma, full_sigma, gls=gls,
+                                               debiased=debiased,
+                                               constraints=constraints)
+
+        self._check_kernel(kernel)
+        self._check_bandwidth(bandwidth)
+        self._name = 'Kernel (HAC) Covariance'
+        self._str_extra['Kernel'] = kernel
+
+    def _xeex(self):
+        return self._kernel_cov(self._moments)
 
 
 class GMMHomoskedasticCovariance(object):

@@ -168,7 +168,6 @@ def blocked_full_inner_product(x, s):
     .. math ::
 
         x^\prime (S \otimes I_N)x
-
     """
     k = s.shape[0]
     t = x.shape[0] // k

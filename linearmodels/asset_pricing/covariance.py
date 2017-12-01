@@ -30,6 +30,8 @@ class _HACMixin(object):
         return self._bandwidth
 
     def _check_kernel(self, kernel):
+        if not isinstance(kernel, str):
+            raise TypeError('kernel must be the name of a kernel')
         self._kernel = kernel.lower()
         if self._kernel not in KERNEL_LOOKUP:
             raise ValueError('Unknown kernel')
@@ -37,6 +39,10 @@ class _HACMixin(object):
     def _check_bandwidth(self, bandwidth):
         self._bandwidth = bandwidth
         if bandwidth is not None:
+            try:
+                bandwidth = float(bandwidth)
+            except (TypeError, ValueError):
+                raise TypeError('bandwidth must be either None or a float')
             if bandwidth < 0:
                 raise ValueError('bandwidth must be non-negative.')
 
@@ -183,6 +189,12 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         Flag indicating to use a debiased estimator
     df : int, optional
         Degree of freedom value ot use if debiasing
+
+    See Also
+    --------
+    linearmodels.iv.covariance.kernel_weight_bartlett,
+    linearmodels.iv.covariance.kernel_weight_parzen,
+    linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
     def __init__(self, xe, *, jacobian=None, inv_jacobian=None,
@@ -275,7 +287,6 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         Kernel name. See notes for available kernels.
     bandwidth : int, optional
         Non-negative integer bandwidth
-
     """
 
     def __init__(self, moments, center=True, kernel='bartlett', bandwidth=None):

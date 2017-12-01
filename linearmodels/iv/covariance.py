@@ -131,6 +131,10 @@ def kernel_weight_quadratic_spectral(bw, n):
 
     where m is the bandwidth.
     """
+    if bw == 0:  # Special handling of bw == 0 case
+        w = zeros(n + 1)
+        w[0] = 0
+        return w
 
     z = arange(n + 1) / bw
     w = 6 * pi * z / 5
@@ -177,8 +181,8 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
         Name of kernel to use.  Supported kernels include:
 
           * 'bartlett', 'newey-west' : Bartlett's kernel
-          * 'parzen', 'gallane' : Parzen's kernel
-          * 'qs', 'quadratic-spectral', 'andrews : Quadratic spectral kernel
+          * 'parzen', 'gallant' : Parzen's kernel
+          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
     Returns
     -------
@@ -198,7 +202,6 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
     linearmodels.iv.covariance.kernel_weight_bartlett,
     linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
-
     """
     t = x.shape[0]
     x = x.squeeze()
@@ -487,7 +490,6 @@ class KernelCovariance(HomoskedasticCovariance):
     linearmodels.iv.covariance.kernel_weight_bartlett,
     linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
-
     """
 
     def __init__(self, x, y, z, params, kernel='bartlett',
