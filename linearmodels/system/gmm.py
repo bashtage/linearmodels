@@ -71,7 +71,7 @@ class HomoskedasticWeightMatrix(object):
 
         return sigma
 
-    def weight_matrix(self, x, z, eps, sigma):
+    def weight_matrix(self, x, z, eps, *, sigma=None):
         """
         Parameters
         ----------
@@ -186,10 +186,11 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None):
-        super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
+        super(KernelWeightMatrix, self).__init__(center, debiased)
         self._name = 'Kernel (HAC) Weighting'
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
+        self._predefined_bw = self._bandwidth
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
@@ -227,7 +228,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         return w
 
     def _optimal_bandwidth(self, moments):
-        """Compute optimal bandwidth used in estimation"""
+        """Compute optimal bandwidth used in estimation if needed"""
+        if self._predefined_bw is not None:
+            return self._predefined_bw
         m = moments / moments.std(0)[None, :]
         m = m.sum(1)
         self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)

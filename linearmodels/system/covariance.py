@@ -331,12 +331,13 @@ class GMMHomoskedasticCovariance(object):
     moments in the system
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None):
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False):
         self._x = x
         self._z = z
         self._eps = eps
         self._sigma = sigma
         self._w = w
+        self._debiased = debiased
         self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
 
     def __str__(self):
@@ -363,7 +364,9 @@ class GMMHomoskedasticCovariance(object):
         xpz_wi_zpxi = inv(xpz_wi_zpx)
         cov = xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi / nobs
         cov = (cov + cov.T) / 2
-        return cov
+
+        adj = self._adjustment()
+        return adj * cov
 
     def _omega(self):
         z = self._z
@@ -373,6 +376,18 @@ class GMMHomoskedasticCovariance(object):
         omega /= nobs
 
         return omega
+
+    def _adjustment(self):
+        if not self._debiased:
+            return 1.0
+        k = list(map(lambda s: s.shape[1], self._x))
+        nobs = self._x[0].shape[0]
+        adj = []
+        for i in range(len(k)):
+            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        adj = vstack(adj)
+        adj = sqrt(adj)
+        return adj @ adj.T
 
 
 class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
@@ -404,13 +419,10 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
     where :math:`\Omega` is the covariance of the moment conditions.
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None):
-        super().__init__(x, z, eps, w, sigma=sigma)
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False):
+        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased)
         self._name = 'GMM Heteroskedastic (Robust) Covariance'
 
-    def _omega(self):
-        eps = self._eps
-        z = self._z
         k = len(z)
         k_total = sum(map(lambda a: a.shape[1], z))
         nobs = z[0].shape[0]
@@ -420,8 +432,12 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
             kz = z[i].shape[1]
             ze[:, loc:loc + kz] = z[i] * eps[:, [i]]
             loc += kz
+        self._moments = ze
+
+    def _omega(self):
+        z = self._z
         nobs = z[0].shape[0]
-        omega = ze.T @ ze / nobs
+        omega = self._moments.T @ self._moments / nobs
 
         return omega
 
@@ -465,22 +481,12 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     where :math:`\Omega` is the covariance of the moment conditions.
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None, kernel='bartlett', bandwidth=None):
-        super().__init__(x, z, eps, w, sigma=sigma)
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False,
+                 kernel='bartlett', bandwidth=None):
+        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased)
         self._name = 'GMM Kernel (HAC) Covariance'
         self._check_bandwidth(bandwidth)
         self._check_kernel(kernel)
-
-        k = len(z)
-        k_total = sum(map(lambda a: a.shape[1], z))
-        nobs = z[0].shape[0]
-        loc = 0
-        ze = empty((nobs, k_total))
-        for i in range(k):
-            kz = z[i].shape[1]
-            ze[:, loc:loc + kz] = z[i] * eps[:, [i]]
-            loc += kz
-        self._moments = ze
 
     def _omega(self):
         return self._kernel_cov(self._moments)

@@ -1322,7 +1322,7 @@ class IVSystemGMM(IV3SLS):
         # TODO: Add constraints to covariance estimators
         cov_type = COV_TYPES[cov_type]
         cov_est = GMM_COV_EST[cov_type]
-        cov = cov_est(wx, wz, eps, w, sigma=sigma)
+        cov = cov_est(wx, wz, eps, w, sigma=sigma, **cov_config)
 
         weps = eps
         eps = []
