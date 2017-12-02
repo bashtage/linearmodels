@@ -208,7 +208,7 @@ def test_summary(data):
 
 def test_summary_homoskedastic(data):
     mod = IVSystemGMM(data.eqns, weight_type='unadjusted', debiased=True)
-    res = mod.fit(cov_type='homoskedastic', debiased='True')
+    res = mod.fit(cov_type='homoskedastic', debiased=True)
     assert 'Homoskedastic (Unadjusted) Weighting' in res.summary.as_text()
 
 
@@ -257,3 +257,12 @@ def test_linear_constraint(data):
 
     res = mod.fit()
     assert_allclose(res.params.iloc[1::6].sum(), 6)
+
+
+def test_kernel_equiv(data):
+    mod = IVSystemGMM(data.eqns, weight_type='kernel', bandwidth=0)
+    res = mod.fit(cov_type='kernel', debiased=True, bandwidth=0)
+    assert 'Kernel (HAC) Weighting' in res.summary.as_text()
+    rob_mod = IVSystemGMM(data.eqns, weight_type='robust')
+    rob_res = rob_mod.fit(cov_type='robust', debiased=True)
+    assert_allclose(res.tstats, rob_res.tstats)

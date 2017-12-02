@@ -99,6 +99,20 @@ def mvreg_data(request):
     return np.hstack(dep), exog
 
 
+kernels = ['bartlett', 'newey-west', 'parzen', 'gallant', 'qs', 'andrews']
+bandwidths = [None, 0, 10]
+debiased = [True, False]
+params = list(product(kernels, bandwidths, debiased))
+ids = list(map(lambda p: p[0] + ', BW: ' + str(p[1]) + ', Debiased: ' + str(p[2]), params))
+
+
+@pytest.fixture(params=params, ids=ids)
+def kernel_options(request):
+    return {'kernel': request.param[0],
+            'bandwidth': request.param[1],
+            'debiased': request.param[2]}
+
+
 def test_smoke(data):
     mod = SUR(data)
     mod.fit()
@@ -564,3 +578,29 @@ def test_model_repr(data):
     assert str(len(data)) in repr
     assert str(hex(id(mod))) in repr
     assert 'Seemingly Unrelated Regression (SUR)' in repr
+
+
+def test_mv_ols_hac_smoke(kernel_options):
+    data = generate_data(p=3, const=True, rho=0.8, common_exog=False,
+                         included_weights=False, output_dict=True)
+    mod = SUR(data)
+    res = mod.fit(cov_type='kernel', **kernel_options)
+    assert 'Kernel (HAC) ' in str(res)
+    assert 'Kernel: {0}'.format(kernel_options['kernel']) in str(res)
+    if kernel_options['bandwidth'] == 0:
+        res_base = mod.fit(cov_type='robust', debiased=kernel_options['debiased'])
+        assert_allclose(res.tstats, res_base.tstats)
+
+
+def test_invalid_kernel_options(kernel_options):
+    data = generate_data(p=3, const=True, rho=0.8, common_exog=False,
+                         included_weights=False, output_dict=True)
+    mod = SUR(data)
+    with pytest.raises(TypeError):
+        ko = {k: v for k, v in kernel_options.items()}
+        ko['bandwidth'] = 'None'
+        mod.fit(cov_type='kernel', **ko)
+    with pytest.raises(TypeError):
+        ko = {k: v for k, v in kernel_options.items()}
+        ko['kernel'] = 1
+        mod.fit(cov_type='kernel', **ko)
