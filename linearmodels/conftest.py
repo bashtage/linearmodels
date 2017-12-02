@@ -9,8 +9,8 @@ def pytest_addoption(parser):
 
 
 def pytest_runtest_setup(item):
-    if 'slow' in item.keywords and item.config.getoption("--skip-slow"):
-        pytest.skip("skipping due to --skip-slow")
+    if 'slow' in item.keywords and item.config.getoption("--skip-slow"):  # pragma: no cover
+        pytest.skip("skipping due to --skip-slow")  # pragma: no cover
 
-    if 'slow' not in item.keywords and item.config.getoption("--only-slow"):
-        pytest.skip("skipping due to --only-slow")
+    if 'slow' not in item.keywords and item.config.getoption("--only-slow"):  # pragma: no cover
+        pytest.skip("skipping due to --only-slow")  # pragma: no cover

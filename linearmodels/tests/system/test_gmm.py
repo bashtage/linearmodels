@@ -266,3 +266,8 @@ def test_kernel_equiv(data):
     rob_mod = IVSystemGMM(data.eqns, weight_type='robust')
     rob_res = rob_mod.fit(cov_type='robust', debiased=True)
     assert_allclose(res.tstats, rob_res.tstats)
+
+
+def test_kernel_optimal_bandwidth_smoke(data):
+    mod = IVSystemGMM(data.eqns, weight_type='kernel')
+    mod.fit(cov_type='kernel', debiased=True)

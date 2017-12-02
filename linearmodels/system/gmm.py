@@ -273,10 +273,11 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         if self._predefined_bw is not None:
             return self._predefined_bw
         elif not self._optimal_bw:
-            return moments.shape[0] - 2
-        m = moments / moments.std(0)[None, :]
-        m = m.sum(1)
-        self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
+            self._bandwidth = moments.shape[0] - 2
+        else:
+            m = moments / moments.std(0)[None, :]
+            m = m.sum(1)
+            self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
         return self._bandwidth
 
     @property
