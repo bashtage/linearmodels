@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.gmm &#8212; linearmodels 4.1+35.gd8a001e documentation</title>
+    <title>linearmodels.iv.gmm &#8212; linearmodels 4.1+39.gff5cb34 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+35.gd8a001e',
+        VERSION:     '4.1+39.gff5cb34',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+39.gff5cb34 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+35, gd8a001e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+39, gff5cb34)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -126,7 +126,7 @@
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.iv.covariance</span> <span class="k">import</span> <span class="p">(</span><span class="n">KERNEL_LOOKUP</span><span class="p">,</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
-                                        <span class="n">_cov_cluster</span><span class="p">,</span> <span class="n">_cov_kernel</span><span class="p">)</span>
+                                        <span class="n">_cov_cluster</span><span class="p">,</span> <span class="n">_cov_kernel</span><span class="p">,</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="HomoskedasticWeightMatrix"><a class="viewcode-back" href="../../../iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HomoskedasticWeightMatrix</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -265,6 +265,9 @@
 <span class="sd">        the mean before computing the weight matrix.</span>
 <span class="sd">    debiased : bool, optional</span>
 <span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">    optimal_bw : bool, optional</span>
+<span class="sd">        Flag indicating whether to estimate the optimal bandwidth, when</span>
+<span class="sd">        bandwidth is None.  If False, nobs - 2 is used</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -290,11 +293,14 @@
 <span class="sd">    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">optimal_bw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KernelWeightMatrix</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orig_bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span> <span class="o">=</span> <span class="n">kernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">KERNEL_LOOKUP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="n">optimal_bw</span>
 
 <div class="viewcode-block" id="KernelWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -317,18 +323,19 @@
         <span class="n">mu</span> <span class="o">=</span> <span class="n">ze</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="n">ze</span> <span class="o">-=</span> <span class="n">mu</span>
 
-        <span class="c1"># TODO: Consider using optimal bandwidth here</span>
-        <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">bw</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_bandwidth</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">ze</span> <span class="o">/</span> <span class="n">ze</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">](</span><span class="n">bw</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
         <span class="n">s</span> <span class="o">=</span> <span class="n">_cov_kernel</span><span class="p">(</span><span class="n">ze</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">*=</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="k">else</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">s</span></div>
-
-    <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
-        <span class="c1"># TODO: Implement this</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -343,7 +350,12 @@
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">,</span>
                 <span class="s1">&#39;bandwidth&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span><span class="p">,</span>
                 <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel</span><span class="p">,</span>
-                <span class="s1">&#39;debiased&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">}</span></div>
+                <span class="s1">&#39;debiased&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Actual bandwidth used in estimating the weight matrix&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span></div>
 
 
 <div class="viewcode-block" id="OneWayClusteredWeightMatrix"><a class="viewcode-back" href="../../../iv/gmm.html#linearmodels.iv.gmm.OneWayClusteredWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">OneWayClusteredWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
@@ -553,7 +565,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+39.gff5cb34 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

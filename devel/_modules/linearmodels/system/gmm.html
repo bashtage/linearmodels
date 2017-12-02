@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.gmm &#8212; linearmodels 4.1+35.gd8a001e documentation</title>
+    <title>linearmodels.system.gmm &#8212; linearmodels 4.1+39.gff5cb34 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+35.gd8a001e',
+        VERSION:     '4.1+39.gff5cb34',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+39.gff5cb34 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+35, gd8a001e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+39, gff5cb34)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -255,7 +255,6 @@
 <span class="sd">    i.  This form allows for heteroskedasticity and arbitrary cross-sectional</span>
 <span class="sd">    dependence between the moment conditions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;Heteroskedastic (Robust) Weighting&#39;</span>
@@ -306,12 +305,54 @@
 
 
 <span class="k">class</span> <span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Heteroskedasticity robust weight estimation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    center : bool, optional</span>
+<span class="sd">        Flag indicating whether to center the moment conditions by subtracting</span>
+<span class="sd">        the mean before computing the weight matrix.</span>
+<span class="sd">    debiased : bool, optional</span>
+<span class="sd">        Flag indicating whether to use small-sample adjustments</span>
+<span class="sd">    kernel : str, optional</span>
+<span class="sd">        Name of kernel to use.  Supported kernels include:</span>
+
+<span class="sd">          * &#39;bartlett&#39;, &#39;newey-west&#39; : Bartlett&#39;s kernel</span>
+<span class="sd">          * &#39;parzen&#39;, &#39;gallant&#39; : Parzen&#39;s kernel</span>
+<span class="sd">          * &#39;qs&#39;, &#39;quadratic-spectral&#39;, &#39;andrews&#39; : Quadratic spectral kernel</span>
+
+<span class="sd">    bandwidth : float, optional</span>
+<span class="sd">        Bandwidth to use for the kernel.  If not provided the optimal</span>
+<span class="sd">        bandwidth will be estimated.</span>
+<span class="sd">    optimal_bw : bool, optional</span>
+<span class="sd">        Flag indicating whether to estimate the optimal bandwidth, when</span>
+<span class="sd">        bandwidth is None.  If False, nobs - 2 is used</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The weight matrix estimator is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">      W   &amp; = n^{-1}\sum_{i=1}^{n}g&#39;_ig_i \\</span>
+<span class="sd">      g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})</span>
+
+<span class="sd">    where :math:`g_i` is the vector of scores across all equations for</span>
+<span class="sd">    observation i.  :math:`z_{ji}` is the vector of instruments for equation</span>
+<span class="sd">    j and :\math:`\epsilon_{ji}` is the error for equation j for observation</span>
+<span class="sd">    i.  This form allows for heteroskedasticity and arbitrary cross-sectional</span>
+<span class="sd">    dependence between the moment conditions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">optimal_bw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KernelWeightMatrix</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;Kernel (HAC) Weighting&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_kernel</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_bandwidth</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="n">optimal_bw</span>
 
     <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -352,6 +393,8 @@
         <span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">moments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">moments</span> <span class="o">/</span> <span class="n">moments</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="n">kernel_optimal_bandwidth</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
@@ -376,7 +419,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+39.gff5cb34 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
