@@ -134,7 +134,6 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     i.  This form allows for heteroskedasticity and arbitrary cross-sectional
     dependence between the moment conditions.
     """
-
     def __init__(self, center=False, debiased=False):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
         self._name = 'Heteroskedastic (Robust) Weighting'
@@ -185,12 +184,54 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
 
 class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
-    def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None):
+    r"""
+    Heteroskedasticity robust weight estimation
+
+    Parameters
+    ----------
+    center : bool, optional
+        Flag indicating whether to center the moment conditions by subtracting
+        the mean before computing the weight matrix.
+    debiased : bool, optional
+        Flag indicating whether to use small-sample adjustments
+    kernel : str, optional
+        Name of kernel to use.  Supported kernels include:
+
+          * 'bartlett', 'newey-west' : Bartlett's kernel
+          * 'parzen', 'gallant' : Parzen's kernel
+          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+
+    bandwidth : float, optional
+        Bandwidth to use for the kernel.  If not provided the optimal
+        bandwidth will be estimated.
+    optimal_bw : bool, optional
+        Flag indicating whether to estimate the optimal bandwidth, when
+        bandwidth is None.  If False, nobs - 2 is used
+
+
+    Notes
+    -----
+    The weight matrix estimator is
+
+    .. math::
+
+      W   & = n^{-1}\sum_{i=1}^{n}g'_ig_i \\
+      g_i & = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})
+
+    where :math:`g_i` is the vector of scores across all equations for
+    observation i.  :math:`z_{ji}` is the vector of instruments for equation
+    j and :\math:`\epsilon_{ji}` is the error for equation j for observation
+    i.  This form allows for heteroskedasticity and arbitrary cross-sectional
+    dependence between the moment conditions.
+    """
+    def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None,
+                 optimal_bw=False):
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._name = 'Kernel (HAC) Weighting'
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
         self._predefined_bw = self._bandwidth
+        self._optimal_bw = optimal_bw
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
@@ -231,6 +272,8 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         """Compute optimal bandwidth used in estimation if needed"""
         if self._predefined_bw is not None:
             return self._predefined_bw
+        elif not self._optimal_bw:
+            return moments.shape[0] - 2
         m = moments / moments.std(0)[None, :]
         m = m.sum(1)
         self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)

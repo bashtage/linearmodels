@@ -102,10 +102,11 @@ class TestHeteroskedasticWeight(object):
 
 class TestKernelWeight(object):
     def test_center(self, data, kernel, bandwidth):
-        wm = KernelWeightMatrix(kernel.kernel, bandwidth, True)
+        wm = KernelWeightMatrix(kernel.kernel, bandwidth, center=True,
+                                optimal_bw=True)
         weight = wm.weight_matrix(data.x, data.z, data.e)
         z, e, nobs = data.z, data.e, data.nobs
-        bw = bandwidth or nobs - 2
+        bw = bandwidth or wm.bandwidth
         w = kernel.weight(bw, nobs - 1)
         ze = z * e
         ze = ze - ze.mean(0)
@@ -117,7 +118,7 @@ class TestKernelWeight(object):
         assert wm.config['bandwidth'] == bw
         assert wm.config['kernel'] == kernel.kernel
         for name in kernel.alt_names:
-            wm = KernelWeightMatrix(name, bandwidth, True)
+            wm = KernelWeightMatrix(name, bandwidth, center=True, optimal_bw=True)
             weight2 = wm.weight_matrix(data.x, data.z, data.e)
             assert_equal(weight, weight2)
 
@@ -125,7 +126,7 @@ class TestKernelWeight(object):
         wm = KernelWeightMatrix(debiased=True, kernel=kernel.kernel, bandwidth=bandwidth)
         weight = wm.weight_matrix(data.x, data.z, data.e)
         z, e, nobs, nvar = data.z, data.e, data.nobs, data.nvar
-        bw = bandwidth or nobs - 2
+        bw = bandwidth or wm.bandwidth
         w = kernel.weight(bw, nobs - 1)
         ze = z * e
         s = ze.T @ ze
@@ -140,7 +141,7 @@ class TestKernelWeight(object):
         wm = KernelWeightMatrix(kernel=kernel.kernel, bandwidth=bandwidth)
         weight = wm.weight_matrix(data.x, data.z, data.e)
         z, e, nobs = data.z, data.e, data.nobs
-        bw = bandwidth or nobs - 2
+        bw = bandwidth or wm.bandwidth
         w = kernel.weight(bw, nobs - 1)
         ze = z * e
         s = ze.T @ ze

@@ -5,7 +5,7 @@ from numpy import asarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                        _cov_cluster, _cov_kernel)
+                                        _cov_cluster, _cov_kernel, kernel_optimal_bandwidth)
 
 
 class HomoskedasticWeightMatrix(object):
@@ -144,6 +144,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         the mean before computing the weight matrix.
     debiased : bool, optional
         Flag indicating whether to use small-sample adjustments
+    optimal_bw : bool, optional
+        Flag indicating whether to estimate the optimal bandwidth, when
+        bandwidth is None.  If False, nobs - 2 is used
 
     Notes
     -----
@@ -169,11 +172,14 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
-    def __init__(self, kernel='bartlett', bandwidth=None, center=False, debiased=False):
+    def __init__(self, kernel='bartlett', bandwidth=None, center=False,
+                 debiased=False, optimal_bw=False):
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
+        self._orig_bandwidth = bandwidth
         self._kernel = kernel
         self._kernels = KERNEL_LOOKUP
+        self._optimal_bw = optimal_bw
 
     def weight_matrix(self, x, z, eps):
         """
@@ -196,18 +202,19 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
 
-        # TODO: Consider using optimal bandwidth here
-        bw = self._bandwidth if self._bandwidth is not None else nobs - 2
-        self._bandwidth = bw
+        if self._orig_bandwidth is None and self._optimal_bw:
+            g = ze / ze.std(0)[None, :]
+            g = g.sum(1)
+            self._bandwidth = kernel_optimal_bandwidth(g, self._kernel)
+        elif self._orig_bandwidth is None:
+            self._bandwidth = nobs - 2
+        bw = self._bandwidth
         w = self._kernels[self._kernel](bw, nobs - 1)
+
         s = _cov_kernel(ze, w)
         s *= 1 if not self._debiased else nobs / (nobs - nvar)
 
         return s
-
-    def _optimal_bandwidth(self, x, z, eps):
-        # TODO: Implement this
-        pass  # pragma: no cover
 
     @property
     def config(self):
@@ -223,6 +230,11 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
                 'bandwidth': self._bandwidth,
                 'kernel': self._kernel,
                 'debiased': self._debiased}
+
+    @property
+    def bandwidth(self):
+        """Actual bandwidth used in estimating the weight matrix"""
+        return self._bandwidth
 
 
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
