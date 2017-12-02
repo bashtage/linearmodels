@@ -271,3 +271,5 @@ def test_kernel_equiv(data):
 def test_kernel_optimal_bandwidth_smoke(data):
     mod = IVSystemGMM(data.eqns, weight_type='kernel')
     mod.fit(cov_type='kernel', debiased=True)
+    mod = IVSystemGMM(data.eqns, weight_type='kernel', optimal_bw=True)
+    mod.fit(cov_type='kernel', debiased=True)
