@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.model &#8212; linearmodels 4.1+31.g88a837b documentation</title>
+    <title>linearmodels.system.model &#8212; linearmodels 4.1+35.gd8a001e documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+31.g88a837b',
+        VERSION:     '4.1+35.gd8a001e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+31.g88a837b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+31, g88a837b)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+35, gd8a001e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -147,8 +147,10 @@
     <span class="n">blocked_cross_prod</span><span class="p">,</span> <span class="n">blocked_diag_product</span><span class="p">,</span> <span class="n">blocked_inner_prod</span><span class="p">,</span> <span class="n">inv_matrix_sqrt</span>
 <span class="kn">from</span> <span class="nn">linearmodels.system.covariance</span> <span class="k">import</span> <span class="p">(</span><span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span>
                                             <span class="n">GMMHomoskedasticCovariance</span><span class="p">,</span> <span class="n">HeteroskedasticCovariance</span><span class="p">,</span>
-                                            <span class="n">HomoskedasticCovariance</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">linearmodels.system.gmm</span> <span class="k">import</span> <span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">HomoskedasticWeightMatrix</span>
+                                            <span class="n">HomoskedasticCovariance</span><span class="p">,</span> <span class="n">KernelCovariance</span><span class="p">,</span>
+                                            <span class="n">GMMKernelCovariance</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.system.gmm</span> <span class="k">import</span> <span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">HomoskedasticWeightMatrix</span><span class="p">,</span> \
+    <span class="n">KernelWeightMatrix</span>
 <span class="kn">from</span> <span class="nn">linearmodels.system.results</span> <span class="k">import</span> <span class="n">GMMSystemResults</span><span class="p">,</span> <span class="n">SystemResults</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
                                   <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">missing_warning</span><span class="p">)</span>
@@ -160,6 +162,25 @@
 <span class="s2">and &#39;exog&#39; or a 2-element tuple of he form (dependent, exog).</span>
 <span class="s2">equations[</span><span class="si">{key}</span><span class="s2">] was </span><span class="si">{type}</span><span class="s2"></span>
 <span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">COV_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span> <span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;homoskedastic&#39;</span><span class="p">:</span> <span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="s1">&#39;robust&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;heteroskedastic&#39;</span><span class="p">:</span> <span class="s1">&#39;robust&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="s1">&#39;kernel&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;hac&#39;</span><span class="p">:</span> <span class="s1">&#39;kernel&#39;</span><span class="p">}</span>
+
+<span class="n">COV_EST</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span> <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
+           <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="n">HeteroskedasticCovariance</span><span class="p">,</span>
+           <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="n">KernelCovariance</span><span class="p">}</span>
+
+<span class="n">GMM_W_EST</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span> <span class="n">HomoskedasticWeightMatrix</span><span class="p">,</span>
+             <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span>
+             <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="n">KernelWeightMatrix</span><span class="p">}</span>
+
+<span class="n">GMM_COV_EST</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span> <span class="n">GMMHomoskedasticCovariance</span><span class="p">,</span>
+               <span class="s1">&#39;robust&#39;</span><span class="p">:</span> <span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span>
+               <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="n">GMMKernelCovariance</span><span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_to_ordered_dict</span><span class="p">(</span><span class="n">equations</span><span class="p">):</span>
@@ -513,8 +534,9 @@
 <span class="sd">            Name of covariance estimator. Valid options are</span>
 
 <span class="sd">            * &#39;unadjusted&#39;, &#39;homoskedastic&#39; - Classic covariance estimator</span>
-<span class="sd">            * &#39;robust&#39;, &#39;heteroskedastic&#39; - Heteroskedasticit robust</span>
+<span class="sd">            * &#39;robust&#39;, &#39;heteroskedastic&#39; - Heteroskedasticity robust</span>
 <span class="sd">              covariance estimator</span>
+<span class="sd">            * &#39;kernel&#39; - Allows for heteroskedasticity and autocorrelation</span>
 
 <span class="sd">        **cov_config</span>
 <span class="sd">            Additional parameters to pass to covariance estimator. All</span>
@@ -524,11 +546,17 @@
 <span class="sd">        -------</span>
 <span class="sd">        results : SystemResults</span>
 <span class="sd">            Estimation results</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.system.covariance.HomoskedasticCovariance</span>
+<span class="sd">        linearmodels.system.covariance.HeteroskedasticCovariance</span>
+<span class="sd">        linearmodels.system.covariance.KernelCovariance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">cov_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">,</span> <span class="s1">&#39;heteroskedastic&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COV_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown cov_type: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cov_type</span><span class="p">))</span>
-        <span class="n">cov_type</span> <span class="o">=</span> <span class="s1">&#39;unadjusted&#39;</span> <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;robust&#39;</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
         <span class="n">col_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">))</span>
         <span class="n">col_idx</span> <span class="o">=</span> <span class="n">cumsum</span><span class="p">(</span><span class="n">col_sizes</span><span class="p">)</span>
@@ -642,10 +670,7 @@
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">)</span>
 
         <span class="c1"># Covariance estimation</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HomoskedasticCovariance</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span>
+        <span class="n">cov_est</span> <span class="o">=</span> <span class="n">COV_EST</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">cov_est</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">gls</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov</span>
@@ -948,10 +973,7 @@
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">)</span>
 
         <span class="c1"># Covariance estimation</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="o">==</span> <span class="s1">&#39;unadjusted&#39;</span><span class="p">:</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HomoskedasticCovariance</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">HeteroskedasticCovariance</span>
+        <span class="n">cov_est</span> <span class="o">=</span> <span class="n">COV_EST</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">gls_eps</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">gls_eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">gls_eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
         <span class="n">cov_est</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="p">,</span> <span class="n">gls_eps</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">full_sigma</span><span class="p">,</span> <span class="n">gls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1328,18 +1350,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span> <span class="o">=</span> <span class="n">weight_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span> <span class="o">=</span> <span class="n">weight_config</span>
 
+        <span class="k">if</span> <span class="n">weight_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COV_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown estimator for weight_type&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">weight_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">warnings</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;sigma has been provided but the estimated weight &#39;</span>
                           <span class="s1">&#39;matrix not unadjusted (homoskedastic).  sigma will &#39;</span>
                           <span class="s1">&#39;be ignored.&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">weight_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="s1">&#39;heteroskedastic&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span> <span class="o">=</span> <span class="n">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">weight_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span> <span class="o">=</span> <span class="n">HomoskedasticWeightMatrix</span><span class="p">(</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown estimator for weight_type&#39;</span><span class="p">)</span>
+        <span class="n">weight_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">weight_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span> <span class="o">=</span> <span class="n">GMM_W_EST</span><span class="p">[</span><span class="n">weight_type</span><span class="p">](</span><span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IVSystemGMM.fit"><a class="viewcode-back" href="../../../system/models.html#linearmodels.system.model.IVSystemGMM.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">initial_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
@@ -1372,10 +1392,8 @@
 <span class="sd">        results : GMMSystemResults</span>
 <span class="sd">            Estimation results</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cov_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">,</span> <span class="s1">&#39;heteroskedastic&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COV_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown cov_type: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cov_type</span><span class="p">))</span>
-        <span class="n">cov_type</span> <span class="o">=</span> <span class="s1">&#39;unadjusted&#39;</span> <span class="k">if</span> <span class="n">cov_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;robust&#39;</span>
         <span class="c1"># Parameter estimation</span>
         <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span>
@@ -1423,12 +1441,9 @@
             <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># TODO: Add constraints to covariance estimators</span>
-        <span class="k">if</span> <span class="n">cov_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="s1">&#39;homoskedastic&#39;</span><span class="p">):</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">GMMHomoskedasticCovariance</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># cov_type.lower() in (&#39;robust&#39;, &#39;heteroskedastic&#39;):</span>
-            <span class="n">cov_est</span> <span class="o">=</span> <span class="n">GMMHeteroskedasticCovariance</span>
-
-        <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">cov_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
+        <span class="n">cov_est</span> <span class="o">=</span> <span class="n">GMM_COV_EST</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
 
         <span class="n">weps</span> <span class="o">=</span> <span class="n">eps</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1631,7 +1646,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+31.g88a837b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+35.gd8a001e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
