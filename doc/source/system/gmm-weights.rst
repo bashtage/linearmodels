@@ -1,7 +1,7 @@
 GMM Moment Weighting
 --------------------
 
-.. module:: linearmodels.system.model
+.. module:: linearmodels.system.gmm
    :synopsis: Moment weight estimators for GMM IV estimation
 
 
@@ -11,5 +11,9 @@ GMM Moment Weighting
 
 
 .. autoclass:: HeteroskedasticWeightMatrix
+   :members:
+   :inherited-members:
+
+.. autoclass:: KernelWeightMatrix
    :members:
    :inherited-members:

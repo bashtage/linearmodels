@@ -12,9 +12,15 @@ Homoskedastic Covariance Estimation
    :members:
    :inherited-members:
 
-Heteroskedastic Covariance Estimation
-=====================================
+Heteroskedasticity Robust Covariance Estimation
+===============================================
 .. autoclass:: HeteroskedasticCovariance
+   :members:
+   :inherited-members:
+
+Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation
+=====================================================================
+.. autoclass:: KernelCovariance
    :members:
    :inherited-members:
 
@@ -24,8 +30,14 @@ GMM Homoskedastic Covariance Estimation
    :members:
    :inherited-members:
 
-GMM Heteroskedastic Covariance Estimation
-=========================================
+GMM Heteroskedasticity Robust Covariance Estimation
+===================================================
 .. autoclass:: GMMHeteroskedasticCovariance
+   :members:
+   :inherited-members:
+
+GMM Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation
+=========================================================================
+.. autoclass:: GMMKernelCovariance
    :members:
    :inherited-members:

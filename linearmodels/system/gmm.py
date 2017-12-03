@@ -41,6 +41,7 @@ class HomoskedasticWeightMatrix(object):
         self._debiased = debiased
         self._bandwidth = 0
         self._name = 'Homoskedastic (Unadjusted) Weighting'
+        self._config = AttrDict(center=center, debiased=debiased)
 
     def __str__(self):
         out = self._name
@@ -100,11 +101,10 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        config : dict
+        config : AttrDict
             Dictionary containing weight estimator configuration information
         """
-        return {'center': self._center,
-                'debiased': self._debiased}
+        return self._config
 
 
 class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
@@ -130,10 +130,11 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     where :math:`g_i` is the vector of scores across all equations for
     observation i.  :math:`z_{ji}` is the vector of instruments for equation
-    j and :\math:`\epsilon_{ji}` is the error for equation j for observation
+    j and :math:`\epsilon_{ji}` is the error for equation j for observation
     i.  This form allows for heteroskedasticity and arbitrary cross-sectional
     dependence between the moment conditions.
     """
+
     def __init__(self, center=False, debiased=False):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
         self._name = 'Heteroskedastic (Robust) Weighting'
@@ -215,15 +216,18 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     .. math::
 
-      W   & = n^{-1}\sum_{i=1}^{n}g'_ig_i \\
+      W   & = \hat{\Gamma}_0 + \sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i + \hat{\Gamma}_i^\prime) \\
+      \hat{\Gamma}_j & = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\
       g_i & = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})
 
     where :math:`g_i` is the vector of scores across all equations for
-    observation i.  :math:`z_{ji}` is the vector of instruments for equation
-    j and :\math:`\epsilon_{ji}` is the error for equation j for observation
-    i.  This form allows for heteroskedasticity and arbitrary cross-sectional
-    dependence between the moment conditions.
+    observation i and :math:`w_j` are the kernel weights which depend on the
+    selected kernel and bandwidth.  :math:`z_{ji}` is the vector of instruments
+    for equation j and :math:`\epsilon_{ji}` is the error for equation j for
+    observation i.  This form allows for heteroskedasticity and autocorrleation
+    between the moment conditions.
     """
+
     def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None,
                  optimal_bw=False):
         super(KernelWeightMatrix, self).__init__(center, debiased)
@@ -282,4 +286,19 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     @property
     def bandwidth(self):
+        """Bandwidth used to estimate covariance of moment conditions"""
         return self._bandwidth
+
+    @property
+    def config(self):
+        """
+        Weight estimator configuration
+
+        Returns
+        -------
+        config : AttrDict
+            Dictionary containing weight estimator configuration information
+        """
+        out = AttrDict([(k, v) for k, v in self._config.items()])
+        out['bandwidth'] = self.bandwidth
+        return out

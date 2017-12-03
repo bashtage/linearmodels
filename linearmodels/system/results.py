@@ -33,6 +33,7 @@ class _CommonResults(_SummaryStr):
         self._rss = results.resid_ss
         self._datetime = dt.datetime.now()
         self._cov_estimator = results.cov_estimator
+        self._cov_config = results.cov_config
 
     @property
     def method(self):
@@ -49,6 +50,11 @@ class _CommonResults(_SummaryStr):
     def cov_estimator(self):
         """Type of covariance estimator used to compute covariance"""
         return self._cov_type
+
+    @property
+    def cov_config(self):
+        """Configuration of covariance estimator used to compute covariance"""
+        return self._cov_config
 
     @property
     def iterations(self):

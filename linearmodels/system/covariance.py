@@ -55,6 +55,7 @@ class HomoskedasticCovariance(object):
         self._constraints = constraints
         self._name = 'Homoskedastic (Unadjusted) Covariance'
         self._str_extra = AttrDict(Debiased=self._debiased, GLS=self._gls)
+        self._cov_config = AttrDict(debiased=self._debiased)
 
     def __str__(self):
         out = self._name
@@ -126,6 +127,11 @@ class HomoskedasticCovariance(object):
             return adj * self._gls_cov()
         else:
             return adj * self._mvreg_cov()
+
+    @property
+    def cov_config(self):
+        """Optional configuration information used in covariance"""
+        return self._cov_config
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
@@ -296,9 +302,17 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._check_bandwidth(bandwidth)
         self._name = 'Kernel (HAC) Covariance'
         self._str_extra['Kernel'] = kernel
+        self._cov_config['kernel'] = kernel
 
     def _xeex(self):
         return self._kernel_cov(self._moments)
+
+    @property
+    def cov_config(self):
+        """Optional configuration information used in covariance"""
+        out = AttrDict([(k, v) for k, v in self._cov_config.items()])
+        out['bandwidth'] = self.bandwidth
+        return out
 
 
 class GMMHomoskedasticCovariance(object):
@@ -339,6 +353,7 @@ class GMMHomoskedasticCovariance(object):
         self._w = w
         self._debiased = debiased
         self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
+        self._cov_config = AttrDict(debiased=self._debiased)
 
     def __str__(self):
         out = self._name
@@ -388,6 +403,11 @@ class GMMHomoskedasticCovariance(object):
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
+
+    @property
+    def cov_config(self):
+        """Optional configuration information used in covariance"""
+        return self._cov_config
 
 
 class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
@@ -487,6 +507,14 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self._name = 'GMM Kernel (HAC) Covariance'
         self._check_bandwidth(bandwidth)
         self._check_kernel(kernel)
+        self._cov_config['kernel'] = kernel
 
     def _omega(self):
         return self._kernel_cov(self._moments)
+
+    @property
+    def cov_config(self):
+        """Optional configuration information used in covariance"""
+        out = AttrDict([(k, v) for k, v in self._cov_config.items()])
+        out['bandwidth'] = self.bandwidth
+        return out
