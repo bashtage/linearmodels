@@ -332,6 +332,8 @@ class GMMHomoskedasticCovariance(object):
         Weighting matrix used in estimation
     sigma : ndarray, optional
         Residual covariance used in estimation
+    constraints : {None, LinearConstraint}, optional
+        Constraints used in estimation, if any
 
     Notes
     -----
@@ -345,13 +347,14 @@ class GMMHomoskedasticCovariance(object):
     moments in the system
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False):
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False, constraints=None):
         self._x = x
         self._z = z
         self._eps = eps
         self._sigma = sigma
         self._w = w
         self._debiased = debiased
+        self._constraints = constraints
         self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
         self._cov_config = AttrDict(debiased=self._debiased)
 
@@ -376,11 +379,19 @@ class GMMHomoskedasticCovariance(object):
 
         omega = self._omega()
         xpz_wi_omega_wi_zpx = xpz @ wi @ omega @ wi @ xpz.T
-        xpz_wi_zpxi = inv(xpz_wi_zpx)
-        cov = xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi / nobs
-        cov = (cov + cov.T) / 2
 
         adj = self._adjustment()
+        if self._constraints is None:
+            xpz_wi_zpxi = inv(xpz_wi_zpx)
+            cov = xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi / nobs
+        else:
+            cons = self._constraints
+            xpz_wi_zpx = cons.t.T @ xpz_wi_zpx @ cons.t
+            xpz_wi_zpxi = inv(xpz_wi_zpx)
+            xpz_wi_omega_wi_zpx = cons.t.T @ xpz_wi_omega_wi_zpx @ cons.t
+            cov = cons.t @ xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi @ cons.t.T / nobs
+
+        cov = (cov + cov.T) / 2
         return adj * cov
 
     def _omega(self):
@@ -427,6 +438,8 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         Weighting matrix used in estimation
     sigma : ndarray, optional
         Residual covariance used in estimation
+    constraints : {None, LinearConstraint}, optional
+        Constraints used in estimation, if any
 
     Notes
     -----
@@ -439,8 +452,8 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
     where :math:`\Omega` is the covariance of the moment conditions.
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False):
-        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased)
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False, constraints=None):
+        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints)
         self._name = 'GMM Heteroskedastic (Robust) Covariance'
 
         k = len(z)
@@ -479,6 +492,8 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         Weighting matrix used in estimation
     sigma : ndarray, optional
         Residual covariance used in estimation
+    constraints : {None, LinearConstraint}, optional
+        Constraints used in estimation, if any
     kernel : str, optional
         Name of kernel to use.  Supported kernels include:
 
@@ -501,9 +516,9 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     where :math:`\Omega` is the covariance of the moment conditions.
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False,
+    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False, constraints=None,
                  kernel='bartlett', bandwidth=None):
-        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased)
+        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints)
         self._name = 'GMM Kernel (HAC) Covariance'
         self._check_bandwidth(bandwidth)
         self._check_kernel(kernel)
