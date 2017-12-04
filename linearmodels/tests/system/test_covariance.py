@@ -2,10 +2,12 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.iv.covariance import kernel_weight_parzen
+from linearmodels.iv.covariance import kernel_weight_parzen, kernel_weight_bartlett
 from linearmodels.system.covariance import GMMHeteroskedasticCovariance, \
     GMMHomoskedasticCovariance, HeteroskedasticCovariance, HomoskedasticCovariance, \
-    KernelCovariance
+    KernelCovariance, GMMKernelCovariance
+from linearmodels.system.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
+    KernelWeightMatrix
 from linearmodels.system.model import IV3SLS
 from linearmodels.tests.system._utility import generate_3sls_data_v2
 
@@ -74,6 +76,30 @@ def _xpxi(x):
                 xpx[loc:loc + kx, loc:loc + kx] = x[i].T @ x[i] / nobs
                 loc += kx
     return np.linalg.inv(xpx)
+
+
+def _xpz(x, z):
+    k = len(x)
+    nobs = x[0].shape[0]
+    xpz = []
+    for i in range(k):
+        row = []
+        for j in range(k):
+            if i == j:
+                row.append(x[i].T @ z[i] / nobs)
+            else:
+                k1, k2 = x[i].shape[1], z[j].shape[1]
+                row.append(np.zeros((k1, k2)))
+        xpz.append(np.concatenate(row, 1))
+    xpz = np.concatenate(xpz, 0)
+    return xpz
+
+
+def _xpz_wi_zpxi(x, z, w):
+    xpz = _xpz(x, z)
+    out = xpz @ np.linalg.inv(w) @ xpz.T
+    out = (out + out.T) / 2
+    return np.linalg.inv(out)
 
 
 def test_str_repr(cov):
@@ -176,3 +202,103 @@ def test_kernel_direct(cov_data, debias):
     s = np.sqrt(np.diag(cov.cov))[:, None]
     c_direct = direct / (s @ s.T)
     assert_allclose(r_direct, c_direct, atol=1e-5)
+
+
+def test_gmm_homoskedastic_direct(cov_data, debias):
+    x, z, eps, sigma = cov_data
+    k = len(x)
+    nobs = x[0].shape[0]
+    wm = HomoskedasticWeightMatrix()
+    w = wm.weight_matrix(x, z, eps, sigma=sigma)
+    cov_est = GMMHomoskedasticCovariance(x, z, eps, w, sigma=sigma, debiased=debias)
+    xpz_wi_zpxi = _xpz_wi_zpxi(x, z, w)
+    xpz = _xpz(x, z)
+    wi = np.linalg.inv(w)
+    xpz_wi = xpz @ wi
+
+    big_z = []
+    for i in range(k):
+        row = []
+        for j in range(k):
+            if i == j:
+                row.append(z[i])
+            else:
+                row.append(np.zeros((nobs, z[j].shape[1])))
+        big_z.append(np.concatenate(row, 1))
+    big_z = np.concatenate(big_z, 0)
+    zeez = big_z.T @ np.kron(sigma, np.eye(nobs)) @ big_z / nobs
+    assert_allclose(zeez, cov_est._omega())
+
+    direct = xpz_wi_zpxi @ (xpz_wi @ zeez @ xpz_wi.T) @ xpz_wi_zpxi / nobs
+    direct = (direct + direct.T) / 2
+    if debias:
+        df = [vx.shape[1] * np.ones(vx.shape[1]) for vx in x]
+        df = np.concatenate(df)[:, None]
+        df = np.sqrt(df)
+        adj = nobs / (nobs - df @ df.T)
+        direct *= adj
+    direct = (direct + direct.T) / 2
+    assert_allclose(direct, cov_est.cov)
+
+
+def test_gmm_heterosedastic_direct(cov_data, debias):
+    x, z, eps, sigma = cov_data
+    k = len(x)
+    nobs = x[0].shape[0]
+    wm = HeteroskedasticWeightMatrix()
+    w = wm.weight_matrix(x, z, eps, sigma=sigma)
+    cov_est = GMMHeteroskedasticCovariance(x, z, eps, w, sigma=sigma, debiased=debias)
+    xpz_wi_zpxi = _xpz_wi_zpxi(x, z, w)
+    xpz = _xpz(x, z)
+    wi = np.linalg.inv(w)
+    xpz_wi = xpz @ wi
+    ze = [z[i] * eps[:, i:i + 1] for i in range(k)]
+    ze = np.concatenate(ze, 1)
+    zeez = ze.T @ ze / nobs
+    assert_allclose(zeez, cov_est._omega())
+
+    direct = xpz_wi_zpxi @ (xpz_wi @ zeez @ xpz_wi.T) @ xpz_wi_zpxi / nobs
+    direct = (direct + direct.T) / 2
+    if debias:
+        df = [vx.shape[1] * np.ones(vx.shape[1]) for vx in x]
+        df = np.concatenate(df)[:, None]
+        df = np.sqrt(df)
+        adj = nobs / (nobs - df @ df.T)
+        direct *= adj
+    direct = (direct + direct.T) / 2
+    assert_allclose(direct, cov_est.cov)
+
+
+def test_gmm_kernel_direct(cov_data):
+    x, z, eps, sigma = cov_data
+    bandwidth = 12
+    k = len(x)
+    nobs = x[0].shape[0]
+    wm = KernelWeightMatrix(kernel='bartlett', bandwidth=bandwidth)
+    w = wm.weight_matrix(x, z, eps, sigma=sigma)
+    cov_est = GMMKernelCovariance(x, z, eps, w, sigma=sigma, debiased=debias, kernel='bartlett',
+                                  bandwidth=bandwidth)
+
+    xpz_wi_zpxi = _xpz_wi_zpxi(x, z, w)
+    xpz = _xpz(x, z)
+    wi = np.linalg.inv(w)
+    xpz_wi = xpz @ wi
+    ze = [z[i] * eps[:, i:i + 1] for i in range(k)]
+    ze = np.concatenate(ze, 1)
+    zeez = ze.T @ ze / nobs
+    w = kernel_weight_bartlett(bandwidth)
+    for i in range(1, bandwidth + 1):
+        op = ze[:-i].T @ ze[i:] / nobs
+        zeez += w[i] * (op + op.T)
+    assert_allclose(zeez, cov_est._omega())
+
+    direct = xpz_wi_zpxi @ (xpz_wi @ zeez @ xpz_wi.T) @ xpz_wi_zpxi / nobs
+    direct = (direct + direct.T) / 2
+    if debias:
+        df = [vx.shape[1] * np.ones(vx.shape[1]) for vx in x]
+        df = np.concatenate(df)[:, None]
+        df = np.sqrt(df)
+        adj = nobs / (nobs - df @ df.T)
+        direct *= adj
+    direct = (direct + direct.T) / 2
+    assert_allclose(direct, cov_est.cov)

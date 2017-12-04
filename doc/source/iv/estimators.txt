@@ -429,7 +429,7 @@ where :math:`q=p-k_{2}`.
 
 **Basman’s F**
 
-Banmann’s F test of overidentification also examines the magnitude of
+Basmann’s F test of overidentification also examines the magnitude of
 the LIML :math:`\hat{\kappa}`. The test statistic is
 
 .. math:: \hat{\kappa}(n-p)/q\sim F_{q,n-n_{instr}}

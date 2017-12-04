@@ -224,7 +224,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     observation i and :math:`w_j` are the kernel weights which depend on the
     selected kernel and bandwidth.  :math:`z_{ji}` is the vector of instruments
     for equation j and :math:`\epsilon_{ji}` is the error for equation j for
-    observation i.  This form allows for heteroskedasticity and autocorrleation
+    observation i.  This form allows for heteroskedasticity and autocorrelation
     between the moment conditions.
     """
 

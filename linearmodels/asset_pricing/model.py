@@ -811,7 +811,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         return GMMFactorModelResults(res)
 
     def _moments(self, parameters, excess_returns):
-        """Calculate nobs by nmoments moment condifions"""
+        """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
         p = self.portfolios.ndarray
         nobs, n = p.shape

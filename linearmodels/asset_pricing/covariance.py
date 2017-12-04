@@ -64,7 +64,7 @@ class HeteroskedasticCovariance(object):
     Parameters
     ----------
     xe : ndarray
-        Scores/moment conditionas
+        Scores/moment conditions
     jacobian : ndarray, optional
         Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
@@ -72,7 +72,7 @@ class HeteroskedasticCovariance(object):
         Inverse jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
     center : bool, optional
-        Falg indicating to center the scores when computing the covariance
+        Flag indicating to center the scores when computing the covariance
     debiased : bool, optional
         Flag indicating to use a debiased estimator
     df : int, optional

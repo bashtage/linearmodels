@@ -54,7 +54,7 @@ def annihilate(y, x):
 
 
 def parse_formula(formula, data):
-    """Parse an IV model forumla"""
+    """Parse an IV model formula"""
     na_action = NAAction(on_NA='raise', NA_types=[])
     if formula.count('~') == 1:
         dep, exog = dmatrices(formula, data, return_type='dataframe', NA_action=na_action)

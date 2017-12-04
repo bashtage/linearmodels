@@ -738,7 +738,7 @@ class PanelOLS(PooledOLS):
         return mod
 
     def _slow_path(self):
-        """Frisch-Waigh-Lovell implementation, works for all scenarios"""
+        """Frisch-Waugh-Lovell implementation, works for all scenarios"""
         has_effect = self.entity_effects or self.time_effects or self.other_effects
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -1057,7 +1057,7 @@ class PanelOLS(PooledOLS):
         if weighted:
             eps = (_y - y_effects) - (_x - x_effects) @ params
             if self.has_constant:
-                # Correction since y_effecs and x_effects @ params add mean
+                # Correction since y_effects and x_effects @ params add mean
                 w = self.weights.values2d
                 eps -= (w * eps).sum() / w.sum()
 
@@ -1659,7 +1659,7 @@ class FamaMacBeth(PooledOLS):
         y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
 
     The Fama-MacBeth estimator is computed by performing T regressions, one
-    for each time period using all availabl entity observations.  Denote the
+    for each time period using all available entity observations.  Denote the
     estimate of the model parameters as :math:`\hat{\beta}_t`.  The reported
     estimator is then
 
@@ -1672,7 +1672,7 @@ class FamaMacBeth(PooledOLS):
     time period is "as-if" time effects are included.
 
     Parameter inference is made using the set T parameter estimates using
-    either the standard covariance estiamtor or a kernel-based covariance,
+    either the standard covariance estimator or a kernel-based covariance,
     depending on ``cov_type``.
     """
 

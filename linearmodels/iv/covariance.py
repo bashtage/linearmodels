@@ -119,7 +119,7 @@ def kernel_weight_quadratic_spectral(bw, n):
 
     Notes
     -----
-    Unlike the Barrlett or Parzen kernels, the QS kernel is not truncated at
+    Unlike the Bartlett or Parzen kernels, the QS kernel is not truncated at
     a specific lag, and so weights are computed for all available lags in
     the sample.
 

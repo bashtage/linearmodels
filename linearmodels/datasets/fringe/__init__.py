@@ -1,3 +1,4 @@
+# noinspection SpellCheckingInspection,SpellCheckingInspection
 DESCR = """
 F. Vella (1993), "A Simple Estimator for Simultaneous Models with Censored
 Endogenous Regressors," International Economic Review 34, 441-457.

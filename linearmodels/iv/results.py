@@ -807,7 +807,7 @@ class IVResults(_CommonIVResults):
 
         Notes
         -----
-        Banmann's F test examines whether the value of :math:`\kappa`
+        Basmann's F test examines whether the value of :math:`\kappa`
         computed for the LIML estimator is sufficiently close to one to
         indicate the model is not overidentified. The test statistic is
 

@@ -1262,7 +1262,7 @@ class IVSystemGMM(IV3SLS):
             Name of covariance estimator. Valid options are
 
             * 'unadjusted', 'homoskedastic' - Classic covariance estimator
-            * 'robust', 'heteroskedastic' - Heteroskedasticit robust
+            * 'robust', 'heteroskedastic' - Heteroskedasticity robust
               covariance estimator
 
         **cov_config

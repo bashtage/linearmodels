@@ -460,7 +460,7 @@ class GMMSystemResults(SystemResults):
 
           n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q
 
-        where :math:`\bar{g}` is the average of the moment conditiona and
+        where :math:`\bar{g}` is the average of the moment conditional and
         :math:`W` is a consistent estimator of the variance of
         :math:`\sqrt{n}\bar{g}`. The degree of freedom is
         :math:`q = n_{instr} - n_{endog}`.
