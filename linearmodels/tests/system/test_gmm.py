@@ -6,7 +6,10 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.system import IVSystemGMM
+from linearmodels.iv.covariance import kernel_weight_parzen
+from linearmodels.system import IVSystemGMM, IV3SLS
+from linearmodels.system.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
+    KernelWeightMatrix
 from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
 from linearmodels.utility import AttrDict
 
@@ -36,6 +39,28 @@ def data(request):
 
     return AttrDict(eqns=eqns, x=x, y=y, z=z, steps=steps,
                     robust=robust, weight_type=weight_type)
+
+
+@pytest.fixture(scope='module')
+def weight_data():
+    eqns = generate_3sls_data_v2(k=2)
+    mod = IV3SLS(eqns)
+    x = mod._x
+    z = mod._z
+    res = mod.fit(cov_type='unadjusted')
+    eps = res.resids.values
+    sigma = res.sigma
+    return x, z, eps, sigma
+
+
+@pytest.fixture(params=[True, False])
+def center(request):
+    return request.param
+
+
+@pytest.fixture(params=[True, False])
+def debias(request):
+    return request.param
 
 
 def test_params(data):
@@ -268,7 +293,7 @@ def test_kernel_equiv(data):
     assert_allclose(res.tstats, rob_res.tstats)
 
 
-def test_kernel_optimal_bandwidth_smoke(data):
+def test_kernel_optimal_bandwidth(data):
     mod = IVSystemGMM(data.eqns, weight_type='kernel')
     res = mod.fit(cov_type='kernel', debiased=True)
     nobs = data.eqns[list(data.eqns.keys())[0]].dependent.shape[0]
@@ -276,3 +301,68 @@ def test_kernel_optimal_bandwidth_smoke(data):
 
     mod = IVSystemGMM(data.eqns, weight_type='kernel', optimal_bw=True)
     mod.fit(cov_type='kernel', debiased=True)
+
+
+def test_homoskedastic_weight_direct(weight_data, center, debias):
+    wm = HomoskedasticWeightMatrix(center, debias)
+    x, z, eps, sigma = weight_data
+    weights = wm.weight_matrix(x, z, eps, sigma=sigma)
+    nobs = x[0].shape[0]
+    big_z = []
+    k = len(z)
+    for i in range(k):
+        row = []
+        for j in range(k):
+            if i == j:
+                row.append(z[j])
+            else:
+                row.append(np.zeros_like(z[j]))
+        big_z.append(np.concatenate(row, 1))
+    big_z = np.concatenate(big_z, 0)
+    direct = big_z.T @ np.kron(sigma, np.eye(nobs)) @ big_z / nobs
+    assert_allclose(weights, direct)
+
+
+def test_heteroskedastic_weight_direct(weight_data, center, debias):
+    wm = HeteroskedasticWeightMatrix(center, debias)
+    x, z, eps, sigma = weight_data
+    weights = wm.weight_matrix(x, z, eps, sigma=sigma)
+    k = len(z)
+    ze = [z[i] * eps[:, i:i + 1] for i in range(k)]
+    ze = np.concatenate(ze, 1)
+    if center:
+        ze = ze - ze.mean(0)
+    nobs = ze.shape[0]
+    direct = ze.T @ ze / nobs
+    if debias:
+        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z)]
+        df = np.concatenate(df)[:, None]
+        df = np.sqrt(df)
+        adj = nobs / (nobs - df @ df.T)
+        direct *= adj
+    assert_allclose(weights, direct)
+
+
+def test_kernel_weight_direct(weight_data, center, debias):
+    bandwidth = 12
+    wm = KernelWeightMatrix(center, debias, kernel='parzen', bandwidth=bandwidth)
+    x, z, eps, sigma = weight_data
+    weights = wm.weight_matrix(x, z, eps, sigma=sigma)
+    k = len(z)
+    ze = [z[i] * eps[:, i:i + 1] for i in range(k)]
+    ze = np.concatenate(ze, 1)
+    if center:
+        ze = ze - ze.mean(0)
+    nobs = ze.shape[0]
+    direct = ze.T @ ze / nobs
+    w = kernel_weight_parzen(bandwidth)
+    for i in range(1, bandwidth + 1):
+        op = ze[:-i].T @ ze[i:] / nobs
+        direct += w[i] * (op + op.T)
+    if debias:
+        df = [vx.shape[1] * np.ones(vz.shape[1]) for vx, vz in zip(x, z)]
+        df = np.concatenate(df)[:, None]
+        df = np.sqrt(df)
+        adj = nobs / (nobs - df @ df.T)
+        direct *= adj
+    assert_allclose(weights, direct)
