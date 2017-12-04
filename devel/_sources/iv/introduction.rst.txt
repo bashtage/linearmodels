@@ -119,7 +119,7 @@ GMM and GMM-CUE Estimation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * ``weight_type`` accepts a string which indicates the type of weighting
-  matrix to use in the GMM estimation proceedure.  There are four classes
+  matrix to use in the GMM estimation procedure.  There are four classes
   if weighting matrices available:
 
   * 'unadjusted' - Assumes the GMM moment conditions are homoskedastic. See

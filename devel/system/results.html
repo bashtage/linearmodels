@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.1+44.gedbb2c2 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.1+48.g7e2ca8e documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.1+44.gedbb2c2',
+        VERSION:     '4.1+48.g7e2ca8e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.1 (+44, gedbb2c2)</a>
+    ../index.html" class="text-logo">linearmodels 4.1 (+48, g7e2ca8e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -139,6 +139,8 @@
             
   <div class="section" id="module-linearmodels.system.results">
 <span id="estimation-results"></span><span id="system-models-module-reference-results"></span><h1>Estimation Results<a class="headerlink" href="#module-linearmodels.system.results" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sur-and-3sls">
+<h2>SUR and 3SLS<a class="headerlink" href="#sur-and-3sls" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.system.results.SystemResults">
 <em class="property">class </em><code class="descname">SystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults" title="Permalink to this definition">¶</a></dt>
@@ -317,6 +319,9 @@
 
 </dd></dl>
 
+</div>
+<div class="section" id="generalized-method-of-moments-gmm">
+<h2>Generalized Method of Moments (GMM)<a class="headerlink" href="#generalized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.system.results.GMMSystemResults">
 <em class="property">class </em><code class="descname">GMMSystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#GMMSystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults" title="Permalink to this definition">¶</a></dt>
@@ -414,7 +419,7 @@ close to zero to indicate that the model is not overidentified. The
 statistic is defined as</p>
 <div class="math">
 \[n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q\]</div>
-<p>where <span class="math">\(\bar{g}\)</span> is the average of the moment conditiona and
+<p>where <span class="math">\(\bar{g}\)</span> is the average of the moment conditional and
 <span class="math">\(W\)</span> is a consistent estimator of the variance of
 <span class="math">\(\sqrt{n}\bar{g}\)</span>. The degree of freedom is
 <span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
@@ -531,6 +536,7 @@ statistic is defined as</p>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -565,7 +571,7 @@ statistic is defined as</p>
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.1+44.gedbb2c2 documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.1+48.g7e2ca8e documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+44.gedbb2c2',
+        VERSION:     '4.1+48.g7e2ca8e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+44, gedbb2c2)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+48, g7e2ca8e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -859,7 +859,7 @@
         <span class="k">return</span> <span class="n">mod</span></div>
 
     <span class="k">def</span> <span class="nf">_slow_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Frisch-Waigh-Lovell implementation, works for all scenarios&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Frisch-Waugh-Lovell implementation, works for all scenarios&quot;&quot;&quot;</span>
         <span class="n">has_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">root_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
@@ -1178,7 +1178,7 @@
         <span class="k">if</span> <span class="n">weighted</span><span class="p">:</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">_y</span> <span class="o">-</span> <span class="n">y_effects</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">_x</span> <span class="o">-</span> <span class="n">x_effects</span><span class="p">)</span> <span class="o">@</span> <span class="n">params</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
-                <span class="c1"># Correction since y_effecs and x_effects @ params add mean</span>
+                <span class="c1"># Correction since y_effects and x_effects @ params add mean</span>
                 <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
                 <span class="n">eps</span> <span class="o">-=</span> <span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -1780,7 +1780,7 @@
 <span class="sd">        y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}</span>
 
 <span class="sd">    The Fama-MacBeth estimator is computed by performing T regressions, one</span>
-<span class="sd">    for each time period using all availabl entity observations.  Denote the</span>
+<span class="sd">    for each time period using all available entity observations.  Denote the</span>
 <span class="sd">    estimate of the model parameters as :math:`\hat{\beta}_t`.  The reported</span>
 <span class="sd">    estimator is then</span>
 
@@ -1793,7 +1793,7 @@
 <span class="sd">    time period is &quot;as-if&quot; time effects are included.</span>
 
 <span class="sd">    Parameter inference is made using the set T parameter estimates using</span>
-<span class="sd">    either the standard covariance estiamtor or a kernel-based covariance,</span>
+<span class="sd">    either the standard covariance estimator or a kernel-based covariance,</span>
 <span class="sd">    depending on ``cov_type``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1903,7 +1903,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

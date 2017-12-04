@@ -3,8 +3,10 @@ Change Log
 
 Since Version 4.0
 =================
-* Re-release to fix PyPi errors
 * Added System GMM estimator
+* Added automatic bandwidth for kernel-based GMM weighting estimators
+* Cleaned up HAC estimation across models
+* Re-release to fix PyPi errors
 
 Version 4.0
 ===========

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.1+44.gedbb2c2 documentation</title>
+    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.1+48.g7e2ca8e documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.1+44.gedbb2c2',
+        VERSION:     '4.1+48.g7e2ca8e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.1 (+44, gedbb2c2)</a>
+    ../index.html" class="text-logo">linearmodels 4.1 (+48, g7e2ca8e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -139,8 +139,10 @@
             
   <div class="section" id="module-linearmodels.system.covariance">
 <span id="system-regression-estimator-covariance-estimation"></span><span id="system-models-module-reference-covariance"></span><h1>System Regression Estimator Covariance Estimation<a class="headerlink" href="#module-linearmodels.system.covariance" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sur-and-3sls">
+<h2>SUR and 3SLS<a class="headerlink" href="#sur-and-3sls" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="homoskedastic-covariance-estimation">
-<h2>Homoskedastic Covariance Estimation<a class="headerlink" href="#homoskedastic-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>Homoskedastic Covariance Estimation<a class="headerlink" href="#homoskedastic-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.HomoskedasticCovariance">
 <em class="property">class </em><code class="descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>*</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
@@ -192,7 +194,7 @@ not used, the covariance is estimated by</p>
 
 </div>
 <div class="section" id="heteroskedasticity-robust-covariance-estimation">
-<h2>Heteroskedasticity Robust Covariance Estimation<a class="headerlink" href="#heteroskedasticity-robust-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>Heteroskedasticity Robust Covariance Estimation<a class="headerlink" href="#heteroskedasticity-robust-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.HeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
@@ -246,7 +248,7 @@ residuals and the weighted X matrix <span class="math">\(\Omega^{-1/2}X\)</span>
 
 </div>
 <div class="section" id="heteroskedasticity-autocorrelation-hac-robust-covariance-estimation">
-<h2>Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation<a class="headerlink" href="#heteroskedasticity-autocorrelation-hac-robust-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation<a class="headerlink" href="#heteroskedasticity-autocorrelation-hac-robust-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.KernelCovariance">
 <em class="property">class </em><code class="descname">KernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>*</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
@@ -326,12 +328,15 @@ based on the model residuals and the weighted X matrix <span class="math">\(\Ome
 </dd></dl>
 
 </div>
+</div>
+<div class="section" id="genralized-method-of-moments-gmm">
+<h2>Genralized Method of Moments (GMM)<a class="headerlink" href="#genralized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="gmm-homoskedastic-covariance-estimation">
-<h2>GMM Homoskedastic Covariance Estimation<a class="headerlink" href="#gmm-homoskedastic-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>GMM Homoskedastic Covariance Estimation<a class="headerlink" href="#gmm-homoskedastic-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.GMMHomoskedasticCovariance">
 <em class="property">class </em><code class="descname">GMMHomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMHomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMHomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Covariance estimator for IV system estimation with homoskedasitc data</p>
+<dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -371,11 +376,11 @@ moments in the system</p>
 
 </div>
 <div class="section" id="gmm-heteroskedasticity-robust-covariance-estimation">
-<h2>GMM Heteroskedasticity Robust Covariance Estimation<a class="headerlink" href="#gmm-heteroskedasticity-robust-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>GMM Heteroskedasticity Robust Covariance Estimation<a class="headerlink" href="#gmm-heteroskedasticity-robust-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.GMMHeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">GMMHeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMHeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMHeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Covariance estimator for IV system estimation with homoskedasitc data</p>
+<dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -414,11 +419,11 @@ equation in the system</li>
 
 </div>
 <div class="section" id="gmm-heteroskedasticity-autocorrelation-hac-robust-covariance-estimation">
-<h2>GMM Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation<a class="headerlink" href="#gmm-heteroskedasticity-autocorrelation-hac-robust-covariance-estimation" title="Permalink to this headline">¶</a></h2>
+<h3>GMM Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation<a class="headerlink" href="#gmm-heteroskedasticity-autocorrelation-hac-robust-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="linearmodels.system.covariance.GMMKernelCovariance">
 <em class="property">class </em><code class="descname">GMMKernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMKernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMKernelCovariance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Covariance estimator for IV system estimation with homoskedasitc data</p>
+<dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -480,6 +485,7 @@ bandwidth will be estimated.</li>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -514,7 +520,7 @@ bandwidth will be estimated.</li>
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1+48.g7e2ca8e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

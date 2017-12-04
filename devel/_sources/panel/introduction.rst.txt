@@ -73,7 +73,7 @@ man is married and a dummy indicating if the man is a union member.
 
 
 While the result contains many properties containing specific quantities of
-interest (e.g., ``params`` or ``tstata``), the string representation of the
+interest (e.g., ``params`` or ``tstats``), the string representation of the
 result is a summary table.
 
 ::
