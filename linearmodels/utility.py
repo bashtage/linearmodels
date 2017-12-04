@@ -24,27 +24,43 @@ class AttrDict(MutableMapping):
     """
 
     def update(self, *args, **kwargs):
+        """
+        Update AD from dict/iterable E and F.
+        If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]
+        If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v
+        In either case, this is followed by: for k in F:  AD[k] = F[k]
+        """
         self.__ordered_dict__.update(*args, **kwargs)
 
     def clear(self):
+        """Remove all items from AD. """
         self.__ordered_dict__.clear()
 
     def copy(self):
+        """Create a shallow copy of AD """
         ad = AttrDict()
         for key in self.__ordered_dict__.keys():
             ad[key] = self.__ordered_dict__[key]
         return ad
 
     def keys(self):
+        """Return an ordered list-like object providing a view on AD's keys """
         return self.__ordered_dict__.keys()
 
     def items(self):
+        """Return an ordered list-like object providing a view on AD's items """
         return self.__ordered_dict__.items()
 
     def values(self):
+        """Return an ordered list-like object object providing a view on AD's values """
         return self.__ordered_dict__.values()
 
     def pop(self, key, default=None):
+        """
+        Remove specified key and return the corresponding value.
+        If key is not found, default is returned if given, otherwise KeyError is raised
+        """
+
         return self.__ordered_dict__.pop(key, default)
 
     def __len__(self):

@@ -574,6 +574,7 @@ class IV3SLS(object):
                                        sigma, individual, debiased)
         results['wresid'] = results.resid
         results['cov_estimator'] = cov_est
+        results['cov_config'] = cov_est.cov_config
 
         return SystemResults(results)
 
@@ -777,6 +778,7 @@ class IV3SLS(object):
         stats['method'] = method
         stats['cov_type'] = cov_type
         stats['cov_estimator'] = cov_est
+        stats['cov_config'] = cov_est.cov_config
         stats['weight_estimator'] = weight_est
         stats['index'] = self._dependent[i].rows
         stats['iter'] = iter_count
@@ -890,6 +892,7 @@ class IV3SLS(object):
         wresid = hstack(wresid)
         results['wresid'] = wresid
         results['cov_estimator'] = cov_est
+        results['cov_config'] = cov_est.cov_config
 
         return SystemResults(results)
 
@@ -1319,10 +1322,9 @@ class IVSystemGMM(IV3SLS):
             eps = hstack(eps)
             iters += 1
 
-        # TODO: Add constraints to covariance estimators
         cov_type = COV_TYPES[cov_type]
         cov_est = GMM_COV_EST[cov_type]
-        cov = cov_est(wx, wz, eps, w, sigma=sigma, **cov_config)
+        cov = cov_est(wx, wz, eps, w, sigma=sigma, constraints=self._constraints, **cov_config)
 
         weps = eps
         eps = []
@@ -1393,8 +1395,9 @@ class IVSystemGMM(IV3SLS):
         results['wresid'] = wresid
         results['wmat'] = wmat
         results['weight_type'] = self._weight_type
-        results['weight_config'] = self._weight_config
+        results['weight_config'] = self._weight_est.config
         results['cov_estimator'] = cov_est
+        results['cov_config'] = cov_est.cov_config
         results['weight_estimator'] = self._weight_est
         results['j_stat'] = self._j_statistic(beta, wmat)
 
