@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.model &#8212; linearmodels 4.1 documentation</title>
+    <title>linearmodels.iv.model &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -122,8 +122,6 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Instrumental variable estimators</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
-
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="nb">any</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">average</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">isscalar</span><span class="p">,</span> <span class="n">logical_not</span><span class="p">,</span>
                    <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">nanmean</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">eigvalsh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">pinv</span>
@@ -874,7 +872,7 @@
         <span class="n">_params</span> <span class="o">=</span> <span class="n">params</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="c1"># _params = params = self.estimate_parameters(wx, wy, wz, wmat)</span>
 
-        <span class="n">iters</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">tol</span>
+        <span class="n">iters</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">tol</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">while</span> <span class="n">iters</span> <span class="o">&lt;</span> <span class="n">iter_limit</span> <span class="ow">and</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
             <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
@@ -1213,7 +1211,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

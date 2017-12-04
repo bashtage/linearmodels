@@ -345,7 +345,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals.  If the regresssor was in fact exogenous, the residuals should not be correlated with the dependent variable."
+    "The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals.  If the regressor was in fact exogenous, the residuals should not be correlated with the dependent variable."
    ]
   },
   {

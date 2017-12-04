@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Utilities &#8212; linearmodels 4.1 documentation</title>
+    <title>Utilities &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="system/mathematical-formula.html" title="Formulas and Mathematical Detail"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -70,7 +70,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    index.html" class="text-logo">linearmodels 4.1</a>
+    index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -209,6 +209,58 @@ F(df, df_denom) distribution.</li>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="linearmodels.utility.AttrDict">
+<em class="property">class </em><code class="descname">AttrDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ordered dictionary-like object that exposes keys as attributes</p>
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all items from AD.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a shallow copy of AD</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.items">
+<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ordered list-like object providing a view on AD’s items</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ordered list-like object providing a view on AD’s keys</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove specified key and return the corresponding value.
+If key is not found, default is returned if given, otherwise KeyError is raised</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update AD from dict/iterable E and F.
+If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]
+If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v
+In either case, this is followed by: for k in F:  AD[k] = F[k]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.utility.AttrDict.values">
+<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ordered list-like object object providing a view on AD’s values</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -244,7 +296,7 @@ F(df, df_denom) distribution.</li>
         <li class="right" >
           <a href="system/mathematical-formula.html" title="Formulas and Mathematical Detail"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

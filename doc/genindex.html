@@ -16,13 +16,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Index &#8212; linearmodels 4.1 documentation</title>
+    <title>Index &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    index.html" class="text-logo">linearmodels 4.1</a>
+    index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -139,6 +139,7 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
@@ -151,6 +152,8 @@
       <li><a href="system/models.html#linearmodels.system.model.IV3SLS.add_constraints">add_constraints() (IV3SLS method)</a>
 
       <ul>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.add_constraints">(IVSystemGMM method)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.add_constraints">(SUR method)</a>
 </li>
       </ul></li>
@@ -159,6 +162,8 @@
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.alphas">alphas (LinearFactorModelResults attribute)</a>
 </li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVResults.anderson_rubin">anderson_rubin (IVResults attribute)</a>
+</li>
+      <li><a href="utility.html#linearmodels.utility.AttrDict">AttrDict (class in linearmodels.utility)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -169,13 +174,17 @@
       <li><a href="panel/covariance.html#linearmodels.panel.covariance.FamaMacBethKernelCovariance.bandwidth">bandwidth (FamaMacBethKernelCovariance attribute)</a>
 
       <ul>
-        <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.bandwidth">(KernelCovariance attribute)</a>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance.bandwidth">(GMMKernelCovariance attribute)</a>
+</li>
+        <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.bandwidth">(KernelCovariance attribute)</a>, <a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance.bandwidth">[1]</a>
+</li>
+        <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.bandwidth">(KernelWeightMatrix attribute)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix.bandwidth">[1]</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVResults.basmann">basmann (IVResults attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="iv/results.html#linearmodels.iv.results.IVResults.basmann">basmann (IVResults attribute)</a>
+</li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVResults.basmann_f">basmann_f (IVResults attribute)</a>
 </li>
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.betas">betas (LinearFactorModelResults attribute)</a>
@@ -190,6 +199,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.c_stat">c_stat() (IVGMMResults method)</a>
 </li>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.clear">clear() (AttrDict method)</a>
+</li>
       <li><a href="iv/covariance.html#linearmodels.iv.covariance.ClusteredCovariance">ClusteredCovariance (class in linearmodels.iv.covariance)</a>
 
       <ul>
@@ -202,9 +213,11 @@
         <li><a href="panel/results.html#linearmodels.panel.results.compare">(in module linearmodels.panel.results)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.conf_int">conf_int() (IVGMMResults method)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.conf_int">conf_int() (GMMSystemResults method)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.conf_int">(IVGMMResults method)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.conf_int">(IVResults method)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.conf_int">(OLSResults method)</a>
@@ -218,12 +231,12 @@
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.conf_int">(SystemResults method)</a>
 </li>
       </ul></li>
-      <li><a href="iv/gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config">config (HeteroskedasticWeightMatrix attribute)</a>
+      <li><a href="iv/gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config">config (HeteroskedasticWeightMatrix attribute)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.config">[1]</a>
 
       <ul>
-        <li><a href="iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix.config">(HomoskedasticWeightMatrix attribute)</a>
+        <li><a href="iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix.config">(HomoskedasticWeightMatrix attribute)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.config">[1]</a>
 </li>
-        <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.config">(KernelWeightMatrix attribute)</a>
+        <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.config">(KernelWeightMatrix attribute)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix.config">[1]</a>
 </li>
         <li><a href="iv/gmm.html#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config">(OneWayClusteredWeightMatrix attribute)</a>
 </li>
@@ -231,11 +244,17 @@
       <li><a href="system/models.html#linearmodels.system.model.IV3SLS.constraints">constraints (IV3SLS attribute)</a>
 
       <ul>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.constraints">(IVSystemGMM attribute)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.constraints">(SUR attribute)</a>
 </li>
       </ul></li>
-      <li><a href="panel/data.html#linearmodels.panel.data.PanelData.copy">copy() (PanelData method)</a>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.copy">copy() (AttrDict method)</a>
+
+      <ul>
+        <li><a href="panel/data.html#linearmodels.panel.data.PanelData.copy">(PanelData method)</a>
 </li>
+      </ul></li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.count">count() (PanelData method)</a>
 </li>
       <li><a href="panel/covariance.html#linearmodels.panel.covariance.ACCovariance.cov">cov (ACCovariance attribute)</a>
@@ -249,6 +268,14 @@
 </li>
         <li><a href="panel/covariance.html#linearmodels.panel.covariance.FamaMacBethKernelCovariance.cov">(FamaMacBethKernelCovariance attribute)</a>
 </li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance.cov">(GMMHeteroskedasticCovariance attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance.cov">(GMMHomoskedasticCovariance attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance.cov">(GMMKernelCovariance attribute)</a>
+</li>
+        <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.cov">(GMMSystemResults attribute)</a>
+</li>
         <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.cov">(HeteroskedasticCovariance attribute)</a>, <a href="iv/covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance.cov">[1]</a>, <a href="panel/covariance.html#linearmodels.panel.covariance.HeteroskedasticCovariance.cov">[2]</a>, <a href="system/covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov">[3]</a>
 </li>
         <li><a href="iv/covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance.cov">(HomoskedasticCovariance attribute)</a>, <a href="panel/covariance.html#linearmodels.panel.covariance.HomoskedasticCovariance.cov">[1]</a>, <a href="system/covariance.html#linearmodels.system.covariance.HomoskedasticCovariance.cov">[2]</a>
@@ -257,7 +284,7 @@
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.cov">(IVResults attribute)</a>
 </li>
-        <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.cov">(KernelCovariance attribute)</a>, <a href="iv/covariance.html#linearmodels.iv.covariance.KernelCovariance.cov">[1]</a>
+        <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.cov">(KernelCovariance attribute)</a>, <a href="iv/covariance.html#linearmodels.iv.covariance.KernelCovariance.cov">[1]</a>, <a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance.cov">[2]</a>
 </li>
         <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.cov">(LinearFactorModelResults attribute)</a>
 </li>
@@ -274,17 +301,35 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.cov_config">cov_config (IVGMMResults attribute)</a>
+      <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance.cov_config">cov_config (GMMHeteroskedasticCovariance attribute)</a>
 
       <ul>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance.cov_config">(GMMHomoskedasticCovariance attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance.cov_config">(GMMKernelCovariance attribute)</a>
+</li>
+        <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.cov_config">(GMMSystemResults attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance.cov_config">(HeteroskedasticCovariance attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.HomoskedasticCovariance.cov_config">(HomoskedasticCovariance attribute)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.cov_config">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.cov_config">(IVResults attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance.cov_config">(KernelCovariance attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.cov_config">(OLSResults attribute)</a>
 </li>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.cov_config">(SystemResults attribute)</a>
+</li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.cov_estimator">cov_estimator (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.cov_estimator">cov_estimator (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.cov_estimator">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.cov_estimator">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.cov_estimator">(IVResults attribute)</a>
@@ -323,6 +368,8 @@
       <li><a href="iv/covariance.html#linearmodels.iv.covariance.ClusteredCovariance.debiased">debiased (ClusteredCovariance attribute)</a>
 
       <ul>
+        <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.debiased">(GMMSystemResults attribute)</a>
+</li>
         <li><a href="iv/covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance.debiased">(HeteroskedasticCovariance attribute)</a>
 </li>
         <li><a href="iv/covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance.debiased">(HomoskedasticCovariance attribute)</a>
@@ -358,11 +405,11 @@
       </ul></li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.demean">demean() (PanelData method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.df_model">df_model (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.df_model">df_model (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.df_model">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.df_model">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.df_model">(OLSResults attribute)</a>
@@ -376,9 +423,13 @@
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.df_model">(SystemResults attribute)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.df_resid">df_resid (IVGMMResults attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.df_resid">df_resid (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.df_resid">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.df_resid">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.df_resid">(OLSResults attribute)</a>
@@ -440,10 +491,18 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="system/results.html#linearmodels.system.results.SystemResults.equation_labels">equation_labels (SystemResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.equation_labels">equation_labels (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.equation_labels">(SystemResults attribute)</a>
 </li>
-      <li><a href="system/results.html#linearmodels.system.results.SystemResults.equations">equations (SystemResults attribute)</a>
+      </ul></li>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.equations">equations (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.equations">(SystemResults attribute)</a>
 </li>
+      </ul></li>
       <li><a href="iv/methods.html#linearmodels.iv.model.IV2SLS.estimate_parameters">estimate_parameters() (IV2SLS method)</a>
 
       <ul>
@@ -531,6 +590,8 @@
 </li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVLIML.fit">(IVLIML method)</a>
 </li>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.fit">(IVSystemGMM method)</a>
+</li>
         <li><a href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModel.fit">(LinearFactorModel method)</a>
 </li>
         <li><a href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM.fit">(LinearFactorModelGMM method)</a>
@@ -597,6 +658,8 @@
 </li>
         <li><a href="system/models.html#linearmodels.system.model.IV3SLS.from_formula">(linearmodels.system.model.IV3SLS class method)</a>
 </li>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.from_formula">(linearmodels.system.model.IVSystemGMM class method)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.from_formula">(linearmodels.system.model.SUR class method)</a>
 </li>
       </ul></li>
@@ -609,6 +672,16 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.general_demean">general_demean() (PanelData method)</a>
+</li>
+      <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance">GMMHeteroskedasticCovariance (class in linearmodels.system.covariance)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="system/covariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance">GMMHomoskedasticCovariance (class in linearmodels.system.covariance)</a>
+</li>
+      <li><a href="system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance">GMMKernelCovariance (class in linearmodels.system.covariance)</a>
+</li>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults">GMMSystemResults (class in linearmodels.system.results)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -637,6 +710,8 @@
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.has_constant">(IVResults attribute)</a>
 </li>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.has_constant">(IVSystemGMM attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.has_constant">(OLSResults attribute)</a>
 </li>
         <li><a href="panel/models.html#linearmodels.panel.model.PanelOLS.has_constant">(PanelOLS attribute)</a>
@@ -661,7 +736,11 @@
 </li>
       </ul></li>
       <li><a href="iv/gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix">HeteroskedasticWeightMatrix (class in linearmodels.iv.gmm)</a>
+
+      <ul>
+        <li><a href="system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">(class in linearmodels.system.gmm)</a>
 </li>
+      </ul></li>
       <li><a href="iv/covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance">HomoskedasticCovariance (class in linearmodels.iv.covariance)</a>
 
       <ul>
@@ -671,7 +750,11 @@
 </li>
       </ul></li>
       <li><a href="iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix">HomoskedasticWeightMatrix (class in linearmodels.iv.gmm)</a>
+
+      <ul>
+        <li><a href="system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">(class in linearmodels.system.gmm)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -704,11 +787,15 @@
         <li><a href="panel/data.html#linearmodels.panel.data.PanelData.isnull">(PanelData attribute)</a>
 </li>
       </ul></li>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.items">items() (AttrDict method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.iterations">iterations (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.iterations">iterations (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.iterations">(IVGMMResults attribute)</a>
+</li>
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.iterations">(SystemResults attribute)</a>
 </li>
       </ul></li>
@@ -730,6 +817,8 @@
 </li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVResults">IVResults (class in linearmodels.iv.results)</a>
 </li>
+      <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM">IVSystemGMM (class in linearmodels.system.model)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -738,8 +827,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="iv/methods.html#linearmodels.iv.model.IVGMMCUE.j">j() (IVGMMCUE method)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.j_stat">j_stat (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.j_stat">j_stat (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.j_stat">(IVGMMResults attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.j_statistic">j_statistic (LinearFactorModelResults attribute)</a>
@@ -764,8 +857,14 @@
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.kappa">(OLSResults attribute)</a>
 </li>
       </ul></li>
-      <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.kernel">kernel (KernelCovariance attribute)</a>
+      <li><a href="system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance.kernel">kernel (GMMKernelCovariance attribute)</a>
+
+      <ul>
+        <li><a href="asset-pricing/covariance.html#linearmodels.asset_pricing.covariance.KernelCovariance.kernel">(KernelCovariance attribute)</a>, <a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance.kernel">[1]</a>
 </li>
+        <li><a href="system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix.kernel">(KernelWeightMatrix attribute)</a>
+</li>
+      </ul></li>
       <li><a href="iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett">kernel_weight_bartlett() (covariance method)</a>
 </li>
   </ul></td>
@@ -779,8 +878,16 @@
       <ul>
         <li><a href="iv/covariance.html#linearmodels.iv.covariance.KernelCovariance">(class in linearmodels.iv.covariance)</a>
 </li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance">(class in linearmodels.system.covariance)</a>
+</li>
       </ul></li>
       <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix">KernelWeightMatrix (class in linearmodels.iv.gmm)</a>
+
+      <ul>
+        <li><a href="system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix">(class in linearmodels.system.gmm)</a>
+</li>
+      </ul></li>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.keys">keys() (AttrDict method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -818,6 +925,8 @@
 </li>
       <li><a href="system/covariance.html#module-linearmodels.system.covariance">linearmodels.system.covariance (module)</a>
 </li>
+      <li><a href="system/gmm-weights.html#module-linearmodels.system.gmm">linearmodels.system.gmm (module)</a>
+</li>
       <li><a href="system/models.html#module-linearmodels.system.model">linearmodels.system.model (module)</a>
 </li>
       <li><a href="system/results.html#module-linearmodels.system.results">linearmodels.system.results (module)</a>
@@ -840,9 +949,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.mean">mean() (PanelData method)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.method">method (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.method">method (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.method">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.method">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.method">(OLSResults attribute)</a>
@@ -850,11 +961,17 @@
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.method">(SystemResults attribute)</a>
 </li>
       </ul></li>
-      <li><a href="system/results.html#linearmodels.system.results.SystemResults.model">model (SystemResults attribute)</a>
-</li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.model_ss">model_ss (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.model">model (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.model">(SystemResults attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.model_ss">model_ss (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.model_ss">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.model_ss">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.model_ss">(OLSResults attribute)</a>
@@ -870,9 +987,11 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="system/models.html#linearmodels.system.model.IV3SLS.multivariate_ls">multivariate_ls() (linearmodels.system.model.IV3SLS class method)</a>
+      <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.multivariate_ls">multivariate_ls() (IVSystemGMM method)</a>
 
       <ul>
+        <li><a href="system/models.html#linearmodels.system.model.IV3SLS.multivariate_ls">(linearmodels.system.model.IV3SLS class method)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.multivariate_ls">(linearmodels.system.model.SUR class method)</a>
 </li>
       </ul></li>
@@ -910,9 +1029,11 @@
 </li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.nentity">nentity (PanelData attribute)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.nobs">nobs (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.nobs">nobs (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.nobs">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.nobs">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.nobs">(IVResults attribute)</a>
@@ -1001,12 +1122,16 @@
       <li><a href="system/models.html#linearmodels.system.model.IV3SLS.param_names">param_names (IV3SLS attribute)</a>
 
       <ul>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.param_names">(IVSystemGMM attribute)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.param_names">(SUR attribute)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.params">params (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.params">params (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.params">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.params">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.params">(IVResults attribute)</a>
@@ -1030,15 +1155,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="panel/models.html#linearmodels.panel.model.PooledOLS">PooledOLS (class in linearmodels.panel.model)</a>
 </li>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.pop">pop() (AttrDict method)</a>
+</li>
       <li><a href="utility.html#linearmodels.utility.InvalidTestStatistic.pval">pval (InvalidTestStatistic attribute)</a>
 
       <ul>
         <li><a href="utility.html#linearmodels.utility.WaldTestStatistic.pval">(WaldTestStatistic attribute)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.pvalues">pvalues (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.pvalues">pvalues (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.pvalues">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.pvalues">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.pvalues">(IVResults attribute)</a>
@@ -1083,12 +1212,16 @@
       <li><a href="system/models.html#linearmodels.system.model.IV3SLS.reset_constraints">reset_constraints() (IV3SLS method)</a>
 
       <ul>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.reset_constraints">(IVSystemGMM method)</a>
+</li>
         <li><a href="system/models.html#linearmodels.system.model.SUR.reset_constraints">(SUR method)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.resid_ss">resid_ss (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.resid_ss">resid_ss (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.resid_ss">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.resid_ss">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.resid_ss">(OLSResults attribute)</a>
@@ -1102,9 +1235,11 @@
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.resid_ss">(SystemResults attribute)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.resids">resids (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.resids">resids (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.resids">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.resids">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.resids">(OLSResults attribute)</a>
@@ -1128,19 +1263,21 @@
         <li><a href="iv/methods.html#linearmodels.iv.model.IVLIML.resids">(IVLIML method)</a>
 </li>
       </ul></li>
-      <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.residual_ss">residual_ss (LinearFactorModelResults attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.residual_ss">residual_ss (LinearFactorModelResults attribute)</a>
+</li>
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.risk_premia">risk_premia (LinearFactorModelResults attribute)</a>
 </li>
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.risk_premia_se">risk_premia_se (LinearFactorModelResults attribute)</a>
 </li>
       <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.risk_premia_tstats">risk_premia_tstats (LinearFactorModelResults attribute)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.rsquared">rsquared (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.rsquared">rsquared (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.rsquared">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.rsquared">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.rsquared">(IVResults attribute)</a>
@@ -1256,10 +1393,14 @@
 </li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.shape">shape (PanelData attribute)</a>
 </li>
-      <li><a href="system/covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance.sigma">sigma (HeteroskedasticCovariance attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.sigma">sigma (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance.sigma">(HeteroskedasticCovariance attribute)</a>
+</li>
         <li><a href="system/covariance.html#linearmodels.system.covariance.HomoskedasticCovariance.sigma">(HomoskedasticCovariance attribute)</a>
+</li>
+        <li><a href="system/covariance.html#linearmodels.system.covariance.KernelCovariance.sigma">(KernelCovariance attribute)</a>
 </li>
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.sigma">(SystemResults attribute)</a>
 </li>
@@ -1274,9 +1415,11 @@
       </ul></li>
       <li><a href="utility.html#linearmodels.utility.WaldTestStatistic.stat">stat (WaldTestStatistic attribute)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.std_errors">std_errors (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.std_errors">std_errors (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.std_errors">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.std_errors">(IVResults attribute)</a>
 </li>
         <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.std_errors">(LinearFactorModelResults attribute)</a>
@@ -1295,6 +1438,8 @@
       <li><a href="iv/results.html#linearmodels.iv.results.FirstStageResults.summary">summary (FirstStageResults attribute)</a>
 
       <ul>
+        <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.summary">(GMMSystemResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.summary">(IVGMMResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.summary">(IVModelComparison attribute)</a>
@@ -1350,9 +1495,11 @@
         <li><a href="panel/results.html#linearmodels.panel.results.RandomEffectsResults.time_info">(RandomEffectsResults attribute)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.total_ss">total_ss (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.total_ss">total_ss (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.total_ss">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.total_ss">(IVResults attribute)</a>
 </li>
         <li><a href="asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults.total_ss">(LinearFactorModelResults attribute)</a>
@@ -1372,9 +1519,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel">TradedFactorModel (class in linearmodels.asset_pricing.model)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.tstats">tstats (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.tstats">tstats (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.tstats">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.tstats">(IVModelComparison attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.tstats">(IVResults attribute)</a>
@@ -1397,9 +1546,19 @@
   </ul></td>
 </tr></table>
 
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.update">update() (AttrDict method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.values">values() (AttrDict method)</a>
+</li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.values2d">values2d (PanelData attribute)</a>
 </li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.values3d">values3d (PanelData attribute)</a>
@@ -1420,35 +1579,47 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.w">w (GMMSystemResults attribute)</a>
+</li>
       <li><a href="utility.html#linearmodels.utility.WaldTestStatistic">WaldTestStatistic (class in linearmodels.utility)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_config">weight_config (IVGMMResults attribute)</a>
-</li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_matrix">weight_matrix (IVGMMResults attribute)</a>
-</li>
-      <li><a href="iv/gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix">weight_matrix() (HeteroskedasticWeightMatrix method)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.weight_config">weight_config (GMMSystemResults attribute)</a>
 
       <ul>
-        <li><a href="iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix">(HomoskedasticWeightMatrix method)</a>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_config">(IVGMMResults attribute)</a>
 </li>
-        <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix">(KernelWeightMatrix method)</a>
+      </ul></li>
+      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_matrix">weight_matrix (IVGMMResults attribute)</a>
+</li>
+      <li><a href="iv/gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix">weight_matrix() (HeteroskedasticWeightMatrix method)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">[1]</a>
+
+      <ul>
+        <li><a href="iv/gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix">(HomoskedasticWeightMatrix method)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix">[1]</a>
+</li>
+        <li><a href="iv/gmm.html#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix">(KernelWeightMatrix method)</a>, <a href="system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[1]</a>
 </li>
         <li><a href="iv/gmm.html#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix">(OneWayClusteredWeightMatrix method)</a>
 </li>
       </ul></li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_type">weight_type (IVGMMResults attribute)</a>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.weight_type">weight_type (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.weight_type">(IVGMMResults attribute)</a>
 </li>
+      </ul></li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVResults.wooldridge_overid">wooldridge_overid (IVResults attribute)</a>
 </li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVResults.wooldridge_regression">wooldridge_regression (IVResults attribute)</a>
 </li>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVResults.wooldridge_score">wooldridge_score (IVResults attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.wresids">wresids (IVGMMResults attribute)</a>
+      <li><a href="iv/results.html#linearmodels.iv.results.IVResults.wooldridge_score">wooldridge_score (IVResults attribute)</a>
+</li>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.wresids">wresids (GMMSystemResults attribute)</a>
 
       <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.wresids">(IVGMMResults attribute)</a>
+</li>
         <li><a href="iv/results.html#linearmodels.iv.results.IVResults.wresids">(IVResults attribute)</a>
 </li>
         <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.wresids">(OLSResults attribute)</a>
@@ -1493,7 +1664,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

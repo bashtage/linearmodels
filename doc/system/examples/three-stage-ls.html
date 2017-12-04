@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.1 documentation</title>
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -71,7 +71,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../index.html" class="text-logo">linearmodels 4.1</a>
+    ../../index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -89,6 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formulas.html">Using formulas to specify models</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#System-GMM-Estimation">System GMM Estimation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
 </ul>
@@ -353,7 +354,7 @@ dropped to avoid warnings.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IV3SLS</span><span class="p">,</span> <span class="n">SUR</span>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IV3SLS</span><span class="p">,</span> <span class="n">SUR</span><span class="p">,</span> <span class="n">IVSystemGMM</span>
 </pre></div>
 </div>
 </div>
@@ -387,8 +388,8 @@ The syntax is the same as in the 2SLS models.</p>
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Sat, Nov 18 2017   P-value (F-stat)                0.0000
-Time:                        12:43:23   Distribution:                  chi2(5)
+Date:                Mon, Dec 04 2017   P-value (F-stat)                0.0000
+Time:                        21:10:30   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -433,8 +434,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Sat, Nov 18 2017   P-value (F-stat)                0.0000
-Time:                        12:43:23   Distribution:                  chi2(4)
+Date:                Mon, Dec 04 2017   P-value (F-stat)                0.0000
+Time:                        21:10:30   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -482,8 +483,8 @@ that are identical to separate equations.</p>
 Estimator:                        OLS   Overall R-squared:              0.1903
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Sat, Nov 18 2017
-Time:                        12:43:23
+Date:                Mon, Dec 04 2017
+Time:                        21:10:30
 
 
                   Equation: hours, Dependent Variable: hours
@@ -496,6 +497,11 @@ kidslt6       -51.616     183.96    -0.2806     0.7790     -412.18      308.95
 nwifeinc      -11.445     6.6787    -1.7137     0.0866     -24.535      1.6449
 lwage          1626.3     472.19     3.4442     0.0006      700.85      2551.8
 
+==============
+ Instruments
+--------------
+exper, expersq
+
                   Equation: lwage, Dependent Variable: lwage
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
@@ -504,8 +510,14 @@ educ           0.0875     0.0162     5.3892     0.0000      0.0557      0.1193
 exper          0.0524     0.0299     1.7501     0.0801     -0.0063      0.1110
 expersq       -0.0009     0.0006    -1.4898     0.1363     -0.0021      0.0003
 hours         -0.0003     0.0003    -0.8666     0.3862     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
 
-==============================================================================
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
 <p>Using <code class="docutils literal"><span class="pre">method='gls'</span></code> will use GLS estimates which can be more
@@ -534,8 +546,8 @@ changes. This is due to the structure of the problem.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Sat, Nov 18 2017
-Time:                        12:43:23
+Date:                Mon, Dec 04 2017
+Time:                        21:10:30
 
 
                   Equation: hours, Dependent Variable: hours
@@ -548,6 +560,11 @@ kidslt6       -196.61     170.04    -1.1563     0.2476     -529.88      136.66
 nwifeinc      -6.4136     5.4646    -1.1736     0.2405     -17.124      4.2969
 lwage          1872.7     461.13     4.0611     0.0000      968.88      2776.5
 
+==============
+ Instruments
+--------------
+exper, expersq
+
                   Equation: lwage, Dependent Variable: lwage
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
@@ -556,8 +573,14 @@ educ           0.0859     0.0159     5.3864     0.0000      0.0546      0.1171
 exper          0.0550     0.0295     1.8622     0.0626     -0.0029      0.1128
 expersq       -0.0010     0.0006    -1.7539     0.0794     -0.0022      0.0001
 hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
 
-==============================================================================
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
 </div>
@@ -606,8 +629,8 @@ programatically generating and estimating models.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Sat, Nov 18 2017
-Time:                        12:43:23
+Date:                Mon, Dec 04 2017
+Time:                        21:10:30
 
 
                   Equation: hours, Dependent Variable: hours
@@ -620,6 +643,11 @@ kidslt6       -196.61     170.04    -1.1563     0.2476     -529.88      136.66
 nwifeinc      -6.4136     5.4646    -1.1736     0.2405     -17.124      4.2969
 lwage          1872.7     461.13     4.0611     0.0000      968.88      2776.5
 
+==============
+ Instruments
+--------------
+exper, expersq
+
                   Equation: lwage, Dependent Variable: lwage
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
@@ -628,10 +656,163 @@ educ           0.0859     0.0159     5.3864     0.0000      0.0546      0.1171
 exper          0.0550     0.0295     1.8622     0.0626     -0.0029      0.1128
 expersq       -0.0010     0.0006    -1.7539     0.0794     -0.0022      0.0001
 hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
 
-==============================================================================
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
+</div>
+</div>
+<div class="section" id="System-GMM-Estimation">
+<h1>System GMM Estimation<a class="headerlink" href="#System-GMM-Estimation" title="Permalink to this headline">¶</a></h1>
+<p>System GMM is an alternative to 3SLS estimation. It is the natural
+extension to GMM estimation of IV models. It makes weaker assumptions
+about instruments than 3SLS does. In particular, instruments are assumed
+exogenous on an equation-by-equation basis rather than the 3SLS
+assumption that all instruments are exogenous in all equations.</p>
+<p>The system GMM estimator is similar to the 3SLS estimator except that it
+requires making a choice about the moment weighting estimator. Valid
+options for the weighting estimator are <code class="docutils literal"><span class="pre">'unadjusted'</span></code> or
+<code class="docutils literal"><span class="pre">'homoskedastic'</span></code> which assumes that residuals are conditionally
+homoskedastic or <code class="docutils literal"><span class="pre">'robust'</span></code> or <code class="docutils literal"><span class="pre">'heteroskedastic'</span></code> which allows for
+conditional heteroskedasticity.</p>
+<p>The System GMM estimator also supports iterative application where it is
+possible to iterate until convergence.</p>
+<p>Here the examples make use of the same data as in the 3SLS example and
+only use the formula interface. The default uses 2-step (efficient) GMM.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">equations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="s1">&#39;hours ~ educ + age + kidslt6 + nwifeinc + [lwage ~ exper + expersq]&#39;</span><span class="p">,</span>
+                 <span class="n">lwage</span><span class="o">=</span><span class="s1">&#39;lwage ~ educ + exper + expersq + [hours ~ age + kidslt6 + nwifeinc]&#39;</span><span class="p">)</span>
+<span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                 System 2-Step System GMM Estimation Summary
+==============================================================================
+Estimator:          2-Step System GMM   Overall R-squared:              0.0121
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 428   Num. Constraints:                 None
+Date:                Mon, Dec 04 2017
+Time:                        21:10:30
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -109.89     48.038    -2.2876     0.0222     -204.05     -15.741
+age            13.653     5.5440     2.4626     0.0138      2.7868      24.519
+kidslt6       -196.57     169.99    -1.1564     0.2475     -529.74      136.60
+nwifeinc      -6.4149     5.4631    -1.1742     0.2403     -17.122      4.2925
+lwage          1872.6     461.00     4.0621     0.0000      969.08      2776.2
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0859     0.0159     5.3866     0.0000      0.0546      0.1171
+exper          0.0550     0.0295     1.8623     0.0626     -0.0029      0.1128
+expersq       -0.0010     0.0006    -1.7540     0.0794     -0.0022      0.0001
+hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+GMM Homoskedastic (Unadjusted) Covariance
+Weight Estimator:
+Homoskedastic (Unadjusted) Weighting (Debiased: False, Center: False)
+</pre></div></div>
+</div>
+<p>Robust weighting can be used by setting the <code class="docutils literal"><span class="pre">weight_type</span></code>. The number
+of iterations can be set using <code class="docutils literal"><span class="pre">iter_limit</span></code>. Overall the parameters do
+not meaningfully change.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">system_gmm</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
+<span class="n">system_gmm_res</span> <span class="o">=</span> <span class="n">system_gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Number of iterations: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="o">.</span><span class="n">iterations</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">system_gmm_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of iterations: 20
+                 System Iterative System GMM Estimation Summary
+================================================================================
+Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
+No. Equations.:                       2   Cov. Estimator:                 robust
+No. Observations:                   428   Num. Constraints:                 None
+Date:                  Mon, Dec 04 2017
+Time:                          21:10:30
+
+
+                  Equation: hours, Dependent Variable: hours
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ          -118.31     57.508    -2.0572     0.0397     -231.02     -5.5947
+age            15.027     5.9903     2.5086     0.0121      3.2864      26.768
+kidslt6       -227.22     216.54    -1.0493     0.2940     -651.64      197.20
+nwifeinc      -8.2578     5.3146    -1.5538     0.1202     -18.674      2.1587
+lwage          1933.5     592.77     3.2618     0.0011      771.69      3095.3
+
+==============
+ Instruments
+--------------
+exper, expersq
+
+                  Equation: lwage, Dependent Variable: lwage
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0967     0.0190     5.0999     0.0000      0.0595      0.1338
+exper          0.0720     0.0363     1.9840     0.0473      0.0009      0.1430
+expersq       -0.0013     0.0007    -1.8475     0.0647     -0.0028   8.133e-05
+hours         -0.0005     0.0004    -1.2298     0.2188     -0.0013      0.0003
+======================
+     Instruments
+----------------------
+age, kidslt6, nwifeinc
+----------------------
+
+Covariance Estimator:
+GMM Heteroskedastic (Robust) Covariance
+Weight Estimator:
+Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
+</pre></div></div>
 </div>
 </div>
 
@@ -668,7 +849,7 @@ hours         -0.0003     0.0003    -0.8398     0.4010     -0.0009      0.0004
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

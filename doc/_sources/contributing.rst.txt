@@ -13,6 +13,9 @@ For more experienced programmers, there are some clear opportunities to
 refactor the code to share more between the difference classes of models.
 These types of simplifications are welcome.
 
+Changes that simplify releasing, documentation or other CI tasks are also
+welcome.
+
 Of course, entire models the expand the package to cover other important
 linear models are always welcome.
 

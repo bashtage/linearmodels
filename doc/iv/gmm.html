@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>GMM Weight and Covariance Estimation &#8212; linearmodels 4.1 documentation</title>
+    <title>GMM Weight and Covariance Estimation &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.1</a>
+    ../index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -342,7 +342,7 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 
 <dl class="class">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix">
-<em class="property">class </em><code class="descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>center=False</em>, <em>debiased=False</em>, <em>optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity, autocorrelation robust weight estimation</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -354,6 +354,8 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 <li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
 the mean before computing the weight matrix.</li>
 <li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</li>
+<li><strong>optimal_bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to estimate the optimal bandwidth, when
+bandwidth is None.  If False, nobs - 2 is used</li>
 </ul>
 </td>
 </tr>
@@ -376,6 +378,12 @@ contains both the exogenous regressors and instruments..</p>
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
+<dl class="attribute">
+<dt id="linearmodels.iv.gmm.KernelWeightMatrix.bandwidth">
+<code class="descname">bandwidth</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.bandwidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actual bandwidth used in estimating the weight matrix</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
@@ -513,7 +521,7 @@ the mean before computing the weight matrix.</li>
         <li class="right" >
           <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

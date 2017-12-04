@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.results &#8212; linearmodels 4.1 documentation</title>
+    <title>linearmodels.system.results &#8212; linearmodels 4.2 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1',
+        VERSION:     '4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -120,6 +120,7 @@
             
   <h1>Source code for linearmodels.system.results</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">diag</span><span class="p">,</span> <span class="n">sqrt</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
@@ -127,10 +128,10 @@
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="k">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
-<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">,</span>
-                                  <span class="n">_str</span><span class="p">,</span> <span class="n">param_table</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">,</span> <span class="n">format_wide</span><span class="p">,</span>
+                                  <span class="n">param_table</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SystemResults&#39;</span><span class="p">,</span> <span class="s1">&#39;SystemEquationResult&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SystemResults&#39;</span><span class="p">,</span> <span class="s1">&#39;SystemEquationResult&#39;</span><span class="p">,</span> <span class="s1">&#39;GMMSystemResults&#39;</span><span class="p">]</span>
 
 
 <span class="k">class</span> <span class="nc">_CommonResults</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
@@ -152,6 +153,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_tss</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">total_ss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rss</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">resid_ss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimator</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">cov_estimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">cov_config</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -168,6 +171,11 @@
     <span class="k">def</span> <span class="nf">cov_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Type of covariance estimator used to compute covariance&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configuration of covariance estimator used to compute covariance&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">iterations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -291,6 +299,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_constraints</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
         <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_constraints</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimtor</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight_estimator&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -366,11 +375,26 @@
         <span class="n">table</span><span class="o">.</span><span class="n">extend_right</span><span class="p">(</span><span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">))</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">eqlabel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">eqlabel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">):</span>
+            <span class="n">last_row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="n">eqlabel</span><span class="p">]</span>
             <span class="n">dep_name</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">dependent</span>
             <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Equation: </span><span class="si">{0}</span><span class="s1">, Dependent Variable: </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eqlabel</span><span class="p">,</span> <span class="n">dep_name</span><span class="p">)</span>
-            <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_table</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">pad_bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">pad_bottom</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">instruments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">last_row</span>
+            <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_table</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">pad_bottom</span><span class="o">=</span><span class="n">pad_bottom</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">instruments</span><span class="p">:</span>
+                <span class="n">formatted</span> <span class="o">=</span> <span class="n">format_wide</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">instruments</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">last_row</span><span class="p">:</span>
+                    <span class="n">formatted</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39; &#39;</span><span class="p">])</span>
+                <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SimpleTable</span><span class="p">(</span><span class="n">formatted</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Instruments&#39;</span><span class="p">]))</span>
+        <span class="n">extra_text</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Covariance Estimator:&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimator</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimtor</span><span class="p">:</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Weight Estimator:&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimtor</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">(</span><span class="n">extra_text</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">smry</span></div>
 
@@ -391,6 +415,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">dependent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_f_statistic</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">f_stat</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_r2a</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">r2a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instruments</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">instruments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">endog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimator</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight_estimator&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">equation_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -401,6 +428,11 @@
     <span class="k">def</span> <span class="nf">dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Name of dependent variable&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">instruments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instruments used in estimation.  None if all variables assumed exogenous.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instruments</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -448,6 +480,23 @@
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Parameter Estimates&#39;</span><span class="p">,</span> <span class="n">pad_bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
+        <span class="n">extra_text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instruments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instruments</span>
+        <span class="k">if</span> <span class="n">instruments</span><span class="p">:</span>
+            <span class="n">endog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span>
+            <span class="n">extra_text</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Endogenous: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endog</span><span class="p">))</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Instruments: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instruments</span><span class="p">))</span>
+
+        <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Covariance Estimator:&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimator</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimator</span><span class="p">:</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Weight Estimator:&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weight_estimator</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">(</span><span class="n">extra_text</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">smry</span>
 
     <span class="nd">@property</span>
@@ -487,6 +536,57 @@
     <span class="k">def</span> <span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sample-size adjusted coefficient of determination (R**2)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r2a</span>
+
+
+<div class="viewcode-block" id="GMMSystemResults"><a class="viewcode-back" href="../../../system/results.html#linearmodels.system.results.GMMSystemResults">[docs]</a><span class="k">class</span> <span class="nc">GMMSystemResults</span><span class="p">(</span><span class="n">SystemResults</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GMMSystemResults</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wmat</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">wmat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">weight_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">weight_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">j_stat</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">w</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;GMM weight matrix used in estimation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wmat</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Type of weighting used in GMM estimation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weight_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Weight configuration options used in GMM estimation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">j_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        J-test of overidentifying restrictions</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        j : WaldTestStatistic</span>
+<span class="sd">            J statistic  test of overidentifying restrictions</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The J statistic tests whether the moment conditions are sufficiently</span>
+<span class="sd">        close to zero to indicate that the model is not overidentified. The</span>
+<span class="sd">        statistic is defined as</span>
+
+<span class="sd">        .. math ::</span>
+
+<span class="sd">          n \bar{g}&#39;W^{-1}\bar{g} \sim \chi^2_q</span>
+
+<span class="sd">        where :math:`\bar{g}` is the average of the moment conditional and</span>
+<span class="sd">        :math:`W` is a consistent estimator of the variance of</span>
+<span class="sd">        :math:`\sqrt{n}\bar{g}`. The degree of freedom is</span>
+<span class="sd">        :math:`q = n_{instr} - n_{endog}`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_stat</span></div>
 </pre></div>
 
           </div>
@@ -503,7 +603,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
