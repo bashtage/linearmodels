@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.model &#8212; linearmodels 4.1+41.gae7831a documentation</title>
+    <title>linearmodels.system.model &#8212; linearmodels 4.1+44.gedbb2c2 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+41.gae7831a',
+        VERSION:     '4.1+44.gedbb2c2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+41.gae7831a documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+41, gae7831a)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+44, gedbb2c2)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -695,6 +695,7 @@
                                        <span class="n">sigma</span><span class="p">,</span> <span class="n">individual</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wresid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">resid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
 
         <span class="k">return</span> <span class="n">SystemResults</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
@@ -898,6 +899,7 @@
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;cov_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_type</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;weight_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_est</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iter_count</span>
@@ -1011,6 +1013,7 @@
         <span class="n">wresid</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">wresid</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wresid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wresid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
 
         <span class="k">return</span> <span class="n">SystemResults</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
@@ -1440,10 +1443,9 @@
             <span class="n">eps</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
             <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="c1"># TODO: Add constraints to covariance estimators</span>
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">cov_est</span> <span class="o">=</span> <span class="n">GMM_COV_EST</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
-        <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
 
         <span class="n">weps</span> <span class="o">=</span> <span class="n">eps</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1514,8 +1516,9 @@
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wresid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wresid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wmat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wmat</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weight_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span>
-        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weight_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_config</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weight_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span><span class="o">.</span><span class="n">config</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weight_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;j_stat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_j_statistic</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">wmat</span><span class="p">)</span>
 
@@ -1646,7 +1649,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+41.gae7831a documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.gmm &#8212; linearmodels 4.1+41.gae7831a documentation</title>
+    <title>linearmodels.system.gmm &#8212; linearmodels 4.1+44.gedbb2c2 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.1+41.gae7831a',
+        VERSION:     '4.1+44.gedbb2c2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+41.gae7831a documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.1 (+41, gae7831a)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.1 (+44, gedbb2c2)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -130,7 +130,7 @@
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="n">AttrDict</span>
 
 
-<div class="viewcode-block" id="HomoskedasticWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.model.HomoskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HomoskedasticWeightMatrix</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="HomoskedasticWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HomoskedasticWeightMatrix</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Homoskedastic (unadjusted) weight estimation</span>
 
@@ -162,6 +162,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;Homoskedastic (Unadjusted) Weighting&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
@@ -182,7 +183,7 @@
     <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">-</span> <span class="n">eps</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<div class="viewcode-block" id="HomoskedasticWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.model.HomoskedasticWeightMatrix.weight_matrix">[docs]</a>        <span class="n">sigma</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
+<div class="viewcode-block" id="HomoskedasticWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix">[docs]</a>        <span class="n">sigma</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
             <span class="n">k</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">)))[:,</span> <span class="kc">None</span><span class="p">]</span>
@@ -221,14 +222,13 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        config : dict</span>
+<span class="sd">        config : AttrDict</span>
 <span class="sd">            Dictionary containing weight estimator configuration information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;center&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">,</span>
-                <span class="s1">&#39;debiased&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span></div>
 
 
-<div class="viewcode-block" id="HeteroskedasticWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.model.HeteroskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
+<div class="viewcode-block" id="HeteroskedasticWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Heteroskedasticity robust weight estimation</span>
 
@@ -251,15 +251,16 @@
 
 <span class="sd">    where :math:`g_i` is the vector of scores across all equations for</span>
 <span class="sd">    observation i.  :math:`z_{ji}` is the vector of instruments for equation</span>
-<span class="sd">    j and :\math:`\epsilon_{ji}` is the error for equation j for observation</span>
+<span class="sd">    j and :math:`\epsilon_{ji}` is the error for equation j for observation</span>
 <span class="sd">    i.  This form allows for heteroskedasticity and arbitrary cross-sectional</span>
 <span class="sd">    dependence between the moment conditions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;Heteroskedastic (Robust) Weighting&#39;</span>
 
-<div class="viewcode-block" id="HeteroskedasticWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.model.HeteroskedasticWeightMatrix.weight_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="HeteroskedasticWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -300,7 +301,7 @@
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">)))</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">nvar</span><span class="p">,</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<div class="viewcode-block" id="KernelWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix">[docs]</a>        <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scale</span></div>
 
 
@@ -336,15 +337,18 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">      W   &amp; = n^{-1}\sum_{i=1}^{n}g&#39;_ig_i \\</span>
+<span class="sd">      W   &amp; = \hat{\Gamma}_0 + \sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i + \hat{\Gamma}_i^\prime) \\</span>
+<span class="sd">      \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g&#39;_ig_{i+j} \\</span>
 <span class="sd">      g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})</span>
 
 <span class="sd">    where :math:`g_i` is the vector of scores across all equations for</span>
-<span class="sd">    observation i.  :math:`z_{ji}` is the vector of instruments for equation</span>
-<span class="sd">    j and :\math:`\epsilon_{ji}` is the error for equation j for observation</span>
-<span class="sd">    i.  This form allows for heteroskedasticity and arbitrary cross-sectional</span>
-<span class="sd">    dependence between the moment conditions.</span>
+<span class="sd">    observation i and :math:`w_j` are the kernel weights which depend on the</span>
+<span class="sd">    selected kernel and bandwidth.  :math:`z_{ji}` is the vector of instruments</span>
+<span class="sd">    for equation j and :math:`\epsilon_{ji}` is the error for equation j for</span>
+<span class="sd">    observation i.  This form allows for heteroskedasticity and autocorrleation</span>
+<span class="sd">    between the moment conditions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">optimal_bw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KernelWeightMatrix</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
@@ -354,7 +358,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_predefined_bw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimal_bw</span> <span class="o">=</span> <span class="n">optimal_bw</span>
 
-    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="KernelWeightMatrix.weight_matrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">weight_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -387,7 +391,7 @@
         <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debias_scale</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">*=</span> <span class="n">scale</span>
 
-        <span class="k">return</span> <span class="n">w</span>
+        <span class="k">return</span> <span class="n">w</span></div>
 
     <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
@@ -403,7 +407,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Bandwidth used to estimate covariance of moment conditions&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bandwidth</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Weight estimator configuration</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        config : AttrDict</span>
+<span class="sd">            Dictionary containing weight estimator configuration information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
           </div>
@@ -420,7 +439,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+41.gae7831a documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.1+44.gedbb2c2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

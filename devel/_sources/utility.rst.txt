@@ -9,3 +9,6 @@ Utilities
 
 .. autoclass:: InvalidTestStatistic
    :members:
+
+.. autoclass:: AttrDict
+   :members:
