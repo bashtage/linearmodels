@@ -68,7 +68,15 @@ script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - set -e
   - if [[ ${DOCBUILD} = true  ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
-  - if [[ -z ${TRAVIS_TAG} && ${DOCBUILD} = true ]]; then echo "Nothing to do"; else doctr deploy doc --no-require-master && doctr deploy devel --no-require-master; fi
+  - |
+    if [[ -z ${TRAVIS_TAG} ]]; then
+      echo "Not a tagged build."
+    else
+      if [[ ${DOCBUILD} = true ]]; then
+        doctr deploy doc --no-require-master
+        doctr deploy devel --no-require-master
+      fi
+    fi
 
 after_success:
   - if [ ${COVERAGE} = true ]; then codecov; fi
