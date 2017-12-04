@@ -297,7 +297,7 @@ class LinearConstraint(object):
 
     @property
     def a(self):
-        """
+        r"""
         Transformed constraint target
 
         Returns

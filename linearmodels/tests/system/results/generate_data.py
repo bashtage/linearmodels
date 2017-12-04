@@ -2,7 +2,7 @@
 Important cases
 
 1. Base
-2. Small sample adjustement
+2. Small sample adjustment
 3. Constraints across equations
 """
 

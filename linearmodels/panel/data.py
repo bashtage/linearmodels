@@ -21,7 +21,7 @@ class _Panel(object):
     Parameters
     ----------
     df : DataFrame
-        Multiindex DataFrame containing floats
+        MultiIndex DataFrame containing floats
 
     Notes
     -----
@@ -230,7 +230,7 @@ class PanelData(object):
         Parameters
         ----------
         locs : ndarray
-            Booleam array indicating observations to drop with reference to
+            Boolean array indicating observations to drop with reference to
             the dataframe view of the data
         """
         self._frame = self._frame.loc[~locs.ravel()]

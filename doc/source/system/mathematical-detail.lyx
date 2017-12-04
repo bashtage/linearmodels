@@ -794,7 +794,7 @@ Inference is identical to the SUR replacing
 \begin_inset Formula $\hat{X}$
 \end_inset
 
- where model residuals are estiamted using 
+ where model residuals are estimated using 
 \begin_inset Formula $X$
 \end_inset
 
@@ -987,7 +987,7 @@ When residuals are heteroskedastic, the weighting matrix is estimated from
 
 \begin_layout Standard
 \noindent
-which allows cross-sectional depdnence but no dependence across observation
+which allows cross-sectional dependence but no dependence across observation
  index.
  
 \end_layout
@@ -1018,7 +1018,7 @@ The efficient estimates are computed using the same expression only with
 \noindent
 Both weighting estimators can be centered which will enforce an exact mean
  0 to the moment conditions.
- When models are over-identified, this can improve accuracy of 2-step estiamtors.
+ When models are over-identified, this can improve accuracy of 2-step estimators.
 \end_layout
 
 \begin_layout Subsubsection*

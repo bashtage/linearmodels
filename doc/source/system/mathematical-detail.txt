@@ -278,7 +278,7 @@ A GLS estimator can be similarly defined as
 .. math:: \hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y.
 
 Inference is identical to the SUR replacing :math:`X` with
-:math:`\hat{X}` where model residuals are estiamted using :math:`X` and
+:math:`\hat{X}` where model residuals are estimated using :math:`X` and
 :math:`Y`.
 
 System Generalized Method of Moments (GMM)
@@ -342,7 +342,7 @@ from
 
 .. math:: \hat{W}=N^{-1}\sum\hat{g}_{i}\hat{g}_{i}^{\prime}
 
-which allows cross-sectional depdnence but no dependence across
+which allows cross-sectional dependence but no dependence across
 observation index.
 
 The efficient estimates are computed using the same expression only with
@@ -352,7 +352,7 @@ The efficient estimates are computed using the same expression only with
 
 Both weighting estimators can be centered which will enforce an exact
 mean 0 to the moment conditions. When models are over-identified, this
-can improve accuracy of 2-step estiamtors.
+can improve accuracy of 2-step estimators.
 
 Parameter Covariance
 ~~~~~~~~~~~~~~~~~~~~

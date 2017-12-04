@@ -539,7 +539,7 @@ class CovarianceManager(object):
 
 class FamaMacBethCovariance(HomoskedasticCovariance):
     """
-    Heteroskedasticty robust covariance estimator for Fama-MacBeth
+    Heteroskedasticity robust covariance estimator for Fama-MacBeth
 
     Parameters
     ----------

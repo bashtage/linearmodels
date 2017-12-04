@@ -317,7 +317,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
 class GMMHomoskedasticCovariance(object):
     r"""
-    Covariance estimator for IV system estimation with homoskedasitc data
+    Covariance estimator for IV system estimation with homoskedastic data
 
     Parameters
     ----------
@@ -379,7 +379,6 @@ class GMMHomoskedasticCovariance(object):
 
         omega = self._omega()
         xpz_wi_omega_wi_zpx = xpz @ wi @ omega @ wi @ xpz.T
-
         adj = self._adjustment()
         if self._constraints is None:
             xpz_wi_zpxi = inv(xpz_wi_zpx)
@@ -423,7 +422,7 @@ class GMMHomoskedasticCovariance(object):
 
 class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
     r"""
-    Covariance estimator for IV system estimation with homoskedasitc data
+    Covariance estimator for IV system estimation with homoskedastic data
 
     Parameters
     ----------
@@ -477,7 +476,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
 class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     r"""
-    Covariance estimator for IV system estimation with homoskedasitc data
+    Covariance estimator for IV system estimation with homoskedastic data
 
     Parameters
     ----------
