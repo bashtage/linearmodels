@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -6,8 +8,8 @@ from numpy.testing import assert_allclose
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
-from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes)
+from linearmodels.tests.panel._utility import (assert_results_equal, datatypes, generate_data,
+                                               assert_frame_similar)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -20,6 +22,14 @@ def data(request):
 @pytest.fixture(params=datatypes)
 def missing_data(request):
     return generate_data(0.20, request.param)
+
+
+@pytest.fixture(params=list(product(datatypes, [True, False])))
+def both_data_types(request):
+    if request.param[1]:
+        return data(request)
+    else:
+        return missing_data(request)
 
 
 def test_single_entity(data):
@@ -293,3 +303,29 @@ def test_default_clusters(data):
     ols = IV2SLS(dep, exog, None, None)
     ols_res = ols.fit(cov_type='clustered')
     assert_results_equal(res, ols_res)
+
+
+def test_fitted_effects_residuals(both_data_types):
+    mod = BetweenOLS(both_data_types.y, both_data_types.x)
+    res = mod.fit(reweight=True, debiased=False)
+    res.idiosyncratic
+    expected = pd.DataFrame(mod.exog.values2d @ res.params.values, mod.dependent.index,
+                            columns=['fitted_values'])
+    assert_allclose(expected, res.fitted_values)
+    assert_frame_similar(res.fitted_values, expected)
+
+    index = mod.dependent.dataframe.index
+    reindex = index.levels[0][index.labels[0]]
+    resids = res.resids.copy()
+    resids = resids.reindex(reindex)
+    resids.index = index
+    expected = pd.DataFrame(resids)
+    expected.columns = ['estimated_effects']
+    assert_allclose(expected, res.estimated_effects)
+    assert_frame_similar(res.estimated_effects, expected)
+
+    fitted_effects = res.fitted_values.values + res.estimated_effects.values
+    expected.iloc[:, 0] = mod.dependent.values2d - fitted_effects
+    expected.columns = ['idiosyncratic']
+    assert_allclose(expected, res.idiosyncratic, atol=1e-8)
+    assert_frame_similar(res.idiosyncratic, expected)

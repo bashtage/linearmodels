@@ -84,7 +84,7 @@ class PooledOLS(object):
         self._cov_estimators = CovarianceManager(self.__class__.__name__, HomoskedasticCovariance,
                                                  HeteroskedasticCovariance, ClusteredCovariance,
                                                  DriscollKraay, ACCovariance)
-
+        self._original_index = self.dependent.index.copy()
         self._validate_data()
 
     def __str__(self):
@@ -354,13 +354,15 @@ class PooledOLS(object):
         nobs = weps.shape[0]
         sigma2 = float(weps.T @ weps / nobs)
         loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+
         res = AttrDict(params=params, deferred_cov=cov.deferred_cov,
                        deferred_f=deferred_f, f_stat=f_stat,
                        debiased=debiased, name=self._name, var_names=self.exog.vars,
                        r2w=r2w, r2b=r2b, r2=r2w, r2o=r2o, s2=cov.s2,
                        model=self, cov_type=cov.name, index=self.dependent.index,
                        entity_info=entity_info, time_info=time_info, other_info=other_info,
-                       f_pooled=f_pooled, loglik=loglik)
+                       f_pooled=f_pooled, loglik=loglik, not_null=self._not_null,
+                       original_index=self._original_index)
         return res
 
     @property
@@ -522,7 +524,11 @@ class PooledOLS(object):
         cov = cov_est(wy, wx, params, self.dependent.entity_ids, self.dependent.time_ids,
                       debiased=debiased, **cov_config)
         weps = wy - wx @ params
-        eps = y - x @ params
+        index = self.dependent.index
+        fitted = pd.DataFrame(x @ params, index, ['fitted_values'])
+        effects = pd.DataFrame(np.full_like(fitted.values, np.nan), index, ['estimated_effects'])
+        eps = y - fitted.values
+        idiosyncratic = pd.DataFrame(eps, index, ['idiosyncratic'])
         residual_ss = float(weps.T @ weps)
         e = y
         if self._constant:
@@ -534,7 +540,8 @@ class PooledOLS(object):
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresids=weps,
-                        resids=eps, index=self.dependent.index))
+                        resids=eps, index=self.dependent.index, fitted=fitted, effects=effects,
+                        idiosyncratic=idiosyncratic))
 
         return PanelResults(res)
 
@@ -623,7 +630,7 @@ class PanelOLS(PooledOLS):
 
         if effects.shape[1:] != self._original_shape[1:]:
             raise ValueError('other_effects must have the same number of '
-                             'entites and time periods as dependent.')
+                             'entities and time periods as dependent.')
 
         num_effects = effects.nvar
         if num_effects + self.entity_effects + self.time_effects > 2:
@@ -1060,8 +1067,11 @@ class PanelOLS(PooledOLS):
                 # Correction since y_effects and x_effects @ params add mean
                 w = self.weights.values2d
                 eps -= (w * eps).sum() / w.sum()
+        index = self.dependent.index
+        fitted = pd.DataFrame(_x @ params, index, ['fitted_values'])
+        idiosyncratic = pd.DataFrame(eps, index, ['idiosyncratic'])
+        eps_effects = _y - fitted.values
 
-        eps_effects = _y - _x @ params
         sigma2_tot = float(eps_effects.T @ eps_effects / nobs)
         sigma2_eps = float(eps.T @ eps / nobs)
         sigma2_effects = sigma2_tot - sigma2_eps
@@ -1105,10 +1115,10 @@ class PanelOLS(PooledOLS):
                                          df_num, df_denom=df_denom,
                                          name='Pooled F-statistic')
             res.update(f_pooled=f_pooled)
-            effects = pd.DataFrame(eps_effects - eps, columns=['effects'],
+            effects = pd.DataFrame(eps_effects - eps, columns=['estimated_effects'],
                                    index=self.dependent.index)
         else:
-            effects = pd.DataFrame(np.zeros_like(eps), columns=['effects'],
+            effects = pd.DataFrame(np.zeros_like(eps), columns=['estimated_effects'],
                                    index=self.dependent.index)
 
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=y.shape[0],
@@ -1116,7 +1126,7 @@ class PanelOLS(PooledOLS):
                         r2=r2, entity_effects=self.entity_effects, time_effects=self.time_effects,
                         other_effects=self.other_effects, sigma2_eps=sigma2_eps,
                         sigma2_effects=sigma2_effects, rho=rho, r2_ex_effects=r2_ex_effects,
-                        effects=effects))
+                        effects=effects, fitted=fitted, idiosyncratic=idiosyncratic))
 
         return PanelEffectsResults(res)
 
@@ -1237,7 +1247,19 @@ class BetweenOLS(PooledOLS):
         cov = cov_est(wy, wx, params, self.dependent.entity_ids, self.dependent.time_ids,
                       debiased=debiased, **cov_config)
         weps = wy - wx @ params
+        index = self.dependent.index
+        fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
         eps = y - x @ params
+        effects = pd.DataFrame(eps, self.dependent.entities, ['estimated_effects'])
+        entities = fitted.index.levels[0][fitted.index.labels[0]]
+        effects = effects.loc[entities]
+        effects.index = fitted.index
+        dep = self.dependent.dataframe
+        fitted = fitted.reindex(dep.index)
+        effects = effects.reindex(dep.index)
+        idiosyncratic = pd.DataFrame(dep.values - fitted.values - effects.values,
+                                     dep.index, ['idiosyncratic'])
+
         residual_ss = float(weps.T @ weps)
         e = y
         if self._constant:
@@ -1249,7 +1271,8 @@ class BetweenOLS(PooledOLS):
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
         res.update(dict(df_resid=df_resid, df_model=df_model, nobs=nobs,
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2, wresids=weps,
-                        resids=eps, index=self.dependent.entities))
+                        resids=eps, index=self.dependent.entities, fitted=fitted, effects=effects,
+                        idiosyncratic=idiosyncratic))
 
         return PanelResults(res)
 
@@ -1447,7 +1470,14 @@ class FirstDifferenceOLS(PooledOLS):
         cov = cov_est(wy, wx, params, entity_ids, time_ids, debiased=debiased, **cov_config)
 
         weps = wy - wx @ params
+        fitted = pd.DataFrame(self.exog.values2d @ params,
+                              self.dependent.index, ['fitted_values'])
+        idiosyncratic = pd.DataFrame(self.dependent.values2d - fitted.values,
+                                     self.dependent.index, ['idiosyncratic'])
+        effects = pd.DataFrame(np.full_like(fitted.values, np.nan), self.dependent.index,
+                               ['estimated_effects'])
         eps = y - x @ params
+
         residual_ss = float(weps.T @ weps)
         total_ss = float(w.T @ (y ** 2))
         r2 = 1 - residual_ss / total_ss
@@ -1455,7 +1485,8 @@ class FirstDifferenceOLS(PooledOLS):
         res = self._postestimation(params, cov, debiased, df_resid, weps, wy, wx, root_w)
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2,
-                        resids=eps, wresids=weps, index=index))
+                        resids=eps, wresids=weps, index=index, fitted=fitted, effects=effects,
+                        idiosyncratic=idiosyncratic))
 
         return PanelResults(res)
 
@@ -1618,6 +1649,11 @@ class RandomEffects(PooledOLS):
 
         weps = wy - wx @ params
         eps = weps / root_w
+        index = self.dependent.index
+        fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
+        effects = pd.DataFrame(self.dependent.values2d - fitted.values - eps, index,
+                               ['estimated_effects'])
+        idiosyncratic = pd.DataFrame(eps, index, ['idiosyncratic'])
         residual_ss = float(weps.T @ weps)
         wmu = 0
         if self.has_constant:
@@ -1630,7 +1666,8 @@ class RandomEffects(PooledOLS):
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss, r2=r2,
                         resids=eps, wresids=weps, index=index, sigma2_eps=sigma2_e,
-                        sigma2_effects=sigma2_u, rho=rho, theta=theta_out))
+                        sigma2_effects=sigma2_u, rho=rho, theta=theta_out,
+                        fitted=fitted, effects=effects, idiosyncratic=idiosyncratic))
 
         return RandomEffectsResults(res)
 
@@ -1718,6 +1755,7 @@ class FamaMacBeth(PooledOLS):
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
         """
+        # TODO: Does not appear to support weights correctly
         y = self.dependent.dataframe
         x = self.exog.dataframe
         yx = pd.DataFrame(np.c_[y.values, x.values],
@@ -1740,7 +1778,13 @@ class FamaMacBeth(PooledOLS):
         # df_resid = params.shape[1]
         wy = self.dependent.values2d
         wx = self.exog.values2d
-        weps = eps = self.dependent.values2d - self.exog.values2d @ params
+        index = self.dependent.index
+        fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
+        effects = pd.DataFrame(np.full_like(fitted.values, np.nan), index, ['estimated_effects'])
+        idiosyncratic = pd.DataFrame(self.dependent.values2d - fitted.values, index,
+                                     ['idiosyncratic'])
+
+        weps = eps = self.dependent.values2d - fitted.values
         w = self.weights.values2d
         root_w = np.sqrt(w)
         #
@@ -1764,5 +1808,6 @@ class FamaMacBeth(PooledOLS):
         index = self.dependent.index
         res.update(dict(df_resid=df_resid, df_model=x.shape[1], nobs=y.shape[0],
                         residual_ss=residual_ss, total_ss=total_ss,
-                        r2=r2, resids=eps, wresids=weps, index=index))
+                        r2=r2, resids=eps, wresids=weps, index=index, fitted=fitted,
+                        effects=effects, idiosyncratic=idiosyncratic))
         return PanelResults(res)

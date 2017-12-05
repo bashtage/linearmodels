@@ -3,11 +3,12 @@ from itertools import product
 import numpy as np
 import pandas as pd
 import pytest
+from numpy.testing import assert_allclose
 
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import FirstDifferenceOLS
-from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes)
+from linearmodels.tests.panel._utility import (assert_frame_similar, assert_results_equal,
+                                               datatypes, generate_data)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -175,3 +176,23 @@ def test_firstdifference_error(data):
 
     with pytest.raises(ValueError):
         mod.fit(cov_type='clustered', clusters=clusters)
+
+
+def test_fitted_effects_residuals(data):
+    mod = FirstDifferenceOLS(data.y, data.x)
+    res = mod.fit()
+
+    expected = mod.exog.values2d @ res.params.values
+    expected = pd.DataFrame(expected, index=mod.exog.index, columns=['fitted_values'])
+    assert_allclose(res.fitted_values, expected)
+    assert_frame_similar(res.fitted_values, expected)
+
+    expected.iloc[:, 0] = mod.dependent.values2d - expected.values
+    expected.columns = ['idiosyncratic']
+    assert_allclose(res.idiosyncratic, expected)
+    assert_frame_similar(res.idiosyncratic, expected)
+
+    expected.iloc[:, 0] = np.nan
+    expected.columns = ['estimated_effects']
+    assert_allclose(res.estimated_effects, expected)
+    assert_frame_similar(res.estimated_effects, expected)

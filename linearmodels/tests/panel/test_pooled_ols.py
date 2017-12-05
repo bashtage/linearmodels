@@ -8,8 +8,8 @@ from numpy.testing import assert_allclose
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS
-from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes)
+from linearmodels.tests.panel._utility import (assert_results_equal, datatypes, generate_data,
+                                               assert_frame_similar)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -215,3 +215,22 @@ def test_two_way_clustering(data):
     ols_mod = IV2SLS(y, x, None, None)
     ols_res = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe)
     assert_results_equal(res, ols_res)
+
+
+def test_fitted_effects_residuals(data):
+    mod = PooledOLS(data.y, data.x)
+    res = mod.fit()
+    expected = pd.DataFrame(res.resids.copy())
+    expected.columns = ['idiosyncratic']
+    assert_allclose(res.idiosyncratic, expected)
+    assert_frame_similar(res.idiosyncratic, expected)
+
+    expected = mod.dependent.values2d - res.resids.values[:, None]
+    expected = pd.DataFrame(expected, index=res.resids.index, columns=['fitted_values'])
+    assert_allclose(res.fitted_values, expected)
+    assert_frame_similar(res.fitted_values, expected)
+
+    expected.iloc[:, 0] = np.nan
+    expected.columns = ['estimated_effects']
+    assert_allclose(res.estimated_effects, expected)
+    assert_frame_similar(res.estimated_effects, expected)

@@ -7,6 +7,7 @@ from numpy.testing import assert_equal
 
 try:
     import xarray as xr
+
     MISSING_XARRAY = False
 except ImportError:
     MISSING_XARRAY = True

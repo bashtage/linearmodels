@@ -70,7 +70,6 @@ estout matrix(Sigma, fmt(%13.12g)) using {outfile}, append
 """
 output = output.format(outfile=OUTFILE)
 
-
 methods = ('3sls', '2sls', 'ols', 'sur', '3sls ireg3')
 
 with open('three-sls.do', 'w') as stata_file:

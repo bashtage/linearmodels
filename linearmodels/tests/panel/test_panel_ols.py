@@ -9,7 +9,8 @@ from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes)
+                                               generate_data, datatypes,
+                                               assert_frame_similar)
 from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
@@ -39,6 +40,16 @@ def const_data(request):
     x.iloc[:, :] = 1
     x.columns = ['Const']
     return AttrDict(y=y, x=x, w=PanelData(data.w).dataframe)
+
+
+@pytest.fixture(params=[True, False])
+def entity_eff(request):
+    return request.param
+
+
+@pytest.fixture(params=[True, False])
+def time_eff(request):
+    return request.param
 
 
 def test_const_data_only(const_data):
@@ -1051,3 +1062,26 @@ def test_panel_effects_sanity(data):
     expected += res.resids.values[:, None]
     expected += res.estimated_effects.values
     assert_allclose(mod.dependent.values2d, expected)
+
+
+def test_fitted_effects_residuals(data, entity_eff, time_eff):
+    mod = PanelOLS(data.y, data.x,
+                   entity_effects=entity_eff,
+                   time_effects=entity_eff)
+    res = mod.fit()
+
+    expected = mod.exog.values2d @ res.params.values
+    expected = pd.DataFrame(expected, index=mod.exog.index, columns=['fitted_values'])
+    assert_allclose(res.fitted_values, expected)
+    assert_frame_similar(res.fitted_values, expected)
+
+    expected.iloc[:, 0] = res.resids
+    expected.columns = ['idiosyncratic']
+    assert_allclose(res.idiosyncratic, expected)
+    assert_frame_similar(res.idiosyncratic, expected)
+
+    fitted_error = res.fitted_values + res.idiosyncratic.values
+    expected.iloc[:, 0] = mod.dependent.values2d - fitted_error
+    expected.columns = ['estimated_effects']
+    assert_allclose(res.estimated_effects, expected, atol=1e-8)
+    assert_frame_similar(res.estimated_effects, expected)

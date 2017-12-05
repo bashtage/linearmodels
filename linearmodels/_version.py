@@ -80,7 +80,7 @@ def run_command(commands, args, cwd=None, verbose=False, hide_stderr=False,
             p = subprocess.Popen([c] + args, cwd=cwd, env=env,
                                  stdout=subprocess.PIPE,
                                  stderr=(subprocess.PIPE if hide_stderr
-                                         else None))
+                                 else None))
             break
         except EnvironmentError:
             e = sys.exc_info()[1]

@@ -44,7 +44,6 @@ for i, dataset in enumerate((basic_data, common_data, missing_data)):
         else:
             out.extend([dep])
 
-
 if __name__ == '__main__':
     df = pd.concat(out, 1)
     df.to_stata('simulated-sur.dta')
