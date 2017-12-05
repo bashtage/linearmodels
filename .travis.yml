@@ -67,14 +67,17 @@ install:
 script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
   - set -e
-  - if [[ ${DOCBUILD} = true  ]]; then cd doc && make html && make html && cd .. && doctr deploy devel; fi
   - |
-    if [[ -z ${TRAVIS_TAG} ]]; then
-      echo "Not a tagged build."
-    else
-      if [[ ${DOCBUILD} = true ]]; then
-        doctr deploy doc --no-require-master
-        doctr deploy devel --no-require-master
+    if [[ ${DOCBUILD} = true ]]; then
+      cd doc
+      make html
+      make html
+      cd ..
+      doctr deploy devel --build-tags
+      if [[ -z ${TRAVIS_TAG} ]]; then
+        echo "Not a tagged build."
+      else
+        doctr deploy doc --build-tags
       fi
     fi
 
