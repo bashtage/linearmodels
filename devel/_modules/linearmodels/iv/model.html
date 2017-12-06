@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.model &#8212; linearmodels 4.2+4.ge4ff395 documentation</title>
+    <title>linearmodels.iv.model &#8212; linearmodels 4.2+6.g5505b53 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+4.ge4ff395',
+        VERSION:     '4.2+6.g5505b53',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+4, ge4ff395)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+6, g5505b53)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -234,6 +234,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;exog&#39;</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;endog&#39;</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">instruments</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;instruments&#39;</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">pandas</span><span class="o">.</span><span class="n">index</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span>
@@ -554,6 +555,8 @@
         <span class="nb">vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">pandas</span>
+        <span class="n">fitted</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fitted_values&#39;</span><span class="p">])</span>
         <span class="n">weps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wresids</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_estimator</span><span class="o">.</span><span class="n">cov</span>
         <span class="n">debiased</span> <span class="o">=</span> <span class="n">cov_estimator</span><span class="o">.</span><span class="n">debiased</span>
@@ -584,7 +587,9 @@
                <span class="s1">&#39;cov_config&#39;</span><span class="p">:</span> <span class="n">cov_estimator</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
                <span class="s1">&#39;cov_type&#39;</span><span class="p">:</span> <span class="n">cov_type</span><span class="p">,</span>
                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span><span class="p">,</span>
-               <span class="s1">&#39;cov_estimator&#39;</span><span class="p">:</span> <span class="n">cov_estimator</span><span class="p">}</span>
+               <span class="s1">&#39;cov_estimator&#39;</span><span class="p">:</span> <span class="n">cov_estimator</span><span class="p">,</span>
+               <span class="s1">&#39;fitted&#39;</span><span class="p">:</span> <span class="n">fitted</span><span class="p">,</span>
+               <span class="s1">&#39;original_index&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">}</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
 
@@ -1211,7 +1216,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
