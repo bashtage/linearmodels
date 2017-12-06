@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.compat.pandas import assert_series_equal
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.system.model import IV3SLS
 from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls
 
@@ -207,3 +207,22 @@ def test_multivariate_iv_bad_data():
 
     with pytest.raises(ValueError):
         IV3SLS.multivariate_ls(dep, None, None, instr)
+
+
+def test_fitted(data):
+    mod = IV3SLS(data)
+    res = mod.fit()
+    expected = []
+    for i, key in enumerate(res.equations):
+        eq = res.equations[key]
+        fv = res.fitted_values[key].copy()
+        fv.name = 'fitted_values'
+        assert_series_equal(eq.fitted_values, fv)
+        b = eq.params.values
+        direct = mod._x[i] @ b
+        expected.append(direct[:, None])
+        assert_allclose(eq.fitted_values, direct, atol=1e-8)
+    expected = np.concatenate(expected, 1)
+    expected = pd.DataFrame(expected, index=mod._dependent[i].pandas.index,
+                            columns=[key for key in res.equations])
+    assert_frame_equal(expected, res.fitted_values)

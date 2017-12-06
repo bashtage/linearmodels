@@ -8,6 +8,7 @@ import pytest
 from numpy.testing import assert_allclose
 from pandas import DataFrame, Series, concat
 
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.iv.model import _OLS as OLS
 from linearmodels.system._utility import blocked_column_product, blocked_diag_product, \
     inv_matrix_sqrt
@@ -72,6 +73,17 @@ def data(request):
     return generate_data(p=p, const=const, rho=rho,
                          common_exog=common_exog, included_weights=included_weights,
                          output_dict=output_dict)
+
+
+@pytest.fixture(scope='module', params=[0, 0.1])
+def missing_data(request):
+    eqns = generate_data()
+    np.random.seed(12345)
+    missing = np.random.random_sample(500)
+    missing = missing < request.param
+    for key in eqns:
+        eqns[key]['dependent'][missing] = np.nan
+    return eqns
 
 
 params = list(product(const, rho, included_weights))
@@ -604,3 +616,66 @@ def test_invalid_kernel_options(kernel_options):
         ko = {k: v for k, v in kernel_options.items()}
         ko['kernel'] = 1
         mod.fit(cov_type='kernel', **ko)
+
+
+def test_fitted(data):
+    mod = SUR(data)
+    res = mod.fit()
+    expected = []
+    for i, key in enumerate(res.equations):
+        eq = res.equations[key]
+        fv = res.fitted_values[key].copy()
+        fv.name = 'fitted_values'
+        assert_series_equal(eq.fitted_values, fv)
+        b = eq.params.values
+        direct = mod._x[i] @ b
+        expected.append(direct[:, None])
+        assert_allclose(eq.fitted_values, direct, atol=1e-8)
+    expected = np.concatenate(expected, 1)
+    expected = DataFrame(expected, index=mod._dependent[i].pandas.index,
+                         columns=[key for key in res.equations])
+    assert_frame_equal(expected, res.fitted_values)
+
+
+def test_predict(missing_data):
+    mod = SUR(missing_data)
+    res = mod.fit()
+    pred = res.predict()
+    for key in pred:
+        assert_series_equal(pred[key].iloc[:, 0], res.equations[key].fitted_values,
+                            check_names=False)
+    pred = res.predict(fitted=False, idiosyncratic=True)
+    for key in pred:
+        assert_series_equal(pred[key].iloc[:, 0], res.equations[key].resids, check_names=False)
+    pred = res.predict(fitted=True, idiosyncratic=True)
+    assert isinstance(pred, dict)
+    for key in res.equations:
+        assert key in pred
+
+    pred = res.predict(dataframe=True)
+    assert isinstance(pred, DataFrame)
+    assert_frame_equal(pred, res.fitted_values)
+    pred = res.predict(fitted=False, idiosyncratic=True, dataframe=True)
+    assert isinstance(pred, DataFrame)
+    assert_frame_equal(pred, res.resids)
+    pred = res.predict(fitted=True, idiosyncratic=True, dataframe=True)
+    assert isinstance(pred, dict)
+    assert 'fitted_values' in pred
+    assert_frame_equal(pred['fitted_values'], res.fitted_values)
+    assert 'idiosyncratic' in pred
+    assert_frame_equal(pred['idiosyncratic'], res.resids)
+
+    nobs = missing_data[list(missing_data.keys())[0]]['dependent'].shape[0]
+    pred = res.predict(fitted=True, idiosyncratic=False, dataframe=True, missing=True)
+    assert pred.shape[0] == nobs
+
+    pred = res.predict(fitted=True, idiosyncratic=True, missing=True)
+    for key in pred:
+        assert pred[key].shape[0] == nobs
+
+
+def test_predict_error(missing_data):
+    mod = SUR(missing_data)
+    res = mod.fit()
+    with pytest.raises(ValueError):
+        res.predict(fitted=False, idiosyncratic=False)
