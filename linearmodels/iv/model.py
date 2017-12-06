@@ -113,6 +113,7 @@ class IVLIML(object):
         self.exog = IVData(exog, var_name='exog', nobs=nobs)
         self.endog = IVData(endog, var_name='endog', nobs=nobs)
         self.instruments = IVData(instruments, var_name='instruments', nobs=nobs)
+        self._original_index = self.dependent.pandas.index
         if weights is None:
             weights = ones(self.dependent.shape)
         weights = IVData(weights).ndarray
@@ -433,6 +434,8 @@ class IVLIML(object):
         vars = self._columns
         index = self._index
         eps = self.resids(params)
+        y = self.dependent.pandas
+        fitted = DataFrame(y.values - eps, y.index, ['fitted_values'])
         weps = self.wresids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
@@ -463,7 +466,9 @@ class IVLIML(object):
                'cov_config': cov_estimator.config,
                'cov_type': cov_type,
                'method': self._method,
-               'cov_estimator': cov_estimator}
+               'cov_estimator': cov_estimator,
+               'fitted': fitted,
+               'original_index': self._original_index}
 
         return out
 
