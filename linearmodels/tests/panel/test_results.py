@@ -1,11 +1,10 @@
-from linearmodels.compat.pandas import assert_series_equal
-
 from collections import OrderedDict
 from itertools import product
 
 import pytest
 import statsmodels.api as sm
 
+from linearmodels.compat.pandas import assert_series_equal
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
@@ -123,3 +122,12 @@ def test_predict(generated_data):
     pred = res.predict(effects=True, idiosyncratic=True, missing=True)
     assert list(pred.columns) == ['fitted_values', 'estimated_effects', 'idiosyncratic']
     assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
+
+
+def test_predict_no_selection(generated_data):
+    mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    res = mod.fit()
+    with pytest.raises(ValueError):
+        res.predict(fitted=False)
+    with pytest.raises(ValueError):
+        res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)

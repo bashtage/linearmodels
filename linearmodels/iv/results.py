@@ -61,6 +61,8 @@ class OLSResults(_SummaryStr):
         self._kappa = results.get('kappa', None)
         self._datetime = dt.datetime.now()
         self._cov_estimator = results['cov_estimator']
+        self._original_index = results['original_index']
+        self._fitted = results['fitted']
 
     @property
     def cov_config(self):
@@ -86,6 +88,64 @@ class OLSResults(_SummaryStr):
     def resids(self):
         """Estimated residuals"""
         return self._resid
+
+    @property
+    def fitted_values(self):
+        """Fitted values"""
+        return self._fitted
+
+    @property
+    def idiosyncratic(self):
+        """
+        Idiosyncratic error
+
+        Notes
+        -----
+        Differs from resids since this is the estimated idiosyncratic shock
+        from the data. It has the same dimension as the dependent data.
+        The shape and nature of resids depends on the model estimated. These
+        estimates only depend on the model estimated through the estimation
+        of parameters and inclusion of effects, if any.
+        """
+        return self.resids
+
+    def predict(self, *, fitted=True, idiosyncratic=False, missing=False):
+        """
+        In-sample predictions
+
+        Parameters
+        ----------
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations.  if True, the
+            values returns will have the same size as the original input data
+            before filtering missing values
+
+        Returns
+        -------
+        predictions : DataFrame
+            DataFrame containing columns for all selected output
+
+        Notes
+        -----
+        The interface for predict will change to allow new exog data to be
+        passed in the future.
+        """
+        out = []
+        if fitted:
+            out.append(self.fitted_values)
+        if idiosyncratic:
+            out.append(self.idiosyncratic)
+        if len(out) == 0:
+            raise ValueError('At least one output must be selected')
+        out = concat(out, 1)  # type: DataFrame
+        if missing:
+            index = self._original_index
+            out = out.reindex(index)
+        return out
 
     @property
     def wresids(self):
