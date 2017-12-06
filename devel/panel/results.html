@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.2+2.g37a67e8 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.2+4.ge4ff395 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+2.g37a67e8',
+        VERSION:     '4.2+4.ge4ff395',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+2.g37a67e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+2, g37a67e8)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+4, ge4ff395)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -199,6 +199,8 @@
 <dt id="linearmodels.panel.results.PanelEffectsResults.estimated_effects">
 <code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated effects</p>
+<p class="rubric">Notes</p>
+<p>NaN filled when models do not include effects.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -288,6 +290,24 @@ distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelEffectsResults.idiosyncratic">
+<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Idiosyncratic error</p>
+<p class="rubric">Notes</p>
+<p>Differs from resids since this is the estimated idiosyncratic shock
+from the data. It has the same dimension as the dependent data.
+The shape and nature of resids depends on the model estimated. These
+estimates only depend on the model estimated through the estimation
+of parameters and inclusion of effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.panel.results.PanelEffectsResults.included_effects">
 <code class="descname">included_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.included_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of effects included in the model</p>
@@ -329,6 +349,37 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="linearmodels.panel.results.PanelEffectsResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The interface for predict will change to allow new exog data to be
+passed in the future.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelEffectsResults.pvalues">
 <code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
@@ -345,6 +396,10 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dt id="linearmodels.panel.results.PanelEffectsResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
+<p class="rubric">Notes</p>
+<p>These residuals are from the estimated model. They will not have the
+same shape as the original data whenever the model is estimated on
+transformed data which has a different shape.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -522,6 +577,14 @@ effects on the exogenous purged of entity effects.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.estimated_effects">
+<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated effects</p>
+<p class="rubric">Notes</p>
+<p>NaN filled when models do not include effects.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.panel.results.RandomEffectsResults.f_statistic">
 <code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
@@ -579,6 +642,24 @@ distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.RandomEffectsResults.idiosyncratic">
+<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Idiosyncratic error</p>
+<p class="rubric">Notes</p>
+<p>Differs from resids since this is the estimated idiosyncratic shock
+from the data. It has the same dimension as the dependent data.
+The shape and nature of resids depends on the model estimated. These
+estimates only depend on the model estimated through the estimation
+of parameters and inclusion of effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.panel.results.RandomEffectsResults.loglik">
 <code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
@@ -608,6 +689,37 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="linearmodels.panel.results.RandomEffectsResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The interface for predict will change to allow new exog data to be
+passed in the future.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="linearmodels.panel.results.RandomEffectsResults.pvalues">
 <code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
@@ -624,6 +736,10 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dt id="linearmodels.panel.results.RandomEffectsResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
+<p class="rubric">Notes</p>
+<p>These residuals are from the estimated model. They will not have the
+same shape as the original data whenever the model is estimated on
+transformed data which has a different shape.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -801,6 +917,14 @@ effects on the exogenous purged of entity effects.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.estimated_effects">
+<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimated effects</p>
+<p class="rubric">Notes</p>
+<p>NaN filled when models do not include effects.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.panel.results.PanelResults.f_statistic">
 <code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
@@ -858,6 +982,24 @@ distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.results.PanelResults.idiosyncratic">
+<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Idiosyncratic error</p>
+<p class="rubric">Notes</p>
+<p>Differs from resids since this is the estimated idiosyncratic shock
+from the data. It has the same dimension as the dependent data.
+The shape and nature of resids depends on the model estimated. These
+estimates only depend on the model estimated through the estimation
+of parameters and inclusion of effects, if any.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.panel.results.PanelResults.loglik">
 <code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.loglik" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
@@ -887,6 +1029,37 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="linearmodels.panel.results.PanelResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected output</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The interface for predict will change to allow new exog data to be
+passed in the future.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelResults.pvalues">
 <code class="descname">pvalues</code><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.pvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.pvalues" title="Permalink to this definition">¶</a></dt>
@@ -903,6 +1076,10 @@ distribution where df is the residual degree of freedom from the model.</p>
 <dt id="linearmodels.panel.results.PanelResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
+<p class="rubric">Notes</p>
+<p>These residuals are from the estimated model. They will not have the
+same shape as the original data whenever the model is estimated on
+transformed data which has a different shape.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1157,7 +1334,7 @@ names.  An OrderedDict will preserve the model order the comparisons.</td>
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+2.g37a67e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

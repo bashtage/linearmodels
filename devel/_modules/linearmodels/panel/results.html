@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.results &#8212; linearmodels 4.2+2.g37a67e8 documentation</title>
+    <title>linearmodels.panel.results &#8212; linearmodels 4.2+4.ge4ff395 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+2.g37a67e8',
+        VERSION:     '4.2+4.ge4ff395',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+2.g37a67e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+2, g37a67e8)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+4, ge4ff395)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -129,8 +129,8 @@
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv.results</span> <span class="k">import</span> <span class="n">default_txt_fmt</span><span class="p">,</span> <span class="n">stub_concat</span><span class="p">,</span> <span class="n">table_concat</span>
-<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span>
-                                  <span class="n">cached_property</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">,</span>
+                                  <span class="n">pval_format</span><span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PanelResults&#39;</span><span class="p">,</span> <span class="s1">&#39;PanelEffectsResults&#39;</span><span class="p">,</span> <span class="s1">&#39;RandomEffectsResults&#39;</span><span class="p">]</span>
 
@@ -167,6 +167,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_f</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">deferred_f</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_f_stat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">f_stat</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loglik</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">loglik</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">fitted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_effects</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">effects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_idiosyncratic</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">idiosyncratic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">original_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_not_null</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">not_null</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -449,8 +454,88 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Model residuals&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Model residuals</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        These residuals are from the estimated model. They will not have the</span>
+<span class="sd">        same shape as the original data whenever the model is estimated on</span>
+<span class="sd">        transformed data which has a different shape.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resids</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;residual&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PanelResults.predict"><a class="viewcode-back" href="../../../panel/results.html#linearmodels.panel.results.PanelResults.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">idiosyncratic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In-sample predictions</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fitted : bool, optional</span>
+<span class="sd">            Flag indicating whether to include the fitted values</span>
+<span class="sd">        effects : bool, optional</span>
+<span class="sd">            Flag indicating whether to include estimated effects</span>
+<span class="sd">        idiosyncratic : bool, optional</span>
+<span class="sd">            Flag indicating whether to include the estimated idiosyncratic shock</span>
+<span class="sd">        missing : bool, optional</span>
+<span class="sd">            Flag indicating to adjust for dropped observations.  if True, the</span>
+<span class="sd">            values returns will have the same size as the original input data</span>
+<span class="sd">            before filtering missing values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predictions : DataFrame</span>
+<span class="sd">            DataFrame containing columns for all selected output</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The interface for predict will change to allow new exog data to be</span>
+<span class="sd">        passed in the future.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">fitted</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitted_values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">effects</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">estimated_effects</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">idiosyncratic</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idiosyncratic</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least one output must be selected&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># type: DataFrame</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fitted_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fitted values&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">estimated_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimated effects</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        NaN filled when models do not include effects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effects</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">idiosyncratic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Idiosyncratic error</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Differs from resids since this is the estimated idiosyncratic shock</span>
+<span class="sd">        from the data. It has the same dimension as the dependent data.</span>
+<span class="sd">        The shape and nature of resids depends on the model estimated. These</span>
+<span class="sd">        estimates only depend on the model estimated through the estimation</span>
+<span class="sd">        of parameters and inclusion of effects, if any.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idiosyncratic</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">wresids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -639,11 +724,6 @@
         <span class="k">return</span> <span class="n">smry</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">estimated_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Estimated effects&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effects</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">variance_decomposition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decomposition of total variance into effects and residuals&quot;&quot;&quot;</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma2_effects</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma2_eps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span><span class="p">]</span>
@@ -823,7 +903,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+2.g37a67e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+4.ge4ff395 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
