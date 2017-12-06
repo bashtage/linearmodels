@@ -8,8 +8,8 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.utility import (_ModelComparison, _str, _SummaryStr,
-                                  cached_property, pval_format)
+from linearmodels.utility import (_ModelComparison, _SummaryStr, _str, cached_property,
+                                  pval_format)
 
 __all__ = ['PanelResults', 'PanelEffectsResults', 'RandomEffectsResults']
 
@@ -46,6 +46,11 @@ class PanelResults(_SummaryStr):
         self._deferred_f = res.deferred_f
         self._f_stat = res.f_stat
         self._loglik = res.loglik
+        self._fitted = res.fitted
+        self._effects = res.effects
+        self._idiosyncratic = res.idiosyncratic
+        self._original_index = res.original_index
+        self._not_null = res.not_null
 
     @property
     def params(self):
@@ -328,8 +333,88 @@ class PanelResults(_SummaryStr):
 
     @property
     def resids(self):
-        """Model residuals"""
+        """Model residuals
+
+        Notes
+        -----
+        These residuals are from the estimated model. They will not have the
+        same shape as the original data whenever the model is estimated on
+        transformed data which has a different shape."""
         return Series(self._resids.squeeze(), index=self._index, name='residual')
+
+    def predict(self, *, fitted=True, effects=False, idiosyncratic=False,
+                missing=False):
+        """
+        In-sample predictions
+
+        Parameters
+        ----------
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values
+        effects : bool, optional
+            Flag indicating whether to include estimated effects
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations.  if True, the
+            values returns will have the same size as the original input data
+            before filtering missing values
+
+        Returns
+        -------
+        predictions : DataFrame
+            DataFrame containing columns for all selected output
+
+        Notes
+        -----
+        The interface for predict will change to allow new exog data to be
+        passed in the future.
+        """
+        out = []
+        if fitted:
+            out.append(self.fitted_values)
+        if effects:
+            out.append(self.estimated_effects)
+        if idiosyncratic:
+            out.append(self.idiosyncratic)
+        if len(out) == 0:
+            raise ValueError('At least one output must be selected')
+        out = concat(out, 1)  # type: DataFrame
+        if missing:
+            index = self._original_index
+            out = out.reindex(index)
+        return out
+
+    @property
+    def fitted_values(self):
+        """Fitted values"""
+        return self._fitted
+
+    @property
+    def estimated_effects(self):
+        """
+        Estimated effects
+
+        Notes
+        -----
+        NaN filled when models do not include effects.
+        """
+        return self._effects
+
+    @property
+    def idiosyncratic(self):
+        """
+        Idiosyncratic error
+
+        Notes
+        -----
+        Differs from resids since this is the estimated idiosyncratic shock
+        from the data. It has the same dimension as the dependent data.
+        The shape and nature of resids depends on the model estimated. These
+        estimates only depend on the model estimated through the estimation
+        of parameters and inclusion of effects, if any.
+        """
+        return self._idiosyncratic
 
     @property
     def wresids(self):
@@ -516,11 +601,6 @@ class PanelEffectsResults(PanelResults):
         smry.add_extra_txt(extra_text)
 
         return smry
-
-    @property
-    def estimated_effects(self):
-        """Estimated effects"""
-        return self._effects
 
     @property
     def variance_decomposition(self):

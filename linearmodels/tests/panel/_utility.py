@@ -138,3 +138,11 @@ def assert_results_equal(res1, res2, test_fit=True, test_df=True):
         assert_allclose(res1.total_ss, res2.total_ss)
         assert_allclose(res1.resid_ss, res2.resid_ss)
         assert_allclose(res1.model_ss, res2.model_ss)
+
+
+def assert_frame_similar(result, expected):
+    r = result.copy()
+    r.iloc[:, :] = 0.0
+    e = expected.copy()
+    e.iloc[:, :] = 0.0
+    assert_frame_equal(r, e)

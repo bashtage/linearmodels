@@ -1,17 +1,34 @@
+from linearmodels.compat.pandas import assert_series_equal
+
 from collections import OrderedDict
+from itertools import product
 
 import pytest
 import statsmodels.api as sm
 
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
+from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
 from linearmodels.panel.results import compare
+from linearmodels.tests.panel._utility import generate_data, datatypes
 
 
 @pytest.fixture(params=[wage_panel.load()])
 def data(request):
     return request.param
+
+
+missing = [0.0, 0.02, 0.20]
+has_const = [True, False]
+perms = list(product(missing, datatypes, has_const))
+ids = list(map(lambda s: '-'.join(map(str, s)), perms))
+
+
+@pytest.fixture(params=perms, ids=ids)
+def generated_data(request):
+    missing, datatype, const = request.param
+    return generate_data(missing, datatype, const=const, ntk=(91, 7, 5), other_effects=2)
 
 
 def test_single(data):
@@ -73,3 +90,36 @@ def test_incorrect_type(data):
     res2 = mod2.fit()
     with pytest.raises(TypeError):
         compare(dict(model1=res, model2=res2))
+
+
+def test_predict(generated_data):
+    mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    res = mod.fit()
+    pred = res.predict()
+    nobs = mod.dependent.dataframe.shape[0]
+    assert list(pred.columns) == ['fitted_values']
+    assert pred.shape == (nobs, 1)
+    pred = res.predict(effects=True, idiosyncratic=True)
+    assert list(pred.columns) == ['fitted_values', 'estimated_effects', 'idiosyncratic']
+    assert pred.shape == (nobs, 3)
+    assert_series_equal(pred.fitted_values, res.fitted_values.iloc[:, 0])
+    assert_series_equal(pred.estimated_effects, res.estimated_effects.iloc[:, 0])
+    assert_series_equal(pred.idiosyncratic, res.idiosyncratic.iloc[:, 0])
+    pred = res.predict(effects=True, idiosyncratic=True, missing=True)
+    assert list(pred.columns) == ['fitted_values', 'estimated_effects', 'idiosyncratic']
+    assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
+
+    mod = PanelOLS(generated_data.y, generated_data.x)
+    res = mod.fit()
+    pred = res.predict()
+    assert list(pred.columns) == ['fitted_values']
+    assert pred.shape == (nobs, 1)
+    pred = res.predict(effects=True, idiosyncratic=True)
+    assert list(pred.columns) == ['fitted_values', 'estimated_effects', 'idiosyncratic']
+    assert pred.shape == (nobs, 3)
+    assert_series_equal(pred.fitted_values, res.fitted_values.iloc[:, 0])
+    assert_series_equal(pred.estimated_effects, res.estimated_effects.iloc[:, 0])
+    assert_series_equal(pred.idiosyncratic, res.idiosyncratic.iloc[:, 0])
+    pred = res.predict(effects=True, idiosyncratic=True, missing=True)
+    assert list(pred.columns) == ['fitted_values', 'estimated_effects', 'idiosyncratic']
+    assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
