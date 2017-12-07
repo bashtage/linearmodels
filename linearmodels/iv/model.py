@@ -2,12 +2,12 @@
 Instrumental variable estimators
 """
 from numpy import (any, array, asarray, average, c_, isscalar, logical_not,
-                   ones, sqrt, nanmean)
+                   ones, sqrt, nanmean, atleast_2d)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
-from linearmodels.iv._utility import parse_formula
+from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.covariance import (ClusteredCovariance,
                                         HeteroskedasticCovariance,
                                         HomoskedasticCovariance,
@@ -215,11 +215,72 @@ class IVLIML(object):
         >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
         >>> mod = IVLIML.from_formula(formula, data)
         """
-        dep, exog, endog, instr = parse_formula(formula, data)
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
         mod = IVLIML(dep, exog, endog, instr, weights=weights,
                      fuller=fuller, kappa=kappa)
         mod.formula = formula
         return mod
+
+    def predict(self, params, *, exog=None, endog=None, data=None, eval_env=4):
+        """
+        Predict values for additional data
+
+        Parameters
+        ----------
+        params : array-like
+            Model parameters (nvar by 1)
+        exog : array-like
+            Exogenous regressors (nobs by nexog)
+        endog : array-like
+            Endogenous regressors (nobs by nendog)
+        data : DataFrame
+            Values to use when making predictions from a model constructed
+            from a formula
+        eval_env : int
+            Depth of use when evaluating formulas using Patsy.
+
+        Returns
+        -------
+        predictions : DataFrame
+            Fitted values from supplied data and parameters
+
+        Notes
+        -----
+        The number of parameters must satisfy nvar = nexog + nendog.
+
+        When using `exog` and `endog`, regressor matrix is constructed as
+        `[exog, endog]` and so parameters must be aligned to this structure.
+        The the the same structure used in model estimation.
+
+        If `data` is not none, then `exog` and `endog` must be none.
+        Predictions from models constructed using formulas can
+        be computed using either `exog` and `endog`, which will treat these are
+        arrays of values corresponding to the formula-process data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+        """
+        if data is not None and self.formula is None:
+            raise ValueError('Unable to use data when the model was not '
+                             'created using a formula.')
+        if data is not None and (exog is not None or endog is not None):
+            raise ValueError('Predictions can only be constructed using one '
+                             'of exog/endog or data, but not both.')
+        if exog is not None or endog is not None:
+            exog = IVData(exog).pandas
+            endog = IVData(endog).pandas
+        else:
+            parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
+            exog = parser.exog
+            endog = parser.endog
+        exog_endog = concat([exog, endog], 1)
+        x = exog_endog.values
+        params = atleast_2d(asarray(params))
+        if params.shape[0] == 1:
+            params = params.T
+        pred = DataFrame(x @ params, index=exog_endog.index, columns=['predictions'])
+
+        return pred
 
     @property
     def formula(self):
@@ -556,7 +617,8 @@ class IV2SLS(IVLIML):
         >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
         >>> mod = IV2SLS.from_formula(formula, data)
         """
-        dep, exog, endog, instr = parse_formula(formula, data)
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
         mod = IV2SLS(dep, exog, endog, instr, weights=weights)
         mod.formula = formula
         return mod
@@ -667,7 +729,8 @@ class IVGMM(IVLIML):
         >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
         >>> mod = IVGMM.from_formula(formula, data)
         """
-        dep, exog, endog, instr = parse_formula(formula, data)
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
         mod = IVGMM(dep, exog, endog, instr, weights=weights, weight_type=weight_type,
                     **weight_config)
         mod.formula = formula
@@ -902,7 +965,8 @@ class IVGMMCUE(IVGMM):
         >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
         >>> mod = IVGMMCUE.from_formula(formula, data)
         """
-        dep, exog, endog, instr = parse_formula(formula, data)
+        parser = IVFormulaParser(formula, data)
+        dep, exog, endog, instr = parser.data
         mod = IVGMMCUE(dep, exog, endog, instr, weights=weights, weight_type=weight_type,
                        **weight_config)
         mod.formula = formula
