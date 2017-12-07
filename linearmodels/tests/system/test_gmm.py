@@ -6,9 +6,10 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
+from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.iv.covariance import kernel_weight_parzen
-from linearmodels.system import IVSystemGMM, IV3SLS
-from linearmodels.system.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
+from linearmodels.system import IV3SLS, IVSystemGMM
+from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix, \
     KernelWeightMatrix
 from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
 from linearmodels.utility import AttrDict
@@ -366,3 +367,22 @@ def test_kernel_weight_direct(weight_data, center, debias):
         adj = nobs / (nobs - df @ df.T)
         direct *= adj
     assert_allclose(weights, direct)
+
+
+def test_fitted(data):
+    mod = IVSystemGMM(data.eqns)
+    res = mod.fit()
+    expected = []
+    for i, key in enumerate(res.equations):
+        eq = res.equations[key]
+        fv = res.fitted_values[key].copy()
+        fv.name = 'fitted_values'
+        assert_series_equal(eq.fitted_values, fv)
+        b = eq.params.values
+        direct = mod._x[i] @ b
+        expected.append(direct[:, None])
+        assert_allclose(eq.fitted_values, direct, atol=1e-8)
+    expected = np.concatenate(expected, 1)
+    expected = pd.DataFrame(expected, index=mod._dependent[i].pandas.index,
+                            columns=[key for key in res.equations])
+    assert_frame_equal(expected, res.fitted_values)

@@ -2,7 +2,7 @@ import datetime as dt
 
 import numpy as np
 from numpy import diag, sqrt
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
@@ -23,6 +23,7 @@ class _CommonResults(_SummaryStr):
         self._r2 = results.r2
         self._resid = results.resid
         self._wresid = results.wresid
+        self._fitted = results.fitted
         self._nobs = results.nobs
         self._df_model = results.df_model
         self._df_resid = self._nobs - self._df_model
@@ -34,6 +35,7 @@ class _CommonResults(_SummaryStr):
         self._datetime = dt.datetime.now()
         self._cov_estimator = results.cov_estimator
         self._cov_config = results.cov_config
+        self._original_index = results.original_index
 
     @property
     def method(self):
@@ -199,6 +201,66 @@ class SystemResults(_CommonResults):
     def resids(self):
         """Estimated residuals"""
         return DataFrame(self._resid, index=self._index, columns=self.equation_labels)
+
+    @property
+    def fitted_values(self):
+        """Fitted values"""
+        return DataFrame(self._fitted, index=self._index, columns=self.equation_labels)
+
+    def predict(self, *, fitted=True, idiosyncratic=False, missing=False, dataframe=False):
+        """
+        In-sample predictions
+
+        Parameters
+        ----------
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations.  if True, the
+            values returns will have the same size as the original input data
+            before filtering missing values
+        dataframe : bool, optional
+            Flag indicating to return output as a dataframe. If False, a
+            dictionary is returned using the equation labels as keys.
+
+        Returns
+        -------
+        predictions : DataFrame, dict
+            DataFrame or dictionary all selected outputs
+
+        Notes
+        -----
+        The interface for predict will change to allow new exog data to be
+        passed in the future.
+        """
+        if not (fitted or idiosyncratic):
+            raise ValueError('At least one output must be selected')
+        if dataframe:
+            if fitted and not idiosyncratic:
+                out = self.fitted_values
+            elif idiosyncratic and not fitted:
+                out = self.resids
+            else:
+                out = {'fitted_values': self.fitted_values, 'idiosyncratic': self.resids}
+        else:
+            out = {}
+            for key in self.equation_labels:
+                vals = []
+                if fitted:
+                    vals.append(self.fitted_values[[key]])
+                if idiosyncratic:
+                    vals.append(self.resids[[key]])
+                out[key] = concat(vals, 1)
+        if missing:
+            if isinstance(out, DataFrame):
+                out = out.reindex(self._original_index)
+            else:
+                for key in out:
+                    out[key] = out[key].reindex(self._original_index)
+
+        return out
 
     @property
     def wresids(self):
@@ -410,6 +472,12 @@ class SystemEquationResult(_CommonResults):
     def wresids(self):
         """Weighted estimated residuals"""
         return Series(self._wresid.squeeze(), index=self._index, name='wresid')
+
+    @property
+    def fitted_values(self):
+        """Fitted values"""
+        return Series(self._fitted.squeeze(), index=self._index, name='fitted_values')
+
 
     @property
     def rsquared_adj(self):

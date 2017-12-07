@@ -127,7 +127,7 @@ class OLSResults(_SummaryStr):
         Returns
         -------
         predictions : DataFrame
-            DataFrame containing columns for all selected output
+            DataFrame containing columns for all selected outputs
 
         Notes
         -----

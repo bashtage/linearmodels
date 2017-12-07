@@ -237,6 +237,7 @@ class IV3SLS(object):
         self._constant_loc = None
         self._has_constant = None
         self._common_exog = False
+        self._original_index = None
         self._model_name = 'Three Stage Least Squares (3SLS)'
 
         self._validate_data()
@@ -358,6 +359,7 @@ class IV3SLS(object):
     def _drop_missing(self):
         k = len(self._dependent)
         nobs = self._dependent[0].shape[0]
+        self._original_index = self._dependent[0].rows.copy()
         missing = np.zeros(nobs, dtype=np.bool)
 
         for i in range(k):
@@ -781,6 +783,7 @@ class IV3SLS(object):
         stats['cov_config'] = cov_est.cov_config
         stats['weight_estimator'] = weight_est
         stats['index'] = self._dependent[i].rows
+        stats['original_index'] = self._original_index
         stats['iter'] = iter_count
         stats['debiased'] = debiased
         stats['has_constant'] = bool(constant)
@@ -801,6 +804,7 @@ class IV3SLS(object):
         stats['nobs'] = nobs
         stats['df_model'] = df
         stats['resid'] = resid[:, [i]]
+        stats['fitted'] = self._x[i] @ b
         stats['resid_ss'] = float(resid[:, [i]].T @ resid[:, [i]])
         stats['total_ss'] = total_ss
         stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
@@ -823,6 +827,7 @@ class IV3SLS(object):
         results['nobs'] = nobs
         results['cov_type'] = cov_type
         results['index'] = self._dependent[0].rows
+        results['original_index'] = self._original_index
         results['sigma'] = sigma
         results['individual'] = individual
         results['params'] = beta
@@ -845,6 +850,19 @@ class IV3SLS(object):
         results['resid'] = resid
         results['constraints'] = self._constraints
         results['model'] = self
+
+        x = self._x
+        k = len(x)
+        loc = 0
+        fitted = []
+        for i in range(k):
+            nb = x[i].shape[1]
+            b = beta[loc:loc + nb]
+            fitted.append(x[i] @ b)
+            loc += nb
+        fitted = hstack(fitted)
+
+        results['fitted'] = fitted
 
         return results
 
