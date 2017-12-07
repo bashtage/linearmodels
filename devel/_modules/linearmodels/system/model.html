@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.model &#8212; linearmodels 4.2+6.g5505b53 documentation</title>
+    <title>linearmodels.system.model &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+6.g5505b53',
+        VERSION:     '4.2+8.gb3dde3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+6, g5505b53)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -358,6 +358,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant_loc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_common_exog</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_name</span> <span class="o">=</span> <span class="s1">&#39;Three Stage Least Squares (3SLS)&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_data</span><span class="p">()</span>
@@ -479,6 +480,7 @@
     <span class="k">def</span> <span class="nf">_drop_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
@@ -902,6 +904,7 @@
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;weight_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_est</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;original_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;iter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iter_count</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;debiased&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;has_constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span>
@@ -922,6 +925,7 @@
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;nobs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nobs</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;df_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;resid_ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">resid</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">resid</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">]])</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_ss</span>
         <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;r2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">resid_ss</span> <span class="o">/</span> <span class="n">stats</span><span class="o">.</span><span class="n">total_ss</span>
@@ -944,6 +948,7 @@
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;nobs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nobs</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_type</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;original_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;individual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">individual</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span>
@@ -966,6 +971,19 @@
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;resid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;constraints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">fitted</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">nb</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
+            <span class="n">fitted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
+            <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
+        <span class="n">fitted</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">fitted</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitted</span>
 
         <span class="k">return</span> <span class="n">results</span>
 
@@ -1649,7 +1667,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

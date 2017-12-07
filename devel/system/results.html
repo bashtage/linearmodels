@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.2+6.g5505b53 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+6.g5505b53',
+        VERSION:     '4.2+8.gb3dde3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+6, g5505b53)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -222,6 +222,12 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.system.results.SystemResults.iterations">
 <code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
@@ -255,6 +261,38 @@
 <dt id="linearmodels.system.results.SystemResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.results.SystemResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+<li><strong>dataframe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to return output as a dataframe. If False, a
+dictionary is returned using the equation labels as keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame or dictionary all selected outputs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The interface for predict will change to allow new exog data to be
+passed in the future.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -394,6 +432,12 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.system.results.GMMSystemResults.iterations">
 <code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
@@ -453,6 +497,38 @@ statistic is defined as</p>
 <dt id="linearmodels.system.results.GMMSystemResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.results.GMMSystemResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+<li><strong>dataframe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to return output as a dataframe. If False, a
+dictionary is returned using the equation labels as keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame or dictionary all selected outputs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The interface for predict will change to allow new exog data to be
+passed in the future.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -571,7 +647,7 @@ statistic is defined as</p>
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+6.g5505b53 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
