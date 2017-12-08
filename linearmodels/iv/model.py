@@ -256,7 +256,7 @@ class IVLIML(object):
         If `data` is not none, then `exog` and `endog` must be none.
         Predictions from models constructed using formulas can
         be computed using either `exog` and `endog`, which will treat these are
-        arrays of values corresponding to the formula-process data, or using
+        arrays of values corresponding to the formula-processed data, or using
         `data` which will be processed using the formula used to construct the
         values corresponding to the original model specification.
         """

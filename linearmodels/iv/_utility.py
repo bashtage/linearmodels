@@ -125,7 +125,7 @@ class IVFormulaParser(object):
 
     @property
     def data(self):
-        """Returns a tuple containins the dependent, exog, endog and instruments"""
+        """Returns a tuple containing the dependent, exog, endog and instruments"""
         self._eval_env += 1
         out = self.dependent, self.exog, self.endog, self.instruments
         self._eval_env -= 1

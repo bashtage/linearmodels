@@ -40,6 +40,10 @@ def models(request):
     return request.param
 
 
+def sigmoid(v):
+    return np.exp(v) / (1 + np.exp(v))
+
+
 def test_basic_formulas(data, models, formula):
     if not isinstance(data.y, pd.DataFrame):
         return
@@ -93,9 +97,12 @@ def test_basic_formulas_math_op(data, models, formula):
     joined = data.x
     joined['y'] = data.y
     formula = formula.replace('x0', 'np.exp(x0)')
-    formula = formula.replace('x1', 'np.arctan(x1)')
+    formula = formula.replace('x1', 'sigmoid(x1)')
     model, formula_func = models
-    model.from_formula(formula, joined).fit()
+    res = model.from_formula(formula, joined).fit()
+    pred = res.predict(data=joined)
+    pred = pred.reindex(res.fitted_values.index)
+    np.testing.assert_allclose(pred.values, res.fitted_values.values)
 
 
 def test_panel_ols_formulas_math_op(data):
@@ -142,3 +149,70 @@ def test_panel_ols_formula(data):
     formula = 'y ~ x1 + EntityEffects + FixedEffects + x2 '
     with pytest.raises(ValueError):
         PanelOLS.from_formula(formula, joined)
+
+
+def test_basic_formulas_predict(data, models, formula):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    joined = data.x
+    joined['y'] = data.y
+    model, formula_func = models
+    mod = model.from_formula(formula, joined)
+    res = mod.fit()
+    pred = res.predict(data=joined)
+
+    mod2 = formula_func(formula, joined)
+    res2 = mod2.fit()
+    pred2 = res2.predict(data=joined)
+    np.testing.assert_allclose(pred.values, pred2.values, atol=1e-8)
+
+    parts = formula.split('~')
+    vars = parts[1].replace(' 1 ', ' const ').split('+')
+    vars = list(map(lambda s: s.strip(), vars))
+    x = data.x
+    res2 = model(data.y, x[vars]).fit()
+    pred3 = res2.predict(x[vars])
+    pred4 = res.predict(x[vars])
+    np.testing.assert_allclose(pred.values, pred3.values, atol=1e-8)
+    np.testing.assert_allclose(pred.values, pred4.values, atol=1e-8)
+
+    if model is FirstDifferenceOLS:
+        return
+
+    formula = formula.split('~')
+    formula[1] = ' 1 + ' + formula[1]
+    formula = '~'.join(formula)
+    mod = model.from_formula(formula, joined)
+    res = mod.fit()
+    pred = res.predict(data=joined)
+
+    x['Intercept'] = 1.0
+    vars = ['Intercept'] + vars
+    mod2 = model(data.y, x[vars])
+    res2 = mod2.fit()
+    pred2 = res.predict(x[vars])
+    pred3 = res2.predict(x[vars])
+    np.testing.assert_allclose(pred, pred2, atol=1e-8)
+    np.testing.assert_allclose(pred, pred3, atol=1e-8)
+
+
+def test_formulas_predict_error(data, models, formula):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    joined = data.x
+    joined['y'] = data.y
+    model, formula_func = models
+    mod = model.from_formula(formula, joined)
+    res = mod.fit()
+    with pytest.raises(ValueError):
+        res.predict(joined, data=joined)
+    with pytest.raises(ValueError):
+        mod.predict(params=res.params, exog=joined, data=joined)
+
+    parts = formula.split('~')
+    vars = parts[1].replace(' 1 ', ' const ').split('+')
+    vars = list(map(lambda s: s.strip(), vars))
+    x = data.x
+    res = model(data.y, x[vars]).fit()
+    with pytest.raises(ValueError):
+        res.predict(data=joined)
