@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+8.gb3dde3e',
+        VERSION:     '4.2+10.ga779d3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -134,9 +134,8 @@
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv._utility</span> <span class="k">import</span> <span class="n">annihilate</span><span class="p">,</span> <span class="n">proj</span>
-<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span>
-                                  <span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span>
-                                  <span class="n">cached_property</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">_ModelComparison</span><span class="p">,</span>
+                                  <span class="n">_SummaryStr</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">cached_property</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">stub_concat</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;=&#39;</span><span class="p">):</span>
@@ -230,20 +229,39 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span>
 
-<div class="viewcode-block" id="OLSResults.predict"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">idiosyncratic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_out_of_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">fitted</span><span class="p">,</span> <span class="n">missing</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Interface between model predict and predict for OOS fits&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">endog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Predictions can only be constructed using one &#39;</span>
+                             <span class="s1">&#39;of exog/endog or data, but not both.&#39;</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="n">endog</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">pred</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">pred</span>
+
+<div class="viewcode-block" id="OLSResults.predict"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">idiosyncratic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        In-sample predictions</span>
+<span class="sd">        In- and out-of-sample predictions</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        exog : array-like</span>
+<span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog)</span>
+<span class="sd">        endog : array-like</span>
+<span class="sd">            Endogenous values to use in out-of-sample prediction (nobs by nendog)</span>
+<span class="sd">        data : DataFrame, optional</span>
+<span class="sd">            Dataframe to use for out-of-sample predictions when model was</span>
+<span class="sd">            constructed using a formula.</span>
 <span class="sd">        fitted : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the fitted values</span>
 <span class="sd">        idiosyncratic : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the estimated idiosyncratic shock</span>
 <span class="sd">        missing : bool, optional</span>
-<span class="sd">            Flag indicating to adjust for dropped observations.  if True, the</span>
-<span class="sd">            values returns will have the same size as the original input data</span>
-<span class="sd">            before filtering missing values</span>
+<span class="sd">            Flag indicating to adjust for dropped observations.  If True, the</span>
+<span class="sd">            values returned will have the same size as the original input data</span>
+<span class="sd">            before filtering missing values.  If False, then missing</span>
+<span class="sd">            observations will not be returned.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -252,9 +270,18 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The interface for predict will change to allow new exog data to be</span>
-<span class="sd">        passed in the future.</span>
+<span class="sd">        If `exog`, `endog` and `data` are all `None`, in-sample predictions</span>
+<span class="sd">        (fitted values) will be returned.</span>
+
+<span class="sd">        If `data` is not none, then `exog` and `endog` must be none.</span>
+<span class="sd">        Predictions from models constructed using formulas can</span>
+<span class="sd">        be computed using either `exog` and `endog`, which will treat these are</span>
+<span class="sd">        arrays of values corresponding to the formula-process data, or using</span>
+<span class="sd">        `data` which will be processed using the formula used to construct the</span>
+<span class="sd">        values corresponding to the original model specification.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">exog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">endog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_of_sample</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">fitted</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">fitted</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitted_values</span><span class="p">)</span>
@@ -1445,7 +1472,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

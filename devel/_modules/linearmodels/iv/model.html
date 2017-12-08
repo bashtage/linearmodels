@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.model &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
+    <title>linearmodels.iv.model &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+8.gb3dde3e',
+        VERSION:     '4.2+10.ga779d3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -123,12 +123,12 @@
 <span class="sd">Instrumental variable estimators</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="nb">any</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">average</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">isscalar</span><span class="p">,</span> <span class="n">logical_not</span><span class="p">,</span>
-                   <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">nanmean</span><span class="p">)</span>
+                   <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">nanmean</span><span class="p">,</span> <span class="n">atleast_2d</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">eigvalsh</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">pinv</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.iv._utility</span> <span class="k">import</span> <span class="n">parse_formula</span>
+<span class="kn">from</span> <span class="nn">linearmodels.iv._utility</span> <span class="k">import</span> <span class="n">IVFormulaParser</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv.covariance</span> <span class="k">import</span> <span class="p">(</span><span class="n">ClusteredCovariance</span><span class="p">,</span>
                                         <span class="n">HeteroskedasticCovariance</span><span class="p">,</span>
                                         <span class="n">HomoskedasticCovariance</span><span class="p">,</span>
@@ -336,11 +336,72 @@
 <span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IVLIML.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">IVLIML</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
                      <span class="n">fuller</span><span class="o">=</span><span class="n">fuller</span><span class="p">,</span> <span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
+
+<div class="viewcode-block" id="IVLIML.predict"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVLIML.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict values for additional data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : array-like</span>
+<span class="sd">            Model parameters (nvar by 1)</span>
+<span class="sd">        exog : array-like</span>
+<span class="sd">            Exogenous regressors (nobs by nexog)</span>
+<span class="sd">        endog : array-like</span>
+<span class="sd">            Endogenous regressors (nobs by nendog)</span>
+<span class="sd">        data : DataFrame</span>
+<span class="sd">            Values to use when making predictions from a model constructed</span>
+<span class="sd">            from a formula</span>
+<span class="sd">        eval_env : int</span>
+<span class="sd">            Depth of use when evaluating formulas using Patsy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predictions : DataFrame</span>
+<span class="sd">            Fitted values from supplied data and parameters</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of parameters must satisfy nvar = nexog + nendog.</span>
+
+<span class="sd">        When using `exog` and `endog`, regressor matrix is constructed as</span>
+<span class="sd">        `[exog, endog]` and so parameters must be aligned to this structure.</span>
+<span class="sd">        The the the same structure used in model estimation.</span>
+
+<span class="sd">        If `data` is not none, then `exog` and `endog` must be none.</span>
+<span class="sd">        Predictions from models constructed using formulas can</span>
+<span class="sd">        be computed using either `exog` and `endog`, which will treat these are</span>
+<span class="sd">        arrays of values corresponding to the formula-process data, or using</span>
+<span class="sd">        `data` which will be processed using the formula used to construct the</span>
+<span class="sd">        values corresponding to the original model specification.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">formula</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to use data when the model was not &#39;</span>
+                             <span class="s1">&#39;created using a formula.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">endog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Predictions can only be constructed using one &#39;</span>
+                             <span class="s1">&#39;of exog/endog or data, but not both.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">endog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+            <span class="n">endog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span><span class="o">.</span><span class="n">pandas</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="n">eval_env</span><span class="p">)</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">exog</span>
+            <span class="n">endog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">endog</span>
+        <span class="n">exog_endog</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exog_endog</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">atleast_2d</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">params</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">exog_endog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;predictions&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">pred</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -677,7 +738,8 @@
 <span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IV2SLS.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div></div>
@@ -788,7 +850,8 @@
 <span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IVGMM.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="n">weight_type</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
@@ -1023,7 +1086,8 @@
 <span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
 <span class="sd">        &gt;&gt;&gt; mod = IVGMMCUE.from_formula(formula, data)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMMCUE</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">weight_type</span><span class="o">=</span><span class="n">weight_type</span><span class="p">,</span>
                        <span class="o">**</span><span class="n">weight_config</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
@@ -1216,7 +1280,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

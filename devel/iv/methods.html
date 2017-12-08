@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Methods &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
+    <title>Estimation Methods &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+8.gb3dde3e',
+        VERSION:     '4.2+10.ga779d3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -302,6 +302,45 @@ valid Patsy formulas.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.resids">
 <code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
@@ -518,6 +557,45 @@ valid Patsy formulas.</p>
 <dt id="linearmodels.iv.model.IVLIML.notnull">
 <code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVLIML.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="method">
@@ -756,6 +834,45 @@ valid Patsy formulas.</p>
 <dt id="linearmodels.iv.model.IVGMM.notnull">
 <code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMM.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1021,6 +1138,45 @@ with the moment conditions, and so has explicit dependence on
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.resids">
 <code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
@@ -1096,7 +1252,7 @@ resids if all weights are unity.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

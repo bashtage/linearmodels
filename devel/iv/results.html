@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.2+8.gb3dde3e documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+8.gb3dde3e',
+        VERSION:     '4.2+10.ga779d3e',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+8, gb3dde3e)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -413,18 +413,23 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
-values returns will have the same size as the original input data
-before filtering missing values</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+values returned will have the same size as the original input data
+before filtering missing values.  If False, then missing
+observations will not be returned.</li>
 </ul>
 </td>
 </tr>
@@ -437,8 +442,14 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
+(fitted values) will be returned.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -930,18 +941,23 @@ freedom is <span class="math">\(q = n_{instr} - n_{endog}\)</span>.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
-values returns will have the same size as the original input data
-before filtering missing values</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+values returned will have the same size as the original input data
+before filtering missing values.  If False, then missing
+observations will not be returned.</li>
 </ul>
 </td>
 </tr>
@@ -954,8 +970,14 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
+(fitted values) will be returned.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1218,18 +1240,23 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
-values returns will have the same size as the original input data
-before filtering missing values</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+values returned will have the same size as the original input data
+before filtering missing values.  If False, then missing
+observations will not be returned.</li>
 </ul>
 </td>
 </tr>
@@ -1242,8 +1269,14 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
+(fitted values) will be returned.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1537,7 +1570,7 @@ the variable names of the endogenous regressors.</td>
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+8.gb3dde3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
