@@ -13,9 +13,8 @@ from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv._utility import annihilate, proj
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
-                                  _ModelComparison, _str, _SummaryStr,
-                                  cached_property, pval_format)
+from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, _ModelComparison,
+                                  _SummaryStr, _str, cached_property, pval_format)
 
 
 def stub_concat(lists, sep='='):
@@ -109,20 +108,39 @@ class OLSResults(_SummaryStr):
         """
         return self.resids
 
-    def predict(self, *, fitted=True, idiosyncratic=False, missing=False):
+    def _out_of_sample(self, exog, endog, data, fitted, missing):
+        """Interface between model predict and predict for OOS fits"""
+        if not (exog is None and endog is None) and data is not None:
+            raise ValueError('Predictions can only be constructed using one '
+                             'of exog/endog or data, but not both.')
+        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
+        if not missing:
+            pred = pred.loc[pred.notnull().all(1)]
+        return pred
+
+    def predict(self, exog=None, endog=None, *, data=None, fitted=True,
+                idiosyncratic=False, missing=False):
         """
-        In-sample predictions
+        In- and out-of-sample predictions
 
         Parameters
         ----------
+        exog : array-like
+            Exogenous values to use in out-of-sample prediction (nobs by nexog)
+        endog : array-like
+            Endogenous values to use in out-of-sample prediction (nobs by nendog)
+        data : DataFrame, optional
+            Dataframe to use for out-of-sample predictions when model was
+            constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values
         idiosyncratic : bool, optional
             Flag indicating whether to include the estimated idiosyncratic shock
         missing : bool, optional
-            Flag indicating to adjust for dropped observations.  if True, the
-            values returns will have the same size as the original input data
-            before filtering missing values
+            Flag indicating to adjust for dropped observations.  If True, the
+            values returned will have the same size as the original input data
+            before filtering missing values.  If False, then missing
+            observations will not be returned.
 
         Returns
         -------
@@ -131,9 +149,18 @@ class OLSResults(_SummaryStr):
 
         Notes
         -----
-        The interface for predict will change to allow new exog data to be
-        passed in the future.
+        If `exog`, `endog` and `data` are all `None`, in-sample predictions
+        (fitted values) will be returned.
+
+        If `data` is not none, then `exog` and `endog` must be none.
+        Predictions from models constructed using formulas can
+        be computed using either `exog` and `endog`, which will treat these are
+        arrays of values corresponding to the formula-process data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
         """
+        if not (exog is None and endog is None and data is None):
+            return self._out_of_sample(exog, endog, data, fitted, missing)
         out = []
         if fitted:
             out.append(self.fitted_values)

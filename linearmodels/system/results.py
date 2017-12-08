@@ -478,7 +478,6 @@ class SystemEquationResult(_CommonResults):
         """Fitted values"""
         return Series(self._fitted.squeeze(), index=self._index, name='fitted_values')
 
-
     @property
     def rsquared_adj(self):
         """Sample-size adjusted coefficient of determination (R**2)"""

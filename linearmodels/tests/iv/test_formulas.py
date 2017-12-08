@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import pytest
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
+from linearmodels.compat.pandas import assert_frame_equal
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
@@ -11,6 +12,10 @@ from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
                                                 [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm])))
 def model_and_func(request):
     return request.param
+
+
+def sigmoid(v):
+    return np.exp(v) / (1 + np.exp(v))
 
 
 formulas = ['y ~ 1 + x3 + x4 + x5 + [x1 + x2 ~ z1 + z2 + z3]',
@@ -170,3 +175,69 @@ def test_categorical(model_and_func):
     assert_allclose(res.rsquared, res2.rsquared)
     assert_allclose(res2.rsquared, res3.rsquared)
     assert mod.formula == formula
+
+
+def test_predict_formula(data, model_and_func, formula):
+    model, func = model_and_func
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
+    exog = data[['Intercept', 'x3', 'x4', 'x5']]
+    endog = data[['x1', 'x2']]
+    pred = res.predict(exog, endog)
+    pred2 = res.predict(data=data)
+    assert_frame_equal(pred, pred2)
+    assert_allclose(res.fitted_values, pred)
+
+
+def test_formula_function(data, model_and_func):
+    model, func = model_and_func
+    fmla = 'y ~ 1 + sigmoid(x3) + x4 + [x1 + x2 ~ z1 + z2 + z3] + np.exp(x5)'
+    mod = model.from_formula(fmla, data)
+    res = mod.fit()
+
+    dep = data.y
+    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']], np.exp(data[['x5']])]
+    exog = pd.concat(exog, 1)
+    endog = data[['x1', 'x2']]
+    instr = data[['z1', 'z2', 'z3']]
+    mod = model(dep, exog, endog, instr)
+    res2 = mod.fit()
+    assert_equal(res.params.values, res2.params.values)
+    res3 = func(fmla, data).fit()
+    assert_equal(res.params.values, res3.params.values)
+
+    with pytest.raises(ValueError):
+        res2.predict(data=data)
+
+
+def test_predict_formula_function(data, model_and_func):
+    model, func = model_and_func
+    fmla = 'y ~ 1 + sigmoid(x3) + x4 + [x1 + x2 ~ z1 + z2 + z3] + np.exp(x5)'
+    mod = model.from_formula(fmla, data)
+    res = mod.fit()
+
+    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']], np.exp(data[['x5']])]
+    exog = pd.concat(exog, 1)
+    endog = data[['x1', 'x2']]
+    pred = res.predict(exog, endog)
+    pred2 = res.predict(data=data)
+    assert_frame_equal(pred, pred2)
+    assert_allclose(res.fitted_values, pred)
+
+    res2 = func(fmla, data).fit()
+    pred3 = res2.predict(exog, endog)
+    pred4 = res2.predict(data=data)
+    assert_frame_equal(pred, pred3)
+    assert_frame_equal(pred, pred4)
+
+
+def test_predict_formula_error(data, model_and_func, formula):
+    model, func = model_and_func
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
+    exog = data[['Intercept', 'x3', 'x4', 'x5']]
+    endog = data[['x1', 'x2']]
+    with pytest.raises(ValueError):
+        res.predict(exog, endog, data=data)
+    with pytest.raises(ValueError):
+        mod.predict(res.params, exog=exog, endog=endog, data=data)
