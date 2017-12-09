@@ -342,13 +342,28 @@ class PanelResults(_SummaryStr):
         transformed data which has a different shape."""
         return Series(self._resids.squeeze(), index=self._index, name='residual')
 
-    def predict(self, *, fitted=True, effects=False, idiosyncratic=False,
+    def _out_of_sample(self, exog, data, fitted, missing):
+        """Interface between model predict and predict for OOS fits"""
+        if exog is not None and data is not None:
+            raise ValueError('Predictions can only be constructed using one '
+                             'of exog or data, but not both.')
+        pred = self.model.predict(self.params, exog=exog, data=data)
+        if not missing:
+            pred = pred.loc[pred.notnull().all(1)]
+        return pred
+
+    def predict(self, exog=None, *, data=None, fitted=True, effects=False, idiosyncratic=False,
                 missing=False):
         """
-        In-sample predictions
+        In- and out-of-sample predictions
 
         Parameters
         ----------
+        exog : array-like
+            Exogenous values to use in out-of-sample prediction (nobs by nexog)
+        data : DataFrame, optional
+            Dataframe to use for out-of-sample predictions when model was
+            constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values
         effects : bool, optional
@@ -367,9 +382,18 @@ class PanelResults(_SummaryStr):
 
         Notes
         -----
-        The interface for predict will change to allow new exog data to be
-        passed in the future.
+        `data` can only be used when the model was created using the formula
+        interface.  `exog` can be used for both a model created using a formula
+        or a model specified with dependent and exog arrays.
+
+        When sing `exog` to generate out-of-sample predictions, the variable
+        order must match the variables in the original model.
+
+        Idiosyncratic errors and effects are not available for out-of-sample
+        predictions.
         """
+        if not (exog is None and data is None):
+            return self._out_of_sample(exog, data, fitted, missing)
         out = []
         if fitted:
             out.append(self.fitted_values)

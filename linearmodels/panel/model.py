@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from numpy.linalg import lstsq, matrix_rank
-from patsy.highlevel import ModelDesc, dmatrices
+from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
@@ -17,6 +17,96 @@ from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
                                   ensure_unique_column, has_constant,
                                   missing_warning)
+
+
+class PanelFormulaParser(object):
+    """
+    Parse formulas for OLS and IV models
+
+    Parameters
+    ----------
+    formula : str
+        String formula object.
+    data : DataFrame
+        Frame containing values for variables used in formula
+    eval_env : int
+        Stack depth to use when evaluating Patsy formulas
+
+    Notes
+    -----
+    The general structure of a formula is `dep ~ exog`
+    """
+
+    def __init__(self, formula, data, eval_env=2):
+        self._formula = formula
+        self._data = PanelData(data)
+        self._na_action = NAAction(on_NA='raise', NA_types=[])
+        self._eval_env = eval_env
+        self._dependent = self._exog = None
+        self._parse()
+
+    def _parse(self):
+        parts = self._formula.split('~')
+        parts[1] = ' 0 + ' + parts[1]
+        cln_formula = '~'.join(parts)
+
+        mod_descr = ModelDesc.from_formula(cln_formula)
+        rm_list = []
+        effects = {'EntityEffects': False, 'FixedEffects': False, 'TimeEffects': False}
+        for term in mod_descr.rhs_termlist:
+            if term.name() in effects:
+                effects[term.name()] = True
+                rm_list.append(term)
+        for term in rm_list:
+            mod_descr.rhs_termlist.remove(term)
+
+        if effects['EntityEffects'] and effects['FixedEffects']:
+            raise ValueError('Cannot use both FixedEffects and EntityEffects')
+        self._entity_effect = effects['EntityEffects'] or effects['FixedEffects']
+        self._time_effect = effects['TimeEffects']
+        cln_formula = mod_descr.describe()
+        self._lhs, self._rhs = map(lambda s: s.strip(), cln_formula.split('~'))
+        self._lhs = '0 + ' + self._lhs
+
+    @property
+    def entity_effect(self):
+        """Formula contains entity effect"""
+        return self._entity_effect
+
+    @property
+    def time_effect(self):
+        """Formula contains time effect"""
+        return self._time_effect
+
+    @property
+    def eval_env(self):
+        """Set of get the eval env depth"""
+        return self._eval_env
+
+    @eval_env.setter
+    def eval_env(self, value):
+        self._eval_env = value
+
+    @property
+    def data(self):
+        """Returns a tuple containing the dependent, exog, endog and instruments"""
+        self._eval_env += 1
+        out = self.dependent, self.exog
+        self._eval_env -= 1
+        return out
+
+    @property
+    def dependent(self):
+        """DataFrame containing the dependent variable"""
+        return dmatrix(self._lhs, self._data.dataframe, eval_env=self._eval_env,
+                       return_type='dataframe', NA_action=self._na_action)
+
+    @property
+    def exog(self):
+        """DataFrame containing the exogenous variables"""
+        out = dmatrix(self._rhs, self._data.dataframe, eval_env=self._eval_env,
+                      return_type='dataframe', NA_action=self._na_action)
+        return out
 
 
 class AbsorbingEffectError(Exception):
@@ -404,13 +494,8 @@ class PooledOLS(object):
         >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
-        na_action = NAAction(on_NA='raise', NA_types=[])
-        data = PanelData(data)
-        parts = formula.split('~')
-        parts[1] = ' 0 + ' + parts[1]
-        cln_formula = '~'.join(parts)
-        dependent, exog = dmatrices(cln_formula, data.dataframe,
-                                    return_type='dataframe', NA_action=na_action)
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights)
         mod.formula = formula
         return mod
@@ -544,6 +629,55 @@ class PooledOLS(object):
                         idiosyncratic=idiosyncratic))
 
         return PanelResults(res)
+
+    def predict(self, params, *, exog=None, data=None, eval_env=4):
+        """
+        Predict values for additional data
+
+        Parameters
+        ----------
+        params : array-like
+            Model parameters (nvar by 1)
+        exog : array-like
+            Exogenous regressors (nobs by nvar)
+        data : DataFrame
+            Values to use when making predictions from a model constructed
+            from a formula
+        eval_env : int
+            Depth of use when evaluating formulas using Patsy.
+
+        Returns
+        -------
+        predictions : DataFrame
+            Fitted values from supplied data and parameters
+
+        Notes
+        -----
+        If `data` is not None, then `exog` must be None.
+        Predictions from models constructed using formulas can
+        be computed using either `exog`, which will treat these are
+        arrays of values corresponding to the formula-processed data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+        """
+        if data is not None and self.formula is None:
+            raise ValueError('Unable to use data when the model was not '
+                             'created using a formula.')
+        if data is not None and exog is not None:
+            raise ValueError('Predictions can only be constructed using one '
+                             'of exog or data, but not both.')
+        if exog is not None:
+            exog = PanelData(exog).dataframe
+        else:
+            parser = PanelFormulaParser(self.formula, data, eval_env=eval_env)
+            exog = parser.exog
+        x = exog.values
+        params = np.atleast_2d(np.asarray(params))
+        if params.shape[0] == 1:
+            params = params.T
+        pred = pd.DataFrame(x @ params, index=exog.index, columns=['predictions'])
+
+        return pred
 
 
 class PanelOLS(PooledOLS):
@@ -716,31 +850,12 @@ class PanelOLS(PooledOLS):
         >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', panel_data)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
         """
-        na_action = NAAction(on_NA='raise', NA_types=[])
-        data = PanelData(data)
-        parts = formula.split('~')
-        parts[1] = ' 0 + ' + parts[1]
-        cln_formula = '~'.join(parts)
-
-        mod_descr = ModelDesc.from_formula(cln_formula)
-        rm_list = []
-        effects = {'EntityEffects': False, 'FixedEffects': False, 'TimeEffects': False}
-        for term in mod_descr.rhs_termlist:
-            if term.name() in effects:
-                effects[term.name()] = True
-                rm_list.append(term)
-        for term in rm_list:
-            mod_descr.rhs_termlist.remove(term)
-
-        if effects['EntityEffects'] and effects['FixedEffects']:
-            raise ValueError('Cannot use both FixedEffects and EntityEffects')
-        entity_effect = effects['EntityEffects'] or effects['FixedEffects']
-        time_effect = effects['TimeEffects']
-
-        dependent, exog = dmatrices(mod_descr, data.dataframe,
-                                    return_type='dataframe', NA_action=na_action)
-        mod = cls(dependent, exog, entity_effects=entity_effect,
-                  time_effects=time_effect, weights=weights, other_effects=other_effects)
+        parser = PanelFormulaParser(formula, data)
+        entity_effect = parser.entity_effect
+        time_effect = parser.time_effect
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, entity_effects=entity_effect, time_effects=time_effect,
+                  weights=weights, other_effects=other_effects)
         mod.formula = formula
         return mod
 
@@ -1310,7 +1425,11 @@ class BetweenOLS(PooledOLS):
         >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
-        return super(BetweenOLS, cls).from_formula(formula, data, weights=weights)
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, weights=weights)
+        mod.formula = formula
+        return mod
 
 
 class FirstDifferenceOLS(PooledOLS):
@@ -1524,7 +1643,11 @@ class FirstDifferenceOLS(PooledOLS):
         >>> mod = FirstDifferenceOLS.from_formula('y ~ x1', panel_data)
         >>> res = mod.fit()
         """
-        return super(FirstDifferenceOLS, cls).from_formula(formula, data, weights=weights)
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, weights=weights)
+        mod.formula = formula
+        return mod
 
 
 class RandomEffects(PooledOLS):
@@ -1588,7 +1711,11 @@ class RandomEffects(PooledOLS):
         >>> mod = RandomEffects.from_formula('y ~ 1 + x1', panel_data)
         >>> res = mod.fit()
         """
-        return super(RandomEffects, cls).from_formula(formula, data, weights=weights)
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, weights=weights)
+        mod.formula = formula
+        return mod
 
     def fit(self, *, small_sample=False, cov_type='unadjusted', debiased=True, **cov_config):
         w = self.weights.values2d
@@ -1756,6 +1883,7 @@ class FamaMacBeth(PooledOLS):
             not provided, a naive default is used.
         """
         # TODO: Does not appear to support weights correctly
+        # TODO: What about from_formula?
         y = self.dependent.dataframe
         x = self.exog.dataframe
         yx = pd.DataFrame(np.c_[y.values, x.values],
