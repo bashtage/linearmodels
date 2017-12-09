@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.2+12.g8e57a12 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+10.ga779d3e',
+        VERSION:     '4.2+12.g8e57a12',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+12, g8e57a12)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -351,13 +351,16 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
@@ -376,8 +379,13 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p><cite>data</cite> can only be used when the model was created using the formula
+interface.  <cite>exog</cite> can be used for both a model created using a formula
+or a model specified with dependent and exog arrays.</p>
+<p>When sing <cite>exog</cite> to generate out-of-sample predictions, the variable
+order must match the variables in the original model.</p>
+<p>Idiosyncratic errors and effects are not available for out-of-sample
+predictions.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -691,13 +699,16 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
@@ -716,8 +727,13 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p><cite>data</cite> can only be used when the model was created using the formula
+interface.  <cite>exog</cite> can be used for both a model created using a formula
+or a model specified with dependent and exog arrays.</p>
+<p>When sing <cite>exog</cite> to generate out-of-sample predictions, the variable
+order must match the variables in the original model.</p>
+<p>Idiosyncratic errors and effects are not available for out-of-sample
+predictions.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1031,13 +1047,16 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>*</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>In-sample predictions</p>
+<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
 <li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
 <li><strong>effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include estimated effects</li>
 <li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
@@ -1056,8 +1075,13 @@ before filtering missing values</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The interface for predict will change to allow new exog data to be
-passed in the future.</p>
+<p><cite>data</cite> can only be used when the model was created using the formula
+interface.  <cite>exog</cite> can be used for both a model created using a formula
+or a model specified with dependent and exog arrays.</p>
+<p>When sing <cite>exog</cite> to generate out-of-sample predictions, the variable
+order must match the variables in the original model.</p>
+<p>Idiosyncratic errors and effects are not available for out-of-sample
+predictions.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1334,7 +1358,7 @@ names.  An OrderedDict will preserve the model order the comparisons.</td>
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

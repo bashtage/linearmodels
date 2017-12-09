@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.2+10.ga779d3e documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.2+12.g8e57a12 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+10.ga779d3e',
+        VERSION:     '4.2+12.g8e57a12',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+10, ga779d3e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+12, g8e57a12)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -122,7 +122,7 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">lstsq</span><span class="p">,</span> <span class="n">matrix_rank</span>
-<span class="kn">from</span> <span class="nn">patsy.highlevel</span> <span class="k">import</span> <span class="n">ModelDesc</span><span class="p">,</span> <span class="n">dmatrices</span>
+<span class="kn">from</span> <span class="nn">patsy.highlevel</span> <span class="k">import</span> <span class="n">ModelDesc</span><span class="p">,</span> <span class="n">dmatrix</span>
 <span class="kn">from</span> <span class="nn">patsy.missing</span> <span class="k">import</span> <span class="n">NAAction</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.panel.covariance</span> <span class="k">import</span> <span class="p">(</span><span class="n">ACCovariance</span><span class="p">,</span> <span class="n">ClusteredCovariance</span><span class="p">,</span>
@@ -138,6 +138,96 @@
                                   <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span>
                                   <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
                                   <span class="n">missing_warning</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">PanelFormulaParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse formulas for OLS and IV models</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    formula : str</span>
+<span class="sd">        String formula object.</span>
+<span class="sd">    data : DataFrame</span>
+<span class="sd">        Frame containing values for variables used in formula</span>
+<span class="sd">    eval_env : int</span>
+<span class="sd">        Stack depth to use when evaluating Patsy formulas</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The general structure of a formula is `dep ~ exog`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="n">on_NA</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">NA_types</span><span class="o">=</span><span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">=</span> <span class="n">eval_env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+        <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; 0 + &#39;</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cln_formula</span> <span class="o">=</span> <span class="s1">&#39;~&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
+        <span class="n">mod_descr</span> <span class="o">=</span> <span class="n">ModelDesc</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">cln_formula</span><span class="p">)</span>
+        <span class="n">rm_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">effects</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;FixedEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;TimeEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">mod_descr</span><span class="o">.</span><span class="n">rhs_termlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="ow">in</span> <span class="n">effects</span><span class="p">:</span>
+                <span class="n">effects</span><span class="p">[</span><span class="n">term</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">rm_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">rm_list</span><span class="p">:</span>
+            <span class="n">mod_descr</span><span class="o">.</span><span class="n">rhs_termlist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;FixedEffects&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot use both FixedEffects and EntityEffects&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_entity_effect</span> <span class="o">=</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;FixedEffects&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_effect</span> <span class="o">=</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;TimeEffects&#39;</span><span class="p">]</span>
+        <span class="n">cln_formula</span> <span class="o">=</span> <span class="n">mod_descr</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rhs</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">cln_formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span> <span class="o">=</span> <span class="s1">&#39;0 + &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entity_effect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Formula contains entity effect&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_effect</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_effect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Formula contains time effect&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_effect</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eval_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set of get the eval env depth&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span>
+
+    <span class="nd">@eval_env</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">eval_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a tuple containing the dependent, exog, endog and instruments&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dependent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DataFrame containing the dependent variable&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dmatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span><span class="p">,</span>
+                       <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">NA_action</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DataFrame containing the exogenous variables&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span><span class="p">,</span>
+                      <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">NA_action</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_na_action</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="k">class</span> <span class="nc">AbsorbingEffectError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -525,13 +615,8 @@
 <span class="sd">        &gt;&gt;&gt; mod = PooledOLS.from_formula(&#39;y ~ 1 + x1&#39;, panel_data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="n">on_NA</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">NA_types</span><span class="o">=</span><span class="p">[])</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
-        <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; 0 + &#39;</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">cln_formula</span> <span class="o">=</span> <span class="s1">&#39;~&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">dmatrices</span><span class="p">(</span><span class="n">cln_formula</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span>
-                                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">NA_action</span><span class="o">=</span><span class="n">na_action</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
@@ -644,7 +729,7 @@
         <span class="n">cov_est</span><span class="p">,</span> <span class="n">cov_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_choose_cov</span><span class="p">(</span><span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">entity_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">time_ids</span><span class="p">,</span>
                       <span class="n">debiased</span><span class="o">=</span><span class="n">debiased</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
-<div class="viewcode-block" id="PanelOLS"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS">[docs]</a>        <span class="n">weps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
+<div class="viewcode-block" id="PooledOLS.predict"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PooledOLS.predict">[docs]</a>        <span class="n">weps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span>
         <span class="n">fitted</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">params</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fitted_values&#39;</span><span class="p">])</span>
         <span class="n">effects</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">fitted</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">index</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;estimated_effects&#39;</span><span class="p">])</span>
@@ -664,7 +749,56 @@
                         <span class="n">resids</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="n">fitted</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="n">effects</span><span class="p">,</span>
                         <span class="n">idiosyncratic</span><span class="o">=</span><span class="n">idiosyncratic</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">PanelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">PanelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict values for additional data</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        params : array-like</span>
+<span class="sd">            Model parameters (nvar by 1)</span>
+<span class="sd">        exog : array-like</span>
+<span class="sd">            Exogenous regressors (nobs by nvar)</span>
+<span class="sd">        data : DataFrame</span>
+<span class="sd">            Values to use when making predictions from a model constructed</span>
+<span class="sd">            from a formula</span>
+<span class="sd">        eval_env : int</span>
+<span class="sd">            Depth of use when evaluating formulas using Patsy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predictions : DataFrame</span>
+<span class="sd">            Fitted values from supplied data and parameters</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If `data` is not None, then `exog` must be None.</span>
+<span class="sd">        Predictions from models constructed using formulas can</span>
+<span class="sd">        be computed using either `exog`, which will treat these are</span>
+<span class="sd">        arrays of values corresponding to the formula-processed data, or using</span>
+<span class="sd">        `data` which will be processed using the formula used to construct the</span>
+<span class="sd">        values corresponding to the original model specification.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">formula</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to use data when the model was not &#39;</span>
+                             <span class="s1">&#39;created using a formula.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Predictions can only be constructed using one &#39;</span>
+                             <span class="s1">&#39;of exog or data, but not both.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="n">eval_env</span><span class="p">)</span>
+            <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">exog</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">exog</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">T</span>
+<div class="viewcode-block" id="PanelOLS"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS">[docs]</a>        <span class="n">pred</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">params</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">exog</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;predictions&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">pred</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">PanelOLS</span><span class="p">(</span><span class="n">PooledOLS</span><span class="p">):</span>
@@ -837,31 +971,12 @@
 <span class="sd">        &gt;&gt;&gt; mod = PanelOLS.from_formula(&#39;y ~ 1 + x1 + EntityEffects&#39;, panel_data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit(cov_type=&#39;clustered&#39;, cluster_entity=True)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">na_action</span> <span class="o">=</span> <span class="n">NAAction</span><span class="p">(</span><span class="n">on_NA</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">,</span> <span class="n">NA_types</span><span class="o">=</span><span class="p">[])</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
-        <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; 0 + &#39;</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">cln_formula</span> <span class="o">=</span> <span class="s1">&#39;~&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-
-        <span class="n">mod_descr</span> <span class="o">=</span> <span class="n">ModelDesc</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">cln_formula</span><span class="p">)</span>
-        <span class="n">rm_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">effects</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;FixedEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;TimeEffects&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">mod_descr</span><span class="o">.</span><span class="n">rhs_termlist</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="ow">in</span> <span class="n">effects</span><span class="p">:</span>
-                <span class="n">effects</span><span class="p">[</span><span class="n">term</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">rm_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">rm_list</span><span class="p">:</span>
-            <span class="n">mod_descr</span><span class="o">.</span><span class="n">rhs_termlist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;FixedEffects&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot use both FixedEffects and EntityEffects&#39;</span><span class="p">)</span>
-        <span class="n">entity_effect</span> <span class="o">=</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;EntityEffects&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;FixedEffects&#39;</span><span class="p">]</span>
-        <span class="n">time_effect</span> <span class="o">=</span> <span class="n">effects</span><span class="p">[</span><span class="s1">&#39;TimeEffects&#39;</span><span class="p">]</span>
-
-        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">dmatrices</span><span class="p">(</span><span class="n">mod_descr</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span>
-                                    <span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;dataframe&#39;</span><span class="p">,</span> <span class="n">NA_action</span><span class="o">=</span><span class="n">na_action</span><span class="p">)</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="n">entity_effect</span><span class="p">,</span>
-                  <span class="n">time_effects</span><span class="o">=</span><span class="n">time_effect</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="n">other_effects</span><span class="p">)</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">entity_effect</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">entity_effect</span>
+        <span class="n">time_effect</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">time_effect</span>
+        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="n">entity_effect</span><span class="p">,</span> <span class="n">time_effects</span><span class="o">=</span><span class="n">time_effect</span><span class="p">,</span>
+                  <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="n">other_effects</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
 
@@ -1431,7 +1546,11 @@
 <span class="sd">        &gt;&gt;&gt; mod = BetweenOLS.from_formula(&#39;y ~ 1 + x1&#39;, panel_data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BetweenOLS</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div></div>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div></div>
 
 
 <div class="viewcode-block" id="FirstDifferenceOLS"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.FirstDifferenceOLS">[docs]</a><span class="k">class</span> <span class="nc">FirstDifferenceOLS</span><span class="p">(</span><span class="n">PooledOLS</span><span class="p">):</span>
@@ -1645,7 +1764,11 @@
 <span class="sd">        &gt;&gt;&gt; mod = FirstDifferenceOLS.from_formula(&#39;y ~ x1&#39;, panel_data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FirstDifferenceOLS</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div></div>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div></div>
 
 
 <div class="viewcode-block" id="RandomEffects"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.RandomEffects">[docs]</a><span class="k">class</span> <span class="nc">RandomEffects</span><span class="p">(</span><span class="n">PooledOLS</span><span class="p">):</span>
@@ -1709,7 +1832,11 @@
 <span class="sd">        &gt;&gt;&gt; mod = RandomEffects.from_formula(&#39;y ~ 1 + x1&#39;, panel_data)</span>
 <span class="sd">        &gt;&gt;&gt; res = mod.fit()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RandomEffects</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">PanelFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div>
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">small_sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
@@ -1877,6 +2004,7 @@
 <span class="sd">            not provided, a naive default is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Does not appear to support weights correctly</span>
+        <span class="c1"># TODO: What about from_formula?</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="n">yx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">],</span>
@@ -1948,7 +2076,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+10.ga779d3e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
