@@ -207,12 +207,38 @@ class SystemResults(_CommonResults):
         """Fitted values"""
         return DataFrame(self._fitted, index=self._index, columns=self.equation_labels)
 
-    def predict(self, *, fitted=True, idiosyncratic=False, missing=False, dataframe=False):
+    def _out_of_sample(self, equations, data, missing, dataframe):
+        if equations is not None and data is not None:
+            raise ValueError('Predictions can only be constructed using one '
+                             'of eqns or data, but not both.')
+        pred = self.model.predict(self.params, equations=equations, data=data)  # type: DataFrame
+        if not dataframe:
+            pred = {col: pred[[col]] for col in pred}
+            if not missing:
+                for key in pred:
+                    pred[key] = pred[key].dropna()
+        else:
+            pred = pred.dropna(how='all', axis=1)
+
+        return pred
+
+    def predict(self, equations=None, *, data=None, fitted=True,
+                idiosyncratic=False, missing=False, dataframe=False):
         """
-        In-sample predictions
+        In- and out-of-sample predictions
 
         Parameters
         ----------
+        equations : dict
+            Dictionary-like structure containing exogenous and endogenous
+            variables.  Each key is an equations label and must
+            match the labels used to fir the model. Each value must be either a tuple
+            of the form (exog, endog) or a dictionary with keys 'exog' and 'endog'.
+            If predictions are not required for one of more of the model equations,
+            these keys can be omitted.
+        data : DataFrame
+            Dataframe to use for out-of-sample predictions when model was
+            constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values
         idiosyncratic : bool, optional
@@ -228,13 +254,28 @@ class SystemResults(_CommonResults):
         Returns
         -------
         predictions : DataFrame, dict
-            DataFrame or dictionary all selected outputs
+            DataFrame or dictionary containing selected outputs
 
         Notes
         -----
-        The interface for predict will change to allow new exog data to be
-        passed in the future.
+        If `equations` and `data` are both `None`, in-sample predictions
+        (fitted values) will be returned.
+
+        If `data` is not none, then `equations` must be none.
+        Predictions from models constructed using formulas can
+        be computed using either `equations`, which will treat these are
+        arrays of values corresponding to the formula-process data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+
+        When using `exog` and `endog`, the regressor array for a particular
+        equation is assembled as
+        `[equations[eqn]['exog'], equations[eqn]['endog']]` where `eqn` is
+        an equation label. These must correspond to the columns in the
+        estimated model.
         """
+        if equations is not None or data is not None:
+            return self._out_of_sample(equations, data, missing, dataframe)
         if not (fitted or idiosyncratic):
             raise ValueError('At least one output must be selected')
         if dataframe:

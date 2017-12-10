@@ -263,7 +263,8 @@ def generate_simultaneous_data(n=500, nsystem=3, nexog=3, ninstr=2, const=True, 
     return eqns
 
 
-def generate_3sls_data_v2(n=500, k=3, nexog=3, nendog=2, ninstr=3, const=True, rho=0.5, seed=1234):
+def generate_3sls_data_v2(n=500, k=3, nexog=3, nendog=2, ninstr=3, const=True, rho=0.5,
+                          output_dict=True, seed=1234, omitted='none'):
     np.random.seed(seed)
     eqns = AttrDict()
     for i in range(k):
@@ -286,9 +287,27 @@ def generate_3sls_data_v2(n=500, k=3, nexog=3, nendog=2, ninstr=3, const=True, r
             x = np.hstack([np.ones((n, 1)), x])
             exog = np.hstack([np.ones((n, 1)), exog])
         dep = x @ params + eps + nendog * np.random.standard_normal((n, 1))
+        if omitted == 'none' or omitted == 'drop':
+            if exog.shape[1] == 0:
+                exog = None
+            if endog.shape[1] == 0:
+                endog = None
+            if instr.shape[1] == 0:
+                instr = None
         eqn = AttrDict(dependent=dep, exog=exog, endog=endog, instruments=instr,
                        params=params)
         eqns['eqn.{0}'.format(i)] = eqn
+    if not output_dict:
+        for key in eqns:
+            eq = eqns[key]
+            eqns[key] = (eq.dependent, eq.exog, eq.endog, eq.instruments)
+    else:
+        if omitted == 'drop':
+            for key in eqns:
+                eq = eqns[key]
+                for key2 in ('exog', 'endog', 'instruments'):
+                    if eq[key2] is None:
+                        del eq[key2]
 
     return eqns
 
