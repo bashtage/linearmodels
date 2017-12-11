@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimators &#8212; linearmodels 4.2+12.g8e57a12 documentation</title>
+    <title>System Regression Estimators &#8212; linearmodels 4.2+14.g10ed7e8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+12.g8e57a12',
+        VERSION:     '4.2+14.g10ed7e8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+12, g8e57a12)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+14, g10ed7e8)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -281,6 +281,12 @@ estimators support debiased which employs a small-sample adjustment</li>
 </div>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="linearmodels.system.model.SUR.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.system.model.SUR.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or get the formula used to construct the model</p>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="linearmodels.system.model.SUR.from_formula">
 <em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>sigma=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR.from_formula" title="Permalink to this definition">¶</a></dt>
@@ -424,9 +430,16 @@ exogenous variable.</p>
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
-‘exog’.  The dictionary may contain optional keys for ‘endog’,
-‘instruments’, and ‘weights’. Endogenous and/or Instrument can be empty
-if all variables in an equation are exogenous.</li>
+and at least one of ‘exog’ or ‘endog’ and ‘instruments’.  When using a
+tuple, values must be provided for all 4 variables, although either
+empty arrays or <cite>None</cite> can be passed if a category of variable is not
+included in a model. The dictionary may contain optional keys for
+‘exog’, ‘endog’, ‘instruments’, and ‘weights’. ‘exog’ can be omitted
+if all variables in an equation are endogenous. Alternatively, ‘exog’
+can contain either an empty array or <cite>None</cite> to indicate that an
+equation contains no exogenous regressors. Similarly ‘endog’ and
+‘instruments’ can either be omitted or may contain an empty array (or
+<cite>None</cite>) if all variables in an equation are exogenous.</li>
 <li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</li>
 </ul>
@@ -551,6 +564,12 @@ estimators support debiased which employs a small-sample adjustment</li>
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
 </div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.system.model.IV3SLS.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or get the formula used to construct the model</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -808,6 +827,12 @@ estimators support debiased which employs a small-sample adjustment</li>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="linearmodels.system.model.IVSystemGMM.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or get the formula used to construct the model</p>
+</dd></dl>
+
 <dl class="classmethod">
 <dt id="linearmodels.system.model.IVSystemGMM.from_formula">
 <em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IVSystemGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.from_formula" title="Permalink to this definition">¶</a></dt>
@@ -972,7 +997,7 @@ exogenous, endogenous and instrumental variables.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

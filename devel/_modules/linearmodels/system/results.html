@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.results &#8212; linearmodels 4.2+12.g8e57a12 documentation</title>
+    <title>linearmodels.system.results &#8212; linearmodels 4.2+14.g10ed7e8 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2+12.g8e57a12',
+        VERSION:     '4.2+14.g10ed7e8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../../../index.html" class="text-logo">linearmodels 4.2 (+12, g8e57a12)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.2 (+14, g10ed7e8)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -328,12 +328,38 @@
         <span class="sd">&quot;&quot;&quot;Fitted values&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SystemResults.predict"><a class="viewcode-back" href="../../../system/results.html#linearmodels.system.results.SystemResults.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">idiosyncratic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_out_of_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">missing</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">equations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Predictions can only be constructed using one &#39;</span>
+                             <span class="s1">&#39;of eqns or data, but not both.&#39;</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">equations</span><span class="o">=</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># type: DataFrame</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataframe</span><span class="p">:</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">pred</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">pred</span><span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">pred</span><span class="p">:</span>
+                    <span class="n">pred</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pred</span>
+
+<div class="viewcode-block" id="SystemResults.predict"><a class="viewcode-back" href="../../../system/results.html#linearmodels.system.results.SystemResults.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">equations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">idiosyncratic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        In-sample predictions</span>
+<span class="sd">        In- and out-of-sample predictions</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        equations : dict</span>
+<span class="sd">            Dictionary-like structure containing exogenous and endogenous</span>
+<span class="sd">            variables.  Each key is an equations label and must</span>
+<span class="sd">            match the labels used to fir the model. Each value must be either a tuple</span>
+<span class="sd">            of the form (exog, endog) or a dictionary with keys &#39;exog&#39; and &#39;endog&#39;.</span>
+<span class="sd">            If predictions are not required for one of more of the model equations,</span>
+<span class="sd">            these keys can be omitted.</span>
+<span class="sd">        data : DataFrame</span>
+<span class="sd">            Dataframe to use for out-of-sample predictions when model was</span>
+<span class="sd">            constructed using a formula.</span>
 <span class="sd">        fitted : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the fitted values</span>
 <span class="sd">        idiosyncratic : bool, optional</span>
@@ -349,13 +375,28 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        predictions : DataFrame, dict</span>
-<span class="sd">            DataFrame or dictionary all selected outputs</span>
+<span class="sd">            DataFrame or dictionary containing selected outputs</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        The interface for predict will change to allow new exog data to be</span>
-<span class="sd">        passed in the future.</span>
+<span class="sd">        If `equations` and `data` are both `None`, in-sample predictions</span>
+<span class="sd">        (fitted values) will be returned.</span>
+
+<span class="sd">        If `data` is not none, then `equations` must be none.</span>
+<span class="sd">        Predictions from models constructed using formulas can</span>
+<span class="sd">        be computed using either `equations`, which will treat these are</span>
+<span class="sd">        arrays of values corresponding to the formula-process data, or using</span>
+<span class="sd">        `data` which will be processed using the formula used to construct the</span>
+<span class="sd">        values corresponding to the original model specification.</span>
+
+<span class="sd">        When using `exog` and `endog`, the regressor array for a particular</span>
+<span class="sd">        equation is assembled as</span>
+<span class="sd">        `[equations[eqn][&#39;exog&#39;], equations[eqn][&#39;endog&#39;]]` where `eqn` is</span>
+<span class="sd">        an equation label. These must correspond to the columns in the</span>
+<span class="sd">        estimated model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">equations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_of_sample</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">missing</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">fitted</span> <span class="ow">or</span> <span class="n">idiosyncratic</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least one output must be selected&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
@@ -670,7 +711,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+12.g8e57a12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
