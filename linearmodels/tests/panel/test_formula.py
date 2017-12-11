@@ -4,10 +4,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from linearmodels.compat.pandas import assert_frame_equal
 from linearmodels.formula import (between_ols, first_difference_ols, panel_ols,
                                   pooled_ols, random_effects, fama_macbeth)
 from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
-                                      PooledOLS, RandomEffects, FamaMacBeth)
+                                      PooledOLS, RandomEffects, FamaMacBeth,
+                                      PanelFormulaParser)
 from linearmodels.tests.panel._utility import generate_data, datatypes
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
@@ -37,6 +39,11 @@ funcs = [pooled_ols, between_ols, first_difference_ols, random_effects, fama_mac
 
 @pytest.fixture(params=list(zip(classes, funcs)))
 def models(request):
+    return request.param
+
+
+@pytest.fixture(params=[True, False])
+def effects(request):
     return request.param
 
 
@@ -216,3 +223,30 @@ def test_formulas_predict_error(data, models, formula):
     res = model(data.y, x[vars]).fit()
     with pytest.raises(ValueError):
         res.predict(data=joined)
+
+
+def test_parser(data, formula, effects):
+    if not isinstance(data.y, pd.DataFrame):
+        return
+    if effects:
+        formula += ' + EntityEffects + TimeEffects'
+    joined = data.x
+    joined['y'] = data.y
+    parser = PanelFormulaParser(formula, joined)
+    dep, exog = parser.data
+    assert_frame_equal(parser.dependent, dep)
+    assert_frame_equal(parser.exog, exog)
+    parser.eval_env = 3
+    assert parser.eval_env == 3
+    parser.eval_env = 2
+    assert parser.eval_env == 2
+    assert parser.entity_effect == ('EntityEffects' in formula)
+    assert parser.time_effect == ('TimeEffects' in formula)
+
+    formula += ' + FixedEffects '
+    if effects:
+        with pytest.raises(ValueError):
+            PanelFormulaParser(formula, joined)
+    else:
+        parser = PanelFormulaParser(formula, joined)
+        assert parser.entity_effect

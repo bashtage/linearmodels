@@ -202,6 +202,22 @@ class SystemFormulaParser(object):
         return self._clean_formula
 
     @property
+    def eval_env(self):
+        """Set or get the eval env depth"""
+        return self._eval_env
+
+    @eval_env.setter
+    def eval_env(self, value):
+        self._eval_env = value
+        # Update parsers for new level
+        parsers = self._parsers
+        new_parsers = OrderedDict()
+        for key in parsers:
+            parser = parsers[key]
+            new_parsers[key] = IVFormulaParser(parser._formula, parser._data, self._eval_env)
+        self._parsers = new_parsers
+
+    @property
     def equation_labels(self):
         return list(self._parsers.keys())
 
@@ -532,6 +548,47 @@ class IV3SLS(object):
         return out
 
     def predict(self, params, *, equations=None, data=None, eval_env=8):
+        """
+        Predict values for additional data
+
+        Parameters
+        ----------
+        params : array-like
+            Model parameters (nvar by 1)
+        equations : dict
+            Dictionary-like structure containing exogenous and endogenous
+            variables.  Each key is an equations label and must
+            match the labels used to fir the model. Each value must be either a tuple
+            of the form (exog, endog) or a dictionary with keys 'exog' and 'endog'.
+            If predictions are not required for one of more of the model equations,
+            these keys can be omitted.
+        data : DataFrame
+            Values to use when making predictions from a model constructed
+            from a formula
+        eval_env : int
+            Depth of use when evaluating formulas using Patsy.
+
+        Returns
+        -------
+        predictions : DataFrame
+            Fitted values from supplied data and parameters
+
+        Notes
+        -----
+        If `data` is not none, then `equations` must be none.
+        Predictions from models constructed using formulas can
+        be computed using either `equations`, which will treat these are
+        arrays of values corresponding to the formula-process data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+
+        When using `exog` and `endog`, the regressor array for a particular
+        equation is assembled as
+        `[equations[eqn]['exog'], equations[eqn]['endog']]` where `eqn` is
+        an equation label. These must correspond to the columns in the
+        estimated model.
+        """
+
         if data is not None:
             parser = SystemFormulaParser(self.formula, data=data, eval_env=eval_env)
             equations = parser.data
@@ -543,11 +600,14 @@ class IV3SLS(object):
         for i, label in enumerate(self._eq_labels):
             kx = self._x[i].shape[1]
             if label in equations:
+                b = params[loc:loc + kx]
                 eqn = equations[label]  # type: dict
                 exog = eqn.get('exog', None)
                 endog = eqn.get('endog', None)
                 if exog is None and endog is None:
+                    loc += kx
                     continue
+
                 if exog is not None:
                     exog_endog = IVData(exog).pandas
                     if endog is not None:
@@ -555,7 +615,7 @@ class IV3SLS(object):
                         exog_endog = concat([exog_endog, endog.pandas], 1)
                 else:
                     exog_endog = IVData(endog).pandas
-                b = params[loc:loc + kx]
+
                 fitted = exog_endog.values @ b
                 fitted = DataFrame(fitted, index=exog_endog.index, columns=[label])
                 out[label] = fitted
