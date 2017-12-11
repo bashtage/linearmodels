@@ -116,7 +116,7 @@ class IVFormulaParser(object):
 
     @property
     def eval_env(self):
-        """Set of get the eval env depth"""
+        """Set or get the eval env depth"""
         return self._eval_env
 
     @eval_env.setter

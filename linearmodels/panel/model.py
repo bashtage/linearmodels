@@ -80,7 +80,7 @@ class PanelFormulaParser(object):
 
     @property
     def eval_env(self):
-        """Set of get the eval env depth"""
+        """Set or get the eval env depth"""
         return self._eval_env
 
     @eval_env.setter
@@ -1882,20 +1882,27 @@ class FamaMacBeth(PooledOLS):
           * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
             not provided, a naive default is used.
         """
-        # TODO: Does not appear to support weights correctly
-        # TODO: What about from_formula?
-        y = self.dependent.dataframe
-        x = self.exog.dataframe
-        yx = pd.DataFrame(np.c_[y.values, x.values],
-                          columns=list(y.columns) + list(x.columns),
-                          index=y.index)
+        y = self._y
+        x = self._x
+        root_w = np.sqrt(self._w)
+        wy = root_w * y
+        wx = root_w * x
+
+        dep = self.dependent.dataframe
+        exog = self.exog.dataframe
+        index = self.dependent.index
+        wy = pd.DataFrame(wy[self._not_null], index=index, columns=dep.columns)
+        wx = pd.DataFrame(wx[self._not_null], index=exog.notnull().index, columns=exog.columns)
+
+        yx = pd.DataFrame(np.c_[wy.values, wx.values], columns=list(wy.columns) + list(wx.columns),
+                          index=wy.index)
 
         def single(z: pd.DataFrame):
-            x = z.iloc[:, 1:].values
-            if x.shape[0] < x.shape[1]:
+            exog = z.iloc[:, 1:].values
+            if exog.shape[0] < exog.shape[1]:
                 return pd.Series([np.nan] * len(z.columns), index=z.columns)
-            y = z.iloc[:, :1].values
-            params = np.linalg.lstsq(x, y)[0]
+            dep = z.iloc[:, :1].values
+            params = np.linalg.lstsq(exog, dep)[0]
             return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
@@ -1903,21 +1910,21 @@ class FamaMacBeth(PooledOLS):
         params = all_params.mean(0).values[:, None]
         all_params = all_params.values
 
-        # df_resid = params.shape[1]
-        wy = self.dependent.values2d
-        wx = self.exog.values2d
+        wy = wy.values
+        wx = wx.values
         index = self.dependent.index
         fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
         effects = pd.DataFrame(np.full_like(fitted.values, np.nan), index, ['estimated_effects'])
         idiosyncratic = pd.DataFrame(self.dependent.values2d - fitted.values, index,
                                      ['idiosyncratic'])
 
-        weps = eps = self.dependent.values2d - fitted.values
+        eps = self.dependent.values2d - fitted.values
+        weps = wy - wx @ params
         w = self.weights.values2d
         root_w = np.sqrt(w)
         #
         residual_ss = float(weps.T @ weps)
-        e = y
+        y = e = self.dependent.values2d
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
         total_ss = float(w.T @ (e ** 2))
@@ -1939,3 +1946,43 @@ class FamaMacBeth(PooledOLS):
                         r2=r2, resids=eps, wresids=weps, index=index, fitted=fitted,
                         effects=effects, idiosyncratic=idiosyncratic))
         return PanelResults(res)
+
+    @classmethod
+    def from_formula(cls, formula, data, *, weights=None):
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array-like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array-like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        model : FamaMacBeth
+            Model specified using the formula
+
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
+
+        Examples
+        --------
+        >>> from linearmodels import BetweenOLS
+        >>> mod = FamaMacBeth.from_formula('y ~ 1 + x1', panel_data)
+        >>> res = mod.fit()
+        """
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, weights=weights)
+        mod.formula = formula
+        return mod
