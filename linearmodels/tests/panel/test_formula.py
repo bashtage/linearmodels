@@ -5,9 +5,9 @@ import pandas as pd
 import pytest
 
 from linearmodels.formula import (between_ols, first_difference_ols, panel_ols,
-                                  pooled_ols, random_effects)
+                                  pooled_ols, random_effects, fama_macbeth)
 from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
-                                      PooledOLS, RandomEffects)
+                                      PooledOLS, RandomEffects, FamaMacBeth)
 from linearmodels.tests.panel._utility import generate_data, datatypes
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
@@ -31,8 +31,8 @@ def formula(request):
     return request.param
 
 
-classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects]
-funcs = [pooled_ols, between_ols, first_difference_ols, random_effects]
+classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects, FamaMacBeth]
+funcs = [pooled_ols, between_ols, first_difference_ols, random_effects, fama_macbeth]
 
 
 @pytest.fixture(params=list(zip(classes, funcs)))
