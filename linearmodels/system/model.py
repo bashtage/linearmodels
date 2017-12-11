@@ -13,14 +13,15 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 """
 import textwrap
 from collections import Mapping, OrderedDict
+from functools import reduce
 
 import numpy as np
 from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
                    ones, ones_like, reshape, sqrt, zeros)
 from numpy.linalg import inv, solve
-from pandas import Series
+from pandas import Series, concat, DataFrame
 
-from linearmodels.iv._utility import parse_formula
+from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
     blocked_cross_prod, blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
@@ -73,12 +74,14 @@ def _to_ordered_dict(equations):
     return equations
 
 
-def _missing_weights(keys):
-    if not keys:
-        return
-    import warnings
-    msg = 'Weights not for for equation labels:\n{0}'.format(', '.join(keys))
-    warnings.warn(msg, UserWarning)
+def _missing_weights(weights):
+    """Raise warning if missing weighs found"""
+    missing = [key for key in weights if weights[key] is None]
+    if missing:
+        import warnings
+        msg = 'Weights not found for equation labels:\n{0}'.format(', '.join(missing))
+        warnings.warn(msg, UserWarning)
+    return None
 
 
 def _parameters_from_xprod(xpx, xpy, constraints=None):
@@ -122,6 +125,123 @@ def _parameters_from_xprod(xpx, xpy, constraints=None):
     return params
 
 
+class SystemFormulaParser(object):
+    def __init__(self, formula, data, weights=None, eval_env=6):
+        if not isinstance(formula, (Mapping, str)):
+            raise TypeError('formula must be a string or dictionary-like')
+        self._formula = formula
+        self._data = data
+        self._weights = weights
+        self._parsers = OrderedDict()
+        self._weight_dict = OrderedDict()
+        self._eval_env = eval_env
+        self._clean_formula = OrderedDict()
+        self._parse()
+
+    def _prevent_autoconst(self, formula):
+        if not (' 0+' in formula or ' 0 +' in formula):
+            formula = '~ 0 +'.join(formula.split('~'))
+        return formula
+
+    def _parse(self):
+        formula = self._formula
+        data = self._data
+        weights = self._weights
+        parsers = self._parsers
+        weight_dict = self._weight_dict
+        cln_fromula = self._clean_formula
+
+        if isinstance(formula, Mapping):
+            for key in formula:
+                f = formula[key]
+                f = self._prevent_autoconst(f)
+                parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
+
+                if weights is not None:
+                    if key in weights:
+                        weight_dict[key] = weights[key]
+                    else:
+                        weight_dict[key] = None
+                cln_fromula[key] = f
+        else:
+            formula = formula.replace('\n', ' ').strip()
+            parts = formula.split('}')
+            for i, part in enumerate(parts):
+                base_key = None
+                part = part.strip()
+                if part == '':
+                    continue
+                part = part.replace('{', '')
+                if ':' in part.split('~')[0]:
+                    base_key, part = part.split(':')
+                    key = base_key = base_key.strip()
+                    part = part.strip()
+                f = self._prevent_autoconst(part)
+                if base_key is None:
+                    base_key = key = f.split('~')[0].strip()
+                count = 0
+                while key in parsers:
+                    key = base_key + '.{0}'.format(count)
+                    count += 1
+                parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
+                cln_fromula[key] = f
+                if weights is not None:
+                    if key in weights:
+                        weight_dict[key] = weights[key]
+                    else:
+                        weight_dict[key] = None
+        _missing_weights(weight_dict)
+        self._weight_dict = weight_dict
+
+    def _get_variable(self, variable):
+        return OrderedDict([(key, getattr(self._parsers[key], variable)) for key in self._parsers])
+
+    @property
+    def formula(self):
+        """Cleaned version of formula"""
+        return self._clean_formula
+
+    @property
+    def equation_labels(self):
+        return list(self._parsers.keys())
+
+    @property
+    def data(self):
+        out = OrderedDict()
+        dep = self.dependent
+        for key in dep:
+            out[key] = {'dependent': dep[key]}
+        exog = self.exog
+        for key in exog:
+            out[key]['exog'] = exog[key]
+        endog = self.endog
+        for key in endog:
+            out[key]['endog'] = endog[key]
+        instr = self.instruments
+        for key in instr:
+            out[key]['instruments'] = instr[key]
+        for key in self._weight_dict:
+            if self._weight_dict[key] is not None:
+                out[key]['weights'] = self._weight_dict[key]
+        return out
+
+    @property
+    def dependent(self):
+        return self._get_variable('dependent')
+
+    @property
+    def exog(self):
+        return self._get_variable('exog')
+
+    @property
+    def endog(self):
+        return self._get_variable('endog')
+
+    @property
+    def instruments(self):
+        return self._get_variable('instruments')
+
+
 class IV3SLS(object):
     r"""
     Three-stage Least Squares (3SLS) Estimator
@@ -133,9 +253,16 @@ class IV3SLS(object):
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
         exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
-        'exog'.  The dictionary may contain optional keys for 'endog',
-        'instruments', and 'weights'. Endogenous and/or Instrument can be empty
-        if all variables in an equation are exogenous.
+        and at least one of 'exog' or 'endog' and 'instruments'.  When using a
+        tuple, values must be provided for all 4 variables, although either
+        empty arrays or `None` can be passed if a category of variable is not
+        included in a model. The dictionary may contain optional keys for
+        'exog', 'endog', 'instruments', and 'weights'. 'exog' can be omitted
+        if all variables in an equation are endogenous. Alternatively, 'exog'
+        can contain either an empty array or `None` to indicate that an
+        equation contains no exogenous regressors. Similarly 'endog' and
+        'instruments' can either be omitted or may contain an empty array (or
+        `None`) if all variables in an equation are exogenous.
     sigma : array-like
         Pre-specified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -233,6 +360,7 @@ class IV3SLS(object):
         self._wz = []
 
         self._weights = []
+        self._formula = None
         self._constraints = None
         self._constant_loc = None
         self._has_constant = None
@@ -241,6 +369,15 @@ class IV3SLS(object):
         self._model_name = 'Three Stage Least Squares (3SLS)'
 
         self._validate_data()
+
+    @property
+    def formula(self):
+        """Set or get the formula used to construct the model"""
+        return self._formula
+
+    @formula.setter
+    def formula(self, value):
+        self._formula = value
 
     def _validate_data(self):
         ids = []
@@ -255,7 +392,7 @@ class IV3SLS(object):
                 dep = IVData(eq_data[0], var_name=dep_name)
                 self._dependent.append(dep)
                 current_id = id(eq_data[1])
-                self._exog.append(IVData(eq_data[1], var_name=exog_name))
+                self._exog.append(IVData(eq_data[1], var_name=exog_name, nobs=dep.shape[0]))
                 endog = IVData(eq_data[2], var_name=endog_name, nobs=dep.shape[0])
                 if endog.shape[1] > 0:
                     current_id = (current_id, id(eq_data[2]))
@@ -272,9 +409,11 @@ class IV3SLS(object):
             elif isinstance(eq_data, (dict, Mapping)):
                 dep = IVData(eq_data['dependent'], var_name=dep_name)
                 self._dependent.append(dep)
-                current_id = id(eq_data['exog'])
 
-                self._exog.append(IVData(eq_data['exog'], var_name=exog_name))
+                exog = eq_data.get('exog', None)
+                self._exog.append(IVData(exog, var_name=exog_name, nobs=dep.shape[0]))
+                current_id = id(exog)
+
                 endog = eq_data.get('endog', None)
                 endog = IVData(endog, var_name=endog_name, nobs=dep.shape[0])
                 self._endog.append(endog)
@@ -297,12 +436,14 @@ class IV3SLS(object):
         for instr in self._instr:
             self._has_instruments = self._has_instruments or (instr.shape[1] > 1)
 
-        for i, comps in enumerate(zip(self._dependent, self._exog, self._endog, self._instr)):
+        for i, comps in enumerate(zip(self._dependent, self._exog, self._endog, self._instr,
+                                      self._weights)):
             shapes = list(map(lambda a: a.shape[0], comps))
             if min(shapes) != max(shapes):
                 raise ValueError('Dependent, exogenous, endogenous and '
-                                 'instruments do not have the same number of '
-                                 'observations in eq {eq}'.format(eq=self._eq_labels[i]))
+                                 'instruments, and weights, if provided, do '
+                                 'not have the same number of observations in '
+                                 '{eq}'.format(eq=self._eq_labels[i]))
 
         self._drop_missing()
         self._common_exog = len(set(ids)) == 1
@@ -388,6 +529,40 @@ class IV3SLS(object):
         out += '\n'.join(textwrap.wrap(eqns, 70))
         if self._common_exog:
             out += '\nCommon Exogenous Variables'
+        return out
+
+    def predict(self, params, *, equations=None, data=None, eval_env=8):
+        if data is not None:
+            parser = SystemFormulaParser(self.formula, data=data, eval_env=eval_env)
+            equations = parser.data
+        params = np.asarray(params)
+        if params.ndim == 1:
+            params = params[:, None]
+        loc = 0
+        out = AttrDict()
+        for i, label in enumerate(self._eq_labels):
+            kx = self._x[i].shape[1]
+            if label in equations:
+                eqn = equations[label]  # type: dict
+                exog = eqn.get('exog', None)
+                endog = eqn.get('endog', None)
+                if exog is None and endog is None:
+                    continue
+                if exog is not None:
+                    exog_endog = IVData(exog).pandas
+                    if endog is not None:
+                        endog = IVData(endog)
+                        exog_endog = concat([exog_endog, endog.pandas], 1)
+                else:
+                    exog_endog = IVData(endog).pandas
+                b = params[loc:loc + kx]
+                fitted = exog_endog.values @ b
+                fitted = DataFrame(fitted, index=exog_endog.index, columns=[label])
+                out[label] = fitted
+            loc += kx
+        out = reduce(lambda left, right: left.merge(right, how='outer',
+                                                    left_index=True, right_index=True),
+                     [out[key] for key in out])
         return out
 
     def fit(self, *, method=None, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
@@ -683,57 +858,11 @@ class IV3SLS(object):
         >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
         >>> mod = IV3SLS.from_formula(formula, data)
         """
-        if not isinstance(formula, (Mapping, str)):
-            raise TypeError('formula must be a string or dictionary-like')
-
-        missing_weight_keys = []
-        eqns = OrderedDict()
-        if isinstance(formula, Mapping):
-            for key in formula:
-                f = formula[key]
-                f = '~ 0 +'.join(f.split('~'))
-                dep, exog, endog, instr = parse_formula(f, data)
-                eqns[key] = {'dependent': dep, 'exog': exog, 'endog': endog,
-                             'instruments': instr}
-                if weights is not None:
-                    if key in weights:
-                        eqns[key]['weights'] = weights[key]
-                    else:
-                        missing_weight_keys.append(key)
-            _missing_weights(missing_weight_keys)
-            return cls(eqns, sigma=sigma)
-
-        formula = formula.replace('\n', ' ').strip()
-        parts = formula.split('}')
-        for i, part in enumerate(parts):
-            base_key = None
-            part = part.strip()
-            if part == '':
-                continue
-            part = part.replace('{', '')
-            if ':' in part.split('~')[0]:
-                base_key, part = part.split(':')
-                key = base_key = base_key.strip()
-                part = part.strip()
-            f = '~ 0 +'.join(part.split('~'))
-            dep, exog, endog, instr = parse_formula(f, data)
-            if base_key is None:
-                base_key = key = f.split('~')[0].strip()
-            count = 0
-            while key in eqns:
-                key = base_key + '.{0}'.format(count)
-                count += 1
-            eqns[key] = {'dependent': dep, 'exog': exog, 'endog': endog,
-                         'instruments': instr}
-            if weights is not None:
-                if key in weights:
-                    eqns[key]['weights'] = weights[key]
-                else:
-                    missing_weight_keys.append(key)
-
-        _missing_weights(missing_weight_keys)
-
-        return cls(eqns, sigma=sigma)
+        parser = SystemFormulaParser(formula, data, weights)
+        eqns = parser.data
+        mod = cls(eqns, sigma=sigma)
+        mod.formula = formula
+        return mod
 
     def _f_stat(self, stats, debiased):
         cov = stats.cov
@@ -1168,7 +1297,11 @@ class SUR(IV3SLS):
         >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
         >>> mod = SUR.from_formula(formula, data)
         """
-        return super(SUR, cls).from_formula(formula, data, sigma=sigma, weights=weights)
+        parser = SystemFormulaParser(formula, data, weights)
+        eqns = parser.data
+        mod = cls(eqns, sigma=sigma)
+        mod.formula = formula
+        return mod
 
 
 class IVSystemGMM(IV3SLS):
@@ -1485,9 +1618,11 @@ class IVSystemGMM(IV3SLS):
         >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
         >>> mod = IVSystemGMM.from_formula(formula, data)
         """
-        mod = super().from_formula(formula, data, weights=weights)
-        equations = mod._equations
-        return cls(equations, weight_type=weight_type, **weight_config)
+        parser = SystemFormulaParser(formula, data, weights)
+        eqns = parser.data
+        mod = cls(eqns, weight_type=weight_type, **weight_config)
+        mod.formula = formula
+        return mod
 
     def _j_statistic(self, params, weight_mat):
         """

@@ -7,7 +7,8 @@ from numpy.testing import assert_allclose
 
 from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.system.model import IV3SLS
-from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls
+from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls, \
+    generate_3sls_data_v2
 
 nexog = [3, [1, 2, 3, 4, 5]]
 nendog = [2, [1, 2, 1, 2, 1]]
@@ -226,3 +227,63 @@ def test_fitted(data):
     expected = pd.DataFrame(expected, index=mod._dependent[i].pandas.index,
                             columns=[key for key in res.equations])
     assert_frame_equal(expected, res.fitted_values)
+
+
+def test_no_exog():
+    data = generate_3sls_data_v2(nexog=0, const=False)
+    mod = IV3SLS(data)
+    res = mod.fit()
+
+    data = generate_3sls_data_v2(nexog=0, const=False, omitted='drop')
+    mod = IV3SLS(data)
+    res2 = mod.fit()
+
+    data = generate_3sls_data_v2(nexog=0, const=False, omitted='empty')
+    mod = IV3SLS(data)
+    res3 = mod.fit()
+
+    data = generate_3sls_data_v2(nexog=0, const=False, output_dict=False)
+    mod = IV3SLS(data)
+    res4 = mod.fit()
+
+    data = generate_3sls_data_v2(nexog=0, const=False, output_dict=False, omitted='empty')
+    mod = IV3SLS(data)
+    res5 = mod.fit()
+    assert_series_equal(res.params, res2.params)
+    assert_series_equal(res.params, res3.params)
+    assert_series_equal(res.params, res4.params)
+    assert_series_equal(res.params, res5.params)
+
+
+def test_no_endog():
+    data = generate_3sls_data_v2(nendog=0, ninstr=0)
+    mod = IV3SLS(data)
+    res = mod.fit()
+
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted='drop')
+    mod = IV3SLS(data)
+    res2 = mod.fit()
+
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted='empty')
+    mod = IV3SLS(data)
+    res3 = mod.fit()
+
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, output_dict=False)
+    mod = IV3SLS(data)
+    res4 = mod.fit()
+
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, output_dict=False, omitted='empty')
+    mod = IV3SLS(data)
+    res5 = mod.fit()
+    assert_series_equal(res.params, res2.params)
+    assert_series_equal(res.params, res3.params)
+    assert_series_equal(res.params, res4.params)
+    assert_series_equal(res.params, res5.params)
+
+
+def test_uneven_shapes():
+    data = generate_3sls_data_v2()
+    eq = data[list(data.keys())[0]]
+    eq['weights'] = np.ones(eq.dependent.shape[0] // 2)
+    with pytest.raises(ValueError):
+        IV3SLS(data)
