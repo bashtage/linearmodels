@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimators &#8212; linearmodels 4.2+16.gab001a0 documentation</title>
+    <title>System Regression Estimators &#8212; linearmodels 4.2+18.g9247a1f documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+16.gab001a0',
+        VERSION:     '4.2+18.g9247a1f',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+16.gab001a0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+18.g9247a1f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+16, gab001a0)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+18, g9247a1f)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -407,6 +407,50 @@ exogenous variable.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.system.model.SUR.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+variables.  Each key is an equations label and must
+match the labels used to fir the model. Each value must be either a tuple
+of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
+If predictions are not required for one of more of the model equations,
+these keys can be omitted.</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>equations</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, the regressor array for a particular
+equation is assembled as
+<cite>[equations[eqn][‘exog’], equations[eqn][‘endog’]]</cite> where <cite>eqn</cite> is
+an equation label. These must correspond to the columns in the
+estimated model.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.system.model.SUR.reset_constraints">
 <code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.reset_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all model constraints</p>
@@ -686,6 +730,50 @@ exogenous, endogenous and instrumental variables.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.system.model.IV3SLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+variables.  Each key is an equations label and must
+match the labels used to fir the model. Each value must be either a tuple
+of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
+If predictions are not required for one of more of the model equations,
+these keys can be omitted.</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>equations</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, the regressor array for a particular
+equation is assembled as
+<cite>[equations[eqn][‘exog’], equations[eqn][‘endog’]]</cite> where <cite>eqn</cite> is
+an equation label. These must correspond to the columns in the
+estimated model.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.reset_constraints">
 <code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.reset_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.reset_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all model constraints</p>
@@ -954,6 +1042,50 @@ exogenous, endogenous and instrumental variables.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.system.model.IVSystemGMM.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+variables.  Each key is an equations label and must
+match the labels used to fir the model. Each value must be either a tuple
+of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
+If predictions are not required for one of more of the model equations,
+these keys can be omitted.</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>equations</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, the regressor array for a particular
+equation is assembled as
+<cite>[equations[eqn][‘exog’], equations[eqn][‘endog’]]</cite> where <cite>eqn</cite> is
+an equation label. These must correspond to the columns in the
+estimated model.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.reset_constraints">
 <code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.reset_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all model constraints</p>
@@ -997,7 +1129,7 @@ exogenous, endogenous and instrumental variables.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+16.gab001a0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+18.g9247a1f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
