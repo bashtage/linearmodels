@@ -1,0 +1,208 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "# Using formulas to specify models"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basic Usage\n",
+    "\n",
+    "Formulas provide an alternative method to specify a model.  The formulas used here utilize [patsy](http://patsy.readthedocs.io/en/latest/) are similar to those in [statsmodels](http://www.statsmodels.org), although they use an enhanced syntax to allow identification of endogenous regressors.  The basis formula syntax for a single variable regression would be\n",
+    "\n",
+    "```\n",
+    "y ~ 1 + x\n",
+    "```\n",
+    "\n",
+    "where the `1` indicates that a constant should be included and `x` is the regressor.  In the context of an instrumental variables model, it is necessary to mark variables as endogenous and to provide a list of instruments that are included only in the model for the endogenous variables.  In a basic single regressor model, this would be specified using `[]` to surround an inner model.\n",
+    "\n",
+    "```\n",
+    "y ~ 1 + [x ~ z]\n",
+    "```\n",
+    "\n",
+    "In this expression, `x` is now marked as endogenous and `z` is an instrument.  Any exogenous variable will automatically be used when instrumenting `x` so there is no need to repeat these here (in this example, the \"first stage\" would include a constant and z).\n",
+    "\n",
+    "## Multiple Endogenous Variables\n",
+    "Multiple endogenous variables are specified in a similar manner.  The basic concept is that any model can be expressed as \n",
+    "```\n",
+    "dep ~ exog + [ endog ~ instruments]\n",
+    "```\n",
+    "\n",
+    "and it must be the case that \n",
+    "\n",
+    "```\n",
+    "dep ~ exog + endog\n",
+    "```\n",
+    "and\n",
+    "```\n",
+    "dep ~ exog + instruments\n",
+    "```\n",
+    "\n",
+    "are valid patsy formulas. This means that multiple endogenous regressors or instruments should be joined with `+`, but that the first endogenous or first instrument should not have a leading `+`.  A simple example with 2 endogenous variables and 3 instruments would be \n",
+    "\n",
+    "```\n",
+    "y ~ 1 + x1 + x2 + x3  + [ x4 + x5 ~ z1 + z2 + z3]\n",
+    "```\n",
+    "\n",
+    "In this example, the \"submodels\" `y ~ 1 + x1 + x2 +x3 + x4 + x5` and `y ~ 1 + x1 + x2 + x3 + z1 + z2 +z3` are both valid patsy expressions.\n",
+    "\n",
+    "## Standard patsy\n",
+    "Aside from this change, the standard rules of patsy apply, and so it is possible to use mathematical expression or other patsy-specific features. See the [patsy quickstart](http://patsy.readthedocs.io/en/latest/quickstart.html) for some examples of what is possible."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## MEPS data\n",
+    "\n",
+    "This example shows the use of formulas to estimate both IV and OLS models using the [medical expenditure panel survey](https://meps.ahrq.gov). The model measures the effect of various characteristics on the log of drug expenditure and instruments the variable that measures where a subject was insured through a union with their social security to income ratio.\n",
+    "\n",
+    "This first block imports the data and numpy."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "from linearmodels.iv import IV2SLS\n",
+    "from linearmodels.datasets import meps\n",
+    "data = meps.load()\n",
+    "data = data.dropna()\n",
+    "print(meps.DESCR)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Estimating a model with a formula\n",
+    "\n",
+    "This model uses a formula which is input using the `from_formula` interface. Unlike direct initialization, this interface takes the formula and a DataFrame containing the data necessary to evaluate the formula."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "formula = 'ldrugexp ~ 1 + totchr + female + age + linc + blhisp + [hi_empunion ~ ssiratio]'\n",
+    "mod = IV2SLS.from_formula(formula, data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "iv_res = mod.fit(cov_type='robust')\n",
+    "print(iv_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Mathematical expression in formulas\n",
+    "\n",
+    "Standard patsy expression, such as using mathematical expressions, can be readily used."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "formula = 'np.log(drugexp) ~ 1 + totchr + age + linc + blhisp + [hi_empunion ~ ssiratio]'\n",
+    "mod = IV2SLS.from_formula(formula, data)\n",
+    "iv_res2 = mod.fit(cov_type='robust')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### OLS\n",
+    "\n",
+    "Omitting the block that marks a variable as endogenous will produce OLS -- just like using `None` for both `endog` and `instruments`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "formula = 'ldrugexp ~ 1 + totchr + female + age + linc + blhisp + hi_empunion'\n",
+    "ols = IV2SLS.from_formula(formula, data)\n",
+    "ols_res = ols.fit(cov_type='robust')\n",
+    "print(ols_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Comparing results\n",
+    "\n",
+    "The function `compare` can be used to compare the result of multiple models.  Here dropping `female` from the IV regression improves the $R^2$."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "from linearmodels.iv import compare\n",
+    "print(compare({'IV':iv_res, 'OLS':ols_res, 'IV-formula': iv_res2}))"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}

@@ -1,0 +1,397 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Examples\n",
+    "These examples cover the models available for estimating panel models.  The initial examples all ignore covariance options and so use the default classic covariance which is appropriate for homoskedastic data. The alternative covariance options are described at the end of this document."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Loading data\n",
+    "These examples all make use of the wage panel from \n",
+    "\n",
+    "F. Vella and M. Verbeek (1998), \"Whose Wages Do Unions Raise? A Dynamic Model of Unionism and Wage Rate Determination for Young Men,\" _Journal of Applied Econometrics_ 13, 163-183.\n",
+    "\n",
+    "The data set consists of wages and characteristics for men during the 1980s.  The entity identifier is ``nr`` and the time identified is ``year``.  This data is used extensively in Chapter 14 of _Introduction to Econometrics_ by Jeffrey Wooldridge.\n",
+    "\n",
+    "Here a ``MultiIndex`` ``DataFrame`` is used to hold the data in a format that can be understood as a panel. Before setting the index, a year ``Categorical`` is created which facilitated making dummies."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.datasets import wage_panel\n",
+    "import pandas as pd\n",
+    "data = wage_panel.load()\n",
+    "year = pd.Categorical(data.year)\n",
+    "data = data.set_index(['nr', 'year'])\n",
+    "data['year'] = year\n",
+    "print(wage_panel.DESCR)\n",
+    "print(data.head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basic regression on panel data\n",
+    "``PooledOLS`` is just plain OLS that understands that various panel data structures. It is useful as a base model. Here the log wage is modeled using all of the variables and time dummies."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import PooledOLS\n",
+    "import statsmodels.api as sm\n",
+    "exog_vars = ['black','hisp','exper','expersq','married', 'educ', 'union', 'year']\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "mod = PooledOLS(data.lwage, exog)\n",
+    "pooled_res = mod.fit()\n",
+    "print(pooled_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Estimating parameters with uncorrelated effects\n",
+    "When modeling panel data it is common to consider models beyond what OLS will efficiently estimate.  The most common are error component models which add an additional term to the standard OLS model,\n",
+    "\n",
+    "$$ y_{it} = x_{it}\\beta + \\alpha_{i} + \\epsilon_{it} $$\n",
+    "\n",
+    "where $\\alpha_i$ affects all values of entity i. When the $\\alpha_i$ are uncorrelated with the regressors in $x_{it}$, a random effects model can be used to efficiently estimate parameters of this model."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Random effects\n",
+    "The random effects model is virtually identical to the pooled OLS model except that is accounts for the structure of the model and so is more efficient. Random effects uses a quasi-demeaning strategy which subtracts the time average fo the within entity values to account for the common shock."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import RandomEffects\n",
+    "mod = RandomEffects(data.lwage, exog)\n",
+    "re_res = mod.fit()\n",
+    "print(re_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The model fit is fairly similar, although the return to experience has changed substantially, as has its significance.  This is partially explainable by the inclusion of the year dummies which will fit the trend in experience and so only the cross-sectional differences matter.  The quasi-differencing in the random effects estimator depends on a quantity that depends on the relative variance of the idiosyncratic shock and the common shock.  This can be accessed using ``variance_decomposition``."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "re_res.variance_decomposition"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The coefficient $\\theta_i$ determines how much demeaning takes place.  When this value is 1, the RE model reduces to the pooled model since this occurs when there is no variance in the effects.  When panels are unbalanced it will vary across entities, but in this balanced panel all values are the same."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "re_res.theta.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### The between estimator\n",
+    "The between estimator is an alternative, usually less efficient estimator, can can be used to estimate model parameters.  It is particular simple since it first computes the time averages of $y$ and $x$ and then runs a simple regression using these averages.\n",
+    "\n",
+    "The year dummies are dropped since the averaging removes differences due to the year.  ``expersq`` was also dropped since it is fairly co-linear with ``exper``. These results are broadly similar to the previous models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import BetweenOLS\n",
+    "exog_vars = ['black','hisp','exper','married', 'educ', 'union']\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "mod = BetweenOLS(data.lwage, exog)\n",
+    "be_res = mod.fit()\n",
+    "print(be_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Other options\n",
+    "The ``fit`` method of ``BetweenOLS`` takes an optional input ``reweight`` which uses GLS-like weighting when panels are unbalanced.  In this dataset the panel is balanced and so using this option would have no effect. By default this is ``False`` and so the averages are directly used in OLS even when there are difference numbers of observations across entities."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Handling correlated effects\n",
+    "\n",
+    "When effects are correlated with the regressors the RE and BE estimators are not consistent. The usual solution is to use Fixed Effects which are available in ``PanelOLS``.  Fixed effects are called ``entity_effects`` when applied to entities and ``time_effects`` when applied to the time dimension:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Including fixed effects\n",
+    "Entity effects are included by setting ``entity_effects=True``.  This is equivalent to including dummies for each entity.  In this panel, this would add 545 dummy variables and estimation of the model would be considerably slower.  ``PanelOLS`` does not actually use dummy variables and instead uses group-wise demeaning to achieve the same effect. \n",
+    "\n",
+    "#### Time-invariant Variables\n",
+    "Time-invariant variables cannot be included when using entity effects since, once demeaned, these will all be 0.  Here ``exper`` is also excluded since once entity effects and time dummies are incorporated, ``exper`` is perfectly co-linear."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import PanelOLS\n",
+    "exog_vars = ['expersq', 'union', 'married', 'year']\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "mod = PanelOLS(data.lwage, exog, entity_effects=True)\n",
+    "fe_res = mod.fit()\n",
+    "print(fe_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Time Effects\n",
+    "Time effect can be added using ``time_effects=True``.  Here the time dummies are removed. Note that the core coefficients are identical. The only change is in the test statistic for poolability since not the \"effects\" include both entity and time, whereas before only entity were included.\n",
+    "\n",
+    "#### Effects vs Dummies\n",
+    "For variable which can be consistently estimated, such as time effects in the usual large N, fixed T panel, it isn't necessary to include these as effects.  They can instead be implemented as dummy variables.  "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import PanelOLS\n",
+    "exog_vars = ['expersq','union','married']\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "mod = PanelOLS(data.lwage, exog, entity_effects=True, time_effects=True)\n",
+    "fe_te_res = mod.fit()\n",
+    "print(fe_te_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Other Options\n",
+    "Some additional options are available when using ``PanelOLS`` and effects.  The ``use_lsdv`` can be used to force the model to be estimated using dummy variables.  This isn't necessary and will be slower in most circumstances.  This options is primarily included for testing.  ``auto_df`` instructs ``PanelOLS`` to determine the degree of freedom adjustment to make.  Unlike most other estimators, the treatment of effects depends on the covariance estimator.  For example, when using a classic covariance estimator, effects count as lost degrees of freedom.  When using entity effects and clustering by entity, they do not.  Setting ``auto_df=False`` will allow the entities to be counted or not, depending on the value of ``count_effects``."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Using first differences\n",
+    "First differencing is an alternative to using fixed effects when there might be correlation.  When using first differences, time-invariant variables must be excluded.  Additionally, only one linear time-trending variable can be included since this will look like a constant.  This variable will soak up all time-trends in the data, and so interpretations of these variable can be challenging."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import FirstDifferenceOLS\n",
+    "exog_vars = ['exper','expersq', 'union', 'married']\n",
+    "exog = data[exog_vars]\n",
+    "mod = FirstDifferenceOLS(data.lwage, exog)\n",
+    "fd_res = mod.fit()\n",
+    "print(fd_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Comparing models\n",
+    "Model results can be compared using ``compare``.  ``compare`` accepts lists of results, a dictionary of results where the key is interpreted as the model name. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel import compare\n",
+    "print(compare({'BE':be_res,'RE':re_res,'Pooled':pooled_res}))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Covariance options"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Heteroskedasticity Robust Covariance\n",
+    "White's robust covariance can be used by setting ``cov_type='robust``. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust.  Instead a clustered covariance is required."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "exog_vars = ['black','hisp','exper','expersq','married', 'educ', 'union']\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "mod = PooledOLS(data.lwage, exog)\n",
+    "robust = mod.fit(cov_type='robust')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Clustered by Entity\n",
+    "The usual variable to cluster are are entity or entity and time.  The can be implemented using ``cov_type='clustered'`` and the additional keyword arguments ``cluster_entity=True`` and/or ``cluster_time=True``. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "clust_entity = mod.fit(cov_type='clustered', cluster_entity=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This next example clusters by both."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "clust_entity_time = mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "An ``OrderedDict`` is used to hold the results for comparing models.  This allows the models to be named as well as for the order of the models to be specified.  A standard ``dict`` will produce effectively random order.\n",
+    "\n",
+    "Clustering on entity reduced the t-stats across the board.  This suggests there is important correlation in the residuals per entity. Clustering by both also decreases the t-stats which suggests that there is cross-sectional dependence in the data. *Note*: clustering by entity addresses correlation across time and clustering by time controls for correlation between entities in a time period."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from collections import OrderedDict\n",
+    "res = OrderedDict()\n",
+    "res['Robust'] = robust\n",
+    "res['Entity'] = clust_entity\n",
+    "res['Entity-Time'] = clust_entity_time\n",
+    "print(compare(res))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Other clusters\n",
+    "Other clusters can be used by directly passing integer arrays (1 or 2 columns, or a 1-d array) using the input ``clusters``.  This example clustered by occupation, which is probably not a reliable variable to cluster on since there are only 9 groups and the usual theory for clustered standard errors requires that the number of clusters is large."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clust_entity = mod.fit(cov_type='clustered', clusters=data.occupation)\n",
+    "print(data.occupation.value_counts())\n",
+    "print(clust_entity)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

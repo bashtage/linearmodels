@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Linear Asset Pricing Models &#8212; linearmodels 4.3+1.g91fef62 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.3+1.g91fef62',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Estimation Results" href="results.html" />
+    <link rel="prev" title="Module Reference" href="reference.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.3 (+1, g91fef62)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Linear Factor Models for Asset Pricing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/formulas.html">Using Formulas</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Linear Factor Models for Asset Pricing</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Linear Asset Pricing Models</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.asset_pricing.model">
+<span id="linear-asset-pricing-models"></span><span id="asset-pricing-module-reference-models"></span><h1>Linear Asset Pricing Models<a class="headerlink" href="#module-linearmodels.asset_pricing.model" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="linear-factor-models-traded-or-non-traded-factors">
+<h2>Linear Factor Models (Traded or Non-traded Factors)<a class="headerlink" href="#linear-factor-models-traded-or-non-traded-factors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModel">
+<em class="property">class </em><code class="descname">LinearFactorModel</code><span class="sig-paren">(</span><em>portfolios</em>, <em>factors</em>, <em>*</em>, <em>risk_free=False</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear factor model estimator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>portfolios</strong> (<em>array-like</em>) – Test portfolio returns (nobs by nportfolio)</li>
+<li><strong>factors</strong> (<em>array-like</em>) – Priced factor returns (nobs by nfactor)</li>
+<li><strong>risk_free</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether the risk-free rate should be estimated
+from returns along other risk premia.  If False, the returns are
+assumed to be excess returns using the correct risk-free rate.</li>
+<li><strong>sigma</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Positive definite residual covariance (nportfolio by nportfolio)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Suitable for traded or non-traded factors.</p>
+<p>Implements a 2-step estimator of risk premia, factor loadings and model
+tests.</p>
+<p>The first stage model estimated is</p>
+<div class="math">
+\[r_{it} = c_i + f_t \beta_i + \epsilon_{it}\]</div>
+<p>where <span class="math">\(r_{it}\)</span> is the return on test portfolio i and
+<span class="math">\(f_t\)</span> are the traded factor returns.  The parameters <span class="math">\(c_i\)</span>
+are required to allow non-traded to be tested, but are not economically
+interesting.  These are not reported.</p>
+<p>The second stage model uses the estimated factor loadings from the first
+and is</p>
+<div class="math">
+\[\bar{r}_i = \lambda_0 + \hat{\beta}_i^\prime \lambda + \eta_i\]</div>
+<p>where <span class="math">\(\bar{r}_i\)</span> is the average excess return to portfolio i and
+<span class="math">\(\lambda_0\)</span> is only included if estimating the risk-free rate. GLS
+is used in the second stage if <code class="docutils literal"><span class="pre">sigma</span></code> is provided.</p>
+<p>The model is tested using the estimated values
+<span class="math">\(\hat{\alpha}_i=\hat{\eta}_i\)</span>.</p>
+<dl class="method">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModel.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>cov_type='robust'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModel.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the covariance estimator using
+a degree of freedom adjustment</li>
+<li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results class with parameter estimates, covariance and test statistics</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.asset_pricing.results.LinearFactorModelResults" title="linearmodels.asset_pricing.results.LinearFactorModelResults">LinearFactorModelResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The kernel covariance estimator takes the optional arguments
+<code class="docutils literal"><span class="pre">kernel</span></code>, one of ‘bartlett’, ‘parzen’ or ‘qs’ (quadratic spectral)
+and <code class="docutils literal"><span class="pre">bandwidth</span></code> (a positive integer).</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModel.from_formula">
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>portfolios=None</em>, <em>risk_free=False</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModel.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModel.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the syntax described in the notes</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>portfolios</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Portfolios to be used in the model. If provided, must use formula
+syntax containing only factors.</li>
+<li><strong>risk_free</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether the risk-free rate should be estimated
+from returns along other risk premia.  If False, the returns are
+assumed to be excess returns using the correct risk-free rate.</li>
+<li><strong>sigma</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Positive definite residual covariance (nportfolio by nportfolio)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel">LinearFactorModel</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The formula can be used in one of two ways.  The first specified only the
+factors and uses the data provided in <code class="docutils literal"><span class="pre">portfolios</span></code> as the test portfolios.
+The second specified the portfolio using <code class="docutils literal"><span class="pre">+</span></code> to separate the test portfolios
+and <code class="docutils literal"><span class="pre">~</span></code> to separate the test portfolios from the factors.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.asset_pricing</span> <span class="k">import</span> <span class="n">LinearFactorModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using only factors</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S1M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M5&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="o">=</span><span class="n">portfolios</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="gmm-estimation-of-linear-factor-models">
+<h2>GMM Estimation of Linear Factor Models<a class="headerlink" href="#gmm-estimation-of-linear-factor-models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModelGMM">
+<em class="property">class </em><code class="descname">LinearFactorModelGMM</code><span class="sig-paren">(</span><em>factors</em>, <em>portfolios</em>, <em>*</em>, <em>risk_free=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModelGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>GMM estimator of Linear factor models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>portfolios</strong> (<em>array-like</em>) – Test portfolio returns (nobs by nportfolio)</li>
+<li><strong>factors</strong> (<em>array-like</em>) – Priced factors values (nobs by nfactor)</li>
+<li><strong>risk_free</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether the risk-free rate should be estimated
+from returns along other risk premia.  If False, the returns are
+assumed to be excess returns using the correct risk-free rate.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Suitable for traded or non-traded factors.</p>
+<p>Implements a GMM estimator of risk premia, factor loadings and model
+tests.</p>
+<p>The moments are</p>
+<div class="math">
+\[\begin{split}\left[\begin{array}{c}
+   \epsilon_{t}\otimes f_{c,t}\\
+   f_{t}-\mu
+\end{array}\right]\end{split}\]</div>
+<p>and</p>
+<div class="math">
+\[\epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)\]</div>
+<p>where <span class="math">\(r_{it}\)</span> is the return on test portfolio i and
+<span class="math">\(f_t\)</span> are the factor returns.</p>
+<p>The model is tested using the optimized objective function using the
+usual GMM J statistic.</p>
+<dl class="method">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModelGMM.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>center=True</em>, <em>use_cue=False</em>, <em>steps=2</em>, <em>disp=10</em>, <em>max_iter=1000</em>, <em>cov_type='robust'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModelGMM.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModelGMM.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to center the moment conditions before computing
+the weighting matrix.</li>
+<li><strong>use_cue</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use continuously updating estimator</li>
+<li><strong>steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of steps to use when estimating parameters.  2 corresponds
+to the standard efficient gmm estimator. Higher values will
+iterate until convergence or up to the number of steps given</li>
+<li><strong>disp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of iterations between printed update. 0 or negative values
+suppresses output</li>
+<li><strong>max_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>positive</em><em>, </em><em>optional</em>) – Maximum number of iterations when minimizing objective</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the covariance estimator using
+a degree of freedom adjustment</li>
+<li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results class with parameter estimates, covariance and test statistics</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">GMMFactorModelResults</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The kernel covariance estimator takes the optional arguments
+<code class="docutils literal"><span class="pre">kernel</span></code>, one of ‘bartlett’, ‘parzen’ or ‘qs’ (quadratic spectral)
+and <code class="docutils literal"><span class="pre">bandwidth</span></code> (a positive integer).</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.asset_pricing.model.LinearFactorModelGMM.from_formula">
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>portfolios=None</em>, <em>risk_free=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModelGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModelGMM.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the syntax described in the notes</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>portfolios</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Portfolios to be used in the model. If provided, must use formula
+syntax containing only factors.</li>
+<li><strong>risk_free</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether the risk-free rate should be estimated
+from returns along other risk premia.  If False, the returns are
+assumed to be excess returns using the correct risk-free rate.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM">LinearFactorModelGMM</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The formula can be used in one of two ways.  The first specified only the
+factors and uses the data provided in <code class="docutils literal"><span class="pre">portfolios</span></code> as the test portfolios.
+The second specified the portfolio using <code class="docutils literal"><span class="pre">+</span></code> to separate the test portfolios
+and <code class="docutils literal"><span class="pre">~</span></code> to separate the test portfolios from the factors.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.asset_pricing</span> <span class="k">import</span> <span class="n">LinearFactorModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using only factors</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S1M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M5&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="o">=</span><span class="n">portfolios</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="linear-factor-models-traded-factors">
+<h2>Linear Factor Models (Traded Factors)<a class="headerlink" href="#linear-factor-models-traded-factors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="linearmodels.asset_pricing.model.TradedFactorModel">
+<em class="property">class </em><code class="descname">TradedFactorModel</code><span class="sig-paren">(</span><em>portfolios</em>, <em>factors</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#TradedFactorModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.TradedFactorModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear factor models estimator applicable to traded factors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>portfolios</strong> (<em>array-like</em>) – Test portfolio returns (nobs by nportfolio)</li>
+<li><strong>factors</strong> (<em>array-like</em>) – Priced factor returns (nobs by nfactor)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Implements both time-series estimators of risk premia, factor loadings
+and zero-alpha tests.</p>
+<p>The model estimated is</p>
+<div class="math">
+\[r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}\]</div>
+<p>where <span class="math">\(r_{it}^e\)</span> is the excess return on test portfolio i and
+<span class="math">\(f_t\)</span> are the traded factor returns.  The model is directly
+tested using the estimated values <span class="math">\(\hat{\alpha}_i\)</span>. Risk premia,
+<span class="math">\(\lambda_i\)</span> are estimated using the sample averages of the factors,
+which must be excess returns on traded portfolios.</p>
+<dl class="method">
+<dt id="linearmodels.asset_pricing.model.TradedFactorModel.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>cov_type='robust'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#TradedFactorModel.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.TradedFactorModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the covariance estimator using
+a degree of freedom adjustment</li>
+<li><strong>**cov_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Additional covariance-specific options.  See Notes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results class with parameter estimates, covariance and test statistics</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.asset_pricing.results.LinearFactorModelResults" title="linearmodels.asset_pricing.results.LinearFactorModelResults">LinearFactorModelResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Supported covariance estimators are:</p>
+<ul class="simple">
+<li>‘robust’ - Heteroskedasticity-robust covariance estimator</li>
+<li>‘kernel’ - Heteroskedasticity and Autocorrelation consistent (HAC)
+covariance estimator</li>
+</ul>
+<p>The kernel covariance estimator takes the optional arguments
+<code class="docutils literal"><span class="pre">kernel</span></code>, one of ‘bartlett’, ‘parzen’ or ‘qs’ (quadratic spectral)
+and <code class="docutils literal"><span class="pre">bandwidth</span></code> (a positive integer).</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="linearmodels.asset_pricing.model.TradedFactorModel.from_formula">
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>portfolios=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#TradedFactorModel.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.TradedFactorModel.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the syntax described in the notes</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>portfolios</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Portfolios to be used in the model</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel">TradedFactorModel</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The formula can be used in one of two ways.  The first specified only the
+factors and uses the data provided in <code class="docutils literal"><span class="pre">portfolios</span></code> as the test portfolios.
+The second specified the portfolio using <code class="docutils literal"><span class="pre">+</span></code> to separate the test portfolios
+and <code class="docutils literal"><span class="pre">~</span></code> to separate the test portfolios from the factors.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.asset_pricing</span> <span class="k">import</span> <span class="n">TradedFactorModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">TradedFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using only factors</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S1M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S3M5&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M1&#39;</span><span class="p">,</span> <span class="s1">&#39;S5M5&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;MktRF + SMB + HML&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">TradedFactorModel</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="o">=</span><span class="n">portfolios</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="reference.html" title="previous chapter (use the left arrow)">Module Reference</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="results.html" title="next chapter (use the right arrow)">Estimation Results</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

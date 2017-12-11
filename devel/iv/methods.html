@@ -1,0 +1,1270 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Estimation Methods &#8212; linearmodels 4.3+1.g91fef62 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.3+1.g91fef62',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Estimation Results" href="results.html" />
+    <link rel="prev" title="Module Reference" href="reference.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">linearmodels 4.3 (+1, g91fef62)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Instrumental Variable Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/basic-examples.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/advanced-examples.html">Further Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Instrumental Variable Estimation</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Estimation Methods</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.iv.model">
+<span id="estimation-methods"></span><span id="iv-module-reference-models"></span><h1>Estimation Methods<a class="headerlink" href="#module-linearmodels.iv.model" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="linearmodels.iv.model.IV2SLS">
+<em class="property">class </em><code class="descname">IV2SLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation of IV models using two-stage least squares</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – Endogenous variables (nobs by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors  (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The 2SLS estimator is defined</p>
+<div class="math">
+\[\begin{split}\hat{\beta}_{2SLS} &amp; =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
+                   &amp; =(\hat{X}'\hat{X})^{-1}\hat{X}'Y\\
+           \hat{X} &amp; =Z(Z'Z)^{-1}Z'X\end{split}\]</div>
+<p>The 2SLS estimator is a special case of a k-class estimator with
+<span class="math">\(\kappa=1\)</span>,</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>VCV: bootstrap</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+</div>
+<dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.estimate_parameters">
+<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter estimation without error checking</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
+<li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
+<li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
+<li><strong>kappa</strong> (<em>scalar</em>) – Parameter value for k-class estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> – Estimated parameters (nvar by 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Exposed as a static method to facilitate estimation with other data,
+e.g., bootstrapped samples.  Performs no error checking.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results container</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.iv.results.IVResults" title="linearmodels.iv.results.IVResults">IVResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Additional covariance parameters depend on specific covariance used.
+The see the docstring of specific covariance estimator for a list of
+supported options. Defaults are used if no covariance configuration
+is provided.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IV2SLS.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formula used to create the model</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IV2SLS.from_formula">
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+section</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS">IV2SLS</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The IV formula modifies the standard Patsy formula to include a
+block of the form [endog ~ instruments] which is used to indicate
+the list of endogenous variables and instruments.  The general
+structure is <cite>dependent ~ exog [endog ~ instruments]</cite> and it must
+be the case that the formula expressions constructed from blocks
+<cite>dependent ~ exog endog</cite> and <cite>dependent ~ exog instruments</cite> are both
+valid Patsy formulas.</p>
+<p>A constant must be explicitly included using ‘1 +’ if required.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IV2SLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IV2SLS.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IV2SLS.isnull">
+<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.isnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations with missing values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IV2SLS.notnull">
+<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.notnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.resids">
+<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>resids</strong> – Model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IV2SLS.wresids">
+<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>wresids</strong> – Weighted model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses weighted versions of data instead of raw data.  Identical to
+resids if all weights are unity.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.model.IVLIML">
+<em class="property">class </em><code class="descname">IVLIML</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limited information ML and k-class estimation of IV models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – Endogenous variables (nobs by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors  (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
+LIML estimator.</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
+produce LIML parameter estimate.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal"><span class="pre">kappa</span></code> and <code class="docutils literal"><span class="pre">fuller</span></code> should not be used simultaneously since Fuller’s
+alpha applies an adjustment to <code class="docutils literal"><span class="pre">kappa</span></code>, and so the same result can be
+computed using only <code class="docutils literal"><span class="pre">kappa</span></code>. Fuller’s alpha is used to adjust the
+LIML estimate of <span class="math">\(\kappa\)</span>, which is computed whenever <code class="docutils literal"><span class="pre">kappa</span></code>
+is not provided.</p>
+<p>The LIML estimator is defined as</p>
+<div class="math">
+\[\begin{split}\hat{\beta}_{\kappa} &amp; =(X(I-\kappa M_{z})X)^{-1}X(I-\kappa M_{z})Y\\
+M_{z} &amp; =I-P_{z}\\
+P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
+<p>where <span class="math">\(Z\)</span> contains both the exogenous regressors and the instruments.
+<span class="math">\(\kappa\)</span> is estimated as part of the LIML estimator.</p>
+<p>When using Fuller’s <span class="math">\(\alpha\)</span>, the value used is modified to</p>
+<div class="math">
+\[\kappa-\alpha/(n-n_{instr})\]</div>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>VCV: bootstrap</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+</div>
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IVLIML.estimate_parameters">
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter estimation without error checking</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
+<li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
+<li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
+<li><strong>kappa</strong> (<em>scalar</em>) – Parameter value for k-class estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> – Estimated parameters (nvar by 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Exposed as a static method to facilitate estimation with other data,
+e.g., bootstrapped samples.  Performs no error checking.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVLIML.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results container</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.iv.results.IVResults" title="linearmodels.iv.results.IVResults">IVResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Additional covariance parameters depend on specific covariance used.
+The see the docstring of specific covariance estimator for a list of
+supported options. Defaults are used if no covariance configuration
+is provided.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVLIML.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formula used to create the model</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IVLIML.from_formula">
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+section</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
+LIML estimator.</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
+produce LIML parameter estimate.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML">IVLIML</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The IV formula modifies the standard Patsy formula to include a
+block of the form [endog ~ instruments] which is used to indicate
+the list of endogenous variables and instruments.  The general
+structure is <cite>dependent ~ exog [endog ~ instruments]</cite> and it must
+be the case that the formula expressions constructed from blocks
+<cite>dependent ~ exog endog</cite> and <cite>dependent ~ exog instruments</cite> are both
+valid Patsy formulas.</p>
+<p>A constant must be explicitly included using ‘1 +’ if required.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVLIML</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVLIML</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVLIML.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVLIML.isnull">
+<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.isnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations with missing values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVLIML.notnull">
+<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.notnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVLIML.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVLIML.resids">
+<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>resids</strong> – Model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVLIML.wresids">
+<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.wresids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>wresids</strong> – Weighted model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses weighted versions of data instead of raw data.  Identical to
+resids if all weights are unity.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.model.IVGMM">
+<em class="property">class </em><code class="descname">IVGMM</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation of IV models using the generalized method of moments (GMM)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – Endogenous variables (nobs by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors  (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Available GMM weight functions are:</p>
+<ul class="simple">
+<li>‘unadjusted’, ‘homoskedastic’ - Assumes moment conditions are
+homoskedastic</li>
+<li>‘robust’, ‘heteroskedastic’ - Allows for heteroskedasticity by not
+autocorrelation</li>
+<li>‘kernel’ - Allows for heteroskedasticity and autocorrelation</li>
+<li>‘cluster’ - Allows for one-way cluster dependence</li>
+</ul>
+<p>The estimator is defined as</p>
+<div class="math">
+\[\hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y\]</div>
+<p>where <span class="math">\(W\)</span> is a positive definite weight matrix and <span class="math">\(Z\)</span>
+contains both the exogenous regressors and the instruments.</p>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>VCV: bootstrap</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+</div>
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IVGMM.estimate_parameters">
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
+<li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
+<li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
+<li><strong>w</strong> (<em>ndarray</em>) – GMM weight matrix (ninstr by ninstr)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> – Estimated parameters (nvar by 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Exposed as a static method to facilitate estimation with other data,
+e.g., bootstrapped samples.  Performs no error checking.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMM.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>iter_limit=2</em>, <em>tol=0.0001</em>, <em>initial_weight=None</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of iterations.  Default is 2, which produces
+two-step efficient GMM estimates.  Larger values can be used
+to iterate between parameter estimation and optimal weight
+matrix estimation until convergence.</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Convergence criteria.  Measured as covariance normalized change in
+parameters across iterations where the covariance estimator is
+based on the first step parameter estimates.</li>
+<li><strong>initial_weight</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Initial weighting matrix to use in the first step.  If not
+specified, uses the average outer-product of the set containing
+the exogenous variables and instruments.</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results container</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.iv.results.IVGMMResults" title="linearmodels.iv.results.IVGMMResults">IVGMMResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Additional covariance parameters depend on specific covariance used.
+The see the docstring of specific covariance estimator for a list of
+supported options. Defaults are used if no covariance configuration
+is provided.</p>
+<p>Available covariance functions are:</p>
+<ul class="simple">
+<li>‘unadjusted’, ‘homoskedastic’ - Assumes moment conditions are
+homoskedastic</li>
+<li>‘robust’, ‘heteroskedastic’ - Allows for heteroskedasticity by not
+autocorrelation</li>
+<li>‘kernel’ - Allows for heteroskedasticity and autocorrelation</li>
+<li>‘cluster’ - Allows for one-way cluster dependence</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMM.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formula used to create the model</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IVGMM.from_formula">
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+section</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The IV formula modifies the standard Patsy formula to include a
+block of the form [endog ~ instruments] which is used to indicate
+the list of endogenous variables and instruments.  The general
+structure is <cite>dependent ~ exog [endog ~ instruments]</cite> and it must
+be the case that the formula expressions constructed from blocks
+<cite>dependent ~ exog endog</cite> and <cite>dependent ~ exog instruments</cite> are both
+valid Patsy formulas.</p>
+<p>A constant must be explicitly included using ‘1 +’ if required.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>model</strong> – Model instance</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM">IVGMM</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVGMM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMM.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMM.isnull">
+<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.isnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations with missing values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMM.notnull">
+<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.notnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMM.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMM.resids">
+<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>resids</strong> – Model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMM.wresids">
+<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>wresids</strong> – Weighted model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses weighted versions of data instead of raw data.  Identical to
+resids if all weights are unity.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="linearmodels.iv.model.IVGMMCUE">
+<em class="property">class </em><code class="descname">IVGMMCUE</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimation of IV models using continuously updating GMM</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dependent</strong> (<em>array-like</em>) – Endogenous variables (nobs by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors  (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Available weight functions are:</p>
+<ul class="simple">
+<li>‘unadjusted’, ‘homoskedastic’ - Assumes moment conditions are
+homoskedastic</li>
+<li>‘robust’, ‘heteroskedastic’ - Allows for heteroskedasticity by not
+autocorrelation</li>
+<li>‘kernel’ - Allows for heteroskedasticity and autocorrelation</li>
+<li>‘cluster’ - Allows for one-way cluster dependence</li>
+</ul>
+<p>In most circumstances, the <code class="docutils literal"><span class="pre">center</span></code> weight option should be <code class="docutils literal"><span class="pre">True</span></code> to
+avoid starting value dependence.</p>
+<div class="math">
+\[\begin{split}\hat{\beta}_{cue} &amp; =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
+g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
+<p>where <span class="math">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math">\(\beta\)</span>
+through <span class="math">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a></p>
+</div>
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.estimate_parameters">
+<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>starting</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>display=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>starting</strong> (<em>ndarray</em>) – Starting values for the optimization</li>
+<li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
+<li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
+<li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to display iterative optimizer output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> – Estimated parameters (nvar by 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Exposed to facilitate estimation with other data, e.g., bootstrapped
+samples.  Performs no error checking.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-meth docutils literal"><span class="pre">scipy.optimize.minimize()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>starting=None</em>, <em>display=False</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>starting</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Starting values to use in optimization.  If not provided, 2SLS
+estimates are used.</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to display optimization output</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Results container</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.iv.results.IVGMMResults" title="linearmodels.iv.results.IVGMMResults">IVGMMResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Additional covariance parameters depend on specific covariance used.
+The see the docstring of specific covariance estimator for a list of
+supported options. Defaults are used if no covariance configuration
+is provided.</p>
+<p>Starting values are computed by IVGMM.</p>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>Expose method to pass optimization options</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMMCUE.formula">
+<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formula used to create the model</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="linearmodels.iv.model.IVGMMCUE.from_formula">
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+section</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
+<li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE">IVGMMCUE</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The IV formula modifies the standard Patsy formula to include a
+block of the form [endog ~ instruments] which is used to indicate
+the list of endogenous variables and instruments.  The general
+structure is <cite>dependent ~ exog [endog ~ instruments]</cite> and it must
+be the case that the formula expressions constructed from blocks
+<cite>dependent ~ exog endog</cite> and <cite>dependent ~ exog instruments</cite> are both
+valid Patsy formulas.</p>
+<p>A constant must be explicitly included using ‘1 +’ if required.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVGMMCUE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVGMMCUE</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMMCUE.has_constant">
+<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.has_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating the model includes a constant or equivalent</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMMCUE.isnull">
+<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.isnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations with missing values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.j">
+<code class="descname">j</code><span class="sig-paren">(</span><em>params</em>, <em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.j"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.j" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimization target</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>ndarray</em>) – Parameter vector (nvar)</li>
+<li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
+<li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
+<li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>j</strong> – GMM objective function, also known as the J statistic</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The GMM objective function is defined as</p>
+<div class="math">
+\[J(\beta) = \bar{g}(\beta)'W(\beta)^{-1}\bar{g}(\beta)\]</div>
+<p>where <span class="math">\(\bar{g}(\beta)\)</span> is the average of the moment
+conditions, <span class="math">\(z_i \hat{\epsilon}_i\)</span>, where
+<span class="math">\(\hat{\epsilon}_i = y_i - x_i\beta\)</span>.  The weighting matrix
+is some estimator of the long-run variance of the moment conditions.</p>
+<p>Unlike tradition GMM, the weighting matrix is simultaneously computed
+with the moment conditions, and so has explicit dependence on
+<span class="math">\(\beta\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.iv.model.IVGMMCUE.notnull">
+<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.notnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations of observations included in estimation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nexog)</li>
+<li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of parameters must satisfy nvar = nexog + nendog.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, regressor matrix is constructed as
+<cite>[exog, endog]</cite> and so parameters must be aligned to this structure.
+The the the same structure used in model estimation.</p>
+<p>If <cite>data</cite> is not none, then <cite>exog</cite> and <cite>endog</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite> and <cite>endog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.resids">
+<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.resids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>resids</strong> – Model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.iv.model.IVGMMCUE.wresids">
+<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.wresids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted model residuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> (<em>ndarray</em>) – Model parameters (nvar by 1)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>wresids</strong> – Weighted model residuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses weighted versions of data instead of raw data.  Identical to
+resids if all weights are unity.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="reference.html" title="previous chapter (use the left arrow)">Module Reference</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="results.html" title="next chapter (use the right arrow)">Estimation Results</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="results.html" title="Estimation Results"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Module Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

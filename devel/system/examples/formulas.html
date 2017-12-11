@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Using formulas to specify models &#8212; linearmodels 4.3+1.g91fef62 documentation</title>
+    <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '4.3+1.g91fef62',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Three-stage Least Squares (3SLS)" href="three-stage-ls.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="three-stage-ls.html" title="Three-stage Least Squares (3SLS)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../index.html" class="text-logo">linearmodels 4.3 (+1, g91fef62)</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../index.html">Docs</a></li>
+              
+                <li><a href="../index.html">System Regression Models</a></li>
+              
+              <li>Using formulas to specify models</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Using-formulas-to-specify-models">
+<h1>Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this headline">¶</a></h1>
+<p>Formulas can be used to specify models using mostly standard
+<a class="reference external" href="https://patsy.readthedocs.io/">patsy</a> syntax. Since system
+estimation is more complicated than the specification of a single model,
+there are two methods available to specify a system:</p>
+<ul class="simple">
+<li>Dictionary of formulas</li>
+<li>Single formula separated using {}</li>
+</ul>
+<p>These examples use data on fringe benefits from F. Vella (1993), “A
+Simple Estimator for Simultaneous Models with Censored Endogenous
+Regressors” which appears in Wooldridge (2002). The model consists of
+two equations, one for hourly wage and the other for hourly benefits.
+The initial model uses the same regressors in both equations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">fringe</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Dictionary">
+<h2>Dictionary<a class="headerlink" href="#Dictionary" title="Permalink to this headline">¶</a></h2>
+<p>The dictionary syntax is virtually identical to standard patsy syntax
+where each equation is specified in a key-value pair where the key is
+the equation label and the value is the formula. It is recommended to
+use an OrderedDict which will preserve equation order in results. Keys
+<strong>must</strong> be strings.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="n">formula</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<span class="n">formula</span><span class="p">[</span><span class="s1">&#39;benefits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male&#39;</span>
+<span class="n">formula</span><span class="p">[</span><span class="s1">&#39;earnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hrearn ~ educ + exper + expersq + nrtheast + married + male&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="kn">import</span> <span class="n">SUR</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.6951
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Mon, Dec 11 2017
+Time:                        20:11:32
+
+
+                Equation: benefits, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0346     0.0050     6.8605     0.0000      0.0247      0.0445
+exper          0.0350     0.0063     5.5974     0.0000      0.0228      0.0473
+expersq       -0.0006     0.0001    -4.4326     0.0000     -0.0009     -0.0003
+union          0.3682     0.0474     7.7659     0.0000      0.2753      0.4612
+south         -0.1775     0.0586    -3.0289     0.0025     -0.2923     -0.0626
+nrtheast      -0.1224     0.0714    -1.7132     0.0867     -0.2624      0.0176
+nrthcen       -0.1433     0.0621    -2.3074     0.0210     -0.2650     -0.0216
+male           0.2518     0.0490     5.1435     0.0000      0.1559      0.3478
+                Equation: earnings, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.3547     0.0357     9.9280     0.0000      0.2847      0.4247
+exper         -0.0750     0.0492    -1.5260     0.1270     -0.1714      0.0213
+expersq        0.0038     0.0011     3.4600     0.0005      0.0016      0.0059
+nrtheast      -0.7127     0.4473    -1.5934     0.1111     -1.5894      0.1640
+married        0.4472     0.3920     1.1410     0.2539     -0.3210      1.2155
+male           1.8899     0.3904     4.8408     0.0000      1.1247      2.6551
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Curly-Braces">
+<h2>Curly Braces<a class="headerlink" href="#Curly-Braces" title="Permalink to this headline">¶</a></h2>
+<p>The same formula can be expressed in a single string by surrounding each
+equation with braces <code class="docutils literal"><span class="pre">{}</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">braces_formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">{hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
+<span class="s1">{hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
+<span class="s1">&#39;&#39;&#39;</span>
+<span class="n">braces_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">braces_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">braces_res</span> <span class="o">=</span> <span class="n">braces_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">braces_res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.6951
+No. Equations.:                     2   Cov. Estimator:             unadjusted
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Mon, Dec 11 2017
+Time:                        20:11:32
+
+
+                 Equation: hrbens, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0346     0.0050     6.8605     0.0000      0.0247      0.0445
+exper          0.0350     0.0063     5.5974     0.0000      0.0228      0.0473
+expersq       -0.0006     0.0001    -4.4326     0.0000     -0.0009     -0.0003
+union          0.3682     0.0474     7.7659     0.0000      0.2753      0.4612
+south         -0.1775     0.0586    -3.0289     0.0025     -0.2923     -0.0626
+nrtheast      -0.1224     0.0714    -1.7132     0.0867     -0.2624      0.0176
+nrthcen       -0.1433     0.0621    -2.3074     0.0210     -0.2650     -0.0216
+male           0.2518     0.0490     5.1435     0.0000      0.1559      0.3478
+                 Equation: hrearn, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.3547     0.0357     9.9280     0.0000      0.2847      0.4247
+exper         -0.0750     0.0492    -1.5260     0.1270     -0.1714      0.0213
+expersq        0.0038     0.0011     3.4600     0.0005      0.0016      0.0059
+nrtheast      -0.7127     0.4473    -1.5934     0.1111     -1.5894      0.1640
+married        0.4472     0.3920     1.1410     0.2539     -0.3210      1.2155
+male           1.8899     0.3904     4.8408     0.0000      1.1247      2.6551
+==============================================================================
+
+Covariance Estimator:
+Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Labeled-Formulas">
+<h2>Labeled Formulas<a class="headerlink" href="#Labeled-Formulas" title="Permalink to this headline">¶</a></h2>
+<p>When using the curly brace formula specification, the equation names are
+determined by the dependent variable names. When names are repeated as
+is the case in some datasets (e.g. a SUR on GDP of multiple countries)
+then the equation labels will be “uglified” until they are unique. This
+can produce meaningless equation labels, and so it is possible to pass
+an equation label using the syntax</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">label</span> <span class="p">:</span> <span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">labeled_formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">{benefits: hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
+<span class="s1">{earnings: hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
+<span class="s1">&#39;&#39;&#39;</span>
+<span class="n">labels_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">labeled_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">labeled_res</span> <span class="o">=</span> <span class="n">labels_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Unlabeled&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">braces_res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Labeled&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">labeled_res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Unlabeled
+[&#39;hrbens&#39;, &#39;hrearn&#39;]
+Labeled
+[&#39;benefits&#39;, &#39;earnings&#39;]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Other-Options">
+<h2>Other Options<a class="headerlink" href="#Other-Options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Estimation-Weights">
+<h3>Estimation Weights<a class="headerlink" href="#Estimation-Weights" title="Permalink to this headline">¶</a></h3>
+<p>SUR supports weights which are assumed to be proportional to the inverse
+variance of the data so that</p>
+<div class="math">
+\[V(y_i \times w_i) = \sigma^2 \,\,\forall i.\]</div>
+<p>Weights can be passed using a <code class="docutils literal"><span class="pre">DataFrame</span></code> where each column.</p>
+<p>Here the results are printed to ensure that the estimates are different
+from those in the standard GLS model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span><span class="n">random_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">616</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">random_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">random_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;benefits&#39;</span><span class="p">,</span> <span class="s1">&#39;earnings&#39;</span><span class="p">])</span>
+<span class="n">weighted_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">random_weights</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">weighted_mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                        System GLS Estimation Summary
+==============================================================================
+Estimator:                        GLS   Overall R-squared:              0.7125
+No. Equations.:                     2   Cov. Estimator:                 robust
+No. Observations:                 616   Num. Constraints:                 None
+Date:                Mon, Dec 11 2017
+Time:                        20:11:32
+
+
+                Equation: benefits, Dependent Variable: hrbens
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.0381     0.0116     3.2968     0.0010      0.0155      0.0608
+exper          0.0367     0.0191     1.9226     0.0545     -0.0007      0.0740
+expersq       -0.0006     0.0005    -1.3543     0.1756     -0.0016      0.0003
+union          0.3748     0.1151     3.2555     0.0011      0.1492      0.6005
+south         -0.2716     0.1211    -2.2430     0.0249     -0.5089     -0.0343
+nrtheast      -0.1732     0.1460    -1.1868     0.2353     -0.4593      0.1129
+nrthcen       -0.1703     0.1384    -1.2306     0.2185     -0.4415      0.1009
+male           0.2430     0.0950     2.5581     0.0105      0.0568      0.4292
+                Equation: earnings, Dependent Variable: hrearn
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+educ           0.4155     0.0336     12.363     0.0000      0.3497      0.4814
+exper         -0.1852     0.0719    -2.5740     0.0101     -0.3262     -0.0442
+expersq        0.0063     0.0019     3.3905     0.0007      0.0027      0.0099
+nrtheast      -1.0558     0.2008    -5.2580     0.0000     -1.4493     -0.6622
+married        0.6873     0.2298     2.9907     0.0028      0.2369      1.1377
+male           1.8450     0.1159     15.919     0.0000      1.6179      2.0722
+==============================================================================
+
+Covariance Estimator:
+Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Pre-specified-Residual-Covariance">
+<h3>Pre-specified Residual Covariance<a class="headerlink" href="#Pre-specified-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
+<p>Like a standard SUR, it is possible to pass a pre-specified residual
+covariance for use in the GLS step. This is done using the keyword
+argument <code class="docutils literal"><span class="pre">sigma</span></code> in the <code class="docutils literal"><span class="pre">from_formula</span></code> method, and is otherwise
+identical to passing one to the standard SUR.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="examples.html" title="previous chapter (use the left arrow)">Examples</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="three-stage-ls.html" title="next chapter (use the right arrow)">Three-stage Least Squares (3SLS)</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="three-stage-ls.html" title="Three-stage Least Squares (3SLS)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.3+1.g91fef62 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>
