@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.2 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.3 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2',
+        VERSION:     '4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2</a>
+    ../index.html" class="text-logo">linearmodels 4.3</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -222,6 +222,12 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.system.results.SystemResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.system.results.SystemResults.iterations">
 <code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
@@ -255,6 +261,57 @@
 <dt id="linearmodels.system.results.SystemResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.results.SystemResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>equations=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+variables.  Each key is an equations label and must
+match the labels used to fir the model. Each value must be either a tuple
+of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
+If predictions are not required for one of more of the model equations,
+these keys can be omitted.</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+<li><strong>dataframe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to return output as a dataframe. If False, a
+dictionary is returned using the equation labels as keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame or dictionary containing selected outputs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>equations</cite> and <cite>data</cite> are both <cite>None</cite>, in-sample predictions
+(fitted values) will be returned.</p>
+<p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>equations</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, the regressor array for a particular
+equation is assembled as
+<cite>[equations[eqn][‘exog’], equations[eqn][‘endog’]]</cite> where <cite>eqn</cite> is
+an equation label. These must correspond to the columns in the
+estimated model.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -394,6 +451,12 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="linearmodels.system.results.GMMSystemResults.fitted_values">
+<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fitted values</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="linearmodels.system.results.GMMSystemResults.iterations">
 <code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
@@ -453,6 +516,57 @@ statistic is defined as</p>
 <dt id="linearmodels.system.results.GMMSystemResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.system.results.GMMSystemResults.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>equations=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>In- and out-of-sample predictions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+variables.  Each key is an equations label and must
+match the labels used to fir the model. Each value must be either a tuple
+of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
+If predictions are not required for one of more of the model equations,
+these keys can be omitted.</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Dataframe to use for out-of-sample predictions when model was
+constructed using a formula.</li>
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  if True, the
+values returns will have the same size as the original input data
+before filtering missing values</li>
+<li><strong>dataframe</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to return output as a dataframe. If False, a
+dictionary is returned using the equation labels as keys.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame or dictionary containing selected outputs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>equations</cite> and <cite>data</cite> are both <cite>None</cite>, in-sample predictions
+(fitted values) will be returned.</p>
+<p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
+Predictions from models constructed using formulas can
+be computed using either <cite>equations</cite>, which will treat these are
+arrays of values corresponding to the formula-process data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+<p>When using <cite>exog</cite> and <cite>endog</cite>, the regressor array for a particular
+equation is assembled as
+<cite>[equations[eqn][‘exog’], equations[eqn][‘endog’]]</cite> where <cite>eqn</cite> is
+an equation label. These must correspond to the columns in the
+estimated model.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -571,7 +685,7 @@ statistic is defined as</p>
         <li class="right" >
           <a href="models.html" title="System Regression Estimators"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

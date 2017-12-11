@@ -16,13 +16,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Index &#8212; linearmodels 4.2 documentation</title>
+    <title>Index &#8212; linearmodels 4.3 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.2',
+        VERSION:     '4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.3 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -63,7 +63,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    index.html" class="text-logo">linearmodels 4.2</a>
+    index.html" class="text-logo">linearmodels 4.3</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -514,7 +514,13 @@
 </li>
       </ul></li>
       <li><a href="panel/results.html#linearmodels.panel.results.PanelEffectsResults.estimated_effects">estimated_effects (PanelEffectsResults attribute)</a>
+
+      <ul>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelResults.estimated_effects">(PanelResults attribute)</a>
 </li>
+        <li><a href="panel/results.html#linearmodels.panel.results.RandomEffectsResults.estimated_effects">(RandomEffectsResults attribute)</a>
+</li>
+      </ul></li>
       <li><a href="iv/results.html#linearmodels.iv.results.IVModelComparison.estimator_method">estimator_method (IVModelComparison attribute)</a>
 
       <ul>
@@ -605,6 +611,24 @@
         <li><a href="asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel.fit">(TradedFactorModel method)</a>
 </li>
       </ul></li>
+      <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.fitted_values">fitted_values (GMMSystemResults attribute)</a>
+
+      <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.fitted_values">(IVGMMResults attribute)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVResults.fitted_values">(IVResults attribute)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.fitted_values">(OLSResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelEffectsResults.fitted_values">(PanelEffectsResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelResults.fitted_values">(PanelResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.RandomEffectsResults.fitted_values">(RandomEffectsResults attribute)</a>
+</li>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.fitted_values">(SystemResults attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="panel/models.html#linearmodels.panel.model.BetweenOLS.formula">formula (BetweenOLS attribute)</a>
@@ -616,11 +640,15 @@
 </li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IV2SLS.formula">(IV2SLS attribute)</a>
 </li>
+        <li><a href="system/models.html#linearmodels.system.model.IV3SLS.formula">(IV3SLS attribute)</a>
+</li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVGMM.formula">(IVGMM attribute)</a>
 </li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVGMMCUE.formula">(IVGMMCUE attribute)</a>
 </li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVLIML.formula">(IVLIML attribute)</a>
+</li>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.formula">(IVSystemGMM attribute)</a>
 </li>
         <li><a href="panel/models.html#linearmodels.panel.model.PanelOLS.formula">(PanelOLS attribute)</a>
 </li>
@@ -628,12 +656,12 @@
 </li>
         <li><a href="panel/models.html#linearmodels.panel.model.RandomEffects.formula">(RandomEffects attribute)</a>
 </li>
+        <li><a href="system/models.html#linearmodels.system.model.SUR.formula">(SUR attribute)</a>
+</li>
       </ul></li>
-      <li><a href="panel/models.html#linearmodels.panel.model.FamaMacBeth.from_formula">from_formula() (FamaMacBeth method)</a>
+      <li><a href="iv/methods.html#linearmodels.iv.model.IV2SLS.from_formula">from_formula() (IV2SLS static method)</a>
 
       <ul>
-        <li><a href="iv/methods.html#linearmodels.iv.model.IV2SLS.from_formula">(IV2SLS static method)</a>
-</li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVGMM.from_formula">(IVGMM static method)</a>
 </li>
         <li><a href="iv/methods.html#linearmodels.iv.model.IVGMMCUE.from_formula">(IVGMMCUE static method)</a>
@@ -647,6 +675,8 @@
         <li><a href="asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel.from_formula">(linearmodels.asset_pricing.model.TradedFactorModel class method)</a>
 </li>
         <li><a href="panel/models.html#linearmodels.panel.model.BetweenOLS.from_formula">(linearmodels.panel.model.BetweenOLS class method)</a>
+</li>
+        <li><a href="panel/models.html#linearmodels.panel.model.FamaMacBeth.from_formula">(linearmodels.panel.model.FamaMacBeth class method)</a>
 </li>
         <li><a href="panel/models.html#linearmodels.panel.model.FirstDifferenceOLS.from_formula">(linearmodels.panel.model.FirstDifferenceOLS class method)</a>
 </li>
@@ -761,6 +791,20 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.idiosyncratic">idiosyncratic (IVGMMResults attribute)</a>
+
+      <ul>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVResults.idiosyncratic">(IVResults attribute)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.idiosyncratic">(OLSResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelEffectsResults.idiosyncratic">(PanelEffectsResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelResults.idiosyncratic">(PanelResults attribute)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.RandomEffectsResults.idiosyncratic">(RandomEffectsResults attribute)</a>
+</li>
+      </ul></li>
       <li><a href="panel/results.html#linearmodels.panel.results.PanelEffectsResults.included_effects">included_effects (PanelEffectsResults attribute)</a>
 </li>
       <li><a href="panel/data.html#linearmodels.panel.data.PanelData.index">index (PanelData attribute)</a>
@@ -787,10 +831,10 @@
         <li><a href="panel/data.html#linearmodels.panel.data.PanelData.isnull">(PanelData attribute)</a>
 </li>
       </ul></li>
-      <li><a href="utility.html#linearmodels.utility.AttrDict.items">items() (AttrDict method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utility.html#linearmodels.utility.AttrDict.items">items() (AttrDict method)</a>
+</li>
       <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.iterations">iterations (GMMSystemResults attribute)</a>
 
       <ul>
@@ -1151,12 +1195,56 @@
         <li><a href="system/results.html#linearmodels.system.results.SystemResults.params">(SystemResults attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="panel/models.html#linearmodels.panel.model.PooledOLS">PooledOLS (class in linearmodels.panel.model)</a>
 </li>
       <li><a href="utility.html#linearmodels.utility.AttrDict.pop">pop() (AttrDict method)</a>
 </li>
+      <li><a href="panel/models.html#linearmodels.panel.model.BetweenOLS.predict">predict() (BetweenOLS method)</a>
+
+      <ul>
+        <li><a href="panel/models.html#linearmodels.panel.model.FamaMacBeth.predict">(FamaMacBeth method)</a>
+</li>
+        <li><a href="panel/models.html#linearmodels.panel.model.FirstDifferenceOLS.predict">(FirstDifferenceOLS method)</a>
+</li>
+        <li><a href="system/results.html#linearmodels.system.results.GMMSystemResults.predict">(GMMSystemResults method)</a>
+</li>
+        <li><a href="iv/methods.html#linearmodels.iv.model.IV2SLS.predict">(IV2SLS method)</a>
+</li>
+        <li><a href="system/models.html#linearmodels.system.model.IV3SLS.predict">(IV3SLS method)</a>
+</li>
+        <li><a href="iv/methods.html#linearmodels.iv.model.IVGMM.predict">(IVGMM method)</a>
+</li>
+        <li><a href="iv/methods.html#linearmodels.iv.model.IVGMMCUE.predict">(IVGMMCUE method)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVGMMResults.predict">(IVGMMResults method)</a>
+</li>
+        <li><a href="iv/methods.html#linearmodels.iv.model.IVLIML.predict">(IVLIML method)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.IVResults.predict">(IVResults method)</a>
+</li>
+        <li><a href="system/models.html#linearmodels.system.model.IVSystemGMM.predict">(IVSystemGMM method)</a>
+</li>
+        <li><a href="iv/results.html#linearmodels.iv.results.OLSResults.predict">(OLSResults method)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelEffectsResults.predict">(PanelEffectsResults method)</a>
+</li>
+        <li><a href="panel/models.html#linearmodels.panel.model.PanelOLS.predict">(PanelOLS method)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.PanelResults.predict">(PanelResults method)</a>
+</li>
+        <li><a href="panel/models.html#linearmodels.panel.model.PooledOLS.predict">(PooledOLS method)</a>
+</li>
+        <li><a href="panel/models.html#linearmodels.panel.model.RandomEffects.predict">(RandomEffects method)</a>
+</li>
+        <li><a href="panel/results.html#linearmodels.panel.results.RandomEffectsResults.predict">(RandomEffectsResults method)</a>
+</li>
+        <li><a href="system/models.html#linearmodels.system.model.SUR.predict">(SUR method)</a>
+</li>
+        <li><a href="system/results.html#linearmodels.system.results.SystemResults.predict">(SystemResults method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utility.html#linearmodels.utility.InvalidTestStatistic.pval">pval (InvalidTestStatistic attribute)</a>
 
       <ul>
@@ -1664,7 +1752,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.3 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

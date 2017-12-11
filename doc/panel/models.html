@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Models for Panel Data &#8212; linearmodels 4.2 documentation</title>
+    <title>Models for Panel Data &#8212; linearmodels 4.3 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2',
+        VERSION:     '4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2</a>
+    ../index.html" class="text-logo">linearmodels 4.3</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -322,6 +322,40 @@ effects. Each variable is treated as an effect.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.panel.model.PanelOLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.panel.model.PanelOLS.reformat_clusters">
 <code class="descname">reformat_clusters</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.PanelOLS.reformat_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reformat cluster variables</p>
@@ -432,6 +466,40 @@ constant using the constant indicator (1)</p>
 <dt id="linearmodels.panel.model.RandomEffects.not_null">
 <code class="descname">not_null</code><a class="headerlink" href="#linearmodels.panel.model.RandomEffects.not_null" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of non-missing observations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.model.RandomEffects.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.RandomEffects.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="method">
@@ -588,6 +656,40 @@ constant using the constant indicator (1)</p>
 <dt id="linearmodels.panel.model.BetweenOLS.not_null">
 <code class="descname">not_null</code><a class="headerlink" href="#linearmodels.panel.model.BetweenOLS.not_null" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of non-missing observations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.model.BetweenOLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.BetweenOLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="method">
@@ -755,6 +857,40 @@ constant using the constant indicator (1)</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.panel.model.FirstDifferenceOLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.FirstDifferenceOLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.panel.model.FirstDifferenceOLS.reformat_clusters">
 <code class="descname">reformat_clusters</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.FirstDifferenceOLS.reformat_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reformat cluster variables</p>
@@ -916,6 +1052,40 @@ constant using the constant indicator (1)</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="linearmodels.panel.model.PooledOLS.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#PooledOLS.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="linearmodels.panel.model.PooledOLS.reformat_clusters">
 <code class="descname">reformat_clusters</code><span class="sig-paren">(</span><em>clusters</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#PooledOLS.reformat_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.PooledOLS.reformat_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reformat cluster variables</p>
@@ -1028,9 +1198,9 @@ not provided, a naive default is used.</li>
 <dd><p>Formula used to construct the model</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="classmethod">
 <dt id="linearmodels.panel.model.FamaMacBeth.from_formula">
-<code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#FamaMacBeth.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a model from a formula</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1050,7 +1220,7 @@ the weight should be homoskedastic.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model specified using the formula</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS">PooledOLS</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth">FamaMacBeth</a></p>
 </td>
 </tr>
 </tbody>
@@ -1059,8 +1229,8 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FamaMacBeth</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1076,6 +1246,40 @@ constant using the constant indicator (1)</p>
 <dt id="linearmodels.panel.model.FamaMacBeth.not_null">
 <code class="descname">not_null</code><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.not_null" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of non-missing observations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.model.FamaMacBeth.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict values for additional data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
+<li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
+<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If <cite>data</cite> is not None, then <cite>exog</cite> must be None.
+Predictions from models constructed using formulas can
+be computed using either <cite>exog</cite>, which will treat these are
+arrays of values corresponding to the formula-processed data, or using
+<cite>data</cite> which will be processed using the formula used to construct the
+values corresponding to the original model specification.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1137,7 +1341,7 @@ missing in the model data.</td>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
