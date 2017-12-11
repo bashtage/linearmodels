@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.3 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.5 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.3',
+        VERSION:     '4.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.5 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -70,7 +70,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    index.html" class="text-logo">linearmodels 4.3</a>
+    index.html" class="text-logo">linearmodels 4.5</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -89,7 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="plan.html">Module Plans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#since-version-4-0">Since Version 4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-4-5">Version 4.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-0">Version 4.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-0">Version 3.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-0">Version 2.0</a></li>
@@ -132,13 +132,15 @@
             
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="since-version-4-0">
-<h2>Since Version 4.0<a class="headerlink" href="#since-version-4-0" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-4-5">
+<h2>Version 4.5<a class="headerlink" href="#version-4-5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Added System GMM estimator</li>
 <li>Added automatic bandwidth for kernel-based GMM weighting estimators</li>
 <li>Cleaned up HAC estimation across models</li>
-<li>Re-release to fix PyPi errors</li>
+<li>Added <cite>predict</cite> method to IV, Panel and System model to allow out-of-sample
+prediction and simplify retrieval of in-sample results</li>
+<li>Fixed small issues with Fama-MacBeth which previously ignored weights</li>
 </ul>
 </div>
 <div class="section" id="version-4-0">
@@ -210,7 +212,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.5 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
