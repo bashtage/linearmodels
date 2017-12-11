@@ -1,12 +1,14 @@
 Change Log
 ----------
 
-Since Version 4.0
-=================
+Version 4.5
+===========
 * Added System GMM estimator
 * Added automatic bandwidth for kernel-based GMM weighting estimators
 * Cleaned up HAC estimation across models
-* Re-release to fix PyPi errors
+* Added `predict` method to IV, Panel and System model to allow out-of-sample
+  prediction and simplify retrieval of in-sample results
+* Fixed small issues with Fama-MacBeth which previously ignored weights
 
 Version 4.0
 ===========
