@@ -15,13 +15,13 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Models for Panel Data &#8212; linearmodels 4.2+14.g10ed7e8 documentation</title>
+    <title>Models for Panel Data &#8212; linearmodels 4.2+16.gab001a0 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2+14.g10ed7e8',
+        VERSION:     '4.2+16.gab001a0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -59,7 +59,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+16.gab001a0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -72,7 +72,7 @@
   <div id="left-column">
     <div class="sphinxsidebar">
         <a href="
-    ../index.html" class="text-logo">linearmodels 4.2 (+14, g10ed7e8)</a>
+    ../index.html" class="text-logo">linearmodels 4.2 (+16, gab001a0)</a>
         
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
@@ -1198,9 +1198,9 @@ not provided, a naive default is used.</li>
 <dd><p>Formula used to construct the model</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="classmethod">
 <dt id="linearmodels.panel.model.FamaMacBeth.from_formula">
-<code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#FamaMacBeth.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a model from a formula</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1220,7 +1220,7 @@ the weight should be homoskedastic.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model specified using the formula</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS">PooledOLS</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth">FamaMacBeth</a></p>
 </td>
 </tr>
 </tbody>
@@ -1229,8 +1229,8 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FamaMacBeth</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1341,7 +1341,7 @@ missing in the model data.</td>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+14.g10ed7e8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.2+16.gab001a0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
