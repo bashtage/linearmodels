@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Introduction &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -70,41 +61,46 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Instrumental Variable Estimation</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/basic-examples.html">Basic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/advanced-examples.html">Further Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#estimators">Estimators</a><ul>
+<li><a class="reference internal" href="#optional-arguments">Optional Arguments</a><ul>
+<li><a class="reference internal" href="#sls-estimation">2SLS Estimation</a></li>
+<li><a class="reference internal" href="#liml-estimation">LIML Estimation</a></li>
+<li><a class="reference internal" href="#gmm-and-gmm-cue-estimation">GMM and GMM-CUE Estimation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-estimation-and-covariance-specification">Model Estimation and Covariance Specification</a><ul>
+<li><a class="reference internal" href="#gmm-estimation">GMM Estimation</a></li>
+<li><a class="reference internal" href="#gmm-cue-estimation">GMM-CUE Estimation</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Instrumental Variable Estimation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples/basic-examples.html"
+                        title="next chapter">Basic Examples</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/iv/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -118,6 +114,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -141,29 +138,29 @@ or there is measurement error on the variable.  These models make use of
 instruments which are correlated with the endogenous variable but not
 with the model error. All model estimated by this package can be described
 as</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}y_i    &amp; = x_{1i}\beta_1 + x_{2i}\beta_2 + \epsilon_i \\
 x_{2i} &amp; = z_{1i}\delta + z_{2i}\gamma + \nu_i\end{split}\]</div>
-<p>In this expression, <span class="math">\(x_{1i}\)</span> is a set of <span class="math">\(k_1\)</span> regressors that
-are exogenous while <span class="math">\(x_{2i}\)</span> is a set of <span class="math">\(k_2\)</span> regressors that are
-endogenous in the sense that <span class="math">\(Cov(x_{2i},\epsilon_i)\neq 0\)</span>. In total
-there are The <span class="math">\(k\)</span> regressors in the model. The <span class="math">\(p_2\)</span> element
-vector <span class="math">\(z_{2i}\)</span> are instruments that explain <span class="math">\(x_{2i}\)</span> but not
-<span class="math">\(y_i\)</span>.  Note that <span class="math">\(x_{1i}\)</span> and <span class="math">\(z_{1i}\)</span> are the same since
+<p>In this expression, <span class="math notranslate">\(x_{1i}\)</span> is a set of <span class="math notranslate">\(k_1\)</span> regressors that
+are exogenous while <span class="math notranslate">\(x_{2i}\)</span> is a set of <span class="math notranslate">\(k_2\)</span> regressors that are
+endogenous in the sense that <span class="math notranslate">\(Cov(x_{2i},\epsilon_i)\neq 0\)</span>. In total
+there are The <span class="math notranslate">\(k\)</span> regressors in the model. The <span class="math notranslate">\(p_2\)</span> element
+vector <span class="math notranslate">\(z_{2i}\)</span> are instruments that explain <span class="math notranslate">\(x_{2i}\)</span> but not
+<span class="math notranslate">\(y_i\)</span>.  Note that <span class="math notranslate">\(x_{1i}\)</span> and <span class="math notranslate">\(z_{1i}\)</span> are the same since
 variables are also valid to use when projecting the endogenous variables.
-In total there are <span class="math">\(p=p_1+p_2=k_1+p_2\)</span> variables available to use when
+In total there are <span class="math notranslate">\(p=p_1+p_2=k_1+p_2\)</span> variables available to use when
 projecting the endogenous regressors.</p>
 <p>There are four estimation methods available to fit models of this type.  All accept the
 same four required inputs:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math">\(y_i\)</span> in the model</li>
-<li><code class="docutils literal"><span class="pre">exog</span></code> - The exogenous regressors, <span class="math">\(x_{1i}\)</span> in the model. Note
-that <span class="math">\(x_{1i}\)</span> and <span class="math">\(z_{1i}\)</span> are the same since variables are
+<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate">\(y_i\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The exogenous regressors, <span class="math notranslate">\(x_{1i}\)</span> in the model. Note
+that <span class="math notranslate">\(x_{1i}\)</span> and <span class="math notranslate">\(z_{1i}\)</span> are the same since variables are
 also valid to use when projecting the endogenous variables.</li>
-<li><code class="docutils literal"><span class="pre">endog</span></code> - The endogenous regressors, <span class="math">\(x_{2i}\)</span> in the model</li>
-<li><code class="docutils literal"><span class="pre">instruments</span></code> - The instruments, <span class="math">\(z_{2i}\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">endog</span></code> - The endogenous regressors, <span class="math notranslate">\(x_{2i}\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">instruments</span></code> - The instruments, <span class="math notranslate">\(z_{2i}\)</span> in the model</li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="kn">import</span> <span class="n">IV2SLS</span>
@@ -179,7 +176,7 @@ also valid to use when projecting the endogenous variables.</li>
 <span class="n">res</span>
 </pre></div>
 </div>
-<div class="highlight-default"><div class="highlight"><pre><span></span>                          <span class="n">IV</span><span class="o">-</span><span class="mi">2</span><span class="n">SLS</span> <span class="n">Estimation</span> <span class="n">Summary</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                          <span class="n">IV</span><span class="o">-</span><span class="mi">2</span><span class="n">SLS</span> <span class="n">Estimation</span> <span class="n">Summary</span>
 <span class="o">==============================================================================</span>
 <span class="n">Dep</span><span class="o">.</span> <span class="n">Variable</span><span class="p">:</span>                   <span class="n">wage</span>   <span class="n">R</span><span class="o">-</span><span class="n">squared</span><span class="p">:</span>                      <span class="mf">0.0459</span>
 <span class="n">Estimator</span><span class="p">:</span>                    <span class="n">IV</span><span class="o">-</span><span class="mi">2</span><span class="n">SLS</span>   <span class="n">Adj</span><span class="o">.</span> <span class="n">R</span><span class="o">-</span><span class="n">squared</span><span class="p">:</span>                 <span class="mf">0.0438</span>
@@ -207,15 +204,15 @@ also valid to use when projecting the endogenous variables.</li>
 <h2>Estimators<a class="headerlink" href="#estimators" title="Permalink to this headline">¶</a></h2>
 <p>Four methods to estimate models are available.</p>
 <ul class="simple">
-<li>Two-stage least squares (2SLS) <a class="reference internal" href="methods.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a></li>
+<li>Two-stage least squares (2SLS) <a class="reference internal" href="methods.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a></li>
 <li>Limited Information Maximum Likelihood (LIML) and related k-class
-estimators <a class="reference internal" href="methods.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a></li>
-<li>Generalized Method of Moments (GMM) <a class="reference internal" href="methods.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a></li>
+estimators <a class="reference internal" href="methods.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a></li>
+<li>Generalized Method of Moments (GMM) <a class="reference internal" href="methods.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a></li>
 <li>Generalized Method of Moments using the Continuously Updating Estimator
-(CUE) <a class="reference internal" href="methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></li>
+(CUE) <a class="reference internal" href="methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></li>
 </ul>
-<p>All estimator require the same four key inputs, <code class="docutils literal"><span class="pre">dependent</span></code>, <code class="docutils literal"><span class="pre">exog</span></code> ,
-<code class="docutils literal"><span class="pre">endog</span></code>  and <code class="docutils literal"><span class="pre">instruments</span></code>. In addition to these four required
+<p>All estimator require the same four key inputs, <code class="docutils literal notranslate"><span class="pre">dependent</span></code>, <code class="docutils literal notranslate"><span class="pre">exog</span></code> ,
+<code class="docutils literal notranslate"><span class="pre">endog</span></code>  and <code class="docutils literal notranslate"><span class="pre">instruments</span></code>. In addition to these four required
 parameters, optional arguments can be used to alter the default configuration.</p>
 <div class="section" id="optional-arguments">
 <h3>Optional Arguments<a class="headerlink" href="#optional-arguments" title="Permalink to this headline">¶</a></h3>
@@ -223,8 +220,8 @@ parameters, optional arguments can be used to alter the default configuration.</
 <h4>2SLS Estimation<a class="headerlink" href="#sls-estimation" title="Permalink to this headline">¶</a></h4>
 <p>The 2SLS estimator is the simplest and has no optional arguments. The 2SLS
 estimator nests OLS and so it is possible to estimate models using OLS by
-specifying both <code class="docutils literal"><span class="pre">endog</span></code> and <code class="docutils literal"><span class="pre">instruments</span></code> as <code class="docutils literal"><span class="pre">None</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+specifying both <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code> as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 <span class="n">ols_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -233,29 +230,29 @@ specifying both <code class="docutils literal"><span class="pre">endog</span></c
 <h4>LIML Estimation<a class="headerlink" href="#liml-estimation" title="Permalink to this headline">¶</a></h4>
 <p>Two optional arguments can be used to alter the estimation method when using IVLIML</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">fuller</span></code> allows Fuller’s <span class="math">\(\alpha\)</span> to be specified, which provides a
+<li><code class="docutils literal notranslate"><span class="pre">fuller</span></code> allows Fuller’s <span class="math notranslate">\(\alpha\)</span> to be specified, which provides a
 finite sample correction to the usual LIML estimator.</li>
-<li><code class="docutils literal"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math">\(\kappa\)</span> to be provided in
-which case the LIML estimated value of <span class="math">\(\kappa\)</span> is ignored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math notranslate">\(\kappa\)</span> to be provided in
+which case the LIML estimated value of <span class="math notranslate">\(\kappa\)</span> is ignored.</li>
 </ul>
 </div>
 <div class="section" id="gmm-and-gmm-cue-estimation">
 <h4>GMM and GMM-CUE Estimation<a class="headerlink" href="#gmm-and-gmm-cue-estimation" title="Permalink to this headline">¶</a></h4>
 <ul>
-<li><p class="first"><code class="docutils literal"><span class="pre">weight_type</span></code> accepts a string which indicates the type of weighting
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">weight_type</span></code> accepts a string which indicates the type of weighting
 matrix to use in the GMM estimation procedure.  There are four classes
 if weighting matrices available:</p>
 <ul class="simple">
 <li>‘unadjusted’ - Assumes the GMM moment conditions are homoskedastic. See
-<a class="reference internal" href="gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix" title="linearmodels.iv.gmm.HomoskedasticWeightMatrix"><code class="xref py py-class docutils literal"><span class="pre">HomoskedasticWeightMatrix</span></code></a>.</li>
+<a class="reference internal" href="gmm.html#linearmodels.iv.gmm.HomoskedasticWeightMatrix" title="linearmodels.iv.gmm.HomoskedasticWeightMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">HomoskedasticWeightMatrix</span></code></a>.</li>
 <li>‘robust’ - Allows the GMM moment conditions to be heteroskedastic while
 assuming they are not correlated across observations. See
-<a class="reference internal" href="gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="linearmodels.iv.gmm.HeteroskedasticWeightMatrix"><code class="xref py py-class docutils literal"><span class="pre">HeteroskedasticWeightMatrix</span></code></a>.</li>
+<a class="reference internal" href="gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="linearmodels.iv.gmm.HeteroskedasticWeightMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroskedasticWeightMatrix</span></code></a>.</li>
 <li>‘kernel’ - Allows for both heteroskedasticity and autocorrrelation in the
-moment conditions. See <a class="reference internal" href="gmm.html#linearmodels.iv.gmm.KernelWeightMatrix" title="linearmodels.iv.gmm.KernelWeightMatrix"><code class="xref py py-class docutils literal"><span class="pre">KernelWeightMatrix</span></code></a>.</li>
+moment conditions. See <a class="reference internal" href="gmm.html#linearmodels.iv.gmm.KernelWeightMatrix" title="linearmodels.iv.gmm.KernelWeightMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelWeightMatrix</span></code></a>.</li>
 <li>‘cluster’ - Allows for a one- and two-way cluster structure where moment
 conditions within a cluster are correlated.
-See <code class="xref py py-class docutils literal"><span class="pre">ClusteredWeightMatrix</span></code>.</li>
+See <code class="xref py py-class docutils literal notranslate"><span class="pre">ClusteredWeightMatrix</span></code>.</li>
 </ul>
 <p>Each weight type accepts a set of additional parameters which are similar to
 those for the corresponding covariance estimator.</p>
@@ -266,19 +263,19 @@ those for the corresponding covariance estimator.</p>
 </div>
 <div class="section" id="model-estimation-and-covariance-specification">
 <h2>Model Estimation and Covariance Specification<a class="headerlink" href="#model-estimation-and-covariance-specification" title="Permalink to this headline">¶</a></h2>
-<p>All models are estimated using teh <code class="docutils literal"><span class="pre">fit</span></code> method which provides an
+<p>All models are estimated using teh <code class="docutils literal notranslate"><span class="pre">fit</span></code> method which provides an
 opportunity to customize the parameter covariance estimator used to
 perform inference. Four classes of covariance estimators are available:</p>
 <ul>
 <li><p class="first">‘unadjusted’ - Assumes the model scores are homoskedastic. See
-<a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance" title="linearmodels.iv.covariance.HomoskedasticCovariance"><code class="xref py py-class docutils literal"><span class="pre">HomoskedasticCovariance</span></code></a>.</p>
+<a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance" title="linearmodels.iv.covariance.HomoskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">HomoskedasticCovariance</span></code></a>.</p>
 </li>
 <li><p class="first">‘robust’, ‘heteroskedastic’ - Allows the model scores to be heteroskedastic
 while assuming they are not correlated across observations. See
-<a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal"><span class="pre">HeteroskedasticCovariance</span></code></a>.</p>
+<a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroskedasticCovariance</span></code></a>.</p>
 </li>
 <li><p class="first">‘kernel’ - Allows for both heteroskedasticity and autocorrrelation in the
-model scores. The estimator allows the <code class="docutils literal"><span class="pre">kernel</span></code> to be selected from</p>
+model scores. The estimator allows the <code class="docutils literal notranslate"><span class="pre">kernel</span></code> to be selected from</p>
 <ul class="simple">
 <li>‘bartlett’, ‘newey-west` - Triangular kernel utilized in the common
 Newey-West estimator.</li>
@@ -286,18 +283,18 @@ Newey-West estimator.</li>
 <li>‘qs’, ‘quadratic-spectral’ - The quadratic spectral kernel studied by
 Andrews.</li>
 </ul>
-<p>The <code class="docutils literal"><span class="pre">bandwidth</span></code> can also be specified.  If not provided, an estimate of
+<p>The <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> can also be specified.  If not provided, an estimate of
 the optimal value is used.</p>
-<p>See <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance"><code class="xref py py-class docutils literal"><span class="pre">KernelCovariance</span></code></a>.</p>
+<p>See <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelCovariance</span></code></a>.</p>
 </li>
 <li><p class="first">‘clustered’, ‘one-way’ - Allows for a one-way cluster structure where model
 scores within a cluster are correlated.
-See <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.ClusteredCovariance" title="linearmodels.iv.covariance.ClusteredCovariance"><code class="xref py py-class docutils literal"><span class="pre">ClusteredCovariance</span></code></a>. Using
+See <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.ClusteredCovariance" title="linearmodels.iv.covariance.ClusteredCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClusteredCovariance</span></code></a>. Using
 clustered covariance requires passing an array containing information
 containing cluster membership information.</p>
 </li>
 </ul>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instruments</span><span class="p">)</span>
 <span class="n">iq_bands</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">IQ</span> <span class="o">//</span> <span class="mi">20</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">iq_bands</span><span class="p">)</span>
 </pre></div>
@@ -306,21 +303,21 @@ containing cluster membership information.</p>
 <h3>GMM Estimation<a class="headerlink" href="#gmm-estimation" title="Permalink to this headline">¶</a></h3>
 <p>GMM allows additional inputs that affect the method of estimation. In
 particular, the default is to use two-step GMM.  One-step (inefficient)
-GMM can be forced by setting <code class="docutils literal"><span class="pre">iter_limit</span></code> to 1.  If <code class="docutils literal"><span class="pre">iter_limit</span></code> is
+GMM can be forced by setting <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code> to 1.  If <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code> is
 raised above 2, then an iterative method is used where multiple steps
 are used to estimate the model parameters.  If normalized model parameters
-change by less than <code class="docutils literal"><span class="pre">tol</span></code> across successive iterations, then the estimation
+change by less than <code class="docutils literal notranslate"><span class="pre">tol</span></code> across successive iterations, then the estimation
 is assumed to converge and the iterations are stopped.</p>
 <p>By default, the first-step uses teh average outer-product of the instruments
-as the weighting matrix.  <code class="docutils literal"><span class="pre">initial_weight</span></code> allows a user-specified choice of
+as the weighting matrix.  <code class="docutils literal notranslate"><span class="pre">initial_weight</span></code> allows a user-specified choice of
 weighting matrix to be used instead.</p>
 </div>
 <div class="section" id="gmm-cue-estimation">
 <h3>GMM-CUE Estimation<a class="headerlink" href="#gmm-cue-estimation" title="Permalink to this headline">¶</a></h3>
 <p>GMM CUE uses a non-linear optimizer to optimize the GMM objective directly
 where both the moment condition and the moment score estimator change with
-parameter values. <code class="docutils literal"><span class="pre">starting</span></code> allows a user-specified set of starting values
-to be used in-place of the default starting values and <code class="docutils literal"><span class="pre">display</span></code> controls
+parameter values. <code class="docutils literal notranslate"><span class="pre">starting</span></code> allows a user-specified set of starting values
+to be used in-place of the default starting values and <code class="docutils literal notranslate"><span class="pre">display</span></code> controls
 whether iterative output is printed during estimation.</p>
 </div>
 </div>

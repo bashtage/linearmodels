@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>GMM Moment Weighting &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -71,41 +62,19 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Regression Models</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
-</ul>
-
-    
-  </div>
-</div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="covariance.html"
+                        title="previous chapter">System Regression Estimator Covariance Estimation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="mathematical-formula.html"
+                        title="next chapter">Formulas and Mathematical Detail</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/system/gmm-weights.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -119,6 +88,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -158,12 +128,12 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math">
+<div class="math notranslate">
 \[Z'(\Sigma \otimes I_N)Z\]</div>
-<p>where <span class="math">\(Z\)</span> is a block diagonal matrix containing both the exogenous
-regressors and instruments and <span class="math">\(\Sigma\)</span> is the covariance of the
+<p>where <span class="math notranslate">\(Z\)</span> is a block diagonal matrix containing both the exogenous
+regressors and instruments and <span class="math notranslate">\(\Sigma\)</span> is the covariance of the
 model residuals.</p>
-<p><code class="docutils literal"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
+<p><code class="docutils literal notranslate"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
 <dl class="attribute">
 <dt id="linearmodels.system.gmm.HomoskedasticWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
@@ -226,12 +196,12 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}W   &amp; = n^{-1}\sum_{i=1}^{n}g'_ig_i \\
 g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})\end{split}\]</div>
-<p>where <span class="math">\(g_i\)</span> is the vector of scores across all equations for
-observation i.  <span class="math">\(z_{ji}\)</span> is the vector of instruments for equation
-j and <span class="math">\(\epsilon_{ji}\)</span> is the error for equation j for observation
+<p>where <span class="math notranslate">\(g_i\)</span> is the vector of scores across all equations for
+observation i.  <span class="math notranslate">\(z_{ji}\)</span> is the vector of instruments for equation
+j and <span class="math notranslate">\(\epsilon_{ji}\)</span> is the error for equation j for observation
 i.  This form allows for heteroskedasticity and arbitrary cross-sectional
 dependence between the moment conditions.</p>
 <dl class="attribute">
@@ -308,14 +278,14 @@ bandwidth is None.  If False, nobs - 2 is used</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}W   &amp; = \hat{\Gamma}_0 + \sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i + \hat{\Gamma}_i^\prime) \\
 \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\
 g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})\end{split}\]</div>
-<p>where <span class="math">\(g_i\)</span> is the vector of scores across all equations for
-observation i and <span class="math">\(w_j\)</span> are the kernel weights which depend on the
-selected kernel and bandwidth.  <span class="math">\(z_{ji}\)</span> is the vector of instruments
-for equation j and <span class="math">\(\epsilon_{ji}\)</span> is the error for equation j for
+<p>where <span class="math notranslate">\(g_i\)</span> is the vector of scores across all equations for
+observation i and <span class="math notranslate">\(w_j\)</span> are the kernel weights which depend on the
+selected kernel and bandwidth.  <span class="math notranslate">\(z_{ji}\)</span> is the vector of instruments
+for equation j and <span class="math notranslate">\(\epsilon_{ji}\)</span> is the error for equation j for
 observation i.  This form allows for heteroskedasticity and autocorrelation
 between the moment conditions.</p>
 <dl class="attribute">

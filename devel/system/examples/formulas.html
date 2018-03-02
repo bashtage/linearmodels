@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Using formulas to specify models &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -70,41 +61,40 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Using formulas to specify models</a><ul>
+<li><a class="reference internal" href="#Dictionary">Dictionary</a></li>
+<li><a class="reference internal" href="#Curly-Braces">Curly Braces</a></li>
+<li><a class="reference internal" href="#Labeled-Formulas">Labeled Formulas</a></li>
+<li><a class="reference internal" href="#Other-Options">Other Options</a><ul>
+<li><a class="reference internal" href="#Estimation-Weights">Estimation Weights</a></li>
+<li><a class="reference internal" href="#Pre-specified-Residual-Covariance">Pre-specified Residual Covariance</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+</li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">Examples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="three-stage-ls.html"
+                        title="next chapter">Three-stage Least Squares (3SLS)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/system/examples/formulas.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -118,6 +108,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -316,11 +307,11 @@ Regressors” which appears in Wooldridge (2002). The model consists of
 two equations, one for hourly wage and the other for hourly benefits.
 The initial model uses the same regressors in both equations.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">fringe</span>
@@ -336,11 +327,11 @@ the equation label and the value is the formula. It is recommended to
 use an OrderedDict which will preserve equation order in results. Keys
 <strong>must</strong> be strings.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="n">formula</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="n">formula</span><span class="p">[</span><span class="s1">&#39;benefits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male&#39;</span>
@@ -349,11 +340,11 @@ use an OrderedDict which will preserve equation order in results. Keys
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="kn">import</span> <span class="n">SUR</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
@@ -370,8 +361,8 @@ use an OrderedDict which will preserve equation order in results. Keys
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:22
+Date:                Fri, Mar 02 2018
+Time:                        20:31:49
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -406,13 +397,13 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <div class="section" id="Curly-Braces">
 <h2>Curly Braces<a class="headerlink" href="#Curly-Braces" title="Permalink to this headline">¶</a></h2>
 <p>The same formula can be expressed in a single string by surrounding each
-equation with braces <code class="docutils literal"><span class="pre">{}</span></code>.</p>
+equation with braces <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">braces_formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">{hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
 <span class="s1">{hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
@@ -433,8 +424,8 @@ equation with braces <code class="docutils literal"><span class="pre">{}</span><
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:22
+Date:                Fri, Mar 02 2018
+Time:                        20:31:49
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -474,15 +465,15 @@ is the case in some datasets (e.g. a SUR on GDP of multiple countries)
 then the equation labels will be “uglified” until they are unique. This
 can produce meaningless equation labels, and so it is possible to pass
 an equation label using the syntax</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">label</span> <span class="p">:</span> <span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span><span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">label</span> <span class="p">:</span> <span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span><span class="p">}</span>
 </pre></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">labeled_formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">{benefits: hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male}</span>
 <span class="s1">{earnings: hrearn ~ educ + exper + expersq + nrtheast + married + male}</span>
@@ -515,17 +506,17 @@ Labeled
 <h3>Estimation Weights<a class="headerlink" href="#Estimation-Weights" title="Permalink to this headline">¶</a></h3>
 <p>SUR supports weights which are assumed to be proportional to the inverse
 variance of the data so that</p>
-<div class="math">
+<div class="math notranslate">
 \[V(y_i \times w_i) = \sigma^2 \,\,\forall i.\]</div>
-<p>Weights can be passed using a <code class="docutils literal"><span class="pre">DataFrame</span></code> where each column.</p>
+<p>Weights can be passed using a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> where each column.</p>
 <p>Here the results are printed to ensure that the estimates are different
 from those in the standard GLS model.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">random_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">616</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">random_weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">random_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;benefits&#39;</span><span class="p">,</span> <span class="s1">&#39;earnings&#39;</span><span class="p">])</span>
 <span class="n">weighted_mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">random_weights</span><span class="p">)</span>
@@ -540,35 +531,35 @@ from those in the standard GLS model.</p>
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.7338
+Estimator:                        GLS   Overall R-squared:              0.7396
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:22
+Date:                Fri, Mar 02 2018
+Time:                        20:31:49
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0392     0.0096     4.0605     0.0000      0.0203      0.0581
-exper          0.0269     0.0121     2.2145     0.0268      0.0031      0.0507
-expersq       -0.0004     0.0003    -1.2856     0.1986     -0.0009      0.0002
-union          0.3572     0.1057     3.3805     0.0007      0.1501      0.5642
-south         -0.1465     0.1246    -1.1762     0.2395     -0.3907      0.0976
-nrtheast      -0.1346     0.1449    -0.9288     0.3530     -0.4187      0.1494
-nrthcen       -0.1475     0.1220    -1.2091     0.2266     -0.3866      0.0916
-male           0.2403     0.0989     2.4307     0.0151      0.0465      0.4340
+educ           0.0364     0.0098     3.7273     0.0002      0.0173      0.0556
+exper          0.0271     0.0133     2.0412     0.0412      0.0011      0.0530
+expersq       -0.0004     0.0003    -1.3196     0.1870     -0.0011      0.0002
+union          0.3012     0.1036     2.9070     0.0036      0.0981      0.5043
+south         -0.1322     0.1213    -1.0897     0.2758     -0.3698      0.1055
+nrtheast      -0.1242     0.1398    -0.8886     0.3742     -0.3982      0.1497
+nrthcen       -0.1002     0.1197    -0.8374     0.4024     -0.3348      0.1344
+male           0.3358     0.1050     3.1989     0.0014      0.1301      0.5415
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.4177     0.0423     9.8838     0.0000      0.3349      0.5005
-exper         -0.2423     0.0934    -2.5928     0.0095     -0.4254     -0.0591
-expersq        0.0089     0.0025     3.5415     0.0004      0.0040      0.0138
-nrtheast      -1.2867     0.2577    -4.9922     0.0000     -1.7919     -0.7815
-married        0.5071     0.2422     2.0934     0.0363      0.0323      0.9819
-male           2.0664     0.1033     19.995     0.0000      1.8638      2.2689
+educ           0.4288     0.0408     10.513     0.0000      0.3489      0.5087
+exper         -0.2271     0.0868    -2.6171     0.0089     -0.3971     -0.0570
+expersq        0.0076     0.0023     3.3506     0.0008      0.0031      0.0120
+nrtheast      -1.2178     0.2363    -5.1532     0.0000     -1.6810     -0.7546
+married        0.6987     0.2268     3.0814     0.0021      0.2543      1.1432
+male           1.9718     0.1300     15.172     0.0000      1.7171      2.2265
 ==============================================================================
 
 Covariance Estimator:
@@ -580,7 +571,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 <h3>Pre-specified Residual Covariance<a class="headerlink" href="#Pre-specified-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
 <p>Like a standard SUR, it is possible to pass a pre-specified residual
 covariance for use in the GLS step. This is done using the keyword
-argument <code class="docutils literal"><span class="pre">sigma</span></code> in the <code class="docutils literal"><span class="pre">from_formula</span></code> method, and is otherwise
+argument <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in the <code class="docutils literal notranslate"><span class="pre">from_formula</span></code> method, and is otherwise
 identical to passing one to the standard SUR.</p>
 </div>
 </div>

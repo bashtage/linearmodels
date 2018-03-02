@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Estimation Methods &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -71,41 +62,19 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Instrumental Variable Estimation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/basic-examples.html">Basic Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/advanced-examples.html">Further Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
-</ul>
-
-    
-  </div>
-</div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="previous chapter">Module Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="results.html"
+                        title="next chapter">Estimation Results</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/iv/methods.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -119,6 +88,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -160,12 +130,12 @@
 </table>
 <p class="rubric">Notes</p>
 <p>The 2SLS estimator is defined</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}\hat{\beta}_{2SLS} &amp; =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
                    &amp; =(\hat{X}'\hat{X})^{-1}\hat{X}'Y\\
            \hat{X} &amp; =Z(Z'Z)^{-1}Z'X\end{split}\]</div>
 <p>The 2SLS estimator is a special case of a k-class estimator with
-<span class="math">\(\kappa=1\)</span>,</p>
+<span class="math notranslate">\(\kappa=1\)</span>,</p>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
@@ -174,11 +144,11 @@
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
-<dl class="method">
+<dl class="staticmethod">
 <dt id="linearmodels.iv.model.IV2SLS.estimate_parameters">
-<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,7 +212,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IV2SLS.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -273,7 +243,7 @@ be the case that the formula expressions constructed from blocks
 valid Patsy formulas.</p>
 <p>A constant must be explicitly included using ‘1 +’ if required.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IV2SLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -405,20 +375,20 @@ produce LIML parameter estimate.</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p><code class="docutils literal"><span class="pre">kappa</span></code> and <code class="docutils literal"><span class="pre">fuller</span></code> should not be used simultaneously since Fuller’s
-alpha applies an adjustment to <code class="docutils literal"><span class="pre">kappa</span></code>, and so the same result can be
-computed using only <code class="docutils literal"><span class="pre">kappa</span></code>. Fuller’s alpha is used to adjust the
-LIML estimate of <span class="math">\(\kappa\)</span>, which is computed whenever <code class="docutils literal"><span class="pre">kappa</span></code>
+<p><code class="docutils literal notranslate"><span class="pre">kappa</span></code> and <code class="docutils literal notranslate"><span class="pre">fuller</span></code> should not be used simultaneously since Fuller’s
+alpha applies an adjustment to <code class="docutils literal notranslate"><span class="pre">kappa</span></code>, and so the same result can be
+computed using only <code class="docutils literal notranslate"><span class="pre">kappa</span></code>. Fuller’s alpha is used to adjust the
+LIML estimate of <span class="math notranslate">\(\kappa\)</span>, which is computed whenever <code class="docutils literal notranslate"><span class="pre">kappa</span></code>
 is not provided.</p>
 <p>The LIML estimator is defined as</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}\hat{\beta}_{\kappa} &amp; =(X(I-\kappa M_{z})X)^{-1}X(I-\kappa M_{z})Y\\
 M_{z} &amp; =I-P_{z}\\
 P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
-<p>where <span class="math">\(Z\)</span> contains both the exogenous regressors and the instruments.
-<span class="math">\(\kappa\)</span> is estimated as part of the LIML estimator.</p>
-<p>When using Fuller’s <span class="math">\(\alpha\)</span>, the value used is modified to</p>
-<div class="math">
+<p>where <span class="math notranslate">\(Z\)</span> contains both the exogenous regressors and the instruments.
+<span class="math notranslate">\(\kappa\)</span> is estimated as part of the LIML estimator.</p>
+<p>When using Fuller’s <span class="math notranslate">\(\alpha\)</span>, the value used is modified to</p>
+<div class="math notranslate">
 \[\kappa-\alpha/(n-n_{instr})\]</div>
 <div class="admonition-todo admonition" id="index-1">
 <p class="first admonition-title">Todo</p>
@@ -428,11 +398,11 @@ P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVLIML.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -496,7 +466,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVLIML.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -531,7 +501,7 @@ be the case that the formula expressions constructed from blocks
 valid Patsy formulas.</p>
 <p>A constant must be explicitly included using ‘1 +’ if required.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVLIML</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -672,9 +642,9 @@ autocorrelation</li>
 <li>‘cluster’ - Allows for one-way cluster dependence</li>
 </ul>
 <p>The estimator is defined as</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y\]</div>
-<p>where <span class="math">\(W\)</span> is a positive definite weight matrix and <span class="math">\(Z\)</span>
+<p>where <span class="math notranslate">\(W\)</span> is a positive definite weight matrix and <span class="math notranslate">\(Z\)</span>
 contains both the exogenous regressors and the instruments.</p>
 <div class="admonition-todo admonition" id="index-2">
 <p class="first admonition-title">Todo</p>
@@ -684,11 +654,11 @@ contains both the exogenous regressors and the instruments.</p>
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal"><span class="pre">IVGMMCUE</span></code></a></p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMM.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -770,7 +740,7 @@ autocorrelation</li>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMM.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -808,7 +778,7 @@ valid Patsy formulas.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVGMM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -948,16 +918,16 @@ autocorrelation</li>
 <li>‘kernel’ - Allows for heteroskedasticity and autocorrelation</li>
 <li>‘cluster’ - Allows for one-way cluster dependence</li>
 </ul>
-<p>In most circumstances, the <code class="docutils literal"><span class="pre">center</span></code> weight option should be <code class="docutils literal"><span class="pre">True</span></code> to
+<p>In most circumstances, the <code class="docutils literal notranslate"><span class="pre">center</span></code> weight option should be <code class="docutils literal notranslate"><span class="pre">True</span></code> to
 avoid starting value dependence.</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}\hat{\beta}_{cue} &amp; =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
 g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
-<p>where <span class="math">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math">\(\beta\)</span>
-through <span class="math">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
+<p>where <span class="math notranslate">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math notranslate">\(\beta\)</span>
+through <span class="math notranslate">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal"><span class="pre">IVGMM</span></code></a></p>
+<p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a></p>
 </div>
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.estimate_parameters">
@@ -988,7 +958,7 @@ through <span class="math">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
 samples.  Performs no error checking.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-meth docutils literal"><span class="pre">scipy.optimize.minimize()</span></code></p>
+<p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></p>
 </div>
 </dd></dl>
 
@@ -1039,7 +1009,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMMCUE.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1073,7 +1043,7 @@ be the case that the formula expressions constructed from blocks
 valid Patsy formulas.</p>
 <p>A constant must be explicitly included using ‘1 +’ if required.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">wage</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.iv</span> <span class="k">import</span> <span class="n">IVGMMCUE</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">wage</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]&#39;</span>
@@ -1120,15 +1090,15 @@ valid Patsy formulas.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>The GMM objective function is defined as</p>
-<div class="math">
+<div class="math notranslate">
 \[J(\beta) = \bar{g}(\beta)'W(\beta)^{-1}\bar{g}(\beta)\]</div>
-<p>where <span class="math">\(\bar{g}(\beta)\)</span> is the average of the moment
-conditions, <span class="math">\(z_i \hat{\epsilon}_i\)</span>, where
-<span class="math">\(\hat{\epsilon}_i = y_i - x_i\beta\)</span>.  The weighting matrix
+<p>where <span class="math notranslate">\(\bar{g}(\beta)\)</span> is the average of the moment
+conditions, <span class="math notranslate">\(z_i \hat{\epsilon}_i\)</span>, where
+<span class="math notranslate">\(\hat{\epsilon}_i = y_i - x_i\beta\)</span>.  The weighting matrix
 is some estimator of the long-run variance of the moment conditions.</p>
 <p>Unlike tradition GMM, the weighting matrix is simultaneously computed
 with the moment conditions, and so has explicit dependence on
-<span class="math">\(\beta\)</span>.</p>
+<span class="math notranslate">\(\beta\)</span>.</p>
 </dd></dl>
 
 <dl class="attribute">

@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>System Regression Estimators &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -71,41 +62,35 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Regression Models</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">System Regression Estimators</a><ul>
+<li><a class="reference internal" href="#seemingly-unrelated-regression-sur-sure">Seemingly Unrelated Regression (SUR/SURE)</a></li>
+<li><a class="reference internal" href="#three-stage-least-squares-3sls">Three-Stage Least Squares (3SLS)</a></li>
+<li><a class="reference internal" href="#generalized-method-of-moments-gmm-estimation-of-systems">Generalized Method of Moments (GMM) Estimation of Systems</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="previous chapter">Module Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="results.html"
+                        title="next chapter">Estimation Results</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/system/models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -119,6 +104,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -166,19 +152,19 @@ provided, FGLS is implemented based on an estimate of sigma.</li>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
 Each equation is of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math">
+<div class="math notranslate">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -186,15 +172,15 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system OLS estimator is</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{OLS} = (X'X)^{-1}X'Y\]</div>
 <p>When certain conditions are satisfied, a GLS estimator of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y\]</div>
 <p>can improve accuracy of coefficient estimates where</p>
-<div class="math">
+<div class="math notranslate">
 \[\Omega = \Sigma \otimes I_N\]</div>
-<p>where <span class="math">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<p>where <span class="math notranslate">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <p>SUR is a special case of 3SLS where there are no endogenous regressors and
 no instruments.</p>
 <dl class="method">
@@ -214,7 +200,7 @@ no instruments.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -277,7 +263,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
+<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -324,7 +310,7 @@ where each key is an equation name.</p>
 <p class="rubric">Examples</p>
 <p>The simplest format uses standard Patsy formulas for each equation
 in a dictionary.  Best practice is to use an Ordered Dictionary</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_1&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="k">import</span> <span class="n">SUR</span>
@@ -333,12 +319,12 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 </pre></div>
 </div>
 <p>The second format uses curly braces {} to surround distinct equations</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is also possible to include equation labels when using curly braces</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -379,7 +365,7 @@ the dictionary of equations from the variables using the common
 exogenous variable.</p>
 <p class="rubric">Examples</p>
 <p>A simple CAP-M can be estimated as a multivariate regression</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="k">import</span> <span class="n">french</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="k">import</span> <span class="n">SUR</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">portfolios</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;S1V1&#39;</span><span class="p">,</span><span class="s1">&#39;S1V5&#39;</span><span class="p">,</span><span class="s1">&#39;S5V1&#39;</span><span class="p">,</span><span class="s1">&#39;S5V5&#39;</span><span class="p">]]</span>
@@ -495,19 +481,19 @@ provided, FGLS is implemented based on an estimate of sigma.</li>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
 Each equation is of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math">
+<div class="math notranslate">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -515,17 +501,17 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system instrumental variable (IV) estimator is</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}\hat{\beta}_{IV} &amp; = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
                  &amp; = (\hat{X}'\hat{X})^{-1}\hat{X}'Y\end{split}\]</div>
-<p>where <span class="math">\(\hat{X} = Z(Z'Z)^{-1}Z'X\)</span> and.  When certain conditions are
+<p>where <span class="math notranslate">\(\hat{X} = Z(Z'Z)^{-1}Z'X\)</span> and.  When certain conditions are
 satisfied, a GLS estimator of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y\]</div>
 <p>can improve accuracy of coefficient estimates where</p>
-<div class="math">
+<div class="math notranslate">
 \[\Omega = \Sigma \otimes I_N\]</div>
-<p>where <span class="math">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<p>where <span class="math notranslate">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.add_constraints" title="Permalink to this definition">¶</a></dt>
@@ -543,7 +529,7 @@ satisfied, a GLS estimator of the form</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -606,7 +592,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
+<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -653,7 +639,7 @@ where each key is an equation name.</p>
 <p class="rubric">Examples</p>
 <p>The simplest format uses standard Patsy formulas for each equation
 in a dictionary.  Best practice is to use an Ordered Dictionary</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z1&#39;</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
@@ -664,12 +650,12 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 </pre></div>
 </div>
 <p>The second format uses curly braces {} to surround distinct equations</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is also possible to include equation labels when using curly braces</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IV3SLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -813,19 +799,19 @@ function</li>
 </table>
 <p class="rubric">Notes</p>
 <p>Estimates a linear model using GMM. Each equation is of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math">
+<div class="math notranslate">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -833,13 +819,13 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system GMM estimator uses the moment condition</p>
-<div class="math">
+<div class="math notranslate">
 \[z_{ij}(y_{ij} - x_{ij}\beta_j) = 0\]</div>
 <p>where j indexes the equation. The estimator for the coefficients is given
 by</p>
-<div class="math">
+<div class="math notranslate">
 \[\begin{split}\hat{\beta}_{GMM} &amp; = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\\end{split}\]</div>
-<p>where <span class="math">\(W\)</span> is a positive definite weighting matrix.</p>
+<p>where <span class="math notranslate">\(W\)</span> is a positive definite weighting matrix.</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.add_constraints" title="Permalink to this definition">¶</a></dt>
@@ -857,7 +843,7 @@ by</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -965,7 +951,7 @@ where each key is an equation name.</p>
 <p class="rubric">Examples</p>
 <p>The simplest format uses standard Patsy formulas for each equation
 in a dictionary.  Best practice is to use an Ordered Dictionary</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x1_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z1&#39;</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2_2&#39;</span><span class="p">,</span> <span class="s1">&#39;z2&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
@@ -976,12 +962,12 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 </pre></div>
 </div>
 <p>The second format uses curly braces {} to surround distinct equations</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is also possible to include equation labels when using curly braces</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">IVSystemGMM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -993,9 +979,9 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <dd><p>Vector indicating which equations contain constants</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="classmethod">
 <dt id="linearmodels.system.model.IVSystemGMM.multivariate_ls">
-<code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>endog=None</em>, <em>instruments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.multivariate_ls" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>endog=None</em>, <em>instruments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.multivariate_ls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for specification of multivariate IV models</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

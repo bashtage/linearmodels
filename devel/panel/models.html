@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Models for Panel Data &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -71,43 +62,38 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Panel Data Model Estimation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/data-formats.html">Data Formats for Panel Data Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faq.html">Implementation Choices</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Models for Panel Data</a><ul>
+<li><a class="reference internal" href="#fixed-effect-estimation">Fixed Effect Estimation</a></li>
+<li><a class="reference internal" href="#random-effects">Random Effects</a></li>
+<li><a class="reference internal" href="#between-ols">Between OLS</a></li>
+<li><a class="reference internal" href="#first-difference-estimation">First Difference Estimation</a></li>
+<li><a class="reference internal" href="#pooled-ols">Pooled OLS</a></li>
+<li><a class="reference internal" href="#fama-macbeth">Fama-MacBeth</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="previous chapter">Module Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="results.html"
+                        title="next chapter">Estimation Results</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/panel/models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -121,6 +107,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -169,19 +156,19 @@ effects. Each variable is treated as an effect.</li>
 <p class="rubric">Notes</p>
 <p>Many models can be estimated. The most common included entity effects and
 can be described</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it} = \alpha_i + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
-<p>where <span class="math">\(\alpha_i\)</span> is included if <code class="docutils literal"><span class="pre">entity_effects=True</span></code>.</p>
+<p>where <span class="math notranslate">\(\alpha_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">entity_effects=True</span></code>.</p>
 <p>Time effect are also supported, which leads to a model of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it}= \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
-<p>where <span class="math">\(\gamma_i\)</span> is included if <code class="docutils literal"><span class="pre">time_effects=True</span></code>.</p>
+<p>where <span class="math notranslate">\(\gamma_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>.</p>
 <p>Both effects can be simultaneously used,</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
 <p>Additionally , arbitrary effects can be specified using categorical variables.</p>
-<p>If both <code class="docutils literal"><span class="pre">entity_effect</span></code>  and``time_effects`` are <code class="docutils literal"><span class="pre">False</span></code>, and no other
-effects are included, the model reduces to <a class="reference internal" href="#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal"><span class="pre">PooledOLS</span></code></a>.</p>
+<p>If both <code class="docutils literal notranslate"><span class="pre">entity_effect</span></code>  and``time_effects`` are <code class="docutils literal notranslate"><span class="pre">False</span></code>, and no other
+effects are included, the model reduces to <a class="reference internal" href="#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>.</p>
 <p>Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
 2 other.</p>
 <dl class="attribute">
@@ -212,7 +199,7 @@ variable as an effect do not require degree of freedom correction
 while other estimators such as the unadjusted covariance do.</li>
 <li><strong>count_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the covariance estimator should be adjusted
 to account for the estimation of effects in the model. Only used
-if <code class="docutils literal"><span class="pre">auto_df=False</span></code>.</li>
+if <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code>.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
 </td>
@@ -226,7 +213,7 @@ if <code class="docutils literal"><span class="pre">auto_df=False</span></code>.
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PanelOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PanelOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -238,19 +225,19 @@ if <code class="docutils literal"><span class="pre">auto_df=False</span></code>.
 <li>‘robust’, ‘heteroskedastic’ - Control for heteroskedasticity using
 White’s estimator</li>
 <li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
-<li><code class="docutils literal"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
+<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
 Clusters should be integer values, although other types will
 be coerced to integer values by treating as categorical variables</li>
-<li><code class="docutils literal"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
+<li><code class="docutils literal notranslate"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
 clusters</li>
-<li><code class="docutils literal"><span class="pre">cluster_time</span></code> - Boolean indicating to use time clusters</li>
+<li><code class="docutils literal notranslate"><span class="pre">cluster_time</span></code> - Boolean indicating to use time clusters</li>
 </ul>
 </li>
 <li>‘kernel’ - Driscoll-Kraay HAC estimator. Configurations options are:<ul>
-<li><code class="docutils literal"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
+<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
 Default is Bartlett’s kernel, which is produces a covariance
 estimator similar to the Newey-West covariance estimator.</li>
-<li><code class="docutils literal"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
+<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
 not provided, a naive default is used.</li>
 </ul>
 </li>
@@ -296,7 +283,7 @@ effects. Each variable is treated as an effect.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PanelOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PanelOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1 + EntityEffects&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -408,10 +395,66 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it} = \beta^{\prime}x_{it} + u_i + \epsilon_{it}\]</div>
-<p>where <span class="math">\(u_i\)</span> is a shock that is independent of <span class="math">\(x_{it}\)</span> but
+<p>where <span class="math notranslate">\(u_i\)</span> is a shock that is independent of <span class="math notranslate">\(x_{it}\)</span> but
 common to all entities i.</p>
+<dl class="method">
+<dt id="linearmodels.panel.model.RandomEffects.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>small_sample=False</em>, <em>cov_type='unadjusted'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#RandomEffects.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.RandomEffects.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate model parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+a degree of freedom adjustment.</li>
+<li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.panel.results.PanelResults" title="linearmodels.panel.results.PanelResults">PanelResults</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>Four covariance estimators are supported:</p>
+<ul class="simple">
+<li>‘unadjusted’, ‘homoskedastic’ - Assume residual are homoskedastic</li>
+<li>‘robust’, ‘heteroskedastic’ - Control for heteroskedasticity using
+White’s estimator</li>
+<li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
+Clusters should be integer values, although other types will
+be coerced to integer values by treating as categorical variables</li>
+<li><code class="docutils literal notranslate"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
+clusters</li>
+<li><code class="docutils literal notranslate"><span class="pre">cluster_time</span></code> - Boolean indicating to use time clusters</li>
+</ul>
+</li>
+<li>‘kernel’ - Driscoll-Kraay HAC estimator. Configurations options are:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
+Default is Bartlett’s kernel, which is produces a covariance
+estimator similar to the Newey-West covariance estimator.</li>
+<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
+not provided, a naive default is used.</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="linearmodels.panel.model.RandomEffects.formula">
 <code class="descname">formula</code><a class="headerlink" href="#linearmodels.panel.model.RandomEffects.formula" title="Permalink to this definition">¶</a></dt>
@@ -449,7 +492,7 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">RandomEffects</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">RandomEffects</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">RandomEffects</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
@@ -549,9 +592,9 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math">
+<div class="math notranslate">
 \[\bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}\]</div>
-<p>where <span class="math">\(\bar{z}\)</span> is the time-average.</p>
+<p>where <span class="math notranslate">\(\bar{z}\)</span> is the time-average.</p>
 <dl class="method">
 <dt id="linearmodels.panel.model.BetweenOLS.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>reweight=False</em>, <em>cov_type='unadjusted'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#BetweenOLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.BetweenOLS.fit" title="Permalink to this definition">¶</a></dt>
@@ -580,7 +623,7 @@ a degree of freedom adjustment.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">BetweenOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
 </pre></div>
@@ -592,7 +635,7 @@ a degree of freedom adjustment.</li>
 <li>‘robust’, ‘heteroskedastic’ - Control for heteroskedasticity using
 White’s estimator</li>
 <li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
-<li><code class="docutils literal"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
+<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
 Clusters should be integer values, although other types will
 be coerced to integer values by treating as categorical variables</li>
 </ul>
@@ -639,7 +682,7 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">BetweenOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
@@ -739,7 +782,7 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math">
+<div class="math notranslate">
 \[\Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}\]</div>
 <dl class="method">
 <dt id="linearmodels.panel.model.FirstDifferenceOLS.fit">
@@ -766,7 +809,7 @@ a degree of freedom adjustment.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FirstDifferenceOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FirstDifferenceOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FirstDifferenceOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -779,18 +822,18 @@ a degree of freedom adjustment.</li>
 <li>‘robust’, ‘heteroskedastic’ - Control for heteroskedasticity using
 White’s estimator</li>
 <li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
-<li><code class="docutils literal"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
+<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
 Clusters should be integer values, although other types will
 be coerced to integer values by treating as categorical variables</li>
-<li><code class="docutils literal"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
+<li><code class="docutils literal notranslate"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
 clusters</li>
 </ul>
 </li>
 <li>‘kernel’ - Driscoll-Kraay HAC estimator. Configurations options are:<ul>
-<li><code class="docutils literal"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
+<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
 Default is Bartlett’s kernel, which is produces a covariance
 estimator similar to the Newey-West covariance estimator.</li>
-<li><code class="docutils literal"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
+<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
 not provided, a naive default is used.</li>
 </ul>
 </li>
@@ -837,7 +880,7 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FirstDifferenceOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FirstDifferenceOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FirstDifferenceOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
@@ -937,7 +980,7 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}\]</div>
 <dl class="method">
 <dt id="linearmodels.panel.model.PooledOLS.fit">
@@ -964,7 +1007,7 @@ a degree of freedom adjustment.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;clustered&#39;</span><span class="p">,</span> <span class="n">cluster_entity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -976,19 +1019,19 @@ a degree of freedom adjustment.</li>
 <li>‘robust’, ‘heteroskedastic’ - Control for heteroskedasticity using
 White’s estimator</li>
 <li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
-<li><code class="docutils literal"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
+<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
 Clusters should be integer values, although other types will
 be coerced to integer values by treating as categorical variables</li>
-<li><code class="docutils literal"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
+<li><code class="docutils literal notranslate"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
 clusters</li>
-<li><code class="docutils literal"><span class="pre">cluster_time</span></code> - Boolean indicating to use time clusters</li>
+<li><code class="docutils literal notranslate"><span class="pre">cluster_time</span></code> - Boolean indicating to use time clusters</li>
 </ul>
 </li>
 <li>‘kernel’ - Driscoll-Kraay HAC estimator. Configurations options are:<ul>
-<li><code class="docutils literal"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
+<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
 Default is Bartlett’s kernel, which is produces a covariance
 estimator similar to the Newey-West covariance estimator.</li>
-<li><code class="docutils literal"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
+<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
 not provided, a naive default is used.</li>
 </ul>
 </li>
@@ -1032,7 +1075,7 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">PooledOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PooledOLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
@@ -1132,20 +1175,20 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math">
+<div class="math notranslate">
 \[y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}\]</div>
 <p>The Fama-MacBeth estimator is computed by performing T regressions, one
 for each time period using all available entity observations.  Denote the
-estimate of the model parameters as <span class="math">\(\hat{\beta}_t\)</span>.  The reported
+estimate of the model parameters as <span class="math notranslate">\(\hat{\beta}_t\)</span>.  The reported
 estimator is then</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta} = T^{-1}\sum_{t=1}^T \hat{\beta}_t\]</div>
 <p>While the model does not explicitly include time-effects, the
 implementation based on regressing all observation in a single
 time period is “as-if” time effects are included.</p>
 <p>Parameter inference is made using the set T parameter estimates using
 either the standard covariance estimator or a kernel-based covariance,
-depending on <code class="docutils literal"><span class="pre">cov_type</span></code>.</p>
+depending on <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>.</p>
 <dl class="method">
 <dt id="linearmodels.panel.model.FamaMacBeth.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>cov_type='unadjusted'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#FamaMacBeth.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.FamaMacBeth.fit" title="Permalink to this definition">¶</a></dt>
@@ -1171,7 +1214,7 @@ a degree of freedom adjustment.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FamaMacBeth</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">FamaMacBeth</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FamaMacBeth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;kernel&#39;</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;Parzen&#39;</span><span class="p">)</span>
 </pre></div>
@@ -1182,10 +1225,10 @@ a degree of freedom adjustment.</li>
 <li>‘unadjusted’, ‘homoskedastic’, ‘robust’, ‘heteroskedastic’ - Use the
 standard covariance estimator of the T parameter estimates.</li>
 <li>‘kernel’ - HAC estimator. Configurations options are:<ul>
-<li><code class="docutils literal"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
+<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code> - One of the supported kernels (bartlett, parzen, qs).
 Default is Bartlett’s kernel, which is implements the the
 Newey-West covariance estimator.</li>
-<li><code class="docutils literal"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
+<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> - Bandwidth to use when computing the kernel.  If
 not provided, a naive default is used.</li>
 </ul>
 </li>
@@ -1229,7 +1272,7 @@ the weight should be homoskedastic.</li>
 <p>Unlike standard patsy, it is necessary to explicitly include a
 constant using the constant indicator (1)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="k">import</span> <span class="n">BetweenOLS</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">FamaMacBeth</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s1">&#39;y ~ 1 + x1&#39;</span><span class="p">,</span> <span class="n">panel_data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>

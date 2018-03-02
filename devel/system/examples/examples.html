@@ -5,6 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
@@ -18,16 +19,7 @@
     <title>Examples &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '4.5+1.g0a77400',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -42,8 +34,7 @@
 
   <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -70,41 +61,51 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar">
-        <a href="
-    ../../index.html" class="text-logo">linearmodels 4.5 (+1, g0a77400)</a>
-        
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="formulas.html">Using formulas to specify models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html">Three-stage Least Squares (3SLS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="three-stage-ls.html#System-GMM-Estimation">System GMM Estimation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+    <h2>Contents</h2>
+    <div class="sidebar-localtoc">
+      <ul>
+<li><a class="reference internal" href="#">Examples</a><ul>
+<li><a class="reference internal" href="#Data">Data</a></li>
+<li><a class="reference internal" href="#Basic-Usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#Estimation-Options">Estimation Options</a><ul>
+<li><a class="reference internal" href="#Iterative-GLS">Iterative GLS</a></li>
+<li><a class="reference internal" href="#Alternative-Covariance-Estimators">Alternative Covariance Estimators</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+<li><a class="reference internal" href="#Pre-specified-Residual-Covariance-Estimators">Pre-specified Residual Covariance Estimators</a><ul>
+<li><a class="reference internal" href="#Diagonal-Residual-Covariance">Diagonal Residual Covariance</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Cross-Equation-Restrictions">Cross-Equation Restrictions</a><ul>
+<li><a class="reference internal" href="#Pooling-using-constraints">Pooling using constraints</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Multivariate-OLS">Multivariate OLS</a><ul>
+<li><a class="reference internal" href="#Using-GLS-with-common-regressors">Using GLS with common regressors</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
-    
+    </div>
   </div>
 </div>
-        
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">System Regression Models</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="formulas.html"
+                        title="next chapter">Using formulas to specify models</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/system/examples/examples.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -118,6 +119,7 @@
     </div>
   </div>
 </div>
+      
     </div>
   </div>
         <div id="right-column">
@@ -311,39 +313,39 @@ models</li>
 <li>Improved precision of parameter estimates (depending on the model
 specification and data)</li>
 </ul>
-<p>There are <span class="math">\(K\)</span> models and each model can be expressed in vector
+<p>There are <span class="math notranslate">\(K\)</span> models and each model can be expressed in vector
 notation as</p>
-<div class="math">
+<div class="math notranslate">
 \[Y_i = X_i\beta_i + \epsilon_i\]</div>
 <p>so that the set of models can be expressed as</p>
-<div class="math">
+<div class="math notranslate">
 \[Y = X\beta + \epsilon\]</div>
-<p>where <span class="math">\(Y\)</span> is a column vector that stacks the vectors <span class="math">\(Y_i\)</span>
-for <span class="math">\(i=1,2,\ldots,K\)</span>, <span class="math">\(X\)</span> is a block-diagonal matrix where
-the i-th block is <span class="math">\(X_i\)</span>, <span class="math">\(\beta\)</span> is a stacked vector of the
-<span class="math">\(K\)</span> <span class="math">\(\beta_i\)</span>s and <span class="math">\(\epsilon\)</span> is similarly comprised
-of the stacked columns of <span class="math">\(\epsilon_i\)</span>.</p>
+<p>where <span class="math notranslate">\(Y\)</span> is a column vector that stacks the vectors <span class="math notranslate">\(Y_i\)</span>
+for <span class="math notranslate">\(i=1,2,\ldots,K\)</span>, <span class="math notranslate">\(X\)</span> is a block-diagonal matrix where
+the i-th block is <span class="math notranslate">\(X_i\)</span>, <span class="math notranslate">\(\beta\)</span> is a stacked vector of the
+<span class="math notranslate">\(K\)</span> <span class="math notranslate">\(\beta_i\)</span>s and <span class="math notranslate">\(\epsilon\)</span> is similarly comprised
+of the stacked columns of <span class="math notranslate">\(\epsilon_i\)</span>.</p>
 <p>The model can be estimated using OLS with the usual estimator</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{OLS} = \left(X^\prime X\right)^{-1}X^\prime Y.\]</div>
 <p>Since there are multiple series, a GLS estimator that accounts for the
 cross-sectional heteroskedasticity as well as the correlation of
 residuals can be estimated</p>
-<div class="math">
+<div class="math notranslate">
 \[\hat{\beta}_{GLS} = \left(X^\prime \Omega^{-1} X\right)^{-1}X^\prime  \Omega^{-1} Y\]</div>
-<p>where <span class="math">\(\Omega^{-1} = \Sigma^{-1} \otimes I_{T}\)</span>,
-<span class="math">\(\Sigma_{ij}\)</span> is the covariance between <span class="math">\(\epsilon_i\)</span> and
-<span class="math">\(\epsilon_j\)</span> and <span class="math">\(T\)</span> is the number of observations. The GLS
+<p>where <span class="math notranslate">\(\Omega^{-1} = \Sigma^{-1} \otimes I_{T}\)</span>,
+<span class="math notranslate">\(\Sigma_{ij}\)</span> is the covariance between <span class="math notranslate">\(\epsilon_i\)</span> and
+<span class="math notranslate">\(\epsilon_j\)</span> and <span class="math notranslate">\(T\)</span> is the number of observations. The GLS
 estimator is only beneficial when the regressors in different models
 differ and when residuals are correlated. There GLS estimates are
 identical to the multivariate OLS estimates when all regressors are
 common.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Common libraries</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -371,11 +373,11 @@ step is to aggregate the data by region. All capital measures are summed
 and the unemployment rate is averaged using weights proportional to the
 total employment in each state.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">munnell</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">munnell</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
@@ -404,14 +406,14 @@ total employment in each state.</p>
 </pre></div>
 </div>
 </div>
-<p>A <code class="docutils literal"><span class="pre">groupby</span></code> transformation is used to aggregate the data, and finally
+<p>A <code class="docutils literal notranslate"><span class="pre">groupby</span></code> transformation is used to aggregate the data, and finally
 all values except the unemployment rate are logged.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">grouped</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;REGION&#39;</span><span class="p">,</span><span class="s1">&#39;YR&#39;</span><span class="p">])</span>
 <span class="n">agg_data</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[[</span><span class="s1">&#39;GSP&#39;</span><span class="p">,</span><span class="s1">&#39;PC&#39;</span><span class="p">,</span><span class="s1">&#39;HWY&#39;</span><span class="p">,</span><span class="s1">&#39;WATER&#39;</span><span class="p">,</span><span class="s1">&#39;UTIL&#39;</span><span class="p">,</span><span class="s1">&#39;EMP&#39;</span><span class="p">,</span><span class="s1">&#39;WEIGHED_UNEMP&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GSP&#39;</span><span class="p">,</span><span class="s1">&#39;PC&#39;</span><span class="p">,</span><span class="s1">&#39;HWY&#39;</span><span class="p">,</span><span class="s1">&#39;WATER&#39;</span><span class="p">,</span><span class="s1">&#39;UTIL&#39;</span><span class="p">,</span><span class="s1">&#39;EMP&#39;</span><span class="p">]:</span>
@@ -426,31 +428,31 @@ all values except the unemployment rate are logged.</p>
 <h2>Basic Usage<a class="headerlink" href="#Basic-Usage" title="Permalink to this headline">¶</a></h2>
 <p>Seemingly Unrelated Models are fairly complex and each equation could
 have a different number of regressors. As a result, it isn’t possibly to
-use standard <code class="docutils literal"><span class="pre">pandas</span></code> or <code class="docutils literal"><span class="pre">numpy</span></code> data structures, and so
+use standard <code class="docutils literal notranslate"><span class="pre">pandas</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy</span></code> data structures, and so
 dictionaries (or technically dictionary-like objects) are used. In
-practice, it is strongly recommended to use a <code class="docutils literal"><span class="pre">OrderedDictionary</span></code> from
-the <code class="docutils literal"><span class="pre">collections</span></code> module. This ensures that equation order will be
+practice, it is strongly recommended to use a <code class="docutils literal notranslate"><span class="pre">OrderedDictionary</span></code> from
+the <code class="docutils literal notranslate"><span class="pre">collections</span></code> module. This ensures that equation order will be
 preserved. In addition, the dictionary must have the following
 structure:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">keys</span></code> <strong>must be strings</strong> and will be used as equation labels</li>
+<li><code class="docutils literal notranslate"><span class="pre">keys</span></code> <strong>must be strings</strong> and will be used as equation labels</li>
 <li>The value associated with each key must be either a dictionary or a
 tuple.</li>
-<li>When a dictionary is used, it must have two keys, <code class="docutils literal"><span class="pre">dependent</span></code> and
-<code class="docutils literal"><span class="pre">exog</span></code>. It can optionally have a third key <code class="docutils literal"><span class="pre">weights</span></code> which
+<li>When a dictionary is used, it must have two keys, <code class="docutils literal notranslate"><span class="pre">dependent</span></code> and
+<code class="docutils literal notranslate"><span class="pre">exog</span></code>. It can optionally have a third key <code class="docutils literal notranslate"><span class="pre">weights</span></code> which
 provides weights to use in the regression.</li>
 <li>When a tuple is used, it must have two elements and takes the form
-<code class="docutils literal"><span class="pre">(dependent,</span> <span class="pre">exog)</span></code>. It can optionally contains weights in which
-case it takes the form <code class="docutils literal"><span class="pre">(dependent,</span> <span class="pre">exog,</span> <span class="pre">weights)</span></code>.</li>
+<code class="docutils literal notranslate"><span class="pre">(dependent,</span> <span class="pre">exog)</span></code>. It can optionally contains weights in which
+case it takes the form <code class="docutils literal notranslate"><span class="pre">(dependent,</span> <span class="pre">exog,</span> <span class="pre">weights)</span></code>.</li>
 </ul>
 <p>This example uses the dictionary syntax to contain the data for each
 region and uses the region identified as the equation label.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="n">mod_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GF&#39;</span><span class="p">,</span><span class="s1">&#39;SW&#39;</span><span class="p">,</span><span class="s1">&#39;WC&#39;</span><span class="p">,</span><span class="s1">&#39;MT&#39;</span><span class="p">,</span><span class="s1">&#39;NE&#39;</span><span class="p">,</span><span class="s1">&#39;MA&#39;</span><span class="p">,</span><span class="s1">&#39;SO&#39;</span><span class="p">,</span><span class="s1">&#39;MW&#39;</span><span class="p">,</span><span class="s1">&#39;CN&#39;</span><span class="p">]:</span>
@@ -464,15 +466,15 @@ region and uses the region identified as the equation label.</p>
 <p>Fitting the model is virtually identical to fitting any other model with
 the exception of the special data structure required.</p>
 <p>The fitting options here ensure that the homoskedastic covariance
-estimator are used (<code class="docutils literal"><span class="pre">cov_type='unadjusted'</span></code>) and that a small sample
+estimator are used (<code class="docutils literal notranslate"><span class="pre">cov_type='unadjusted'</span></code>) and that a small sample
 adjustment is applied. By default, GLS is used (this can be overridden
-using <code class="docutils literal"><span class="pre">method='ols'</span></code>.</p>
+using <code class="docutils literal notranslate"><span class="pre">method='ols'</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">linearmodels.system</span> <span class="kn">import</span> <span class="n">SUR</span>
 <span class="n">mod</span> <span class="o">=</span> <span class="n">SUR</span><span class="p">(</span><span class="n">mod_data</span><span class="p">)</span>
@@ -484,11 +486,11 @@ using <code class="docutils literal"><span class="pre">method='ols'</span></code
 that the residuals are correlated. A heatmap is used to inspect this
 correlation, which is substantial and varies by region.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">cov</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">sigma</span>
 <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">sigma</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">])</span>
 <span class="n">regions</span> <span class="o">=</span>  <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
@@ -511,14 +513,14 @@ correlation, which is substantial and varies by region.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[6]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <style  type="text/css" >
 </style>
-<table id="T_946cbc8e_0858_11e8_ad8f_42010a140041" >
+<table id="T_b90134e2_1e58_11e8_a799_42010a140015" >
 <thead>    <tr>
         <th class="blank level0" ></th>
         <th class="col_heading level0 col0" >GF</th>
@@ -532,115 +534,115 @@ correlation, which is substantial and varies by region.</p>
         <th class="col_heading level0 col8" >CN</th>
     </tr></thead>
 <tbody>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row0" class="row_heading level0 row0" >GF</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col0" class="data row0 col0" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col1" class="data row0 col1" >0.173</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col2" class="data row0 col2" >0.447</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col3" class="data row0 col3" >-0.547</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col4" class="data row0 col4" >0.525</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col5" class="data row0 col5" >0.425</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col6" class="data row0 col6" >0.763</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col7" class="data row0 col7" >0.167</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row0_col8" class="data row0 col8" >0.325</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col0" class="data row0 col0" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col1" class="data row0 col1" >0.173</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col2" class="data row0 col2" >0.447</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col3" class="data row0 col3" >-0.547</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col4" class="data row0 col4" >0.525</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col5" class="data row0 col5" >0.425</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col6" class="data row0 col6" >0.763</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col7" class="data row0 col7" >0.167</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row0_col8" class="data row0 col8" >0.325</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row1" class="row_heading level0 row1" >SW</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col0" class="data row1 col0" >0.173</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col1" class="data row1 col1" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col2" class="data row1 col2" >0.697</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col3" class="data row1 col3" >-0.290</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col4" class="data row1 col4" >0.489</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col5" class="data row1 col5" >0.132</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col6" class="data row1 col6" >0.314</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col7" class="data row1 col7" >0.565</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row1_col8" class="data row1 col8" >0.119</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col0" class="data row1 col0" >0.173</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col1" class="data row1 col1" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col2" class="data row1 col2" >0.697</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col3" class="data row1 col3" >-0.290</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col4" class="data row1 col4" >0.489</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col5" class="data row1 col5" >0.132</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col6" class="data row1 col6" >0.314</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col7" class="data row1 col7" >0.565</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row1_col8" class="data row1 col8" >0.119</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row2" class="row_heading level0 row2" >WC</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col0" class="data row2 col0" >0.447</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col1" class="data row2 col1" >0.697</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col2" class="data row2 col2" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col3" class="data row2 col3" >-0.537</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col4" class="data row2 col4" >0.343</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col5" class="data row2 col5" >0.130</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col6" class="data row2 col6" >0.505</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col7" class="data row2 col7" >0.574</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row2_col8" class="data row2 col8" >0.037</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col0" class="data row2 col0" >0.447</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col1" class="data row2 col1" >0.697</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col2" class="data row2 col2" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col3" class="data row2 col3" >-0.537</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col4" class="data row2 col4" >0.343</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col5" class="data row2 col5" >0.130</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col6" class="data row2 col6" >0.505</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col7" class="data row2 col7" >0.574</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row2_col8" class="data row2 col8" >0.037</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row3" class="row_heading level0 row3" >MT</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col0" class="data row3 col0" >-0.547</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col1" class="data row3 col1" >-0.290</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col2" class="data row3 col2" >-0.537</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col3" class="data row3 col3" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col4" class="data row3 col4" >-0.241</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col5" class="data row3 col5" >-0.322</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col6" class="data row3 col6" >-0.351</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col7" class="data row3 col7" >-0.058</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row3_col8" class="data row3 col8" >0.091</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col0" class="data row3 col0" >-0.547</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col1" class="data row3 col1" >-0.290</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col2" class="data row3 col2" >-0.537</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col3" class="data row3 col3" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col4" class="data row3 col4" >-0.241</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col5" class="data row3 col5" >-0.322</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col6" class="data row3 col6" >-0.351</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col7" class="data row3 col7" >-0.058</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row3_col8" class="data row3 col8" >0.091</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row4" class="row_heading level0 row4" >NE</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col0" class="data row4 col0" >0.525</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col1" class="data row4 col1" >0.489</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col2" class="data row4 col2" >0.343</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col3" class="data row4 col3" >-0.241</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col4" class="data row4 col4" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col5" class="data row4 col5" >0.259</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col6" class="data row4 col6" >0.783</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col7" class="data row4 col7" >0.269</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row4_col8" class="data row4 col8" >0.200</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col0" class="data row4 col0" >0.525</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col1" class="data row4 col1" >0.489</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col2" class="data row4 col2" >0.343</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col3" class="data row4 col3" >-0.241</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col4" class="data row4 col4" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col5" class="data row4 col5" >0.259</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col6" class="data row4 col6" >0.783</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col7" class="data row4 col7" >0.269</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row4_col8" class="data row4 col8" >0.200</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row5" class="row_heading level0 row5" >MA</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col0" class="data row5 col0" >0.425</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col1" class="data row5 col1" >0.132</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col2" class="data row5 col2" >0.130</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col3" class="data row5 col3" >-0.322</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col4" class="data row5 col4" >0.259</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col5" class="data row5 col5" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col6" class="data row5 col6" >0.388</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col7" class="data row5 col7" >-0.037</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row5_col8" class="data row5 col8" >0.713</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col0" class="data row5 col0" >0.425</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col1" class="data row5 col1" >0.132</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col2" class="data row5 col2" >0.130</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col3" class="data row5 col3" >-0.322</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col4" class="data row5 col4" >0.259</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col5" class="data row5 col5" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col6" class="data row5 col6" >0.388</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col7" class="data row5 col7" >-0.037</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row5_col8" class="data row5 col8" >0.713</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row6" class="row_heading level0 row6" >SO</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col0" class="data row6 col0" >0.763</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col1" class="data row6 col1" >0.314</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col2" class="data row6 col2" >0.505</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col3" class="data row6 col3" >-0.351</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col4" class="data row6 col4" >0.783</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col5" class="data row6 col5" >0.388</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col6" class="data row6 col6" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col7" class="data row6 col7" >0.366</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row6_col8" class="data row6 col8" >0.350</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col0" class="data row6 col0" >0.763</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col1" class="data row6 col1" >0.314</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col2" class="data row6 col2" >0.505</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col3" class="data row6 col3" >-0.351</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col4" class="data row6 col4" >0.783</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col5" class="data row6 col5" >0.388</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col6" class="data row6 col6" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col7" class="data row6 col7" >0.366</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row6_col8" class="data row6 col8" >0.350</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row7" class="row_heading level0 row7" >MW</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col0" class="data row7 col0" >0.167</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col1" class="data row7 col1" >0.565</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col2" class="data row7 col2" >0.574</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col3" class="data row7 col3" >-0.058</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col4" class="data row7 col4" >0.269</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col5" class="data row7 col5" >-0.037</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col6" class="data row7 col6" >0.366</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col7" class="data row7 col7" >1.000</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row7_col8" class="data row7 col8" >0.298</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col0" class="data row7 col0" >0.167</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col1" class="data row7 col1" >0.565</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col2" class="data row7 col2" >0.574</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col3" class="data row7 col3" >-0.058</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col4" class="data row7 col4" >0.269</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col5" class="data row7 col5" >-0.037</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col6" class="data row7 col6" >0.366</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col7" class="data row7 col7" >1.000</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row7_col8" class="data row7 col8" >0.298</td>
     </tr>    <tr>
-        <th id="T_946cbc8e_0858_11e8_ad8f_42010a140041level0_row8" class="row_heading level0 row8" >CN</th>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col0" class="data row8 col0" >0.325</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col1" class="data row8 col1" >0.119</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col2" class="data row8 col2" >0.037</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col3" class="data row8 col3" >0.091</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col4" class="data row8 col4" >0.200</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col5" class="data row8 col5" >0.713</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col6" class="data row8 col6" >0.350</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col7" class="data row8 col7" >0.298</td>
-        <td id="T_946cbc8e_0858_11e8_ad8f_42010a140041row8_col8" class="data row8 col8" >1.000</td>
+        <th id="T_b90134e2_1e58_11e8_a799_42010a140015level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col0" class="data row8 col0" >0.325</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col1" class="data row8 col1" >0.119</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col2" class="data row8 col2" >0.037</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col3" class="data row8 col3" >0.091</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col4" class="data row8 col4" >0.200</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col5" class="data row8 col5" >0.713</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col6" class="data row8 col6" >0.350</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col7" class="data row8 col7" >0.298</td>
+        <td id="T_b90134e2_1e58_11e8_a799_42010a140015row8_col8" class="data row8 col8" >1.000</td>
     </tr></tbody>
 </table></div>
 </div>
 <p>These values can be seen to be identical to the reported results in the
 existing example from Greene.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display_png</span>
 <span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-2.png&#39;</span><span class="p">))</span>
 </pre></div>
@@ -657,11 +659,11 @@ existing example from Greene.</p>
 lines which show results for two regions. By default it reports all
 estimates along with the usual measures of precision.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">as_text</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="mi">33</span><span class="p">]))</span>
 </pre></div>
 </div>
@@ -676,8 +678,8 @@ estimates along with the usual measures of precision.</p>
 Estimator:                        GLS   Overall R-squared:              0.9937
 No. Equations.:                     9   Cov. Estimator:             unadjusted
 No. Observations:                  17   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:17
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                    Equation: GF, Dependent Variable: lnGSP
@@ -707,16 +709,16 @@ UNEMP         -0.0156     0.0025    -6.2950     0.0000     -0.0205     -0.0108
 </pre></div></div>
 </div>
 <p>Individual results are contained in a dictionary located at the
-attribute <code class="docutils literal"><span class="pre">equations</span></code> and can be accessed using equation labels
-(available using the attribute <code class="docutils literal"><span class="pre">equation_labels</span></code>). Additional
+attribute <code class="docutils literal notranslate"><span class="pre">equations</span></code> and can be accessed using equation labels
+(available using the attribute <code class="docutils literal notranslate"><span class="pre">equation_labels</span></code>). Additional
 information about the model is presented in this view. The West Coast
 results are show.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">equations</span><span class="p">[</span><span class="s1">&#39;WC&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -732,8 +734,8 @@ Eq. Label:                         WC   R-squared:                      0.9937
 Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9900
 Estimator:                        GLS   Cov. Estimator:             unadjusted
 No. Observations:                  17   F-statistic:                    2862.4
-Date:                Fri, Feb 02 2018   P-value (F-stat)                0.0000
-Time:                        20:35:17   Distribution:                  chi2(6)
+Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
+Time:                        20:31:44   Distribution:                  chi2(6)
 
                              Parameter Estimates
 ==============================================================================
@@ -756,11 +758,11 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <p>The current version of the model doesn’t facilitate cross equation
 comparisons and so this is manually implemented here.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># TODO: Implement method to compare across equations</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">equation_labels</span><span class="p">:</span>
@@ -772,14 +774,14 @@ comparisons and so this is manually implemented here.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <style  type="text/css" >
 </style>
-<table id="T_9486ba76_0858_11e8_ad8f_42010a140041" >
+<table id="T_b9168900_1e58_11e8_a799_42010a140015" >
 <thead>    <tr>
         <th class="blank level0" ></th>
         <th class="col_heading level0 col0" >Intercept</th>
@@ -791,97 +793,97 @@ comparisons and so this is manually implemented here.</p>
         <th class="col_heading level0 col6" >UNEMP</th>
     </tr></thead>
 <tbody>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row0" class="row_heading level0 row0" >GF</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col0" class="data row0 col0" >12.310</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col1" class="data row0 col1" >-0.201</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col2" class="data row0 col2" >-1.886</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col3" class="data row0 col3" >0.178</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col4" class="data row0 col4" >1.190</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col5" class="data row0 col5" >0.953</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row0_col6" class="data row0 col6" >-0.003</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col0" class="data row0 col0" >12.310</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col1" class="data row0 col1" >-0.201</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col2" class="data row0 col2" >-1.886</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col3" class="data row0 col3" >0.178</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col4" class="data row0 col4" >1.190</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col5" class="data row0 col5" >0.953</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row0_col6" class="data row0 col6" >-0.003</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row1" class="row_heading level0 row1" >SW</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col0" class="data row1 col0" >4.083</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col1" class="data row1 col1" >0.077</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col2" class="data row1 col2" >-0.131</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col3" class="data row1 col3" >-0.136</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col4" class="data row1 col4" >0.522</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col5" class="data row1 col5" >0.539</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row1_col6" class="data row1 col6" >-0.016</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col0" class="data row1 col0" >4.083</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col1" class="data row1 col1" >0.077</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col2" class="data row1 col2" >-0.131</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col3" class="data row1 col3" >-0.136</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col4" class="data row1 col4" >0.522</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col5" class="data row1 col5" >0.539</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row1_col6" class="data row1 col6" >-0.016</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row2" class="row_heading level0 row2" >WC</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col0" class="data row2 col0" >1.960</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col1" class="data row2 col1" >0.170</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col2" class="data row2 col2" >0.132</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col3" class="data row2 col3" >-0.347</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col4" class="data row2 col4" >0.090</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col5" class="data row2 col5" >1.070</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row2_col6" class="data row2 col6" >-0.006</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col0" class="data row2 col0" >1.960</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col1" class="data row2 col1" >0.170</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col2" class="data row2 col2" >0.132</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col3" class="data row2 col3" >-0.347</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col4" class="data row2 col4" >0.090</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col5" class="data row2 col5" >1.070</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row2_col6" class="data row2 col6" >-0.006</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row3" class="row_heading level0 row3" >MT</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col0" class="data row3 col0" >3.463</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col1" class="data row3 col1" >-0.115</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col2" class="data row3 col2" >0.180</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col3" class="data row3 col3" >0.262</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col4" class="data row3 col4" >-0.330</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col5" class="data row3 col5" >1.079</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row3_col6" class="data row3 col6" >-0.001</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col0" class="data row3 col0" >3.463</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col1" class="data row3 col1" >-0.115</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col2" class="data row3 col2" >0.180</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col3" class="data row3 col3" >0.262</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col4" class="data row3 col4" >-0.330</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col5" class="data row3 col5" >1.079</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row3_col6" class="data row3 col6" >-0.001</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row4" class="row_heading level0 row4" >NE</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col0" class="data row4 col0" >-12.294</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col1" class="data row4 col1" >0.118</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col2" class="data row4 col2" >0.934</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col3" class="data row4 col3" >-0.557</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col4" class="data row4 col4" >-0.290</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col5" class="data row4 col5" >2.494</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row4_col6" class="data row4 col6" >0.020</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col0" class="data row4 col0" >-12.294</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col1" class="data row4 col1" >0.118</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col2" class="data row4 col2" >0.934</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col3" class="data row4 col3" >-0.557</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col4" class="data row4 col4" >-0.290</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col5" class="data row4 col5" >2.494</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row4_col6" class="data row4 col6" >0.020</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row5" class="row_heading level0 row5" >MA</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col0" class="data row5 col0" >-18.616</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col1" class="data row5 col1" >-0.311</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col2" class="data row5 col2" >3.060</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col3" class="data row5 col3" >-0.109</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col4" class="data row5 col4" >-1.659</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col5" class="data row5 col5" >2.186</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row5_col6" class="data row5 col6" >0.018</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col0" class="data row5 col0" >-18.616</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col1" class="data row5 col1" >-0.311</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col2" class="data row5 col2" >3.060</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col3" class="data row5 col3" >-0.109</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col4" class="data row5 col4" >-1.659</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col5" class="data row5 col5" >2.186</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row5_col6" class="data row5 col6" >0.018</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row6" class="row_heading level0 row6" >SO</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col0" class="data row6 col0" >3.162</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col1" class="data row6 col1" >-0.063</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col2" class="data row6 col2" >-0.641</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col3" class="data row6 col3" >-0.081</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col4" class="data row6 col4" >0.281</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col5" class="data row6 col5" >1.620</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row6_col6" class="data row6 col6" >0.008</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col0" class="data row6 col0" >3.162</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col1" class="data row6 col1" >-0.063</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col2" class="data row6 col2" >-0.641</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col3" class="data row6 col3" >-0.081</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col4" class="data row6 col4" >0.281</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col5" class="data row6 col5" >1.620</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row6_col6" class="data row6 col6" >0.008</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row7" class="row_heading level0 row7" >MW</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col0" class="data row7 col0" >-9.258</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col1" class="data row7 col1" >0.096</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col2" class="data row7 col2" >1.612</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col3" class="data row7 col3" >0.694</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col4" class="data row7 col4" >-0.340</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col5" class="data row7 col5" >-0.062</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row7_col6" class="data row7 col6" >-0.031</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col0" class="data row7 col0" >-9.258</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col1" class="data row7 col1" >0.096</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col2" class="data row7 col2" >1.612</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col3" class="data row7 col3" >0.694</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col4" class="data row7 col4" >-0.340</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col5" class="data row7 col5" >-0.062</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row7_col6" class="data row7 col6" >-0.031</td>
     </tr>    <tr>
-        <th id="T_9486ba76_0858_11e8_ad8f_42010a140041level0_row8" class="row_heading level0 row8" >CN</th>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col0" class="data row8 col0" >-3.405</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col1" class="data row8 col1" >0.295</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col2" class="data row8 col2" >0.934</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col3" class="data row8 col3" >0.539</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col4" class="data row8 col4" >0.003</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col5" class="data row8 col5" >-0.321</td>
-        <td id="T_9486ba76_0858_11e8_ad8f_42010a140041row8_col6" class="data row8 col6" >-0.029</td>
+        <th id="T_b9168900_1e58_11e8_a799_42010a140015level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col0" class="data row8 col0" >-3.405</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col1" class="data row8 col1" >0.295</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col2" class="data row8 col2" >0.934</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col3" class="data row8 col3" >0.539</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col4" class="data row8 col4" >0.003</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col5" class="data row8 col5" >-0.321</td>
+        <td id="T_b9168900_1e58_11e8_a799_42010a140015row8_col6" class="data row8 col6" >-0.029</td>
     </tr></tbody>
 </table></div>
 </div>
 <p>These results can be compared to the results in Greene – they are
 unsurprisingly identical.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-1.png&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -896,15 +898,15 @@ unsurprisingly identical.</p>
 <p>The GLS estimation method requires stronger assumptions for parameter
 estimates to be consistent. If these are violated then it might be the
 case that OLS is still consistent (in some sense) and so OLS can be used
-by passing <code class="docutils literal"><span class="pre">method='ols'</span></code> when calling <code class="docutils literal"><span class="pre">fit</span></code>.</p>
+by passing <code class="docutils literal notranslate"><span class="pre">method='ols'</span></code> when calling <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 <p>These results can be compared to Greene’s table – they are identical
 except the final value which seems to have a small typo.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">res_ols</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">r2</span> <span class="o">=</span> <span class="p">[]</span>
@@ -920,14 +922,14 @@ except the final value which seems to have a small typo.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <style  type="text/css" >
 </style>
-<table id="T_9491db04_0858_11e8_ad8f_42010a140041" >
+<table id="T_b92018a8_1e58_11e8_a799_42010a140015" >
 <thead>    <tr>
         <th class="blank level0" ></th>
         <th class="col_heading level0 col0" >Intercept</th>
@@ -940,106 +942,106 @@ except the final value which seems to have a small typo.</p>
         <th class="col_heading level0 col7" >R2</th>
     </tr></thead>
 <tbody>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row0" class="row_heading level0 row0" >GF</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col0" class="data row0 col0" >11.567</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col1" class="data row0 col1" >0.002</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col2" class="data row0 col2" >-2.029</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col3" class="data row0 col3" >0.101</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col4" class="data row0 col4" >1.358</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col5" class="data row0 col5" >0.805</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col6" class="data row0 col6" >-0.007</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row0_col7" class="data row0 col7" >0.997</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row0" class="row_heading level0 row0" >GF</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col0" class="data row0 col0" >11.567</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col1" class="data row0 col1" >0.002</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col2" class="data row0 col2" >-2.029</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col3" class="data row0 col3" >0.101</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col4" class="data row0 col4" >1.358</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col5" class="data row0 col5" >0.805</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col6" class="data row0 col6" >-0.007</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row0_col7" class="data row0 col7" >0.997</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row1" class="row_heading level0 row1" >SW</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col0" class="data row1 col0" >3.028</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col1" class="data row1 col1" >0.164</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col2" class="data row1 col2" >-0.075</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col3" class="data row1 col3" >-0.169</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col4" class="data row1 col4" >0.637</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col5" class="data row1 col5" >0.362</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col6" class="data row1 col6" >-0.017</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row1_col7" class="data row1 col7" >0.998</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row1" class="row_heading level0 row1" >SW</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col0" class="data row1 col0" >3.028</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col1" class="data row1 col1" >0.164</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col2" class="data row1 col2" >-0.075</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col3" class="data row1 col3" >-0.169</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col4" class="data row1 col4" >0.637</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col5" class="data row1 col5" >0.362</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col6" class="data row1 col6" >-0.017</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row1_col7" class="data row1 col7" >0.998</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row2" class="row_heading level0 row2" >WC</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col0" class="data row2 col0" >3.590</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col1" class="data row2 col1" >0.295</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col2" class="data row2 col2" >0.174</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col3" class="data row2 col3" >-0.226</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col4" class="data row2 col4" >-0.214</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col5" class="data row2 col5" >0.917</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col6" class="data row2 col6" >-0.008</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row2_col7" class="data row2 col7" >0.994</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row2" class="row_heading level0 row2" >WC</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col0" class="data row2 col0" >3.590</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col1" class="data row2 col1" >0.295</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col2" class="data row2 col2" >0.174</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col3" class="data row2 col3" >-0.226</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col4" class="data row2 col4" >-0.214</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col5" class="data row2 col5" >0.917</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col6" class="data row2 col6" >-0.008</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row2_col7" class="data row2 col7" >0.994</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row3" class="row_heading level0 row3" >MT</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col0" class="data row3 col0" >6.378</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col1" class="data row3 col1" >-0.153</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col2" class="data row3 col2" >-0.123</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col3" class="data row3 col3" >0.306</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col4" class="data row3 col4" >-0.533</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col5" class="data row3 col5" >1.344</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col6" class="data row3 col6" >0.005</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row3_col7" class="data row3 col7" >0.999</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row3" class="row_heading level0 row3" >MT</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col0" class="data row3 col0" >6.378</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col1" class="data row3 col1" >-0.153</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col2" class="data row3 col2" >-0.123</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col3" class="data row3 col3" >0.306</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col4" class="data row3 col4" >-0.533</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col5" class="data row3 col5" >1.344</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col6" class="data row3 col6" >0.005</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row3_col7" class="data row3 col7" >0.999</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row4" class="row_heading level0 row4" >NE</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col0" class="data row4 col0" >-13.730</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col1" class="data row4 col1" >-0.020</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col2" class="data row4 col2" >0.662</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col3" class="data row4 col3" >-0.969</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col4" class="data row4 col4" >-0.107</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col5" class="data row4 col5" >3.380</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col6" class="data row4 col6" >0.034</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row4_col7" class="data row4 col7" >0.985</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row4" class="row_heading level0 row4" >NE</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col0" class="data row4 col0" >-13.730</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col1" class="data row4 col1" >-0.020</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col2" class="data row4 col2" >0.662</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col3" class="data row4 col3" >-0.969</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col4" class="data row4 col4" >-0.107</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col5" class="data row4 col5" >3.380</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col6" class="data row4 col6" >0.034</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row4_col7" class="data row4 col7" >0.985</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row5" class="row_heading level0 row5" >MA</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col0" class="data row5 col0" >-22.855</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col1" class="data row5 col1" >-0.378</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col2" class="data row5 col2" >3.348</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col3" class="data row5 col3" >-0.264</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col4" class="data row5 col4" >-1.778</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col5" class="data row5 col5" >2.673</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col6" class="data row5 col6" >0.026</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row5_col7" class="data row5 col7" >0.986</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row5" class="row_heading level0 row5" >MA</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col0" class="data row5 col0" >-22.855</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col1" class="data row5 col1" >-0.378</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col2" class="data row5 col2" >3.348</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col3" class="data row5 col3" >-0.264</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col4" class="data row5 col4" >-1.778</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col5" class="data row5 col5" >2.673</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col6" class="data row5 col6" >0.026</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row5_col7" class="data row5 col7" >0.986</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row6" class="row_heading level0 row6" >SO</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col0" class="data row6 col0" >3.927</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col1" class="data row6 col1" >0.043</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col2" class="data row6 col2" >-0.773</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col3" class="data row6 col3" >-0.035</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col4" class="data row6 col4" >0.140</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col5" class="data row6 col5" >1.665</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col6" class="data row6 col6" >0.008</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row6_col7" class="data row6 col7" >0.994</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row6" class="row_heading level0 row6" >SO</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col0" class="data row6 col0" >3.927</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col1" class="data row6 col1" >0.043</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col2" class="data row6 col2" >-0.773</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col3" class="data row6 col3" >-0.035</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col4" class="data row6 col4" >0.140</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col5" class="data row6 col5" >1.665</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col6" class="data row6 col6" >0.008</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row6_col7" class="data row6 col7" >0.994</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row7" class="row_heading level0 row7" >MW</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col0" class="data row7 col0" >-9.111</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col1" class="data row7 col1" >0.233</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col2" class="data row7 col2" >1.604</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col3" class="data row7 col3" >0.717</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col4" class="data row7 col4" >-0.356</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col5" class="data row7 col5" >-0.259</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col6" class="data row7 col6" >-0.034</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row7_col7" class="data row7 col7" >0.989</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row7" class="row_heading level0 row7" >MW</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col0" class="data row7 col0" >-9.111</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col1" class="data row7 col1" >0.233</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col2" class="data row7 col2" >1.604</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col3" class="data row7 col3" >0.717</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col4" class="data row7 col4" >-0.356</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col5" class="data row7 col5" >-0.259</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col6" class="data row7 col6" >-0.034</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row7_col7" class="data row7 col7" >0.989</td>
     </tr>    <tr>
-        <th id="T_9491db04_0858_11e8_ad8f_42010a140041level0_row8" class="row_heading level0 row8" >CN</th>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col0" class="data row8 col0" >-5.621</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col1" class="data row8 col1" >0.386</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col2" class="data row8 col2" >1.267</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col3" class="data row8 col3" >0.546</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col4" class="data row8 col4" >-0.108</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col5" class="data row8 col5" >-0.475</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col6" class="data row8 col6" >-0.031</td>
-        <td id="T_9491db04_0858_11e8_ad8f_42010a140041row8_col7" class="data row8 col7" >0.995</td>
+        <th id="T_b92018a8_1e58_11e8_a799_42010a140015level0_row8" class="row_heading level0 row8" >CN</th>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col0" class="data row8 col0" >-5.621</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col1" class="data row8 col1" >0.386</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col2" class="data row8 col2" >1.267</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col3" class="data row8 col3" >0.546</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col4" class="data row8 col4" >-0.108</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col5" class="data row8 col5" >-0.475</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col6" class="data row8 col6" >-0.031</td>
+        <td id="T_b92018a8_1e58_11e8_a799_42010a140015row8_col7" class="data row8 col7" >0.995</td>
     </tr></tbody>
 </table></div>
 </div>
 <p>The parameter estimates for one coefficient – unemployment – can be
 compared across the two estimation methods.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">params</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res_ols</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span> <span class="n">res_ols</span><span class="o">.</span><span class="n">std_errors</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span>
  <span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">],</span> <span class="n">res</span><span class="o">.</span><span class="n">std_errors</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">7</span><span class="p">]],</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">params</span><span class="o">.</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OLS&#39;</span><span class="p">,</span> <span class="s1">&#39;OLS se&#39;</span><span class="p">,</span> <span class="s1">&#39;GLS&#39;</span><span class="p">,</span> <span class="s1">&#39;GLS se&#39;</span><span class="p">]</span>
@@ -1049,7 +1051,7 @@ compared across the two estimation methods.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[13]:
 </pre></div>
 </div>
@@ -1148,11 +1150,11 @@ compared across the two estimation methods.</p>
 </div>
 <p>The parameters and their standard errors match those reported in Greene.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">display_png</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;system_correct-greene-table-10-3.png&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1175,11 +1177,11 @@ Regressors” which appears in Wooldridge (2002). The model consists of
 two equations, one for hourly wage and the other for hourly benefits.
 The initial model uses the same regressors in both equations.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">fringe</span>
 <span class="k">print</span><span class="p">(</span><span class="n">fringe</span><span class="o">.</span><span class="n">DESCR</span><span class="p">)</span>
 <span class="n">fdata</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -1240,14 +1242,14 @@ vserat                   (vacdays+sicklve)/annearn
 <p>The estimated model is reported as “System OLS Estimation” since when
 all regressors are identical, OLS is used since GLS brings no efficiency
 gains. OLS will be used when the data structure containing the exogenous
-regressors in each equations is the same (i.e., <code class="docutils literal"><span class="pre">id(exog)</span></code> is the same
+regressors in each equations is the same (i.e., <code class="docutils literal notranslate"><span class="pre">id(exog)</span></code> is the same
 for all equations).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [16]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">exog</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span><span class="s1">&#39;tenuresq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;south&#39;</span><span class="p">,</span><span class="s1">&#39;nrtheast&#39;</span><span class="p">,</span><span class="s1">&#39;nrthcen&#39;</span><span class="p">,</span><span class="s1">&#39;married&#39;</span><span class="p">,</span><span class="s1">&#39;white&#39;</span><span class="p">,</span><span class="s1">&#39;male&#39;</span><span class="p">]])</span>
 <span class="n">fmod_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrearn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog</span><span class="p">}</span>
@@ -1267,8 +1269,8 @@ for all equations).</p>
 Estimator:                        OLS   Overall R-squared:              0.2087
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:17
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                  Equation: hrearn, Dependent Variable: hrearn
@@ -1311,17 +1313,17 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
-<p>The estimator can be forced to use GLS by setting <code class="docutils literal"><span class="pre">method='gls'</span></code>. As
+<p>The estimator can be forced to use GLS by setting <code class="docutils literal notranslate"><span class="pre">method='gls'</span></code>. As
 can be seen below, the parameter estimates and standard errors do not
-change even though two-stage GLS is used. The <span class="math">\(R^2\)</span> <strong>does
+change even though two-stage GLS is used. The <span class="math notranslate">\(R^2\)</span> <strong>does
 change</strong> since the left-hand side variable is transformed by the GLS
 weighting before estimation.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">print</span><span class="p">(</span><span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;gls&#39;</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1336,8 +1338,8 @@ weighting before estimation.</p>
 Estimator:                        GLS   Overall R-squared:              0.2087
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:17
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                  Equation: hrearn, Dependent Variable: hrearn
@@ -1385,11 +1387,11 @@ insignificant variables are dropped from each equation so that the
 regressors will no longer be identical. The typical standard error is
 marginally smaller, although this might be due to dropping regressors.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">exog_earn</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;nrtheast&#39;</span><span class="p">,</span><span class="s1">&#39;white&#39;</span><span class="p">]])</span>
 <span class="n">exog_bens</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">fdata</span><span class="p">[[</span><span class="s1">&#39;educ&#39;</span><span class="p">,</span><span class="s1">&#39;exper&#39;</span><span class="p">,</span><span class="s1">&#39;expersq&#39;</span><span class="p">,</span><span class="s1">&#39;tenure&#39;</span><span class="p">,</span><span class="s1">&#39;tenuresq&#39;</span><span class="p">,</span><span class="s1">&#39;union&#39;</span><span class="p">,</span><span class="s1">&#39;male&#39;</span><span class="p">]])</span>
 <span class="n">fmod_data</span><span class="p">[</span><span class="s1">&#39;hrearn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dependent&#39;</span><span class="p">:</span> <span class="n">fdata</span><span class="o">.</span><span class="n">hrearn</span><span class="p">,</span> <span class="s1">&#39;exog&#39;</span><span class="p">:</span> <span class="n">exog_earn</span><span class="p">}</span>
@@ -1409,8 +1411,8 @@ marginally smaller, although this might be due to dropping regressors.</p>
 Estimator:                        GLS   Overall R-squared:              0.1685
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:17
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                  Equation: hrearn, Dependent Variable: hrearn
@@ -1448,13 +1450,13 @@ estimated. The second stage uses the estimated covariance to estimate
 the model via GLS. Iterative GLS can be used to continue these
 iterations using the most recent step to estimate the residual
 covariance and then re-estimating the parameters using GLS. This option
-can be used by setting <code class="docutils literal"><span class="pre">iterate=True</span></code>.</p>
+can be used by setting <code class="docutils literal notranslate"><span class="pre">iterate=True</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [19]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fmod_res</span> <span class="o">=</span> <span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">iterate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">fmod_res</span><span class="p">)</span>
 </pre></div>
@@ -1470,8 +1472,8 @@ can be used by setting <code class="docutils literal"><span class="pre">iterate=
 Estimator:              Iterative GLS   Overall R-squared:              0.1685
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:18
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                  Equation: hrearn, Dependent Variable: hrearn
@@ -1503,24 +1505,24 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
-<p>The number of GLS iterations can be verified using the <code class="docutils literal"><span class="pre">iterations</span></code>
+<p>The number of GLS iterations can be verified using the <code class="docutils literal notranslate"><span class="pre">iterations</span></code>
 attribute of the results.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fmod_res</span><span class="o">.</span><span class="n">iterations</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[20]:
 </pre></div>
 </div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
 <span></span>5
 </pre></div>
 </div>
@@ -1529,7 +1531,7 @@ attribute of the results.</p>
 <div class="section" id="Alternative-Covariance-Estimators">
 <h3>Alternative Covariance Estimators<a class="headerlink" href="#Alternative-Covariance-Estimators" title="Permalink to this headline">¶</a></h3>
 <p>The estimator supports heteroskedasticity robust covariance estimation b
-setting <code class="docutils literal"><span class="pre">cov_type='robust'</span></code>. The estimator allows for arbitrary
+setting <code class="docutils literal notranslate"><span class="pre">cov_type='robust'</span></code>. The estimator allows for arbitrary
 correlation across series with the same time index but not correlation
 across time periods, which is the same assumption as in the unadjusted
 estimator. The main difference is that this estimator will correct
@@ -1538,13 +1540,13 @@ regressors) and squared residuals.</p>
 <p>In the fringe benefit model there are some large differences between
 standard errors computed using the the homoskedastic covariance
 estimator and the heteroskedasticity robust covariance estimator (e.g.,
-<code class="docutils literal"><span class="pre">exper</span></code>).</p>
+<code class="docutils literal notranslate"><span class="pre">exper</span></code>).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fres_het</span> <span class="o">=</span> <span class="n">fmod</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">fres_het</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
@@ -1560,8 +1562,8 @@ estimator and the heteroskedasticity robust covariance estimator (e.g.,
 Estimator:                        GLS   Overall R-squared:              0.1685
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:18
+Date:                Fri, Mar 02 2018
+Time:                        20:31:44
 
 
                  Equation: hrearn, Dependent Variable: hrearn
@@ -1599,14 +1601,14 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 <h2>Pre-specified Residual Covariance Estimators<a class="headerlink" href="#Pre-specified-Residual-Covariance-Estimators" title="Permalink to this headline">¶</a></h2>
 <p>The GLS estimator can be used with a user specified covariance. This
 example uses and equi-correlation covariance in the state GDP model. The
-estimator must be used when constructing the model through the <code class="docutils literal"><span class="pre">sigma</span></code>
+estimator must be used when constructing the model through the <code class="docutils literal notranslate"><span class="pre">sigma</span></code>
 keyword argument.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">avg_corr</span> <span class="o">=</span> <span class="p">(</span><span class="n">corr</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">81</span><span class="o">/</span><span class="mi">72</span><span class="p">)</span>
 <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span> <span class="o">*</span> <span class="n">avg_corr</span>  <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">avg_corr</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
 <span class="n">sigma_pre</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">std</span> <span class="err">@</span> <span class="n">std</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
@@ -1628,8 +1630,8 @@ Eq. Label:                         GF   R-squared:                      0.9966
 Dep. Variable:                  lnGSP   Adj. R-squared:                 0.9945
 Estimator:                        GLS   Cov. Estimator:             unadjusted
 No. Observations:                  17   F-statistic:                    549.95
-Date:                Fri, Feb 02 2018   P-value (F-stat)                0.0000
-Time:                        20:35:18   Distribution:                  F(6,90)
+Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
+Time:                        20:31:45   Distribution:                  F(6,90)
 
                              Parameter Estimates
 ==============================================================================
@@ -1653,8 +1655,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: True, GLS: True)
 <h3>Diagonal Residual Covariance<a class="headerlink" href="#Diagonal-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
 <p>The default assumption is that there can be arbitrary correlation
 between series. The model can be estimated assuming no correlation but
-different variance by setting the keyword argument <code class="docutils literal"><span class="pre">full_cov=False</span></code> in
-the <code class="docutils literal"><span class="pre">fit</span></code> method. This is only useful when there are cross-equation
+different variance by setting the keyword argument <code class="docutils literal notranslate"><span class="pre">full_cov=False</span></code> in
+the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method. This is only useful when there are cross-equation
 parameter restrictions.</p>
 </div>
 </div>
@@ -1663,30 +1665,30 @@ parameter restrictions.</p>
 <p>One of the more useful features of using a SUR to estimate a system is
 the ability to impose constraints on parameters across equations. Here
 only linear constraints of the form</p>
-<div class="math">
+<div class="math notranslate">
 \[r \beta = q\]</div>
-<p>are supported. Linear constraints are entered by passing a <code class="docutils literal"><span class="pre">DataFrame</span></code>
+<p>are supported. Linear constraints are entered by passing a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
 with the shape number of constraints by number of parameters. The number
-and name of parameters can be seen by inspecting the <code class="docutils literal"><span class="pre">param_names</span></code>
+and name of parameters can be seen by inspecting the <code class="docutils literal notranslate"><span class="pre">param_names</span></code>
 attribute of a model. Below are the parameter names from the state GDP
 model which consist of the equation label, an underscore, and the
 variable name. This ensures uniqueness.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">mod</span><span class="o">.</span><span class="n">param_names</span><span class="p">[:</span><span class="mi">14</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[23]:
 </pre></div>
 </div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
 <span></span>[&#39;GF_Intercept&#39;,
  &#39;GF_lnPC&#39;,
  &#39;GF_lnHWY&#39;,
@@ -1707,18 +1709,18 @@ variable name. This ensures uniqueness.</p>
 <p>The example of a parameter constraint will enforce a common value of the
 coefficient of unemployment in all equations. This restriction takes the
 form</p>
-<div class="math">
+<div class="math notranslate">
 \[\beta_{unemp,i} - \beta_{unemp,j} = 0\]</div>
 <p>where in all examples i is the first series and j is one of the 8
 others. In total there are 8 restrictions.</p>
 <p>The construction of the restriction array and the non-zero columns are
 shown below.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">r</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">param_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rest{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 <span class="n">r</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">r</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
@@ -1754,16 +1756,16 @@ rest7       0.0       1.0
 </pre></div></div>
 </div>
 <p>The constraint can be added to an existing model using the
-<code class="docutils literal"><span class="pre">add_constraint</span></code> method. This method requires one input, <code class="docutils literal"><span class="pre">r</span></code> and
-optionally <code class="docutils literal"><span class="pre">q</span></code>. if <code class="docutils literal"><span class="pre">q</span></code> is not provided, it is set to 0.</p>
+<code class="docutils literal notranslate"><span class="pre">add_constraint</span></code> method. This method requires one input, <code class="docutils literal notranslate"><span class="pre">r</span></code> and
+optionally <code class="docutils literal notranslate"><span class="pre">q</span></code>. if <code class="docutils literal notranslate"><span class="pre">q</span></code> is not provided, it is set to 0.</p>
 <p>Here the constraint is added, the model is estimated, and the parameters
 for unemployment are displayed. They all have the same value.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [25]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">mod</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <span class="n">constrained_res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="n">constrained_res</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="mi">6</span><span class="p">::</span><span class="mi">7</span><span class="p">]</span>
@@ -1771,11 +1773,11 @@ for unemployment are displayed. They all have the same value.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>Out[25]:
 </pre></div>
 </div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
 <span></span>GF_UNEMP   -0.005801
 SW_UNEMP   -0.005801
 WC_UNEMP   -0.005801
@@ -1795,7 +1797,7 @@ Name: params, dtype: float64
 Using the same idea as the previous set of constraints, a pooled SUR
 (excluding the constant) is constructed by restricting all coefficients
 to have the same value. Here the form of the restriction is</p>
-<div class="math">
+<div class="math notranslate">
 \[\beta_{var,0} - \beta_{var,j} = 0\]</div>
 <p>so that the restriction is identical to the previous, only applied to
 all variables excluding the constant.</p>
@@ -1805,11 +1807,11 @@ coefficients except the intercept are identical across equations.</p>
 matrix will be singular. Caution is needed to ensure test statistics are
 meaningful.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">r2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">8</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 <span class="n">loc</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
@@ -1835,8 +1837,8 @@ meaningful.</p>
 Estimator:                        GLS   Overall R-squared:              0.9777
 No. Equations.:                     9   Cov. Estimator:                 robust
 No. Observations:                  17   Num. Constraints:                   48
-Date:                Fri, Feb 02 2018
-Time:                        20:35:18
+Date:                Fri, Mar 02 2018
+Time:                        20:31:45
 
 
                    Equation: GF, Dependent Variable: lnGSP
@@ -1872,16 +1874,16 @@ UNEMP         -0.0128     0.1933    -0.0661     0.9473     -0.3916      0.3660
 <p>One final feature worth demonstrating is a simple interface for
 specifying multivariate OLS models. These models have the same
 regressors and so it is possible to specify them with two arrays. The
-first is a <span class="math">\(T\)</span> by <span class="math">\(K\)</span> array of dependent variables where
+first is a <span class="math notranslate">\(T\)</span> by <span class="math notranslate">\(K\)</span> array of dependent variables where
 each column contains a dependent variable. The second contains the
 common exogenous regressors.</p>
 <p>This example shows how a CAPM can be estimated as a MV OLS.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
 <span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">french</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">french</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -1902,8 +1904,8 @@ common exogenous regressors.</p>
 Estimator:                        OLS   Overall R-squared:              0.6564
 No. Equations.:                     6   Cov. Estimator:             unadjusted
 No. Observations:                 819   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:18
+Date:                Fri, Mar 02 2018
+Time:                        20:31:45
 
 
                    Equation: S1V1, Dependent Variable: S1V1
@@ -1951,13 +1953,13 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 <div class="section" id="Using-GLS-with-common-regressors">
 <h3>Using GLS with common regressors<a class="headerlink" href="#Using-GLS-with-common-regressors" title="Permalink to this headline">¶</a></h3>
 <p>As noted previously, forcing GLS has no effect (except on changing the
-<span class="math">\(R^2\)</span>). This can be seen below.</p>
+<span class="math notranslate">\(R^2\)</span>). This can be seen below.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">print</span><span class="p">(</span><span class="n">mv_ols</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gls&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1972,8 +1974,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 Estimator:                        GLS   Overall R-squared:              0.6564
 No. Equations.:                     6   Cov. Estimator:             unadjusted
 No. Observations:                 819   Num. Constraints:                 None
-Date:                Fri, Feb 02 2018
-Time:                        20:35:18
+Date:                Fri, Mar 02 2018
+Time:                        20:31:45
 
 
                    Equation: S1V1, Dependent Variable: S1V1
