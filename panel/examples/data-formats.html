@@ -1,0 +1,1053 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Data Formats for Panel Data Analysis &#8212; linearmodels 4.6 documentation</title>
+    <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Introduction" href="../introduction.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../../_static/css/overrides.css" type="text/css" />
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar"><a href="
+    ../../index.html" class="text-logo">linearmodels 4.6</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Panel Data Model Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Formats for Panel Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html">Implementation Choices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../index.html">Docs</a></li>
+              
+                <li><a href="../index.html">Panel Data Model Estimation</a></li>
+              
+              <li>Data Formats for Panel Data Analysis</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 9ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+</style>
+<div class="section" id="Data-Formats-for-Panel-Data-Analysis">
+<h1>Data Formats for Panel Data Analysis<a class="headerlink" href="#Data-Formats-for-Panel-Data-Analysis" title="Permalink to this headline">¶</a></h1>
+<p>There are two primary methods to express data:</p>
+<ul class="simple">
+<li>MultiIndex DataFrames where the outer index is the entity and the
+inner is the time index. This requires using pandas.</li>
+<li>3D structures were dimension 0 (outer) is variable, dimension 1 is
+time index and dimension 2 is the entity index. It is also possible
+to use a 2D data structure with dimensions (t, n) which is treated as
+a 3D data structure having dimensions (1, t, n). These 3D data
+structures can be pandas, NumPy or xarray.</li>
+</ul>
+<div class="section" id="Multi-Index-DataFrames">
+<h2>Multi Index DataFrames<a class="headerlink" href="#Multi-Index-DataFrames" title="Permalink to this headline">¶</a></h2>
+<p>The most precise data format to use is a MultiIndex <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This
+is the most precise since only single columns can preserve all types
+within a panel. For example, it is not possible to span a single
+Categorical variable across multiple columns when using a pandas
+<code class="docutils literal notranslate"><span class="pre">Panel</span></code>.</p>
+<p>This example uses the jobtraining example to format a MultiIndex
+<code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> using the <code class="docutils literal notranslate"><span class="pre">set_index</span></code> command. The entity index is known
+as fcode and the time index is year.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.datasets</span> <span class="kn">import</span> <span class="n">jobtraining</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">jobtraining</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+   year   fcode  employ       sales   avgsal  scrap  rework  tothrs  union  \
+0  1987  410032   100.0  47000000.0  35000.0    NaN     NaN    12.0      0
+1  1988  410032   131.0  43000000.0  37000.0    NaN     NaN     8.0      0
+2  1989  410032   123.0  49000000.0  39000.0    NaN     NaN     8.0      0
+3  1987  410440    12.0   1560000.0  10500.0    NaN     NaN    12.0      0
+4  1988  410440    13.0   1970000.0  11000.0    NaN     NaN    12.0      0
+
+   grant    ...     grant_1  clscrap  cgrant  clemploy   clsales    lavgsal  \
+0      0    ...           0      NaN       0       NaN       NaN  10.463100
+1      0    ...           0      NaN       0  0.270027 -0.088949  10.518670
+2      0    ...           0      NaN       0 -0.063013  0.130621  10.571320
+3      0    ...           0      NaN       0       NaN       NaN   9.259130
+4      0    ...           0      NaN       0  0.080043  0.233347   9.305651
+
+   clavgsal  cgrant_1   chrsemp  clhrsemp
+0       NaN       NaN       NaN       NaN
+1  0.055570       0.0 -8.946565 -1.165385
+2  0.052644       0.0  0.198597  0.047832
+3       NaN       NaN       NaN       NaN
+4  0.046520       0.0  0.000000  0.000000
+
+[5 rows x 30 columns]
+</pre></div></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the multi index using the firm code
+(entity) and year (time).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mi_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;fcode&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+             employ       sales   avgsal  scrap  rework  tothrs  union  grant  \
+fcode  year
+410032 1987   100.0  47000000.0  35000.0    NaN     NaN    12.0      0      0
+       1988   131.0  43000000.0  37000.0    NaN     NaN     8.0      0      0
+       1989   123.0  49000000.0  39000.0    NaN     NaN     8.0      0      0
+410440 1987    12.0   1560000.0  10500.0    NaN     NaN    12.0      0      0
+       1988    13.0   1970000.0  11000.0    NaN     NaN    12.0      0      0
+
+             d89  d88    ...     grant_1  clscrap  cgrant  clemploy   clsales  \
+fcode  year              ...
+410032 1987    0    0    ...           0      NaN       0       NaN       NaN
+       1988    0    1    ...           0      NaN       0  0.270027 -0.088949
+       1989    1    0    ...           0      NaN       0 -0.063013  0.130621
+410440 1987    0    0    ...           0      NaN       0       NaN       NaN
+       1988    0    1    ...           0      NaN       0  0.080043  0.233347
+
+               lavgsal  clavgsal  cgrant_1   chrsemp  clhrsemp
+fcode  year
+410032 1987  10.463100       NaN       NaN       NaN       NaN
+       1988  10.518670  0.055570       0.0 -8.946565 -1.165385
+       1989  10.571320  0.052644       0.0  0.198597  0.047832
+410440 1987   9.259130       NaN       NaN       NaN       NaN
+       1988   9.305651  0.046520       0.0  0.000000  0.000000
+
+[5 rows x 28 columns]
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> can be used to initialized the model.
+When only referencing a single series, the <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">Series</span></code>
+representation can be used.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">mi_data</span><span class="o">.</span><span class="n">lscrap</span><span class="p">,</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">hrsemp</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                 lscrap   R-squared:                        0.0528
+Estimator:                   PanelOLS   R-squared (Between):             -0.0379
+No. Observations:                 140   R-squared (Within):               0.0528
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0288
+Time:                        11:29:03   Log-likelihood                   -90.459
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      5.0751
+Entities:                          48   P-value                           0.0267
+Avg Obs:                       2.9167   Distribution:                    F(1,91)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             5.0751
+                                        P-value                           0.0267
+Time periods:                       3   Distribution:                    F(1,91)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+hrsemp        -0.0054     0.0024    -2.2528     0.0267     -0.0102     -0.0006
+==============================================================================
+
+F-test for Poolability: 17.094
+P-value: 0.0000
+Distribution: F(47,91)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="pandas-Panels-and-DataFrames">
+<h2>pandas Panels and DataFrames<a class="headerlink" href="#pandas-Panels-and-DataFrames" title="Permalink to this headline">¶</a></h2>
+<p>An alternative formal is to use pandas Panels ad DataFrames. Panels
+should be formatted with <code class="docutils literal notranslate"><span class="pre">items</span></code> containing distinct variables,
+<code class="docutils literal notranslate"><span class="pre">major_axis</span></code> holding the time dimension and <code class="docutils literal notranslate"><span class="pre">minor_axis</span></code> holding the
+entity index. Here we transform the MultiIndex DataFrame to a panel to
+demonstrate this format.</p>
+<p>A single index DataFrame can also be used and is treated as being a
+single item slice of a Panel, and so the items should contain the time
+series dimension and the columns should contain entities. Note that
+using the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> version loses information about variable names,
+which is not usually desirable.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">panel</span> <span class="o">=</span> <span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">,</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_panel</span><span class="p">()</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">lscrap</span> <span class="o">=</span> <span class="n">panel</span><span class="p">[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">]</span>
+<span class="n">hrsemp</span> <span class="o">=</span> <span class="n">panel</span><span class="p">[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">]</span>
+<span class="n">panel</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/site-packages/ipykernel_launcher.py:1: DeprecationWarning:
+Panel is deprecated and will be removed in a future version.
+The recommended way to represent these types of 3-dimensional data are with a MultiIndex on a DataFrame, via the Panel.to_frame() method
+Alternatively, you can use the xarray package http://xarray.pydata.org/en/stable/.
+Pandas provides a `.to_xarray()` method to help automate this conversion.
+
+  &#34;&#34;&#34;Entry point for launching an IPython kernel.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;class &#39;pandas.core.panel.Panel&#39;&gt;
+Dimensions: 2 (items) x 3 (major_axis) x 157 (minor_axis)
+Items axis: lscrap to hrsemp
+Major_axis axis: 1987 to 1989
+Minor_axis axis: 410032 to 419486
+</pre></div>
+</div>
+</div>
+<p>When using panels, it is best to input the panel which requires
+selecting using <code class="docutils literal notranslate"><span class="pre">[[</span></code><em>var</em><code class="docutils literal notranslate"><span class="pre">]]</span></code> so ensure that the variable(s)
+selected still has 3 dimensions. This retains information about variable
+name.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">panel</span><span class="p">[[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">]],</span> <span class="n">panel</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">]],</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                 lscrap   R-squared:                        0.0528
+Estimator:                   PanelOLS   R-squared (Between):             -0.0379
+No. Observations:                 140   R-squared (Within):               0.0528
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0288
+Time:                        11:29:03   Log-likelihood                   -90.459
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      5.0751
+Entities:                          48   P-value                           0.0267
+Avg Obs:                       2.9167   Distribution:                    F(1,91)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             5.0751
+                                        P-value                           0.0267
+Time periods:                       3   Distribution:                    F(1,91)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+hrsemp        -0.0054     0.0024    -2.2528     0.0267     -0.0102     -0.0006
+==============================================================================
+
+F-test for Poolability: 17.094
+P-value: 0.0000
+Distribution: F(47,91)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+<p>Using DataFrames removes this information and so the generic <em>Dep</em> and
+<em>Exog</em> are used.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">lscrap</span><span class="p">,</span> <span class="n">hrsemp</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                    Dep   R-squared:                        0.0528
+Estimator:                   PanelOLS   R-squared (Between):             -0.0379
+No. Observations:                 140   R-squared (Within):               0.0528
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0288
+Time:                        11:29:03   Log-likelihood                   -90.459
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      5.0751
+Entities:                          48   P-value                           0.0267
+Avg Obs:                       2.9167   Distribution:                    F(1,91)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             5.0751
+                                        P-value                           0.0267
+Time periods:                       3   Distribution:                    F(1,91)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Exog          -0.0054     0.0024    -2.2528     0.0267     -0.0102     -0.0006
+==============================================================================
+
+F-test for Poolability: 17.094
+P-value: 0.0000
+Distribution: F(47,91)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="NumPy-arrays">
+<h2>NumPy arrays<a class="headerlink" href="#NumPy-arrays" title="Permalink to this headline">¶</a></h2>
+<p>NumPy arrays are treated identically to pandas Panel and single index
+DataFrames. In particular, using <code class="docutils literal notranslate"><span class="pre">panel.values</span></code> and <code class="docutils literal notranslate"><span class="pre">df.values</span></code> will
+produce identical results. The main difference between NumPy and pandas
+is that NumPy loses all label information.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">lscrap</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">hrsemp</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                    Dep   R-squared:                        0.0528
+Estimator:                   PanelOLS   R-squared (Between):             -0.0379
+No. Observations:                 140   R-squared (Within):               0.0528
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0288
+Time:                        11:29:03   Log-likelihood                   -90.459
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      5.0751
+Entities:                          48   P-value                           0.0267
+Avg Obs:                       2.9167   Distribution:                    F(1,91)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             5.0751
+                                        P-value                           0.0267
+Time periods:                       3   Distribution:                    F(1,91)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+Exog          -0.0054     0.0024    -2.2528     0.0267     -0.0102     -0.0006
+==============================================================================
+
+F-test for Poolability: 17.094
+P-value: 0.0000
+Distribution: F(47,91)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="xarray-DataArrays">
+<h2>xarray DataArrays<a class="headerlink" href="#xarray-DataArrays" title="Permalink to this headline">¶</a></h2>
+<p>xarray is a relatively new entrant into the set of packages used for
+data structures. The data structures provided by <code class="docutils literal notranslate"><span class="pre">xarray</span></code> are relevant
+in the context of panel models since pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> is scheduled for
+removal in the futures, and so the only 3d data format that will remain
+viable is an <code class="docutils literal notranslate"><span class="pre">xarray</span></code> <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>s are similar to
+pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> although <code class="docutils literal notranslate"><span class="pre">DataArrays</span></code> use some difference notation.
+In principle it is possible to express the same information in a
+<code class="docutils literal notranslate"><span class="pre">DataArray</span></code> as one can in a <code class="docutils literal notranslate"><span class="pre">Panel</span></code></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">da</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+<span class="n">da</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;xarray.DataArray (items: 2, major_axis: 3, minor_axis: 157)&gt;
+array([[[       nan,        nan, ...,   2.995732,        nan],
+        [       nan,        nan, ...,   3.218876,        nan],
+        [       nan,        nan, ...,   3.401197,        nan]],
+
+       [[ 12.      ,  12.      , ...,   0.      ,   0.      ],
+        [  3.053435,  12.      , ...,   0.      ,   0.      ],
+        [  3.252033,  10.      , ...,   3.100775,  36.      ]]])
+Coordinates:
+  * items       (items) object &#39;lscrap&#39; &#39;hrsemp&#39;
+  * major_axis  (major_axis) int64 1987 1988 1989
+  * minor_axis  (minor_axis) int64 410032 410440 410495 410500 410501 410509 ...
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">]],</span> <span class="n">da</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">]],</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                 lscrap   R-squared:                        0.0528
+Estimator:                   PanelOLS   R-squared (Between):             -0.0379
+No. Observations:                 140   R-squared (Within):               0.0528
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0288
+Time:                        11:29:03   Log-likelihood                   -90.459
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      5.0751
+Entities:                          48   P-value                           0.0267
+Avg Obs:                       2.9167   Distribution:                    F(1,91)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             5.0751
+                                        P-value                           0.0267
+Time periods:                       3   Distribution:                    F(1,91)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                             Parameter Estimates
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+hrsemp        -0.0054     0.0024    -2.2528     0.0267     -0.0102     -0.0006
+==============================================================================
+
+F-test for Poolability: 17.094
+P-value: 0.0000
+Distribution: F(47,91)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Conversion-of-Categorical-and-Strings-to-Dummies">
+<h2>Conversion of Categorical and Strings to Dummies<a class="headerlink" href="#Conversion-of-Categorical-and-Strings-to-Dummies" title="Permalink to this headline">¶</a></h2>
+<p>Categorical or string variables are treated as factors and so are
+converted to dummies. The first category is always dropped. If this is
+not desirable, you should manually convert the data to dummies before
+estimating a model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">year_str</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s1">&#39;year&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span>
+<span class="n">year_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">year_str</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">year_str</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">index</span>
+<span class="n">year_cat</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">mi_data</span><span class="o">.</span><span class="n">index</span>
+<span class="n">mi_data</span><span class="p">[</span><span class="s1">&#39;year_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_str</span>
+<span class="n">mi_data</span><span class="p">[</span><span class="s1">&#39;year_cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year_cat</span>
+</pre></div>
+</div>
+</div>
+<p>Here year has been converted to a string which is then used in the model
+to produce year dummies.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;Exogenous variables&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_str&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_str&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">]],</span> <span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_str&#39;</span><span class="p">]],</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Exogenous variables
+                hrsemp year_str
+fcode  year
+410032 1987  12.000000     1987
+       1988   3.053435     1988
+       1989   3.252033     1989
+410440 1987  12.000000     1987
+       1988  12.000000     1988
+hrsemp      float64
+year_str     object
+dtype: object
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                 lscrap   R-squared:                        0.1985
+Estimator:                   PanelOLS   R-squared (Between):             -0.1240
+No. Observations:                 140   R-squared (Within):               0.1985
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0934
+Time:                        11:29:03   Log-likelihood                   -78.765
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      7.3496
+Entities:                          48   P-value                           0.0002
+Avg Obs:                       2.9167   Distribution:                    F(3,89)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             7.3496
+                                        P-value                           0.0002
+Time periods:                       3   Distribution:                    F(3,89)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                               Parameter Estimates
+=================================================================================
+               Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+---------------------------------------------------------------------------------
+hrsemp           -0.0024     0.0024    -1.0058     0.3172     -0.0071      0.0023
+year_str.1988    -0.1591     0.1146    -1.3888     0.1684     -0.3868      0.0685
+year_str.1989    -0.4620     0.1176    -3.9297     0.0002     -0.6957     -0.2284
+=================================================================================
+
+F-test for Poolability: 19.649
+P-value: 0.0000
+Distribution: F(47,89)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">categorical</span></code>s has the same effect.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;Exogenous variables&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_cat&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_cat&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">PanelOLS</span><span class="p">(</span><span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;lscrap&#39;</span><span class="p">]],</span> <span class="n">mi_data</span><span class="p">[[</span><span class="s1">&#39;hrsemp&#39;</span><span class="p">,</span><span class="s1">&#39;year_cat&#39;</span><span class="p">]],</span> <span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Exogenous variables
+                hrsemp year_cat
+fcode  year
+410032 1987  12.000000     1987
+       1988   3.053435     1988
+       1989   3.252033     1989
+410440 1987  12.000000     1987
+       1988  12.000000     1988
+hrsemp       float64
+year_cat    category
+dtype: object
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/build/bashtage/linearmodels/linearmodels/utility.py:490: MissingValueWarning:
+Inputs contain missing values. Dropping rows with missing observations.
+  warnings.warn(missing_value_warning_msg, MissingValueWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                          PanelOLS Estimation Summary
+================================================================================
+Dep. Variable:                 lscrap   R-squared:                        0.1985
+Estimator:                   PanelOLS   R-squared (Between):             -0.1240
+No. Observations:                 140   R-squared (Within):               0.1985
+Date:                Thu, Mar 15 2018   R-squared (Overall):             -0.0934
+Time:                        11:29:04   Log-likelihood                   -78.765
+Cov. Estimator:            Unadjusted
+                                        F-statistic:                      7.3496
+Entities:                          48   P-value                           0.0002
+Avg Obs:                       2.9167   Distribution:                    F(3,89)
+Min Obs:                       1.0000
+Max Obs:                       3.0000   F-statistic (robust):             7.3496
+                                        P-value                           0.0002
+Time periods:                       3   Distribution:                    F(3,89)
+Avg Obs:                       46.667
+Min Obs:                       46.000
+Max Obs:                       48.000
+
+                               Parameter Estimates
+=================================================================================
+               Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+---------------------------------------------------------------------------------
+hrsemp           -0.0024     0.0024    -1.0058     0.3172     -0.0071      0.0023
+year_cat.1988    -0.1591     0.1146    -1.3888     0.1684     -0.3868      0.0685
+year_cat.1989    -0.4620     0.1176    -3.9297     0.0002     -0.6957     -0.2284
+=================================================================================
+
+F-test for Poolability: 19.649
+P-value: 0.0000
+Distribution: F(47,89)
+
+Included effects: Entity
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="../introduction.html" title="previous chapter (use the left arrow)">Introduction</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="examples.html" title="next chapter (use the right arrow)">Examples</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Panel Data Model Estimation</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

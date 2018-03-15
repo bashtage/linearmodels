@@ -1,0 +1,395 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Examples"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## General Setup\n",
+    "\n",
+    "Models include factors and returns.  Factors can be traded or non-traded.  Common examples of traded assets include the excess return on the market and the size and value factors.  Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.  \n",
+    "\n",
+    "Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Import data\n",
+    "\n",
+    "The data used comes from Ken French's [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.datasets import french\n",
+    "data = french.load()\n",
+    "print(french.DESCR)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Transform the portfolios to be excesses\n",
+    "\n",
+    "Subtract the risk-free rate from the test portfolios since these are not zero-investment."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "data.iloc[:,6:] = data.iloc[:,6:].values - data[['RF']].values"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1-Step Estimation using Seemingly Unrelated Regression (SUR)\n",
+    "\n",
+    "When the factors are traded assets, they must price themselves, and so the observed factor returns can be used to consistently estimate the expected factor returns.  This also allows a set of seemingly unrelated regressions where each test portfolio is regressed on the factors and a constant to estimate factor loadings and $\\alpha$s. \n",
+    "\n",
+    "Note that when using this type of model, it is essential that the test portfolios are excess returns. This isn't a requirement of the other factor model estimators. \n",
+    "\n",
+    "This specification is a CAP-M since only the market is included.  The J-statistic tests whether all model $\\alpha$s are 0.  The CAP-M is unsurprisingly unable to price the test portfolios."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import TradedFactorModel\n",
+    "portfolios = data[['S1V1','S1V3','S1V5','S3V1','S3V3','S3V5','S5V1','S5V3','S5V5']]\n",
+    "factors = data[['MktRF']]\n",
+    "mod = TradedFactorModel(portfolios, factors)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The factor set is expanded to include both the size and the value factors.\n",
+    "\n",
+    "While the extra factors lower the J statistic and increases the $R^2$, the model is still easily rejected."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "factors = data[['MktRF', 'SMB', 'HML']]\n",
+    "mod = TradedFactorModel(portfolios, factors)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Changing the test portfolios to include only the industry portfolios does not allow factors to price the assets."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "indu = ['NoDur', 'Durbl', 'Manuf', 'Enrgy', 'Chems', 'BusEq', \n",
+    "        'Telcm', 'Utils', 'Shops',  'Hlth', 'Money',  'Other']\n",
+    "portfolios = data[indu]\n",
+    "mod = TradedFactorModel(portfolios, factors)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The estimated factor loadings ($\\beta$s) can be displayed using the `betas` property. There is reasonable dispersion in the factor loadings for all of the factors, except possibly the market which are all close to unity."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(res.betas)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import seaborn as sns\n",
+    "%matplotlib inline\n",
+    "sns.heatmap(res.betas)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Similarly the $\\alpha$s can be displayed.  These are monthly returns, and so scaling by 12 shows annualized returns. Healthcare has the largest pricing error. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "12 * res.alphas"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2-Step Estimation\n",
+    "\n",
+    "When one of more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM).  In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.  \n",
+    "\n",
+    "Here all four factors are used to attempt to price the size-momentum portfolios."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import LinearFactorModel\n",
+    "factors = data[['MktRF', 'SMB', 'HML', 'Mom']]\n",
+    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "mod = LinearFactorModel(portfolios, factors)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(res.betas)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The identification requirements for this model are the the $\\beta$s have unique variation -- this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated.  Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.  "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(res.betas.corr())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The size factor was insignificant and so is dropped. This doesn't have much of an effect on the estimates."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import LinearFactorModel\n",
+    "factors = data[['MktRF', 'HML', 'Mom']]\n",
+    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "mod = LinearFactorModel(portfolios, factors)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The risk-free rate can be optionally estimated.  This is useful in case excess returns are not available of if the risk-free rate used to construct the excess returns might be mis-specified.\n",
+    "\n",
+    "Here the estimated risk-free rate is small and insignificant and has little impact on the model J-statistic."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import LinearFactorModel\n",
+    "factors = data[['MktRF', 'HML', 'Mom']]\n",
+    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "mod = LinearFactorModel(portfolios, factors, risk_free=True)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns.  Kernel-based HAC estimators (e.g. Newey-West) can be used by setting `cov_type='kernel'`.\n",
+    "\n",
+    "This reduces the J-statistic indicating there might be some serial correlation although the model is still firmly rejected."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = LinearFactorModel(portfolios, factors)\n",
+    "print(mod.fit(cov_type='kernel'))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## GMM Estimation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step.  In practice the GMM estimator is estimated at least twice, once to get an consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters. \n",
+    "\n",
+    "The GMM estimator does not have a closed form and so a non-linear optimizer is required.  The default output prints the progress every 10 iterations.  Here the model is fit twice, which is the standard method to implement efficient GMM."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.asset_pricing import LinearFactorModelGMM\n",
+    "mod = LinearFactorModelGMM(portfolios, factors)\n",
+    "res = mod.fit()\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Kernel HAC estimators can be used with this estimator as well. Using a kernel HAC covariance also implies a Kernel HAC weighting matrix estimator. \n",
+    "\n",
+    "Here the GMM estimator along with the HAC estimator indicates that these factors might be able to price this set of 9 test portfolios. `disp=0` is used to suppress iterative output."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = mod.fit(cov_type='kernel', kernel='bartlett', disp=0)\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Iterating until convergence\n",
+    "\n",
+    "The standard approach is efficient and uses 2-steps.  The first consistently estimates parameters using a sub-optimal weighting matrix, and the second uses the optimal weighting matrix conditional using the first stage estimates.  \n",
+    "\n",
+    "This method can be repeated until convergence, or for a fixed number of steps using the `steps` keyword argument."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = mod.fit(steps=10, disp=25)\n",
+    "print(res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Continuously Updating Estimator\n",
+    "\n",
+    "The  Continuously Updating Estimator (CUE) is optionally available using the flag `use_cue`.  CUE jointly minimizes the J-statistic as a function of the moment conditions and the weighting matrix, rather than iterating between minimizing the J-statistic for a fixed weighting matrix and updating the weighting matrix.  \n",
+    "\n",
+    "Here the results are essentially the same as in the iterative approach."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = mod.fit(use_cue=True)\n",
+    "print(res)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

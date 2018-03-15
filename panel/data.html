@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Panel Data Structures &#8212; linearmodels 4.6 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Formulas and Mathematical Detail" href="mathematical-formula.html" />
+    <link rel="prev" title="Panel Model Covariance Estimators" href="covariance.html" />
+  
+  
+   
+
+  <link rel="stylesheet" href="../_static/css/overrides.css" type="text/css" />
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mathematical-formula.html" title="Formulas and Mathematical Detail"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Panel Model Covariance Estimators"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar"><a href="
+    ../index.html" class="text-logo">linearmodels 4.6</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Panel Data Model Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/data-formats.html">Data Formats for Panel Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html">Implementation Choices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+    
+  </div>
+</div>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Panel Data Model Estimation</a></li>
+              
+                <li><a href="reference.html">Module Reference</a></li>
+              
+              <li>Panel Data Structures</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="module-linearmodels.panel.data">
+<span id="panel-data-structures"></span><span id="panel-module-reference-data"></span><h1>Panel Data Structures<a class="headerlink" href="#module-linearmodels.panel.data" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="linearmodels.panel.data.PanelData">
+<em class="property">class </em><code class="descname">PanelData</code><span class="sig-paren">(</span><em>x</em>, <em>var_name='x'</em>, <em>convert_dummies=True</em>, <em>drop_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstraction to handle alternative formats for panel data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>Panel</em><em>, </em><em>DataArray}</em>) – Input data</li>
+<li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
+xarray DataArrays</li>
+<li><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
+should be converted to dummy variables</li>
+<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to drop first dummy category when converting</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Data can be either 2- or 3-dimensional. The three key dimensions are</p>
+<ul class="simple">
+<li>nvar - number of variables</li>
+<li>nobs - number of time periods</li>
+<li>nentity - number of entities</li>
+</ul>
+<p>All 3-d inputs should be in the form (nvar, nobs, nentity). With one
+exception, 2-d inputs are treated as (nobs, nentity) so that the input
+can be treated as-if being (1, nobs, nentity).</p>
+<p>If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
+input is treated differently.  Index level 0 is assumed ot be entity.
+Index level 1 is time.  The columns are the variables.  This is the most
+precise format to use since pandas Panels do not preserve all variable
+type information across transformations between Panel and MultiIndex
+DataFrame. MultiIndex Series are also accepted and treated as single
+column MultiIndex DataFrames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If the input type is not supported</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input has the wrong number of dimensions or a MultiIndex
+DataFrame does not have 2 levels</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a deep copy</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.count">
+<code class="descname">count</code><span class="sig-paren">(</span><em>group='entity'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count number of observations by entity or time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>count</strong> – Counts according to type. Either (entity by var) or (time by var)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.dataframe">
+<code class="descname">dataframe</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>pandas DataFrame view of data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.demean">
+<code class="descname">demean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.demean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Demeans data by either entity or time group</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</li>
+<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>demeaned</strong> – Demeaned data according to type</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If weights are provided, the values returned will be scaled by
+sqrt(weights) so that they can be used in WLS estimation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.drop">
+<code class="descname">drop</code><span class="sig-paren">(</span><em>locs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.drop" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>locs</strong> (<em>ndarray</em>) – Boolean array indicating observations to drop with reference to
+the dataframe view of the data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.dummies">
+<code class="descname">dummies</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>drop_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.dummies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate entity or time dummies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em><em>, </em><em>optional</em>) – Type of dummies to generate</li>
+<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the dummy column corresponding to the first
+entity or time period should be dropped</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dummies</strong> – Dummy variables</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.entities">
+<code class="descname">entities</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of entity index names</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.entity_ids">
+<code class="descname">entity_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entity_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get array containing entity group membership information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>id</strong> – 2d array containing entity ids corresponding dataframe view</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.first_difference">
+<code class="descname">first_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.first_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.first_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute first differences of variables</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>diffs</strong> – Differenced values</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.general_demean">
+<code class="descname">general_demean</code><span class="sig-paren">(</span><em>groups</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.general_demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.general_demean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multi-way demeaning using only groupby</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>groups</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a>) – Arrays with the same size containing group identifiers</li>
+<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to use in the weighted demeaning</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>demeaned</strong> – Weighted, demeaned data according to groups</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Iterates until convergence</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.index">
+<code class="descname">index</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the multi-index dataframe view</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.isnull">
+<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.isnull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locations with missing observations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="linearmodels.panel.data.PanelData.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute data mean by either entity or time group</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</li>
+<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mean</strong> – Data mean according to type. Either (entity by var) or (time by var)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.ndim">
+<code class="descname">ndim</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.ndim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of dimensions of panel view of data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.nentity">
+<code class="descname">nentity</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nentity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of entities</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.nobs">
+<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of time observations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.nvar">
+<code class="descname">nvar</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nvar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of variables</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.panel">
+<code class="descname">panel</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.panel" title="Permalink to this definition">¶</a></dt>
+<dd><p>pandas Panel view of data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.shape">
+<code class="descname">shape</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shape of panel view of data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.time">
+<code class="descname">time</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of time index names</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.time_ids">
+<code class="descname">time_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get array containing time membership information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>id</strong> – 2d array containing time ids corresponding dataframe view</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.values2d">
+<code class="descname">values2d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>NumPy ndarray view of dataframe</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.values3d">
+<code class="descname">values3d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>NumPy ndarray view of panel</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linearmodels.panel.data.PanelData.vars">
+<code class="descname">vars</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.vars" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of variable names</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="covariance.html" title="previous chapter (use the left arrow)">Panel Model Covariance Estimators</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="mathematical-formula.html" title="next chapter (use the right arrow)">Formulas and Mathematical Detail</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="mathematical-formula.html" title="Formulas and Mathematical Detail"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="covariance.html" title="Panel Model Covariance Estimators"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2017, Kevin Sheppard. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

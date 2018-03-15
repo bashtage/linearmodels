@@ -1,0 +1,184 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "# Using formulas to specify models\n",
+    "\n",
+    "All of the models can be specified using formulas. The formulas used here utilize [patsy](http://patsy.readthedocs.io/en/latest/) are similar to those in [statsmodels](http://www.statsmodels.org).  The basis formula syntax for a single variable regression would be\n",
+    "\n",
+    "```\n",
+    "y ~ 1 + x\n",
+    "```\n",
+    "\n",
+    "The formulas used with ``BetweenOLS``, ``PooledOLS`` and ``RandomEffects`` are completely standard and are identical to [statsmodels](http://www.statsmodels.org).  ``FirstDifferenceOLS`` is nearly identical with the caveat that the model *cannot* include an intercept. \n",
+    "\n",
+    "``PanelOLS``, which implements effects (entity, time or other) has a small extension to the formula which allows entity effects or time effects (or both) to be specified as part of the formula. While it is not possible to specify other effects using the formula interface, these can be included as an optional parameter when using a formula."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Loading and preparing data \n",
+    "When using formulas, a MultiIndex pandas dataframe where the index is entity-time is **required**. Here the Grunfeld data, from \"The Determinants of Corporate Investment\", provided by [statsmodels](http://www.statsmodels.org/stable/datasets/generated/grunfeld.html), is used to illustrate the use of formulas.  This dataset contains data on firm investment, market value and the stock of plant capital. \n",
+    "\n",
+    "``set_index`` is used to set the index using variables from the dataset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from statsmodels.datasets import grunfeld\n",
+    "data = grunfeld.load_pandas().data\n",
+    "data = data.set_index(['firm','year'])\n",
+    "print(data.head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## PanelOLS with Entity Effects\n",
+    "\n",
+    "Entity effects are specified using the special command `EntityEffects`.  By default a constant is not included, and so if a constant is desired, `1+` should be included in the formula.  When including effects, the model and fit are identical whether a constant is included or not."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels import PanelOLS\n",
+    "mod = PanelOLS.from_formula('invest ~ value + capital + EntityEffects', data=data)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## PanelOLS with Entity Effects and a constant\n",
+    "\n",
+    "The constant can be explicitly included using the `1 + ` notation.  When a constant is included in the model, and additional constraint is imposed that the number of the effects is 0.  This allows the constant to be identified using teh grand mean of the dependent and the regressors."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = PanelOLS.from_formula('invest ~ 1 + value + capital + EntityEffects', data=data)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Panel with Entity and Time Effects\n",
+    "\n",
+    "Time effects can be similarly included using `TimeEffect`.  In many models, time effects can be consistently estimated and so they could be equivalently included in the set of regressors using a categorical variable."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = PanelOLS.from_formula('invest ~ 1 + value + capital + EntityEffects + TimeEffects', data=data)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Between OLS\n",
+    "\n",
+    "The other panel models are straight-forward and are included for completeness."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels import BetweenOLS, FirstDifferenceOLS, PooledOLS\n",
+    "mod = BetweenOLS.from_formula('invest ~ 1 + value + capital', data=data)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "## First Difference OLS\n",
+    "\n",
+    "The first difference model must never include a constant since this is not identified after differencing."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = FirstDifferenceOLS.from_formula('invest ~ value + capital', data=data)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Pooled OLS\n",
+    "\n",
+    "The pooled OLS estimator is a special case of `PanelOLS` when there are no effects.  It is effectively identical to `OLS` in `statsmodels` (or `WLS`) but is included for completeness."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = PooledOLS.from_formula('invest ~ 1 + value + capital', data=data)\n",
+    "print(mod.fit())"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.5.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
