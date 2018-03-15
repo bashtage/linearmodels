@@ -99,7 +99,7 @@ python setup.py install
 
 ## Documentation
 
-[Stable Documentation](https://bashtage.github.io/linearmodels/doc) is
+[Stable Documentation](https://bashtage.github.io/linearmodels/) is
 built on every tagged version using
 [doctr](https://github.com/drdoctr/doctr).
 [Development Documentation](https://bashtage.github.io/linearmodels/devel)

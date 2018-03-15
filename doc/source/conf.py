@@ -130,8 +130,8 @@ extensions.append("guzzle_sphinx_theme")
 # documentation.
 # Guzzle theme options (see theme.conf for more information)
 html_theme_options = {
-     # Set the name of the project to appear in the sidebar
-     "project_nav_name": project + u" " + version,
+    # Set the name of the project to appear in the sidebar
+    "project_nav_name": project + u" " + version,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -139,6 +139,9 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_sidebars = {
+    '**': ['logo-text.html', 'globaltoc.html', 'searchbox.html']
+}
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.

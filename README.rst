@@ -105,10 +105,10 @@ The master branch can be installed by cloning the repo and running setup
 Documentation
 -------------
 
-`Stable Documentation <https://bashtage.github.io/linearmodels/doc>`__
+`Stable Documentation <https://bashtage.github.io/linearmodels/>`__
 is built on every tagged version using
 `doctr <https://github.com/drdoctr/doctr>`__. `Development
-Documentation <https://bashtage.github.io/linearmodels/devel>`__ is
+Documentation <https://bashtage.github.io/linearmodels/devel/>`__ is
 automatically built on every successful build of master.
 
 Plan and status

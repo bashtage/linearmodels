@@ -77,7 +77,7 @@ script:
       if [[ -z ${TRAVIS_TAG} ]]; then
         echo "Not a tagged build."
       else
-        doctr deploy doc --build-tags
+        doctr deploy . --build-tags
       fi
     fi
 
