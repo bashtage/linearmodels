@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
+    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.5+2.g0467855 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="gmm.html" title="GMM Weight and Covariance Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -60,61 +60,39 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    ../index.html" class="text-logo">linearmodels 4.5 (+2, g0467855)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
-      <ul>
-<li><a class="reference internal" href="#">Formulas and Mathematical Detail</a><ul>
-<li><a class="reference internal" href="#notation">Notation</a></li>
-<li><a class="reference internal" href="#parameter-estimation">Parameter Estimation</a><ul>
-<li><a class="reference internal" href="#two-stage-least-squares-2sls">Two-stage Least Squares (2SLS)</a></li>
-<li><a class="reference internal" href="#limited-information-maximum-likelihood-and-k-class-estimators">Limited Information Maximum Likelihood and k-class Estimators</a></li>
-<li><a class="reference internal" href="#generalized-method-of-moments-gmm">Generalized Method of Moments (GMM)</a></li>
-<li><a class="reference internal" href="#continuously-updating-generalized-method-of-moments-gmm-cue">Continuously Updating Generalized Method of Moments (GMM-CUE)</a></li>
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Instrumental Variable Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/basic-examples.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/advanced-examples.html">Further Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Formulas and Mathematical Detail</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#basic-statistics">Basic Statistics</a></li>
-<li><a class="reference internal" href="#parameter-covariance-estimation">Parameter Covariance Estimation</a><ul>
-<li><a class="reference internal" href="#two-stage-ls-liml-and-k-class-estimators">Two-stage LS, LIML and k-class estimators</a></li>
-<li><a class="reference internal" href="#standard-errors">Standard Errors</a></li>
-<li><a class="reference internal" href="#t-statistics">T-statistics</a></li>
-<li><a class="reference internal" href="#p-values">P-values</a></li>
-<li><a class="reference internal" href="#confidence-intervals">Confidence Intervals</a></li>
-<li><a class="reference internal" href="#linear-hypothesis-tests">Linear Hypothesis Tests</a></li>
-<li><a class="reference internal" href="#gmm-covariance-estimators">GMM Covariance estimators</a></li>
-<li><a class="reference internal" href="#gmm-weight-estimators">GMM Weight Estimators</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#post-estimation">Post-estimation</a><ul>
-<li><a class="reference internal" href="#sls-and-liml-post-estimation-results">2SLS and LIML Post-estimation Results</a></li>
-<li><a class="reference internal" href="#gmm-post-estimation-results">GMM Post-estimation Results</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#first-stage-estimation-analysis">First-stage Estimation Analysis</a></li>
-<li><a class="reference internal" href="#kernel-weights-and-bandwidth-selection">Kernel Weights and Bandwidth Selection</a></li>
-<li><a class="reference internal" href="#constant-detection">Constant Detection</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="gmm.html"
-                        title="previous chapter">GMM Weight and Covariance Estimation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../panel/index.html"
-                        title="next chapter">Panel Data Model Estimation</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/iv/mathematical-formula.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -646,7 +624,7 @@ excluding one category of dummy.</td></tr>
         <li class="right" >
           <a href="gmm.html" title="GMM Weight and Covariance Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

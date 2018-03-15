@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.5+2.g0467855 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -60,43 +60,39 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    ../../index.html" class="text-logo">linearmodels 4.5 (+2, g0467855)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
-      <ul>
-<li><a class="reference internal" href="#">Using formulas to specify models</a><ul>
-<li><a class="reference internal" href="#Basic-Usage">Basic Usage</a></li>
-<li><a class="reference internal" href="#Multiple-Endogenous-Variables">Multiple Endogenous Variables</a></li>
-<li><a class="reference internal" href="#Standard-patsy">Standard patsy</a></li>
-<li><a class="reference internal" href="#MEPS-data">MEPS data</a><ul>
-<li><a class="reference internal" href="#Estimating-a-model-with-a-formula">Estimating a model with a formula</a></li>
-<li><a class="reference internal" href="#Mathematical-expression-in-formulas">Mathematical expression in formulas</a></li>
-<li><a class="reference internal" href="#OLS">OLS</a></li>
-<li><a class="reference internal" href="#Comparing-results">Comparing results</a></li>
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Instrumental Variable Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basic-examples.html">Basic Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced-examples.html">Further Examples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="advanced-examples.html"
-                        title="previous chapter">Further Examples</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../reference.html"
-                        title="next chapter">Module Reference</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/iv/examples/using-formulas.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -453,8 +449,8 @@ formula.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
-Time:                        20:31:24   Distribution:                  chi2(6)
+Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
+Time:                        10:58:36   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -521,8 +517,8 @@ be readily used.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
-Time:                        20:31:24   Distribution:                  chi2(6)
+Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
+Time:                        10:58:36   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -632,7 +628,7 @@ T-stats reported in parentheses
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.5+2.g0467855 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -60,37 +60,39 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    ../../index.html" class="text-logo">linearmodels 4.5 (+2, g0467855)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
-      <ul>
-<li><a class="reference internal" href="#">Three-stage Least Squares (3SLS)</a><ul>
-<li><a class="reference internal" href="#Data">Data</a></li>
-<li><a class="reference internal" href="#Formulas">Formulas</a></li>
-<li><a class="reference internal" href="#Direct-Model-Specification">Direct Model Specification</a></li>
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panel/index.html">Panel Data Model Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">System Regression Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Three-stage Least Squares (3SLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#System-GMM-Estimation">System GMM Estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="formulas.html"
-                        title="previous chapter">Using formulas to specify models</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../reference.html"
-                        title="next chapter">Module Reference</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/system/examples/three-stage-ls.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -375,8 +377,8 @@ The syntax is the same as in the 2SLS models.</p>
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
-Time:                        20:31:52   Distribution:                  chi2(5)
+Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
+Time:                        10:58:58   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -421,8 +423,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Fri, Mar 02 2018   P-value (F-stat)                0.0000
-Time:                        20:31:52   Distribution:                  chi2(4)
+Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
+Time:                        10:58:58   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -470,8 +472,8 @@ that are identical to separate equations.</p>
 Estimator:                        OLS   Overall R-squared:              0.1903
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Fri, Mar 02 2018
-Time:                        20:31:52
+Date:                Thu, Mar 15 2018
+Time:                        10:58:58
 
 
                   Equation: hours, Dependent Variable: hours
@@ -533,8 +535,8 @@ changes. This is due to the structure of the problem.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Fri, Mar 02 2018
-Time:                        20:31:52
+Date:                Thu, Mar 15 2018
+Time:                        10:58:58
 
 
                   Equation: hours, Dependent Variable: hours
@@ -616,8 +618,8 @@ programatically generating and estimating models.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Fri, Mar 02 2018
-Time:                        20:31:52
+Date:                Thu, Mar 15 2018
+Time:                        10:58:58
 
 
                   Equation: hours, Dependent Variable: hours
@@ -696,8 +698,8 @@ only use the formula interface. The default uses 2-step (efficient) GMM.</p>
 Estimator:          2-Step System GMM   Overall R-squared:              0.0121
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Fri, Mar 02 2018
-Time:                        20:31:52
+Date:                Thu, Mar 15 2018
+Time:                        10:58:58
 
 
                   Equation: hours, Dependent Variable: hours
@@ -762,8 +764,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
 No. Equations.:                       2   Cov. Estimator:                 robust
 No. Observations:                   428   Num. Constraints:                 None
-Date:                  Fri, Mar 02 2018
-Time:                          20:31:52
+Date:                  Thu, Mar 15 2018
+Time:                          10:58:58
 
 
                   Equation: hours, Dependent Variable: hours
@@ -836,7 +838,7 @@ Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

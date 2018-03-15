@@ -3,8 +3,8 @@ Linear Model Estimation
 
 .. note::
 
-  `Stable documentation <https://bashtage.github.io/linearmodels/doc/>`_ for the latest release
-  is located at `doc <https://bashtage.github.io/linearmodels/doc/>`_.
+  `Stable documentation <https://bashtage.github.io/linearmodels/>`_ for the latest release
+  is located at `doc <https://bashtage.github.io/linearmodels/>`_.
   Documentation for `recent developments <https://bashtage.github.io/linearmodels/devel/>`_
   is located at `devel <https://bashtage.github.io/linearmodels/devel/>`_.
 

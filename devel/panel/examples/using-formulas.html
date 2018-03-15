@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.5+2.g0467855 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -60,40 +60,41 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    ../../index.html" class="text-logo">linearmodels 4.5 (+2, g0467855)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
-      <ul>
-<li><a class="reference internal" href="#">Using formulas to specify models</a><ul>
-<li><a class="reference internal" href="#Loading-and-preparing-data">Loading and preparing data</a></li>
-<li><a class="reference internal" href="#PanelOLS-with-Entity-Effects">PanelOLS with Entity Effects</a></li>
-<li><a class="reference internal" href="#PanelOLS-with-Entity-Effects-and-a-constant">PanelOLS with Entity Effects and a constant</a></li>
-<li><a class="reference internal" href="#Panel-with-Entity-and-Time-Effects">Panel with Entity and Time Effects</a></li>
-<li><a class="reference internal" href="#Between-OLS">Between OLS</a></li>
-<li><a class="reference internal" href="#First-Difference-OLS">First Difference OLS</a></li>
-<li><a class="reference internal" href="#Pooled-OLS">Pooled OLS</a></li>
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Panel Data Model Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-formats.html">Data Formats for Panel Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../faq.html">Implementation Choices</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="examples.html"
-                        title="previous chapter">Examples</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../pandas.html"
-                        title="next chapter">Comparison with pandas PanelOLS and FamaMacBeth</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/panel/examples/using-formulas.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -375,8 +376,8 @@ included or not.</p>
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8223
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.8132
-Time:                        20:31:38   Log-likelihood                   -1167.4
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.8132
+Time:                        10:58:47   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -432,8 +433,8 @@ be identified using teh grand mean of the dependent and the regressors.</p>
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8193
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.8071
-Time:                        20:31:38   Log-likelihood                   -1167.4
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.8071
+Time:                        10:58:47   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -490,8 +491,8 @@ variable.</p>
 Dep. Variable:                 invest   R-squared:                        0.7253
 Estimator:                   PanelOLS   R-squared (Between):              0.7944
 No. Observations:                 220   R-squared (Within):               0.7566
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.7856
-Time:                        20:31:38   Log-likelihood                   -1153.0
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.7856
+Time:                        10:58:47   Log-likelihood                   -1153.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      248.15
 Entities:                          11   P-value                           0.0000
@@ -547,8 +548,8 @@ completeness.</p>
 Dep. Variable:                 invest   R-squared:                        0.8644
 Estimator:                 BetweenOLS   R-squared (Between):              0.8644
 No. Observations:                  11   R-squared (Within):               0.4195
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.7616
-Time:                        20:31:38   Log-likelihood                   -61.997
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.7616
+Time:                        10:58:47   Log-likelihood                   -61.997
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      25.500
 Entities:                          11   P-value                           0.0003
@@ -597,8 +598,8 @@ not identified after differencing.</p>
 Dep. Variable:                 invest   R-squared:                        0.4287
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.8643
 No. Observations:                 209   R-squared (Within):               0.7539
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.8461
-Time:                        20:31:38   Log-likelihood                   -1071.1
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.8461
+Time:                        10:58:47   Log-likelihood                   -1071.1
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      77.679
 Entities:                          11   P-value                           0.0000
@@ -647,8 +648,8 @@ are no effects. It is effectively identical to <code class="docutils literal not
 Dep. Variable:                 invest   R-squared:                        0.8179
 Estimator:                  PooledOLS   R-squared (Between):              0.8426
 No. Observations:                 220   R-squared (Within):               0.7357
-Date:                Fri, Mar 02 2018   R-squared (Overall):              0.8179
-Time:                        20:31:38   Log-likelihood                   -1301.3
+Date:                Thu, Mar 15 2018   R-squared (Overall):              0.8179
+Time:                        10:58:47   Log-likelihood                   -1301.3
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      487.28
 Entities:                          11   P-value                           0.0000
@@ -707,7 +708,7 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

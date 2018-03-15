@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.5+1.g0a77400 documentation</title>
+    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.5+2.g0467855 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="data.html" title="Panel Data Structures"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -60,48 +60,41 @@
         <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
       </div>
   <div id="left-column">
-    <div class="sphinxsidebar">
+    <div class="sphinxsidebar"><a href="
+    ../index.html" class="text-logo">linearmodels 4.5 (+2, g0467855)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
-    <h2>Contents</h2>
-    <div class="sidebar-localtoc">
-      <ul>
-<li><a class="reference internal" href="#">Formulas and Mathematical Detail</a><ul>
-<li><a class="reference internal" href="#models">Models</a><ul>
-<li><a class="reference internal" href="#fixed-effect-estimation-panelols">Fixed Effect Estimation (PanelOLS)</a></li>
-<li><a class="reference internal" href="#random-effect-estimation-randomeffects">Random Effect Estimation (RandomEffects)</a></li>
-<li><a class="reference internal" href="#between-estimation-betweenols">Between Estimation (BetweenOLS)</a></li>
-<li><a class="reference internal" href="#first-difference-estimation-firstdifferenceols">First Difference Estimation (FirstDifferenceOLS)</a></li>
-<li><a class="reference internal" href="#pooled-model-estimation-pooledols">Pooled Model Estimation (PooledOLS)</a></li>
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../iv/index.html">Instrumental Variable Estimation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Panel Data Model Estimation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/data-formats.html">Data Formats for Panel Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pandas.html">Comparison with pandas PanelOLS and FamaMacBeth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Module Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Formulas and Mathematical Detail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html">Implementation Choices</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#covariance-estimators">Covariance Estimators</a><ul>
-<li><a class="reference internal" href="#standard-covariance-estimator-unadjusted">Standard Covariance Estimator (unadjusted)</a></li>
-<li><a class="reference internal" href="#heteroskedastic-covariance-estimator-robust">Heteroskedastic Covariance Estimator (robust)</a></li>
-<li><a class="reference internal" href="#clustered-covariance-estimator">Clustered Covariance Estimator</a></li>
-<li><a class="reference internal" href="#driscoll-kraay-covariance-estimator">Driscoll-Kraay Covariance Estimator</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../asset-pricing/index.html">Linear Factor Models for Asset Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../system/index.html">System Regression Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utility.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plan.html">Module Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changes.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
-    </div>
+    
   </div>
 </div>
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="data.html"
-                        title="previous chapter">Panel Data Structures</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="faq.html"
-                        title="next chapter">Implementation Choices</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/panel/mathematical-formula.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <div id="main-search">
@@ -364,7 +357,7 @@ supported include the Bartlett, Parzen and Quadratic Spectral.</p>
         <li class="right" >
           <a href="data.html" title="Panel Data Structures"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+1.g0a77400 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.5+2.g0467855 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
