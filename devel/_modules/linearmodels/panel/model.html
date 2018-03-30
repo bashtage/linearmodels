@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.6+4.g990b5cd documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.6+6.g357f269 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+6.g357f269 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6 (+4, g990b5cd)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.6 (+6, g357f269)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -480,8 +480,9 @@
 
     <span class="k">def</span> <span class="nf">_prepare_between</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prepare values for between estimation of R2&quot;&quot;&quot;</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
         <span class="c1"># Weight transformation</span>
         <span class="n">wcount</span><span class="p">,</span> <span class="n">wmean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span>
         <span class="n">wsum</span> <span class="o">=</span> <span class="n">wcount</span> <span class="o">*</span> <span class="n">wmean</span>
@@ -2120,7 +2121,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+6.g357f269 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
