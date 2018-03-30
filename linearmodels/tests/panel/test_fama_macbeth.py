@@ -5,6 +5,7 @@ import pytest
 import pandas as pd
 from numpy.testing import assert_allclose
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
 from linearmodels.tests.panel._utility import generate_data, datatypes, assert_frame_similar
@@ -40,7 +41,7 @@ def test_fama_macbeth(data):
         if _x.shape[0] < _x.shape[1]:
             continue
         _x = _x.loc[_y.index]
-        params.append(np.linalg.lstsq(_x.values, _y.values)[0])
+        params.append(lstsq(_x.values, _y.values)[0])
     params = np.array(params).squeeze()
     all_params = params
     params = params.mean(0)

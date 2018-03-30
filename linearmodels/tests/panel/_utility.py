@@ -3,6 +3,8 @@ import pandas as pd
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
 
+from linearmodels.compat.numpy import lstsq
+
 try:
     import xarray  # flake8: noqa
 
@@ -47,7 +49,7 @@ def lsdv(y: pd.DataFrame, x: pd.DataFrame, has_const=False, entity=False, time=F
 
     wy = w * y.values
     wx = w * x.values
-    params = np.linalg.lstsq(wx, wy)[0]
+    params = lstsq(wx, wy)[0]
     params = params.squeeze()
 
     return params[:nvar]

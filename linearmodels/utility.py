@@ -9,6 +9,7 @@ from pandas import DataFrame, Series, concat
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
+from linearmodels.compat.numpy import lstsq
 
 class MissingValueWarning(Warning):
     pass
@@ -142,7 +143,7 @@ def has_constant(x):
     has_const = bool(aug_rank == rank)
     loc = None
     if has_const:
-        out = np.linalg.lstsq(x, np.ones((n, 1)))
+        out = lstsq(x, np.ones((n, 1)))
         beta = out[0].ravel()
         loc = np.argmax(np.abs(beta) * x.var(0))
     return has_const, loc

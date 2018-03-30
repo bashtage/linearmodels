@@ -13,6 +13,7 @@ from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
                                                    KernelWeight)
 from linearmodels.asset_pricing.results import (GMMFactorModelResults,
                                                 LinearFactorModelResults)
+from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.data import IVData
 from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
                                   matrix_rank, missing_warning)
@@ -439,7 +440,7 @@ class LinearFactorModel(TradedFactorModel):
 
         # Step 1, n regressions to get B
         fc = np.c_[np.ones((nobs, 1)), f]
-        b = np.linalg.lstsq(fc, p)[0]  # nf+1 by np
+        b = lstsq(fc, p)[0]  # nf+1 by np
         eps = p - fc @ b
         if excess_returns:
             betas = b[1:].T
@@ -448,7 +449,7 @@ class LinearFactorModel(TradedFactorModel):
             betas[:, 0] = 1.0
 
         sigma_m12 = self._sigma_m12
-        lam = np.linalg.lstsq(sigma_m12 @ betas, sigma_m12 @ p.mean(0)[:, None])[0]
+        lam = lstsq(sigma_m12 @ betas, sigma_m12 @ p.mean(0)[:, None])[0]
         expected = betas @ lam
         pricing_errors = p - expected.T
         # Moments

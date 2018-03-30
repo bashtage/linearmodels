@@ -5,6 +5,7 @@ import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
@@ -142,6 +143,8 @@ class PanelData(object):
         self._var_name = var_name
         self._convert_dummies = convert_dummies
         self._drop_first = drop_first
+        self._panel = None
+        self._shape = None
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
@@ -208,7 +211,9 @@ class PanelData(object):
     @property
     def panel(self):
         """pandas Panel view of data"""
-        return _Panel(self._frame)
+        if self._panel is None:
+            self._panel = _Panel(self._frame)
+        return self._panel
 
     @property
     def dataframe(self):
@@ -235,12 +240,20 @@ class PanelData(object):
         """
         self._frame = self._frame.loc[~locs.ravel()]
         self._frame = self._minimize_multiindex(self._frame)
+        # Reset panel and shape after a drop
+        self._panel = self._shape = None
         self._k, self._t, self._n = self.shape
 
     @property
     def shape(self):
         """Shape of panel view of data"""
-        return self.panel.shape
+        if self._shape is None:
+            k = self._frame.shape[1]
+            index = self._frame.index
+            t = pd.Series(index.levels[1][index.labels[1]]).unique().shape[0]
+            n = pd.Series(index.levels[0][index.labels[0]]).unique().shape[0]
+            self._shape = k, t, n
+        return self._shape
 
     @property
     def ndim(self):
@@ -329,7 +342,7 @@ class PanelData(object):
         d = PanelData(d).demean(group, weights=weights)
         d = d.values2d
         e = e.values2d
-        resid = e - d @ np.linalg.lstsq(d, e)[0]
+        resid = e - d @ lstsq(d, e)[0]
         resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 
         return PanelData(resid)
@@ -415,7 +428,7 @@ class PanelData(object):
 
         return PanelData(current)
 
-    def demean(self, group='entity', weights=None):
+    def demean(self, group='entity', weights=None, return_panel=True):
         """
         Demeans data by either entity or time group
 
@@ -425,6 +438,9 @@ class PanelData(object):
             Group to use in demeaning
         weights : PanelData, optional
             Weights to implement weighted averaging
+        return_panel : bool
+            Flag indicating to return a PanelData object. If False, a 2-d
+            NumPy representation of the panel is returned
 
         Returns
         -------
@@ -444,7 +460,10 @@ class PanelData(object):
         level = 0 if group == 'entity' else 1
         if weights is None:
             group_mu = self._frame.groupby(level=level).transform('mean')
-            return PanelData(self._frame - group_mu)
+            out = self._frame - group_mu
+            if not return_panel:
+                return out.values
+            return PanelData(out)
         else:
             w = weights.values2d
             frame = self._frame.copy()
@@ -453,7 +472,10 @@ class PanelData(object):
             frame.iloc[:, :] = w
             sum_weights = frame.groupby(level=level).transform('sum')
             group_mu = weighted_sum / sum_weights
-            return PanelData(np.sqrt(w) * (self._frame - group_mu))
+            out = np.sqrt(w) * (self._frame - group_mu)
+            if not return_panel:
+                return out.values
+            return PanelData(out)
 
     def __str__(self):
         return self.__class__.__name__ + '\n' + str(self._frame)

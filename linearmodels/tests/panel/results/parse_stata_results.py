@@ -8,23 +8,22 @@ from linearmodels.utility import AttrDict
 filename = 'stata-panel-simulated-results.txt'
 
 cwd = os.path.split(os.path.abspath(__file__))[0]
-results = open(os.path.join(cwd, filename))
-
 blocks = {}
 block = []
 key = ''
-for line in results.readlines():
-    line = line.strip()
-    if not line:
-        continue
-    if '###!' in line:
-        if key:
-            blocks[key] = block
-        block = []
-        key = line.split('!')[1]
-    block.append(line)
-if block:
-    blocks[key] = block
+with open(os.path.join(cwd, filename)) as results:
+    for line in results.readlines():
+        line = line.strip()
+        if not line:
+            continue
+        if '###!' in line:
+            if key:
+                blocks[key] = block
+            block = []
+            key = line.split('!')[1]
+        block.append(line)
+    if block:
+        blocks[key] = block
 
 
 def parse_block(block):
@@ -43,7 +42,8 @@ def parse_block(block):
         value = float(value)
         tstat = float(block[i + 1])
         pvalue = float(block[i + 1])
-        params[name] = pd.Series({'param': value, 'tstat': tstat, 'pvalue': pvalue})
+        params[name] = pd.Series(
+            {'param': value, 'tstat': tstat, 'pvalue': pvalue})
     params = pd.DataFrame(params).sort_index()
     for i in range(stats_start, variance_start - 1):
         if '\t' in block[i]:

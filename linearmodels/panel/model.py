@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
-from numpy.linalg import lstsq, matrix_rank
+from numpy.linalg import matrix_rank
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
                                            CovarianceManager, DriscollKraay,
                                            FamaMacBethCovariance,
@@ -168,6 +169,7 @@ class PooledOLS(object):
         self._original_shape = self.dependent.shape
         self._constant = None
         self._formula = None
+        self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
         self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
@@ -232,6 +234,7 @@ class PooledOLS(object):
     def _adapt_weights(self, weights):
         """Check and transform weights depending on size"""
         if weights is None:
+            self._is_weighted = False
             frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = 1
             frame.columns = ['weight']
@@ -421,8 +424,13 @@ class PooledOLS(object):
         #############################################
         # R2 - Within
         #############################################
-        wy = self.dependent.demean('entity', weights=self.weights).values2d
-        wx = self.exog.demean('entity', weights=self.weights).values2d
+        weights = self.weights if self._is_weighted else None
+        wy = self.dependent.demean('entity', weights=weights,
+                                   return_panel=False)
+        wx = self.exog.demean('entity', weights=weights,
+                              return_panel=False)
+        # wy = self.dependent.demean('entity', weights=self.weights).values2d
+        # wx = self.exog.demean('entity', weights=self.weights).values2d
         weps = wy - wx @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)
@@ -893,8 +901,8 @@ class PanelOLS(PooledOLS):
             z = np.ones_like(root_w)
             d -= z * (z.T @ d / z.sum())
 
-        x_mean = np.linalg.lstsq(wd, x)[0]
-        y_mean = np.linalg.lstsq(wd, y)[0]
+        x_mean = lstsq(wd, x)[0]
+        y_mean = lstsq(wd, y)[0]
 
         # Save fitted unweighted effects to use in eps calculation
         x_effects = d @ x_mean
@@ -1161,7 +1169,7 @@ class PanelOLS(PooledOLS):
             if matrix_rank(x) < x.shape[1]:
                 raise AbsorbingEffectError(absorbing_error_msg)
 
-        params = np.linalg.lstsq(x, y)[0]
+        params = lstsq(x, y)[0]
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
@@ -1217,10 +1225,10 @@ class PanelOLS(PooledOLS):
             df_num, df_denom = (df_model - wx.shape[1]), df_resid
             if not self.has_constant:
                 # Correction for when models does not have explicit constant
-                wy -= root_w * np.linalg.lstsq(root_w, wy)[0]
-                wx -= root_w * np.linalg.lstsq(root_w, wx)[0]
+                wy -= root_w * lstsq(root_w, wy)[0]
+                wx -= root_w * lstsq(root_w, wx)[0]
                 df_num -= 1
-            weps_pooled = wy - wx @ np.linalg.lstsq(wx, wy)[0]
+            weps_pooled = wy - wx @ lstsq(wx, wy)[0]
             resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
             num = (resid_ss_pooled - resid_ss) / df_num
 
@@ -1728,12 +1736,12 @@ class RandomEffects(PooledOLS):
             x_gm = (w * self.exog.values2d).sum(0) / w_sum
             y += root_w * y_gm
             x += root_w * x_gm
-        params = np.linalg.lstsq(x, y)[0]
+        params = lstsq(x, y)[0]
         weps = y - x @ params
 
         wybar = self.dependent.mean('entity', weights=self.weights)
         wxbar = self.exog.mean('entity', weights=self.weights)
-        params = np.linalg.lstsq(wxbar, wybar)[0]
+        params = lstsq(wxbar, wybar)[0]
         wu = wybar.values - wxbar.values @ params
 
         nobs = weps.shape[0]
@@ -1767,7 +1775,7 @@ class RandomEffects(PooledOLS):
         wxbar = (theta * wxbar).loc[reindex]
         wy -= wybar.values
         wx -= wxbar.values
-        params = np.linalg.lstsq(wx, wy)[0]
+        params = lstsq(wx, wy)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
@@ -1902,7 +1910,7 @@ class FamaMacBeth(PooledOLS):
             if exog.shape[0] < exog.shape[1]:
                 return pd.Series([np.nan] * len(z.columns), index=z.columns)
             dep = z.iloc[:, :1].values
-            params = np.linalg.lstsq(exog, dep)[0]
+            params = lstsq(exog, dep)[0]
             return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
