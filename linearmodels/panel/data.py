@@ -35,9 +35,9 @@ class _Panel(object):
         index = df.index
         self._major_axis = pd.Series(index.levels[1][index.labels[1]]).unique()
         self._minor_axis = pd.Series(index.levels[0][index.labels[0]]).unique()
-        full_index = list(product(self._minor_axis, self._major_axis))
-        self._full_index = pd.MultiIndex.from_tuples(full_index)
-        new_df = df.copy().loc[self._full_index]
+        self._full_index = pd.MultiIndex.from_product([self._minor_axis,
+                                                       self._major_axis])
+        new_df = df.reindex(self._full_index)
         self._frame = new_df
         i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
         self._shape = (i, j, k)
@@ -507,7 +507,7 @@ class PanelData(object):
         index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
         out = DataFrame(count.T, index=index, columns=self.vars)
         reindex = self.entities if group == 'entity' else self.time
-        out = out.loc[reindex].astype(np.int64)
+        out = out.reindex(reindex).astype(np.int64)
         out.index.name = group
         return out
 
@@ -550,7 +550,7 @@ class PanelData(object):
             mu = weighted_sum / sum_weights
 
         reindex = self.entities if group == 'entity' else self.time
-        out = mu.loc[reindex]
+        out = mu.reindex(reindex)
 
         return out
 

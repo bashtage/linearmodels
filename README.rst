@@ -105,10 +105,10 @@ The master branch can be installed by cloning the repo and running setup
 Documentation
 -------------
 
-`Stable Documentation <https://bashtage.github.io/linearmodels/>`__
-is built on every tagged version using
+`Stable Documentation <https://bashtage.github.io/linearmodels/>`__ is
+built on every tagged version using
 `doctr <https://github.com/drdoctr/doctr>`__. `Development
-Documentation <https://bashtage.github.io/linearmodels/devel/>`__ is
+Documentation <https://bashtage.github.io/linearmodels/devel>`__ is
 automatically built on every successful build of master.
 
 Plan and status
@@ -137,9 +137,9 @@ others are the version that are being used in the test environment. It
 is possible that older versions work.
 
 -  **Python 3.5+**: extensive use of ``@`` operator
--  NumPy (1.11+)
+-  NumPy (1.12+)
 -  SciPy (0.18+)
--  pandas (0.19+)
+-  pandas (0.20+)
 -  statsmodels (0.8+)
 -  xarray (0.9+, optional)
 
