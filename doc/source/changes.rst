@@ -1,6 +1,15 @@
 Change Log
 ----------
 
+Version 4.7
+===========
+* Improved performance of Panel estimators by optimizing data structure
+  construction
+
+Version 4.6
+===========
+* Added a license
+
 Version 4.5
 ===========
 * Added System GMM estimator
