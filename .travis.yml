@@ -21,22 +21,22 @@ matrix:
   - python: 3.6
     env:
     - PYTHON=3.5
-    - NUMPY=1.11
-    - SCIPY=0.18
-    - PANDAS=0.19
-  - python: 3.6
-    env:
-    - PYTHON=3.5
     - NUMPY=1.12
-    - SCIPY=0.19
+    - SCIPY=0.18
     - PANDAS=0.20
-    - XARRAY=0.9
   - python: 3.6
     env:
     - PYTHON=3.6
     - NUMPY=1.13
-    - SCIPY=1.0
+    - SCIPY=0.19
     - PANDAS=0.21
+    - XARRAY=0.9
+  - python: 3.6
+    env:
+    - PYTHON=3.6
+    - NUMPY=1.14
+    - SCIPY=1.0
+    - PANDAS=0.22
     - XARRAY=0.10
     - DOCBUILD=true
 
