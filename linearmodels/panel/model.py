@@ -370,8 +370,9 @@ class PooledOLS(object):
 
     def _prepare_between(self):
         """Prepare values for between estimation of R2"""
-        y = self.dependent.mean('entity', weights=self.weights).values
-        x = self.exog.mean('entity', weights=self.weights).values
+        weights = self.weights if self._is_weighted else None
+        y = self.dependent.mean('entity', weights=weights).values
+        x = self.exog.mean('entity', weights=weights).values
         # Weight transformation
         wcount, wmean = self.weights.count('entity'), self.weights.mean('entity')
         wsum = wcount * wmean

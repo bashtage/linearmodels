@@ -11,6 +11,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 from linearmodels.compat.numpy import lstsq
 
+
 class MissingValueWarning(Warning):
     pass
 
