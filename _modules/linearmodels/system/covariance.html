@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.covariance &#8212; linearmodels 4.6 documentation</title>
+    <title>linearmodels.system.covariance &#8212; linearmodels 4.7 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../../index.html" class="text-logo">linearmodels 4.7</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -240,8 +240,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
+        <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
 <div class="viewcode-block" id="HeteroskedasticCovariance"><a class="viewcode-back" href="../../../system/covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance">[docs]</a><span class="k">class</span> <span class="nc">HeteroskedasticCovariance</span><span class="p">(</span><span class="n">HomoskedasticCovariance</span><span class="p">):</span>
@@ -343,8 +343,8 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)):</span>
             <span class="n">adj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">ones</span><span class="p">((</span><span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">)))</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="n">vstack</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
-        <span class="n">adj</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span></div>
-        <span class="k">return</span> <span class="n">adj</span> <span class="o">@</span> <span class="n">adj</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">adj</span> <span class="o">@</span> <span class="n">adj</span><span class="o">.</span><span class="n">T</span></div>
 
 
 <div class="viewcode-block" id="KernelCovariance"><a class="viewcode-back" href="../../../system/covariance.html#linearmodels.system.covariance.KernelCovariance">[docs]</a><span class="k">class</span> <span class="nc">KernelCovariance</span><span class="p">(</span><span class="n">HeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
@@ -421,8 +421,8 @@
     <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span></div>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="GMMHomoskedasticCovariance"><a class="viewcode-back" href="../../../system/covariance.html#linearmodels.system.covariance.GMMHomoskedasticCovariance">[docs]</a><span class="k">class</span> <span class="nc">GMMHomoskedasticCovariance</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -526,8 +526,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span>
+        <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span></div>
 
 
 <div class="viewcode-block" id="GMMHeteroskedasticCovariance"><a class="viewcode-back" href="../../../system/covariance.html#linearmodels.system.covariance.GMMHeteroskedasticCovariance">[docs]</a><span class="k">class</span> <span class="nc">GMMHeteroskedasticCovariance</span><span class="p">(</span><span class="n">GMMHomoskedasticCovariance</span><span class="p">):</span>
@@ -580,8 +580,8 @@
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">omega</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span> <span class="o">/</span> <span class="n">nobs</span>
-</div>
-        <span class="k">return</span> <span class="n">omega</span>
+
+        <span class="k">return</span> <span class="n">omega</span></div>
 
 
 <div class="viewcode-block" id="GMMKernelCovariance"><a class="viewcode-back" href="../../../system/covariance.html#linearmodels.system.covariance.GMMKernelCovariance">[docs]</a><span class="k">class</span> <span class="nc">GMMKernelCovariance</span><span class="p">(</span><span class="n">GMMHeteroskedasticCovariance</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
@@ -640,8 +640,8 @@
     <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Optional configuration information used in covariance&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span></div>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
           </div>
@@ -658,7 +658,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

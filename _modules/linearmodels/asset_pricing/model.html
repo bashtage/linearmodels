@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.asset_pricing.model &#8212; linearmodels 4.6 documentation</title>
+    <title>linearmodels.asset_pricing.model &#8212; linearmodels 4.7 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../../index.html" class="text-logo">linearmodels 4.7</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -123,6 +123,7 @@
                                                    <span class="n">KernelWeight</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">linearmodels.asset_pricing.results</span> <span class="k">import</span> <span class="p">(</span><span class="n">GMMFactorModelResults</span><span class="p">,</span>
                                                 <span class="n">LinearFactorModelResults</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.compat.numpy</span> <span class="k">import</span> <span class="n">lstsq</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv.data</span> <span class="k">import</span> <span class="n">IVData</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
                                   <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">missing_warning</span><span class="p">)</span>
@@ -280,8 +281,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">)</span>
-        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span></div>
-        <span class="k">return</span> <span class="n">mod</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div>
 
 <div class="viewcode-block" id="TradedFactorModel.fit"><a class="viewcode-back" href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -383,8 +384,8 @@
                        <span class="n">factor_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
                        <span class="n">cov_type</span><span class="o">=</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">,</span> <span class="n">rp_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span>
                        <span class="n">cov_est</span><span class="o">=</span><span class="n">cov_est</span><span class="p">)</span>
-</div></div>
-        <span class="k">return</span> <span class="n">LinearFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">LinearFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="LinearFactorModel"><a class="viewcode-back" href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModel">[docs]</a><span class="k">class</span> <span class="nc">LinearFactorModel</span><span class="p">(</span><span class="n">TradedFactorModel</span><span class="p">):</span>
@@ -513,8 +514,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="n">risk_free</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
-        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span></div>
-        <span class="k">return</span> <span class="n">mod</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div>
 
 <div class="viewcode-block" id="LinearFactorModel.fit"><a class="viewcode-back" href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModel.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -549,7 +550,7 @@
 
         <span class="c1"># Step 1, n regressions to get B</span>
         <span class="n">fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">f</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># nf+1 by np</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># nf+1 by np</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">fc</span> <span class="o">@</span> <span class="n">b</span>
         <span class="k">if</span> <span class="n">excess_returns</span><span class="p">:</span>
             <span class="n">betas</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span>
@@ -558,7 +559,7 @@
             <span class="n">betas</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
         <span class="n">sigma_m12</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_m12</span>
-        <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">sigma_m12</span> <span class="o">@</span> <span class="n">betas</span><span class="p">,</span> <span class="n">sigma_m12</span> <span class="o">@</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">sigma_m12</span> <span class="o">@</span> <span class="n">betas</span><span class="p">,</span> <span class="n">sigma_m12</span> <span class="o">@</span> <span class="n">p</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">expected</span> <span class="o">=</span> <span class="n">betas</span> <span class="o">@</span> <span class="n">lam</span>
         <span class="n">pricing_errors</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">expected</span><span class="o">.</span><span class="n">T</span>
         <span class="c1"># Moments</span>
@@ -617,8 +618,8 @@
                        <span class="n">factor_names</span><span class="o">=</span><span class="n">factor_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
                        <span class="n">cov_type</span><span class="o">=</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">,</span> <span class="n">rp_names</span><span class="o">=</span><span class="n">rp_names</span><span class="p">,</span>
                        <span class="n">cov_est</span><span class="o">=</span><span class="n">cov_est</span><span class="p">)</span>
-</div>
-        <span class="k">return</span> <span class="n">LinearFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">LinearFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">shape</span>
@@ -672,8 +673,8 @@
         <span class="n">g1</span> <span class="o">=</span> <span class="n">f_rep</span> <span class="o">*</span> <span class="n">eps_rep</span>
         <span class="n">g2</span> <span class="o">=</span> <span class="n">pricing_errors</span> <span class="o">@</span> <span class="n">sigma_inv</span> <span class="o">@</span> <span class="n">betas</span>
         <span class="n">g3</span> <span class="o">=</span> <span class="n">pricing_errors</span> <span class="o">-</span> <span class="n">alphas</span><span class="o">.</span><span class="n">T</span>
-</div>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">g3</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">g3</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="LinearFactorModelGMM"><a class="viewcode-back" href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM">[docs]</a><span class="k">class</span> <span class="nc">LinearFactorModelGMM</span><span class="p">(</span><span class="n">LinearFactorModel</span><span class="p">):</span>
@@ -767,8 +768,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">factors</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_data_from_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">portfolios</span><span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">portfolios</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="n">risk_free</span><span class="p">)</span>
-        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span></div>
-        <span class="k">return</span> <span class="n">mod</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
+        <span class="k">return</span> <span class="n">mod</span></div>
 
 <div class="viewcode-block" id="LinearFactorModelGMM.fit"><a class="viewcode-back" href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_cue</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
             <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
@@ -917,8 +918,8 @@
                        <span class="n">factor_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
                        <span class="n">cov_type</span><span class="o">=</span><span class="n">cov_type</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">,</span> <span class="n">rp_names</span><span class="o">=</span><span class="n">rp_names</span><span class="p">,</span>
                        <span class="nb">iter</span><span class="o">=</span><span class="n">iters</span><span class="p">,</span> <span class="n">cov_est</span><span class="o">=</span><span class="n">cov_est</span><span class="p">)</span>
-</div>
-        <span class="k">return</span> <span class="n">GMMFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">GMMFactorModelResults</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_moments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate nobs by nmoments moment conditions&quot;&quot;&quot;</span>
@@ -990,8 +991,8 @@
         <span class="n">jac</span><span class="p">[:</span><span class="n">r1</span><span class="p">,</span> <span class="n">s1</span><span class="p">:</span><span class="n">s2</span><span class="p">]</span> <span class="o">=</span> <span class="n">jac12</span>
         <span class="n">jac</span><span class="p">[:</span><span class="n">r1</span><span class="p">,</span> <span class="n">s2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">jac13</span>
         <span class="n">jac</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:,</span> <span class="o">-</span><span class="n">k</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-</div>
-        <span class="k">return</span> <span class="n">jac</span>
+
+        <span class="k">return</span> <span class="n">jac</span></div>
 </pre></div>
 
           </div>
@@ -1008,7 +1009,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

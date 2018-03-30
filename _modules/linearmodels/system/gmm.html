@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.gmm &#8212; linearmodels 4.6 documentation</title>
+    <title>linearmodels.system.gmm &#8212; linearmodels 4.7 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../../index.html" class="text-logo">linearmodels 4.7</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -201,8 +201,8 @@
 <span class="sd">            Covariance of GMM moment conditions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span></div>
-        <span class="k">return</span> <span class="n">w</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
+        <span class="k">return</span> <span class="n">w</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -213,8 +213,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        config : AttrDict</span>
 <span class="sd">            Dictionary containing weight estimator configuration information</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span></div>
 
 
 <div class="viewcode-block" id="HeteroskedasticWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.HeteroskedasticWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">HeteroskedasticWeightMatrix</span><span class="p">(</span><span class="n">HomoskedasticWeightMatrix</span><span class="p">):</span>
@@ -280,8 +280,8 @@
         <span class="n">w</span> <span class="o">=</span> <span class="n">ze</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ze</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debias_scale</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">*=</span> <span class="n">scale</span>
-</div>
-        <span class="k">return</span> <span class="n">w</span>
+
+        <span class="k">return</span> <span class="n">w</span></div>
 
     <span class="k">def</span> <span class="nf">_debias_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
@@ -290,8 +290,8 @@
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">)))</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="n">nvar</span><span class="p">,</span> <span class="n">ninstr</span><span class="p">)</span>
         <span class="n">nvar</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">nvar</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
-        <span class="k">return</span> <span class="n">scale</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">nobs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span> <span class="o">@</span> <span class="n">nvar</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scale</span></div>
 
 
 <div class="viewcode-block" id="KernelWeightMatrix"><a class="viewcode-back" href="../../../system/gmm-weights.html#linearmodels.system.gmm.KernelWeightMatrix">[docs]</a><span class="k">class</span> <span class="nc">KernelWeightMatrix</span><span class="p">(</span><span class="n">HeteroskedasticWeightMatrix</span><span class="p">,</span> <span class="n">_HACMixin</span><span class="p">):</span>
@@ -379,8 +379,8 @@
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_cov</span><span class="p">(</span><span class="n">ze</span><span class="p">)</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debias_scale</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">*=</span> <span class="n">scale</span>
-</div>
-        <span class="k">return</span> <span class="n">w</span>
+
+        <span class="k">return</span> <span class="n">w</span></div>
 
     <span class="k">def</span> <span class="nf">_optimal_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moments</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute optimal bandwidth used in estimation if needed&quot;&quot;&quot;</span>
@@ -410,8 +410,8 @@
 <span class="sd">            Dictionary containing weight estimator configuration information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span></div>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
           </div>
@@ -428,7 +428,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

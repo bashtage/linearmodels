@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.results &#8212; linearmodels 4.6 documentation</title>
+    <title>linearmodels.panel.results &#8212; linearmodels 4.7 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../../index.html" class="text-logo">linearmodels 4.7</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -171,8 +171,8 @@
     <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimated covariance of parameters&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_deferred_cov</span><span class="p">(),</span>
-                         <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span></div>
-                         <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">)</span>
+                         <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span>
+                         <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -193,8 +193,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debiased</span><span class="p">:</span>
             <span class="n">pv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">abs_tstats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_resid</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">pv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">abs_tstats</span><span class="p">))</span></div>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;pvalue&#39;</span><span class="p">)</span>
+            <span class="n">pv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">abs_tstats</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;pvalue&#39;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -336,8 +336,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">ci_quantiles</span><span class="p">)</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">ci</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">q</span></div>
-        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">])</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">])</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -516,8 +516,8 @@
         <span class="n">out</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># type: DataFrame</span>
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
-        <span class="k">return</span> <span class="n">out</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fitted_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -617,8 +617,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loglik</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Log-likelihood of model&quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loglik</span>
+        <span class="sd">&quot;&quot;&quot;Log-likelihood of model&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loglik</span></div>
 
 
 <div class="viewcode-block" id="PanelEffectsResults"><a class="viewcode-back" href="../../../panel/results.html#linearmodels.panel.results.PanelEffectsResults">[docs]</a><span class="k">class</span> <span class="nc">PanelEffectsResults</span><span class="p">(</span><span class="n">PanelResults</span><span class="p">):</span>
@@ -740,8 +740,8 @@
     <span class="k">def</span> <span class="nf">variance_decomposition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Decomposition of total variance into effects and residuals&quot;&quot;&quot;</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma2_effects</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma2_eps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rho</span><span class="p">]</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Effects&#39;</span><span class="p">,</span> <span class="s1">&#39;Residual&#39;</span><span class="p">,</span> <span class="s1">&#39;Percent due to Effects&#39;</span><span class="p">]</span></div>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Variance Decomposition&#39;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Effects&#39;</span><span class="p">,</span> <span class="s1">&#39;Residual&#39;</span><span class="p">,</span> <span class="s1">&#39;Percent due to Effects&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Variance Decomposition&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RandomEffectsResults"><a class="viewcode-back" href="../../../panel/results.html#linearmodels.panel.results.RandomEffectsResults">[docs]</a><span class="k">class</span> <span class="nc">RandomEffectsResults</span><span class="p">(</span><span class="n">PanelResults</span><span class="p">):</span>
@@ -765,8 +765,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Values used in generalized demeaning&quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span>
+        <span class="sd">&quot;&quot;&quot;Values used in generalized demeaning&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theta</span></div>
 
 
 <div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../../panel/results.html#linearmodels.panel.results.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
@@ -782,8 +782,8 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    comparison : PanelModelComparison</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-    <span class="k">return</span> <span class="n">PanelModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PanelModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PanelModelComparison"><a class="viewcode-back" href="../../../panel/results.html#linearmodels.panel.results.PanelModelComparison">[docs]</a><span class="k">class</span> <span class="nc">PanelModelComparison</span><span class="p">(</span><span class="n">_ModelComparison</span><span class="p">):</span>
@@ -898,8 +898,8 @@
         <span class="n">txt_fmt</span><span class="p">[</span><span class="s1">&#39;header_align&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">,</span> <span class="n">txt_fmt</span><span class="o">=</span><span class="n">txt_fmt</span><span class="p">)</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;T-stats reported in parentheses&#39;</span><span class="p">])</span></div>
-        <span class="k">return</span> <span class="n">smry</span>
+        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;T-stats reported in parentheses&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">smry</span></div>
 </pre></div>
 
           </div>
@@ -916,7 +916,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
