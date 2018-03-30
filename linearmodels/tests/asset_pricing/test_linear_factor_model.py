@@ -4,6 +4,7 @@ from numpy.testing import assert_allclose
 from scipy import stats
 
 from linearmodels.asset_pricing.model import LinearFactorModel
+from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.covariance import (_cov_kernel, kernel_optimal_bandwidth,
                                         kernel_weight_bartlett)
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
@@ -22,7 +23,7 @@ def test_linear_model_parameters(data):
     n = f.shape[0]
     moments = np.zeros((n, p.shape[1] * (f.shape[1] + 1) + f.shape[1] + p.shape[1]))
     fc = np.c_[np.ones((n, 1)), f]
-    betas = np.linalg.lstsq(fc, p)[0]
+    betas = lstsq(fc, p)[0]
     eps = p - fc @ betas
     loc = 0
     for i in range(eps.shape[1]):
@@ -30,7 +31,7 @@ def test_linear_model_parameters(data):
             moments[:, loc] = eps[:, i] * fc[:, j]
             loc += 1
     b = betas[1:, :].T
-    lam = np.linalg.lstsq(b, p.mean(0)[:, None])[0]
+    lam = lstsq(b, p.mean(0)[:, None])[0]
     pricing_errors = p - (b @ lam).T
     for i in range(lam.shape[0]):
         lam_error = (p - (b @ lam).T) @ b[:, [i]]
@@ -125,7 +126,7 @@ def test_linear_model_parameters_risk_free(data):
     n = f.shape[0]
     moments = np.zeros((n, p.shape[1] * (f.shape[1] + 1) + f.shape[1] + 1 + p.shape[1]))
     fc = np.c_[np.ones((n, 1)), f]
-    betas = np.linalg.lstsq(fc, p)[0]
+    betas = lstsq(fc, p)[0]
     eps = p - fc @ betas
     loc = 0
     for i in range(eps.shape[1]):
@@ -134,7 +135,7 @@ def test_linear_model_parameters_risk_free(data):
             loc += 1
 
     bc = np.c_[np.ones((p.shape[1], 1)), betas[1:, :].T]
-    lam = np.linalg.lstsq(bc, p.mean(0)[:, None])[0]
+    lam = lstsq(bc, p.mean(0)[:, None])[0]
     pricing_errors = p - (bc @ lam).T
     for i in range(lam.shape[0]):
         lam_error = (p - (bc @ lam).T) @ bc[:, [i]]
@@ -227,7 +228,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     n = f.shape[0]
     moments = np.zeros((n, p.shape[1] * (f.shape[1] + 1) + f.shape[1] + 1 + p.shape[1]))
     fc = np.c_[np.ones((n, 1)), f]
-    betas = np.linalg.lstsq(fc, p)[0]
+    betas = lstsq(fc, p)[0]
     eps = p - fc @ betas
     loc = 0
     for i in range(eps.shape[1]):
@@ -235,7 +236,7 @@ def test_linear_model_parameters_risk_free_gls(data):
             moments[:, loc] = eps[:, i] * fc[:, j]
             loc += 1
     bc = np.c_[np.ones((p.shape[1], 1)), betas[1:, :].T]
-    lam = np.linalg.lstsq(sigma_m12 @ bc, sigma_m12 @ p.mean(0)[:, None])[0]
+    lam = lstsq(sigma_m12 @ bc, sigma_m12 @ p.mean(0)[:, None])[0]
     pricing_errors = p - (bc @ lam).T
 
     for i in range(lam.shape[0]):

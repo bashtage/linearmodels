@@ -5,6 +5,7 @@ import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
@@ -341,7 +342,7 @@ class PanelData(object):
         d = PanelData(d).demean(group, weights=weights)
         d = d.values2d
         e = e.values2d
-        resid = e - d @ np.linalg.lstsq(d, e)[0]
+        resid = e - d @ lstsq(d, e)[0]
         resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 
         return PanelData(resid)

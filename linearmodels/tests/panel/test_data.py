@@ -14,6 +14,7 @@ try:
 except ImportError:
     pass
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import generate_data, datatypes, \
@@ -270,14 +271,14 @@ def test_demean_against_dummy_regression(data):
 
     cat = pd.Categorical(no_index[df.index.levels[0].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
+    dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     entity_demean = dh.demean('entity')
     assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
+    dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     time_demean = dh.demean('time')
     assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(dummy_demeaned))
@@ -287,7 +288,7 @@ def test_demean_against_dummy_regression(data):
     cat = pd.Categorical(no_index[df.index.levels[1].name])
     d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
     d = np.c_[d1.values, d2.values]
-    dummy_demeaned = df.values - d @ np.linalg.lstsq(d, df.values)[0]
+    dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     both_demean = dh.demean('both')
     assert_allclose(1 + np.abs(both_demean.values2d),
                     1 + np.abs(dummy_demeaned))
@@ -494,7 +495,7 @@ def test_demean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = wd @ np.linalg.lstsq(wd, wx)[0]
+    mu = wd @ lstsq(wd, wx)[0]
     e = wx - mu
     assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(e))
@@ -505,7 +506,7 @@ def test_demean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = wd @ np.linalg.lstsq(wd, wx)[0]
+    mu = wd @ lstsq(wd, wx)[0]
     e = wx - mu
     assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(e))
@@ -525,7 +526,7 @@ def test_mean_weighted(data):
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
     wd = d * root_w
-    mu = np.linalg.lstsq(wd, wx)[0]
+    mu = lstsq(wd, wx)[0]
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean('time', weights=w)
@@ -620,7 +621,7 @@ def test_general_demean_oneway(panel):
     dm2 = y.general_demean(g)
     g = pd.Categorical(g.iloc[:, 0])
     d = pd.get_dummies(g)
-    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1, dm2.values2d)
 
 
@@ -639,7 +640,7 @@ def test_general_demean_twoway(panel):
     g2 = pd.Categorical(g.iloc[:, 1])
     d2 = pd.get_dummies(g2, drop_first=True)
     d = np.c_[d1, d2]
-    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
 
 
@@ -667,7 +668,7 @@ def test_general_unit_weighted_demean_oneway(panel):
     dm3 = y.general_demean(g)
     g = pd.Categorical(g.dataframe.iloc[:, 0])
     d = pd.get_dummies(g)
-    dm1 = y.values2d - d @ np.linalg.lstsq(d, y.values2d)[0]
+    dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1, dm2.values2d)
     assert_allclose(dm3.values2d, dm2.values2d)
 
@@ -695,7 +696,7 @@ def test_general_weighted_demean_oneway(panel):
     d = pd.get_dummies(g)
     wd = np.sqrt(w.values2d) * d
     wy = np.sqrt(w.values2d) * y.values2d
-    dm1 = wy - wd @ np.linalg.lstsq(wd, wy)[0]
+    dm1 = wy - wd @ lstsq(wd, wy)[0]
     assert_allclose(dm1, dm2.values2d, atol=1e-14)
 
 
@@ -722,7 +723,7 @@ def test_general_unit_weighted_demean_twoway(panel):
     d = np.c_[d1, d2]
     wd = np.sqrt(w.values2d) * d
     wy = np.sqrt(w.values2d) * y.values2d
-    dm1 = wy - wd @ np.linalg.lstsq(wd, wy)[0]
+    dm1 = wy - wd @ lstsq(wd, wy)[0]
     assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
 
 

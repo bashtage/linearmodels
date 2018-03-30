@@ -21,6 +21,7 @@ from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
 from numpy.linalg import inv, solve
 from pandas import Series, concat, DataFrame
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
 from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
@@ -742,7 +743,7 @@ class IV3SLS(object):
                 self._xhat.append(x)
                 self._wxhat.append(self._wx[i])
             else:
-                delta = np.linalg.lstsq(z, x)[0]
+                delta = lstsq(z, x)[0]
                 xhat = z @ delta
                 self._xhat.append(xhat)
                 w = self._w[i]
@@ -799,7 +800,7 @@ class IV3SLS(object):
             cons = int(self.has_constant.iloc[i])
             if cons:
                 wc = np.ones_like(wy) * np.sqrt(w)
-                wye = wy - wc @ np.linalg.lstsq(wc, wy)[0]
+                wye = wy - wc @ lstsq(wc, wy)[0]
             total_ss = float(wye.T @ wye)
             stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
                                                cov_type, cov_est, 0, debiased, cons, total_ss)
@@ -1077,7 +1078,7 @@ class IV3SLS(object):
 
             if cons:
                 c = np.sqrt(self._w[i])
-                ye = self._wy[i] - c @ np.linalg.lstsq(c, self._wy[i])[0]
+                ye = self._wy[i] - c @ lstsq(c, self._wy[i])[0]
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
@@ -1581,7 +1582,7 @@ class IVSystemGMM(IV3SLS):
 
             if cons:
                 c = np.sqrt(self._w[i])
-                ye = self._wy[i] - c @ np.linalg.lstsq(c, self._wy[i])[0]
+                ye = self._wy[i] - c @ lstsq(c, self._wy[i])[0]
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
