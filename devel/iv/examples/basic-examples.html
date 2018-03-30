@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Basic Examples &#8212; linearmodels 4.6 documentation</title>
+    <title>Basic Examples &#8212; linearmodels 4.6+4.g990b5cd documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../index.html" class="text-logo">linearmodels 4.6 (+4, g990b5cd)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -323,6 +323,15 @@ values are dropped.</p>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/site-packages/statsmodels/compat/pandas.py:56: FutureWarning: The pandas.core.datetools module is deprecated and will be removed in a future version. Please use the pandas.tseries module instead.
+  from pandas.core import datetools
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 
@@ -355,15 +364,6 @@ expersq    exper^2
 
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="stderr output_area docutils container">
-<div class="highlight"><pre>
-/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/site-packages/statsmodels/compat/pandas.py:56: FutureWarning: The pandas.core.datetools module is deprecated and will be removed in a future version. Please use the pandas.tseries module instead.
-  from pandas.core import datetools
-</pre></div></div>
-</div>
 <p>Since OLS is a special case of 2SLS, IV2SLS can be used to estimate a
 model using OLS by setting <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code> variables to
 <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
@@ -392,8 +392,8 @@ the log of wage. It indicates that 1 year of education increases wage by
 Dep. Variable:                   wage   R-squared:                      0.1179
 Estimator:                        OLS   Adj. R-squared:                 0.1158
 No. Observations:                 428   F-statistic:                    57.196
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:06   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -434,8 +434,8 @@ where the F-statistic is at least 10.</p>
 Dep. Variable:                   educ   R-squared:                      0.1726
 Estimator:                        OLS   Adj. R-squared:                 0.1706
 No. Observations:                 428   F-statistic:                    89.258
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:06   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -470,8 +470,8 @@ indicates a much lower effect of education.</p>
 Dep. Variable:                   wage   R-squared:                      0.0934
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0913
 No. Observations:                 428   F-statistic:                    2.8487
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0914
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0914
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -609,8 +609,8 @@ sample.</p>
 Dep. Variable:                   wage   R-squared:                      0.0973
 Estimator:                        OLS   Adj. R-squared:                 0.0964
 No. Observations:                 934   F-statistic:                    100.71
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -645,8 +645,8 @@ There is a strong, negative relationship here.</p>
 Dep. Variable:                   educ   R-squared:                      0.0576
 Estimator:                        OLS   Adj. R-squared:                 0.0566
 No. Observations:                 934   F-statistic:                    57.107
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -681,8 +681,8 @@ estimate.</p>
 Dep. Variable:                   wage   R-squared:                     -0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0101
 No. Observations:                 934   F-statistic:                    21.715
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -734,8 +734,8 @@ produce GLS estimates.</p>
 Dep. Variable:               residual   R-squared:                      0.0045
 Estimator:                        OLS   Adj. R-squared:                 0.0024
 No. Observations:                 934   F-statistic:                    3.9903
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.1360
-Time:                        11:28:53   Distribution:                  chi2(2)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.1360
+Time:                        14:07:07   Distribution:                  chi2(2)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -772,8 +772,8 @@ don’t differ by much.</p>
 Dep. Variable:                   wage   R-squared:                      0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0080
 No. Observations:                 934   F-statistic:                    23.520
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:53   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -859,8 +859,8 @@ example of a _weak instrument.</p>
 Dep. Variable:                  packs   R-squared:                      0.0015
 Estimator:                        OLS   Adj. R-squared:                 0.0008
 No. Observations:                1388   F-statistic:                    2.0731
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.1499
-Time:                        11:28:54   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.1499
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -897,8 +897,8 @@ warranted to interpret the results. Note the very negative <span class="math not
 Dep. Variable:                  bwght   R-squared:                     -1.5224
 Estimator:                    IV-2SLS   Adj. R-squared:                -1.5242
 No. Observations:                1388   F-statistic:                    1.1356
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.2866
-Time:                        11:28:54   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.2866
+Time:                        14:07:07   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1023,8 +1023,8 @@ interpreted. It is better to use the <code class="docutils literal notranslate">
 Dep. Variable:                   educ   R-squared:                      0.4771
 Estimator:                        OLS   Adj. R-squared:                 0.4745
 No. Observations:                3010   F-statistic:                    3693.4
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                 chi2(15)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1072,8 +1072,8 @@ reg669         0.2103     0.1988     1.0575     0.2903     -0.1794      0.6000
 Dep. Variable:                   wage   R-squared:                      0.2998
 Estimator:                        OLS   Adj. R-squared:                 0.2963
 No. Observations:                3010   F-statistic:                    1377.0
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                 chi2(15)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1123,8 +1123,8 @@ F-statistic in the first stage regression.</p>
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                 chi2(15)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:07   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1299,8 +1299,8 @@ instead of the individual dummies. The model is identical.</p>
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                 chi2(15)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:08   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1376,8 +1376,8 @@ instruments than endogenous variables).</p>
 Dep. Variable:                 lnwage   R-squared:                      0.1357
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1296
 No. Observations:                 428   F-statistic:                    24.653
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                  chi2(3)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:08   Distribution:                  chi2(3)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1422,7 +1422,7 @@ H0: Endogenous variables are exogenous
 Statistic: 2.8256
 P-value: 0.0928
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b28a0fd66d8
+WaldTestStatistic, id: 0x2b1cb41fea90
 </pre></div>
 </div>
 </div>
@@ -1454,8 +1454,8 @@ P-value of the previous test – this is not an accident.</p>
 Dep. Variable:                 lnwage   R-squared:                      0.1624
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1544
 No. Observations:                 428   F-statistic:                    82.954
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                  chi2(4)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:08   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1501,7 +1501,7 @@ H0: Model is not overidentified.
 Statistic: 0.4435
 P-value: 0.5055
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b28a0fd6b38
+WaldTestStatistic, id: 0x2b1cb4258fd0
 </pre></div>
 </div>
 </div>
@@ -1578,7 +1578,7 @@ H0: Model is not overidentified.
 Statistic: 1.0421
 P-value: 0.5939
 Distributed: chi2(2)
-WaldTestStatistic, id: 0x2b28a1028c18
+WaldTestStatistic, id: 0x2b1cb4890358
 </pre></div>
 </div>
 </div>
@@ -1766,8 +1766,8 @@ coefficient is just the difference in means.</p>
 Dep. Variable:                 hrsemp   R-squared:                      0.3408
 Estimator:                        OLS   Adj. R-squared:                 0.3255
 No. Observations:                  45   F-statistic:                    23.266
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0000
-Time:                        11:28:54   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
+Time:                        14:07:08   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1803,8 +1803,8 @@ that the <code class="docutils literal notranslate"><span class="pre">[]</span><
 Dep. Variable:                 lscrap   R-squared:                      0.0159
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0070
 No. Observations:                  45   F-statistic:                    3.3464
-Date:                Thu, Mar 15 2018   P-value (F-stat)                0.0674
-Time:                        11:28:55   Distribution:                  chi2(1)
+Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0674
+Time:                        14:07:08   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1899,7 +1899,7 @@ T-stats reported in parentheses
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

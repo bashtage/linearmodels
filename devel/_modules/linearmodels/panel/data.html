@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.data &#8212; linearmodels 4.6 documentation</title>
+    <title>linearmodels.panel.data &#8212; linearmodels 4.6+4.g990b5cd documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.6</a>
+    ../../../index.html" class="text-logo">linearmodels 4.6 (+4, g990b5cd)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -115,6 +115,7 @@
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">Series</span>
 
+<span class="kn">from</span> <span class="nn">linearmodels.compat.numpy</span> <span class="k">import</span> <span class="n">lstsq</span>
 <span class="kn">from</span> <span class="nn">linearmodels.compat.pandas</span> <span class="k">import</span> <span class="p">(</span><span class="n">is_categorical</span><span class="p">,</span>
                                         <span class="n">is_datetime64_any_dtype</span><span class="p">,</span>
                                         <span class="n">is_numeric_dtype</span><span class="p">,</span> <span class="n">is_string_dtype</span><span class="p">,</span>
@@ -252,6 +253,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_var_name</span> <span class="o">=</span> <span class="n">var_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_dummies</span> <span class="o">=</span> <span class="n">convert_dummies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_first</span> <span class="o">=</span> <span class="n">drop_first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">PanelData</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original</span> <span class="o">=</span> <span class="n">x</span>
@@ -318,7 +321,9 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">panel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;pandas Panel view of data&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_Panel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="o">=</span> <span class="n">_Panel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -344,13 +349,21 @@
 <span class="sd">            the dataframe view of the data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">locs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize_multiindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span></div>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize_multiindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
+        <span class="c1"># Reset panel and shape after a drop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_panel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Shape of panel view of data&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">index</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">index</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">k</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -439,7 +452,7 @@
         <span class="n">d</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">values2d</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">values2d</span>
-        <span class="n">resid</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">d</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">d</span> <span class="o">@</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">resid</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
@@ -522,10 +535,10 @@
             <span class="n">previous</span> <span class="o">=</span> <span class="n">current</span>
             <span class="n">current</span> <span class="o">=</span> <span class="n">demean_pass</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">root_w</span><span class="p">)</span>
         <span class="n">current</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span>
-</div>
-        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PanelData.demean"><a class="viewcode-back" href="../../../panel/data.html#linearmodels.panel.data.PanelData.demean">[docs]</a>    <span class="k">def</span> <span class="nf">demean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">current</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PanelData.demean"><a class="viewcode-back" href="../../../panel/data.html#linearmodels.panel.data.PanelData.demean">[docs]</a>    <span class="k">def</span> <span class="nf">demean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_panel</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Demeans data by either entity or time group</span>
 
@@ -535,6 +548,9 @@
 <span class="sd">            Group to use in demeaning</span>
 <span class="sd">        weights : PanelData, optional</span>
 <span class="sd">            Weights to implement weighted averaging</span>
+<span class="sd">        return_panel : bool</span>
+<span class="sd">            Flag indicating to return a PanelData object. If False, a 2-d</span>
+<span class="sd">            NumPy representation of the panel is returned</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -554,7 +570,10 @@
         <span class="n">level</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;entity&#39;</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">group_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">-</span> <span class="n">group_mu</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">-</span> <span class="n">group_mu</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_panel</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">values2d</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -562,8 +581,11 @@
             <span class="n">weighted_sum</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
             <span class="n">frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">w</span>
             <span class="n">sum_weights</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
-            <span class="n">group_mu</span> <span class="o">=</span> <span class="n">weighted_sum</span> <span class="o">/</span> <span class="n">sum_weights</span></div>
-            <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">-</span> <span class="n">group_mu</span><span class="p">))</span>
+            <span class="n">group_mu</span> <span class="o">=</span> <span class="n">weighted_sum</span> <span class="o">/</span> <span class="n">sum_weights</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">-</span> <span class="n">group_mu</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">return_panel</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">)</span>
@@ -596,8 +618,8 @@
         <span class="n">out</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">count</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
         <span class="n">reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;entity&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">group</span></div>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -606,8 +628,8 @@
 
 <div class="viewcode-block" id="PanelData.copy"><a class="viewcode-back" href="../../../panel/data.html#linearmodels.panel.data.PanelData.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a deep copy&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_name</span><span class="p">,</span></div>
-                         <span class="n">convert_dummies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_dummies</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_first</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_var_name</span><span class="p">,</span>
+                         <span class="n">convert_dummies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_dummies</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_first</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PanelData.mean"><a class="viewcode-back" href="../../../panel/data.html#linearmodels.panel.data.PanelData.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -639,8 +661,8 @@
 
         <span class="n">reindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;entity&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">reindex</span><span class="p">]</span>
-</div>
-        <span class="k">return</span> <span class="n">out</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="PanelData.first_difference"><a class="viewcode-back" href="../../../panel/data.html#linearmodels.panel.data.PanelData.first_difference">[docs]</a>    <span class="k">def</span> <span class="nf">first_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -657,8 +679,8 @@
                       <span class="n">major_axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">major_axis</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
                       <span class="n">minor_axis</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">minor_axis</span><span class="p">)</span>
         <span class="n">diffs</span> <span class="o">=</span> <span class="n">diffs</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">filter_observations</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">diffs</span> <span class="o">=</span> <span class="n">diffs</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span></div>
-        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">diffs</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PanelData</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_minimize_multiindex</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -697,8 +719,8 @@
         <span class="n">levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span>
         <span class="n">cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">levels</span><span class="p">[</span><span class="n">axis</span><span class="p">][</span><span class="n">labels</span><span class="p">[</span><span class="n">axis</span><span class="p">]])</span>
         <span class="n">dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="n">drop_first</span><span class="p">)</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;entity&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span></div></div>
-        <span class="k">return</span> <span class="n">dummies</span><span class="p">[[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dummies</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entities</span> <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;entity&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+        <span class="k">return</span> <span class="n">dummies</span><span class="p">[[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dummies</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
@@ -715,7 +737,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.6+4.g990b5cd documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
