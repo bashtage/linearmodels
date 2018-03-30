@@ -168,6 +168,7 @@ class PooledOLS(object):
         self._original_shape = self.dependent.shape
         self._constant = None
         self._formula = None
+        self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
         self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
@@ -232,6 +233,7 @@ class PooledOLS(object):
     def _adapt_weights(self, weights):
         """Check and transform weights depending on size"""
         if weights is None:
+            self._is_weighted = False
             frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = 1
             frame.columns = ['weight']
@@ -421,8 +423,13 @@ class PooledOLS(object):
         #############################################
         # R2 - Within
         #############################################
-        wy = self.dependent.demean('entity', weights=self.weights).values2d
-        wx = self.exog.demean('entity', weights=self.weights).values2d
+        weights = self.weights if self._is_weighted else None
+        wy = self.dependent.demean('entity', weights=weights,
+                                   return_panel=False)
+        wx = self.exog.demean('entity', weights=weights,
+                              return_panel=False)
+        # wy = self.dependent.demean('entity', weights=self.weights).values2d
+        # wx = self.exog.demean('entity', weights=self.weights).values2d
         weps = wy - wx @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)
