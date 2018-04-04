@@ -114,12 +114,15 @@ class AttrDict(MutableMapping):
         return self.__ordered_dict__.__iter__()
 
 
-def has_constant(x):
+def has_constant(x, x_rank=None):
     """
     Parameters
     ----------
     x: ndarray
         Array to be checked for a constant (n,k)
+    x_rank : {int, None}
+        Rank of x if previously computed.  If None, this value will be
+        computed.
 
     Returns
     -------
@@ -140,7 +143,8 @@ def has_constant(x):
 
     n = x.shape[0]
     aug_rank = matrix_rank(np.c_[np.ones((n, 1)), x])
-    rank = matrix_rank(x)
+    rank = matrix_rank(x) if x_rank is None else x_rank
+
     has_const = bool(aug_rank == rank)
     loc = None
     if has_const:
