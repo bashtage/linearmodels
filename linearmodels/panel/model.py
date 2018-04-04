@@ -298,9 +298,10 @@ class PooledOLS(object):
         w = w / w.mean()
         self.weights = PanelData(w)
 
-        if matrix_rank(x) < x.shape[1]:
+        rank_of_x = matrix_rank(x)
+        if rank_of_x < x.shape[1]:
             raise ValueError('exog does not have full column rank.')
-        self._constant, self._constant_index = has_constant(x)
+        self._constant, self._constant_index = has_constant(x, rank_of_x)
 
     @property
     def formula(self):
@@ -428,10 +429,7 @@ class PooledOLS(object):
         weights = self.weights if self._is_weighted else None
         wy = self.dependent.demean('entity', weights=weights,
                                    return_panel=False)
-        wx = self.exog.demean('entity', weights=weights,
-                              return_panel=False)
-        # wy = self.dependent.demean('entity', weights=self.weights).values2d
-        # wx = self.exog.demean('entity', weights=self.weights).values2d
+        wx = self.exog.demean('entity', weights=weights, return_panel=False)
         weps = wy - wx @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)

@@ -187,7 +187,7 @@ class PanelData(object):
             entity_str = 'entity.{0:0>' + str(int(np.log10(n) + .01)) + '}'
             entities = [entity_str.format(i) for i in range(n)]
             time = list(range(t))
-            x = x.astype(np.float64)
+            x = x.astype(np.float64, copy=False)
             panel = _Panel.from_array(x, items=variables, major_axis=time,
                                       minor_axis=entities)
             self._fake_panel = panel
@@ -197,14 +197,15 @@ class PanelData(object):
                             'are supported')
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
-            self._frame = self._frame.astype(np.float64)
+            self._frame = self._frame.astype(np.float64, copy=False)
 
         time_index = Series(self._frame.index.levels[1])
         if not (is_numeric_dtype(time_index.dtype) or
                 is_datetime64_any_dtype(time_index.dtype)):
             raise ValueError('The index on the time dimension must be either '
                              'numeric or date-like')
-        self._k, self._t, self._n = self.panel.shape
+        # self._k, self._t, self._n = self.panel.shape
+        self._k, self._t, self._n = self.shape
         self._frame.index.levels[0].name = 'entity'
         self._frame.index.levels[1].name = 'time'
 
@@ -250,8 +251,8 @@ class PanelData(object):
         if self._shape is None:
             k = self._frame.shape[1]
             index = self._frame.index
-            t = pd.Series(index.levels[1][index.labels[1]]).unique().shape[0]
-            n = pd.Series(index.levels[0][index.labels[0]]).unique().shape[0]
+            t = index.get_level_values(1).unique().shape[0]
+            n = index.get_level_values(0).unique().shape[0]
             self._shape = k, t, n
         return self._shape
 
@@ -343,7 +344,8 @@ class PanelData(object):
         d = d.values2d
         e = e.values2d
         resid = e - d @ lstsq(d, e)[0]
-        resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
+        resid = DataFrame(resid, index=self._frame.index,
+                          columns=self._frame.columns)
 
         return PanelData(resid)
 
@@ -374,7 +376,7 @@ class PanelData(object):
                                              index=self.index,
                                              columns=['weights']))
         weights = weights.values2d
-        groups = groups.values2d.astype(np.int64)
+        groups = groups.values2d.astype(np.int64, copy=False)
 
         weight_sum = {}
 
@@ -493,23 +495,18 @@ class PanelData(object):
         Parameters
         ----------
         group : {'entity', 'time'}
-            Group to use in demeaning
+            Group to count
 
         Returns
         -------
         count : DataFrame
             Counts according to type. Either (entity by var) or (time by var)
         """
-        v = self.panel.values
-        axis = 1 if group == 'entity' else 2
-        count = np.sum(np.isfinite(v), axis=axis)
-
-        index = self.panel.minor_axis if group == 'entity' else self.panel.major_axis
-        out = DataFrame(count.T, index=index, columns=self.vars)
+        level = 0 if group == 'entity' else 1
         reindex = self.entities if group == 'entity' else self.time
-        out = out.reindex(reindex).astype(np.int64)
-        out.index.name = group
-        return out
+        out = self._frame.groupby(level=level).count()
+
+        return out.reindex(reindex)
 
     @property
     def index(self):
@@ -610,4 +607,4 @@ class PanelData(object):
         cat = pd.Categorical(levels[axis][labels[axis]])
         dummies = pd.get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == 'entity' else self.time
-        return dummies[[c for c in cols if c in dummies]].astype(np.float64)
+        return dummies[[c for c in cols if c in dummies]].astype(np.float64, copy=False)
