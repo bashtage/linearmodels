@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="data.html" title="Panel Data Structures"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -131,27 +131,27 @@
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p>The estimators in this module are designed to estimate the parameters of
 a model specified by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=x_{it}\beta+\alpha_{i}+\epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(i\)</span> indexes entities and <span class="math notranslate">\(t\)</span> indexes time,
-<span class="math notranslate">\(x_{it}\)</span>is <span class="math notranslate">\(1\)</span> by <span class="math notranslate">\(k\)</span> (may include a constant, but
-not for all models), <span class="math notranslate">\(\beta\)</span> is <span class="math notranslate">\(k\)</span> by 1, <span class="math notranslate">\(\alpha_{i}\)</span>
-is an entity-specific shock and <span class="math notranslate">\(\epsilon_{it}\)</span> is an
+<p>where <span class="math notranslate nohighlight">\(i\)</span> indexes entities and <span class="math notranslate nohighlight">\(t\)</span> indexes time,
+<span class="math notranslate nohighlight">\(x_{it}\)</span>is <span class="math notranslate nohighlight">\(1\)</span> by <span class="math notranslate nohighlight">\(k\)</span> (may include a constant, but
+not for all models), <span class="math notranslate nohighlight">\(\beta\)</span> is <span class="math notranslate nohighlight">\(k\)</span> by 1, <span class="math notranslate nohighlight">\(\alpha_{i}\)</span>
+is an entity-specific shock and <span class="math notranslate nohighlight">\(\epsilon_{it}\)</span> is an
 idiosyncratic shock. The most important difference in the models is the
-assumptions on <span class="math notranslate">\(\alpha_{i}\)</span> which determine whether the estimator
-is consistent and/or efficient. There are <span class="math notranslate">\(N\)</span> entities and
-<span class="math notranslate">\(T_{i}\)</span> observations for entity <span class="math notranslate">\(i\)</span>.</p>
+assumptions on <span class="math notranslate nohighlight">\(\alpha_{i}\)</span> which determine whether the estimator
+is consistent and/or efficient. There are <span class="math notranslate nohighlight">\(N\)</span> entities and
+<span class="math notranslate nohighlight">\(T_{i}\)</span> observations for entity <span class="math notranslate nohighlight">\(i\)</span>.</p>
 <div class="section" id="fixed-effect-estimation-panelols">
 <h3>Fixed Effect Estimation (PanelOLS)<a class="headerlink" href="#fixed-effect-estimation-panelols" title="Permalink to this headline">¶</a></h3>
 <p>The fixed effect estimator with entity effects estimates the model</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}-\bar{y}_{i}=(x_{it}-x_{i})\beta+\left(\epsilon_{it}-\bar{\epsilon}_{i}\right).\]</div>
-<p>When the model includes a constant in <span class="math notranslate">\(x_{it}\)</span> then the grand mean
-of <span class="math notranslate">\(y\)</span>,
-<span class="math notranslate">\(\bar{\bar{y}}=(NT)^{-1}\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}y_{it}\)</span>,
-and <span class="math notranslate">\(x\)</span> are re-added to the <span class="math notranslate">\(y\)</span> and <span class="math notranslate">\(x\)</span> terms,
+<p>When the model includes a constant in <span class="math notranslate nohighlight">\(x_{it}\)</span> then the grand mean
+of <span class="math notranslate nohighlight">\(y\)</span>,
+<span class="math notranslate nohighlight">\(\bar{\bar{y}}=(NT)^{-1}\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}y_{it}\)</span>,
+and <span class="math notranslate nohighlight">\(x\)</span> are re-added to the <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(x\)</span> terms,
 respectively. In practice this imposes the restriction that
-<span class="math notranslate">\(\sum\alpha_{i}=0\)</span>. The estimated coefficients for the remaining
+<span class="math notranslate nohighlight">\(\sum\alpha_{i}=0\)</span>. The estimated coefficients for the remaining
 parameters are identical as is the estimated parameter covariance and
 related statistics.</p>
 <p>The fixed effects estimator can handle general fixed effects, not just
@@ -160,9 +160,9 @@ time effects, general effects can also be used. For example, one might
 want to use industry effect rather than firm effects. Generally the
 fixed effect model can be expressed as a least squares dummy variable
 (LSDV) estimator of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=x_{it}\beta+d_{1,it}\gamma_{1}+d_{2,it}\gamma_{2}\]</div>
-<p>where <span class="math notranslate">\(d_{1,it}\)</span> and <span class="math notranslate">\(d_{2,it}\)</span> are the dummy variables for
+<p>where <span class="math notranslate nohighlight">\(d_{1,it}\)</span> and <span class="math notranslate nohighlight">\(d_{2,it}\)</span> are the dummy variables for
 the first and second effect. When the model contains an intercept, one
 dummy is dropped form each group and the dummies are orthogonalized to a
 constant so that they have mean 0. This allows the constant to be
@@ -170,56 +170,56 @@ estimated. If the model does not contain an intercept, the first group
 of dummies will contain all values and the second will have one dropped.</p>
 <p><strong>Weights</strong></p>
 <p>When weights are used, the results are identical to the LSDV model where
-all variables <span class="math notranslate">\(y_{it,}\)</span><span class="math notranslate">\(x_{it}\)</span>, <span class="math notranslate">\(d_{1,it}\)</span> and
-<span class="math notranslate">\(d_{2,it}\)</span>(if included) are multiplied by <span class="math notranslate">\(\sqrt{w_{it}}\)</span>.</p>
+all variables <span class="math notranslate nohighlight">\(y_{it,}\)</span><span class="math notranslate nohighlight">\(x_{it}\)</span>, <span class="math notranslate nohighlight">\(d_{1,it}\)</span> and
+<span class="math notranslate nohighlight">\(d_{2,it}\)</span>(if included) are multiplied by <span class="math notranslate nohighlight">\(\sqrt{w_{it}}\)</span>.</p>
 </div>
 <div class="section" id="random-effect-estimation-randomeffects">
 <h3>Random Effect Estimation (RandomEffects)<a class="headerlink" href="#random-effect-estimation-randomeffects" title="Permalink to this headline">¶</a></h3>
 <p>The random effects estimator makes use of a quasi-differenced model,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}-\hat{\theta}_{i}\bar{y}_{i}=\left(1-\hat{\theta}_{i}\right)\alpha_{i}+(x_{it}-\hat{\theta}_{i}x_{i})\beta+\left(\epsilon_{it}-\hat{\theta}_{i}\bar{\epsilon}_{i}\right)\]</div>
-<p>where <span class="math notranslate">\(\theta_{i}\)</span> is a function of the variance of
-<span class="math notranslate">\(\epsilon_{it}\)</span> , the variance of <span class="math notranslate">\(\alpha_{i}\)</span> and the
-number of observations for entity <span class="math notranslate">\(i\)</span>,</p>
-<div class="math notranslate">
+<p>where <span class="math notranslate nohighlight">\(\theta_{i}\)</span> is a function of the variance of
+<span class="math notranslate nohighlight">\(\epsilon_{it}\)</span> , the variance of <span class="math notranslate nohighlight">\(\alpha_{i}\)</span> and the
+number of observations for entity <span class="math notranslate nohighlight">\(i\)</span>,</p>
+<div class="math notranslate nohighlight">
 \[\hat{\theta}_{i}=1-\sqrt{\frac{\sigma_{\epsilon}^{2}}{T_{i}\sigma_{\alpha}^{2}+\sigma_{\epsilon}^{2}}}\]</div>
-<p>so that <span class="math notranslate">\(\hat{\theta}_{i}\approx1\)</span> when <span class="math notranslate">\(T_{i}\)</span> is large (as
-long as <span class="math notranslate">\(\sigma_{\alpha}^{2}&gt;0\)</span>) or when <span class="math notranslate">\(\alpha_{i}\)</span> is the
+<p>so that <span class="math notranslate nohighlight">\(\hat{\theta}_{i}\approx1\)</span> when <span class="math notranslate nohighlight">\(T_{i}\)</span> is large (as
+long as <span class="math notranslate nohighlight">\(\sigma_{\alpha}^{2}&gt;0\)</span>) or when <span class="math notranslate nohighlight">\(\alpha_{i}\)</span> is the
 only source of variance. On the other hand,
-<span class="math notranslate">\(\hat{\theta}_{i}\approx0\)</span> when the variation due to
-<span class="math notranslate">\(\alpha_{i}\)</span> is low. The estimator of the idiosyncratic variance
+<span class="math notranslate nohighlight">\(\hat{\theta}_{i}\approx0\)</span> when the variation due to
+<span class="math notranslate nohighlight">\(\alpha_{i}\)</span> is low. The estimator of the idiosyncratic variance
 is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\frac{\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\hat{\epsilon}_{it}^{2}}{\sum_{i=1}^{N}T_{i}-N-K+c}\]</div>
-<p>where <span class="math notranslate">\(c=1\)</span> if the model includes a constant in the regressors.
-The variance of <span class="math notranslate">\(\alpha_{i}\)</span> is estimated using the residual sum
-of squares from the between regression (see below), <span class="math notranslate">\(RSS_{b}\)</span>,</p>
-<div class="math notranslate">
+<p>where <span class="math notranslate nohighlight">\(c=1\)</span> if the model includes a constant in the regressors.
+The variance of <span class="math notranslate nohighlight">\(\alpha_{i}\)</span> is estimated using the residual sum
+of squares from the between regression (see below), <span class="math notranslate nohighlight">\(RSS_{b}\)</span>,</p>
+<div class="math notranslate nohighlight">
 \[\hat{\sigma}_{\alpha}^{2}=\max\{0,\frac{RSS_{b}}{N-K}-\frac{\hat{\sigma}_{\epsilon}^{2}}{\bar{T}}\}\]</div>
-<p>where <span class="math notranslate">\(\bar{T}=\frac{n}{\sum_{i=1}^{n}T_{i}^{-1}}\)</span>. If the
+<p>where <span class="math notranslate nohighlight">\(\bar{T}=\frac{n}{\sum_{i=1}^{n}T_{i}^{-1}}\)</span>. If the
 optional argument for a small sample adjustment is used, the Baltagi and
 Chang (1994) estimator is used. This only has an effect when the data
 are unbalanced.</p>
 <p><strong>Weights</strong></p>
 <p>When weights are included the averages are replaced by weighted averages
 and the final regression terms are all multiplied by
-<span class="math notranslate">\(\sqrt{w_{it}}\)</span>.</p>
+<span class="math notranslate nohighlight">\(\sqrt{w_{it}}\)</span>.</p>
 </div>
 <div class="section" id="between-estimation-betweenols">
 <h3>Between Estimation (BetweenOLS)<a class="headerlink" href="#between-estimation-betweenols" title="Permalink to this headline">¶</a></h3>
 <p>Between estimation regresses time averages of the dependent variable on
 the time averaged values of the regressors,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\bar{y}_{i}=\bar{x}_{i}\beta+\bar{\epsilon}_{i}.\]</div>
 <p>When weights are included, weighted averages are used so that</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\bar{y}_{i}^{w}=\frac{\sum_{t=1}^{T}w_{it}y_{it}}{\sum_{t=1}^{T}w_{it}}\]</div>
-<p>with <span class="math notranslate">\(\bar{x}_{i}\)</span> similarly defined. Note that if the conditional
-variance of <span class="math notranslate">\(y_{it}\propto w_{it}^{-1}\)</span> then the conditional
-variance of <span class="math notranslate">\(\bar{y}_{i}^{w}\propto\frac{1}{\sum w_{i}}\)</span> and these
+<p>with <span class="math notranslate nohighlight">\(\bar{x}_{i}\)</span> similarly defined. Note that if the conditional
+variance of <span class="math notranslate nohighlight">\(y_{it}\propto w_{it}^{-1}\)</span> then the conditional
+variance of <span class="math notranslate nohighlight">\(\bar{y}_{i}^{w}\propto\frac{1}{\sum w_{i}}\)</span> and these
 weights are used when regressing the weighted averages. Also note that
-when <span class="math notranslate">\(w_{i}=1\)</span> but the panel is imbalanced than the conditional
-variance of <span class="math notranslate">\(\bar{y}_{i}^{w}=\bar{y}_{i}\propto\frac{1}{T_{i}}\)</span>.
+when <span class="math notranslate nohighlight">\(w_{i}=1\)</span> but the panel is imbalanced than the conditional
+variance of <span class="math notranslate nohighlight">\(\bar{y}_{i}^{w}=\bar{y}_{i}\propto\frac{1}{T_{i}}\)</span>.
 Re-weighting unbalanced panels is exposed through the fit option
 <code class="docutils literal notranslate"><span class="pre">reweight</span></code>.</p>
 <p><strong>Weights</strong></p>
@@ -231,26 +231,26 @@ the actual between regression.</p>
 <h3>First Difference Estimation (FirstDifferenceOLS)<a class="headerlink" href="#first-difference-estimation-firstdifferenceols" title="Permalink to this headline">¶</a></h3>
 <p>First difference estimation regresses first difference of the dependent
 variable on the first difference the regressors,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Delta y_{it}=\Delta x_{it}\beta+\Delta\epsilon_{it}.\]</div>
 <p><strong>Weights</strong></p>
 <p>When weights are included, weighted are summed to that the weight on
-<span class="math notranslate">\(\Delta y_{it}\)</span> is
-<span class="math notranslate">\(\left(w_{it}^{-1}+w_{it-1}^{-1}\right)^{-1}\)</span> which exploits that
+<span class="math notranslate nohighlight">\(\Delta y_{it}\)</span> is
+<span class="math notranslate nohighlight">\(\left(w_{it}^{-1}+w_{it-1}^{-1}\right)^{-1}\)</span> which exploits that
 the structure that conditional variance of
-<span class="math notranslate">\(y_{it}\propto w_{it}^{-1}\)</span> and the variance of the difference is
+<span class="math notranslate nohighlight">\(y_{it}\propto w_{it}^{-1}\)</span> and the variance of the difference is
 the sum of the variances when observations are uncorrelated.</p>
 </div>
 <div class="section" id="pooled-model-estimation-pooledols">
 <h3>Pooled Model Estimation (PooledOLS)<a class="headerlink" href="#pooled-model-estimation-pooledols" title="Permalink to this headline">¶</a></h3>
 <p>The pooled estimator is a standard regression,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=x_{it}\beta+\epsilon_{it}.\]</div>
 <p><strong>Weights</strong></p>
 <p>When weights are included, the data is transformed by multiplying with
 the square root of the weights prior to the regression (i.e.,
-<span class="math notranslate">\(y_{it}\)</span> is replaced by <span class="math notranslate">\(\sqrt{w_{it}}y_{it}\)</span> and
-<span class="math notranslate">\(x_{it}\)</span> is similarly transformed).</p>
+<span class="math notranslate nohighlight">\(y_{it}\)</span> is replaced by <span class="math notranslate nohighlight">\(\sqrt{w_{it}}y_{it}\)</span> and
+<span class="math notranslate nohighlight">\(x_{it}\)</span> is similarly transformed).</p>
 </div>
 </div>
 <div class="section" id="covariance-estimators">
@@ -258,48 +258,48 @@ the square root of the weights prior to the regression (i.e.,
 <div class="section" id="standard-covariance-estimator-unadjusted">
 <h3>Standard Covariance Estimator (unadjusted)<a class="headerlink" href="#standard-covariance-estimator-unadjusted" title="Permalink to this headline">¶</a></h3>
 <p>The standard covariance estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s^{2}\Sigma_{XX}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Sigma_{XX}=\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}x_{it}^{\prime}x_{it}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s^{2}=(n_{obs}-k)\sum_{i=1}^{N}\sum_{t=1}^{Ti}\hat{\epsilon}_{it}^{2}\]</div>
-<p>where <span class="math notranslate">\(n_{obs}=\sum_{i=1}^{N}T_{i}\)</span>. If the debiased options is
-not used, the <span class="math notranslate">\(k\)</span> is omitted.</p>
+<p>where <span class="math notranslate nohighlight">\(n_{obs}=\sum_{i=1}^{N}T_{i}\)</span>. If the debiased options is
+not used, the <span class="math notranslate nohighlight">\(k\)</span> is omitted.</p>
 </div>
 <div class="section" id="heteroskedastic-covariance-estimator-robust">
 <h3>Heteroskedastic Covariance Estimator (robust)<a class="headerlink" href="#heteroskedastic-covariance-estimator-robust" title="Permalink to this headline">¶</a></h3>
 <p>The standard covariance estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}\Sigma_{XX}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{S}=\sum_{i=1}^{N}\sum_{t=1}^{T_{i}}\hat{\epsilon}_{it}^{2}x_{it}^{\prime}x_{it}.\]</div>
-<p>The <span class="math notranslate">\(-k\)</span> term is dropped if the debiased options is not used</p>
+<p>The <span class="math notranslate nohighlight">\(-k\)</span> term is dropped if the debiased options is not used</p>
 </div>
 <div class="section" id="clustered-covariance-estimator">
 <h3>Clustered Covariance Estimator<a class="headerlink" href="#clustered-covariance-estimator" title="Permalink to this headline">¶</a></h3>
 <p>The clustered covariance estimator supports 1 and 2 way clustering.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{\mathcal{G}}\Sigma_{XX}^{-1}\]</div>
 <p>where in the case of one-way clustering,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{S}_{\mathcal{G}}=\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\sum_{g=1}^{G}\xi_{g}^{\prime}\xi_{g}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\xi_{g}=\sum_{it\in G_{g}}\hat{\epsilon}_{ii}^{2}x_{it}^{\prime}x_{it}\]</div>
-<p>and <span class="math notranslate">\(it\in G_{g}\)</span> indicates that observation belongs to group
-<span class="math notranslate">\(g\)</span>. The two-way clustered replaces
-<span class="math notranslate">\(\hat{S}_{\mathcal{G}}\)</span>by</p>
-<div class="math notranslate">
+<p>and <span class="math notranslate nohighlight">\(it\in G_{g}\)</span> indicates that observation belongs to group
+<span class="math notranslate nohighlight">\(g\)</span>. The two-way clustered replaces
+<span class="math notranslate nohighlight">\(\hat{S}_{\mathcal{G}}\)</span>by</p>
+<div class="math notranslate nohighlight">
 \[\hat{S}_{\mathcal{G}_{1}}+\hat{S}_{\mathcal{G}_{2}}-\hat{S}_{\mathcal{G}_{1}\cap\mathcal{G}_{2}}.\]</div>
 <p>Where the group debiasing is applies individually to each of the three
 components depending on the number of groups in the three estimators. If
 the group debias term is not used, the expression
-<span class="math notranslate">\(\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\)</span> is omitted. The
-<span class="math notranslate">\(-k\)</span> term is dropped if the debiased estimator is not used.</p>
+<span class="math notranslate nohighlight">\(\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\)</span> is omitted. The
+<span class="math notranslate nohighlight">\(-k\)</span> term is dropped if the debiased estimator is not used.</p>
 <p><strong>Clustering by Variables used as Effects</strong></p>
 <p>When clustering by the same variable used in the effect estimation,
 e.g., entity effects with clustering by entity, there the degrees of
@@ -310,15 +310,15 @@ freedom used in estimating the effects are <em>not</em> counted.</p>
 <p>The Driscoll-Kraay covariance estimator may be appropriate when the
 number of time periods is relatively large (e.g., a large T panel), and
 are given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n_{obs}/(n_{obs}-k)\Sigma_{XX}^{-1}\hat{S}_{HAC}\Sigma_{XX}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 \hat{S}_{HAC} &amp; =\hat{\Gamma}_{0}+\sum_{i=1}^{bw}K(i,bw)(\hat{\Gamma}_{1}+\hat{\Gamma}_{1}^{\prime})\\
 \hat{\Gamma}_{i} &amp; =\sum_{t=i+1}^{T}\xi_{t}^{\prime}\xi_{t}\\
 \xi_{t} &amp; =\sum_{i=1}^{n_{t}}\hat{\epsilon}_{it}x_{it}\end{aligned}\end{split}\]</div>
-<p>and <span class="math notranslate">\(K\left(i,bw\right)\)</span> is a kernel weighting function. Kernel
+<p>and <span class="math notranslate nohighlight">\(K\left(i,bw\right)\)</span> is a kernel weighting function. Kernel
 supported include the Bartlett, Parzen and Quadratic Spectral.</p>
 </div>
 </div>
@@ -357,7 +357,7 @@ supported include the Bartlett, Parzen and Quadratic Spectral.</p>
         <li class="right" >
           <a href="data.html" title="Panel Data Structures"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

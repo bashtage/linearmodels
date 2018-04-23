@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Formulas and Mathematical Detail &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="gmm-weights.html" title="GMM Moment Weighting"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -135,11 +135,11 @@ parameter estimates if some residuals are conditionally homoskedastic
 and regressors differ across equations.</p>
 <div class="section" id="basic-notation">
 <h3>Basic Notation<a class="headerlink" href="#basic-notation" title="Permalink to this headline">¶</a></h3>
-<p>Assume <span class="math notranslate">\(K\)</span> series are observed for <span class="math notranslate">\(N\)</span> time periods. Denote
-the stacked observations of series <span class="math notranslate">\(i\)</span> as <span class="math notranslate">\(Y_{i}\)</span> and its
-corresponding regressor matrix <span class="math notranslate">\(X_{i}\)</span>. The complete model
+<p>Assume <span class="math notranslate nohighlight">\(K\)</span> series are observed for <span class="math notranslate nohighlight">\(N\)</span> time periods. Denote
+the stacked observations of series <span class="math notranslate nohighlight">\(i\)</span> as <span class="math notranslate nohighlight">\(Y_{i}\)</span> and its
+corresponding regressor matrix <span class="math notranslate nohighlight">\(X_{i}\)</span>. The complete model
 spanning all series can be specified as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 Y &amp; =X\beta+\epsilon\\
 \left[\begin{array}{c}
@@ -163,24 +163,24 @@ X_{1} &amp; 0 &amp; 0 &amp; 0\\
 \vdots\\
 \epsilon_{K}
 \end{array}\right].\end{aligned}\end{split}\]</div>
-<p>The OLS estimator of <span class="math notranslate">\(\beta\)</span> is then</p>
-<div class="math notranslate">
+<p>The OLS estimator of <span class="math notranslate nohighlight">\(\beta\)</span> is then</p>
+<div class="math notranslate nohighlight">
 \[\hat{\beta}=\left(X^{\prime}X\right)^{-1}X^{\prime}Y.\]</div>
 <p>A GLS estimator can be similarly defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{GLS}=\left(X^{\prime}\Omega^{-1}X\right)^{-1}X^{\prime}\Omega^{-1}Y\]</div>
-<p>where <span class="math notranslate">\(\Omega=\Sigma\otimes I_{N}\)</span> is the joint covariance of the
-residuals. In practice <span class="math notranslate">\(\Sigma\)</span> is not known as so a feasible GLS
+<p>where <span class="math notranslate nohighlight">\(\Omega=\Sigma\otimes I_{N}\)</span> is the joint covariance of the
+residuals. In practice <span class="math notranslate nohighlight">\(\Sigma\)</span> is not known as so a feasible GLS
 (FGLS) is implemented in two steps. The first uses OLS to estimate
-<span class="math notranslate">\(\hat{\epsilon}\)</span> and then estimates the residual covariance as</p>
-<div class="math notranslate">
+<span class="math notranslate nohighlight">\(\hat{\epsilon}\)</span> and then estimates the residual covariance as</p>
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}=N^{-1}\left[\begin{array}{cccc}
 \hat{\epsilon}_{1} &amp; \hat{\epsilon}_{2} &amp; \ldots &amp; \hat{\epsilon}_{N}\end{array}\right]^{\prime}\left[\begin{array}{cccc}
 \hat{\epsilon}_{1} &amp; \hat{\epsilon}_{2} &amp; \ldots &amp; \hat{\epsilon}_{N}\end{array}\right].\]</div>
 <p>The feasible GLS estimator is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{FGLS}=\left(X^{\prime}\hat{\Omega}^{-1}X\right)^{-1}X^{\prime}\hat{\Omega}^{-1}Y\]</div>
-<p>where <span class="math notranslate">\(\hat{\Omega}=\hat{\Sigma}\otimes I_{N}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(\hat{\Omega}=\hat{\Sigma}\otimes I_{N}\)</span>.</p>
 </div>
 </div>
 <div class="section" id="covariance-estimation">
@@ -188,79 +188,79 @@ residuals. In practice <span class="math notranslate">\(\Sigma\)</span> is not k
 <p><strong>Homoskedastic Data</strong></p>
 <p>When residuals are assumed to be homoskedastic, the covariance can be
 consistently estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\left(X^{\prime}\Delta^{-1}X\right)^{-1}\left(X^{\prime}\Delta^{-1}\hat{\Omega}\Delta^{-1}X\right)\left(X^{\prime}\Delta^{-1}X\right)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\Delta\)</span> is the weighting matrix used in the parameter
-estimator. For example, in OLS <span class="math notranslate">\(\Delta=I_{NK}\)</span> while in
-FGLS<span class="math notranslate">\(\Delta=\hat{\Omega}\)</span>. The estimator supports using FGLS
-with an assumption that <span class="math notranslate">\(\hat{\Sigma}\)</span> is diagonal or using a
-user-specified value of <span class="math notranslate">\(\Sigma\)</span>. When the FGLS estimator is used,
+<p>where <span class="math notranslate nohighlight">\(\Delta\)</span> is the weighting matrix used in the parameter
+estimator. For example, in OLS <span class="math notranslate nohighlight">\(\Delta=I_{NK}\)</span> while in
+FGLS<span class="math notranslate nohighlight">\(\Delta=\hat{\Omega}\)</span>. The estimator supports using FGLS
+with an assumption that <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span> is diagonal or using a
+user-specified value of <span class="math notranslate nohighlight">\(\Sigma\)</span>. When the FGLS estimator is used,
 this simplifies to</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\left(X^{\prime}\Delta^{-1}X\right)^{-1}\]</div>
 <p><strong>Heteroskedastic Data</strong></p>
 <p>When residuals are heteroskedastic, the covariance can be consistently
 estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\left(X^{\prime}\Delta^{-1}X\right)^{-1}\hat{S}\left(X^{\prime}\Delta^{-1}X\right)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\hat{S}\)</span> is a covariance estimator that is clustered by
+<p>where <span class="math notranslate nohighlight">\(\hat{S}\)</span> is a covariance estimator that is clustered by
 time. Define the matrix of scores as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{g}=\left[\begin{array}{c}
 \hat{g}_{1}\\
 \hat{g}_{2}\\
 \vdots\\
 \hat{g}_{N}
 \end{array}\right]=\Delta^{-\frac{1}{2}}X\odot\left(\hat{\epsilon}\iota_{M}^{\prime}\right)\end{split}\]</div>
-<p>where <span class="math notranslate">\(\iota_{M}\)</span> is a vector of ones with <span class="math notranslate">\(M\)</span> elements
-where <span class="math notranslate">\(M\)</span> is the number of columns in <span class="math notranslate">\(X\)</span> and <span class="math notranslate">\(\odot\)</span>
+<p>where <span class="math notranslate nohighlight">\(\iota_{M}\)</span> is a vector of ones with <span class="math notranslate nohighlight">\(M\)</span> elements
+where <span class="math notranslate nohighlight">\(M\)</span> is the number of columns in <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(\odot\)</span>
 is element by element multiplication. The clustered-by-time score
 covariance estimator is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{S}=N^{-1}\sum_{i=1}^{N}\Psi_{i}^{\prime}\Psi_{i}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Psi_{i}=\sum_{j=1}^{K}\hat{g}_{ij}\]</div>
-<p>is the sum of the scores across models <span class="math notranslate">\(\left(j\right)\)</span> that have
-the same observation index <span class="math notranslate">\(i\)</span>. This estimator allows arbitrary
+<p>is the sum of the scores across models <span class="math notranslate nohighlight">\(\left(j\right)\)</span> that have
+the same observation index <span class="math notranslate nohighlight">\(i\)</span>. This estimator allows arbitrary
 correlation of residuals with the same observation index.</p>
 <p><strong>Debiased Estimators</strong></p>
 <p>When the debiased flag is set, a small sample adjustment if applied so
-that element <span class="math notranslate">\(ij\)</span> of <span class="math notranslate">\(\hat{\Sigma}\)</span> is scaled by</p>
-<div class="math notranslate">
+that element <span class="math notranslate nohighlight">\(ij\)</span> of <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span> is scaled by</p>
+<div class="math notranslate nohighlight">
 \[\frac{T}{\sqrt{\left(T-P_{i}\right)\left(T-P_{j}\right)}}.\]</div>
 <div class="section" id="other-statistics">
 <h3>Other Statistics<a class="headerlink" href="#other-statistics" title="Permalink to this headline">¶</a></h3>
 <p><strong>Goodness of fit</strong></p>
-<p>The reported <span class="math notranslate">\(R^{2}\)</span> is always for the data, or weighted data is
+<p>The reported <span class="math notranslate nohighlight">\(R^{2}\)</span> is always for the data, or weighted data is
 weights are used, for either OLS or GLS. The means that the reported
-<span class="math notranslate">\(R^{2}\)</span> for the GLS estimator may be negative</p>
+<span class="math notranslate nohighlight">\(R^{2}\)</span> for the GLS estimator may be negative</p>
 <p><strong>F statistics</strong></p>
 <p>When the debiased covariance estimator is used (small sample adjustment)
-the reported <span class="math notranslate">\(F\)</span> statistics use <span class="math notranslate">\(K\left(T-\bar{P}\right)\)</span>
-where <span class="math notranslate">\(\bar{P}=K^{-1}\sum_{i=1}^{K}P_{i}\)</span> where <span class="math notranslate">\(P_{i}\)</span> is
-the number of variables including the constant in model <span class="math notranslate">\(i\)</span>. When
+the reported <span class="math notranslate nohighlight">\(F\)</span> statistics use <span class="math notranslate nohighlight">\(K\left(T-\bar{P}\right)\)</span>
+where <span class="math notranslate nohighlight">\(\bar{P}=K^{-1}\sum_{i=1}^{K}P_{i}\)</span> where <span class="math notranslate nohighlight">\(P_{i}\)</span> is
+the number of variables including the constant in model <span class="math notranslate nohighlight">\(i\)</span>. When
 models include restrictions it may be the case that the covariance is
-singular. When this occurs, the <span class="math notranslate">\(F\)</span> statistic cannot be
+singular. When this occurs, the <span class="math notranslate nohighlight">\(F\)</span> statistic cannot be
 calculated.</p>
 </div>
 </div>
 <div class="section" id="memory-efficient-calculations">
 <h2>Memory efficient calculations<a class="headerlink" href="#memory-efficient-calculations" title="Permalink to this headline">¶</a></h2>
 <p>The parameter estimates in the SUR model can are</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\left(X^{\prime}\Omega^{-1}X\right)^{-1}\left(X^{\prime}\Omega^{-1}Y\right)^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\Omega^{-1}=\left[\begin{array}{cccc}
 \sigma^{11}I_{T} &amp; \sigma^{12}I_{T} &amp; \ldots &amp; \sigma^{1k}I_{T}\\
 \sigma^{21}I_{T} &amp; \sigma^{22}I_{T} &amp; \dots &amp; \sigma^{2k}I_{T}\\
 \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
 \sigma^{k2}I_{T} &amp; \sigma^{k2}I_{T} &amp; \dots &amp; \sigma^{kk}I_{T}
 \end{array}\right]\end{split}\]</div>
-<p>where <span class="math notranslate">\(\sigma^{ij}=\left[\Sigma^{-1}\right]_{ij}\)</span>. Since <span class="math notranslate">\(X\)</span>
+<p>where <span class="math notranslate nohighlight">\(\sigma^{ij}=\left[\Sigma^{-1}\right]_{ij}\)</span>. Since <span class="math notranslate nohighlight">\(X\)</span>
 is block diagonal,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X^{\prime}\Omega^{-1}=\left[\begin{array}{cccc}
 \sigma^{11}X_{1}^{\prime} &amp; \sigma^{12}X_{1}^{\prime} &amp; \ldots &amp; \sigma^{1k}X_{1}^{\prime}\\
 \sigma^{21}X_{2}^{\prime} &amp; \sigma^{22}X_{2}^{\prime} &amp; \dots &amp; \sigma^{2k}X_{2}^{\prime}\\
@@ -268,7 +268,7 @@ is block diagonal,</p>
 \sigma^{k2}X_{k}^{\prime} &amp; \sigma^{k2}X_{k}^{\prime} &amp; \dots &amp; \sigma^{kk}X_{k}^{\prime}
 \end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X^{\prime}\Omega^{-1}X=\left[\begin{array}{cccc}
 \sigma^{11}X_{1}^{\prime}X_{1} &amp; \sigma^{12}X_{1}^{\prime}X_{2} &amp; \ldots &amp; \sigma^{1k}X_{1}^{\prime}X_{k}\\
 \sigma^{21}X_{2}^{\prime}X_{1} &amp; \sigma^{22}X_{2}^{\prime}X_{2} &amp; \dots &amp; \sigma^{2k}X_{2}^{\prime}X_{k}\\
@@ -276,14 +276,14 @@ is block diagonal,</p>
 \sigma^{k2}X_{k}^{\prime}X_{1} &amp; \sigma^{k2}X_{k}^{\prime}X_{2} &amp; \dots &amp; \sigma^{kk}X_{k}^{\prime}X_{k}
 \end{array}\right]\end{split}\]</div>
 <p>Similarly</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X^{\prime}\Omega^{-1}Y=\left[\begin{array}{c}
 \sigma^{11}X_{1}^{\prime}Y_{1}+\sigma^{12}X_{1}^{\prime}Y_{2}+\ldots\sigma^{1k}X_{1}^{\prime}Y_{k}\\
 \sigma^{21}X_{2}^{\prime}Y_{1}+\sigma^{22}X_{2}^{\prime}Y_{2}+\dots+\sigma^{2k}X_{2}^{\prime}Y_{k}\\
 \vdots\\
 \sigma^{k2}X_{k}^{\prime}Y_{1}+\sigma^{k2}X_{k}^{\prime}Y_{2}+\dots+\sigma^{kk}X_{k}^{\prime}Y_{k}
 \end{array}\right]\end{split}\]</div>
-<p>This suggests that constructing the high dimensional <span class="math notranslate">\(\Omega^{-1}\)</span>
+<p>This suggests that constructing the high dimensional <span class="math notranslate nohighlight">\(\Omega^{-1}\)</span>
 can be avoided and many needless multiplications can be avoided by
 directly computing these two components and the solution can be found
 using <code class="docutils literal notranslate"><span class="pre">solve</span></code>.</p>
@@ -298,11 +298,11 @@ parameter estimates if some residuals are conditionally homoskedastic
 and regressors differ across equations.</p>
 <div class="section" id="id1">
 <h3>Basic Notation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Assume <span class="math notranslate">\(K\)</span> series are observed for <span class="math notranslate">\(N\)</span> time periods. Denote
-the stacked observations of series <span class="math notranslate">\(i\)</span> as <span class="math notranslate">\(Y_{i}\)</span> and its
-corresponding regressor matrix <span class="math notranslate">\(X_{i}\)</span>. The complete model
+<p>Assume <span class="math notranslate nohighlight">\(K\)</span> series are observed for <span class="math notranslate nohighlight">\(N\)</span> time periods. Denote
+the stacked observations of series <span class="math notranslate nohighlight">\(i\)</span> as <span class="math notranslate nohighlight">\(Y_{i}\)</span> and its
+corresponding regressor matrix <span class="math notranslate nohighlight">\(X_{i}\)</span>. The complete model
 spanning all series can be specified as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 Y &amp; =X\beta+\epsilon\\
 \left[\begin{array}{c}
@@ -326,17 +326,17 @@ X_{1} &amp; 0 &amp; 0 &amp; 0\\
 \vdots\\
 \epsilon_{K}
 \end{array}\right].\end{aligned}\end{split}\]</div>
-<p>where <span class="math notranslate">\(X_{i}\)</span> contains both exogenous and endogenous variables.
-For each equation denote the available instruments as <span class="math notranslate">\(Z_{i}\)</span>. The
+<p>where <span class="math notranslate nohighlight">\(X_{i}\)</span> contains both exogenous and endogenous variables.
+For each equation denote the available instruments as <span class="math notranslate nohighlight">\(Z_{i}\)</span>. The
 instrument include both exogenous regressors and excluded instrumental
 variables. Define the fitted values of the exogenous variables as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{X}_{i}=Z_{i}\left(Z_{i}^{\prime}Z_{i}\right)^{-1}Z_{i}^{\prime}X_{i}.\]</div>
-<p>The IV estimator of <span class="math notranslate">\(\beta\)</span> is then</p>
-<div class="math notranslate">
+<p>The IV estimator of <span class="math notranslate nohighlight">\(\beta\)</span> is then</p>
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{IV}=\left(\hat{X}^{\prime}\hat{X}\right)^{-1}\hat{X}^{\prime}Y\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{X}=\left[\begin{array}{cccc}
 \hat{X}_{1} &amp; 0 &amp; 0 &amp; 0\\
 0 &amp; \hat{X}_{2} &amp; 0 &amp; 0\\
@@ -344,17 +344,17 @@ variables. Define the fitted values of the exogenous variables as</p>
 0 &amp; 0 &amp; 0 &amp; \hat{X}_{N}
 \end{array}\right].\end{split}\]</div>
 <p>A GLS estimator can be similarly defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{GLS}=\left(\hat{X}^{\prime}\Omega^{-1}\hat{X}\right)^{-1}\hat{X}^{\prime}\Omega^{-1}Y.\]</div>
-<p>Inference is identical to the SUR replacing <span class="math notranslate">\(X\)</span> with
-<span class="math notranslate">\(\hat{X}\)</span> where model residuals are estimated using <span class="math notranslate">\(X\)</span> and
-<span class="math notranslate">\(Y\)</span>.</p>
+<p>Inference is identical to the SUR replacing <span class="math notranslate nohighlight">\(X\)</span> with
+<span class="math notranslate nohighlight">\(\hat{X}\)</span> where model residuals are estimated using <span class="math notranslate nohighlight">\(X\)</span> and
+<span class="math notranslate nohighlight">\(Y\)</span>.</p>
 </div>
 </div>
 <div class="section" id="system-generalized-method-of-moments-gmm">
 <h2>System Generalized Method of Moments (GMM)<a class="headerlink" href="#system-generalized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
 <p>The system GMM estimator uses a set of moment conditions of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 E\left[g_{i}\right] &amp; =0,i=1,\ldots,T\\
 E\left[\begin{array}{c}
@@ -363,34 +363,34 @@ g_{2i}\\
 \vdots\\
 g_{Ki}
 \end{array}\right] &amp; =0\end{aligned}\end{split}\]</div>
-<p>where <span class="math notranslate">\(g_{ji}=z_{ji}^{\prime}\left(y_{ji}-x_{ji}\beta\right)\)</span>
-where <span class="math notranslate">\(j\)</span> is the equation index, <span class="math notranslate">\(z_{ji}\)</span> is a set of
-instruments for equation <span class="math notranslate">\(j\)</span> at time period i and <span class="math notranslate">\(x_{ji}\)</span>
-and <span class="math notranslate">\(y_{ji}\)</span> are similarly defined. Define</p>
-<div class="math notranslate">
+<p>where <span class="math notranslate nohighlight">\(g_{ji}=z_{ji}^{\prime}\left(y_{ji}-x_{ji}\beta\right)\)</span>
+where <span class="math notranslate nohighlight">\(j\)</span> is the equation index, <span class="math notranslate nohighlight">\(z_{ji}\)</span> is a set of
+instruments for equation <span class="math notranslate nohighlight">\(j\)</span> at time period i and <span class="math notranslate nohighlight">\(x_{ji}\)</span>
+and <span class="math notranslate nohighlight">\(y_{ji}\)</span> are similarly defined. Define</p>
+<div class="math notranslate nohighlight">
 \[g_{N}\left(\beta\right)=N^{-1}\sum_{i=1}^{N}g_{i}\left(\beta\right),\]</div>
 <p>then the parameters are estimated to minimize</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\min_{\beta}g_{N}\left(\beta\right)^{\prime}W^{-1}g_{N}\left(\beta\right).\]</div>
 <p>The solution to this minimization problem is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}=\left(X^{\prime}ZW^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}ZW^{-1}Z^{\prime}Y\right).\]</div>
-<p><span class="math notranslate">\(W\)</span> is the moment weighting matrix and for efficiency should be
+<p><span class="math notranslate nohighlight">\(W\)</span> is the moment weighting matrix and for efficiency should be
 set to the covariance of the moment conditions. In practice a 2-step
-estimator is required since estimators of <span class="math notranslate">\(W\)</span> depend on
-<span class="math notranslate">\(\beta\)</span>. In the first step, <span class="math notranslate">\(W=N^{-1}Z^{\prime}Z\)</span> is used to
-construct an initial estimate of <span class="math notranslate">\(\hat{\beta}\)</span>. This would be
+estimator is required since estimators of <span class="math notranslate nohighlight">\(W\)</span> depend on
+<span class="math notranslate nohighlight">\(\beta\)</span>. In the first step, <span class="math notranslate nohighlight">\(W=N^{-1}Z^{\prime}Z\)</span> is used to
+construct an initial estimate of <span class="math notranslate nohighlight">\(\hat{\beta}\)</span>. This would be
 efficient if residuals were homoskedastic and uncorrelated. This choice
 will produce estimates that are identical to system 2SLS. Using the
 initial parameter estimated, the covariance of the moment conditions is
 computed used one of two forms using the estimated model residuals
-<span class="math notranslate">\(\hat{\epsilon}\)</span>.</p>
+<span class="math notranslate nohighlight">\(\hat{\epsilon}\)</span>.</p>
 <div class="section" id="homoskedastic-weighting">
 <h3>Homoskedastic Weighting<a class="headerlink" href="#homoskedastic-weighting" title="Permalink to this headline">¶</a></h3>
 <p>When residuals are assumed to be conditionally homoskedastic, then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{W}=N^{-1}Z^{\prime}\left(\hat{\Sigma}\otimes I_{N}\right)Z\]</div>
-<p>where <span class="math notranslate">\(\hat{\Sigma}\)</span>is the <span class="math notranslate">\(K\)</span> by <span class="math notranslate">\(K\)</span> covariance of
+<p>where <span class="math notranslate nohighlight">\(\hat{\Sigma}\)</span>is the <span class="math notranslate nohighlight">\(K\)</span> by <span class="math notranslate nohighlight">\(K\)</span> covariance of
 the model residuals. This specification assumes that residuals are not
 correlated across observation index (only across models)</p>
 </div>
@@ -398,13 +398,13 @@ correlated across observation index (only across models)</p>
 <h3>Heteroskedastic Weighting<a class="headerlink" href="#heteroskedastic-weighting" title="Permalink to this headline">¶</a></h3>
 <p>When residuals are heteroskedastic, the weighting matrix is estimated
 from</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{W}=N^{-1}\sum\hat{g}_{i}\hat{g}_{i}^{\prime}\]</div>
 <p>which allows cross-sectional dependence but no dependence across
 observation index.</p>
 <p>The efficient estimates are computed using the same expression only with
-<span class="math notranslate">\(\hat{W}\)</span>,</p>
-<div class="math notranslate">
+<span class="math notranslate nohighlight">\(\hat{W}\)</span>,</p>
+<div class="math notranslate nohighlight">
 \[\hat{\beta}=\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}X\right)^{-1}\left(X^{\prime}Z\hat{W}^{-1}Z^{\prime}Y\right).\]</div>
 <p>Both weighting estimators can be centered which will enforce an exact
 mean 0 to the moment conditions. When models are over-identified, this
@@ -416,15 +416,15 @@ can improve accuracy of 2-step estimators.</p>
 heteroskedastic data. The only difference is in how the covariance of
 the moments is computed. In either case, the parameter covariance can be
 estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\hat{\Omega}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.\]</div>
-<p>The covariance of the scores <span class="math notranslate">\(\hat{\Omega}\)</span> estimated using either
+<p>The covariance of the scores <span class="math notranslate nohighlight">\(\hat{\Omega}\)</span> estimated using either
 the homoskedastic weighting formula or the heteroskedastic weighting
 formula immediately above. This allow the choice of weighting matrix to
 be set separately from the score covariance estimator, although in most
 cases these should be the same, and so the covariance of the estimated
 parameters will simplify to</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.\]</div>
 <p>Sources used in writing the code include <a class="reference internal" href="../references.html#greene" id="id2">[Greene]</a>, <a class="reference internal" href="../references.html#stata" id="id3">[Stata]</a> and <a class="reference internal" href="../references.html#henningsen" id="id4">[Henningsen]</a>.</p>
 </div>
@@ -464,7 +464,7 @@ parameters will simplify to</p>
         <li class="right" >
           <a href="gmm-weights.html" title="GMM Moment Weighting"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

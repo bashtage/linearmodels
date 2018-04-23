@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Methods &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Estimation Methods &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -149,12 +149,12 @@
 </table>
 <p class="rubric">Notes</p>
 <p>The 2SLS estimator is defined</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{2SLS} &amp; =(X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y\\
                    &amp; =(\hat{X}'\hat{X})^{-1}\hat{X}'Y\\
            \hat{X} &amp; =Z(Z'Z)^{-1}Z'X\end{split}\]</div>
 <p>The 2SLS estimator is a special case of a k-class estimator with
-<span class="math notranslate">\(\kappa=1\)</span>,</p>
+<span class="math notranslate nohighlight">\(\kappa=1\)</span>,</p>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
@@ -167,7 +167,7 @@
 </div>
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IV2SLS.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -231,7 +231,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IV2SLS.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -397,17 +397,17 @@ produce LIML parameter estimate.</li>
 <p><code class="docutils literal notranslate"><span class="pre">kappa</span></code> and <code class="docutils literal notranslate"><span class="pre">fuller</span></code> should not be used simultaneously since Fuller’s
 alpha applies an adjustment to <code class="docutils literal notranslate"><span class="pre">kappa</span></code>, and so the same result can be
 computed using only <code class="docutils literal notranslate"><span class="pre">kappa</span></code>. Fuller’s alpha is used to adjust the
-LIML estimate of <span class="math notranslate">\(\kappa\)</span>, which is computed whenever <code class="docutils literal notranslate"><span class="pre">kappa</span></code>
+LIML estimate of <span class="math notranslate nohighlight">\(\kappa\)</span>, which is computed whenever <code class="docutils literal notranslate"><span class="pre">kappa</span></code>
 is not provided.</p>
 <p>The LIML estimator is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{\kappa} &amp; =(X(I-\kappa M_{z})X)^{-1}X(I-\kappa M_{z})Y\\
 M_{z} &amp; =I-P_{z}\\
 P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
-<p>where <span class="math notranslate">\(Z\)</span> contains both the exogenous regressors and the instruments.
-<span class="math notranslate">\(\kappa\)</span> is estimated as part of the LIML estimator.</p>
-<p>When using Fuller’s <span class="math notranslate">\(\alpha\)</span>, the value used is modified to</p>
-<div class="math notranslate">
+<p>where <span class="math notranslate nohighlight">\(Z\)</span> contains both the exogenous regressors and the instruments.
+<span class="math notranslate nohighlight">\(\kappa\)</span> is estimated as part of the LIML estimator.</p>
+<p>When using Fuller’s <span class="math notranslate nohighlight">\(\alpha\)</span>, the value used is modified to</p>
+<div class="math notranslate nohighlight">
 \[\kappa-\alpha/(n-n_{instr})\]</div>
 <div class="admonition-todo admonition" id="index-1">
 <p class="first admonition-title">Todo</p>
@@ -421,7 +421,7 @@ P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
 </div>
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVLIML.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -485,7 +485,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVLIML.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -661,9 +661,9 @@ autocorrelation</li>
 <li>‘cluster’ - Allows for one-way cluster dependence</li>
 </ul>
 <p>The estimator is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y\]</div>
-<p>where <span class="math notranslate">\(W\)</span> is a positive definite weight matrix and <span class="math notranslate">\(Z\)</span>
+<p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weight matrix and <span class="math notranslate nohighlight">\(Z\)</span>
 contains both the exogenous regressors and the instruments.</p>
 <div class="admonition-todo admonition" id="index-2">
 <p class="first admonition-title">Todo</p>
@@ -677,7 +677,7 @@ contains both the exogenous regressors and the instruments.</p>
 </div>
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMM.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -759,7 +759,7 @@ autocorrelation</li>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMM.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -939,11 +939,11 @@ autocorrelation</li>
 </ul>
 <p>In most circumstances, the <code class="docutils literal notranslate"><span class="pre">center</span></code> weight option should be <code class="docutils literal notranslate"><span class="pre">True</span></code> to
 avoid starting value dependence.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{cue} &amp; =\min_{\beta}\bar{g}(\beta)'W(\beta)^{-1}g(\beta)\\
 g(\beta) &amp; =n^{-1}\sum_{i=1}^{n}z_{i}(y_{i}-x_{i}\beta)\end{split}\]</div>
-<p>where <span class="math notranslate">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math notranslate">\(\beta\)</span>
-through <span class="math notranslate">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(W(\beta)\)</span> is a weight matrix that depends on <span class="math notranslate nohighlight">\(\beta\)</span>
+through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta\)</span>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a></p>
@@ -1028,7 +1028,7 @@ is provided.</p>
 
 <dl class="staticmethod">
 <dt id="linearmodels.iv.model.IVGMMCUE.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1109,15 +1109,15 @@ valid Patsy formulas.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>The GMM objective function is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[J(\beta) = \bar{g}(\beta)'W(\beta)^{-1}\bar{g}(\beta)\]</div>
-<p>where <span class="math notranslate">\(\bar{g}(\beta)\)</span> is the average of the moment
-conditions, <span class="math notranslate">\(z_i \hat{\epsilon}_i\)</span>, where
-<span class="math notranslate">\(\hat{\epsilon}_i = y_i - x_i\beta\)</span>.  The weighting matrix
+<p>where <span class="math notranslate nohighlight">\(\bar{g}(\beta)\)</span> is the average of the moment
+conditions, <span class="math notranslate nohighlight">\(z_i \hat{\epsilon}_i\)</span>, where
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_i = y_i - x_i\beta\)</span>.  The weighting matrix
 is some estimator of the long-run variance of the moment conditions.</p>
 <p>Unlike tradition GMM, the weighting matrix is simultaneously computed
 with the moment conditions, and so has explicit dependence on
-<span class="math notranslate">\(\beta\)</span>.</p>
+<span class="math notranslate nohighlight">\(\beta\)</span>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1241,7 +1241,7 @@ resids if all weights are unity.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

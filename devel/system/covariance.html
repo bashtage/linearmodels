@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -155,11 +155,11 @@ assume OLS was used</li>
 </table>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'\Omega^{-1}X)^{-1}\]</div>
 <p>where X is a block diagonal matrix of exogenous variables. When GLS is
 not used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'X)^{-1}(X'\Omega X)(X'X)^{-1}\]</div>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.HomoskedasticCovariance.cov">
@@ -206,15 +206,15 @@ assume OLS was used</li>
 </table>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'\Omega^{-1}X)^{-1}\tilde{S}(X'\Omega^{-1}X)^{-1}\]</div>
 <p>where X is a block diagonal matrix of exogenous variables and where
-<span class="math notranslate">\(\tilde{S}\)</span> is a estimator of the model scores based on the model
-residuals and the weighted X matrix <span class="math notranslate">\(\Omega^{-1/2}X\)</span>.</p>
+<span class="math notranslate nohighlight">\(\tilde{S}\)</span> is a estimator of the model scores based on the model
+residuals and the weighted X matrix <span class="math notranslate nohighlight">\(\Omega^{-1/2}X\)</span>.</p>
 <p>When GLS is not used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'X)^{-1}\hat{S}(X'X)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\hat{S}\)</span> is a estimator of the covariance of the model scores.</p>
+<p>where <span class="math notranslate nohighlight">\(\hat{S}\)</span> is a estimator of the covariance of the model scores.</p>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.HeteroskedasticCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -271,15 +271,15 @@ bandwidth will be estimated.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'\Omega^{-1}X)^{-1}\tilde{S}(X'\Omega^{-1}X)^{-1}\]</div>
 <p>where X is a block diagonal matrix of exogenous variables and where
-<span class="math notranslate">\(\tilde{S}\)</span> is a estimator of the covariance of the model scores
-based on the model residuals and the weighted X matrix <span class="math notranslate">\(\Omega^{-1/2}X\)</span>.</p>
+<span class="math notranslate nohighlight">\(\tilde{S}\)</span> is a estimator of the covariance of the model scores
+based on the model residuals and the weighted X matrix <span class="math notranslate nohighlight">\(\Omega^{-1/2}X\)</span>.</p>
 <p>When GLS is not used, the covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'X)^{-1}\hat{S}(X'X)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\hat{S}\)</span> is a estimator of the covariance of the model scores.</p>
+<p>where <span class="math notranslate nohighlight">\(\hat{S}\)</span> is a estimator of the covariance of the model scores.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
@@ -345,9 +345,9 @@ equation in the system</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\Omega = W = Z'(\Sigma \otimes I_N)Z\)</span> where m is the number of
+<p>where <span class="math notranslate nohighlight">\(\Omega = W = Z'(\Sigma \otimes I_N)Z\)</span> where m is the number of
 moments in the system</p>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.GMMHomoskedasticCovariance.cov">
@@ -389,9 +389,9 @@ equation in the system</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\Omega\)</span> is the covariance of the moment conditions.</p>
+<p>where <span class="math notranslate nohighlight">\(\Omega\)</span> is the covariance of the moment conditions.</p>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.GMMHeteroskedasticCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.covariance.GMMHeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -443,9 +443,9 @@ bandwidth will be estimated.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(X'ZW^{-1}Z'X)^{-1}(X'ZW^{-1}\Omega W^{-1}Z'X)(X'ZW^{-1}Z'X)^{-1}\]</div>
-<p>where <span class="math notranslate">\(\Omega\)</span> is the covariance of the moment conditions.</p>
+<p>where <span class="math notranslate nohighlight">\(\Omega\)</span> is the covariance of the moment conditions.</p>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.GMMKernelCovariance.bandwidth">
 <code class="descname">bandwidth</code><a class="headerlink" href="#linearmodels.system.covariance.GMMKernelCovariance.bandwidth" title="Permalink to this definition">¶</a></dt>
@@ -509,7 +509,7 @@ bandwidth will be estimated.</li>
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

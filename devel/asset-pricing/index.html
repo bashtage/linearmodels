@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Linear Factor Models for Asset Pricing &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Linear Factor Models for Asset Pricing &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="../panel/faq.html" title="Implementation Choices"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -60,7 +60,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -124,10 +124,10 @@
 <p>Factor models are commonly used to test whether a set of factors, for example
 the market (CAP-M) or the Fama-French 3 (Market, Size and Value) can explain
 the return in a set of test portfolio.  The economic hypothesis tested is that</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[E[r_{it}] = \lambda_0 + \beta_i \lambda\]</div>
-<p>where <span class="math notranslate">\(\beta_i\)</span> is a set of factor loadings and <span class="math notranslate">\(\lambda\)</span> are the
-risk premia associated with the factors. <span class="math notranslate">\(\lambda_0\)</span> is the risk-free
+<p>where <span class="math notranslate nohighlight">\(\beta_i\)</span> is a set of factor loadings and <span class="math notranslate nohighlight">\(\lambda\)</span> are the
+risk premia associated with the factors. <span class="math notranslate nohighlight">\(\lambda_0\)</span> is the risk-free
 rate.</p>
 <p>When all of the factors are traded, a simple Seemingly Unrelated Regression
 (SUR) approach can be used to test whether the factors price the test
@@ -135,7 +135,7 @@ portfolios.  This is possible since the expected average return on a factor
 must equal the factor’s risk premium.
 <a class="reference internal" href="models.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements this
 model and allows the specification to be testes with a J-statistic of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_P\]</div>
 <p>where there are P portfolios.</p>
 <p>When some factors are not-traded, for example macroeconomic shocks, then a 2-step
@@ -146,7 +146,7 @@ step estimates the risk premia using the factor exposures as regressors so
 that the estimated risk premia attempt to price the cross-section of assets as
 well as possible.  A similar J-statistic can be used to test the model, although it
 has a different distribution,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[J = \hat{\alpha}^{\prime} \hat{\Sigma}_{\alpha} \hat{\alpha} \sim \chi^2_{P-K}\]</div>
 <p>where K is the number of factors.
 <a class="reference internal" href="models.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements this
@@ -205,7 +205,7 @@ implementing hypothesis tests.</p>
         <li class="right" >
           <a href="../panel/faq.html" title="Implementation Choices"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Linear Asset Pricing Models &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Linear Asset Pricing Models &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -154,21 +154,21 @@ assumed to be excess returns using the correct risk-free rate.</li>
 <p>Implements a 2-step estimator of risk premia, factor loadings and model
 tests.</p>
 <p>The first stage model estimated is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[r_{it} = c_i + f_t \beta_i + \epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(r_{it}\)</span> is the return on test portfolio i and
-<span class="math notranslate">\(f_t\)</span> are the traded factor returns.  The parameters <span class="math notranslate">\(c_i\)</span>
+<p>where <span class="math notranslate nohighlight">\(r_{it}\)</span> is the return on test portfolio i and
+<span class="math notranslate nohighlight">\(f_t\)</span> are the traded factor returns.  The parameters <span class="math notranslate nohighlight">\(c_i\)</span>
 are required to allow non-traded to be tested, but are not economically
 interesting.  These are not reported.</p>
 <p>The second stage model uses the estimated factor loadings from the first
 and is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\bar{r}_i = \lambda_0 + \hat{\beta}_i^\prime \lambda + \eta_i\]</div>
-<p>where <span class="math notranslate">\(\bar{r}_i\)</span> is the average excess return to portfolio i and
-<span class="math notranslate">\(\lambda_0\)</span> is only included if estimating the risk-free rate. GLS
+<p>where <span class="math notranslate nohighlight">\(\bar{r}_i\)</span> is the average excess return to portfolio i and
+<span class="math notranslate nohighlight">\(\lambda_0\)</span> is only included if estimating the risk-free rate. GLS
 is used in the second stage if <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is provided.</p>
 <p>The model is tested using the estimated values
-<span class="math notranslate">\(\hat{\alpha}_i=\hat{\eta}_i\)</span>.</p>
+<span class="math notranslate nohighlight">\(\hat{\alpha}_i=\hat{\eta}_i\)</span>.</p>
 <dl class="method">
 <dt id="linearmodels.asset_pricing.model.LinearFactorModel.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>cov_type='robust'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/model.html#LinearFactorModel.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.model.LinearFactorModel.fit" title="Permalink to this definition">¶</a></dt>
@@ -276,16 +276,16 @@ assumed to be excess returns using the correct risk-free rate.</li>
 <p>Implements a GMM estimator of risk premia, factor loadings and model
 tests.</p>
 <p>The moments are</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\left[\begin{array}{c}
    \epsilon_{t}\otimes f_{c,t}\\
    f_{t}-\mu
 \end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\epsilon_{t}=r_{t}-\left[1_{N}\;\beta\right]\lambda-\beta\left(f_{t}-\mu\right)\]</div>
-<p>where <span class="math notranslate">\(r_{it}\)</span> is the return on test portfolio i and
-<span class="math notranslate">\(f_t\)</span> are the factor returns.</p>
+<p>where <span class="math notranslate nohighlight">\(r_{it}\)</span> is the return on test portfolio i and
+<span class="math notranslate nohighlight">\(f_t\)</span> are the factor returns.</p>
 <p>The model is tested using the optimized objective function using the
 usual GMM J statistic.</p>
 <dl class="method">
@@ -399,12 +399,12 @@ and <code class="docutils literal notranslate"><span class="pre">~</span></code>
 <p>Implements both time-series estimators of risk premia, factor loadings
 and zero-alpha tests.</p>
 <p>The model estimated is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(r_{it}^e\)</span> is the excess return on test portfolio i and
-<span class="math notranslate">\(f_t\)</span> are the traded factor returns.  The model is directly
-tested using the estimated values <span class="math notranslate">\(\hat{\alpha}_i\)</span>. Risk premia,
-<span class="math notranslate">\(\lambda_i\)</span> are estimated using the sample averages of the factors,
+<p>where <span class="math notranslate nohighlight">\(r_{it}^e\)</span> is the excess return on test portfolio i and
+<span class="math notranslate nohighlight">\(f_t\)</span> are the traded factor returns.  The model is directly
+tested using the estimated values <span class="math notranslate nohighlight">\(\hat{\alpha}_i\)</span>. Risk premia,
+<span class="math notranslate nohighlight">\(\lambda_i\)</span> are estimated using the sample averages of the factors,
 which must be excess returns on traded portfolios.</p>
 <dl class="method">
 <dt id="linearmodels.asset_pricing.model.TradedFactorModel.fit">
@@ -523,7 +523,7 @@ and <code class="docutils literal notranslate"><span class="pre">~</span></code>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

@@ -1,6 +1,10 @@
 Change Log
 ----------
 
+Since 4.7
+=========
+* Corrected kappa estimation in LIML when there are no exogenous regressors
+
 Version 4.7
 ===========
 * Improved performance of Panel estimators by optimizing data structure

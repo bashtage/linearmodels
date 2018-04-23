@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -147,12 +147,12 @@
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>The Anderson-Rubin test examines whether the value of <span class="math notranslate">\(\kappa\)</span>
+<p>The Anderson-Rubin test examines whether the value of <span class="math notranslate nohighlight">\(\kappa\)</span>
 computed for the LIML estimator is sufficiently close to one to
 indicate the model is not overidentified. The test statistic is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n \ln(\hat{\kappa}) \sim \chi^2_{q}\]</div>
-<p>where <span class="math notranslate">\(q = n_{instr} - n_{endog}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -173,14 +173,14 @@ indicate the model is not overidentified. The test statistic is</p>
 <p>Requires more instruments than endogenous variables</p>
 <p>Tests is a small-sample version of Sargan’s test that has the same
 distribution.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s (n - n_{instr}) / (n - s) \sim \chi^2_{v}\]</div>
-<p>where <span class="math notranslate">\(n_{instr}\)</span> is the number of instruments, <span class="math notranslate">\(n_{exog}\)</span>
-is the number of exogenous regressors and <span class="math notranslate">\(n_{endog}\)</span> is the
+<p>where <span class="math notranslate nohighlight">\(n_{instr}\)</span> is the number of instruments, <span class="math notranslate nohighlight">\(n_{exog}\)</span>
+is the number of exogenous regressors and <span class="math notranslate nohighlight">\(n_{endog}\)</span> is the
 number of endogenous regressors.  The degree of freedom is the
 difference between the number of instruments and the number of
 endogenous regressors.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[v = n_{instr} - n_{exog}\]</div>
 </dd></dl>
 
@@ -199,12 +199,12 @@ endogenous regressors.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Basmann’s F test examines whether the value of <span class="math notranslate">\(\kappa\)</span>
+<p>Basmann’s F test examines whether the value of <span class="math notranslate nohighlight">\(\kappa\)</span>
 computed for the LIML estimator is sufficiently close to one to
 indicate the model is not overidentified. The test statistic is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\kappa} (n -n_{instr})/q \sim F_{q, n - n_{instr}}\]</div>
-<p>where <span class="math notranslate">\(q = n_{instr} - n_{endog}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -291,19 +291,19 @@ are jointly tested.</td>
 squared IV residuals where each set of residuals has been projected
 onto the set of instruments in teh IV model.</p>
 <p>Start by defining</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
            \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c\]</div>
-<p>where <span class="math notranslate">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
+<p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
 model where <code class="docutils literal notranslate"><span class="pre">vars</span></code> are treated as exogenous,
-<span class="math notranslate">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
-leaving <code class="docutils literal notranslate"><span class="pre">vars</span></code> as endogenous, <span class="math notranslate">\(P_{[z,w]}\)</span> is a projection
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
+leaving <code class="docutils literal notranslate"><span class="pre">vars</span></code> as endogenous, <span class="math notranslate nohighlight">\(P_{[z,w]}\)</span> is a projection
 matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
-<code class="docutils literal notranslate"><span class="pre">vars</span></code>, and <span class="math notranslate">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">vars</span></code>, and <span class="math notranslate nohighlight">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
 <p>The test statistic is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\delta / (\hat{\epsilon}'_e\hat{\epsilon}_e) / n \sim \chi^2_{q}\]</div>
-<p>where <span class="math notranslate">\(q\)</span> is the number of variables tested.</p>
+<p>where <span class="math notranslate nohighlight">\(q\)</span> is the number of variables tested.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -495,14 +495,14 @@ values corresponding to the original model specification.</p>
 <p>Requires more instruments than endogenous variables</p>
 <p>Tests the ratio of re-projected IV regression residual variance to
 variance of the IV residuals.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n(1-\hat{\epsilon}^{\prime}M_{Z}\hat{\epsilon}/
 \hat{\epsilon}^{\prime}\hat{\epsilon})\sim\chi_{v}^{2}\]</div>
-<p>where <span class="math notranslate">\(M_{z}\)</span> is the annihilator matrix where z is the set of
-instruments and <span class="math notranslate">\(\hat{\epsilon}\)</span> are the residuals from the IV
+<p>where <span class="math notranslate nohighlight">\(M_{z}\)</span> is the annihilator matrix where z is the set of
+instruments and <span class="math notranslate nohighlight">\(\hat{\epsilon}\)</span> are the residuals from the IV
 estimator.  The degree of freedom is the difference between the number
 of instruments and the number of endogenous regressors.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[v = n_{instr} - n_{exog}\]</div>
 </dd></dl>
 
@@ -542,9 +542,9 @@ when forming the restrictions.</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Hypothesis test examines whether <span class="math notranslate">\(H_0:C\theta=v\)</span> where the
+<p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
-has a <span class="math notranslate">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -576,15 +576,15 @@ has a <span class="math notranslate">\(\chi^2_q\)</span> distribution where q is
 <p class="rubric">Notes</p>
 <p>Wooldridge’s test examines whether there is correlation between the
 model residuals and the component of the instruments that is
-orthogonal to the endogenous variables. Define <span class="math notranslate">\(\tilde{z}\)</span>
+orthogonal to the endogenous variables. Define <span class="math notranslate nohighlight">\(\tilde{z}\)</span>
 to be the residuals of the instruments regressed on the exogenous
 variables and the first-stage fitted values of the endogenous
 variables.  The test is computed as a regression</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[1 = \gamma_1 \hat{\epsilon}_i \tilde{z}_{i,1} + \ldots +
     \gamma_q \hat{\epsilon}_i \tilde{z}_{i,q}\]</div>
-<p>where <span class="math notranslate">\(q = n_{instr} - n_{endog}\)</span>.  The test is a
-<span class="math notranslate">\(n\times R^2 \sim \chi^2_{q}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.  The test is a
+<span class="math notranslate nohighlight">\(n\times R^2 \sim \chi^2_{q}\)</span>.</p>
 <p>The order of the instruments does not affect this test.</p>
 </dd></dl>
 
@@ -607,12 +607,12 @@ variables.  The test is computed as a regression</p>
 components of the endogenous variables that cannot be explained by
 the instruments and the OLS regression residuals.</p>
 <p>The test is implemented as an OLS where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_i = x_{1i}\beta_i + x_{2i}\beta_2 + \hat{e}_i\gamma + \epsilon_i\]</div>
-<p>where <span class="math notranslate">\(x_{1i}\)</span> are the exogenous regressors, <span class="math notranslate">\(x_{2i}\)</span> are
-the  endogenous regressors and <span class="math notranslate">\(\hat{e}_{i}\)</span> are the residuals
+<p>where <span class="math notranslate nohighlight">\(x_{1i}\)</span> are the exogenous regressors, <span class="math notranslate nohighlight">\(x_{2i}\)</span> are
+the  endogenous regressors and <span class="math notranslate nohighlight">\(\hat{e}_{i}\)</span> are the residuals
 from regressing the endogenous variables on the exogenous variables
-and instruments. The null is <span class="math notranslate">\(\gamma=0\)</span> and is implemented
+and instruments. The null is <span class="math notranslate nohighlight">\(\gamma=0\)</span> and is implemented
 using a Wald test.  The covariance estimator used in the test is
 identical to the covariance estimator used with <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
 </dd></dl>
@@ -637,12 +637,12 @@ errors produced when the endogenous variable are treated as
 exogenous so that the model can be fit by OLS, and the component of
 the endogenous variables that cannot be explained by the instruments.</p>
 <p>The test is implemented using a regression,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[1 = \gamma_1 \hat{\epsilon}_1 \hat{v}_{1,i} + \ldots
   + \gamma_p \hat{\epsilon}_1 \hat{v}_{p,i} + \eta_i\]</div>
-<p>where <span class="math notranslate">\(\hat{v}_{j,i}\)</span> is the residual from regressing endogenous
-variable <span class="math notranslate">\(x_j\)</span> on the exogenous variables and instruments.</p>
-<p>The test is a <span class="math notranslate">\(n\times R^2 \sim \chi^2_{p}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(\hat{v}_{j,i}\)</span> is the residual from regressing endogenous
+variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogenous variables and instruments.</p>
+<p>The test is a <span class="math notranslate nohighlight">\(n\times R^2 \sim \chi^2_{p}\)</span>.</p>
 <p>Implemented using the expression in Wooldridge (2002), Eq. 6.19</p>
 </dd></dl>
 
@@ -674,21 +674,21 @@ are jointly tested.</td>
 squared IV residuals where each set of residuals has been projected
 onto the set of instruments in teh IV model.</p>
 <p>Start by defining</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
            \hat{\epsilon}'_c P_{z} \hat{\epsilon}_c\]</div>
-<p>where <span class="math notranslate">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
+<p>where <span class="math notranslate nohighlight">\(\hat{\epsilon}_e\)</span> are the regression residuals from a
 model where <code class="docutils literal notranslate"><span class="pre">vars</span></code> are treated as exogenous,
-<span class="math notranslate">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
-leaving <code class="docutils literal notranslate"><span class="pre">vars</span></code> as endogenous, <span class="math notranslate">\(P_{[z,w]}\)</span> is a projection
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_c\)</span> are the regression residuals from the model
+leaving <code class="docutils literal notranslate"><span class="pre">vars</span></code> as endogenous, <span class="math notranslate nohighlight">\(P_{[z,w]}\)</span> is a projection
 matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
-<code class="docutils literal notranslate"><span class="pre">vars</span></code>, and <span class="math notranslate">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">vars</span></code>, and <span class="math notranslate nohighlight">\(P_{z}\)</span> is a projection matrix only onto <cite>z</cite>.</p>
 <p>The test statistic is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\frac{\delta / q}{(\hat{\epsilon}'_e\hat{\epsilon}_e - \delta) / v}\]</div>
-<p>where <span class="math notranslate">\(q\)</span> is the number of variables iv,
-<span class="math notranslate">\(v = n - n_{endog} - n_{exog} - q\)</span>. The test statistic has a
-<span class="math notranslate">\(F_{q, v}\)</span> distribution.</p>
+<p>where <span class="math notranslate nohighlight">\(q\)</span> is the number of variables iv,
+<span class="math notranslate nohighlight">\(v = n - n_{endog} - n_{exog} - q\)</span>. The test statistic has a
+<span class="math notranslate nohighlight">\(F_{q, v}\)</span> distribution.</p>
 </dd></dl>
 
 </dd></dl>
@@ -724,18 +724,18 @@ statistic to be positive.</p>
 <p>The first model is a estimated uses GMM estimation where one or more
 of the endogenous variables are assumed to be endogenous.  The model
 would be relatively efficient if the assumption were true, and two
-quantities are computed, the J statistic, <span class="math notranslate">\(J_e\)</span>, and the
-moment weighting matrix, <span class="math notranslate">\(W_e\)</span>.</p>
+quantities are computed, the J statistic, <span class="math notranslate nohighlight">\(J_e\)</span>, and the
+moment weighting matrix, <span class="math notranslate nohighlight">\(W_e\)</span>.</p>
 <p>WLOG assume the q variables tested are in the final q positions so that
-the first <span class="math notranslate">\(n_{exog} + n_{instr}\)</span> rows and columns correspond to
+the first <span class="math notranslate nohighlight">\(n_{exog} + n_{instr}\)</span> rows and columns correspond to
 the moment conditions in the original model. The second J statistic is
 computed using parameters estimated using the original moment
-conditions along with the upper left block of <span class="math notranslate">\(W_e\)</span>.  Denote this
-values as <span class="math notranslate">\(J_c\)</span> where the c is used to indicate consistent.</p>
+conditions along with the upper left block of <span class="math notranslate nohighlight">\(W_e\)</span>.  Denote this
+values as <span class="math notranslate nohighlight">\(J_c\)</span> where the c is used to indicate consistent.</p>
 <p>The test statistic is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[J_e - J_c \sim \chi^2_{m}\]</div>
-<p>where <span class="math notranslate">\(m\)</span> is the number of variables whose exogeneity is being
+<p>where <span class="math notranslate nohighlight">\(m\)</span> is the number of variables whose exogeneity is being
 tested.</p>
 </dd></dl>
 
@@ -889,13 +889,13 @@ of parameters and inclusion of effects, if any.</p>
 <p>The J statistic tests whether the moment conditions are sufficiently
 close to zero to indicate that the model is not overidentified. The
 statistic is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n \bar{g}'W^{-1}\bar{g} \sim \chi^2_q\]</div>
-<p>where <span class="math notranslate">\(\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i\)</span> where
-<span class="math notranslate">\(z_i\)</span> includes both the exogenous variables and instruments and
-<span class="math notranslate">\(\hat{\epsilon}_i\)</span> are the model residuals. <span class="math notranslate">\(W\)</span> is a consistent
-estimator of the variance of <span class="math notranslate">\(\sqrt{n}\bar{g}\)</span>. The degree of
-freedom is <span class="math notranslate">\(q = n_{instr} - n_{endog}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(\bar{g} = n^{-1}\sum \hat{\epsilon}_i z_i\)</span> where
+<span class="math notranslate nohighlight">\(z_i\)</span> includes both the exogenous variables and instruments and
+<span class="math notranslate nohighlight">\(\hat{\epsilon}_i\)</span> are the model residuals. <span class="math notranslate nohighlight">\(W\)</span> is a consistent
+estimator of the variance of <span class="math notranslate nohighlight">\(\sqrt{n}\bar{g}\)</span>. The degree of
+freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1041,9 +1041,9 @@ when forming the restrictions.</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Hypothesis test examines whether <span class="math notranslate">\(H_0:C\theta=v\)</span> where the
+<p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
-has a <span class="math notranslate">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1340,9 +1340,9 @@ when forming the restrictions.</li>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Hypothesis test examines whether <span class="math notranslate">\(H_0:C\theta=v\)</span> where the
+<p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
-has a <span class="math notranslate">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
+has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distribution where q is the number of rows in C.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1559,7 +1559,7 @@ the variable names of the endogenous regressors.</td>
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

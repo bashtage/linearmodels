@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.7+2.gb3b8d75 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.7+4.g3638b0c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7 (+2, gb3b8d75)</a>
+    ../index.html" class="text-logo">linearmodels 4.7 (+4, g3638b0c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -210,15 +210,15 @@
 <p>Joint test that all included effects are zero.  Only correct under an
 assumption of homoskedasticity.</p>
 <p>The test statistic is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[F = \frac{(RSS_{pool}-RSS_{effect})/(df_{pool}-df_{effect})}{RSS_{effect}/df_{effect}}\]</div>
-<p>where <span class="math notranslate">\(RSS_{pool}\)</span> is the residual sum of squares from a no-
-effect (pooled) model. <span class="math notranslate">\(RSS_{effect}\)</span> is the residual sum of
-squares from a model with effects.  <span class="math notranslate">\(df_{pool}\)</span> is the residual
-degree of freedom in the pooled regression and <span class="math notranslate">\(df_{effect}\)</span> is
+<p>where <span class="math notranslate nohighlight">\(RSS_{pool}\)</span> is the residual sum of squares from a no-
+effect (pooled) model. <span class="math notranslate nohighlight">\(RSS_{effect}\)</span> is the residual sum of
+squares from a model with effects.  <span class="math notranslate nohighlight">\(df_{pool}\)</span> is the residual
+degree of freedom in the pooled regression and <span class="math notranslate nohighlight">\(df_{effect}\)</span> is
 the residual degree of freedom from the model with effects. The test
-has an <span class="math notranslate">\(F_{k,df_{effect}}\)</span> distribution where
-<span class="math notranslate">\(k=df_{pool}-df_{effect}\)</span>.</p>
+has an <span class="math notranslate nohighlight">\(F_{k,df_{effect}}\)</span> distribution where
+<span class="math notranslate nohighlight">\(k=df_{pool}-df_{effect}\)</span>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -238,14 +238,14 @@ has an <span class="math notranslate">\(F_{k,df_{effect}}\)</span> distribution 
 <p class="rubric">Notes</p>
 <p>Classical F-stat that is only correct under an assumption of
 homoskedasticity.  The test statistic is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
-<p>where <span class="math notranslate">\(RSS_R\)</span> is the restricted sum of squares from the model
+<p>where <span class="math notranslate nohighlight">\(RSS_R\)</span> is the restricted sum of squares from the model
 where the coefficients on all exog variables is zero, excluding a
-constant if one was included. <span class="math notranslate">\(RSS_U\)</span> is the unrestricted
+constant if one was included. <span class="math notranslate nohighlight">\(RSS_U\)</span> is the unrestricted
 residual sum of squares.  k is the number of non-constant regressors
-in the model and <span class="math notranslate">\(df_U\)</span> is the residual degree of freedom in the
-unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}\)</span> distribution.</p>
+in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -266,15 +266,15 @@ unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}
 <p>Implemented as a Wald test using the estimated parameter covariance,
 and so inherits any robustness that the choice of covariance estimator
 provides.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
-<p>where <span class="math notranslate">\(\hat{\beta}_{-}\)</span> does not include the model constant and
-<span class="math notranslate">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+<p>where <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
 parameters, also excluding the constant.  The test statistic is
-distributed as <span class="math notranslate">\(\chi^2_{k}\)</span> where k is the number of non-
+distributed as <span class="math notranslate nohighlight">\(\chi^2_{k}\)</span> where k is the number of non-
 constant parameters.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
-number of restrictions and inference is made using an <span class="math notranslate">\(F_{k,df}\)</span>
+number of restrictions and inference is made using an <span class="math notranslate nohighlight">\(F_{k,df}\)</span>
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
@@ -598,14 +598,14 @@ effects on the exogenous purged of entity effects.</p>
 <p class="rubric">Notes</p>
 <p>Classical F-stat that is only correct under an assumption of
 homoskedasticity.  The test statistic is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
-<p>where <span class="math notranslate">\(RSS_R\)</span> is the restricted sum of squares from the model
+<p>where <span class="math notranslate nohighlight">\(RSS_R\)</span> is the restricted sum of squares from the model
 where the coefficients on all exog variables is zero, excluding a
-constant if one was included. <span class="math notranslate">\(RSS_U\)</span> is the unrestricted
+constant if one was included. <span class="math notranslate nohighlight">\(RSS_U\)</span> is the unrestricted
 residual sum of squares.  k is the number of non-constant regressors
-in the model and <span class="math notranslate">\(df_U\)</span> is the residual degree of freedom in the
-unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}\)</span> distribution.</p>
+in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -626,15 +626,15 @@ unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}
 <p>Implemented as a Wald test using the estimated parameter covariance,
 and so inherits any robustness that the choice of covariance estimator
 provides.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
-<p>where <span class="math notranslate">\(\hat{\beta}_{-}\)</span> does not include the model constant and
-<span class="math notranslate">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+<p>where <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
 parameters, also excluding the constant.  The test statistic is
-distributed as <span class="math notranslate">\(\chi^2_{k}\)</span> where k is the number of non-
+distributed as <span class="math notranslate nohighlight">\(\chi^2_{k}\)</span> where k is the number of non-
 constant parameters.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
-number of restrictions and inference is made using an <span class="math notranslate">\(F_{k,df}\)</span>
+number of restrictions and inference is made using an <span class="math notranslate nohighlight">\(F_{k,df}\)</span>
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
@@ -946,14 +946,14 @@ effects on the exogenous purged of entity effects.</p>
 <p class="rubric">Notes</p>
 <p>Classical F-stat that is only correct under an assumption of
 homoskedasticity.  The test statistic is defined as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[F = \frac{(RSS_R - RSS_U)/ k}{RSS_U / df_U}\]</div>
-<p>where <span class="math notranslate">\(RSS_R\)</span> is the restricted sum of squares from the model
+<p>where <span class="math notranslate nohighlight">\(RSS_R\)</span> is the restricted sum of squares from the model
 where the coefficients on all exog variables is zero, excluding a
-constant if one was included. <span class="math notranslate">\(RSS_U\)</span> is the unrestricted
+constant if one was included. <span class="math notranslate nohighlight">\(RSS_U\)</span> is the unrestricted
 residual sum of squares.  k is the number of non-constant regressors
-in the model and <span class="math notranslate">\(df_U\)</span> is the residual degree of freedom in the
-unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}\)</span> distribution.</p>
+in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is the residual degree of freedom in the
+unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -974,15 +974,15 @@ unrestricted model.  The test has an <span class="math notranslate">\(F_{k,df_U}
 <p>Implemented as a Wald test using the estimated parameter covariance,
 and so inherits any robustness that the choice of covariance estimator
 provides.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}\]</div>
-<p>where <span class="math notranslate">\(\hat{\beta}_{-}\)</span> does not include the model constant and
-<span class="math notranslate">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
+<p>where <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> does not include the model constant and
+<span class="math notranslate nohighlight">\(\hat{\Sigma}_{-}\)</span> is tht estimated covariance of the
 parameters, also excluding the constant.  The test statistic is
-distributed as <span class="math notranslate">\(\chi^2_{k}\)</span> where k is the number of non-
+distributed as <span class="math notranslate nohighlight">\(\chi^2_{k}\)</span> where k is the number of non-
 constant parameters.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, then the Wald statistic is divided by the
-number of restrictions and inference is made using an <span class="math notranslate">\(F_{k,df}\)</span>
+number of restrictions and inference is made using an <span class="math notranslate nohighlight">\(F_{k,df}\)</span>
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
@@ -1347,7 +1347,7 @@ names.  An OrderedDict will preserve the model order the comparisons.</td>
         <li class="right" >
           <a href="models.html" title="Models for Panel Data"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+2.gb3b8d75 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7+4.g3638b0c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
