@@ -12,7 +12,7 @@ tsset time \n
 """.format(dtafile=dtafile)
 
 model = r"""
-ivregress {method} {depvar} {exog_var} \\\
+ivregress {method} {depvar} {exog_var} ///
    ({endog_var} = {instr}) {weight_opt}, {variance_option} {other_option}
 """
 
@@ -21,7 +21,7 @@ depvars = ['y_unadjusted', 'y_robust', 'y_clustered', 'y_kernel']
 variance_options = ['vce(unadjusted)', 'vce(robust)', 'vce(cluster cluster_id)',
                     'vce(hac bartlett 12)']
 depvar_with_var = list(zip(depvars, variance_options))
-exog_vars = ['x3 x4 x5']
+exog_vars = ['', 'x3 x4 x5']
 endog_vars = ['x1', 'x1 x2']
 instr = ['z1', 'z1 z2']
 other_options = ['', 'small', 'noconstant', 'small noconstant', 'small center',
@@ -82,7 +82,12 @@ if os.path.exists(outfile):
 
 
 def count_vars(v):
-    return sum(map(lambda s: s == ' ', v)) + 1
+    if v.strip() == '':
+        return 0
+    v = v.strip()
+    while '  ' in v:
+        v = v.replace('  ', ' ')
+    return len(v.split(' '))
 
 
 with open('simulated-results.do', 'w') as stata:

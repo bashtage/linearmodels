@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 
+import numpy as np
 import pandas as pd
 import pytest
 import statsmodels.api as sm
@@ -107,7 +108,7 @@ def construct_model(key):
     mod = MODELS[model]
     data = SIMULATED_DATA
     endog = data[['x1', 'x2']] if '2' in nendog else data.x1
-    exog = data[['x3', 'x4', 'x5']]
+    exog = data[['x3', 'x4', 'x5']] if '3' in nexog else None
     instr = data[['z1', 'z2']] if '2' in ninstr else data.z1
     deps = {'vce(unadjusted)': data.y_unadjusted,
             'vce(robust)': data.y_robust,
@@ -115,7 +116,10 @@ def construct_model(key):
             'vce(hac bartlett 12)': data.y_kernel}
     dep = deps[var]
     if 'noconstant' not in other:
-        exog = sm.add_constant(data[['x3', 'x4', 'x5']])
+        if exog is not None:
+            exog = sm.add_constant(exog)
+        else:
+            exog = sm.add_constant(pd.DataFrame(np.empty((dep.shape[0], 0))))
 
     cov_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
     cov_opts['debiased'] = 'small' in other

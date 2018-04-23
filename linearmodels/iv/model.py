@@ -148,7 +148,7 @@ class IVLIML(object):
             if fuller != 0:
                 additional.append('fuller(alpha={0})'.format(fuller))
             if kappa is not None:
-                additional.append('kappa={0}'.format(fuller))
+                additional.append('kappa={0}'.format(kappa))
             if additional:
                 self._method += '(' + ', '.join(additional) + ')'
         if not hasattr(self, '_result_container'):
@@ -361,12 +361,12 @@ class IVLIML(object):
         is_exog = self._regressor_is_exog
         e = c_[y, x[:, ~is_exog]]
         x1 = x[:, is_exog]
-        if x1.shape[1] == 0:
-            # No exogenous regressors
-            return 1
 
         ez = e - z @ (pinv(z) @ e)
-        ex1 = e - x1 @ (pinv(x1) @ e)
+        if x1.shape[1] == 0:  # No exogenous regressors
+            ex1 = e
+        else:
+            ex1 = e - x1 @ (pinv(x1) @ e)
 
         vpmzv_sqinv = inv_sqrth(ez.T @ ez)
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
