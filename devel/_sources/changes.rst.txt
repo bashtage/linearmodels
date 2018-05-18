@@ -3,6 +3,7 @@ Change Log
 
 Since 4.7
 =========
+* Corrected bug that prevented single character names in IV formulas
 * Corrected kappa estimation in LIML when there are no exogenous regressors
 
 Version 4.7
