@@ -95,10 +95,10 @@ class IVFormulaParser(object):
             dep = blocks[0].strip()
             exog, endog = [bl.strip() for bl in blocks[1].split('[')]
             instr, exog2 = [bl.strip() for bl in blocks[2].split(']')]
-            if endog[0] == '+' or endog[1] == '+':
+            if endog[0] == '+' or endog[-1] == '+':
                 raise ValueError('endogenous block must not start or end with +. This block '
                                  'was: {0}'.format(endog))
-            if instr[0] == '+' or instr[1] == '+':
+            if instr[0] == '+' or instr[-1] == '+':
                 raise ValueError('instrument block must not start or end with +. This '
                                  'block was: {0}'.format(instr))
             if exog2:

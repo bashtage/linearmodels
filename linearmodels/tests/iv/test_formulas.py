@@ -8,8 +8,9 @@ from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
 
-@pytest.fixture(scope='module', params=list(zip([IV2SLS, IVLIML, IVGMMCUE, IVGMM],
-                                                [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm])))
+@pytest.fixture(scope='module',
+                params=list(zip([IV2SLS, IVLIML, IVGMMCUE, IVGMM],
+                                [iv_2sls, iv_liml, iv_gmm_cue, iv_gmm])))
 def model_and_func(request):
     return request.param
 
@@ -196,7 +197,8 @@ def test_formula_function(data, model_and_func):
     res = mod.fit()
 
     dep = data.y
-    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']], np.exp(data[['x5']])]
+    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']],
+            np.exp(data[['x5']])]
     exog = pd.concat(exog, 1)
     endog = data[['x1', 'x2']]
     instr = data[['z1', 'z2', 'z3']]
@@ -216,7 +218,8 @@ def test_predict_formula_function(data, model_and_func):
     mod = model.from_formula(fmla, data)
     res = mod.fit()
 
-    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']], np.exp(data[['x5']])]
+    exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']],
+            np.exp(data[['x5']])]
     exog = pd.concat(exog, 1)
     endog = data[['x1', 'x2']]
     pred = res.predict(exog, endog)
@@ -241,3 +244,26 @@ def test_predict_formula_error(data, model_and_func, formula):
         res.predict(exog, endog, data=data)
     with pytest.raises(ValueError):
         mod.predict(res.params, exog=exog, endog=endog, data=data)
+
+
+def test_single_character_names(data, model_and_func):
+    # GH 149
+    data = data.copy()
+    data['x'] = data['x1']
+    data['v'] = data['x2']
+    data['z'] = data['z1']
+    data['a'] = data['z2']
+    fmla = 'y ~ 1 + [x ~ z]'
+    model, func = model_and_func
+    mod = model.from_formula(fmla, data)
+    mod.fit()
+
+    fmla = 'y ~ 1 + [x ~ z + a]'
+    model, func = model_and_func
+    mod = model.from_formula(fmla, data)
+    mod.fit()
+
+    fmla = 'y ~ 1 + [x + v ~ z + a]'
+    model, func = model_and_func
+    mod = model.from_formula(fmla, data)
+    mod.fit()
