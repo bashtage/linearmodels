@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Panel Model Covariance Estimators &#8212; linearmodels 4.7 documentation</title>
+    <title>Panel Model Covariance Estimators &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -157,13 +157,13 @@ adjusted for extra_df irrespective of the setting of debiased</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s^2\hat{\Sigma}_{xx}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx} = X'X\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s^2 = (n-df)^{-1} \hat{\epsilon}'\hat{\epsilon}\]</div>
 <p>where df is <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> and n-df is replace by n-df-k if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
 <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
@@ -227,13 +227,13 @@ adjusted for extra_df irrespective of the setting of debiased</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx} = n^{-1}X'X\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{S} = (n-df)^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 x_i'x_i\]</div>
 <p>where df is <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> and n-df is replace by n-df-k if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
 <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
@@ -305,12 +305,12 @@ adjusted for extra_df irrespective of the setting of debiased</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx}^{-1}\hat{S}_{\mathcal{G}}\hat{\Sigma}_{xx}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx} = X'X\]</div>
-<p>and <span class="math notranslate">\(\hat{S}_{\mathcal{G}}\)</span> is a one- or two-way cluster covariance
+<p>and <span class="math notranslate nohighlight">\(\hat{S}_{\mathcal{G}}\)</span> is a one- or two-way cluster covariance
 of the scores.  Two-way clustering is implemented by summing up the two
 one-way cluster covariances and then subtracting the one-way clustering
 covariance computed using the group formed from the intersection of the
@@ -318,7 +318,7 @@ two groups.</p>
 <p>Two small sample adjustment are available.  <code class="docutils literal notranslate"><span class="pre">debias=True</span></code> will account
 for regressors in the main model. <code class="docutils literal notranslate"><span class="pre">group_debias=True</span></code> will provide a
 small sample adjustment for the number of clusters of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[(g / (g- 1)) ((n - 1) / n)\]</div>
 <p>where g is the number of distinct groups and n is the number of
 observations.</p>
@@ -393,19 +393,19 @@ thumb value is used.</li>
 <p>Bandwidth is set to the common value for the Bartlett kernel if not
 provided.</p>
 <p>The estimator of the covariance is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx} = n^{-1}X'X\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\xi_t &amp; = \sum_{i=1}^{n_t} \epsilon_i x_{i} \\
 \hat{S}_0 &amp; = \sum_{i=1}^{t} \xi'_t \xi_t \\
 \hat{S}_j &amp; = \sum_{i=1}^{t-j} \xi'_t \xi_{t+j} + \xi'_{t+j} \xi_t  \\
 \hat{S}   &amp; = (n-df)^{-1} \sum_{j=0}^{bw} K(j, bw) \hat{S}_j\end{split}\]</div>
 <p>where df is <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> and n-df is replace by n-df-k if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
-<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate">\(K(i, bw)\)</span> is the kernel weighting function.</p>
+<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate nohighlight">\(K(i, bw)\)</span> is the kernel weighting function.</p>
 <dl class="attribute">
 <dt id="linearmodels.panel.covariance.DriscollKraay.cov">
 <code class="descname">cov</code><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#DriscollKraay.cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.DriscollKraay.cov" title="Permalink to this definition">¶</a></dt>
@@ -478,20 +478,20 @@ thumb value is used.</li>
 <p>Bandwidth is set to the common value for the Bartlett kernel if not
 provided.</p>
 <p>The estimator of the covariance is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1}\hat{\Sigma}_{xx}^{-1}\hat{S}\hat{\Sigma}_{xx}^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\Sigma}_{xx} = n^{-1}X'X\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\xi_t &amp; = \epsilon_{it} x_{it} \\
 \hat{S} &amp; = n / (N(n-df))  \sum_{i=1}^N S_i \\
 \hat{S}_i &amp; = \sum_{j=0}^{bw} K(j, bw) \hat{S}_{ij} \\
 \hat{S}_{i0} &amp; = \sum_{t=1}^{T} \xi'_{it} \xi_{it} \\
 \hat{S}_{ij} &amp; = \sum_{t=1}^{T-j} \xi'_{it} \xi_{it+j} + \xi'_{it+j} \xi_{it}\end{split}\]</div>
 <p>where df is <code class="docutils literal notranslate"><span class="pre">extra_df</span></code> and n-df is replace by n-df-k if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is
-<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate">\(K(i, bw)\)</span> is the kernel weighting function.</p>
+<code class="docutils literal notranslate"><span class="pre">True</span></code>. <span class="math notranslate nohighlight">\(K(i, bw)\)</span> is the kernel weighting function.</p>
 <dl class="attribute">
 <dt id="linearmodels.panel.covariance.ACCovariance.cov">
 <code class="descname">cov</code><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#ACCovariance.cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.ACCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -682,7 +682,7 @@ thumb value is used.</li>
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

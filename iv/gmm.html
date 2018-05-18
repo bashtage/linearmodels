@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>GMM Weight and Covariance Estimation &#8212; linearmodels 4.7 documentation</title>
+    <title>GMM Weight and Covariance Estimation &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -223,10 +223,10 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}s^{2} &amp; =n^{-1}\sum_{i=1}^{n}(\epsilon_i-\bar{\epsilon})^2 \\
 W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
-<p>where <span class="math notranslate">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
+<p>where <span class="math notranslate nohighlight">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
 <p><code class="docutils literal notranslate"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix.config">
@@ -289,10 +289,10 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}g_i &amp; =z_i\epsilon_i\\
 W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
-<p>where <span class="math notranslate">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
+<p>where <span class="math notranslate nohighlight">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
@@ -363,11 +363,11 @@ bandwidth is None.  If False, nobs - 2 is used</li>
 <li>‘parzen’, ‘gallant’ - Parzen’s kernel</li>
 <li>‘qs’, ‘quadratic-spectral’, ‘andrews’ - The quadratic spectral kernel</li>
 </ul>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}g_i &amp; =z_i \epsilon_i \\
 W &amp; =n^{-1}(\Gamma_0+\sum_{j=1}^{n-1}k(j)(\Gamma_j+\Gamma_j')) \\
 \Gamma_j &amp; =\sum_{i=j+1}^n g'_i g_{j-j}\end{split}\]</div>
-<p>where <span class="math notranslate">\(k(j)\)</span> is the kernel weight for lag j and <span class="math notranslate">\(z_i\)</span>
+<p>where <span class="math notranslate nohighlight">\(k(j)\)</span> is the kernel weight for lag j and <span class="math notranslate nohighlight">\(z_i\)</span>
 contains both the exogenous regressors and instruments..</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -516,7 +516,7 @@ the mean before computing the weight matrix.</li>
         <li class="right" >
           <a href="covariance.html" title="Instrumental Variable Covariance Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

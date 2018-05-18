@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Introduction &#8212; linearmodels 4.7 documentation</title>
+    <title>Introduction &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="index.html" title="Panel Data Model Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -135,19 +135,19 @@ estimators has been developed under an assumption that N will diverge while
 T is fixed.</p>
 <p>Most panel models are designed to estimate the parameters of a model which
 can be described</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}  = x_{it}\beta + \alpha_i + \epsilon_{it}\]</div>
-<p>where i indexes the entities and t indexes time.  <span class="math notranslate">\(\beta\)</span> contains the
-parameters of interest.  <span class="math notranslate">\(\alpha_i\)</span> are entity-specific components that
+<p>where i indexes the entities and t indexes time.  <span class="math notranslate nohighlight">\(\beta\)</span> contains the
+parameters of interest.  <span class="math notranslate nohighlight">\(\alpha_i\)</span> are entity-specific components that
 are not usually identified in the standard setup, and so cannot be
-consistently estimated and <span class="math notranslate">\(\epsilon_{it}\)</span> are idiosyncratic errors
-uncorrelated with <span class="math notranslate">\(\alpha_i\)</span> and the covariates <span class="math notranslate">\(x_{it}\)</span>.</p>
+consistently estimated and <span class="math notranslate nohighlight">\(\epsilon_{it}\)</span> are idiosyncratic errors
+uncorrelated with <span class="math notranslate nohighlight">\(\alpha_i\)</span> and the covariates <span class="math notranslate nohighlight">\(x_{it}\)</span>.</p>
 <p>All models require two inputs</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate">\(y_{it}\)</span> in the model</li>
-<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The regressors, <span class="math notranslate">\(x_{it}\)</span> in the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate nohighlight">\(y_{it}\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The regressors, <span class="math notranslate nohighlight">\(x_{it}\)</span> in the model.</li>
 </ul>
-<p>and use different techniques to address the presence of <span class="math notranslate">\(\alpha_i\)</span>.</p>
+<p>and use different techniques to address the presence of <span class="math notranslate nohighlight">\(\alpha_i\)</span>.</p>
 <p>In particular,</p>
 <ul class="simple">
 <li><a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> uses fixed effect
@@ -160,7 +160,7 @@ entity and then regresses the time-averaged values using OLS.</li>
 <li><a class="reference internal" href="models.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> takes the first
 difference to eliminate the entity specific effect.</li>
 <li><a class="reference internal" href="models.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> uses a quasi-difference
-to efficiently estimate <span class="math notranslate">\(\beta\)</span> when the entity effect is
+to efficiently estimate <span class="math notranslate nohighlight">\(\beta\)</span> when the entity effect is
 independent from the regressors.  It is, however, not consistent when
 there is dependence between the entity effect and the regressors.</li>
 <li><a class="reference internal" href="models.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a> ignores the entity effect
@@ -266,7 +266,7 @@ to include the fixed effects.</p>
         <li class="right" >
           <a href="index.html" title="Panel Data Model Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

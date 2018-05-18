@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Models for Panel Data &#8212; linearmodels 4.7 documentation</title>
+    <title>Models for Panel Data &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -158,15 +158,15 @@ effects. Each variable is treated as an effect.</li>
 <p class="rubric">Notes</p>
 <p>Many models can be estimated. The most common included entity effects and
 can be described</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it} = \alpha_i + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(\alpha_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">entity_effects=True</span></code>.</p>
+<p>where <span class="math notranslate nohighlight">\(\alpha_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">entity_effects=True</span></code>.</p>
 <p>Time effect are also supported, which leads to a model of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}= \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(\gamma_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>.</p>
+<p>where <span class="math notranslate nohighlight">\(\gamma_i\)</span> is included if <code class="docutils literal notranslate"><span class="pre">time_effects=True</span></code>.</p>
 <p>Both effects can be simultaneously used,</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=\alpha_i + \gamma_t + \beta^{\prime}x_{it} + \epsilon_{it}\]</div>
 <p>Additionally , arbitrary effects can be specified using categorical variables.</p>
 <p>If both <code class="docutils literal notranslate"><span class="pre">entity_effect</span></code>  and``time_effects`` are <code class="docutils literal notranslate"><span class="pre">False</span></code>, and no other
@@ -397,9 +397,9 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it} = \beta^{\prime}x_{it} + u_i + \epsilon_{it}\]</div>
-<p>where <span class="math notranslate">\(u_i\)</span> is a shock that is independent of <span class="math notranslate">\(x_{it}\)</span> but
+<p>where <span class="math notranslate nohighlight">\(u_i\)</span> is a shock that is independent of <span class="math notranslate nohighlight">\(x_{it}\)</span> but
 common to all entities i.</p>
 <dl class="method">
 <dt id="linearmodels.panel.model.RandomEffects.fit">
@@ -594,9 +594,9 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\bar{y}_{i}=  \beta^{\prime}\bar{x}_{i}+\bar{\epsilon}_{i}\]</div>
-<p>where <span class="math notranslate">\(\bar{z}\)</span> is the time-average.</p>
+<p>where <span class="math notranslate nohighlight">\(\bar{z}\)</span> is the time-average.</p>
 <dl class="method">
 <dt id="linearmodels.panel.model.BetweenOLS.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>reweight=False</em>, <em>cov_type='unadjusted'</em>, <em>debiased=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#BetweenOLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.BetweenOLS.fit" title="Permalink to this definition">¶</a></dt>
@@ -784,7 +784,7 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}\]</div>
 <dl class="method">
 <dt id="linearmodels.panel.model.FirstDifferenceOLS.fit">
@@ -982,7 +982,7 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}\]</div>
 <dl class="method">
 <dt id="linearmodels.panel.model.PooledOLS.fit">
@@ -1177,13 +1177,13 @@ the weight should be homoskedastic.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The model is given by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}\]</div>
 <p>The Fama-MacBeth estimator is computed by performing T regressions, one
 for each time period using all available entity observations.  Denote the
-estimate of the model parameters as <span class="math notranslate">\(\hat{\beta}_t\)</span>.  The reported
+estimate of the model parameters as <span class="math notranslate nohighlight">\(\hat{\beta}_t\)</span>.  The reported
 estimator is then</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta} = T^{-1}\sum_{t=1}^T \hat{\beta}_t\]</div>
 <p>While the model does not explicitly include time-effects, the
 implementation based on regressing all observation in a single
@@ -1386,7 +1386,7 @@ missing in the model data.</td>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

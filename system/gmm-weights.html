@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>GMM Moment Weighting &#8212; linearmodels 4.7 documentation</title>
+    <title>GMM Moment Weighting &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="covariance.html" title="System Regression Estimator Covariance Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -147,10 +147,10 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[Z'(\Sigma \otimes I_N)Z\]</div>
-<p>where <span class="math notranslate">\(Z\)</span> is a block diagonal matrix containing both the exogenous
-regressors and instruments and <span class="math notranslate">\(\Sigma\)</span> is the covariance of the
+<p>where <span class="math notranslate nohighlight">\(Z\)</span> is a block diagonal matrix containing both the exogenous
+regressors and instruments and <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance of the
 model residuals.</p>
 <p><code class="docutils literal notranslate"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
 <dl class="attribute">
@@ -215,12 +215,12 @@ the mean before computing the weight matrix.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}W   &amp; = n^{-1}\sum_{i=1}^{n}g'_ig_i \\
 g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})\end{split}\]</div>
-<p>where <span class="math notranslate">\(g_i\)</span> is the vector of scores across all equations for
-observation i.  <span class="math notranslate">\(z_{ji}\)</span> is the vector of instruments for equation
-j and <span class="math notranslate">\(\epsilon_{ji}\)</span> is the error for equation j for observation
+<p>where <span class="math notranslate nohighlight">\(g_i\)</span> is the vector of scores across all equations for
+observation i.  <span class="math notranslate nohighlight">\(z_{ji}\)</span> is the vector of instruments for equation
+j and <span class="math notranslate nohighlight">\(\epsilon_{ji}\)</span> is the error for equation j for observation
 i.  This form allows for heteroskedasticity and arbitrary cross-sectional
 dependence between the moment conditions.</p>
 <dl class="attribute">
@@ -297,14 +297,14 @@ bandwidth is None.  If False, nobs - 2 is used</li>
 </table>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}W   &amp; = \hat{\Gamma}_0 + \sum_{i=1}^{n-1} w_i (\hat{\Gamma}_i + \hat{\Gamma}_i^\prime) \\
 \hat{\Gamma}_j &amp; = n^{-1}\sum_{i=1}^{n-j} g'_ig_{i+j} \\
 g_i &amp; = (z_{1i}\epsilon_{1i},z_{2i}\epsilon_{2i},\ldots,z_{ki}\epsilon_{ki})\end{split}\]</div>
-<p>where <span class="math notranslate">\(g_i\)</span> is the vector of scores across all equations for
-observation i and <span class="math notranslate">\(w_j\)</span> are the kernel weights which depend on the
-selected kernel and bandwidth.  <span class="math notranslate">\(z_{ji}\)</span> is the vector of instruments
-for equation j and <span class="math notranslate">\(\epsilon_{ji}\)</span> is the error for equation j for
+<p>where <span class="math notranslate nohighlight">\(g_i\)</span> is the vector of scores across all equations for
+observation i and <span class="math notranslate nohighlight">\(w_j\)</span> are the kernel weights which depend on the
+selected kernel and bandwidth.  <span class="math notranslate nohighlight">\(z_{ji}\)</span> is the vector of instruments
+for equation j and <span class="math notranslate nohighlight">\(\epsilon_{ji}\)</span> is the error for equation j for
 observation i.  This form allows for heteroskedasticity and autocorrelation
 between the moment conditions.</p>
 <dl class="attribute">
@@ -396,7 +396,7 @@ between the moment conditions.</p>
         <li class="right" >
           <a href="covariance.html" title="System Regression Estimator Covariance Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

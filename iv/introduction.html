@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Introduction &#8212; linearmodels 4.7 documentation</title>
+    <title>Introduction &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="index.html" title="Instrumental Variable Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -130,27 +130,27 @@ or there is measurement error on the variable.  These models make use of
 instruments which are correlated with the endogenous variable but not
 with the model error. All model estimated by this package can be described
 as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}y_i    &amp; = x_{1i}\beta_1 + x_{2i}\beta_2 + \epsilon_i \\
 x_{2i} &amp; = z_{1i}\delta + z_{2i}\gamma + \nu_i\end{split}\]</div>
-<p>In this expression, <span class="math notranslate">\(x_{1i}\)</span> is a set of <span class="math notranslate">\(k_1\)</span> regressors that
-are exogenous while <span class="math notranslate">\(x_{2i}\)</span> is a set of <span class="math notranslate">\(k_2\)</span> regressors that are
-endogenous in the sense that <span class="math notranslate">\(Cov(x_{2i},\epsilon_i)\neq 0\)</span>. In total
-there are The <span class="math notranslate">\(k\)</span> regressors in the model. The <span class="math notranslate">\(p_2\)</span> element
-vector <span class="math notranslate">\(z_{2i}\)</span> are instruments that explain <span class="math notranslate">\(x_{2i}\)</span> but not
-<span class="math notranslate">\(y_i\)</span>.  Note that <span class="math notranslate">\(x_{1i}\)</span> and <span class="math notranslate">\(z_{1i}\)</span> are the same since
+<p>In this expression, <span class="math notranslate nohighlight">\(x_{1i}\)</span> is a set of <span class="math notranslate nohighlight">\(k_1\)</span> regressors that
+are exogenous while <span class="math notranslate nohighlight">\(x_{2i}\)</span> is a set of <span class="math notranslate nohighlight">\(k_2\)</span> regressors that are
+endogenous in the sense that <span class="math notranslate nohighlight">\(Cov(x_{2i},\epsilon_i)\neq 0\)</span>. In total
+there are The <span class="math notranslate nohighlight">\(k\)</span> regressors in the model. The <span class="math notranslate nohighlight">\(p_2\)</span> element
+vector <span class="math notranslate nohighlight">\(z_{2i}\)</span> are instruments that explain <span class="math notranslate nohighlight">\(x_{2i}\)</span> but not
+<span class="math notranslate nohighlight">\(y_i\)</span>.  Note that <span class="math notranslate nohighlight">\(x_{1i}\)</span> and <span class="math notranslate nohighlight">\(z_{1i}\)</span> are the same since
 variables are also valid to use when projecting the endogenous variables.
-In total there are <span class="math notranslate">\(p=p_1+p_2=k_1+p_2\)</span> variables available to use when
+In total there are <span class="math notranslate nohighlight">\(p=p_1+p_2=k_1+p_2\)</span> variables available to use when
 projecting the endogenous regressors.</p>
 <p>There are four estimation methods available to fit models of this type.  All accept the
 same four required inputs:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate">\(y_i\)</span> in the model</li>
-<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The exogenous regressors, <span class="math notranslate">\(x_{1i}\)</span> in the model. Note
-that <span class="math notranslate">\(x_{1i}\)</span> and <span class="math notranslate">\(z_{1i}\)</span> are the same since variables are
+<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate nohighlight">\(y_i\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The exogenous regressors, <span class="math notranslate nohighlight">\(x_{1i}\)</span> in the model. Note
+that <span class="math notranslate nohighlight">\(x_{1i}\)</span> and <span class="math notranslate nohighlight">\(z_{1i}\)</span> are the same since variables are
 also valid to use when projecting the endogenous variables.</li>
-<li><code class="docutils literal notranslate"><span class="pre">endog</span></code> - The endogenous regressors, <span class="math notranslate">\(x_{2i}\)</span> in the model</li>
-<li><code class="docutils literal notranslate"><span class="pre">instruments</span></code> - The instruments, <span class="math notranslate">\(z_{2i}\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">endog</span></code> - The endogenous regressors, <span class="math notranslate nohighlight">\(x_{2i}\)</span> in the model</li>
+<li><code class="docutils literal notranslate"><span class="pre">instruments</span></code> - The instruments, <span class="math notranslate nohighlight">\(z_{2i}\)</span> in the model</li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -222,10 +222,10 @@ specifying both <code class="docutils literal notranslate"><span class="pre">end
 <h4>LIML Estimation<a class="headerlink" href="#liml-estimation" title="Permalink to this headline">¶</a></h4>
 <p>Two optional arguments can be used to alter the estimation method when using IVLIML</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">fuller</span></code> allows Fuller’s <span class="math notranslate">\(\alpha\)</span> to be specified, which provides a
+<li><code class="docutils literal notranslate"><span class="pre">fuller</span></code> allows Fuller’s <span class="math notranslate nohighlight">\(\alpha\)</span> to be specified, which provides a
 finite sample correction to the usual LIML estimator.</li>
-<li><code class="docutils literal notranslate"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math notranslate">\(\kappa\)</span> to be provided in
-which case the LIML estimated value of <span class="math notranslate">\(\kappa\)</span> is ignored.</li>
+<li><code class="docutils literal notranslate"><span class="pre">kappa</span></code> allows a user-specified value of <span class="math notranslate nohighlight">\(\kappa\)</span> to be provided in
+which case the LIML estimated value of <span class="math notranslate nohighlight">\(\kappa\)</span> is ignored.</li>
 </ul>
 </div>
 <div class="section" id="gmm-and-gmm-cue-estimation">
@@ -348,7 +348,7 @@ whether iterative output is printed during estimation.</p>
         <li class="right" >
           <a href="index.html" title="Instrumental Variable Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

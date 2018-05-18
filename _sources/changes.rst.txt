@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+Version 4.8
+===========
+* Corrected bug that prevented single character names in IV formulas
+* Corrected kappa estimation in LIML when there are no exogenous regressors
+
 Version 4.7
 ===========
 * Improved performance of Panel estimators by optimizing data structure

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Basic Examples &#8212; linearmodels 4.7 documentation</title>
+    <title>Basic Examples &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.7</a>
+    ../../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -320,7 +320,7 @@ values are dropped.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
@@ -355,15 +355,6 @@ expersq    exper^2
 
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="stderr output_area docutils container">
-<div class="highlight"><pre>
-/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/site-packages/statsmodels/compat/pandas.py:56: FutureWarning: The pandas.core.datetools module is deprecated and will be removed in a future version. Please use the pandas.tseries module instead.
-  from pandas.core import datetools
-</pre></div></div>
-</div>
 <p>Since OLS is a special case of 2SLS, IV2SLS can be used to estimate a
 model using OLS by setting <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code> variables to
 <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
@@ -392,8 +383,8 @@ the log of wage. It indicates that 1 year of education increases wage by
 Dep. Variable:                   wage   R-squared:                      0.1179
 Estimator:                        OLS   Adj. R-squared:                 0.1158
 No. Observations:                 428   F-statistic:                    57.196
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -434,8 +425,8 @@ where the F-statistic is at least 10.</p>
 Dep. Variable:                   educ   R-squared:                      0.1726
 Estimator:                        OLS   Adj. R-squared:                 0.1706
 No. Observations:                 428   F-statistic:                    89.258
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -470,8 +461,8 @@ indicates a much lower effect of education.</p>
 Dep. Variable:                   wage   R-squared:                      0.0934
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0913
 No. Observations:                 428   F-statistic:                    2.8487
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0914
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0914
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -489,7 +480,7 @@ Debiased: False
 </pre></div></div>
 </div>
 <p>The fitted value can be used with OLS to estimate the same parameters.
-Note that the other values reported such as t-statistics or <span class="math notranslate">\(R^2\)</span>
+Note that the other values reported such as t-statistics or <span class="math notranslate nohighlight">\(R^2\)</span>
 are not correct.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">compare</span></code> function is used to compare the different models. The
 2SLS coefficient on education and the direct coefficient on educ_hat
@@ -609,8 +600,8 @@ sample.</p>
 Dep. Variable:                   wage   R-squared:                      0.0973
 Estimator:                        OLS   Adj. R-squared:                 0.0964
 No. Observations:                 934   F-statistic:                    100.71
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -645,8 +636,8 @@ There is a strong, negative relationship here.</p>
 Dep. Variable:                   educ   R-squared:                      0.0576
 Estimator:                        OLS   Adj. R-squared:                 0.0566
 No. Observations:                 934   F-statistic:                    57.107
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -681,8 +672,8 @@ estimate.</p>
 Dep. Variable:                   wage   R-squared:                     -0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0101
 No. Observations:                 934   F-statistic:                    21.715
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -707,7 +698,7 @@ OLS model to IV estimation. The weights are applied to the dependent
 variables, the matrix of regressors (endogenous and exogenous) and the
 matrix of instrument (exogenous and instruments) which allows for
 GLS-type estimation. In particular, if the variance of model residuals
-was <span class="math notranslate">\(\sigma^2_i\)</span>, then setting <span class="math notranslate">\(w_i = 1 / \sigma^2_i\)</span> would
+was <span class="math notranslate nohighlight">\(\sigma^2_i\)</span>, then setting <span class="math notranslate nohighlight">\(w_i = 1 / \sigma^2_i\)</span> would
 produce GLS estimates.</p>
 <p>This example shows how a feasible GLS-type of estimator could be used.</p>
 <div class="nbinput docutils container">
@@ -734,8 +725,8 @@ produce GLS estimates.</p>
 Dep. Variable:               residual   R-squared:                      0.0045
 Estimator:                        OLS   Adj. R-squared:                 0.0024
 No. Observations:                 934   F-statistic:                    3.9903
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.1360
-Time:                        21:28:10   Distribution:                  chi2(2)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.1360
+Time:                        13:09:41   Distribution:                  chi2(2)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -772,8 +763,8 @@ don’t differ by much.</p>
 Dep. Variable:                   wage   R-squared:                      0.0090
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0080
 No. Observations:                 934   F-statistic:                    23.520
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -859,8 +850,8 @@ example of a _weak instrument.</p>
 Dep. Variable:                  packs   R-squared:                      0.0015
 Estimator:                        OLS   Adj. R-squared:                 0.0008
 No. Observations:                1388   F-statistic:                    2.0731
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.1499
-Time:                        21:28:10   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.1499
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -874,7 +865,7 @@ cigprice       0.0356     0.0247     1.4398     0.1499     -0.0129      0.0840
 </div>
 <p>Despite the weak relationship between the price and the number of pack
 smoked, the 2SLS can be estimated, although substantial caution is
-warranted to interpret the results. Note the very negative <span class="math notranslate">\(R^2\)</span>
+warranted to interpret the results. Note the very negative <span class="math notranslate nohighlight">\(R^2\)</span>
 (-150%).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -897,8 +888,8 @@ warranted to interpret the results. Note the very negative <span class="math not
 Dep. Variable:                  bwght   R-squared:                     -1.5224
 Estimator:                    IV-2SLS   Adj. R-squared:                -1.5242
 No. Observations:                1388   F-statistic:                    1.1356
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.2866
-Time:                        21:28:11   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.2866
+Time:                        13:09:41   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1023,8 +1014,8 @@ interpreted. It is better to use the <code class="docutils literal notranslate">
 Dep. Variable:                   educ   R-squared:                      0.4771
 Estimator:                        OLS   Adj. R-squared:                 0.4745
 No. Observations:                3010   F-statistic:                    3693.4
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                 chi2(15)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1072,8 +1063,8 @@ reg669         0.2103     0.1988     1.0575     0.2903     -0.1794      0.6000
 Dep. Variable:                   wage   R-squared:                      0.2998
 Estimator:                        OLS   Adj. R-squared:                 0.2963
 No. Observations:                3010   F-statistic:                    1377.0
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                 chi2(15)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1123,8 +1114,8 @@ F-statistic in the first stage regression.</p>
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                 chi2(15)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:41   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1156,10 +1147,10 @@ Debiased: False
 </pre></div></div>
 </div>
 <p>The property <code class="docutils literal notranslate"><span class="pre">first_stage</span></code> can be used to show a large set of first
-stage diagnostics. These results show a much lower <em>partial</em> <span class="math notranslate">\(R^2\)</span>
+stage diagnostics. These results show a much lower <em>partial</em> <span class="math notranslate nohighlight">\(R^2\)</span>
 that has measures the unique effect of the instrument on the endogenous
 controlling for the exogenous regressors. This is much smaller than the
-naive first stage <span class="math notranslate">\(R^2\)</span> of 47%. The partial F-statistic is also
+naive first stage <span class="math notranslate nohighlight">\(R^2\)</span> of 47%. The partial F-statistic is also
 much smaller, although it technically over the rule-of-thumb of 10 for a
 single instrument.</p>
 <p>The instrument is a dummy variable and being close to a 4 year college
@@ -1241,7 +1232,7 @@ instrumental variables. The generic form is</p>
 </div>
 <p>where each block can contain multiple variables.</p>
 <p>Here the model is compared to the direct parameterization using
-DataFrames by differencing the <span class="math notranslate">\(R^2\)</span>.</p>
+DataFrames by differencing the <span class="math notranslate nohighlight">\(R^2\)</span>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [21]:
@@ -1299,8 +1290,8 @@ instead of the individual dummies. The model is identical.</p>
 Dep. Variable:                   wage   R-squared:                      0.2382
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.2343
 No. Observations:                3010   F-statistic:                    840.83
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                 chi2(15)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:42   Distribution:                 chi2(15)
 Cov. Estimator:                robust
 
                              Parameter Estimates
@@ -1376,8 +1367,8 @@ instruments than endogenous variables).</p>
 Dep. Variable:                 lnwage   R-squared:                      0.1357
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1296
 No. Observations:                 428   F-statistic:                    24.653
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                  chi2(3)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:42   Distribution:                  chi2(3)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1422,7 +1413,7 @@ H0: Endogenous variables are exogenous
 Statistic: 2.8256
 P-value: 0.0928
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2ae1a52990f0
+WaldTestStatistic, id: 0x2b2aa0893780
 </pre></div>
 </div>
 </div>
@@ -1454,8 +1445,8 @@ P-value of the previous test – this is not an accident.</p>
 Dep. Variable:                 lnwage   R-squared:                      0.1624
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1544
 No. Observations:                 428   F-statistic:                    82.954
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:11   Distribution:                  chi2(4)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:42   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1501,7 +1492,7 @@ H0: Model is not overidentified.
 Statistic: 0.4435
 P-value: 0.5055
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2ae1a5299438
+WaldTestStatistic, id: 0x2b2aa08e3550
 </pre></div>
 </div>
 </div>
@@ -1519,7 +1510,7 @@ if the model was overidentified.</p>
 </pre></div>
 </div>
 </div>
-<p>The test is <span class="math notranslate">\(n\times R^2\)</span>, and has the same <span class="math notranslate">\(\chi^2_1\)</span>
+<p>The test is <span class="math notranslate nohighlight">\(n\times R^2\)</span>, and has the same <span class="math notranslate nohighlight">\(\chi^2_1\)</span>
 distribution. The test statistic is slightly smaller but the conclusions
 are the same.</p>
 <div class="nbinput docutils container">
@@ -1538,7 +1529,7 @@ are the same.</p>
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>0.37198111061488515
+<span></span>0.3719811106150277
 </pre></div>
 </div>
 </div>
@@ -1578,7 +1569,7 @@ H0: Model is not overidentified.
 Statistic: 1.0421
 P-value: 0.5939
 Distributed: chi2(2)
-WaldTestStatistic, id: 0x2ae1a539df60
+WaldTestStatistic, id: 0x2b2aa08bdda0
 </pre></div>
 </div>
 </div>
@@ -1766,8 +1757,8 @@ coefficient is just the difference in means.</p>
 Dep. Variable:                 hrsemp   R-squared:                      0.3408
 Estimator:                        OLS   Adj. R-squared:                 0.3255
 No. Observations:                  45   F-statistic:                    23.266
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0000
-Time:                        21:28:12   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0000
+Time:                        13:09:42   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1803,8 +1794,8 @@ that the <code class="docutils literal notranslate"><span class="pre">[]</span><
 Dep. Variable:                 lscrap   R-squared:                      0.0159
 Estimator:                    IV-2SLS   Adj. R-squared:                -0.0070
 No. Observations:                  45   F-statistic:                    3.3464
-Date:                Fri, Mar 30 2018   P-value (F-stat)                0.0674
-Time:                        21:28:12   Distribution:                  chi2(1)
+Date:                Fri, May 18 2018   P-value (F-stat)                0.0674
+Time:                        13:09:42   Distribution:                  chi2(1)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -1899,7 +1890,7 @@ T-stats reported in parentheses
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

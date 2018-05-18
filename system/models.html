@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimators &#8212; linearmodels 4.7 documentation</title>
+    <title>System Regression Estimators &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -155,19 +155,19 @@ provided, FGLS is implemented based on an estimate of sigma.</li>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
 Each equation is of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -175,15 +175,15 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system OLS estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{OLS} = (X'X)^{-1}X'Y\]</div>
 <p>When certain conditions are satisfied, a GLS estimator of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y\]</div>
 <p>can improve accuracy of coefficient estimates where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Omega = \Sigma \otimes I_N\]</div>
-<p>where <span class="math notranslate">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<p>where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <p>SUR is a special case of 3SLS where there are no endogenous regressors and
 no instruments.</p>
 <dl class="method">
@@ -203,7 +203,7 @@ no instruments.</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -484,19 +484,19 @@ provided, FGLS is implemented based on an estimate of sigma.</li>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
 Each equation is of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -504,17 +504,17 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system instrumental variable (IV) estimator is</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{IV} &amp; = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
                  &amp; = (\hat{X}'\hat{X})^{-1}\hat{X}'Y\end{split}\]</div>
-<p>where <span class="math notranslate">\(\hat{X} = Z(Z'Z)^{-1}Z'X\)</span> and.  When certain conditions are
+<p>where <span class="math notranslate nohighlight">\(\hat{X} = Z(Z'Z)^{-1}Z'X\)</span> and.  When certain conditions are
 satisfied, a GLS estimator of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y\]</div>
 <p>can improve accuracy of coefficient estimates where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\Omega = \Sigma \otimes I_N\]</div>
-<p>where <span class="math notranslate">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
+<p>where <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance matrix of the residuals.</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.add_constraints" title="Permalink to this definition">¶</a></dt>
@@ -532,7 +532,7 @@ satisfied, a GLS estimator of the form</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -802,19 +802,19 @@ function</li>
 </table>
 <p class="rubric">Notes</p>
 <p>Estimates a linear model using GMM. Each equation is of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}\]</div>
 <p>where k denotes the equation and i denoted the observation index. By
 stacking vertically arrays of dependent and placing the exogenous
 variables into a block diagonal array, the entire system can be compactly
 expressed as</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[Y = X\beta + \epsilon\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]\end{split}\]</div>
 <p>and</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}X = \left[\begin{array}{cccc}
          X_1 &amp; 0 &amp; \ldots &amp; 0 \\
          0 &amp; X_2 &amp; \dots &amp; 0 \\
@@ -822,13 +822,13 @@ expressed as</p>
          0 &amp; 0 &amp; \dots &amp; X_K
     \end{array}\right]\end{split}\]</div>
 <p>The system GMM estimator uses the moment condition</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[z_{ij}(y_{ij} - x_{ij}\beta_j) = 0\]</div>
 <p>where j indexes the equation. The estimator for the coefficients is given
 by</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{\beta}_{GMM} &amp; = (X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y \\\end{split}\]</div>
-<p>where <span class="math notranslate">\(W\)</span> is a positive definite weighting matrix.</p>
+<p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weighting matrix.</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.add_constraints" title="Permalink to this definition">¶</a></dt>
@@ -846,7 +846,7 @@ by</p>
 </table>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[r \beta = q\]</div>
 <p>The property <cite>param_names</cite> can be used to determine the order of
 parameters.</p>
@@ -1118,7 +1118,7 @@ estimated model.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

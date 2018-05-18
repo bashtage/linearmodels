@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Instrumental Variable Covariance Estimation &#8212; linearmodels 4.7 documentation</title>
+    <title>Instrumental Variable Covariance Estimation &#8212; linearmodels 4.8 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.7</a>
+    ../index.html" class="text-logo">linearmodels 4.8</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -150,16 +150,16 @@
 </table>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1} s^2 V^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[s^2 = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2\]</div>
-<p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then <span class="math notranslate">\(s^2\)</span> is scaled by n / (n-k).</p>
-<div class="math notranslate">
+<p>If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then <span class="math notranslate nohighlight">\(s^2\)</span> is scaled by n / (n-k).</p>
+<div class="math notranslate nohighlight">
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
-<p>where <span class="math notranslate">\(X\)</span> is the matrix of variables included in the model and
-<span class="math notranslate">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
+<span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -208,18 +208,18 @@
 </table>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1} V^{-1} \hat{S} V^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\hat{S} = n^{-1} \sum_{i=1}^n \hat{\epsilon}_i^2 \hat{x}_i^{\prime} \hat{x}_i\]</div>
-<p>where <span class="math notranslate">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span> and
-<span class="math notranslate">\(\hat{x}_i = z_i\hat{\gamma}\)</span>. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then
-<span class="math notranslate">\(S\)</span> is scaled by n / (n-k).</p>
-<div class="math notranslate">
+<p>where <span class="math notranslate nohighlight">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span> and
+<span class="math notranslate nohighlight">\(\hat{x}_i = z_i\hat{\gamma}\)</span>. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then
+<span class="math notranslate nohighlight">\(S\)</span> is scaled by n / (n-k).</p>
+<div class="math notranslate nohighlight">
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
-<p>where <span class="math notranslate">\(X\)</span> is the matrix of variables included in the model and
-<span class="math notranslate">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
+<span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -270,21 +270,21 @@ Either nobs by ncluster where ncluster is 1 or 2.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1} V^{-1} \hat{S} V^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{S} &amp; = n^{-1} (G/(G-1)) \sum_{g=1}^G \xi_{g}^\prime \xi_{g} \\
 \xi_{g} &amp; = \sum_{i\in\mathcal{G}_g} \hat{\epsilon}_i \hat{x}_i \\\end{split}\]</div>
-<p>where <span class="math notranslate">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span> and
-<span class="math notranslate">\(\hat{x}_i = z_i\hat{\gamma}\)</span>.  <span class="math notranslate">\(\mathcal{G}_g\)</span> contains the
+<p>where <span class="math notranslate nohighlight">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span> and
+<span class="math notranslate nohighlight">\(\hat{x}_i = z_i\hat{\gamma}\)</span>.  <span class="math notranslate nohighlight">\(\mathcal{G}_g\)</span> contains the
 indices of elements in cluster g. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then
-<span class="math notranslate">\(S\)</span> is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number
+<span class="math notranslate nohighlight">\(S\)</span> is scaled by g(n - 1) / ((g-1)(n-k)) where g is the number
 of groups..</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
-<p>where <span class="math notranslate">\(X\)</span> is the matrix of variables included in the model and
-<span class="math notranslate">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
+<span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.cov" title="Permalink to this definition">¶</a></dt>
@@ -342,24 +342,24 @@ bandwidth selection is used.</li>
 </table>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[n^{-1} V^{-1} \hat{S} V^{-1}\]</div>
 <p>where</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}\hat{S}_0 &amp; = n^{-1} \sum_{i=1}^{n} \hat{\epsilon}^2_i \hat{x}_i^{\prime}
      \hat{x}_{i} \\
 \hat{S}_j &amp; = n^{-1} \sum_{i=1}^{n-j}
     \hat{\epsilon}_i\hat{\epsilon}_{i+j} (\hat{x}_i^{\prime}
     \hat{x}_{i+j} + \hat{x}_{i+j}^{\prime} \hat{x}_{i}) \\
 \hat{S}   &amp; = \sum_{i=0}^{bw} K(i, bw) \hat{S}_i\end{split}\]</div>
-<p>where <span class="math notranslate">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span>,
-<span class="math notranslate">\(\hat{x}_i = z_i\hat{\gamma}\)</span> and <span class="math notranslate">\(K(i,bw)\)</span> is a weight that
-depends on the kernel. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then <span class="math notranslate">\(S\)</span> is scaled
+<p>where <span class="math notranslate nohighlight">\(\hat{\gamma}=(Z'Z)^{-1}(Z'X)\)</span>,
+<span class="math notranslate nohighlight">\(\hat{x}_i = z_i\hat{\gamma}\)</span> and <span class="math notranslate nohighlight">\(K(i,bw)\)</span> is a weight that
+depends on the kernel. If <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is true, then <span class="math notranslate nohighlight">\(S\)</span> is scaled
 by n / (n-k).</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
-<p>where <span class="math notranslate">\(X\)</span> is the matrix of variables included in the model and
-<span class="math notranslate">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
+<p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
+<span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
@@ -409,7 +409,7 @@ by n / (n-k).</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[w_i = 1 - i / (m + 1), \, i &lt; m\]</div>
 </dd></dl>
 
@@ -430,7 +430,7 @@ by n / (n-k).</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}z_i &amp; = i / (m+1)                    \\
 w_i &amp;  = 1-6z_i^2+6z_i^3, z \leq 0.5 \\
 w_i &amp;  = 2(1-z_i)^3, z &gt; 0.5\end{split}\]</div>
@@ -462,7 +462,7 @@ w_i &amp;  = 2(1-z_i)^3, z &gt; 0.5\end{split}\]</div>
 <p>Unlike the Bartlett or Parzen kernels, the QS kernel is not truncated at
 a specific lag, and so weights are computed for all available lags in
 the sample.</p>
-<div class="math notranslate">
+<div class="math notranslate nohighlight">
 \[\begin{split}z_i &amp; = 6 \pi (i / m) / 5                                \\
 w_0 &amp;  = 1                                                \\
 w_i &amp;  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1\end{split}\]</div>
@@ -505,7 +505,7 @@ w_i &amp;  = 3(\sin(z_i)/z_i - cos(z_i))/z_i^ 2, \, i \geq 1\end{split}\]</div>
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
