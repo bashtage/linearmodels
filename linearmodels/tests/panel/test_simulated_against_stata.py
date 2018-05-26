@@ -11,7 +11,8 @@ from linearmodels.panel.model import (BetweenOLS, PanelOLS, PooledOLS,
 from linearmodels.tests.panel.results import parse_stata_results
 from linearmodels.utility import AttrDict
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    'ignore::linearmodels.utility.MissingValueWarning')
 
 STATA_RESULTS = parse_stata_results.data()
 MODELS = {'between': BetweenOLS, 'fixed_effect': PanelOLS, 'pooled': PooledOLS,
@@ -35,7 +36,7 @@ def data(request):
         y_vars = vars[:1]
         x_vars = vars[1:]
     y = sim_data[y_vars]
-    x = sim_data[['intercept'] + x_vars]
+    x = sim_data[x_vars + ['intercept']]
     mod = MODELS[model]
     mod_options = {}
     if model == 'fixed_effect':
@@ -68,9 +69,9 @@ def data(request):
 
 
 def test_params(data):
-    model_params = data.fit
+    model_params = data.fit.params.squeeze()
     stata_params = data.stata.params.param
-    assert_allclose(stata_params.values, model_params.params.squeeze())
+    assert_allclose(stata_params.values, model_params)
 
 
 def test_rsquared_between(data):
