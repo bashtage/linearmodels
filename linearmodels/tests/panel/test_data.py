@@ -1,5 +1,4 @@
-from linearmodels.compat.pandas import (assert_frame_equal, assert_panel_equal,
-                                        is_string_dtype)
+from linearmodels.compat.pandas import assert_frame_equal, is_string_dtype
 
 from itertools import product
 
@@ -19,6 +18,7 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import generate_data, datatypes, \
     MISSING_XARRAY
+from linearmodels.utility import panel_to_frame
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -35,14 +35,14 @@ def data(request):
 
 
 @pytest.fixture
-def panel():
+def mi_df():
     np.random.seed(12345)
     n, t, k = 11, 7, 3
     x = np.random.standard_normal((k, t, n))
     major = pd.date_range('12-31-1999', periods=7)
     items = ['var.{0}'.format(i) for i in range(1, k + 1)]
     minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
-    return pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
+    return panel_to_frame(x, items, major, minor, swap=True)
 
 
 def test_numpy_3d():
@@ -57,9 +57,8 @@ def test_numpy_3d():
     items = ['entity.{0}'.format(i) for i in range(n)]
     obs = [i for i in range(t)]
     var_names = ['x.{0}'.format(i) for i in range(k)]
-    expected = pd.Panel(np.reshape(x, (k, t, n)), items=var_names,
-                        major_axis=obs, minor_axis=items)
-    expected_frame = expected.swapaxes(1, 2).to_frame()
+    expected_frame = panel_to_frame(np.reshape(x, (k, t, n)), items=var_names,
+                                    major_axis=obs, minor_axis=items, swap=True)
     expected_frame.index.levels[0].name = 'entity'
     expected_frame.index.levels[1].name = 'time'
     assert_frame_equal(dh.dataframe, expected_frame)
@@ -83,34 +82,13 @@ def test_numpy_2d():
     assert_equal(np.reshape(x, (k, t, n)), dh.values3d)
 
 
-def test_pandas_panel():
-    n, t, k = 11, 7, 3
-    x = np.random.random((k, t, n))
-    major = pd.date_range('12-31-1999', periods=7)
-    items = ['var.{0}'.format(i) for i in range(1, k + 1)]
-    minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
-    x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
-    dh = PanelData(x)
-    assert dh.nentity == n
-    assert dh.nobs == t
-    assert dh.nvar == k
-    assert_equal(dh.values3d, x.values)
-    expected = np.reshape(x.swapaxes(0, 2).values, (n * t, k))
-    assert_equal(dh.values2d, expected)
-    expected_frame = x.swapaxes(1, 2).to_frame()
-    expected_frame.index.levels[0].name = 'entity'
-    expected_frame.index.levels[1].name = 'time'
-    assert_frame_equal(dh.dataframe, expected_frame)
-
-
 def test_pandas_multiindex_dataframe():
     n, t, k = 11, 7, 3
     x = np.random.random((n, t, k))
     major = pd.date_range('12-31-1999', periods=7)
     minor = ['var.{0}'.format(i) for i in range(1, k + 1)]
     items = ['item.{0}'.format(i) for i in range(1, n + 1)]
-    x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
-    x = x.swapaxes(1, 2).swapaxes(0, 1).to_frame()
+    x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
     PanelData(x)
 
 
@@ -129,7 +107,7 @@ def test_existing_panel_data():
     major = pd.date_range('12-31-1999', periods=7)
     items = ['var.{0}'.format(i) for i in range(1, k + 1)]
     minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
-    x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
+    x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
     dh = PanelData(x)
     dh2 = PanelData(dh)
     assert_frame_equal(dh.dataframe, dh2.dataframe)
@@ -158,15 +136,15 @@ def test_xarray_3d():
     assert_equal(np.reshape(x.values.T, (n * t, k)), dh.values2d)
 
 
-def test_dimensions(panel):
-    dh = PanelData(panel)
-    assert dh.nentity == panel.shape[2]
-    assert dh.nvar == panel.shape[0]
-    assert dh.nobs == panel.shape[1]
+def test_dimensions(mi_df):
+    dh = PanelData(mi_df)
+    assert dh.nentity == len(mi_df.index.levels[0])
+    assert dh.nvar == mi_df.shape[1]
+    assert dh.nobs == len(mi_df.index.levels[1])
 
 
-def test_drop(panel):
-    dh = PanelData(panel)
+def test_drop(mi_df):
+    dh = PanelData(mi_df)
     orig = dh.dataframe.copy()
     sel = np.zeros(orig.shape[0], dtype=np.bool)
     sel[::3] = True
@@ -174,16 +152,19 @@ def test_drop(panel):
     assert dh.dataframe.shape[0] == len(sel) - sel.sum()
 
 
-def test_labels(panel):
-    dh = PanelData(panel)
-    assert dh.vars == list(panel.items)
-    assert dh.time == list(panel.major_axis)
-    assert dh.entities == list(panel.minor_axis)
+def test_labels(mi_df):
+    dh = PanelData(mi_df)
+    assert dh.vars == list(mi_df.columns)
+    assert dh.time == list(mi_df.index.levels[1])
+    assert dh.entities == list(mi_df.index.get_level_values(0).unique())
 
 
-def test_missing(panel):
-    panel.iloc[0, :, ::3] = np.nan
-    dh = PanelData(panel)
+def test_missing(mi_df):
+    mi_df = mi_df.copy()
+    entities = mi_df.index.levels[0]
+    for entity in entities[::3]:
+        mi_df.loc[entity] = np.nan
+    dh = PanelData(mi_df)
     assert_equal(dh.isnull, np.any(np.isnan(dh.values2d), 1))
 
 
@@ -209,8 +190,8 @@ def test_incorrect_types_xarray():
         PanelData(xr.DataArray(np.random.randn(10)))
 
 
-def test_ids(panel):
-    data = PanelData(panel)
+def test_ids(mi_df):
+    data = PanelData(mi_df)
     eids = data.entity_ids
     assert eids.shape == (77, 1)
     assert len(np.unique(eids)) == 11
@@ -225,22 +206,22 @@ def test_ids(panel):
         assert np.ptp(tids[i::7]) == 0
 
 
-def test_str_repr(panel):
-    data = PanelData(panel)
+def test_str_repr(mi_df):
+    data = PanelData(mi_df)
     assert 'PanelData' in str(data)
     assert str(hex(id(data))) in data.__repr__()
 
 
-def test_demean(panel):
-    data = PanelData(panel)
+def test_demean(mi_df):
+    data = PanelData(mi_df)
     fe = data.demean('entity')
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         expected[i] -= expected[i].mean(0)
     assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         expected[i] -= expected[i].mean(1)[:, None]
     assert_allclose(te.values3d, expected)
@@ -294,35 +275,39 @@ def test_demean_against_dummy_regression(data):
                     1 + np.abs(dummy_demeaned))
 
 
-def test_demean_missing(panel):
-    panel.values.flat[::13] = np.nan
-    data = PanelData(panel)
+def test_demean_missing(mi_df):
+    mi_df.values.flat[::13] = np.nan
+    data = PanelData(mi_df)
     fe = data.demean('entity')
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 0)
     assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         expected[i] -= np.nanmean(expected[i], 1)[:, None]
     assert_allclose(te.values3d, expected)
 
 
-def test_demean_many_missing(panel):
-    panel.iloc[0, ::3] = np.nan
-    panel.iloc[0, :, ::3] = np.nan
-    panel.iloc[1, ::5] = np.nan
-    panel.iloc[1, :, ::5] = np.nan
-    panel.iloc[2, ::2] = np.nan
-    panel.iloc[2, :, ::2] = np.nan
-    data = PanelData(panel)
+def test_demean_many_missing(mi_df):
+    entities = mi_df.index.levels[0]
+    times = mi_df.index.levels[1]
+    skips = (3, 5, 2)
+    for column, skip in zip(mi_df, skips):
+        for entity in entities[::skip]:
+            mi_df.loc[entity, column] = np.nan
+        mi_df.index = mi_df.index.swaplevel()
+        for time in times[::skip]:
+            mi_df.loc[time, column] = np.nan
+        mi_df.index = mi_df.index.swaplevel()
+    data = PanelData(mi_df)
     fe = data.demean('entity')
-    orig_nan = np.isnan(panel.values.ravel())
+    orig_nan = np.isnan(data.values3d.ravel())
     fe_nan = np.isnan(fe.values3d.ravel())
     assert np.all(fe_nan[orig_nan])
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         mu = np.ones(expected[i].shape[1]) * np.nan
         for j in range(expected[i].shape[1]):
@@ -332,7 +317,7 @@ def test_demean_many_missing(panel):
     assert_allclose(fe.values3d, expected)
 
     te = data.demean('time')
-    expected = panel.values.copy()
+    expected = data.values3d.copy()
     for i in range(3):
         mu = np.ones((expected[i].shape[0], 1)) * np.nan
         for j in range(expected[i].shape[0]):
@@ -342,9 +327,18 @@ def test_demean_many_missing(panel):
     assert_allclose(te.values3d, expected)
 
 
-def test_demean_many_missing_dropped(panel):
-    panel.iloc[0, ::3, ::3] = np.nan
-    data = PanelData(panel)
+def test_demean_many_missing_dropped(mi_df):
+    entities = mi_df.index.levels[0]
+    times = mi_df.index.levels[1]
+    column = mi_df.columns[0]
+    for entity in entities[::3]:
+        mi_df.loc[entity, column] = np.nan
+    mi_df.index = mi_df.index.swaplevel()
+    for time in times[::3]:
+        mi_df.loc[time, column] = np.nan
+    mi_df.index = mi_df.index.swaplevel()
+
+    data = PanelData(mi_df)
     data.drop(data.isnull)
     fe = data.demean('entity')
 
@@ -357,7 +351,11 @@ def test_demean_many_missing_dropped(panel):
 
 
 def test_demean_both_large_t():
-    data = PanelData(pd.Panel(np.random.standard_normal((1, 100, 10))))
+    x = np.random.standard_normal((1, 100, 10))
+    time = pd.date_range('1-1-2000', periods=100)
+    entities = ['entity.{0}'.format(i) for i in range(10)]
+    data = panel_to_frame(x, ['x'], time, entities, swap=True)
+    data = PanelData(data)
     demeaned = data.demean('both')
 
     df = data.dataframe
@@ -372,14 +370,14 @@ def test_demean_both_large_t():
                     1 + np.abs(dummy_demeaned))
 
 
-def test_demean_invalid(panel):
-    data = PanelData(panel)
+def test_demean_invalid(mi_df):
+    data = PanelData(mi_df)
     with pytest.raises(ValueError):
         data.demean('unknown')
 
 
-def test_dummies(panel):
-    data = PanelData(panel)
+def test_dummies(mi_df):
+    data = PanelData(mi_df)
     edummy = data.dummies()
     assert edummy.shape == (77, 11)
     assert np.all(edummy.sum(0) == 7)
@@ -397,32 +395,39 @@ def test_roundtrip_3d(data):
     x = data.x
     xpd = PanelData(x)
     xv = x if isinstance(x, np.ndarray) else x.values
-    assert_equal(xpd.values3d, xv)
+    if isinstance(x, pd.DataFrame):
+        assert_equal(xpd.values2d, xv)
+    else:
+        assert_equal(xpd.values3d, xv)
 
 
-def test_series_multiindex(panel):
-    mi = panel.swapaxes(1, 2).to_frame(filter_observations=False)
-    from_df = PanelData(mi.iloc[:, [0]])
-    from_series = PanelData(mi.iloc[:, 0])
+def test_series_multiindex(mi_df):
+    from_df = PanelData(mi_df.iloc[:, [0]])
+    from_series = PanelData(mi_df.iloc[:, 0])
     assert_frame_equal(from_df.dataframe, from_series.dataframe)
 
 
-def test_invalid_seires(panel):
-    si = panel.to_frame().reset_index()
+def test_invalid_seires(mi_df):
+    si = mi_df.reset_index()
     with pytest.raises(ValueError):
         PanelData(si.iloc[:, 0])
 
 
 def test_demean_missing_alt_types(data):
+    check = isinstance(data.x, (pd.DataFrame, np.ndarray))
     xpd = PanelData(data.x)
     xpd.drop(xpd.isnull)
     entity_demean = xpd.demean('entity')
     expected = xpd.dataframe.groupby(level=0).transform(lambda s: s - s.mean())
-    assert_frame_equal(entity_demean.dataframe, expected)
+    assert_frame_equal(entity_demean.dataframe, expected,
+                       check_index_type=check,
+                       check_column_type=check)
 
     time_demean = xpd.demean('time')
     expected = xpd.dataframe.groupby(level=1).transform(lambda s: s - s.mean())
-    assert_frame_equal(time_demean.dataframe, expected)
+    assert_frame_equal(time_demean.dataframe, expected,
+                       check_index_type=check,
+                       check_column_type=check)
 
 
 def test_mean_missing(data):
@@ -545,7 +550,12 @@ def test_categorical_conversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    p = pd.Panel({'a': string, 'b': num})
+    time = pd.date_range('1-1-2000', periods=t)
+    entities = ['entity.{0}'.format(i) for i in range(n)]
+    p = panel_to_frame(None, items=['a', 'b'], major_axis=time,
+                       minor_axis=entities, swap=True)
+    p['a'] = string.T.ravel()
+    p['b'] = num.T.ravel()
     p = p[['a', 'b']]
     panel = PanelData(p, convert_dummies=False)
     df = panel.dataframe.copy()
@@ -571,7 +581,12 @@ def test_string_conversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    p = pd.Panel({'a': string, 'b': num})
+    time = pd.date_range('1-1-2000', periods=t)
+    entities = ['entity.{0}'.format(i) for i in range(n)]
+    p = panel_to_frame(None, items=['a', 'b'], major_axis=time, minor_axis=entities,
+                       swap=True)
+    p['a'] = string.T.ravel()
+    p['b'] = num.T.ravel()
     p = p[['a', 'b']]
     panel = PanelData(p, var_name='OtherEffect')
     df = panel.dataframe
@@ -593,20 +608,25 @@ def test_string_nonconversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    p = pd.Panel({'a': string, 'b': num})
+    time = pd.date_range('1-1-2000', periods=t)
+    entities = ['entity.{0}'.format(i) for i in range(n)]
+    p = panel_to_frame(None, items=['a', 'b'], major_axis=time, minor_axis=entities,
+                       swap=True)
+    p['a'] = string.T.ravel()
+    p['b'] = num.T.ravel()
     panel = PanelData(p, var_name='OtherEffect', convert_dummies=False)
     assert is_string_dtype(panel.dataframe['a'].dtype)
     assert np.all(panel.dataframe['a'] == string.T.ravel())
 
 
-def test_repr_html(panel):
-    data = PanelData(panel)
+def test_repr_html(mi_df):
+    data = PanelData(mi_df)
     html = data._repr_html_()
     assert '<br/>' in html
 
 
-def test_general_demean_oneway(panel):
-    y = PanelData(panel)
+def test_general_demean_oneway(mi_df):
+    y = PanelData(mi_df)
     dm1 = y.demean('entity')
     g = pd.DataFrame(y.entity_ids, index=y.index)
     dm2 = y.general_demean(g)
@@ -625,8 +645,8 @@ def test_general_demean_oneway(panel):
     assert_allclose(dm1, dm2.values2d)
 
 
-def test_general_demean_twoway(panel):
-    y = PanelData(panel)
+def test_general_demean_twoway(mi_df):
+    y = PanelData(mi_df)
     dm1 = y.demean('both')
     g = pd.DataFrame(y.entity_ids, index=y.index)
     g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
@@ -644,8 +664,8 @@ def test_general_demean_twoway(panel):
     assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
 
 
-def test_general_unit_weighted_demean_oneway(panel):
-    y = PanelData(panel)
+def test_general_unit_weighted_demean_oneway(mi_df):
+    y = PanelData(mi_df)
     dm1 = y.demean('entity')
     g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
     weights = PanelData(g).copy()
@@ -673,8 +693,8 @@ def test_general_unit_weighted_demean_oneway(panel):
     assert_allclose(dm3.values2d, dm2.values2d)
 
 
-def test_general_weighted_demean_oneway(panel):
-    y = PanelData(panel)
+def test_general_weighted_demean_oneway(mi_df):
+    y = PanelData(mi_df)
     weights = pd.DataFrame(
         np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
@@ -700,9 +720,9 @@ def test_general_weighted_demean_oneway(panel):
     assert_allclose(dm1, dm2.values2d, atol=1e-14)
 
 
-def test_general_unit_weighted_demean_twoway(panel):
+def test_general_unit_weighted_demean_twoway(mi_df):
     np.random.seed(12345)
-    y = PanelData(panel)
+    y = PanelData(mi_df)
     weights = pd.DataFrame(
         np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
@@ -733,13 +753,9 @@ def test_original_unmodified(data):
     pre_w = data.w.copy()
     mod = PanelOLS(data.y, data.x, weights=data.w)
     mod.fit(debiased=True)
-    if isinstance(data.y, (pd.DataFrame, pd.Panel)):
-        for after, before in (
-                (data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
-            if isinstance(before, pd.DataFrame):
-                assert_frame_equal(before, after)
-            else:
-                assert_panel_equal(before, after)
+    if isinstance(data.y, (pd.DataFrame)):
+        for after, before in ((data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
+            assert_frame_equal(before, after)
 
         mi_df_y = PanelData(data.y).dataframe
         mi_df_x = PanelData(data.x).dataframe
@@ -769,21 +785,18 @@ def test_incorrect_time_axis():
     entities = ['entity.{0}'.format(i) for i in range(1000)]
     time = ['time.{0}'.format(i) for i in range(3)]
     var_names = ['var.{0}'.format(i) for i in range(3)]
-    p = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
+    p = panel_to_frame(x, items=var_names, major_axis=time, minor_axis=entities,
+                       swap=True)
     with pytest.raises(ValueError):
         PanelData(p)
-    df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
-    with pytest.raises(ValueError):
-        PanelData(df)
 
-    time = [1, pd.datetime(1960, 1, 1), 'a']
+    time = [1, 2, 3]
     var_names = ['var.{0}'.format(i) for i in range(3)]
-    p = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
+    p = panel_to_frame(x, items=var_names, major_axis=time, minor_axis=entities,
+                       swap=True)
+    p.index = p.index.set_levels([1, pd.datetime(1960, 1, 1), 'a'], 1)
     with pytest.raises(ValueError):
         PanelData(p)
-    df = p.swapaxes(1, 2).swapaxes(0, 1).to_frame()
-    with pytest.raises(ValueError):
-        PanelData(df)
 
 
 @pytest.mark.skipif(MISSING_XARRAY, reason='xarray is not installed')

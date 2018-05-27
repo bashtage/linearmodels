@@ -10,7 +10,7 @@ from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
                                         is_string_like)
-from linearmodels.utility import ensure_unique_column
+from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ['PanelData']
 
@@ -155,7 +155,14 @@ class PanelData(object):
                 if isinstance(x, DataArray):
                     if x.ndim not in (2, 3):
                         raise ValueError('Only 2-d or 3-d DataArrays are supported')
-                    x = x.to_pandas()
+                    if x.ndim == 2:
+                        x = x.to_pandas()
+                    else:
+                        items = x.coords[x.dims[0]].values.tolist()
+                        major = x.coords[x.dims[1]].values.tolist()
+                        minor = x.coords[x.dims[2]].values.tolist()
+                        values = x.values
+                        x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
                 pass
 
@@ -562,10 +569,8 @@ class PanelData(object):
         """
         diffs = self.panel.values
         diffs = diffs[:, 1:] - diffs[:, :-1]
-        diffs = Panel(diffs, items=self.panel.items,
-                      major_axis=self.panel.major_axis[1:],
-                      minor_axis=self.panel.minor_axis)
-        diffs = diffs.swapaxes(1, 2).to_frame(filter_observations=False)
+        diffs = panel_to_frame(diffs, self.panel.items, self.panel.major_axis[1:],
+                               self.panel.minor_axis, True)
         diffs = diffs.reindex(self._frame.index).dropna(how='any')
         return PanelData(diffs)
 

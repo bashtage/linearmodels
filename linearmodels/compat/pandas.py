@@ -1,5 +1,3 @@
-from pandas.util.testing import assert_panel_equal
-
 try:
     from pandas.api.types import (is_numeric_dtype, is_categorical,
                                   is_string_dtype, is_categorical_dtype,
@@ -33,4 +31,4 @@ except ImportError:
 
 __all__ = ['is_string_dtype', 'is_numeric_dtype', 'is_categorical',
            'is_string_like', 'is_categorical_dtype', 'is_datetime64_any_dtype',
-           'assert_frame_equal', 'assert_series_equal', 'assert_panel_equal']
+           'assert_frame_equal', 'assert_series_equal']

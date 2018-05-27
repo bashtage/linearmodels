@@ -17,7 +17,7 @@ from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
                                   ensure_unique_column, has_constant,
-                                  missing_warning)
+                                  missing_warning, panel_to_frame)
 
 
 class PanelFormulaParser(object):
@@ -1354,7 +1354,7 @@ class BetweenOLS(PooledOLS):
         """
         y, x, w = self._prepare_between()
         if np.all(self.weights.values2d == 1.0) and not reweight:
-            w = root_w = np.ones_like(w)
+            w = root_w = np.ones_like(y)
         else:
             root_w = np.sqrt(w)
 
@@ -1500,9 +1500,8 @@ class FirstDifferenceOLS(PooledOLS):
                 clusters = pd.DataFrame(group_ids)
         clusters = PanelData(clusters)
         values = clusters.values3d[:, 1:]
-        clusters = pd.Panel(values, items=clusters.panel.items,
-                            major_axis=clusters.panel.major_axis[1:],
-                            minor_axis=clusters.panel.minor_axis)
+        clusters = panel_to_frame(values, clusters.panel.items, clusters.panel.major_axis[1:],
+                                  clusters.panel.minor_axis, True)
         clusters = PanelData(clusters).dataframe
         clusters = clusters.loc[self.dependent.first_difference().index]
         clusters = clusters.astype(np.int64)
@@ -1577,10 +1576,8 @@ class FirstDifferenceOLS(PooledOLS):
             w = 1.0 / self.weights.values3d
             w = w[:, :-1] + w[:, 1:]
             w = 1.0 / w
-            w = pd.Panel(w, items=self.weights.panel.items,
-                         major_axis=self.weights.panel.major_axis[1:],
-                         minor_axis=self.weights.panel.minor_axis)
-            w = w.swapaxes(1, 2).to_frame(filter_observations=False)
+            w = panel_to_frame(w, self.weights.panel.items, self.weights.panel.major_axis[1:],
+                               self.weights.panel.minor_axis, True)
             w = w.reindex(self.weights.index).dropna(how='any')
             index = w.index
             w = w.values

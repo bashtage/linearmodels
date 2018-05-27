@@ -176,7 +176,7 @@ class TestDataHandler(object):
     def test_categorical_no_conversion(self):
         index = pd.date_range('2017-01-01', periods=10)
         cat = pd.Categorical(['a', 'b', 'a', 'b', 'a', 'a', 'b', 'c', 'c', 'a'])
-        s = pd.Series({'cat': cat}, index=index, name='cat')
+        s = pd.Series(cat, index=index, name='cat')
         dh = IVData(s, convert_dummies=False)
         assert dh.ndim == 2
         assert dh.shape == (10, 1)

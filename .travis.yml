@@ -24,6 +24,7 @@ matrix:
     - NUMPY=1.12
     - SCIPY=0.18
     - PANDAS=0.20
+    - STATAMODELS=0.8
   - python: 3.6
     env:
     - PYTHON=3.6
@@ -31,6 +32,7 @@ matrix:
     - SCIPY=0.19
     - PANDAS=0.21
     - XARRAY=0.9
+    - STATAMODELS=0.8
   - python: 3.6
     env:
     - PYTHON=3.6
@@ -39,6 +41,15 @@ matrix:
     - PANDAS=0.22
     - XARRAY=0.10
     - DOCBUILD=true
+    - STATAMODELS=0.9
+  - python: 3.6
+    env:
+    - PYTHON=3.6
+    - NUMPY=1.14
+    - SCIPY=1.1
+    - PANDAS=0.23
+    - XARRAY=0.10
+    - STATAMODELS=0.9
 
 before_install:
   - sudo apt-get install -y pandoc
@@ -50,8 +61,8 @@ before_install:
   - conda config --set always_yes true
   - conda update conda
   # Install packages
-  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
-  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels matplotlib seaborn
+  - echo conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels=${STATSMODELS} matplotlib seaborn
+  - conda create -n linearmodels-test python=${PYTHON} numpy=${NUMPY} scipy=${SCIPY} pandas=${PANDAS} statsmodels=${STATSMODELS} matplotlib seaborn
   - source activate linearmodels-test
   - if [[ ! -z ${XARRAY} ]]; then conda install xarray=${XARRAY}; fi
   - conda install --yes --quiet sphinx ipython jupyter nbconvert nbformat

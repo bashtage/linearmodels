@@ -4,6 +4,8 @@ from numpy.random import standard_normal
 from numpy.testing import assert_allclose
 
 from linearmodels.compat.numpy import lstsq
+from linearmodels.panel.data import PanelData
+from linearmodels.utility import panel_to_frame
 
 try:
     import xarray  # flake8: noqa
@@ -92,21 +94,47 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
         entities = ['firm' + str(i) for i in range(n)]
         time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
         var_names = ['x' + str(i) for i in range(k)]
-        y = pd.DataFrame(y, index=time, columns=entities)
-        w = pd.DataFrame(w, index=time, columns=entities)
-        x = pd.Panel(x, items=var_names, major_axis=time, minor_axis=entities)
-        c = pd.Panel(c, items=cats, major_axis=time, minor_axis=entities)
-        vc1 = pd.Panel(vc1, items=vcats[:1], major_axis=time, minor_axis=entities)
-        vc2 = pd.Panel(vc2, items=vcats, major_axis=time, minor_axis=entities)
+        # y = pd.DataFrame(y, index=time, columns=entities)
+        y = panel_to_frame(y[None], items=['y'], major_axis=time, minor_axis=entities, swap=True)
+        w = panel_to_frame(w[None], items=['w'], major_axis=time, minor_axis=entities, swap=True)
+        w = w.reindex(y.index)
+        x = panel_to_frame(x, items=var_names, major_axis=time, minor_axis=entities, swap=True)
+        x = x.reindex(y.index)
+        c = panel_to_frame(c, items=cats, major_axis=time, minor_axis=entities, swap=True)
+        c = c.reindex(y.index)
+        vc1 = panel_to_frame(vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True)
+        vc1 = vc1.reindex(y.index)
+        vc2 = panel_to_frame(vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True)
+        vc2 = vc2.reindex(y.index)
 
     if datatype == 'xarray':
+        # TODO: This is broken now, need to transfor multiindex to xarray 3d
         import xarray as xr
-        x = xr.DataArray(x)
-        y = xr.DataArray(y)
-        w = xr.DataArray(w)
-        c = xr.DataArray(c)
-        vc1 = xr.DataArray(vc1)
-        vc2 = xr.DataArray(vc2)
+        x = xr.DataArray(PanelData(x).values3d,
+                         coords={'entities': entities, 'time': time,
+                                 'vars': var_names},
+                         dims=['vars', 'time', 'entities'])
+        y = xr.DataArray(PanelData(y).values3d,
+                         coords={'entities': entities, 'time': time,
+                                 'vars': ['y']},
+                         dims=['vars', 'time', 'entities'])
+        w = xr.DataArray(PanelData(w).values3d,
+                         coords={'entities': entities, 'time': time,
+                                 'vars': ['w']},
+                         dims=['vars', 'time', 'entities'])
+        if c.shape[1] > 0:
+            c = xr.DataArray(PanelData(c).values3d,
+                             coords={'entities': entities, 'time': time,
+                                     'vars': c.columns},
+                             dims=['vars', 'time', 'entities'])
+        vc1 = xr.DataArray(PanelData(vc1).values3d,
+                           coords={'entities': entities, 'time': time,
+                                   'vars': vc1.columns},
+                           dims=['vars', 'time', 'entities'])
+        vc2 = xr.DataArray(PanelData(vc2).values3d,
+                           coords={'entities': entities, 'time': time,
+                                   'vars': vc2.columns},
+                           dims=['vars', 'time', 'entities'])
 
     if rng is not None:
         rng.set_state(np.random.get_state())
@@ -124,11 +152,13 @@ def assert_results_equal(res1, res2, test_fit=True, test_df=True):
     assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
     assert_allclose(res1.s2, res2.s2)
 
-    delta = 1 + (res1.resids.values - res2.resids.values) / max(res1.resids.std(),
-                                                                res2.resids.std())
+    delta = 1 + (res1.resids.values - res2.resids.values) / max(
+        res1.resids.std(),
+        res2.resids.std())
     assert_allclose(delta, np.ones_like(delta))
-    delta = 1 + (res1.wresids.values - res2.wresids.values) / max(res1.wresids.std(),
-                                                                  res2.wresids.std())
+    delta = 1 + (res1.wresids.values - res2.wresids.values) / max(
+        res1.wresids.std(),
+        res2.wresids.std())
     assert_allclose(delta, np.ones_like(delta))
 
     if test_df:

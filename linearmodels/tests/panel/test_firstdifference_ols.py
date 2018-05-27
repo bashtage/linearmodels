@@ -138,16 +138,17 @@ def test_firstdifference_ols_weighted(data):
 
 
 def test_first_difference_errors(data):
-    if isinstance(data.x, pd.Panel):
-        x = data.x.iloc[:, [0], :]
-        y = data.y.iloc[[0], :]
+    if isinstance(data.x, pd.DataFrame):
+        time = data.y.index.levels[1][0]
+        y = data.y.xs(time, level=1, drop_level=False)
+        x = data.x.xs(time, level=1, drop_level=False)
     else:
         x = data.x[:, [0], :]
         y = data.y[[0], :]
     with pytest.raises(ValueError):
         FirstDifferenceOLS(y, x)
 
-    if not isinstance(data.x, pd.Panel):
+    if not isinstance(data.x, pd.DataFrame):
         return
     x = data.x.copy()
     x['Intercept'] = 1.0

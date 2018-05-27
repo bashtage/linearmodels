@@ -44,24 +44,41 @@ def test_valid_weight_shape(data):
     assert_equal(w, expected)
 
     # Per time
-    n = data.y.shape[0]
+    if isinstance(data.x, pd.DataFrame):
+        n = len(data.y.index.levels[1])
+        k = len(data.y.index.levels[0])
+    elif isinstance(data.x, np.ndarray):
+        n = data.y.shape[0]
+        k = data.y.shape[1]
+    else:
+        n = data.y.shape[1]
+        k = data.y.shape[2]
+
     weights = 1 + np.random.random_sample(n)
     mod = PanelOLS(data.y, data.x, weights=weights)
     mod.fit()
     w = mod.weights.values2d
-    expected = weights[:, None] @ np.ones((1, data.y.shape[1]))
+    expected = weights[:, None] @ np.ones((1, k))
     expected = expected.T.ravel()
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
     assert_equal(w, expected)
 
     # Per entity
-    n = data.y.shape[1]
+    if isinstance(data.x, pd.DataFrame):
+        n = len(data.y.index.levels[0])
+        k = len(data.y.index.levels[1])
+    elif isinstance(data.x, np.ndarray):
+        n = data.y.shape[1]
+        k = data.y.shape[0]
+    else:
+        n = data.y.shape[2]
+        k = data.y.shape[1]
     weights = 1 + np.random.random_sample(n)
     mod = PanelOLS(data.y, data.x, weights=weights)
     mod.fit()
     w = mod.weights.values2d
-    expected = np.ones((data.y.shape[0], 1)) @ weights[None, :]
+    expected = np.ones((k, 1)) @ weights[None, :]
     expected = expected.T.ravel()
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
@@ -137,8 +154,8 @@ def test_panel_lsdv(data):
 def test_incorrect_weight_shape(data):
     w = data.w
     if isinstance(w, pd.DataFrame):
-        w = w.iloc[:3]
-        w = pd.Panel({'weights': w})
+        entities = w.index.levels[0][:4]
+        w = w.loc[pd.IndexSlice[entities[0]:entities[-1]], :]
     elif isinstance(w, np.ndarray):
         w = w[:3]
         w = w[None, :, :]
@@ -150,10 +167,13 @@ def test_incorrect_weight_shape(data):
 
 
 def test_weight_ambiguity(data):
-    t = data.y.shape[0]
-    if isinstance(data.x, pd.Panel):
-        x = data.x.iloc[:, :, :t]
+    if isinstance(data.x, pd.DataFrame):
+        t = len(data.y.index.levels[1])
+        entities = data.x.index.levels[0]
+        slice = pd.IndexSlice[entities[0]:entities[t - 1]]
+        x = data.x.loc[slice, :]
     else:
+        t = data.x.shape[1]
         x = data.x[:, :, :t]
     y = data.y
     weights = 1 + np.random.random_sample(t)
@@ -162,13 +182,14 @@ def test_weight_ambiguity(data):
 
 
 def test_absorbing_effect(data):
-    if not isinstance(data.x, pd.Panel):
+    if not isinstance(data.x, pd.DataFrame):
         return
     x = data.x.copy()
-    temp = data.x.iloc[0].copy()
-    temp.values[:, :] = 1.0
-    n = temp.shape[1]
-    temp.values[:, n // 2:] = 0
+    nentity = len(x.index.levels[0])
+    ntime = len(x.index.levels[1])
+    temp = data.x.iloc[:, 0].copy()
+    temp.values[:] = 1.0
+    temp.values[:(ntime * (nentity // 2))] = 0
     x['Intercept'] = 1.0
     x['absorbed'] = temp
     with pytest.raises(AbsorbingEffectError):
