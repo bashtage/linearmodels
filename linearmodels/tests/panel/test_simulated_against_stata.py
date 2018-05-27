@@ -56,26 +56,45 @@ def data(request):
     else:
         fit_options.update({'cov_type': 'unadjusted'})
 
-    if vcv == 'cluster' or (model in ('fixed_effect', 'random_effect') and vcv == 'robust'):
+    if vcv == 'cluster' or (
+            model in ('fixed_effect', 'random_effect') and vcv == 'robust'):
         fit_options.update({'group_debias': True})
     spec_mod = mod(y, x, **mod_options)
     fit = spec_mod.fit(**fit_options)
-    return AttrDict(fit=fit, model=spec_mod, model_options=mod_options, y=y, x=x,
-                    stata=STATA_RESULTS[request.param], fit_options=fit_options,
-                    model_name=model, vcv=vcv, weights=weights, missing=missing)
+    return AttrDict(fit=fit, model=spec_mod, model_options=mod_options, y=y,
+                    x=x,
+                    stata=STATA_RESULTS[request.param],
+                    fit_options=fit_options,
+                    model_name=model, vcv=vcv, weights=weights,
+                    missing=missing)
 
 
 # TODO: pvals, r2o, r2
+def correct_order(stata, lm):
+    repl = []
+    for c in stata.index:
+        if c == '_cons':
+            repl.append('intercept')
+        else:
+            repl.append(c)
+    stata = stata.copy()
+    stata.index = repl
+    index = lm.index
+    stata.reindex(index)
+
+    return stata
 
 
 def test_params(data):
-    model_params = data.fit.params.squeeze()
-    stata_params = data.stata.params.param
-    assert_allclose(stata_params.values, model_params)
+    model_params = data.fit.params
+    stata = data.stata.params
+    stata = correct_order(stata, model_params)
+    assert_allclose(stata.param, model_params)
 
 
 def test_rsquared_between(data):
-    if data.weights in ('weighted', 'wls') or data.missing in ('_heavy', '_light'):
+    if (data.weights in ('weighted', 'wls') or
+            data.missing in ('_heavy', '_light')):
         pytest.xfail(reason='Respect weights in calculation')
     r2_between = data.fit.rsquared_between
     if np.isnan(data.stata.r2_b):
