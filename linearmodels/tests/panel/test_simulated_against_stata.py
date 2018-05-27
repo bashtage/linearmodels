@@ -36,7 +36,7 @@ def data(request):
         y_vars = vars[:1]
         x_vars = vars[1:]
     y = sim_data[y_vars]
-    x = sim_data[x_vars + ['intercept']]
+    x = sim_data[['intercept'] + x_vars]
     mod = MODELS[model]
     mod_options = {}
     if model == 'fixed_effect':
@@ -80,9 +80,8 @@ def correct_order(stata, lm):
     stata = stata.copy()
     stata.index = repl
     index = lm.index
-    stata.reindex(index)
 
-    return stata
+    return stata.reindex(index)
 
 
 def test_params(data):
