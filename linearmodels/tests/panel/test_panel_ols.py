@@ -156,7 +156,9 @@ def test_const_data_both(const_data):
 
     x = mod.exog.dataframe
     d1 = mod.dependent.dummies('entity', drop_first=True)
+    d1.columns = ['d.entity.{0}'.format(i) for i in d1]
     d2 = mod.dependent.dummies('time', drop_first=True)
+    d2.columns = ['d.time.{0}'.format(i) for i in d2]
     d = np.c_[d1.values, d2.values]
     d = pd.DataFrame(d, index=x.index, columns=list(d1.columns) + list(d2.columns))
     d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values)[0]
@@ -177,7 +179,9 @@ def test_const_data_both_weights(const_data):
     x = mod.exog.dataframe
 
     d1 = mod.dependent.dummies('entity', drop_first=True)
+    d1.columns = ['d.entity.{0}'.format(i) for i in d1]
     d2 = mod.dependent.dummies('time', drop_first=True)
+    d2.columns = ['d.time.{0}'.format(i) for i in d2]
     d = np.c_[d1.values, d2.values]
     root_w = np.sqrt(w.values)
     z = np.ones_like(x)

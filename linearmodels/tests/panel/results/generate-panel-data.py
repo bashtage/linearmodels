@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from linearmodels.panel.data import PanelData
+from linearmodels.utility import panel_to_frame
 
 np.random.seed(12345)
 n, t, k = 1000, 3, 6
@@ -21,20 +22,21 @@ items = ['intercept'] + items
 major = pd.date_range('12-31-1999', periods=t, freq='A-DEC')
 minor = ['firm.' + str(i) for i in range(1, n + 1)]
 
-x = pd.Panel(x, items=items, major_axis=major, minor_axis=minor)
-
-y = pd.DataFrame(y, index=major, columns=minor)
-y = pd.Panel({'y': y})
-
-w = pd.DataFrame(w, index=major, columns=minor)
-w = pd.Panel({'w': w})
+x = panel_to_frame(x, items, major, minor, swap=True)
+y = panel_to_frame(y[None, :], ['y'], major, minor, swap=True)
+w = panel_to_frame(w[None, :], ['w'], major, minor, swap=True)
 
 x = PanelData(x)
 y = PanelData(y)
 w = PanelData(w)
 
 z = pd.concat([x.dataframe, y.dataframe, w.dataframe], 1)
+final_index = pd.MultiIndex.from_product([minor, major])
+final_index.levels[0].name = 'firm'
+z = z.reindex(final_index)
 z.index.levels[0].name = 'firm'
+z.index.levels[1].name = 'time'
+
 z = z.reset_index()
 z['firm_id'] = z.firm.astype('category')
 z['firm_id'] = z.firm_id.cat.codes

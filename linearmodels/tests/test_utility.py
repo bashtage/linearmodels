@@ -1,3 +1,5 @@
+import random
+import string
 import warnings
 
 import numpy as np
@@ -9,7 +11,10 @@ from scipy import stats
 import linearmodels
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic, InvalidTestStatistic,
                                   WaldTestStatistic, cached_property, ensure_unique_column,
-                                  format_wide, has_constant, inv_sqrth, missing_warning)
+                                  format_wide, has_constant, inv_sqrth, missing_warning,
+                                  panel_to_frame)
+
+MISSING_PANEL = 'Panel' not in dir(pd)
 
 
 def test_missing_warning():
@@ -202,3 +207,24 @@ def test_format_wide():
     inputs = [chr(65 + i) * (20 + i) for i in range(k)]
     out = format_wide(inputs, 80)
     assert max(map(lambda v: len(v), out)) <= 80
+
+
+@pytest.mark.skipif(MISSING_PANEL, reason='pd.Panel is not installed')
+@pytest.mark.filterwarnings('ignore::FutureWarning')
+def test_panel_to_midf():
+    x = np.random.standard_normal((3, 7, 100))
+    expected = pd.Panel(x).to_frame()
+    df = panel_to_frame(x, list(range(3)), list(range(7)), list(range(100)))
+    pd.testing.assert_frame_equal(df, expected)
+
+    expected = pd.Panel(x).swapaxes(1, 2).to_frame(filter_observations=False)
+    df = panel_to_frame(x, list(range(3)), list(range(7)), list(range(100)), True)
+    pd.testing.assert_frame_equal(df, expected)
+    entities = list(map(''.join, [[random.choice(string.ascii_lowercase) for __ in range(10)]
+                                  for _ in range(100)]))
+    times = pd.date_range('1999-12-31', freq='A-DEC', periods=7)
+    var_names = ['x.{0}'.format(i) for i in range(1, 4)]
+    expected = pd.Panel(x, items=var_names, major_axis=times, minor_axis=entities)
+    expected = expected.swapaxes(1, 2).to_frame(filter_observations=False)
+    df = panel_to_frame(x, var_names, times, entities, True)
+    pd.testing.assert_frame_equal(df, expected)

@@ -5,7 +5,7 @@ from collections.abc import MutableMapping
 import numpy as np
 from numpy import NaN, ceil, diag, isnan, log10, sqrt
 from numpy.linalg import eigh, matrix_rank
-from pandas import DataFrame, Series, concat
+from pandas import DataFrame, Series, concat, MultiIndex
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
@@ -557,3 +557,45 @@ def format_wide(s, cols):
                 line = temp
     lines.append([line])
     return lines
+
+
+def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
+    """
+    Construct a multiindex DataFrame using Panel-like arguments
+
+    Parameters
+    ----------
+    x : ndarray
+        3-d array with size nite, nmajor, nminor
+    items : list-like
+        List like object with item labels
+    major_axis : list-like
+        List like object with major_axis labels
+    minor_axis : list-like
+        List like object with minor_axis labels
+
+    Notes
+    -----
+    This function is equivalent to
+
+    Panel(x, items, major_axis, minor_axis).to_frame()
+
+    if `swap` is True, it is equivalent to
+
+    Panel(x, items, major_axis, minor_axis).swapaxes(1,2).to_frame()
+    """
+    nmajor = np.arange(len(major_axis))
+    nminor = np.arange(len(minor_axis))
+    final_levels = [major_axis, minor_axis]
+    mi = MultiIndex.from_product([nmajor, nminor])
+    if x is not None:
+        shape = x.shape
+        x = x.reshape((shape[0], shape[1] * shape[2])).T
+    df = DataFrame(x, columns=items, index=mi)
+    if swap:
+        df.index = df.index.swaplevel()
+        df.sort_index(inplace=True)
+        final_levels = [minor_axis, major_axis]
+    df.index.set_levels(final_levels, [0, 1], inplace=True)
+    df.index.names = ['major', 'minor']
+    return df

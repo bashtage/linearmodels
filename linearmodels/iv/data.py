@@ -78,6 +78,11 @@ class IVData(object):
                 name = var_name if not x.name else x.name
                 x = pd.DataFrame({name: x})
             copied = False
+            columns = list(x.columns)
+            if len(set(columns)) != len(columns):
+                raise ValueError('DataFrame contains duplicate column names. '
+                                 'All column names must be distinct')
+            all_numeric = True
             for col in x:
                 c = x[col]
                 if is_string_dtype(c.dtype) and \
@@ -89,6 +94,7 @@ class IVData(object):
                         copied = True
                     x[col] = c
                 dt = c.dtype
+                all_numeric = all_numeric and is_numeric_dtype(dt)
                 if not (is_numeric_dtype(dt) or is_categorical_dtype(dt)):
                     raise ValueError('Only numeric, string  or categorical '
                                      'data permitted')
@@ -97,7 +103,9 @@ class IVData(object):
                 x = expand_categoricals(x, drop_first)
 
             self._pandas = x
-            self._ndarray = self._pandas.values.astype(np.float64)
+            self._ndarray = self._pandas.values
+            if all_numeric or convert_dummies:
+                self._ndarray = self._ndarray.astype(np.float64)
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
 
         else:

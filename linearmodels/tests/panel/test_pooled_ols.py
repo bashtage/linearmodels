@@ -56,24 +56,25 @@ def test_pooled_ols_weighted(data):
 
 
 def test_diff_data_size(data):
-    if isinstance(data.x, pd.Panel):
-        x = data.x.iloc[:, :, :-1]
+    if isinstance(data.x, pd.DataFrame):
+        entities = data.x.index.levels[0]
+        x = data.x.loc[pd.IndexSlice[entities[0]:entities[-2]]]
         y = data.y
     elif isinstance(data.x, np.ndarray):
         x = data.x
         y = data.y[:-1]
     else:  # xr.DataArray:
-        x = data.x[:, :-1]
-        y = data.y[:, :-1]
+        x = data.x[:, :, :-1]
+        y = data.y
 
     with pytest.raises(ValueError):
         PooledOLS(y, x)
 
 
 def test_rank_deficient_array(data):
-    x = data.x
-    if isinstance(data.x, pd.Panel):
-        x.iloc[1] = x.iloc[0]
+    x = data.x.copy()
+    if isinstance(data.x, pd.DataFrame):
+        x.iloc[:, 1] = x.iloc[:, 0]
     else:
         x[1] = x[0]
     with pytest.raises(ValueError):
@@ -99,7 +100,7 @@ def test_results_access(data):
             if callable(val):
                 val()
 
-    if not isinstance(data.x, pd.Panel):
+    if not isinstance(data.x, pd.DataFrame):
         return
     x = data.y.copy()
     x.iloc[:, :] = 1

@@ -1,6 +1,10 @@
 Change Log
 ----------
 
+Since 4.8
+=========
+* Removed internal use of pandas Panel
+
 Version 4.8
 ===========
 * Corrected bug that prevented single character names in IV formulas

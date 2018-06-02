@@ -35,12 +35,17 @@ def both_data_types(request):
 def test_single_entity(data):
     x = data.x
     y = data.y
-    if isinstance(x, pd.Panel):
-        x = x.iloc[:, [0], :]
-        y = y.iloc[[0], :]
-    else:
+    if isinstance(x, pd.DataFrame):
+        time = y.index.levels[1][0]
+        y = y.xs(time, level=1, drop_level=False)
+        x = x.xs(time, level=1, drop_level=False)
+    elif isinstance(x, np.ndarray):
         x = x[:, [0]]
         y = y[[0]]
+    else:
+        # xarray DataArray
+        x = x[:, [0]]
+        y = y[:, [0]]
     mod = BetweenOLS(y, x)
     res = mod.fit(reweight=True, debiased=False)
 
@@ -65,14 +70,20 @@ def test_single_entity_weights(data):
     x = data.x
     y = data.y
     w = data.w
-    if isinstance(x, pd.Panel):
-        x = x.iloc[:, [0], :]
-        y = y.iloc[[0], :]
-        w = w.iloc[[0], :]
-    else:
+    if isinstance(x, pd.DataFrame):
+        time = y.index.levels[1][0]
+        y = y.xs(time, level=1, drop_level=False)
+        x = x.xs(time, level=1, drop_level=False)
+        w = w.xs(time, level=1, drop_level=False)
+    elif isinstance(x, np.ndarray):
         x = x[:, [0]]
         y = y[[0]]
         w = w[[0]]
+    else:
+        # xarray DataArray
+        x = x[:, [0]]
+        y = y[:, [0]]
+        w = w[:, [0]]
 
     mod = BetweenOLS(y, x, weights=w)
     res = mod.fit(reweight=True, debiased=False)
@@ -178,7 +189,8 @@ def test_missing(missing_data):
     ols_clusters = vc1.dataframe.groupby(level=0).mean().astype(np.int32)
     ols_clusters = ols_clusters.reindex(mod.dependent.entities)
 
-    res = mod.fit(reweight=True, cov_type='clustered', clusters=missing_data.vc1, debiased=False)
+    res = mod.fit(reweight=True, cov_type='clustered',
+                  clusters=missing_data.vc1, debiased=False)
     ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
@@ -289,12 +301,17 @@ def test_cluster_error(data):
 def test_default_clusters(data):
     x = data.x
     y = data.y
-    if isinstance(x, pd.Panel):
-        x = x.iloc[:, [0], :]
-        y = y.iloc[[0], :]
-    else:
+    if isinstance(x, pd.DataFrame):
+        time = y.index.levels[1][0]
+        y = y.xs(time, level=1, drop_level=False)
+        x = x.xs(time, level=1, drop_level=False)
+    elif isinstance(x, np.ndarray):
         x = x[:, [0]]
         y = y[[0]]
+    else:
+        # xarray DataArray
+        x = x[:, [0]]
+        y = y[:, [0]]
     mod = BetweenOLS(y, x)
     res = mod.fit(reweight=True, cov_type='clustered', debiased=False)
 
@@ -308,7 +325,6 @@ def test_default_clusters(data):
 def test_fitted_effects_residuals(both_data_types):
     mod = BetweenOLS(both_data_types.y, both_data_types.x)
     res = mod.fit(reweight=True, debiased=False)
-    res.idiosyncratic
     expected = pd.DataFrame(mod.exog.values2d @ res.params.values, mod.dependent.index,
                             columns=['fitted_values'])
     assert_allclose(expected, res.fitted_values)
