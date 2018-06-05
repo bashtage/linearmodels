@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import assert_frame_equal, is_string_dtype
-
 from itertools import product
 
 import numpy as np
@@ -7,6 +5,8 @@ import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
+
+from linearmodels.compat.pandas import assert_frame_equal, is_string_dtype
 
 try:
     import xarray as xr
@@ -816,3 +816,17 @@ def test_incorrect_time_axis_xarray():
                       dims=['vars', 'time', 'entities'])
     with pytest.raises(ValueError):
         PanelData(da)
+
+
+def test_named_index(data):
+    pdata = PanelData(data.x)
+    if isinstance(data.x, pd.DataFrame):
+        assert pdata.dataframe.index.levels[0].name == data.x.index.levels[0].name
+        assert pdata.dataframe.index.levels[1].name == data.x.index.levels[1].name
+
+        data.x.index.levels[0].name = None
+        data.x.index.levels[1].name = None
+        pdata = PanelData(data.x)
+
+    assert pdata.dataframe.index.levels[0].name == 'entity'
+    assert pdata.dataframe.index.levels[1].name == 'time'

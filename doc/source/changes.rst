@@ -4,6 +4,8 @@ Change Log
 Since 4.8
 =========
 * Removed internal use of pandas Panel
+* Improved performance in panel models when using `from_formula`
+* Switched to retaining index column names when original input index is named
 
 Version 4.8
 ===========

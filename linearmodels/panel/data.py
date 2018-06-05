@@ -148,6 +148,7 @@ class PanelData(object):
         self._drop_first = drop_first
         self._panel = None
         self._shape = None
+        index_names = ['entity', 'time']
         if isinstance(x, PanelData):
             x = x.dataframe
         self._original = x
@@ -180,6 +181,9 @@ class PanelData(object):
                     if len(x.index.levels) != 2:
                         raise ValueError('DataFrame input must have a '
                                          'MultiIndex with 2 levels')
+                    if isinstance(self._original, (pd.DataFrame, PanelData, pd.Series)):
+                        for i in range(2):
+                            index_names[i] = x.index.levels[i].name or index_names[i]
                     self._frame = x
                     if copy:
                         self._frame = self._frame.copy()
@@ -218,8 +222,9 @@ class PanelData(object):
                              'numeric or date-like')
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
-        self._frame.index.levels[0].name = 'entity'
-        self._frame.index.levels[1].name = 'time'
+        levels = self._frame.index.levels
+        for i in range(2):
+            levels[i].name = index_names[i]
 
     @property
     def panel(self):
