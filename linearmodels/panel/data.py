@@ -109,6 +109,9 @@ class PanelData(object):
         should be converted to dummy variables
     drop_first : bool, optional
         Flag indicating to drop first dummy category when converting
+    copy: bool, optional
+        Flag indicating whether to copy the input. Only has an effect when
+        x is a DataFrame
 
     Notes
     -----
@@ -139,7 +142,7 @@ class PanelData(object):
         DataFrame does not have 2 levels
     """
 
-    def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True):
+    def __init__(self, x, var_name='x', convert_dummies=True, drop_first=True, copy=True):
         self._var_name = var_name
         self._convert_dummies = convert_dummies
         self._drop_first = drop_first
@@ -177,7 +180,9 @@ class PanelData(object):
                     if len(x.index.levels) != 2:
                         raise ValueError('DataFrame input must have a '
                                          'MultiIndex with 2 levels')
-                    self._frame = x.copy()
+                    self._frame = x
+                    if copy:
+                        self._frame = self._frame.copy()
                 else:
                     self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
             else:
