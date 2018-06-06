@@ -27,6 +27,10 @@ def data(request):
     missing, datatype, const = request.param
     return generate_data(missing, datatype, const=const, ntk=(91, 7, 5), other_effects=2)
 
+@pytest.fixture(params=perms, ids=ids)
+def large_data(request):
+    missing, datatype, const = request.param
+    return generate_data(missing, datatype, const=const, ntk=(51, 30, 5), other_effects=2)
 
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
@@ -292,8 +296,8 @@ def test_panel_entity_fwl(data):
     assert_results_equal(res, res2, test_df=False)
 
 
-def test_panel_time_lsdv(data):
-    mod = PanelOLS(data.y, data.x, time_effects=True)
+def test_panel_time_lsdv(large_data):
+    mod = PanelOLS(large_data.y, large_data.x, time_effects=True)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -317,14 +321,14 @@ def test_panel_time_lsdv(data):
     res2 = ols_mod.fit(cov_type='robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = data.vc1
+    clusters = large_data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False,
                   debiased=False)
     res2 = ols_mod.fit(cov_type='clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = data.vc2
+    clusters = large_data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False,
                   debiased=False)
@@ -517,8 +521,8 @@ def test_panel_entity_lsdv_weighted(data):
     assert_results_equal(res, res2, test_fit=False)
 
 
-def test_panel_time_lsdv_weighted(data):
-    mod = PanelOLS(data.y, data.x, time_effects=True, weights=data.w)
+def test_panel_time_lsdv_weighted(large_data):
+    mod = PanelOLS(large_data.y, large_data.x, time_effects=True, weights=large_data.w)
     res = mod.fit(auto_df=False, count_effects=False, debiased=False)
 
     y = mod.dependent.dataframe
@@ -545,14 +549,14 @@ def test_panel_time_lsdv_weighted(data):
     res2 = ols_mod.fit(cov_type='robust')
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = data.vc1
+    clusters = large_data.vc1
     ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False,
                   debiased=False)
     res2 = ols_mod.fit(cov_type='clustered', clusters=ols_clusters.dataframe)
     assert_results_equal(res, res2, test_fit=False)
 
-    clusters = data.vc2
+    clusters = large_data.vc2
     ols_clusters = mod.reformat_clusters(clusters)
     res = mod.fit(cov_type='clustered', clusters=clusters, auto_df=False, count_effects=False,
                   debiased=False)
