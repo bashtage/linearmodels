@@ -40,7 +40,7 @@ class PanelFormulaParser(object):
 
     def __init__(self, formula, data, eval_env=2):
         self._formula = formula
-        self._data = PanelData(data)
+        self._data = PanelData(data, convert_dummies=False, copy=False)
         self._na_action = NAAction(on_NA='raise', NA_types=[])
         self._eval_env = eval_env
         self._dependent = self._exog = None
