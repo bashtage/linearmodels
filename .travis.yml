@@ -52,7 +52,7 @@ matrix:
     - STATAMODELS=0.9
 
 before_install:
-  - sudo apt-get install -y pandoc
+  - sudo apt-get install -y pandoc enchant
   - git fetch --tags
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
   - chmod +x miniconda3.sh
@@ -80,9 +80,12 @@ script:
   - set -e
   - |
     if [[ ${DOCBUILD} = true ]]; then
+      sudo apt-get install -y enchant
+      pip install sphinxcontrib-spelling
       cd doc
       make html
       make html
+      make spelling
       cd ..
       doctr deploy devel --build-tags
       if [[ -z ${TRAVIS_TAG} ]]; then

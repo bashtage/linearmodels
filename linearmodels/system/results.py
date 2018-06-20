@@ -237,7 +237,7 @@ class SystemResults(_CommonResults):
             If predictions are not required for one of more of the model equations,
             these keys can be omitted.
         data : DataFrame
-            Dataframe to use for out-of-sample predictions when model was
+            DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values

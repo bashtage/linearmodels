@@ -55,7 +55,7 @@ effects).
 
 Model specification is similar to `statsmodels <http://www.statsmodels.org/>`_.
 This example estimates a fixed effect regression on a panel of the wages of working
-men modeling teh log wage as a function of squared experience, a dummy if the
+men modeling the log wage as a function of squared experience, a dummy if the
 man is married and a dummy indicating if the man is a union member.
 
 .. code-block:: python

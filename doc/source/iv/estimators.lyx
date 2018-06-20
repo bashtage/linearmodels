@@ -1514,7 +1514,7 @@ Durbin and Wu-Haussman
 
 \begin_layout Standard
 \noindent
-Durbin's and the Wu-Hausmann tests of exogeneity test of exogeneity is depends
+Durbin's and the Wu-Hausman tests of exogeneity test of exogeneity is depends
  on the variance of the residuals when come endogenous variables are treated
  as exogenous against the case where they are treated as endogenous.
  Durbin's test statistic is
@@ -1531,7 +1531,7 @@ D= & \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}
 
 \begin_layout Standard
 \noindent
-and the Wu-Hausmann test statistic is
+and the Wu-Hausman test statistic is
 \end_layout
 
 \begin_layout Standard

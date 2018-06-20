@@ -27,10 +27,12 @@ def data(request):
     missing, datatype, const = request.param
     return generate_data(missing, datatype, const=const, ntk=(91, 7, 5), other_effects=2)
 
+
 @pytest.fixture(params=perms, ids=ids)
 def large_data(request):
     missing, datatype, const = request.param
     return generate_data(missing, datatype, const=const, ntk=(51, 30, 5), other_effects=2)
+
 
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
