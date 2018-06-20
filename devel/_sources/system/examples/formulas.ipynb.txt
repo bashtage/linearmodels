@@ -93,7 +93,7 @@
    "source": [
     "## Labeled Formulas\n",
     "\n",
-    "When using the curly brace formula specification, the equation names are determined by the dependent variable names.  When names are repeated as is the case in some datasets (e.g. a SUR on GDP of multiple countries) then the equation labels will be \"uglified\" until they are unique.  This can produce meaningless equation labels, and so it is possible to pass an equation label using the syntax\n",
+    "When using the curly brace formula specification, the equation names are determined by the dependent variable names.  When names are repeated as is the case in some datasets (e.g. a SUR on GDP of multiple countries) then the equation labels will be modified until they are unique.  This can produce meaningless equation labels, and so it is possible to pass an equation label using the syntax\n",
     "\n",
     "```\n",
     "{label : dep ~ exog}\n",
@@ -157,8 +157,8 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "### Pre-specified Residual Covariance\n",
-    "Like a standard SUR, it is possible to pass a pre-specified residual covariance for use in the GLS step.  This is done using the keyword argument `sigma` in the `from_formula` method, and is otherwise identical to passing one to the standard SUR."
+    "### Prespecified Residual Covariance\n",
+    "Like a standard SUR, it is possible to pass a prespecified residual covariance for use in the GLS step.  This is done using the keyword argument `sigma` in the `from_formula` method, and is otherwise identical to passing one to the standard SUR."
    ]
   }
  ],

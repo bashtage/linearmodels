@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimators &#8212; linearmodels 4.8+11.g0239039 documentation</title>
+    <title>System Regression Estimators &#8212; linearmodels 4.8+14.gf39ebfc documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8 (+11, g0239039)</a>
+    ../index.html" class="text-logo">linearmodels 4.8 (+14, gf39ebfc)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -144,7 +144,7 @@ values.  Each key is an equations label and must be a string. Each
 value must be either a tuple of the form (dependent,
 exog, [weights]) or a dictionary with keys ‘dependent’ and ‘exog’ and
 the optional key ‘weights’.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</li>
 </ul>
 </td>
@@ -289,7 +289,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 the dictionary represents a single equation. See Notes for a
 description of the accepted syntax</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
 not provided, FGLS is implemented based on an estimate of sigma.</li>
 <li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
@@ -473,7 +473,7 @@ can contain either an empty array or <cite>None</cite> to indicate that an
 equation contains no exogenous regressors. Similarly ‘endog’ and
 ‘instruments’ can either be omitted or may contain an empty array (or
 <cite>None</cite>) if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</li>
 </ul>
 </td>
@@ -618,7 +618,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 the dictionary represents a single equation. See Notes for a
 description of the accepted syntax</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
 not provided, FGLS is implemented based on an estimate of sigma.</li>
 <li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
@@ -681,7 +681,7 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
 <li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nengod array of endogenous regressors common to all models</li>
+<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
 <li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
 </ul>
 </td>
@@ -789,7 +789,7 @@ exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
 ‘exog’.  The dictionary may contain optional keys for ‘endog’,
 ‘instruments’, and ‘weights’. Endogenous and/or Instrument can be empty
 if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma. Only used
 if weight_type is ‘unadjusted’</li>
 <li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
@@ -993,7 +993,7 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
 <li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nengod array of endogenous regressors common to all models</li>
+<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
 <li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
 </ul>
 </td>
@@ -1118,7 +1118,7 @@ estimated model.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.8+11.g0239039 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.8+14.gf39ebfc documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.8 (+11, g0239039)</a>
+    ../../index.html" class="text-logo">linearmodels 4.8 (+14, gf39ebfc)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -359,8 +359,8 @@ use an OrderedDict which will preserve equation order in results. Keys
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 06 2018
-Time:                        22:51:31
+Date:                Wed, Jun 20 2018
+Time:                        12:03:34
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -422,8 +422,8 @@ equation with braces <code class="docutils literal notranslate"><span class="pre
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 06 2018
-Time:                        22:51:31
+Date:                Wed, Jun 20 2018
+Time:                        12:03:35
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -460,7 +460,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <p>When using the curly brace formula specification, the equation names are
 determined by the dependent variable names. When names are repeated as
 is the case in some datasets (e.g. a SUR on GDP of multiple countries)
-then the equation labels will be “uglified” until they are unique. This
+then the equation labels will be modified until they are unique. This
 can produce meaningless equation labels, and so it is possible to pass
 an equation label using the syntax</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">label</span> <span class="p">:</span> <span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span><span class="p">}</span>
@@ -529,35 +529,35 @@ from those in the standard GLS model.</p>
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.6198
+Estimator:                        GLS   Overall R-squared:              0.7451
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 06 2018
-Time:                        22:51:31
+Date:                Wed, Jun 20 2018
+Time:                        12:03:35
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0319     0.0116     2.7465     0.0060      0.0091      0.0547
-exper          0.0386     0.0185     2.0896     0.0367      0.0024      0.0749
-expersq       -0.0007     0.0005    -1.4949     0.1349     -0.0016      0.0002
-union          0.3445     0.1095     3.1469     0.0017      0.1299      0.5590
-south         -0.1265     0.1304    -0.9698     0.3321     -0.3821      0.1291
-nrtheast      -0.0723     0.1422    -0.5087     0.6110     -0.3510      0.2063
-nrthcen       -0.0708     0.1279    -0.5530     0.5802     -0.3215      0.1800
-male           0.1897     0.1034     1.8344     0.0666     -0.0130      0.3924
+educ           0.0424     0.0115     3.6819     0.0002      0.0198      0.0650
+exper          0.0287     0.0155     1.8533     0.0638     -0.0017      0.0590
+expersq       -0.0004     0.0004    -1.1726     0.2409     -0.0012      0.0003
+union          0.3797     0.1141     3.3287     0.0009      0.1561      0.6033
+south         -0.2105     0.1248    -1.6866     0.0917     -0.4551      0.0341
+nrtheast      -0.0511     0.1547    -0.3302     0.7413     -0.3543      0.2521
+nrthcen       -0.1517     0.1347    -1.1264     0.2600     -0.4156      0.1123
+male           0.1736     0.1027     1.6904     0.0909     -0.0277      0.3749
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.2589     0.0098     26.346     0.0000      0.2396      0.2782
-exper          0.1302     0.0166     7.8490     0.0000      0.0977      0.1627
-expersq       -0.0016     0.0004    -3.9607     0.0001     -0.0024     -0.0008
-nrtheast      -0.5053     0.1269    -3.9807     0.0001     -0.7541     -0.2565
-married        0.3365     0.1865     1.8048     0.0711     -0.0289      0.7020
-male           1.8968     0.1196     15.853     0.0000      1.6623      2.1313
+educ           0.5326     0.0417     12.757     0.0000      0.4508      0.6144
+exper         -0.4832     0.0950    -5.0870     0.0000     -0.6693     -0.2970
+expersq        0.0148     0.0025     5.9043     0.0000      0.0099      0.0197
+nrtheast      -1.3457     0.2287    -5.8828     0.0000     -1.7940     -0.8974
+married        0.9843     0.2345     4.1966     0.0000      0.5246      1.4440
+male           1.7873     0.1040     17.184     0.0000      1.5834      1.9912
 ==============================================================================
 
 Covariance Estimator:
@@ -565,9 +565,9 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
 </pre></div></div>
 </div>
 </div>
-<div class="section" id="Pre-specified-Residual-Covariance">
-<h3>Pre-specified Residual Covariance<a class="headerlink" href="#Pre-specified-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
-<p>Like a standard SUR, it is possible to pass a pre-specified residual
+<div class="section" id="Prespecified-Residual-Covariance">
+<h3>Prespecified Residual Covariance<a class="headerlink" href="#Prespecified-Residual-Covariance" title="Permalink to this headline">¶</a></h3>
+<p>Like a standard SUR, it is possible to pass a prespecified residual
 covariance for use in the GLS step. This is done using the keyword
 argument <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in the <code class="docutils literal notranslate"><span class="pre">from_formula</span></code> method, and is otherwise
 identical to passing one to the standard SUR.</p>
@@ -608,7 +608,7 @@ identical to passing one to the standard SUR.</p>
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

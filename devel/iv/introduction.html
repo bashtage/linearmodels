@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Introduction &#8212; linearmodels 4.8+11.g0239039 documentation</title>
+    <title>Introduction &#8212; linearmodels 4.8+14.gf39ebfc documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="index.html" title="Instrumental Variable Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8 (+11, g0239039)</a>
+    ../index.html" class="text-logo">linearmodels 4.8 (+14, gf39ebfc)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -240,7 +240,7 @@ if weighting matrices available:</p>
 <li>‘robust’ - Allows the GMM moment conditions to be heteroskedastic while
 assuming they are not correlated across observations. See
 <a class="reference internal" href="gmm.html#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="linearmodels.iv.gmm.HeteroskedasticWeightMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroskedasticWeightMatrix</span></code></a>.</li>
-<li>‘kernel’ - Allows for both heteroskedasticity and autocorrrelation in the
+<li>‘kernel’ - Allows for both heteroskedasticity and autocorrelation in the
 moment conditions. See <a class="reference internal" href="gmm.html#linearmodels.iv.gmm.KernelWeightMatrix" title="linearmodels.iv.gmm.KernelWeightMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelWeightMatrix</span></code></a>.</li>
 <li>‘cluster’ - Allows for a one- and two-way cluster structure where moment
 conditions within a cluster are correlated.
@@ -255,7 +255,7 @@ those for the corresponding covariance estimator.</p>
 </div>
 <div class="section" id="model-estimation-and-covariance-specification">
 <h2>Model Estimation and Covariance Specification<a class="headerlink" href="#model-estimation-and-covariance-specification" title="Permalink to this headline">¶</a></h2>
-<p>All models are estimated using teh <code class="docutils literal notranslate"><span class="pre">fit</span></code> method which provides an
+<p>All models are estimated using the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method which provides an
 opportunity to customize the parameter covariance estimator used to
 perform inference. Four classes of covariance estimators are available:</p>
 <ul>
@@ -266,7 +266,7 @@ perform inference. Four classes of covariance estimators are available:</p>
 while assuming they are not correlated across observations. See
 <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroskedasticCovariance</span></code></a>.</p>
 </li>
-<li><p class="first">‘kernel’ - Allows for both heteroskedasticity and autocorrrelation in the
+<li><p class="first">‘kernel’ - Allows for both heteroskedasticity and autocorrelation in the
 model scores. The estimator allows the <code class="docutils literal notranslate"><span class="pre">kernel</span></code> to be selected from</p>
 <ul class="simple">
 <li>‘bartlett’, ‘newey-west` - Triangular kernel utilized in the common
@@ -300,7 +300,7 @@ raised above 2, then an iterative method is used where multiple steps
 are used to estimate the model parameters.  If normalized model parameters
 change by less than <code class="docutils literal notranslate"><span class="pre">tol</span></code> across successive iterations, then the estimation
 is assumed to converge and the iterations are stopped.</p>
-<p>By default, the first-step uses teh average outer-product of the instruments
+<p>By default, the first-step uses the average outer-product of the instruments
 as the weighting matrix.  <code class="docutils literal notranslate"><span class="pre">initial_weight</span></code> allows a user-specified choice of
 weighting matrix to be used instead.</p>
 </div>
@@ -348,7 +348,7 @@ whether iterative output is printed during estimation.</p>
         <li class="right" >
           <a href="index.html" title="Instrumental Variable Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

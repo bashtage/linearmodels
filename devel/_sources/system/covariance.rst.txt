@@ -27,8 +27,8 @@ Heteroskedasticity-Autocorrelation (HAC) Robust Covariance Estimation
    :members:
    :inherited-members:
 
-Genralized Method of Moments (GMM)
-==================================
+Generalized Method of Moments (GMM)
+===================================
 
 GMM Homoskedastic Covariance Estimation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

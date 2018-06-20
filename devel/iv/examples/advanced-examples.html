@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Further Examples &#8212; linearmodels 4.8+11.g0239039 documentation</title>
+    <title>Further Examples &#8212; linearmodels 4.8+14.gf39ebfc documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.8 (+11, g0239039)</a>
+    ../../index.html" class="text-logo">linearmodels 4.8 (+14, gf39ebfc)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -438,7 +438,7 @@ max        9.250620      1.000000      1.000000     50.000000
 <p>And finally the simple correlation between the endogenous variable and
 the instruments. Instruments must be correlated to be relevant (but also
 must be exogenous, which can’t be examined using simple correlation).
-THe correlation of <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is especially low, which might lead to the
+The correlation of <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is especially low, which might lead to the
 weak instruments problem if used exclusively.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -570,8 +570,8 @@ leads to an <strong>increase</strong> in out-of-pocket drug expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Wed, Jun 06 2018   P-value (F-stat)                0.0000
-Time:                        22:50:50   Distribution:                  chi2(6)
+Date:                Wed, Jun 20 2018   P-value (F-stat)                0.0000
+Time:                        12:02:57   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -618,8 +618,8 @@ expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Wed, Jun 06 2018   P-value (F-stat)                0.0000
-Time:                        22:50:50   Distribution:                  chi2(6)
+Date:                Wed, Jun 20 2018   P-value (F-stat)                0.0000
+Time:                        12:02:58   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -692,7 +692,7 @@ weighting matrix is correctly specified). It is possible to iterate
 until convergence using the optional keyword input <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>, which
 is naturally 2 by default. Generally, GMM-CUE would be preferred to
 using multiple iterations of standard GMM.</p>
-<p>The default weighting matrix is robust to heteroskecasticity (but not
+<p>The default weighting matrix is robust to heteroskedasticity (but not
 clustering).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -751,8 +751,8 @@ output of the non-linear optimizer used to estimate the parameters.</p>
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 1.045365
          Iterations: 10
-         Function evaluations: 660
-         Gradient evaluations: 72
+         Function evaluations: 687
+         Gradient evaluations: 75
 </pre></div></div>
 </div>
 </div>
@@ -855,7 +855,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b3e7b9f7908
+WaldTestStatistic, id: 0x2aeacadf0400
 </pre></div>
 </div>
 </div>
@@ -882,7 +882,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x2b3e7bd1e160
+WaldTestStatistic, id: 0x2aeacafdcb70
 </pre></div>
 </div>
 </div>
@@ -912,7 +912,7 @@ not be correlated with the dependent variable.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-25.345410499779078
+25.345410499723005
 </pre></div></div>
 </div>
 <p>Wooldridge’s regression-based test of exogeneity is robust to
@@ -939,7 +939,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b3e7bf246a0
+WaldTestStatistic, id: 0x2aeacb150320
 </pre></div>
 </div>
 </div>
@@ -967,7 +967,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b3e7bf24630
+WaldTestStatistic, id: 0x2aeacb47d6a0
 </pre></div>
 </div>
 </div>
@@ -998,7 +998,7 @@ there is no evidence that against the null.</p>
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b3e7bbd97b8
+WaldTestStatistic, id: 0x2aeacadf0e48
 </pre></div>
 </div>
 </div>
@@ -1027,7 +1027,7 @@ endogenous.</p>
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x2b3e7c3fd198
+WaldTestStatistic, id: 0x2aeacb5d3a90
 </pre></div>
 </div>
 </div>
@@ -1037,7 +1037,7 @@ WaldTestStatistic, id: 0x2b3e7c3fd198
 <h2>Single Instrument Regressions<a class="headerlink" href="#Single-Instrument-Regressions" title="Permalink to this headline">¶</a></h2>
 <p>It can be useful to run the just identified regressions to see how the
 IV estimate varies by instrument. The OLS model is included for
-comparrison. The coefficient when using <code class="docutils literal notranslate"><span class="pre">lowincome</span></code> is very similar to
+comparison. The coefficient when using <code class="docutils literal notranslate"><span class="pre">lowincome</span></code> is very similar to
 the OLS as is the <span class="math notranslate nohighlight">\(R^2\)</span> which indicates this variable may be
 endogenous. The coefficient using <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is also very different, but
 this is probably due to the low correlation between <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> and the
@@ -1283,7 +1283,7 @@ T-stats reported in parentheses
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.0001153166806431
+1.0001153166806425
 </pre></div></div>
 </div>
 <div class="section" id="IV2SLS-as-OLS">
@@ -1357,7 +1357,7 @@ blhisp       -0.151307 -0.151307
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+11.g0239039 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+14.gf39ebfc documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
