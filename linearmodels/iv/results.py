@@ -130,7 +130,7 @@ class OLSResults(_SummaryStr):
         endog : array-like
             Endogenous values to use in out-of-sample prediction (nobs by nendog)
         data : DataFrame, optional
-            Dataframe to use for out-of-sample predictions when model was
+            DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values
@@ -612,7 +612,7 @@ class IVResults(_CommonIVResults):
         -----
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
-        onto the set of instruments in teh IV model.
+        onto the set of instruments in the IV model.
 
         Start by defining
 
@@ -667,7 +667,7 @@ class IVResults(_CommonIVResults):
         -----
         Test statistic is difference between sum of squared OLS and sum of
         squared IV residuals where each set of residuals has been projected
-        onto the set of instruments in teh IV model.
+        onto the set of instruments in the IV model.
 
         Start by defining
 

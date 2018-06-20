@@ -675,7 +675,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             Flag indicating to use continuously updating estimator
         steps : int, optional
             Number of steps to use when estimating parameters.  2 corresponds
-            to the standard efficient gmm estimator. Higher values will
+            to the standard efficient GMM estimator. Higher values will
             iterate until convergence or up to the number of steps given
         disp : int, optional
             Number of iterations between printed update. 0 or negative values

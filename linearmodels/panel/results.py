@@ -362,7 +362,7 @@ class PanelResults(_SummaryStr):
         exog : array-like
             Exogenous values to use in out-of-sample prediction (nobs by nexog)
         data : DataFrame, optional
-            Dataframe to use for out-of-sample predictions when model was
+            DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
         fitted : bool, optional
             Flag indicating whether to include the fitted values
@@ -466,7 +466,7 @@ class PanelResults(_SummaryStr):
            W = \hat{\beta}_{-}' \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}
 
         where :math:`\hat{\beta}_{-}` does not include the model constant and
-        :math:`\hat{\Sigma}_{-}` is tht estimated covariance of the
+        :math:`\hat{\Sigma}_{-}` is the estimated covariance of the
         parameters, also excluding the constant.  The test statistic is
         distributed as :math:`\chi^2_{k}` where k is the number of non-
         constant parameters.

@@ -438,7 +438,7 @@ where :math:`q=p-k_{2}`.
 
 **Durbin and Wu-Haussman**
 
-Durbin’s and the Wu-Hausmann tests of exogeneity test of exogeneity is
+Durbin’s and the Wu-Hausman tests of exogeneity test of exogeneity is
 depends on the variance of the residuals when come endogenous variables
 are treated as exogenous against the case where they are treated as
 endogenous. Durbin’s test statistic is
@@ -449,7 +449,7 @@ endogenous. Durbin’s test statistic is
    \delta= & \hat{\epsilon}'_{e}P_{[z,w]}\hat{\epsilon}_{e}-\hat{\epsilon}'_{c}P_{z}\hat{\epsilon}_{c}\\
    D= & \delta/(\hat{\epsilon}'_{e}\hat{\epsilon}_{e})/n\sim\chi_{q}^{2}\end{aligned}
 
-and the Wu-Hausmann test statistic is
+and the Wu-Hausman test statistic is
 
 .. math::
 

@@ -281,7 +281,7 @@ class IV3SLS(object):
         'instruments' can either be omitted or may contain an empty array (or
         `None`) if all variables in an equation are exogenous.
     sigma : array-like
-        Pre-specified residual covariance to use in GLS estimation. If not
+        Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
 
     Notes
@@ -833,7 +833,7 @@ class IV3SLS(object):
         exog : array-like, optional
             nobs by nexog array of exogenous regressors common to all models
         endog : array-like, optional
-            nobs by nengod array of endogenous regressors common to all models
+            nobs by nendog array of endogenous regressors common to all models
         instruments : array-like, optional
             nobs by ninstr array of instruments to use in all equations
 
@@ -876,7 +876,7 @@ class IV3SLS(object):
         data : DataFrame
             Frame containing named variables
         sigma : array-like
-            Pre-specified residual covariance to use in GLS estimation. If
+            Prespecified residual covariance to use in GLS estimation. If
             not provided, FGLS is implemented based on an estimate of sigma.
         weights : dict-like
             Dictionary like object (e.g. a DataFrame) containing variable
@@ -1177,7 +1177,7 @@ class SUR(IV3SLS):
         exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
         the optional key 'weights'.
     sigma : array-like
-        Pre-specified residual covariance to use in GLS estimation. If not
+        Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
 
     Notes
@@ -1317,7 +1317,7 @@ class SUR(IV3SLS):
         data : DataFrame
             Frame containing named variables
         sigma : array-like
-            Pre-specified residual covariance to use in GLS estimation. If
+            Prespecified residual covariance to use in GLS estimation. If
             not provided, FGLS is implemented based on an estimate of sigma.
         weights : dict-like
             Dictionary like object (e.g. a DataFrame) containing variable
@@ -1380,7 +1380,7 @@ class IVSystemGMM(IV3SLS):
         'instruments', and 'weights'. Endogenous and/or Instrument can be empty
         if all variables in an equation are exogenous.
     sigma : array-like
-        Pre-specified residual covariance to use in GLS estimation. If not
+        Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma. Only used
         if weight_type is 'unadjusted'
     weight_type : str

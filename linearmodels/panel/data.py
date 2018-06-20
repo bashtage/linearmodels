@@ -469,7 +469,8 @@ class PanelData(object):
         Notes
         -----
         If weights are provided, the values returned will be scaled by
-        sqrt(weights) so that they can be used in WLS estimation.
+        the square root of the weights so that they can be used in WLS
+        estimation.
         """
         if group not in ('entity', 'time', 'both'):
             raise ValueError
