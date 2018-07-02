@@ -203,7 +203,7 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
 <li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
 </ul>
 </td>
@@ -237,7 +237,7 @@ is provided.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
 section</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
@@ -304,7 +304,7 @@ valid Patsy formulas.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -384,9 +384,9 @@ resids if all weights are unity.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
+<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
 LIML estimator.</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
 produce LIML parameter estimate.</li>
 </ul>
 </td>
@@ -457,7 +457,7 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
 <li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
 </ul>
 </td>
@@ -491,13 +491,13 @@ is provided.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
 section</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
+<li><strong>fuller</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Fuller’s alpha to modify LIML estimator. Default returns unmodified
 LIML estimator.</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Parameter value for k-class estimation.  If not provided, computed to
 produce LIML parameter estimate.</li>
 </ul>
 </td>
@@ -562,7 +562,7 @@ valid Patsy formulas.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -642,7 +642,7 @@ resids if all weights are unity.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
 <li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
 function</li>
 </ul>
@@ -712,17 +712,17 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of iterations.  Default is 2, which produces
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of iterations.  Default is 2, which produces
 two-step efficient GMM estimates.  Larger values can be used
 to iterate between parameter estimation and optimal weight
 matrix estimation until convergence.</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Convergence criteria.  Measured as covariance normalized change in
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Convergence criteria.  Measured as covariance normalized change in
 parameters across iterations where the covariance estimator is
 based on the first step parameter estimates.</li>
 <li><strong>initial_weight</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Initial weighting matrix to use in the first step.  If not
 specified, uses the average outer-product of the set containing
 the exogenous variables and instruments.</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
 <li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
 </ul>
 </td>
@@ -765,11 +765,11 @@ autocorrelation</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
 section</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
 <li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
 function</li>
 </ul>
@@ -839,7 +839,7 @@ valid Patsy formulas.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -919,7 +919,7 @@ resids if all weights are unity.</p>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>instruments</strong> (<em>array-like</em>) – Instrumental variables (nobs by ninstr)</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
 <li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
 function</li>
 </ul>
@@ -960,7 +960,7 @@ through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta
 <li><strong>x</strong> (<em>ndarray</em>) – Regressor matrix (nobs by nvar)</li>
 <li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
-<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to display iterative optimizer output</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to display iterative optimizer output</li>
 </ul>
 </td>
 </tr>
@@ -992,8 +992,8 @@ samples.  Performs no error checking.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>starting</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Starting values to use in optimization.  If not provided, 2SLS
 estimates are used.</li>
-<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to display optimization output</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to display optimization output</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
 <li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
 </ul>
 </td>
@@ -1034,11 +1034,11 @@ is provided.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Patsy formula modified for the IV syntax described in the notes
 section</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – DataFrame containing the variables used in the formula</li>
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Observation weights used in estimation</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
 <li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
 function</li>
 </ul>
@@ -1102,7 +1102,7 @@ valid Patsy formulas.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>j</strong> – GMM objective function, also known as the J statistic</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
 </td>
 </tr>
 </tbody>
@@ -1140,7 +1140,7 @@ with the moment conditions, and so has explicit dependence on
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous regressors (nobs by nendog)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>

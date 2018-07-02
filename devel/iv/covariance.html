@@ -141,8 +141,8 @@
 <li><strong>y</strong> (<em>ndarray</em>) – Series modeled (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
 <li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
 </ul>
 </td>
 </tr>
@@ -199,8 +199,8 @@
 <li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
 <li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
 </ul>
 </td>
 </tr>
@@ -259,10 +259,10 @@
 <li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
 <li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
 <li><strong>clusters</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Cluster group assignment.  If not provided, uses clusters of 1.
 Either nobs by ncluster where ncluster is 1 or 2.</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
 </ul>
 </td>
 </tr>
@@ -324,7 +324,7 @@ of groups..</p>
 <li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
 <li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Kernel name. Supported kernels are:</p>
+<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Kernel name. Supported kernels are:</p>
 <ul>
 <li>’bartlett’, ‘newey-west’ - Triangular kernel</li>
 <li>’qs’, ‘quadratic-spectral’, ‘andrews’ - Quadratic spectral kernel</li>
@@ -333,8 +333,8 @@ of groups..</p>
 </li>
 <li><strong>bandwidth</strong> (<em>{int</em><em>, </em><em>None}</em>) – Non-negative bandwidth to use with kernel. If None, automatic
 bandwidth selection is used.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
+<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
 </ul>
 </td>
 </tr>
@@ -400,7 +400,7 @@ by n / (n-k).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum lag to used in kernel</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</td>
 </tr>
@@ -421,7 +421,7 @@ by n / (n-k).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum lag to used in kernel</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</td>
 </tr>
@@ -446,7 +446,7 @@ w_i &amp;  = 2(1-z_i)^3, z &gt; 0.5\end{split}\]</div>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>bw</strong> (<em>{int</em><em>, </em><em>float}</em>) – Maximum lag to used in kernel</li>
-<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Positive number of weight to return</li>
+<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Positive number of weight to return</li>
 </ul>
 </td>
 </tr>

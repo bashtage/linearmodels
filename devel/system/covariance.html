@@ -144,9 +144,9 @@
 <li><strong>x</strong> (<em>list of ndarray</em>) – List of regressor arrays (ndependent)</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</li>
 <li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
 </ul>
 </td>
@@ -196,9 +196,9 @@ not used, the covariance is estimated by</p>
 <li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
 </ul>
 </td>
 </tr>
@@ -250,10 +250,10 @@ residuals and the weighted X matrix <span class="math notranslate nohighlight">\
 <li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
 <li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
@@ -262,7 +262,7 @@ assume OLS was used</li>
 </ul>
 </div></blockquote>
 </li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
 bandwidth will be estimated.</li>
 </ul>
 </td>
@@ -425,7 +425,7 @@ equation in the system</li>
 <li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</li>
 <li><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</li>
 <li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
 <li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
@@ -434,7 +434,7 @@ equation in the system</li>
 </ul>
 </div></blockquote>
 </li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
 bandwidth will be estimated.</li>
 </ul>
 </td>

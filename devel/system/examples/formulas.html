@@ -359,8 +359,8 @@ use an OrderedDict which will preserve equation order in results. Keys
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 20 2018
-Time:                        12:03:34
+Date:                Mon, Jul 02 2018
+Time:                        20:29:40
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -422,8 +422,8 @@ equation with braces <code class="docutils literal notranslate"><span class="pre
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 20 2018
-Time:                        12:03:35
+Date:                Mon, Jul 02 2018
+Time:                        20:29:40
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -459,7 +459,7 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <h2>Labeled Formulas<a class="headerlink" href="#Labeled-Formulas" title="Permalink to this headline">¶</a></h2>
 <p>When using the curly brace formula specification, the equation names are
 determined by the dependent variable names. When names are repeated as
-is the case in some datasets (e.g. a SUR on GDP of multiple countries)
+is the case in some datasets (e.g.&nbsp;a SUR on GDP of multiple countries)
 then the equation labels will be modified until they are unique. This
 can produce meaningless equation labels, and so it is possible to pass
 an equation label using the syntax</p>
@@ -529,35 +529,35 @@ from those in the standard GLS model.</p>
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.7451
+Estimator:                        GLS   Overall R-squared:              0.6739
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Jun 20 2018
-Time:                        12:03:35
+Date:                Mon, Jul 02 2018
+Time:                        20:29:40
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0424     0.0115     3.6819     0.0002      0.0198      0.0650
-exper          0.0287     0.0155     1.8533     0.0638     -0.0017      0.0590
-expersq       -0.0004     0.0004    -1.1726     0.2409     -0.0012      0.0003
-union          0.3797     0.1141     3.3287     0.0009      0.1561      0.6033
-south         -0.2105     0.1248    -1.6866     0.0917     -0.4551      0.0341
-nrtheast      -0.0511     0.1547    -0.3302     0.7413     -0.3543      0.2521
-nrthcen       -0.1517     0.1347    -1.1264     0.2600     -0.4156      0.1123
-male           0.1736     0.1027     1.6904     0.0909     -0.0277      0.3749
+educ           0.0359     0.0121     2.9565     0.0031      0.0121      0.0596
+exper          0.0349     0.0190     1.8413     0.0656     -0.0023      0.0721
+expersq       -0.0006     0.0005    -1.2426     0.2140     -0.0015      0.0003
+union          0.3767     0.1059     3.5579     0.0004      0.1692      0.5842
+south         -0.2086     0.1272    -1.6395     0.1011     -0.4579      0.0408
+nrtheast      -0.1492     0.1473    -1.0126     0.3113     -0.4380      0.1396
+nrthcen       -0.2075     0.1344    -1.5440     0.1226     -0.4708      0.0559
+male           0.2576     0.0973     2.6465     0.0081      0.0668      0.4483
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.5326     0.0417     12.757     0.0000      0.4508      0.6144
-exper         -0.4832     0.0950    -5.0870     0.0000     -0.6693     -0.2970
-expersq        0.0148     0.0025     5.9043     0.0000      0.0099      0.0197
-nrtheast      -1.3457     0.2287    -5.8828     0.0000     -1.7940     -0.8974
-married        0.9843     0.2345     4.1966     0.0000      0.5246      1.4440
-male           1.7873     0.1040     17.184     0.0000      1.5834      1.9912
+educ           0.3197     0.0219     14.606     0.0000      0.2768      0.3626
+exper         -0.0286     0.0480    -0.5950     0.5518     -0.1228      0.0656
+expersq        0.0024     0.0012     1.9786     0.0479   2.269e-05      0.0048
+nrtheast      -0.3468     0.1704    -2.0350     0.0419     -0.6808     -0.0128
+married        0.5278     0.2049     2.5765     0.0100      0.1263      0.9294
+male           2.0337     0.1042     19.513     0.0000      1.8294      2.2380
 ==============================================================================
 
 Covariance Estimator:
