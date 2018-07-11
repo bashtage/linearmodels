@@ -175,6 +175,7 @@ class IVData(object):
         return np.any(self._pandas.isnull(), axis=1)
 
     def drop(self, locs):
+        locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
         self._labels[0] = list(pd.Series(self._labels[0]).loc[~locs])
