@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.results &#8212; linearmodels 4.8+17.gf1d0bb5 documentation</title>
+    <title>linearmodels.panel.results &#8212; linearmodels 4.8+18.gdd74013 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+17.gf1d0bb5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+18.gdd74013 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.8 (+17, gf1d0bb5)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.8 (+18, gdd74013)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -341,7 +341,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; Estimation Summary&#39;</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
@@ -702,7 +706,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">smry</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PanelEffectsResults</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span>
 
         <span class="n">is_invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_pooled</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
@@ -828,7 +837,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model comparison&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">smry</span> <span class="o">=</span> <span class="n">Summary</span><span class="p">()</span>
         <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Model Comparison&#39;</span>
@@ -916,7 +930,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+17.gf1d0bb5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+18.gdd74013 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

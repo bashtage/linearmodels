@@ -8,6 +8,7 @@ Since 4.8
 * Switched to retaining index column names when original input index is named
 * Modified tests that were not well conceived
 * Added spell check to documentation build
+* Improve docstring for ``summary`` properties
 
 Version 4.8
 ===========
