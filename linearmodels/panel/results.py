@@ -231,7 +231,11 @@ class PanelResults(_SummaryStr):
 
     @property
     def summary(self):
-        """Summary table of model estimation results"""
+        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+
+        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
+        ``summary.as_html()`` and ``summary.as_latex()``.
+        """
 
         title = self.name + ' Estimation Summary'
         mod = self.model
@@ -592,7 +596,12 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def summary(self):
-        """Summary table of model estimation results"""
+        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+
+        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
+        ``summary.as_html()`` and ``summary.as_latex()``.
+        """
+
         smry = super(PanelEffectsResults, self).summary
 
         is_invalid = np.isfinite(self.f_pooled.stat)
@@ -718,7 +727,12 @@ class PanelModelComparison(_ModelComparison):
 
     @property
     def summary(self):
-        """Summary table of model comparison"""
+        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+
+        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
+        ``summary.as_html()`` and ``summary.as_latex()``.
+        """
+
         smry = Summary()
         models = list(self._results.keys())
         title = 'Model Comparison'

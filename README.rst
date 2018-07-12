@@ -1,7 +1,8 @@
 Linear Models
 =============
 
-|Build Status| |codecov|
+`Build Status <https://travis-ci.org/bashtage/linearmodels>`__
+`codecov <https://codecov.io/gh/bashtage/linearmodels>`__
 
 Linear (regression) models for Python. Extends
 `statsmodels <http://www.statsmodels.org>`__ with Panel regression,
@@ -47,23 +48,23 @@ specified
 
 .. code:: python
 
-    import numpy as np
-    from statsmodels.datasets import grunfeld
-    data = grunfeld.load_pandas().data
-    data.year = data.year.astype(np.int64)
-    # MultiIndex, entity - time
-    data = data.set_index(['firm','year'])
-    from linearmodels import PanelOLS
-    mod = PanelOLS(data.invest, data[['value','capital']], entity_effect=True)
-    res = mod.fit(cov_type='clustered', cluster_entity=True)
+   import numpy as np
+   from statsmodels.datasets import grunfeld
+   data = grunfeld.load_pandas().data
+   data.year = data.year.astype(np.int64)
+   # MultiIndex, entity - time
+   data = data.set_index(['firm','year'])
+   from linearmodels import PanelOLS
+   mod = PanelOLS(data.invest, data[['value','capital']], entity_effects=True)
+   res = mod.fit(cov_type='clustered', cluster_entity=True)
 
 Models can also be specified using the formula interface.
 
 .. code:: python
 
-    from linearmodels import PanelOLS
-    mod = PanelOLS.from_formula('invest ~ value + capital + EntityEffect', data)
-    res = mod.fit(cov_type='clustered', cluster_entity=True)
+   from linearmodels import PanelOLS
+   mod = PanelOLS.from_formula('invest ~ value + capital + EntityEffects', data)
+   res = mod.fit(cov_type='clustered', cluster_entity=True)
 
 The formula interface for ``PanelOLS`` supports the special values
 ``EntityEffects`` and ``TimeEffects`` which add entity (fixed) and time
@@ -76,11 +77,11 @@ IV regression models can be similarly specified.
 
 .. code:: python
 
-    import numpy as np
-    from linearmodels.iv import IV2SLS
-    from linearmodels.datasets import mroz
-    data = mroz.load()
-    mod = IV2SLS.from_formula('np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ motheduc + fatheduc]', data)
+   import numpy as np
+   from linearmodels.iv import IV2SLS
+   from linearmodels.datasets import mroz
+   data = mroz.load()
+   mod = IV2SLS.from_formula('np.log(wage) ~ 1 + exper + exper ** 2 + [educ ~ motheduc + fatheduc]', data)
 
 The expressions in the ``[ ]`` indicate endogenous regressors (before
 ``~``) and the instruments.
@@ -92,15 +93,15 @@ The latest release can be installed using pip
 
 .. code:: bash
 
-    pip install linearmodels
+   pip install linearmodels
 
 The master branch can be installed by cloning the repo and running setup
 
 .. code:: bash
 
-    git clone https://github.com/bashtage/linearmodels
-    cd linearmodels
-    python setup.py install
+   git clone https://github.com/bashtage/linearmodels
+   cd linearmodels
+   python setup.py install
 
 Documentation
 -------------
@@ -148,18 +149,15 @@ Testing
 
 -  py.test
 
+.. _documentation-1:
+
 Documentation
 ~~~~~~~~~~~~~
 
 -  sphinx
--  guzzle\_sphinx\_theme
+-  guzzle_sphinx_theme
 -  nbsphinx
 -  nbconvert
 -  nbformat
 -  ipython
 -  jupyter
-
-.. |Build Status| image:: https://travis-ci.org/bashtage/linearmodels.svg?branch=master
-   :target: https://travis-ci.org/bashtage/linearmodels
-.. |codecov| image:: https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/bashtage/linearmodels

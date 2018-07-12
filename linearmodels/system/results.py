@@ -315,7 +315,12 @@ class SystemResults(_CommonResults):
 
     @property
     def summary(self):
-        """Model summary"""
+        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+
+        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
+        ``summary.as_html()`` and ``summary.as_latex()``.
+        """
+
         title = 'System ' + self._method + ' Estimation Summary'
 
         top_left = [('Estimator:', self._method),
@@ -418,7 +423,12 @@ class SystemEquationResult(_CommonResults):
 
     @property
     def summary(self):
-        """Equation summary"""
+        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+
+        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
+        ``summary.as_html()`` and ``summary.as_latex()``.
+        """
+
         title = self._method + ' Estimation Summary'
 
         top_left = [('Eq. Label:', self.equation_label),
