@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.8+18.gdd74013 documentation</title>
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.8+19.g994a141 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+18.gdd74013 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+19.g994a141 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.8 (+18, gdd74013)</a>
+    ../../index.html" class="text-logo">linearmodels 4.8 (+19, g994a141)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -307,7 +307,7 @@ not the other.</p>
 <div class="section" id="Data">
 <h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
 <p>The data set is the MORZ data set from Wooldridge (2002).</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -317,6 +317,17 @@ not the other.</p>
 <span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88
+  return f(*args, **kwds)
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88
+  return f(*args, **kwds)
+</pre></div></div>
 </div>
 <p>Here the relevant variables are selected and missing observations are
 dropped to avoid warnings.</p>
@@ -377,8 +388,8 @@ The syntax is the same as in the 2SLS models.</p>
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Thu, Jul 12 2018   P-value (F-stat)                0.0000
-Time:                        11:42:47   Distribution:                  chi2(5)
+Date:                Tue, Jul 31 2018   P-value (F-stat)                0.0000
+Time:                        09:45:28   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -423,8 +434,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Thu, Jul 12 2018   P-value (F-stat)                0.0000
-Time:                        11:42:47   Distribution:                  chi2(4)
+Date:                Tue, Jul 31 2018   P-value (F-stat)                0.0000
+Time:                        09:45:28   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -472,8 +483,8 @@ that are identical to separate equations.</p>
 Estimator:                        OLS   Overall R-squared:              0.1903
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Thu, Jul 12 2018
-Time:                        11:42:47
+Date:                Tue, Jul 31 2018
+Time:                        09:45:28
 
 
                   Equation: hours, Dependent Variable: hours
@@ -535,8 +546,8 @@ changes. This is due to the structure of the problem.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Thu, Jul 12 2018
-Time:                        11:42:47
+Date:                Tue, Jul 31 2018
+Time:                        09:45:28
 
 
                   Equation: hours, Dependent Variable: hours
@@ -618,8 +629,8 @@ programmatically generating and estimating models.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Thu, Jul 12 2018
-Time:                        11:42:47
+Date:                Tue, Jul 31 2018
+Time:                        09:45:28
 
 
                   Equation: hours, Dependent Variable: hours
@@ -698,8 +709,8 @@ only use the formula interface. The default uses 2-step (efficient) GMM.</p>
 Estimator:          2-Step System GMM   Overall R-squared:              0.0121
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Thu, Jul 12 2018
-Time:                        11:42:47
+Date:                Tue, Jul 31 2018
+Time:                        09:45:29
 
 
                   Equation: hours, Dependent Variable: hours
@@ -764,8 +775,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
 No. Equations.:                       2   Cov. Estimator:                 robust
 No. Observations:                   428   Num. Constraints:                 None
-Date:                  Thu, Jul 12 2018
-Time:                          11:42:47
+Date:                  Tue, Jul 31 2018
+Time:                          09:45:29
 
 
                   Equation: hours, Dependent Variable: hours
@@ -838,7 +849,7 @@ Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+18.gdd74013 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+19.g994a141 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>
