@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.covariance &#8212; linearmodels 4.8+19.g994a141 documentation</title>
+    <title>linearmodels.iv.covariance &#8212; linearmodels 4.8+20.ga20057f documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+19.g994a141 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+20.ga20057f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.8 (+19, g994a141)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.8 (+20, ga20057f)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -112,7 +112,7 @@
 <span class="sd">Covariance estimation for 2SLS and LIML IV estimators</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="n">arange</span><span class="p">,</span> <span class="n">argsort</span><span class="p">,</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">int64</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span>
-                   <span class="n">r_</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="nb">sum</span><span class="p">,</span> <span class="n">unique</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
+                   <span class="n">r_</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="nb">sum</span> <span class="k">as</span> <span class="n">npsum</span><span class="p">,</span> <span class="n">unique</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
 
 <span class="n">CLUSTER_ERR</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -331,7 +331,7 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
         <span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">t</span>
     <span class="n">s0</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">sq</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*</span> <span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">sq</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">npsum</span><span class="p">(</span><span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*</span> <span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_star</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span>
     <span class="n">rate</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">((</span><span class="n">sq</span> <span class="o">/</span> <span class="n">s0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="n">rate</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">t</span> <span class="o">**</span> <span class="n">rate</span>
@@ -424,7 +424,7 @@
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Score covariance estimate&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
-        <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">s2</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
         <span class="n">pinvz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
         <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinvz</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
@@ -458,7 +458,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimated variance of residuals. Small-sample adjusted if debiased.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nobs</span><span class="p">,</span> <span class="n">nvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="n">eps</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">nobs</span>
@@ -789,7 +789,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+19.g994a141 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8+20.ga20057f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
