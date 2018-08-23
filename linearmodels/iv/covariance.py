@@ -2,7 +2,7 @@
 Covariance estimation for 2SLS and LIML IV estimators
 """
 from numpy import (arange, argsort, asarray, ceil, cos, empty, int64, ones, pi,
-                   r_, sin, sum, unique, where, zeros)
+                   r_, sin, sum as npsum, unique, where, zeros)
 from numpy.linalg import inv, pinv
 
 CLUSTER_ERR = """
@@ -221,7 +221,7 @@ def kernel_optimal_bandwidth(x, kernel='bartlett'):
     for i in range(1, m_star + 1):
         sigma[i] = x[i:].T @ x[:-i] / t
     s0 = sigma[0] + 2 * sigma[1:].sum()
-    sq = 2 * sum(sigma[1:] * arange(1, m_star + 1) ** q)
+    sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
     rate = 1 / (2 * q + 1)
     gamma = c * ((sq / s0) ** 2) ** rate
     m = gamma * t ** rate
@@ -314,7 +314,7 @@ class HomoskedasticCovariance(object):
     def s(self):
         """Score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
         s2 = eps.T @ eps / nobs
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
@@ -348,7 +348,7 @@ class HomoskedasticCovariance(object):
         """
         Estimated variance of residuals. Small-sample adjusted if debiased.
         """
-        nobs, nvar = self.x.shape
+        nobs = self.x.shape[0]
         eps = self.eps
 
         return self._scale * eps.T @ eps / nobs

@@ -18,7 +18,7 @@ from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, _Mode
 
 
 def stub_concat(lists, sep='='):
-    col_size = max([max(map(lambda s: len(s), l)) for l in lists])
+    col_size = max([max(map(len, l)) for l in lists])
     out = []
     for l in lists:
         out.extend(l)
@@ -29,7 +29,7 @@ def stub_concat(lists, sep='='):
 def table_concat(lists, sep='='):
     col_sizes = []
     for l in lists:
-        size = list(map(lambda r: list(map(lambda v: len(v), r)), l))
+        size = list(map(lambda r: list(map(len, r)), l))
         col_sizes.append(list(array(size).max(0)))
     col_size = array(col_sizes).max(axis=0)
     sep_cols = [sep * (cs + 2) for cs in col_size]
@@ -644,7 +644,7 @@ class IVResults(_CommonIVResults):
         if variables is not None:
             null = 'Variables {0} are exogenous'.format(', '.join(variables))
 
-        e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(variables)
+        e0, e1, e2, nobs, _, _, ntested = self._endogeneity_setup(variables)
         stat = e1.T @ e1 - e2.T @ e2
         stat /= (e0.T @ e0) / nobs
 
@@ -1322,7 +1322,7 @@ class IVModelComparison(_ModelComparison):
         for key in self._results:
             res = self._results[key]
             all_instr.append(res.model.instruments.cols)
-        ninstr = max(map(lambda l: len(l), all_instr))
+        ninstr = max(map(len, all_instr))
         instruments = []
         instrument_stub = ['Instruments']
         for i in range(ninstr):

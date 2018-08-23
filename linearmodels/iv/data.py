@@ -85,9 +85,7 @@ class IVData(object):
             all_numeric = True
             for col in x:
                 c = x[col]
-                if is_string_dtype(c.dtype) and \
-                        c.map(lambda v: is_string_like(v)).all():
-
+                if is_string_dtype(c.dtype) and c.map(is_string_like).all():
                     c = c.astype('category')
                     if not copied:
                         x = x.copy()

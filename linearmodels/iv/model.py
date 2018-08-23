@@ -492,7 +492,7 @@ class IVLIML(object):
         return wald
 
     def _post_estimation(self, params, cov_estimator, cov_type):
-        vars = self._columns
+        columns = self._columns
         index = self._index
         eps = self.resids(params)
         y = self.dependent.pandas
@@ -512,17 +512,17 @@ class IVLIML(object):
         r2 = 1 - residual_ss / total_ss
 
         fstat = self._f_statistic(params, cov, debiased)
-        out = {'params': Series(params.squeeze(), vars, name='parameter'),
+        out = {'params': Series(params.squeeze(), columns, name='parameter'),
                'eps': Series(eps.squeeze(), index=index, name='residual'),
                'weps': Series(weps.squeeze(), index=index, name='weighted residual'),
-               'cov': DataFrame(cov, columns=vars, index=vars),
+               'cov': DataFrame(cov, columns=columns, index=columns),
                's2': float(cov_estimator.s2),
                'debiased': debiased,
                'residual_ss': float(residual_ss),
                'total_ss': float(total_ss),
                'r2': float(r2),
                'fstat': fstat,
-               'vars': vars,
+               'vars': columns,
                'instruments': self._instr_columns,
                'cov_config': cov_estimator.config,
                'cov_type': cov_type,

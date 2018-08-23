@@ -779,7 +779,7 @@ class PanelModelComparison(_ModelComparison):
             effects = getattr(res, 'included_effects', [])
             all_effects.append(effects)
 
-        neffect = max(map(lambda l: len(l), all_effects))
+        neffect = max(map(len, all_effects))
         effects = []
         effects_stub = ['Effects']
         for i in range(neffect):

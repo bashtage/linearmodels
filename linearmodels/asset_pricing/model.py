@@ -553,7 +553,7 @@ class LinearFactorModel(TradedFactorModel):
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
-        nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
+        nobs, nf, nport, _, s1, s2, s3 = self._boundaries()
         fc = np.c_[np.ones((nobs, 1)), f]
         f_rep = np.tile(fc, (1, nport))
         eps_rep = np.tile(eps, (nf + 1, 1))

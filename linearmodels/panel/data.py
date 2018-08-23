@@ -79,7 +79,7 @@ class _Panel(object):
 
 
 def convert_columns(s, drop_first):
-    if is_string_dtype(s.dtype) and s.map(lambda v: is_string_like(v)).all():
+    if is_string_dtype(s.dtype) and s.map(is_string_like).all():
         s = s.astype('category')
 
     if is_categorical(s):

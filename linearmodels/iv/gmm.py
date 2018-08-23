@@ -410,7 +410,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     @property
     def cov(self):
         x, z, eps, w = self.x, self.z, self.eps, self.w
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
         xpz = x.T @ z / nobs
         xpzw = xpz @ w
         xpzwzpx_inv = inv(xpzw @ xpz.T)

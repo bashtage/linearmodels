@@ -167,7 +167,7 @@ class SystemFormulaParser(object):
         else:
             formula = formula.replace('\n', ' ').strip()
             parts = formula.split('}')
-            for i, part in enumerate(parts):
+            for part in parts:
                 base_key = None
                 part = part.strip()
                 if part == '':
@@ -506,7 +506,7 @@ class IV3SLS(object):
                 raise ValueError('Equation {eq} instrument array is full '
                                  'rank'.format(eq=label))
 
-        for lhs, rhs, label in zip(self._y, self._x, self._eq_labels):
+        for rhs in self._x:
             const, const_loc = has_constant(rhs)
             constant.append(const)
             constant_loc.append(const_loc)

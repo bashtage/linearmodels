@@ -227,11 +227,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def _adjustment(self):
         if not self._debiased:
             return 1.0
-        k = list(map(lambda s: s.shape[1], self._x))
+        ks = list(map(lambda s: s.shape[1], self._x))
         nobs = self._x[0].shape[0]
         adj = []
-        for i in range(len(k)):
-            adj.append(nobs / (nobs - k[i]) * ones((k[i], 1)))
+        for k in ks:
+            adj.append(nobs / (nobs - k) * ones((k, 1)))
         adj = vstack(adj)
         adj = sqrt(adj)
         return adj @ adj.T
