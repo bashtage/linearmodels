@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Methods &#8212; linearmodels 4.8+21.g528d7b9 documentation</title>
+    <title>Estimation Methods &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+21.g528d7b9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8 (+21, g528d7b9)</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -130,7 +130,7 @@
 <span id="estimation-methods"></span><span id="iv-module-reference-models"></span><h1>Estimation Methods<a class="headerlink" href="#module-linearmodels.iv.model" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.iv.model.IV2SLS">
-<em class="property">class </em><code class="descname">IV2SLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">IV2SLS</code><span class="sig-paren">(</span><em>dependent: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series], exog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], endog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], instruments: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], *, weights: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using two-stage least squares</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -372,7 +372,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVLIML">
-<em class="property">class </em><code class="descname">IVLIML</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">IVLIML</code><span class="sig-paren">(</span><em>dependent: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series], exog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], endog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], instruments: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], *, weights: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None] = None, fuller: Union[int, float] = 0, kappa: Union[int, float, None] = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Limited information ML and k-class estimation of IV models</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -630,7 +630,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVGMM">
-<em class="property">class </em><code class="descname">IVGMM</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">IVGMM</code><span class="sig-paren">(</span><em>dependent: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series], exog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], endog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], instruments: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], *, weights: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None] = None, weight_type: str = 'robust', **weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using the generalized method of moments (GMM)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -907,7 +907,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVGMMCUE">
-<em class="property">class </em><code class="descname">IVGMMCUE</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">IVGMMCUE</code><span class="sig-paren">(</span><em>dependent: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series], exog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], endog: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], instruments: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None], *, weights: Union[numpy.ndarray, xarray.core.dataarray.DataArray, pandas.core.frame.DataFrame, pandas.core.series.Series, None] = None, weight_type: str = 'robust', **weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using continuously updating GMM</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -950,7 +950,7 @@ through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta
 </div>
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.estimate_parameters">
-<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>starting</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>display=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>starting</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>display=False</em>, <em>opt_options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -961,6 +961,8 @@ through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta
 <li><strong>y</strong> (<em>ndarray</em>) – Regressand matrix (nobs by 1)</li>
 <li><strong>z</strong> (<em>ndarray</em>) – Instrument matrix (nobs by ninstr)</li>
 <li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to display iterative optimizer output</li>
+<li><strong>opt_options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary containing additional keyword arguments to pass to
+scipy.optimize.minimize.</li>
 </ul>
 </td>
 </tr>
@@ -983,7 +985,7 @@ samples.  Performs no error checking.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>starting=None</em>, <em>display=False</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>starting=None</em>, <em>display=False</em>, <em>cov_type='robust'</em>, <em>opt_options=None</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -994,6 +996,9 @@ samples.  Performs no error checking.</p>
 estimates are used.</li>
 <li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to display optimization output</li>
 <li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator to use</li>
+<li><strong>opt_options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional options to pass to scipy.optimize.minimize when
+optimizing the objective function. If not provided, defers to
+scipy to choose an appropriate optimizer.</li>
 <li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator</li>
 </ul>
 </td>
@@ -1012,12 +1017,6 @@ The see the docstring of specific covariance estimator for a list of
 supported options. Defaults are used if no covariance configuration
 is provided.</p>
 <p>Starting values are computed by IVGMM.</p>
-<div class="admonition-todo admonition" id="index-3">
-<p class="first admonition-title">Todo</p>
-<ul class="last simple">
-<li>Expose method to pass optimization options</li>
-</ul>
-</div>
 </dd></dl>
 
 <dl class="attribute">
@@ -1241,7 +1240,7 @@ resids if all weights are unity.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8+21.g528d7b9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

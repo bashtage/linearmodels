@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.8+21.g528d7b9 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+21.g528d7b9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.8 (+21, g528d7b9)</a>
+    ../../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -304,7 +304,7 @@ Simple Estimator for Simultaneous Models with Censored Endogenous
 Regressors” which appears in Wooldridge (2002). The model consists of
 two equations, one for hourly wage and the other for hourly benefits.
 The initial model uses the same regressors in both equations.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
@@ -316,17 +316,6 @@ The initial model uses the same regressors in both equations.</p>
 <span class="n">data</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="stderr output_area docutils container">
-<div class="highlight"><pre>
-/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88
-  return f(*args, **kwds)
-/home/travis/miniconda3/envs/linearmodels-test/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88
-  return f(*args, **kwds)
-</pre></div></div>
 </div>
 <div class="section" id="Dictionary">
 <h2>Dictionary<a class="headerlink" href="#Dictionary" title="Permalink to this headline">¶</a></h2>
@@ -370,8 +359,8 @@ use an OrderedDict which will preserve equation order in results. Keys
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Thu, Aug 23 2018
-Time:                        17:06:17
+Date:                Wed, Aug 29 2018
+Time:                        15:32:09
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -433,8 +422,8 @@ equation with braces <code class="docutils literal notranslate"><span class="pre
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Thu, Aug 23 2018
-Time:                        17:06:17
+Date:                Wed, Aug 29 2018
+Time:                        15:32:09
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -540,35 +529,35 @@ from those in the standard GLS model.</p>
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.7842
+Estimator:                        GLS   Overall R-squared:              0.6913
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Thu, Aug 23 2018
-Time:                        17:06:17
+Date:                Wed, Aug 29 2018
+Time:                        15:32:09
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0434     0.0116     3.7287     0.0002      0.0206      0.0662
-exper          0.0257     0.0173     1.4827     0.1381     -0.0083      0.0596
-expersq       -0.0004     0.0004    -0.9460     0.3442     -0.0012      0.0004
-union          0.3690     0.1136     3.2498     0.0012      0.1465      0.5916
-south         -0.2425     0.1136    -2.1344     0.0328     -0.4652     -0.0198
-nrtheast      -0.1503     0.1427    -1.0532     0.2923     -0.4299      0.1294
-nrthcen       -0.1509     0.1285    -1.1746     0.2402     -0.4026      0.1009
-male           0.2431     0.1079     2.2540     0.0242      0.0317      0.4546
+educ           0.0377     0.0106     3.5662     0.0004      0.0170      0.0585
+exper          0.0299     0.0161     1.8611     0.0627     -0.0016      0.0615
+expersq       -0.0005     0.0004    -1.3474     0.1778     -0.0013      0.0002
+union          0.3781     0.1052     3.5928     0.0003      0.1718      0.5843
+south         -0.1832     0.1227    -1.4931     0.1354     -0.4236      0.0573
+nrtheast      -0.1487     0.1483    -1.0030     0.3158     -0.4394      0.1419
+nrthcen       -0.1044     0.1294    -0.8068     0.4198     -0.3580      0.1492
+male           0.2778     0.0963     2.8858     0.0039      0.0891      0.4664
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.5804     0.0382     15.181     0.0000      0.5055      0.6554
-exper         -0.5851     0.0891    -6.5651     0.0000     -0.7598     -0.4105
-expersq        0.0169     0.0023     7.4030     0.0000      0.0124      0.0214
-nrtheast      -1.4640     0.2023    -7.2366     0.0000     -1.8605     -1.0675
-married        1.3160     0.2418     5.4425     0.0000      0.8421      1.7899
-male           1.9286     0.1279     15.080     0.0000      1.6780      2.1793
+educ           0.3293     0.0217     15.174     0.0000      0.2867      0.3718
+exper          0.0113     0.0461     0.2463     0.8054     -0.0789      0.1016
+expersq        0.0016     0.0012     1.3690     0.1710     -0.0007      0.0040
+nrtheast      -0.6969     0.1932    -3.6080     0.0003     -1.0755     -0.3183
+married        0.2665     0.1887     1.4119     0.1580     -0.1034      0.6364
+male           1.8116     0.1142     15.871     0.0000      1.5879      2.0354
 ==============================================================================
 
 Covariance Estimator:
@@ -619,7 +608,7 @@ identical to passing one to the standard SUR.</p>
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.8+21.g528d7b9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>
