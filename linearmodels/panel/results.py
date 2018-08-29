@@ -1,7 +1,6 @@
 import datetime as dt
 
 import numpy as np
-from numpy import diag, sqrt
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
@@ -67,7 +66,7 @@ class PanelResults(_SummaryStr):
     @property
     def std_errors(self):
         """Estimated parameter standard errors"""
-        return Series(sqrt(diag(self.cov)), self._var_names, name='std_error')
+        return Series(np.sqrt(np.diag(self.cov)), self._var_names, name='std_error')
 
     @property
     def tstats(self):

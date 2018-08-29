@@ -47,6 +47,10 @@ System Estimation
 =================
 * Seemingly Unrelated Regression (SUR) Estimator - :class:`linearmodels.system.model.SUR`
 
+  - Multivariate OLS is supported as a special case of SUR.  This method does
+    not perform well on large datasets and should be improved by a special
+    purpose implementation.
+
 Instrumental Variable Estimators
 ********************************
 * Three-stage Least Squares (3SLS) Estimator - :class:`linearmodels.system.model.IV3SLS`

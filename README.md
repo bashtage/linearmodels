@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels)
 [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c771bce50a164b6fa71c344b374f140d)](https://www.codacy.com/app/bashtage/linearmodels?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bashtage/linearmodels&amp;utm_campaign=Badge_Grade)
+[![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-master)
 
 Linear (regression) models for Python.  Extends
 [statsmodels](http://www.statsmodels.org) with Panel regression,
