@@ -14,10 +14,10 @@ def concat(*args, **kwargs):
     if PD_LT_023 and 'sort' in kwargs:
         kwargs = kwargs.copy()
         del kwargs['sort']
-    else:
+    elif not PD_LT_023:
         if 'sort' not in kwargs:
             kwargs = kwargs.copy()
-            kwargs['sort'] = True
+            kwargs['sort'] = False
 
     return pd.concat(*args, **kwargs)
 

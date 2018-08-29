@@ -1,8 +1,7 @@
 Linear Models
 =============
 
-`Build Status <https://travis-ci.org/bashtage/linearmodels>`__
-`codecov <https://codecov.io/gh/bashtage/linearmodels>`__
+|Build Status| |codecov| |Codacy Badge| |codebeat badge|
 
 Linear (regression) models for Python. Extends
 `statsmodels <http://www.statsmodels.org>`__ with Panel regression,
@@ -161,3 +160,12 @@ Documentation
 -  nbformat
 -  ipython
 -  jupyter
+
+.. |Build Status| image:: https://travis-ci.org/bashtage/linearmodels.svg?branch=master
+   :target: https://travis-ci.org/bashtage/linearmodels
+.. |codecov| image:: https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/bashtage/linearmodels
+.. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/c771bce50a164b6fa71c344b374f140d
+   :target: https://www.codacy.com/app/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade
+.. |codebeat badge| image:: https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243
+   :target: https://codebeat.co/projects/github-com-bashtage-linearmodels-master

@@ -439,7 +439,7 @@ class _ModelComparison(_SummaryStr):
     def _get_series_property(self, name):
         out = ([(k, getattr(v, name)) for k, v in self._results.items()])
         cols = [v[0] for v in out]
-        values = concat([v[1] for v in out], 1, sort=True)
+        values = concat([v[1] for v in out], 1)
         values.columns = cols
         return values
 
