@@ -1,11 +1,11 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
+from pandas import DataFrame
+from pandas.testing import assert_frame_equal, assert_series_equal
 
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.system.model import IV3SLS
 from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls, \
     generate_3sls_data_v2
@@ -183,11 +183,11 @@ def test_multivariate_iv():
     n = 250
     dep = np.random.standard_normal((n, 2))
     exog = np.random.standard_normal((n, 3))
-    exog = pd.DataFrame(exog, columns=['exog.{0}'.format(i) for i in range(3)])
+    exog = DataFrame(exog, columns=['exog.{0}'.format(i) for i in range(3)])
     endog = np.random.standard_normal((n, 2))
-    endog = pd.DataFrame(endog, columns=['endog.{0}'.format(i) for i in range(2)])
+    endog = DataFrame(endog, columns=['endog.{0}'.format(i) for i in range(2)])
     instr = np.random.standard_normal((n, 3))
-    instr = pd.DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
     eqns = {}
     for i in range(2):
         eqns['dependent.{0}'.format(i)] = (dep[:, i], exog, endog, instr)
@@ -204,7 +204,7 @@ def test_multivariate_iv_bad_data():
     n = 250
     dep = np.random.standard_normal((n, 2))
     instr = np.random.standard_normal((n, 3))
-    instr = pd.DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
 
     with pytest.raises(ValueError):
         IV3SLS.multivariate_ls(dep, None, None, instr)
@@ -224,8 +224,8 @@ def test_fitted(data):
         expected.append(direct[:, None])
         assert_allclose(eq.fitted_values, direct, atol=1e-8)
     expected = np.concatenate(expected, 1)
-    expected = pd.DataFrame(expected, index=mod._dependent[i].pandas.index,
-                            columns=[key for key in res.equations])
+    expected = DataFrame(expected, index=mod._dependent[i].pandas.index,
+                         columns=[key for key in res.equations])
     assert_frame_equal(expected, res.fitted_values)
 
 

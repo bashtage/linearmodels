@@ -3,8 +3,8 @@ from itertools import product
 
 import pytest
 import statsmodels.api as sm
+from pandas.testing import assert_series_equal
 
-from linearmodels.compat.pandas import assert_series_equal
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData

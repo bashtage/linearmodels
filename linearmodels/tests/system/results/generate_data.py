@@ -9,6 +9,7 @@ Important cases
 import numpy as np
 import pandas as pd
 
+from linearmodels.compat.pandas import concat
 from linearmodels.tests.system._utility import generate_data
 
 basic_data = generate_data(n=200, k=3, p=[2, 3, 4], const=True, seed=0)
@@ -45,5 +46,5 @@ for i, dataset in enumerate((basic_data, common_data, missing_data)):
             out.extend([dep])
 
 if __name__ == '__main__':
-    df = pd.concat(out, 1)
+    df = concat(out, 1)
     df.to_stata('simulated-sur.dta')

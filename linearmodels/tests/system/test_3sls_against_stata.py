@@ -1,7 +1,7 @@
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
+from linearmodels.compat.pandas import concat
 from linearmodels.system import IV3SLS, SUR
 from linearmodels.tests.system._utility import generate_simultaneous_data
 from linearmodels.tests.system.results.parse_stata_3sls_results import results
@@ -15,7 +15,7 @@ def fit(request):
         mod = SUR
         for key in data:
             temp = data[key]
-            temp['exog'] = pd.concat([temp['exog'], temp['endog']], 1)
+            temp['exog'] = concat([temp['exog'], temp['endog']], 1)
             del temp['endog']
             del temp['instruments']
     else:

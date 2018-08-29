@@ -8,7 +8,7 @@ import pandas as pd
 
 from linearmodels.compat.pandas import (is_categorical, is_categorical_dtype,
                                         is_numeric_dtype, is_string_dtype,
-                                        is_string_like)
+                                        is_string_like, concat)
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are supported'
@@ -25,7 +25,7 @@ def convert_columns(s, drop_first):
 def expand_categoricals(x, drop_first):
     if x.shape[1] == 0:
         return x
-    return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
 class IVData(object):

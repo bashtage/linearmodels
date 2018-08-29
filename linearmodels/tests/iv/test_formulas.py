@@ -1,9 +1,10 @@
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose, assert_equal
+from pandas import DataFrame, Categorical
+from pandas.testing import assert_frame_equal
 
-from linearmodels.compat.pandas import assert_frame_equal
+from linearmodels.compat.pandas import concat
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
@@ -49,7 +50,7 @@ def data():
     y = x @ params + e
     cols = ['y'] + ['x' + str(i) for i in range(1, 6)]
     cols += ['z' + str(i) for i in range(1, 4)]
-    data = pd.DataFrame(np.c_[y, x, z], columns=cols)
+    data = DataFrame(np.c_[y, x, z], columns=cols)
     data['Intercept'] = 1.0
     data['weights'] = np.random.chisquare(10, size=data.shape[0]) / 10
     return data
@@ -164,8 +165,8 @@ def test_categorical(model_and_func):
     y = np.random.randn(1000)
     x1 = np.random.randn(1000)
     d = np.random.randint(0, 4, 1000)
-    d = pd.Categorical(d)
-    data = pd.DataFrame({'y': y, 'x1': x1, 'd': d})
+    d = Categorical(d)
+    data = DataFrame({'y': y, 'x1': x1, 'd': d})
     data['Intercept'] = 1.0
     model, func = model_and_func
     mod = model.from_formula(formula, data)
@@ -199,7 +200,7 @@ def test_formula_function(data, model_and_func):
     dep = data.y
     exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']],
             np.exp(data[['x5']])]
-    exog = pd.concat(exog, 1)
+    exog = concat(exog, 1)
     endog = data[['x1', 'x2']]
     instr = data[['z1', 'z2', 'z3']]
     mod = model(dep, exog, endog, instr)
@@ -220,7 +221,7 @@ def test_predict_formula_function(data, model_and_func):
 
     exog = [data[['Intercept']], sigmoid(data[['x3']]), data[['x4']],
             np.exp(data[['x5']])]
-    exog = pd.concat(exog, 1)
+    exog = concat(exog, 1)
     endog = data[['x1', 'x2']]
     pred = res.predict(exog, endog)
     pred2 = res.predict(data=data)

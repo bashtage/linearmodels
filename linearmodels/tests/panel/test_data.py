@@ -1,12 +1,13 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
+from pandas import DataFrame, date_range, Categorical, get_dummies, Series, datetime
+from pandas.testing import assert_frame_equal
 
-from linearmodels.compat.pandas import assert_frame_equal, is_string_dtype
+from linearmodels.compat.pandas import is_string_dtype
 
 try:
     import xarray as xr
@@ -39,7 +40,7 @@ def mi_df():
     np.random.seed(12345)
     n, t, k = 11, 7, 3
     x = np.random.standard_normal((k, t, n))
-    major = pd.date_range('12-31-1999', periods=7)
+    major = date_range('12-31-1999', periods=7)
     items = ['var.{0}'.format(i) for i in range(1, k + 1)]
     minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
     return panel_to_frame(x, items, major, minor, swap=True)
@@ -85,7 +86,7 @@ def test_numpy_2d():
 def test_pandas_multiindex_dataframe():
     n, t, k = 11, 7, 3
     x = np.random.random((n, t, k))
-    major = pd.date_range('12-31-1999', periods=7)
+    major = date_range('12-31-1999', periods=7)
     minor = ['var.{0}'.format(i) for i in range(1, k + 1)]
     items = ['item.{0}'.format(i) for i in range(1, n + 1)]
     x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
@@ -95,16 +96,16 @@ def test_pandas_multiindex_dataframe():
 def test_pandas_dataframe():
     t, n = 11, 7
     x = np.random.random((t, n))
-    index = pd.date_range('12-31-1999', periods=t)
+    index = date_range('12-31-1999', periods=t)
     cols = ['entity.{0}'.format(i) for i in range(1, n + 1)]
-    x = pd.DataFrame(x, columns=cols, index=index)
+    x = DataFrame(x, columns=cols, index=index)
     PanelData(x)
 
 
 def test_existing_panel_data():
     n, t, k = 11, 7, 3
     x = np.random.random((k, t, n))
-    major = pd.date_range('12-31-1999', periods=7)
+    major = date_range('12-31-1999', periods=7)
     items = ['var.{0}'.format(i) for i in range(1, k + 1)]
     minor = ['entities.{0}'.format(i) for i in range(1, n + 1)]
     x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
@@ -170,10 +171,10 @@ def test_missing(mi_df):
 
 def test_incorrect_dataframe():
     grouped = np.array(list([i] * 10 for i in range(10))).ravel()
-    df = pd.DataFrame({'a': np.arange(100),
-                       'b': grouped,
-                       'c': np.random.permutation(grouped),
-                       'data': np.random.randn(100)})
+    df = DataFrame({'a': np.arange(100),
+                    'b': grouped,
+                    'c': np.random.permutation(grouped),
+                    'data': np.random.randn(100)})
     df = df.set_index(['a', 'b', 'c'])
     with pytest.raises(ValueError):
         PanelData(df)
@@ -250,24 +251,24 @@ def test_demean_against_dummy_regression(data):
     df = dh.dataframe
     no_index = df.reset_index()
 
-    cat = pd.Categorical(no_index[df.index.levels[0].name])
-    d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[0].name])
+    d = get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     entity_demean = dh.demean('entity')
     assert_allclose(1 + np.abs(entity_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
-    cat = pd.Categorical(no_index[df.index.levels[1].name])
-    d = pd.get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[1].name])
+    d = get_dummies(cat, drop_first=False).astype(np.float64)
     dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     time_demean = dh.demean('time')
     assert_allclose(1 + np.abs(time_demean.values2d),
                     1 + np.abs(dummy_demeaned))
 
-    cat = pd.Categorical(no_index[df.index.levels[0].name])
-    d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    cat = pd.Categorical(no_index[df.index.levels[1].name])
-    d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[0].name])
+    d1 = get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[1].name])
+    d2 = get_dummies(cat, drop_first=True).astype(np.float64)
     d = np.c_[d1.values, d2.values]
     dummy_demeaned = df.values - d @ lstsq(d, df.values)[0]
     both_demean = dh.demean('both')
@@ -352,7 +353,7 @@ def test_demean_many_missing_dropped(mi_df):
 
 def test_demean_both_large_t():
     x = np.random.standard_normal((1, 100, 10))
-    time = pd.date_range('1-1-2000', periods=100)
+    time = date_range('1-1-2000', periods=100)
     entities = ['entity.{0}'.format(i) for i in range(10)]
     data = panel_to_frame(x, ['x'], time, entities, swap=True)
     data = PanelData(data)
@@ -360,10 +361,10 @@ def test_demean_both_large_t():
 
     df = data.dataframe
     no_index = df.reset_index()
-    cat = pd.Categorical(no_index[df.index.levels[0].name])
-    d1 = pd.get_dummies(cat, drop_first=False).astype(np.float64)
-    cat = pd.Categorical(no_index[df.index.levels[1].name])
-    d2 = pd.get_dummies(cat, drop_first=True).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[0].name])
+    d1 = get_dummies(cat, drop_first=False).astype(np.float64)
+    cat = Categorical(no_index[df.index.levels[1].name])
+    d2 = get_dummies(cat, drop_first=True).astype(np.float64)
     d = np.c_[d1.values, d2.values]
     dummy_demeaned = df.values - d @ pinv(d) @ df.values
     assert_allclose(1 + np.abs(demeaned.values2d),
@@ -395,7 +396,7 @@ def test_roundtrip_3d(data):
     x = data.x
     xpd = PanelData(x)
     xv = x if isinstance(x, np.ndarray) else x.values
-    if isinstance(x, pd.DataFrame):
+    if isinstance(x, DataFrame):
         assert_equal(xpd.values2d, xv)
     else:
         assert_equal(xpd.values3d, xv)
@@ -414,7 +415,7 @@ def test_invalid_seires(mi_df):
 
 
 def test_demean_missing_alt_types(data):
-    check = isinstance(data.x, (pd.DataFrame, np.ndarray))
+    check = isinstance(data.x, (DataFrame, np.ndarray))
     xpd = PanelData(data.x)
     xpd.drop(xpd.isnull)
     entity_demean = xpd.demean('entity')
@@ -495,7 +496,7 @@ def test_demean_weighted(data):
     w.drop(missing)
 
     entity_demean = x.demean('entity', weights=w)
-    d = pd.get_dummies(pd.Categorical(x.index.labels[0]))
+    d = get_dummies(Categorical(x.index.labels[0]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -506,7 +507,7 @@ def test_demean_weighted(data):
                     1 + np.abs(e))
 
     time_demean = x.demean('time', weights=w)
-    d = pd.get_dummies(pd.Categorical(x.index.labels[1]))
+    d = get_dummies(Categorical(x.index.labels[1]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -525,7 +526,7 @@ def test_mean_weighted(data):
     w.drop(missing)
     entity_mean = x.mean('entity', weights=w)
     c = x.index.levels[0][x.index.labels[0]]
-    d = pd.get_dummies(pd.Categorical(c, ordered=True))
+    d = get_dummies(Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
     root_w = np.sqrt(w.values2d)
@@ -536,7 +537,7 @@ def test_mean_weighted(data):
 
     time_mean = x.mean('time', weights=w)
     c = x.index.levels[1][x.index.labels[1]]
-    d = pd.get_dummies(pd.Categorical(c, ordered=True))
+    d = get_dummies(Categorical(c, ordered=True))
     d = d[time_mean.index]
     d = d.values
     root_w = np.sqrt(w.values2d)
@@ -550,7 +551,7 @@ def test_categorical_conversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    time = pd.date_range('1-1-2000', periods=t)
+    time = date_range('1-1-2000', periods=t)
     entities = ['entity.{0}'.format(i) for i in range(n)]
     p = panel_to_frame(None, items=['a', 'b'], major_axis=time,
                        minor_axis=entities, swap=True)
@@ -559,7 +560,7 @@ def test_categorical_conversion():
     p = p[['a', 'b']]
     panel = PanelData(p, convert_dummies=False)
     df = panel.dataframe.copy()
-    df['a'] = pd.Categorical(df['a'])
+    df['a'] = Categorical(df['a'])
     panel = PanelData(df, convert_dummies=True)
 
     df = panel.dataframe
@@ -581,7 +582,7 @@ def test_string_conversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    time = pd.date_range('1-1-2000', periods=t)
+    time = date_range('1-1-2000', periods=t)
     entities = ['entity.{0}'.format(i) for i in range(n)]
     p = panel_to_frame(None, items=['a', 'b'], major_axis=time, minor_axis=entities,
                        swap=True)
@@ -608,7 +609,7 @@ def test_string_nonconversion():
     t, n = 3, 1000
     string = np.random.choice(['a', 'b', 'c'], (t, n))
     num = np.random.randn(t, n)
-    time = pd.date_range('1-1-2000', periods=t)
+    time = date_range('1-1-2000', periods=t)
     entities = ['entity.{0}'.format(i) for i in range(n)]
     p = panel_to_frame(None, items=['a', 'b'], major_axis=time, minor_axis=entities,
                        swap=True)
@@ -628,19 +629,19 @@ def test_repr_html(mi_df):
 def test_general_demean_oneway(mi_df):
     y = PanelData(mi_df)
     dm1 = y.demean('entity')
-    g = pd.DataFrame(y.entity_ids, index=y.index)
+    g = DataFrame(y.entity_ids, index=y.index)
     dm2 = y.general_demean(g)
     assert_allclose(dm1.values2d, dm2.values2d)
 
     dm1 = y.demean('time')
-    g = pd.DataFrame(y.time_ids, index=y.index)
+    g = DataFrame(y.time_ids, index=y.index)
     dm2 = y.general_demean(g)
     assert_allclose(dm1.values2d, dm2.values2d)
 
-    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    g = DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g)
-    g = pd.Categorical(g.iloc[:, 0])
-    d = pd.get_dummies(g)
+    g = Categorical(g.iloc[:, 0])
+    d = get_dummies(g)
     dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1, dm2.values2d)
 
@@ -648,17 +649,17 @@ def test_general_demean_oneway(mi_df):
 def test_general_demean_twoway(mi_df):
     y = PanelData(mi_df)
     dm1 = y.demean('both')
-    g = pd.DataFrame(y.entity_ids, index=y.index)
-    g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
+    g = DataFrame(y.entity_ids, index=y.index)
+    g['column2'] = Series(y.time_ids.squeeze(), index=y.index)
     dm2 = y.general_demean(g)
     assert_allclose(dm1.values2d, dm2.values2d)
 
-    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    g = DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g)
-    g1 = pd.Categorical(g.iloc[:, 0])
-    d1 = pd.get_dummies(g1)
-    g2 = pd.Categorical(g.iloc[:, 1])
-    d2 = pd.get_dummies(g2, drop_first=True)
+    g1 = Categorical(g.iloc[:, 0])
+    d1 = get_dummies(g1)
+    g2 = Categorical(g.iloc[:, 1])
+    d2 = get_dummies(g2, drop_first=True)
     d = np.c_[d1, d2]
     dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1 - dm2.values2d, np.zeros_like(dm2.values2d), atol=1e-7)
@@ -667,7 +668,7 @@ def test_general_demean_twoway(mi_df):
 def test_general_unit_weighted_demean_oneway(mi_df):
     y = PanelData(mi_df)
     dm1 = y.demean('entity')
-    g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
+    g = PanelData(DataFrame(y.entity_ids, index=y.index))
     weights = PanelData(g).copy()
     weights.dataframe.iloc[:, :] = 1
     dm2 = y.general_demean(g, weights)
@@ -676,18 +677,18 @@ def test_general_unit_weighted_demean_oneway(mi_df):
     assert_allclose(dm3.values2d, dm2.values2d)
 
     dm1 = y.demean('time')
-    g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
+    g = PanelData(DataFrame(y.time_ids, index=y.index))
     dm2 = y.general_demean(g, weights)
     assert_allclose(dm1.values2d, dm2.values2d)
     dm3 = y.general_demean(g)
     assert_allclose(dm3.values2d, dm2.values2d)
 
-    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape),
-                               index=y.index))
+    g = PanelData(DataFrame(np.random.randint(0, 10, g.dataframe.shape),
+                            index=y.index))
     dm2 = y.general_demean(g, weights)
     dm3 = y.general_demean(g)
-    g = pd.Categorical(g.dataframe.iloc[:, 0])
-    d = pd.get_dummies(g)
+    g = Categorical(g.dataframe.iloc[:, 0])
+    d = get_dummies(g)
     dm1 = y.values2d - d @ lstsq(d, y.values2d)[0]
     assert_allclose(dm1, dm2.values2d)
     assert_allclose(dm3.values2d, dm2.values2d)
@@ -695,25 +696,25 @@ def test_general_unit_weighted_demean_oneway(mi_df):
 
 def test_general_weighted_demean_oneway(mi_df):
     y = PanelData(mi_df)
-    weights = pd.DataFrame(
+    weights = DataFrame(
         np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
 
     dm1 = y.demean('entity', weights=w)
-    g = PanelData(pd.DataFrame(y.entity_ids, index=y.index))
+    g = PanelData(DataFrame(y.entity_ids, index=y.index))
     dm2 = y.general_demean(g, w)
     assert_allclose(dm1.values2d, dm2.values2d)
 
     dm1 = y.demean('time', weights=w)
-    g = PanelData(pd.DataFrame(y.time_ids, index=y.index))
+    g = PanelData(DataFrame(y.time_ids, index=y.index))
     dm2 = y.general_demean(g, w)
     assert_allclose(dm1.values2d, dm2.values2d)
 
-    g = PanelData(pd.DataFrame(np.random.randint(0, 10, g.dataframe.shape),
-                               index=y.index))
+    g = PanelData(DataFrame(np.random.randint(0, 10, g.dataframe.shape),
+                            index=y.index))
     dm2 = y.general_demean(g, w)
-    g = pd.Categorical(g.dataframe.iloc[:, 0])
-    d = pd.get_dummies(g)
+    g = Categorical(g.dataframe.iloc[:, 0])
+    d = get_dummies(g)
     wd = np.sqrt(w.values2d) * d
     wy = np.sqrt(w.values2d) * y.values2d
     dm1 = wy - wd @ lstsq(wd, wy)[0]
@@ -723,23 +724,23 @@ def test_general_weighted_demean_oneway(mi_df):
 def test_general_unit_weighted_demean_twoway(mi_df):
     np.random.seed(12345)
     y = PanelData(mi_df)
-    weights = pd.DataFrame(
+    weights = DataFrame(
         np.random.chisquare(10, (y.dataframe.shape[0], 1)) / 10, index=y.index)
     w = PanelData(weights)
 
     dm1 = y.demean('both', weights=w)
-    g = pd.DataFrame(y.entity_ids, index=y.index)
-    g['column2'] = pd.Series(y.time_ids.squeeze(), index=y.index)
+    g = DataFrame(y.entity_ids, index=y.index)
+    g['column2'] = Series(y.time_ids.squeeze(), index=y.index)
     dm2 = y.general_demean(g, weights=w)
     assert_allclose(dm1.values2d - dm2.values2d, np.zeros_like(dm2.values2d),
                     atol=1e-7)
 
-    g = pd.DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
+    g = DataFrame(np.random.randint(0, 10, g.shape), index=y.index)
     dm2 = y.general_demean(g, weights=w)
-    g1 = pd.Categorical(g.iloc[:, 0])
-    d1 = pd.get_dummies(g1)
-    g2 = pd.Categorical(g.iloc[:, 1])
-    d2 = pd.get_dummies(g2, drop_first=True)
+    g1 = Categorical(g.iloc[:, 0])
+    d1 = get_dummies(g1)
+    g2 = Categorical(g.iloc[:, 1])
+    d2 = get_dummies(g2, drop_first=True)
     d = np.c_[d1, d2]
     wd = np.sqrt(w.values2d) * d
     wy = np.sqrt(w.values2d) * y.values2d
@@ -753,7 +754,7 @@ def test_original_unmodified(data):
     pre_w = data.w.copy()
     mod = PanelOLS(data.y, data.x, weights=data.w)
     mod.fit(debiased=True)
-    if isinstance(data.y, (pd.DataFrame)):
+    if isinstance(data.y, (DataFrame)):
         for after, before in ((data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
             assert_frame_equal(before, after)
 
@@ -794,7 +795,7 @@ def test_incorrect_time_axis():
     var_names = ['var.{0}'.format(i) for i in range(3)]
     p = panel_to_frame(x, items=var_names, major_axis=time, minor_axis=entities,
                        swap=True)
-    p.index = p.index.set_levels([1, pd.datetime(1960, 1, 1), 'a'], 1)
+    p.index = p.index.set_levels([1, datetime(1960, 1, 1), 'a'], 1)
     with pytest.raises(ValueError):
         PanelData(p)
 
@@ -820,7 +821,7 @@ def test_incorrect_time_axis_xarray():
 
 def test_named_index(data):
     pdata = PanelData(data.x)
-    if isinstance(data.x, pd.DataFrame):
+    if isinstance(data.x, DataFrame):
         assert pdata.dataframe.index.levels[0].name == data.x.index.levels[0].name
         assert pdata.dataframe.index.levels[1].name == data.x.index.levels[1].name
 

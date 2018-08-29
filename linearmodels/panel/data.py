@@ -8,7 +8,7 @@ from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
-                                        is_string_like)
+                                        is_string_like, concat)
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ['PanelData']
@@ -89,7 +89,7 @@ def convert_columns(s, drop_first):
 
 
 def expand_categoricals(x, drop_first):
-    return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
 class PanelData(object):
