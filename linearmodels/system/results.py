@@ -1,7 +1,6 @@
 import datetime as dt
 
 import numpy as np
-from numpy import diag, sqrt
 from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
@@ -76,7 +75,7 @@ class _CommonResults(_SummaryStr):
     @property
     def std_errors(self):
         """Estimated parameter standard errors"""
-        std_errors = sqrt(diag(self.cov))
+        std_errors = np.sqrt(np.diag(self.cov))
         return Series(std_errors, index=self._param_names, name='stderr')
 
     @property

@@ -2,14 +2,13 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
-from numpy import ndarray
 from pandas import DataFrame, Panel, Series
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
-                                        is_string_like)
+                                        is_string_like, concat)
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ['PanelData']
@@ -90,7 +89,7 @@ def convert_columns(s, drop_first):
 
 
 def expand_categoricals(x, drop_first):
-    return pd.concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
 
 
 class PanelData(object):
@@ -153,7 +152,7 @@ class PanelData(object):
             x = x.dataframe
         self._original = x
 
-        if not isinstance(x, (Series, DataFrame, Panel, ndarray)):
+        if not isinstance(x, (Series, DataFrame, Panel, np.ndarray)):
             try:
                 from xarray import DataArray
                 if isinstance(x, DataArray):
@@ -191,7 +190,7 @@ class PanelData(object):
                     self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
             else:
                 self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
-        elif isinstance(x, ndarray):
+        elif isinstance(x, np.ndarray):
             if x.ndim not in (2, 3):
                 raise ValueError('2 or 3-d array required for numpy input')
             if x.ndim == 2:

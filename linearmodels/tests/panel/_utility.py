@@ -1,7 +1,8 @@
 import numpy as np
-import pandas as pd
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
+from pandas import DataFrame, Categorical, get_dummies, date_range
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
@@ -13,7 +14,6 @@ try:
     MISSING_XARRAY = False
 except ImportError:
     MISSING_XARRAY = True
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
 from linearmodels.utility import AttrDict
 
 datatypes = ['numpy', 'pandas']
@@ -21,30 +21,30 @@ if not MISSING_XARRAY:
     datatypes += ['xarray']
 
 
-def lsdv(y: pd.DataFrame, x: pd.DataFrame, has_const=False, entity=False, time=False,
+def lsdv(y: DataFrame, x: DataFrame, has_const=False, entity=False, time=False,
          general=None):
     nvar = x.shape[1]
     temp = x.reset_index()
     cat_index = temp.index
     if entity:
-        cat = pd.Categorical(temp.iloc[:, 0])
+        cat = Categorical(temp.iloc[:, 0])
         cat.index = cat_index
-        dummies = pd.get_dummies(cat, drop_first=has_const)
-        x = pd.DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
+        dummies = get_dummies(cat, drop_first=has_const)
+        x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
                          index=x.index,
                          columns=list(x.columns) + list(dummies.columns))
     if time:
-        cat = pd.Categorical(temp.iloc[:, 1])
+        cat = Categorical(temp.iloc[:, 1])
         cat.index = cat_index
-        dummies = pd.get_dummies(cat, drop_first=(has_const or entity))
-        x = pd.DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
+        dummies = get_dummies(cat, drop_first=(has_const or entity))
+        x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
                          index=x.index,
                          columns=list(x.columns) + list(dummies.columns))
     if general is not None:
-        cat = pd.Categorical(general)
+        cat = Categorical(general)
         cat.index = cat_index
-        dummies = pd.get_dummies(cat, drop_first=(has_const or entity or time))
-        x = pd.DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
+        dummies = get_dummies(cat, drop_first=(has_const or entity or time))
+        x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
                          index=x.index,
                          columns=list(x.columns) + list(dummies.columns))
     w = np.ones_like(y)
@@ -92,9 +92,9 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
 
     if datatype in ('pandas', 'xarray'):
         entities = ['firm' + str(i) for i in range(n)]
-        time = pd.date_range('1-1-1900', periods=t, freq='A-DEC')
+        time = date_range('1-1-1900', periods=t, freq='A-DEC')
         var_names = ['x' + str(i) for i in range(k)]
-        # y = pd.DataFrame(y, index=time, columns=entities)
+        # y = DataFrame(y, index=time, columns=entities)
         y = panel_to_frame(y[None], items=['y'], major_axis=time, minor_axis=entities, swap=True)
         w = panel_to_frame(w[None], items=['w'], major_axis=time, minor_axis=entities, swap=True)
         w = w.reindex(y.index)

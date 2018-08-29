@@ -12,7 +12,7 @@ try:
 except ImportError:
     MISSING_XARRAY = True
 
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 from linearmodels.iv.data import IVData
 
 

@@ -5,7 +5,7 @@ Important cases
 import os
 import subprocess
 
-import pandas as pd
+from linearmodels.compat.pandas import concat
 from linearmodels.tests.system._utility import generate_simultaneous_data
 
 data = generate_simultaneous_data()
@@ -21,7 +21,7 @@ for key in data:
             else:
                 out.append(vals[col])
                 all_cols.append(col)
-out = pd.concat(out, 1)
+out = concat(out, 1)
 if 'const' in out:
     out.pop('const')
 out.to_stata('simulated-3sls.dta', write_index=False)

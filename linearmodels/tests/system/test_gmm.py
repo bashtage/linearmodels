@@ -2,11 +2,12 @@ from collections import OrderedDict
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
+from pandas import DataFrame, Series
+from pandas.testing import assert_frame_equal, assert_series_equal
 
-from linearmodels.compat.pandas import assert_frame_equal, assert_series_equal
+from linearmodels.compat.pandas import concat
 from linearmodels.iv.covariance import kernel_weight_parzen
 from linearmodels.system import IV3SLS, IVSystemGMM
 from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix, \
@@ -100,15 +101,15 @@ def test_formula_equivalence(data):
         ex = eqn.exog
         en = eqn.endog
         instr = eqn.instruments
-        dep = pd.DataFrame(dep, columns=['dep_{0}'.format(i)])
+        dep = DataFrame(dep, columns=['dep_{0}'.format(i)])
         has_const = False
         if np.any(np.all(ex == 1, 0)):
             ex = ex[:, 1:]
             has_const = True
-        ex = pd.DataFrame(ex, columns=['ex_{0}_{1}'.format(i, j) for j in range(ex.shape[1])])
-        en = pd.DataFrame(en, columns=['en_{0}_{1}'.format(i, j) for j in range(en.shape[1])])
-        instr = pd.DataFrame(instr, columns=['instr_{0}_{1}'.format(i, j)
-                                             for j in range(ex.shape[1])])
+        ex = DataFrame(ex, columns=['ex_{0}_{1}'.format(i, j) for j in range(ex.shape[1])])
+        en = DataFrame(en, columns=['en_{0}_{1}'.format(i, j) for j in range(en.shape[1])])
+        instr = DataFrame(instr, columns=['instr_{0}_{1}'.format(i, j)
+                                          for j in range(ex.shape[1])])
         fmla = ''.join(dep.columns) + ' ~  '
         if has_const:
             fmla += ' 1 + '
@@ -121,7 +122,7 @@ def test_formula_equivalence(data):
     formulas = OrderedDict()
     for i, f in enumerate(formula):
         formulas['eq{0}'.format(i)] = f
-    df = pd.concat(df, 1)
+    df = concat(df, 1)
     formula_mod = IVSystemGMM.from_formula(formulas, df, weight_type='unadjusted')
     res = mod.fit(cov_type='unadjusted')
     formula_res = formula_mod.fit(cov_type='unadjusted')
@@ -148,15 +149,15 @@ def test_formula_equivalence_weights(data):
         ex = eqn.exog
         en = eqn.endog
         instr = eqn.instruments
-        dep = pd.DataFrame(dep, columns=['dep_{0}'.format(i)])
+        dep = DataFrame(dep, columns=['dep_{0}'.format(i)])
         has_const = False
         if np.any(np.all(ex == 1, 0)):
             ex = ex[:, 1:]
             has_const = True
-        ex = pd.DataFrame(ex, columns=['ex_{0}_{1}'.format(i, j) for j in range(ex.shape[1])])
-        en = pd.DataFrame(en, columns=['en_{0}_{1}'.format(i, j) for j in range(en.shape[1])])
-        instr = pd.DataFrame(instr, columns=['instr_{0}_{1}'.format(i, j)
-                                             for j in range(ex.shape[1])])
+        ex = DataFrame(ex, columns=['ex_{0}_{1}'.format(i, j) for j in range(ex.shape[1])])
+        en = DataFrame(en, columns=['en_{0}_{1}'.format(i, j) for j in range(en.shape[1])])
+        instr = DataFrame(instr, columns=['instr_{0}_{1}'.format(i, j)
+                                          for j in range(ex.shape[1])])
         fmla = ''.join(dep.columns) + ' ~  '
         if has_const:
             fmla += ' 1 + '
@@ -165,7 +166,7 @@ def test_formula_equivalence_weights(data):
         fmla += ' + '.join(instr.columns) + ' ] '
         formulas[key] = fmla
         df.extend([dep, ex, en, instr])
-    df = pd.concat(df, 1)
+    df = concat(df, 1)
     formula_mod = IVSystemGMM.from_formula(formulas, df, weights=weights, weight_type='unadjusted')
     res = mod.fit(cov_type='unadjusted')
     formula_res = formula_mod.fit(cov_type='unadjusted')
@@ -276,9 +277,9 @@ def test_j_statistic_direct(data):
 def test_linear_constraint(data):
     mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
     p = mod.param_names
-    r = pd.DataFrame(np.zeros((1, len(p))), index=[0], columns=p)
+    r = DataFrame(np.zeros((1, len(p))), index=[0], columns=p)
     r.iloc[0, 1::6] = 1
-    q = pd.Series([6])
+    q = Series([6])
     mod.add_constraints(r, q)
 
     res = mod.fit()
@@ -383,6 +384,6 @@ def test_fitted(data):
         expected.append(direct[:, None])
         assert_allclose(eq.fitted_values, direct, atol=1e-8)
     expected = np.concatenate(expected, 1)
-    expected = pd.DataFrame(expected, index=mod._dependent[i].pandas.index,
-                            columns=[key for key in res.equations])
+    expected = DataFrame(expected, index=mod._dependent[i].pandas.index,
+                         columns=[key for key in res.equations])
     assert_frame_equal(expected, res.fitted_values)

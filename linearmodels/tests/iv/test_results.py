@@ -1,8 +1,8 @@
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
+from pandas import DataFrame
+from pandas.testing import assert_series_equal
 
-from linearmodels.compat.pandas import assert_series_equal
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.tests.iv._utility import generate_data
@@ -65,12 +65,12 @@ def test_fitted_predict(data, model):
     assert_series_equal(res.idiosyncratic, res.resids)
     y = mod.dependent.pandas
     expected = y.values - res.resids.values[:, None]
-    expected = pd.DataFrame(expected, y.index, ['fitted_values'])
+    expected = DataFrame(expected, y.index, ['fitted_values'])
     assert_frame_similar(expected, res.fitted_values)
     assert_allclose(expected, res.fitted_values)
     pred = res.predict()
     nobs = res.resids.shape[0]
-    assert isinstance(pred, pd.DataFrame)
+    assert isinstance(pred, DataFrame)
     assert pred.shape == (nobs, 1)
     pred = res.predict(idiosyncratic=True, missing=True)
     nobs = IVData(data.dep).pandas.shape[0]

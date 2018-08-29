@@ -4,9 +4,9 @@ from itertools import product
 import numpy as np
 import pytest
 from pandas import Series, concat
+from pandas.testing import assert_series_equal, assert_frame_equal
 
 from linearmodels import SUR, IVSystemGMM, IV3SLS
-from linearmodels.compat.pandas import assert_series_equal, assert_frame_equal
 from linearmodels.formula import sur, iv_system_gmm, iv_3sls
 from linearmodels.system.model import SystemFormulaParser
 from linearmodels.tests.system._utility import generate_3sls_data_v2
