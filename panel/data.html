@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Panel Data Structures &#8212; linearmodels 4.8 documentation</title>
+    <title>Panel Data Structures &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="covariance.html" title="Panel Model Covariance Estimators"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -132,7 +132,7 @@
 <span id="panel-data-structures"></span><span id="panel-module-reference-data"></span><h1>Panel Data Structures<a class="headerlink" href="#module-linearmodels.panel.data" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.panel.data.PanelData">
-<em class="property">class </em><code class="descname">PanelData</code><span class="sig-paren">(</span><em>x</em>, <em>var_name='x'</em>, <em>convert_dummies=True</em>, <em>drop_first=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">PanelData</code><span class="sig-paren">(</span><em>x</em>, <em>var_name='x'</em>, <em>convert_dummies=True</em>, <em>drop_first=True</em>, <em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstraction to handle alternative formats for panel data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -140,11 +140,13 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>Panel</em><em>, </em><em>DataArray}</em>) – Input data</li>
-<li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
+<li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
 xarray DataArrays</li>
-<li><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
+<li><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
 should be converted to dummy variables</li>
-<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to drop first dummy category when converting</li>
+<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to drop first dummy category when converting</li>
+<li><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to copy the input. Only has an effect when
+x is a DataFrame</li>
 </ul>
 </td>
 </tr>
@@ -172,8 +174,8 @@ column MultiIndex DataFrames.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If the input type is not supported</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input has the wrong number of dimensions or a MultiIndex
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If the input type is not supported</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input has the wrong number of dimensions or a MultiIndex
 DataFrame does not have 2 levels</li>
 </ul>
 </td>
@@ -221,7 +223,7 @@ DataFrame does not have 2 levels</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</li>
 <li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</li>
-<li><strong>return_panel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to return a PanelData object. If False, a 2-d
+<li><strong>return_panel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to return a PanelData object. If False, a 2-d
 NumPy representation of the panel is returned</li>
 </ul>
 </td>
@@ -236,7 +238,8 @@ NumPy representation of the panel is returned</li>
 </table>
 <p class="rubric">Notes</p>
 <p>If weights are provided, the values returned will be scaled by
-sqrt(weights) so that they can be used in WLS estimation.</p>
+the square root of the weights so that they can be used in WLS
+estimation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -263,7 +266,7 @@ the dataframe view of the data</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em><em>, </em><em>optional</em>) – Type of dummies to generate</li>
-<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the dummy column corresponding to the first
+<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the dummy column corresponding to the first
 entity or time period should be dropped</li>
 </ul>
 </td>
@@ -491,7 +494,7 @@ entity or time period should be dropped</li>
         <li class="right" >
           <a href="covariance.html" title="Panel Model Covariance Estimators"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

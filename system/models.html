@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimators &#8212; linearmodels 4.8 documentation</title>
+    <title>System Regression Estimators &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -139,12 +139,12 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing dependent and exogenous variable
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent and exogenous variable
 values.  Each key is an equations label and must be a string. Each
 value must be either a tuple of the form (dependent,
 exog, [weights]) or a dictionary with keys ‘dependent’ and ‘exog’ and
 the optional key ‘weights’.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</li>
 </ul>
 </td>
@@ -237,13 +237,13 @@ parameters.</p>
 <li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
 using OLS only if all regressors are identical. The other two
 arguments force the use of GLS or OLS.</li>
-<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
 when estimating the model with GLS</li>
-<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
 iterations have been completed</li>
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
 <li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
 <li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
@@ -289,7 +289,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 the dictionary represents a single equation. See Notes for a
 description of the accepted syntax</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
 not provided, FGLS is implemented based on an estimate of sigma.</li>
 <li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
@@ -389,7 +389,7 @@ exogenous variable.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>]</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
 </tr>
 </tbody>
 </table>
@@ -405,7 +405,7 @@ exogenous variable.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
@@ -413,7 +413,7 @@ If predictions are not required for one of more of the model equations,
 these keys can be omitted.</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -459,7 +459,7 @@ estimated model.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
@@ -473,7 +473,7 @@ can contain either an empty array or <cite>None</cite> to indicate that an
 equation contains no exogenous regressors. Similarly ‘endog’ and
 ‘instruments’ can either be omitted or may contain an empty array (or
 <cite>None</cite>) if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma.</li>
 </ul>
 </td>
@@ -566,13 +566,13 @@ parameters.</p>
 <li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
 using OLS only if all regressors are identical. The other two
 arguments force the use of GLS or OLS.</li>
-<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
 when estimating the model with GLS</li>
-<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
 iterations have been completed</li>
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
 <li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
 <li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
@@ -618,7 +618,7 @@ estimators support debiased which employs a small-sample adjustment</li>
 the dictionary represents a single equation. See Notes for a
 description of the accepted syntax</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
 not provided, FGLS is implemented based on an estimate of sigma.</li>
 <li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
@@ -681,7 +681,7 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
 <li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nengod array of endogenous regressors common to all models</li>
+<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
 <li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
 </ul>
 </td>
@@ -712,7 +712,7 @@ exogenous, endogenous and instrumental variables.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>]</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
 </tr>
 </tbody>
 </table>
@@ -728,7 +728,7 @@ exogenous, endogenous and instrumental variables.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
@@ -736,7 +736,7 @@ If predictions are not required for one of more of the model equations,
 these keys can be omitted.</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -782,17 +782,17 @@ estimated model.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
 ‘exog’.  The dictionary may contain optional keys for ‘endog’,
 ‘instruments’, and ‘weights’. Endogenous and/or Instrument can be empty
 if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Pre-specified residual covariance to use in GLS estimation. If not
+<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma. Only used
 if weight_type is ‘unadjusted’</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
 <li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
 function</li>
 </ul>
@@ -877,12 +877,12 @@ parameters.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
+<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
+<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
 <li><strong>initial_weight</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Initial weighting matrix to use in the first step. If not
 specified, uses the average outer-product of the set containing
 the exogenous variables and instruments.</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
 <li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
 <li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
@@ -927,7 +927,7 @@ description of the accepted syntax</li>
 weights.  Each entry must have the same number of observations as
 data.  If an equation label is not a key weights, the weights will
 be set to unity</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Name of moment condition weight function to use in the GMM
+<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of moment condition weight function to use in the GMM
 estimation. Valid options are:</p>
 <ul>
 <li>’unadjusted’, ‘homoskedastic’ - Assume moments are homoskedastic</li>
@@ -993,7 +993,7 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
 <li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nengod array of endogenous regressors common to all models</li>
+<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
 <li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
 </ul>
 </td>
@@ -1024,7 +1024,7 @@ exogenous, endogenous and instrumental variables.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>]</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
 </tr>
 </tbody>
 </table>
@@ -1040,7 +1040,7 @@ exogenous, endogenous and instrumental variables.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
@@ -1048,7 +1048,7 @@ If predictions are not required for one of more of the model equations,
 these keys can be omitted.</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -1118,7 +1118,7 @@ estimated model.</p>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

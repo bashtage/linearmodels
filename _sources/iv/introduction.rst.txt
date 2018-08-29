@@ -127,7 +127,7 @@ GMM and GMM-CUE Estimation
   * 'robust' - Allows the GMM moment conditions to be heteroskedastic while
     assuming they are not correlated across observations. See
     :class:`~linearmodels.iv.gmm.HeteroskedasticWeightMatrix`.
-  * 'kernel' - Allows for both heteroskedasticity and autocorrrelation in the
+  * 'kernel' - Allows for both heteroskedasticity and autocorrelation in the
     moment conditions. See :class:`~linearmodels.iv.gmm.KernelWeightMatrix`.
   * 'cluster' - Allows for a one- and two-way cluster structure where moment
     conditions within a cluster are correlated.
@@ -138,7 +138,7 @@ GMM and GMM-CUE Estimation
 
 Model Estimation and Covariance Specification
 =============================================
-All models are estimated using teh ``fit`` method which provides an
+All models are estimated using the ``fit`` method which provides an
 opportunity to customize the parameter covariance estimator used to
 perform inference. Four classes of covariance estimators are available:
 
@@ -149,7 +149,7 @@ perform inference. Four classes of covariance estimators are available:
   while assuming they are not correlated across observations. See
   :class:`~linearmodels.iv.covariance.HeteroskedasticCovariance`.
 
-* 'kernel' - Allows for both heteroskedasticity and autocorrrelation in the
+* 'kernel' - Allows for both heteroskedasticity and autocorrelation in the
   model scores. The estimator allows the ``kernel`` to be selected from
 
   * 'bartlett', 'newey-west` - Triangular kernel utilized in the common
@@ -185,7 +185,7 @@ are used to estimate the model parameters.  If normalized model parameters
 change by less than ``tol`` across successive iterations, then the estimation
 is assumed to converge and the iterations are stopped.
 
-By default, the first-step uses teh average outer-product of the instruments
+By default, the first-step uses the average outer-product of the instruments
 as the weighting matrix.  ``initial_weight`` allows a user-specified choice of
 weighting matrix to be used instead.
 

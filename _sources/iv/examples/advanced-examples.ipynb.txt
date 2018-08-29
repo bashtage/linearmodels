@@ -91,7 +91,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "And finally the simple correlation between the endogenous variable and the instruments.  Instruments must be correlated to be relevant (but also must be exogenous, which can't be examined using simple correlation).  THe correlation of `firmsz` is especially low, which might lead to the weak instruments problem if used exclusively.  "
+    "And finally the simple correlation between the endogenous variable and the instruments.  Instruments must be correlated to be relevant (but also must be exogenous, which can't be examined using simple correlation).  The correlation of `firmsz` is especially low, which might lead to the weak instruments problem if used exclusively.  "
    ]
   },
   {
@@ -224,7 +224,7 @@
     "\n",
     "GMM estimation can be more efficient than 2SLS when there are more than one instrument.  By default, 2-step efficient GMM is used (assuming the weighting matrix is correctly specified).  It is possible to iterate until convergence using the optional keyword input ``iter_limit``, which is naturally 2 by default.  Generally, GMM-CUE would be preferred to using multiple iterations of standard GMM.\n",
     "\n",
-    "The default weighting matrix is robust to heteroskecasticity (but not clustering)."
+    "The default weighting matrix is robust to heteroskedasticity (but not clustering)."
    ]
   },
   {
@@ -434,7 +434,7 @@
    "metadata": {},
    "source": [
     "## Single Instrument Regressions\n",
-    "It can be useful to run the just identified regressions to see how the IV estimate varies by instrument. The OLS model is included for comparrison. The coefficient when using ``lowincome`` is very similar to the OLS as is the $R^2$ which indicates this variable may be endogenous. The coefficient using ``firmsz`` is also very different, but this is probably due to the low correlation between ``firmsz`` and the endogenous regressor so that this is a weak instrument. "
+    "It can be useful to run the just identified regressions to see how the IV estimate varies by instrument. The OLS model is included for comparison. The coefficient when using ``lowincome`` is very similar to the OLS as is the $R^2$ which indicates this variable may be endogenous. The coefficient using ``firmsz`` is also very different, but this is probably due to the low correlation between ``firmsz`` and the endogenous regressor so that this is a weak instrument. "
    ]
   },
   {

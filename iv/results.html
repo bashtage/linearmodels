@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.8 documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -215,7 +215,7 @@ indicate the model is not overidentified. The test statistic is</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
 </tr>
@@ -277,7 +277,7 @@ indicate the model is not overidentified. The test statistic is</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
 are jointly tested.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
@@ -289,7 +289,7 @@ are jointly tested.</td>
 <p class="rubric">Notes</p>
 <p>Test statistic is difference between sum of squared OLS and sum of
 squared IV residuals where each set of residuals has been projected
-onto the set of instruments in teh IV model.</p>
+onto the set of instruments in the IV model.</p>
 <p>Start by defining</p>
 <div class="math notranslate nohighlight">
 \[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
@@ -411,11 +411,11 @@ of parameters and inclusion of effects, if any.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
 constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
 observations will not be returned.</li>
@@ -515,7 +515,9 @@ of instruments and the number of endogenous regressors.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.summary">
 <code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Summary table of model estimation results</p>
+<dd><p><a class="reference external" href="http://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels v0.9.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a> – Summary table of model estimation results</p>
+<p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -660,7 +662,7 @@ variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogen
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
 are jointly tested.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
@@ -672,7 +674,7 @@ are jointly tested.</td>
 <p class="rubric">Notes</p>
 <p>Test statistic is difference between sum of squared OLS and sum of
 squared IV residuals where each set of residuals has been projected
-onto the set of instruments in teh IV model.</p>
+onto the set of instruments in the IV model.</p>
 <p>Start by defining</p>
 <div class="math notranslate nohighlight">
 \[\delta &amp; = \hat{\epsilon}'_e P_{[z,w]} \hat{\epsilon}_e -
@@ -705,7 +707,7 @@ matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
 are jointly tested.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
@@ -747,7 +749,7 @@ tested.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
 </tr>
@@ -939,11 +941,11 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
 constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
 observations will not be returned.</li>
@@ -1014,7 +1016,9 @@ values corresponding to the original model specification.</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.summary">
 <code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Summary table of model estimation results</p>
+<dd><p><a class="reference external" href="http://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels v0.9.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a> – Summary table of model estimation results</p>
+<p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1095,7 +1099,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Confidence level for interval</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
 </tr>
@@ -1238,11 +1242,11 @@ of parameters and inclusion of effects, if any.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
 <li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – Dataframe to use for out-of-sample predictions when model was
+<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
 constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
+<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
+<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
 observations will not be returned.</li>
@@ -1306,14 +1310,16 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">std_errors</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.std_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.summary">
 <code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Summary table of model estimation results</p>
+<dd><p><a class="reference external" href="http://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels v0.9.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a> – Summary table of model estimation results</p>
+<p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1353,7 +1359,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.tstats" title="Permalink to this definition">¶</a></dt>
+<code class="descname">tstats</code><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.tstats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
@@ -1373,7 +1379,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
 names.  An OrderedDict will preserve the model order the comparisons.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>comparison</strong></td>
@@ -1392,7 +1398,7 @@ names.  An OrderedDict will preserve the model order the comparisons.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
 names.  An OrderedDict will preserve the model order the comparisons.</td>
 </tr>
 </tbody>
@@ -1448,7 +1454,9 @@ names.  An OrderedDict will preserve the model order the comparisons.</td>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVModelComparison.summary">
 <code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Summary table of model comparison</p>
+<dd><p><a class="reference external" href="http://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels v0.9.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a> – Summary table of model estimation results</p>
+<p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1510,7 +1518,7 @@ is with respect to the other included variables in the model.</li>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>res</strong> – Dictionary containing first stage estimation results. Keys are
 the variable names of the endogenous regressors.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -1519,7 +1527,9 @@ the variable names of the endogenous regressors.</td>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.FirstStageResults.summary">
 <code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Summary table of first-stage estimation results</p>
+<dd><p><a class="reference external" href="http://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels v0.9.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a> – Summary table of model estimation results</p>
+<p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1559,7 +1569,7 @@ the variable names of the endogenous regressors.</td>
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

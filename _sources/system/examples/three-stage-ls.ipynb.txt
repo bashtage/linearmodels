@@ -170,7 +170,7 @@
     "* endog - Endogenous regressors\n",
     "* instruments - Instrumental variables\n",
     "\n",
-    "The estimates are the same.  This interface is more useful for programatically generating and estimating models."
+    "The estimates are the same.  This interface is more useful for programmatically generating and estimating models."
    ]
   },
   {

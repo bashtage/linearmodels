@@ -1,6 +1,19 @@
 Change Log
 ----------
 
+Version 4.9
+===========
+* Changed the return type of Wooldridge's over identification test when
+  invalid to `InvalidTestStatistic`
+* Add typing information to IV models
+* Allow optimization parameters to be passed to `IVGMMCUE`
+* Removed internal use of pandas Panel
+* Improved performance in panel models when using `from_formula`
+* Switched to retaining index column names when original input index is named
+* Modified tests that were not well conceived
+* Added spell check to documentation build
+* Improve docstring for ``summary`` properties
+
 Version 4.8
 ===========
 * Corrected bug that prevented single character names in IV formulas

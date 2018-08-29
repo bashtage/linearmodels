@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.8 documentation</title>
+    <title>System Regression Estimator Covariance Estimation &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -144,9 +144,9 @@
 <li><strong>x</strong> (<em>list of ndarray</em>) – List of regressor arrays (ndependent)</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</li>
 <li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
 </ul>
 </td>
@@ -196,9 +196,9 @@ not used, the covariance is estimated by</p>
 <li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
 </ul>
 </td>
 </tr>
@@ -250,10 +250,10 @@ residuals and the weighted X matrix <span class="math notranslate nohighlight">\
 <li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
 <li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
 <li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
 assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
+<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
 <li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
@@ -262,7 +262,7 @@ assume OLS was used</li>
 </ul>
 </div></blockquote>
 </li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
 bandwidth will be estimated.</li>
 </ul>
 </td>
@@ -318,8 +318,8 @@ based on the model residuals and the weighted X matrix <span class="math notrans
 
 </div>
 </div>
-<div class="section" id="genralized-method-of-moments-gmm">
-<h2>Genralized Method of Moments (GMM)<a class="headerlink" href="#genralized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="generalized-method-of-moments-gmm">
+<h2>Generalized Method of Moments (GMM)<a class="headerlink" href="#generalized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="gmm-homoskedastic-covariance-estimation">
 <h3>GMM Homoskedastic Covariance Estimation<a class="headerlink" href="#gmm-homoskedastic-covariance-estimation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
@@ -425,7 +425,7 @@ equation in the system</li>
 <li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</li>
 <li><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</li>
 <li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
 <li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
@@ -434,7 +434,7 @@ equation in the system</li>
 </ul>
 </div></blockquote>
 </li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
 bandwidth will be estimated.</li>
 </ul>
 </td>
@@ -509,7 +509,7 @@ bandwidth will be estimated.</li>
         <li class="right" >
           <a href="results.html" title="Estimation Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >System Regression Models</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>

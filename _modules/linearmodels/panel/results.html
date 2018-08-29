@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.results &#8212; linearmodels 4.8 documentation</title>
+    <title>linearmodels.panel.results &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.8</a>
+    ../../../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -111,7 +111,6 @@
 <span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">diag</span><span class="p">,</span> <span class="n">sqrt</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">stats</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="k">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
@@ -177,7 +176,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimated parameter standard errors&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;std_error&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;std_error&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -341,7 +340,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; Estimation Summary&#39;</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
@@ -472,7 +475,7 @@
 <span class="sd">        exog : array-like</span>
 <span class="sd">            Exogenous values to use in out-of-sample prediction (nobs by nexog)</span>
 <span class="sd">        data : DataFrame, optional</span>
-<span class="sd">            Dataframe to use for out-of-sample predictions when model was</span>
+<span class="sd">            DataFrame to use for out-of-sample predictions when model was</span>
 <span class="sd">            constructed using a formula.</span>
 <span class="sd">        fitted : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the fitted values</span>
@@ -576,7 +579,7 @@
 <span class="sd">           W = \hat{\beta}_{-}&#39; \hat{\Sigma}_{-}^{-1} \hat{\beta}_{-}</span>
 
 <span class="sd">        where :math:`\hat{\beta}_{-}` does not include the model constant and</span>
-<span class="sd">        :math:`\hat{\Sigma}_{-}` is tht estimated covariance of the</span>
+<span class="sd">        :math:`\hat{\Sigma}_{-}` is the estimated covariance of the</span>
 <span class="sd">        parameters, also excluding the constant.  The test statistic is</span>
 <span class="sd">        distributed as :math:`\chi^2_{k}` where k is the number of non-</span>
 <span class="sd">        constant parameters.</span>
@@ -702,7 +705,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">smry</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PanelEffectsResults</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span>
 
         <span class="n">is_invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_pooled</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
@@ -828,7 +836,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model comparison&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">smry</span> <span class="o">=</span> <span class="n">Summary</span><span class="p">()</span>
         <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Model Comparison&#39;</span>
@@ -875,7 +888,7 @@
             <span class="n">effects</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s1">&#39;included_effects&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">all_effects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">effects</span><span class="p">)</span>
 
-        <span class="n">neffect</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">all_effects</span><span class="p">))</span>
+        <span class="n">neffect</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">all_effects</span><span class="p">))</span>
         <span class="n">effects</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">effects_stub</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Effects&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">neffect</span><span class="p">):</span>
@@ -916,7 +929,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

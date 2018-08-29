@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.8 documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.8</a>
+    ../../../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -128,7 +128,7 @@
 
 
 <span class="k">def</span> <span class="nf">stub_concat</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;=&#39;</span><span class="p">):</span>
-    <span class="n">col_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">l</span><span class="p">))</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">])</span>
+    <span class="n">col_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">])</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
         <span class="n">out</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
@@ -139,7 +139,7 @@
 <span class="k">def</span> <span class="nf">table_concat</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;=&#39;</span><span class="p">):</span>
     <span class="n">col_sizes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">r</span><span class="p">)),</span> <span class="n">l</span><span class="p">))</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">r</span><span class="p">)),</span> <span class="n">l</span><span class="p">))</span>
         <span class="n">col_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
     <span class="n">col_size</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">col_sizes</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">sep_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">sep</span> <span class="o">*</span> <span class="p">(</span><span class="n">cs</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">col_size</span><span class="p">]</span>
@@ -240,7 +240,7 @@
 <span class="sd">        endog : array-like</span>
 <span class="sd">            Endogenous values to use in out-of-sample prediction (nobs by nendog)</span>
 <span class="sd">        data : DataFrame, optional</span>
-<span class="sd">            Dataframe to use for out-of-sample predictions when model was</span>
+<span class="sd">            DataFrame to use for out-of-sample predictions when model was</span>
 <span class="sd">            constructed using a formula.</span>
 <span class="sd">        fitted : bool, optional</span>
 <span class="sd">            Flag indicating whether to include the fitted values</span>
@@ -330,16 +330,16 @@
         <span class="sd">&quot;&quot;&quot;Covariance estimator used&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span>
 
-    <span class="nd">@property</span>
+<div class="viewcode-block" id="OLSResults.std_errors"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.std_errors">[docs]</a>    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">std_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimated parameter standard errors&quot;&quot;&quot;</span>
         <span class="n">std_errors</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stderr&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;stderr&#39;</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
+<div class="viewcode-block" id="OLSResults.tstats"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.tstats">[docs]</a>    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">tstats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parameter t-statistics&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tstat&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tstat&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OLSResults.pvalues"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.pvalues">[docs]</a>    <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">pvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -435,7 +435,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">+</span> <span class="s1">&#39; Estimation Summary&#39;</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
@@ -722,7 +726,7 @@
 <span class="sd">        -----</span>
 <span class="sd">        Test statistic is difference between sum of squared OLS and sum of</span>
 <span class="sd">        squared IV residuals where each set of residuals has been projected</span>
-<span class="sd">        onto the set of instruments in teh IV model.</span>
+<span class="sd">        onto the set of instruments in the IV model.</span>
 
 <span class="sd">        Start by defining</span>
 
@@ -750,7 +754,7 @@
         <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">null</span> <span class="o">=</span> <span class="s1">&#39;Variables </span><span class="si">{0}</span><span class="s1"> are exogenous&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variables</span><span class="p">))</span>
 
-        <span class="n">e0</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">nexog</span><span class="p">,</span> <span class="n">nendog</span><span class="p">,</span> <span class="n">ntested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endogeneity_setup</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">e0</span><span class="p">,</span> <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ntested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endogeneity_setup</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
         <span class="n">stat</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e1</span> <span class="o">-</span> <span class="n">e2</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e2</span>
         <span class="n">stat</span> <span class="o">/=</span> <span class="p">(</span><span class="n">e0</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">e0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
 
@@ -777,7 +781,7 @@
 <span class="sd">        -----</span>
 <span class="sd">        Test statistic is difference between sum of squared OLS and sum of</span>
 <span class="sd">        squared IV residuals where each set of residuals has been projected</span>
-<span class="sd">        onto the set of instruments in teh IV model.</span>
+<span class="sd">        onto the set of instruments in the IV model.</span>
 
 <span class="sd">        Start by defining</span>
 
@@ -940,12 +944,10 @@
         <span class="n">instruments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span>
         <span class="n">nobs</span><span class="p">,</span> <span class="n">nendog</span> <span class="o">=</span> <span class="n">endog</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">ninstr</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Wooldridge</span><span class="se">\&#39;</span><span class="s1">s score test of overidentification&#39;</span>
         <span class="k">if</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">warnings</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Test requires more instruments than &#39;</span>
-                          <span class="s1">&#39;endogenous variables&#39;</span><span class="p">,</span>
-                          <span class="ne">UserWarning</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Test is not feasible.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Infeasible test.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">InvalidTestStatistic</span><span class="p">(</span><span class="s1">&#39;Test requires more instruments than &#39;</span>
+                                        <span class="s1">&#39;endogenous variables.&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
         <span class="n">endog_hat</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">c_</span><span class="p">[</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span><span class="p">)]</span>
@@ -956,7 +958,6 @@
         <span class="n">stat</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">nobs</span> <span class="o">*</span> <span class="n">res</span><span class="o">.</span><span class="n">rsquared</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">ninstr</span> <span class="o">-</span> <span class="n">nendog</span>
         <span class="n">null</span> <span class="o">=</span> <span class="s1">&#39;Model is not overidentified.&#39;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Wooldridge</span><span class="se">\&#39;</span><span class="s1">s score test of overidentification&#39;</span>
         <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IVResults.anderson_rubin"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.IVResults.anderson_rubin">[docs]</a>    <span class="nd">@cached_property</span>
@@ -1282,7 +1283,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of first-stage estimation results&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stubs_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rsquared&#39;</span><span class="p">:</span> <span class="s1">&#39;R-squared&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;partial.rsquared&#39;</span><span class="p">:</span> <span class="s1">&#39;Partial R-squared&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;shea.rsquared&#39;</span><span class="p">:</span> <span class="s1">&#39;Shea</span><span class="se">\&#39;</span><span class="s1">s R-squared&#39;</span><span class="p">,</span>
@@ -1380,7 +1385,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Summary table of model comparison&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
+
+<span class="sd">        Supports export to csv, html and latex  using the methods ``summary.as_csv()``,</span>
+<span class="sd">        ``summary.as_html()`` and ``summary.as_latex()``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">smry</span> <span class="o">=</span> <span class="n">Summary</span><span class="p">()</span>
         <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Model Comparison&#39;</span>
@@ -1420,7 +1429,7 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">all_instr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
-        <span class="n">ninstr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">all_instr</span><span class="p">))</span>
+        <span class="n">ninstr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">all_instr</span><span class="p">))</span>
         <span class="n">instruments</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">instrument_stub</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Instruments&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ninstr</span><span class="p">):</span>
@@ -1461,7 +1470,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

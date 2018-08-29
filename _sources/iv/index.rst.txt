@@ -14,7 +14,7 @@ through examples from Wooldridge's introductory text book and
 advanced examples following the examples in Cameron and Trivedi's Stata
 introduction.
 
-:ref:`iv-mathematical-notation` contains a concise explanation of teh formulas
+:ref:`iv-mathematical-notation` contains a concise explanation of the formulas
 used in estimating parameters, estimating covariances and conducting hypothesis
 tests.
 

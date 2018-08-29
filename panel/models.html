@@ -16,10 +16,10 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Models for Panel Data &#8212; linearmodels 4.8 documentation</title>
+    <title>Models for Panel Data &#8212; linearmodels 4.9 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.8</a>
+    ../index.html" class="text-logo">linearmodels 4.9</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -146,8 +146,8 @@
 <li><strong>weights</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Weights to use in estimation.  Assumes residual variance is
 proportional to inverse of weight to that the residual time
 the weight should be homoskedastic.</li>
-<li><strong>entity_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag whether to include entity (fixed) effects in the model</li>
-<li><strong>time_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag whether to include time effects in the model</li>
+<li><strong>entity_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag whether to include entity (fixed) effects in the model</li>
+<li><strong>time_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag whether to include time effects in the model</li>
 <li><strong>other_effects</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Category codes to use for any effects that are not entity or time
 effects. Each variable is treated as an effect.</li>
 </ul>
@@ -188,18 +188,18 @@ effects are included, the model reduces to <a class="reference internal" href="#
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>use_lsdv</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use the Least Squares Dummy Variable estimator
+<li><strong>use_lsdv</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use the Least Squares Dummy Variable estimator
 to eliminate effects.  The default value uses only means and does
 note require constructing dummy variables for each effect.</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
-<li><strong>auto_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the treatment of estimated effects in degree
+<li><strong>auto_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the treatment of estimated effects in degree
 of freedom adjustment is automatically handled. This is useful
 since clustered standard errors that are clustered using the same
 variable as an effect do not require degree of freedom correction
 while other estimators such as the unadjusted covariance do.</li>
-<li><strong>count_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the covariance estimator should be adjusted
+<li><strong>count_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the covariance estimator should be adjusted
 to account for the estimation of effects in the model. Only used
 if <code class="docutils literal notranslate"><span class="pre">auto_df=False</span></code>.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
@@ -261,7 +261,7 @@ not provided, a naive default is used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules
 with two special variable names, EntityEffects and TimeEffects
 which can be used to specify that the model should contain an
 entity effect or a time effect, respectively. See Examples.</li>
@@ -323,7 +323,7 @@ effects. Each variable is treated as an effect.</li>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -410,8 +410,8 @@ common to all entities i.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
@@ -472,7 +472,7 @@ not provided, a naive default is used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
 <li><strong>data</strong> (<em>array-like</em>) – Data structure that can be coerced into a PanelData.  In most
 cases, this should be a multi-index DataFrame where the level 0
 index contains the entities and the level 1 contains the time.</li>
@@ -526,7 +526,7 @@ constant using the constant indicator (1)</p>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -606,11 +606,11 @@ the weight should be homoskedastic.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reweight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Flag indicating to reweight observations if the input data is
+<li><strong>reweight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to reweight observations if the input data is
 unbalanced using a WLS estimator.  If weights are provided, these
 are accounted for when reweighting. Has no effect on balanced data.</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
@@ -662,7 +662,7 @@ identical within an entity.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
 <li><strong>data</strong> (<em>array-like</em>) – Data structure that can be coerced into a PanelData.  In most
 cases, this should be a multi-index DataFrame where the level 0
 index contains the entities and the level 1 contains the time.</li>
@@ -716,7 +716,7 @@ constant using the constant indicator (1)</p>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -795,8 +795,8 @@ the weight should be homoskedastic.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
@@ -860,7 +860,7 @@ ids to be identical within an entity.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
 <li><strong>data</strong> (<em>array-like</em>) – Data structure that can be coerced into a PanelData.  In most
 cases, this should be a multi-index DataFrame where the level 0
 index contains the entities and the level 1 contains the time.</li>
@@ -914,7 +914,7 @@ constant using the constant indicator (1)</p>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -993,8 +993,8 @@ the weight should be homoskedastic.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
@@ -1055,7 +1055,7 @@ not provided, a naive default is used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
 <li><strong>data</strong> (<em>array-like</em>) – Data structure that can be coerced into a PanelData.  In most
 cases, this should be a multi-index DataFrame where the level 0
 index contains the entities and the level 1 contains the time.</li>
@@ -1109,7 +1109,7 @@ constant using the constant indicator (1)</p>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -1200,8 +1200,8 @@ depending on <code class="docutils literal notranslate"><span class="pre">cov_ty
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
+<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of covariance estimator. See Notes.</li>
+<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debiased the covariance estimator using
 a degree of freedom adjustment.</li>
 <li><strong>**cov_config</strong> – Additional covariance-specific options.  See Notes.</li>
 </ul>
@@ -1252,7 +1252,7 @@ not provided, a naive default is used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
+<li><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Formula to transform into model. Conforms to patsy formula rules.</li>
 <li><strong>data</strong> (<em>array-like</em>) – Data structure that can be coerced into a PanelData.  In most
 cases, this should be a multi-index DataFrame where the level 0
 index contains the entities and the level 1 contains the time.</li>
@@ -1306,7 +1306,7 @@ constant using the constant indicator (1)</p>
 <li><strong>exog</strong> (<em>array-like</em>) – Exogenous regressors (nobs by nvar)</li>
 <li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
 from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
 </ul>
 </td>
 </tr>
@@ -1386,7 +1386,7 @@ missing in the model data.</td>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
