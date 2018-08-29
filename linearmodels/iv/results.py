@@ -220,13 +220,13 @@ class OLSResults(_SummaryStr):
         """Covariance estimator used"""
         return self._cov_type
 
-    @property
+    @cached_property
     def std_errors(self):
         """Estimated parameter standard errors"""
         std_errors = sqrt(diag(self.cov))
         return Series(std_errors, index=self._vars, name='stderr')
 
-    @property
+    @cached_property
     def tstats(self):
         """Parameter t-statistics"""
         return Series(self._params / self.std_errors, name='tstat')
@@ -834,12 +834,10 @@ class IVResults(_CommonIVResults):
         instruments = self.model.instruments
         nobs, nendog = endog.shape
         ninstr = instruments.shape[1]
+        name = 'Wooldridge\'s score test of overidentification'
         if ninstr - nendog == 0:
-            import warnings
-            warnings.warn('Test requires more instruments than '
-                          'endogenous variables',
-                          UserWarning)
-            return WaldTestStatistic(0, 'Test is not feasible.', 1, name='Infeasible test.')
+            return InvalidTestStatistic('Test requires more instruments than '
+                                        'endogenous variables.', name=name)
 
         endog_hat = proj(endog.ndarray, c_[exog.ndarray, instruments.ndarray])
         q = instruments.ndarray[:, :(ninstr - nendog)]
@@ -850,7 +848,6 @@ class IVResults(_CommonIVResults):
         stat = res.nobs * res.rsquared
         df = ninstr - nendog
         null = 'Model is not overidentified.'
-        name = 'Wooldridge\'s score test of overidentification'
         return WaldTestStatistic(stat, null, df, name=name)
 
     @cached_property

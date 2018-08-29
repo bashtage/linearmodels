@@ -18,6 +18,8 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  KernelWeightMatrix,
                                  OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
+from linearmodels.typing import Numeric, OptionalNumeric
+from linearmodels.typing.iv import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
                                   missing_warning)
 
@@ -105,11 +107,13 @@ class IVLIML(object):
     IV2SLS, IVGMM, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
-                 fuller=0, kappa=None):
+    def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike,
+                 endog: OptionalArrayLike, instruments: OptionalArrayLike, *,
+                 weights: OptionalArrayLike = None, fuller: Numeric = 0,
+                 kappa: OptionalNumeric = None):
 
         self.dependent = IVData(dependent, var_name='dependent')
-        nobs = self.dependent.shape[0]
+        nobs = self.dependent.shape[0]  # type: int
         self.exog = IVData(exog, var_name='exog', nobs=nobs)
         self.endog = IVData(endog, var_name='endog', nobs=nobs)
         self.instruments = IVData(instruments, var_name='instruments', nobs=nobs)
@@ -573,7 +577,9 @@ class IV2SLS(IVLIML):
     IVLIML, IVGMM, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments, *, weights=None):
+    def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike,
+                 endog: OptionalArrayLike, instruments: OptionalArrayLike, *,
+                 weights: OptionalArrayLike = None):
         self._method = 'IV-2SLS'
         super(IV2SLS, self).__init__(dependent, exog, endog, instruments,
                                      weights=weights, fuller=0, kappa=1)
@@ -675,8 +681,10 @@ class IVGMM(IVLIML):
     IV2SLS, IVLIML, IVGMMCUE
     """
 
-    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
-                 weight_type='robust', **weight_config):
+    def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike,
+                 endog: OptionalArrayLike, instruments: OptionalArrayLike, *,
+                 weights: OptionalArrayLike = None,
+                 weight_type: str = 'robust', **weight_config):
         self._method = 'IV-GMM'
         self._result_container = IVGMMResults
         super(IVGMM, self).__init__(dependent, exog, endog, instruments, weights=weights)
@@ -914,8 +922,10 @@ class IVGMMCUE(IVGMM):
     IV2SLS, IVLIML, IVGMM
     """
 
-    def __init__(self, dependent, exog, endog, instruments, *, weights=None,
-                 weight_type='robust', **weight_config):
+    def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike,
+                 endog: OptionalArrayLike, instruments: OptionalArrayLike, *,
+                 weights: OptionalArrayLike = None,
+                 weight_type: str = 'robust', **weight_config):
         self._method = 'IV-GMM-CUE'
         super(IVGMMCUE, self).__init__(dependent, exog, endog, instruments, weights=weights,
                                        weight_type=weight_type, **weight_config)
@@ -1017,7 +1027,7 @@ class IVGMMCUE(IVGMM):
         g_bar = (z * eps).mean(0)
         return nobs * g_bar.T @ w @ g_bar.T
 
-    def estimate_parameters(self, starting, x, y, z, display=False):
+    def estimate_parameters(self, starting, x, y, z, display=False, opt_options=None):
         r"""
         Parameters
         ----------
@@ -1031,6 +1041,9 @@ class IVGMMCUE(IVGMM):
             Instrument matrix (nobs by ninstr)
         display : bool
             Flag indicating whether to display iterative optimizer output
+        opt_options : dict, optional
+            Dictionary containing additional keyword arguments to pass to
+            scipy.optimize.minimize.
 
         Returns
         -------
@@ -1047,11 +1060,18 @@ class IVGMMCUE(IVGMM):
         scipy.optimize.minimize
         """
         args = (x, y, z)
-        res = minimize(self.j, starting, args=args, options={'disp': display})
+        opt_options = {} if opt_options is None else opt_options
+        options = {'disp': display}
+        if 'options' in opt_options:
+            opt_options = opt_options.copy()
+            options.update(opt_options.pop('options'))
+
+        res = minimize(self.j, starting, args=args, options=options, **opt_options)
 
         return res.x[:, None], res.nit
 
-    def fit(self, *, starting=None, display=False, cov_type='robust', **cov_config):
+    def fit(self, *, starting=None, display=False, cov_type='robust', opt_options=None,
+            **cov_config):
         r"""
         Estimate model parameters
 
@@ -1064,6 +1084,10 @@ class IVGMMCUE(IVGMM):
             Flag indicating whether to display optimization output
         cov_type : str, optional
             Name of covariance estimator to use
+        opt_options : dict, optional
+            Additional options to pass to scipy.optimize.minimize when
+            optimizing the objective function. If not provided, defers to
+            scipy to choose an appropriate optimizer.
         **cov_config
             Additional parameters to pass to covariance estimator
 
@@ -1080,10 +1104,6 @@ class IVGMMCUE(IVGMM):
         is provided.
 
         Starting values are computed by IVGMM.
-
-        .. todo::
-
-          * Expose method to pass optimization options
         """
 
         wy, wx, wz = self._wy, self._wx, self._wz
@@ -1103,7 +1123,8 @@ class IVGMMCUE(IVGMM):
             if len(starting) != self.exog.shape[1] + self.endog.shape[1]:
                 raise ValueError('starting does not have the correct number '
                                  'of values')
-        params, iters = self.estimate_parameters(starting, wx, wy, wz, display)
+        params, iters = self.estimate_parameters(starting, wx, wy, wz, display,
+                                                 opt_options=opt_options)
         eps = wy - wx @ params
         wmat = inv(weight_matrix(wx, wz, eps))
 
@@ -1140,6 +1161,7 @@ class _OLS(IVLIML):
     statsmodels.regression.linear_model.GLS
     """
 
-    def __init__(self, dependent, exog, *, weights=None):
+    def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike, *,
+                 weights: OptionalArrayLike = None):
         super(_OLS, self).__init__(dependent, exog, None, None, weights=weights, kappa=0.0)
         self._result_container = OLSResults

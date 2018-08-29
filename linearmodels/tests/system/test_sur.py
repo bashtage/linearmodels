@@ -637,6 +637,7 @@ def test_fitted(data):
     assert_frame_equal(expected, res.fitted_values)
 
 
+@pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 def test_predict(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
@@ -674,6 +675,7 @@ def test_predict(missing_data):
         assert pred[key].shape[0] == nobs
 
 
+@pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 def test_predict_error(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()

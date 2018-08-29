@@ -31,7 +31,7 @@ def data(request):
 @pytest.fixture(params=perms, ids=ids)
 def large_data(request):
     missing, datatype, const = request.param
-    return generate_data(missing, datatype, const=const, ntk=(51, 30, 5), other_effects=2)
+    return generate_data(missing, datatype, const=const, ntk=(51, 71, 5), other_effects=2)
 
 
 perms = list(product(missing, datatypes))

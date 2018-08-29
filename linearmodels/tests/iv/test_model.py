@@ -342,3 +342,21 @@ def test_gmm_str(data):
     str(mod.fit(cov_type='robust'))
     str(mod.fit(cov_type='clustered', clusters=data.clusters))
     str(mod.fit(cov_type='kernel'))
+
+
+def test_gmm_cue_optimization_options(data):
+    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
+    res_none = mod.fit(display=False)
+    opt_options = dict(method='BFGS', options={'disp': False})
+    res_bfgs = mod.fit(display=False, opt_options=opt_options)
+    opt_options = dict(method='L-BFGS-B', options={'disp': False})
+    res_lbfgsb = mod.fit(display=False, opt_options=opt_options)
+    assert res_none.iterations > 2
+    assert res_bfgs.iterations > 2
+    assert res_lbfgsb.iterations > 2
+
+    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    res2 = mod2.fit()
+    assert res_none.j_stat.stat <= res2.j_stat.stat
+    assert res_bfgs.j_stat.stat <= res2.j_stat.stat
+    assert res_lbfgsb.j_stat.stat <= res2.j_stat.stat
