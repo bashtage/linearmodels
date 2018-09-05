@@ -4,6 +4,8 @@
 [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c771bce50a164b6fa71c344b374f140d)](https://www.codacy.com/app/bashtage/linearmodels?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bashtage/linearmodels&amp;utm_campaign=Badge_Grade)
 [![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-master)
+[![Code Quality: Python](https://img.shields.io/lgtm/grade/python/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/context:python)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/alerts)
 
 Linear (regression) models for Python.  Extends
 [statsmodels](http://www.statsmodels.org) with Panel regression,
