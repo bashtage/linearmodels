@@ -56,7 +56,7 @@ def parse_block(block):
     stats = params.loc[params.tstats.isnull(), 'params']
     params = params.loc[params.tstats.notnull()]
 
-    for i, line in enumerate(block[last + 2:]):
+    for line in block[last + 2:]:
         if len(line) == 1 and line[0].startswith('***'):
             break
         cov.append(line)

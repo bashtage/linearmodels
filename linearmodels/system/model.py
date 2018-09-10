@@ -16,9 +16,7 @@ from collections import Mapping, OrderedDict
 from functools import reduce
 
 import numpy as np
-from numpy import (asarray, cumsum, diag, eye, hstack, inf, nanmean,
-                   ones, ones_like, reshape, sqrt, zeros)
-from numpy.linalg import inv, solve
+from numpy.linalg import inv, solve, matrix_rank
 from pandas import Series, concat, DataFrame
 
 from linearmodels.compat.numpy import lstsq
@@ -34,7 +32,7 @@ from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWe
     KernelWeightMatrix
 from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
-                                  matrix_rank, missing_warning)
+                                  missing_warning)
 
 __all__ = ['SUR', 'IV3SLS', 'IVSystemGMM']
 
@@ -139,7 +137,8 @@ class SystemFormulaParser(object):
         self._clean_formula = OrderedDict()
         self._parse()
 
-    def _prevent_autoconst(self, formula):
+    @staticmethod
+    def _prevent_autoconst(formula):
         if not (' 0+' in formula or ' 0 +' in formula):
             formula = '~ 0 +'.join(formula.split('~'))
         return formula
@@ -150,7 +149,7 @@ class SystemFormulaParser(object):
         weights = self._weights
         parsers = self._parsers
         weight_dict = self._weight_dict
-        cln_fromula = self._clean_formula
+        cln_formula = self._clean_formula
 
         if isinstance(formula, Mapping):
             for key in formula:
@@ -163,12 +162,12 @@ class SystemFormulaParser(object):
                         weight_dict[key] = weights[key]
                     else:
                         weight_dict[key] = None
-                cln_fromula[key] = f
+                cln_formula[key] = f
         else:
             formula = formula.replace('\n', ' ').strip()
             parts = formula.split('}')
             for part in parts:
-                base_key = None
+                key = base_key = None
                 part = part.strip()
                 if part == '':
                     continue
@@ -185,7 +184,7 @@ class SystemFormulaParser(object):
                     key = base_key + '.{0}'.format(count)
                     count += 1
                 parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
-                cln_fromula[key] = f
+                cln_formula[key] = f
                 if weights is not None:
                     if key in weights:
                         weight_dict[key] = weights[key]
@@ -356,7 +355,7 @@ class IV3SLS(object):
         self._equations = equations
         self._sigma = None
         if sigma is not None:
-            self._sigma = asarray(sigma)
+            self._sigma = np.asarray(sigma)
             k = len(self._equations)
             if self._sigma.shape != (k, k):
                 raise ValueError('sigma must be a square matrix with dimensions '
@@ -421,7 +420,7 @@ class IV3SLS(object):
                     self._weights.append(IVData(eq_data[4]))
                 else:
                     dep = self._dependent[-1].ndarray
-                    self._weights.append(IVData(ones_like(dep)))
+                    self._weights.append(IVData(np.ones_like(dep)))
 
             elif isinstance(eq_data, (dict, Mapping)):
                 dep = IVData(eq_data['dependent'], var_name=dep_name)
@@ -445,7 +444,7 @@ class IV3SLS(object):
                 if 'weights' in eq_data:
                     self._weights.append(IVData(eq_data['weights']))
                 else:
-                    self._weights.append(IVData(ones(dep.shape)))
+                    self._weights.append(IVData(np.ones(dep.shape)))
             else:
                 msg = UNKNOWN_EQ_TYPE.format(key=key, type=type(vars))
                 raise TypeError(msg)
@@ -479,7 +478,7 @@ class IV3SLS(object):
             x = np.concatenate([exog.ndarray, endog.ndarray], 1)
             z = np.concatenate([exog.ndarray, instr.ndarray], 1)
             w = w.ndarray
-            w = w / nanmean(w)
+            w = w / np.nanmean(w)
             w_sqrt = np.sqrt(w)
             self._w.append(w)
             self._y.append(y)
@@ -520,12 +519,12 @@ class IV3SLS(object):
         self._original_index = self._dependent[0].rows.copy()
         missing = np.zeros(nobs, dtype=np.bool)
 
+        values = [self._dependent, self._exog, self._endog, self._instr, self._weights]
         for i in range(k):
-            missing |= self._dependent[i].isnull
-            missing |= self._exog[i].isnull
-            missing |= self._endog[i].isnull
-            missing |= self._instr[i].isnull
-            missing |= self._weights[i].isnull
+            for value in values:
+                nulls = value[i].isnull
+                if nulls.any():
+                    missing |= nulls
 
         missing_warning(missing)
         if np.any(missing):
@@ -676,7 +675,7 @@ class IV3SLS(object):
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
         col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
-        col_idx = cumsum(col_sizes)
+        col_idx = np.cumsum(col_sizes)
         total_cols = col_idx[-1]
         self._construct_xhat()
         beta, eps = self._multivariate_ls_fit()
@@ -689,13 +688,13 @@ class IV3SLS(object):
         beta_hist = [beta]
         nobs = eps.shape[0]
         iter_count = 0
-        delta = inf
+        delta = np.inf
         while ((iter_count < iter_limit and iterate) or iter_count == 0) and delta >= tol:
             beta, eps, sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
                                                   full_cov, debiased)
             beta_hist.append(beta)
             delta = beta_hist[-1] - beta_hist[-2]
-            delta = sqrt(np.mean(delta ** 2))
+            delta = np.sqrt(np.mean(delta ** 2))
             iter_count += 1
 
         sigma_m12 = inv_matrix_sqrt(sigma)
@@ -703,8 +702,8 @@ class IV3SLS(object):
         wx = blocked_diag_product(self._wx, sigma_m12)
         gls_eps = wy - wx @ beta
 
-        y = blocked_column_product(self._y, eye(k))
-        x = blocked_diag_product(self._x, eye(k))
+        y = blocked_column_product(self._y, np.eye(k))
+        x = blocked_diag_product(self._x, np.eye(k))
         eps = y - x @ beta
 
         return self._gls_finalize(beta, sigma, full_sigma, gls_eps,
@@ -714,7 +713,7 @@ class IV3SLS(object):
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
 
-        xpx = blocked_inner_prod(wxhat, eye(len(wxhat)))
+        xpx = blocked_inner_prod(wxhat, np.eye(len(wxhat)))
         xpy = []
         for i in range(k):
             xpy.append(wxhat[i].T @ wy[i])
@@ -728,7 +727,7 @@ class IV3SLS(object):
             b = beta[loc:loc + nb]
             eps.append(wy[i] - wx[i] @ b)
             loc += nb
-        eps = hstack(eps)
+        eps = np.hstack(eps)
 
         return beta, eps
 
@@ -758,15 +757,15 @@ class IV3SLS(object):
             sigma *= self._sigma_scale(debiased)
 
         if not full_cov:
-            sigma = diag(diag(sigma))
+            sigma = np.diag(np.diag(sigma))
         sigma_inv = inv(sigma)
 
         k = len(wy)
 
         xpx = blocked_inner_prod(wxhat, sigma_inv)
-        xpy = zeros((total_cols, 1))
+        xpy = np.zeros((total_cols, 1))
         for i in range(k):
-            sy = zeros((nobs, 1))
+            sy = np.zeros((nobs, 1))
             for j in range(k):
                 sy += sigma_inv[i, j] * wy[j]
             xpy[ci[i]:ci[i + 1]] = wxhat[i].T @ sy
@@ -1032,7 +1031,7 @@ class IV3SLS(object):
             total_ss += individual[key].total_ss
             resid_ss += individual[key].resid_ss
             resid.append(individual[key].resid)
-        resid = hstack(resid)
+        resid = np.hstack(resid)
 
         results['resid_ss'] = resid_ss
         results['total_ss'] = total_ss
@@ -1050,7 +1049,7 @@ class IV3SLS(object):
             b = beta[loc:loc + nb]
             fitted.append(x[i] @ b)
             loc += nb
-        fitted = hstack(fitted)
+        fitted = np.hstack(fitted)
 
         results['fitted'] = fitted
 
@@ -1063,8 +1062,8 @@ class IV3SLS(object):
 
         # Covariance estimation
         cov_est = COV_EST[cov_type]
-        gls_eps = reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
-        eps = reshape(eps, (k, eps.shape[0] // k)).T
+        gls_eps = np.reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
+        eps = np.reshape(eps, (k, eps.shape[0] // k)).T
         cov_est = cov_est(self._wxhat, gls_eps, sigma, full_sigma, gls=True,
                           constraints=self._constraints, **cov_config)
         cov = cov_est.cov
@@ -1097,7 +1096,7 @@ class IV3SLS(object):
         wresid = []
         for key in individual:
             wresid.append(individual[key].wresid)
-        wresid = hstack(wresid)
+        wresid = np.hstack(wresid)
         results['wresid'] = wresid
         results['cov_estimator'] = cov_est
         results['cov_config'] = cov_est.cov_config
@@ -1505,7 +1504,7 @@ class IVSystemGMM(IV3SLS):
             b = beta[loc:loc + nb]
             eps.append(wy[i] - wx[i] @ b)
             loc += nb
-        eps = hstack(eps)
+        eps = np.hstack(eps)
         sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
         vinv = None
         iters = 1
@@ -1517,7 +1516,7 @@ class IVSystemGMM(IV3SLS):
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
-                xpz = blocked_cross_prod(wx, wz, eye(k))
+                xpz = blocked_cross_prod(wx, wz, np.eye(k))
                 xpz = xpz / nobs
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
@@ -1531,7 +1530,7 @@ class IVSystemGMM(IV3SLS):
                 b = beta[loc:loc + nb]
                 eps.append(wy[i] - wx[i] @ b)
                 loc += nb
-            eps = hstack(eps)
+            eps = np.hstack(eps)
             iters += 1
 
         cov_type = COV_TYPES[cov_type]
@@ -1547,7 +1546,7 @@ class IVSystemGMM(IV3SLS):
             b = beta[loc:loc + nb]
             eps.append(y[i] - x[i] @ b)
             loc += nb
-        eps = hstack(eps)
+        eps = np.hstack(eps)
         iters += 1
         return self._finalize_results(beta, cov.cov, weps, eps, w, sigma,
                                       iters - 1, cov_type, cov_config, cov)
@@ -1555,7 +1554,7 @@ class IVSystemGMM(IV3SLS):
     @staticmethod
     def _blocked_gmm(x, y, z, *, w=None, constraints=None):
         k = len(x)
-        xpz = blocked_cross_prod(x, z, eye(k))
+        xpz = blocked_cross_prod(x, z, np.eye(k))
         wi = np.linalg.inv(w)
         xpz_wi_zpx = xpz @ wi @ xpz.T
         zpy = []
@@ -1603,7 +1602,7 @@ class IVSystemGMM(IV3SLS):
         wresid = []
         for key in individual:
             wresid.append(individual[key].wresid)
-        wresid = hstack(wresid)
+        wresid = np.hstack(wresid)
         results['wresid'] = wresid
         results['wmat'] = wmat
         results['weight_type'] = self._weight_type

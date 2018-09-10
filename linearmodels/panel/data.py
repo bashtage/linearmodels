@@ -1,8 +1,7 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
-from pandas import DataFrame, Panel, Series
+from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
@@ -32,10 +31,10 @@ class _Panel(object):
     def __init__(self, df):
         self._items = df.columns
         index = df.index
-        self._major_axis = pd.Series(index.levels[1][index.labels[1]]).unique()
-        self._minor_axis = pd.Series(index.levels[0][index.labels[0]]).unique()
-        self._full_index = pd.MultiIndex.from_product([self._minor_axis,
-                                                       self._major_axis])
+        self._major_axis = Series(index.levels[1][index.labels[1]]).unique()
+        self._minor_axis = Series(index.levels[0][index.labels[0]]).unique()
+        self._full_index = MultiIndex.from_product([self._minor_axis,
+                                                    self._major_axis])
         new_df = df.reindex(self._full_index)
         self._frame = new_df
         i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
@@ -45,12 +44,12 @@ class _Panel(object):
     @classmethod
     def from_array(cls, values, items, major_axis, minor_axis):
         index = list(product(minor_axis, major_axis))
-        index = pd.MultiIndex.from_tuples(index)
+        index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
         values = np.swapaxes(values.copy(), 0, 2).ravel()
         values = np.reshape(values, ((j * k), i))
 
-        df = pd.DataFrame(values, index=index, columns=items)
+        df = DataFrame(values, index=index, columns=items)
         return cls(df)
 
     @property
@@ -82,7 +81,7 @@ def convert_columns(s, drop_first):
         s = s.astype('category')
 
     if is_categorical(s):
-        out = pd.get_dummies(s, drop_first=drop_first)
+        out = get_dummies(s, drop_first=drop_first)
         out.columns = [str(s.name) + '.' + str(c) for c in out]
         return out
     return s
@@ -169,18 +168,18 @@ class PanelData(object):
             except ImportError:
                 pass
 
-        if isinstance(x, Series) and isinstance(x.index, pd.MultiIndex):
+        if isinstance(x, Series) and isinstance(x.index, MultiIndex):
             x = DataFrame(x)
         elif isinstance(x, Series):
             raise ValueError('Series can only be used with a 2-level MultiIndex')
 
         if isinstance(x, (Panel, DataFrame)):
             if isinstance(x, DataFrame):
-                if isinstance(x.index, pd.MultiIndex):
+                if isinstance(x.index, MultiIndex):
                     if len(x.index.levels) != 2:
                         raise ValueError('DataFrame input must have a '
                                          'MultiIndex with 2 levels')
-                    if isinstance(self._original, (pd.DataFrame, PanelData, pd.Series)):
+                    if isinstance(self._original, (DataFrame, PanelData, Series)):
                         for i in range(2):
                             index_names[i] = x.index.levels[i].name or index_names[i]
                     self._frame = x
@@ -388,9 +387,9 @@ class PanelData(object):
         if not isinstance(groups, PanelData):
             groups = PanelData(groups)
         if weights is None:
-            weights = PanelData(pd.DataFrame(np.ones((self._frame.shape[0], 1)),
-                                             index=self.index,
-                                             columns=['weights']))
+            weights = PanelData(DataFrame(np.ones((self._frame.shape[0], 1)),
+                                          index=self.index,
+                                          columns=['weights']))
         weights = weights.values2d
         groups = groups.values2d.astype(np.int64, copy=False)
 
@@ -417,11 +416,11 @@ class PanelData(object):
             return frame
 
         # Swap out the index for better performance
-        init_index = pd.DataFrame(groups)
+        init_index = DataFrame(groups)
         init_index.set_index(list(init_index.columns), inplace=True)
 
         root_w = np.sqrt(weights)
-        weights = pd.DataFrame(weights, index=init_index.index)
+        weights = DataFrame(weights, index=init_index.index)
         wframe = root_w * self._frame
         wframe.index = init_index.index
 
@@ -619,7 +618,7 @@ class PanelData(object):
         axis = 0 if group == 'entity' else 1
         labels = self._frame.index.labels
         levels = self._frame.index.levels
-        cat = pd.Categorical(levels[axis][labels[axis]])
-        dummies = pd.get_dummies(cat, drop_first=drop_first)
+        cat = Categorical(levels[axis][labels[axis]])
+        dummies = get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == 'entity' else self.time
         return dummies[[c for c in cols if c in dummies]].astype(np.float64, copy=False)

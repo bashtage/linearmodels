@@ -3,8 +3,6 @@ from collections import OrderedDict
 from collections.abc import MutableMapping
 
 import numpy as np
-from numpy import NaN, ceil, diag, isnan, log10, sqrt
-from numpy.linalg import eigh, matrix_rank
 from pandas import DataFrame, Series, concat, MultiIndex
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
@@ -142,8 +140,8 @@ def has_constant(x, x_rank=None):
         return True, int(loc)
 
     n = x.shape[0]
-    aug_rank = matrix_rank(np.c_[np.ones((n, 1)), x])
-    rank = matrix_rank(x) if x_rank is None else x_rank
+    aug_rank = np.linalg.matrix_rank(np.c_[np.ones((n, 1)), x])
+    rank = np.linalg.matrix_rank(x) if x_rank is None else x_rank
 
     has_const = bool(aug_rank == rank)
     loc = None
@@ -168,8 +166,8 @@ def inv_sqrth(x):
     invsqrt : ndarray
         Input to the power -1/2
     """
-    vals, vecs = eigh(x)
-    return vecs @ diag(1 / sqrt(vals)) @ vecs.T
+    vals, vecs = np.linalg.eigh(x)
+    return vecs @ np.diag(1 / np.sqrt(vals)) @ vecs.T
 
 
 class WaldTestStatistic(object):
@@ -264,13 +262,13 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __init__(self, reason, *, name=None):
         self._reason = reason
-        super(InvalidTestStatistic, self).__init__(NaN, NaN, df=1, df_denom=1, name=name)
+        super(InvalidTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1, name=name)
         self.dist_name = 'None'
 
     @property
     def pval(self):
-        """Always returns NaN"""
-        return NaN
+        """Always returns np.NaN"""
+        return np.NaN
 
     @property
     def critical_values(self):
@@ -304,13 +302,13 @@ class InapplicableTestStatistic(WaldTestStatistic):
         if reason is None:
             self._reason = 'Test is not applicable to model specification'
 
-        super(InapplicableTestStatistic, self).__init__(NaN, NaN, df=1, df_denom=1, name=name)
+        super(InapplicableTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1, name=name)
         self.dist_name = 'None'
 
     @property
     def pval(self):
-        """Always returns NaN"""
-        return NaN
+        """Always returns np.NaN"""
+        return np.NaN
 
     @property
     def critical_values(self):
@@ -371,12 +369,12 @@ cached_property = CachedProperty
 
 def _str(v):
     """Preferred basic formatter"""
-    if isnan(v):
+    if np.isnan(v):
         return '        '
     av = abs(v)
     digits = 0
     if av != 0:
-        digits = ceil(log10(av))
+        digits = np.ceil(np.log10(av))
     if digits > 4 or digits <= -4:
         return '{0:8.4g}'.format(v)
 
@@ -423,7 +421,7 @@ class _ModelComparison(_SummaryStr):
         if not isinstance(results, (dict, OrderedDict)):
             _results = OrderedDict()
             for i, res in enumerate(results):
-                _results['Model ' + str(i)] = results[i]
+                _results['Model ' + str(i)] = res
             results = _results
         elif not isinstance(results, OrderedDict):
             _results = OrderedDict()

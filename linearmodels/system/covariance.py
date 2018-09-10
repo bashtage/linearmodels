@@ -181,15 +181,27 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         self._name = 'Heteroskedastic (Robust) Covariance'
 
         k = len(x)
-        weights = inv(sigma) if gls else eye(k)
-        bigx = blocked_diag_product(x, weights)
         nobs = eps.shape[0]
-        e = eps.T.ravel()[:, None]
-        bigxe = bigx * e
-        m = bigx.shape[1]
-        xe = zeros((nobs, m))
-        for i in range(nobs):
-            xe[i, :] = bigxe[i::nobs].sum(0)[None, :]
+
+        if gls:
+            weights = inv(sigma)
+            bigx = blocked_diag_product(x, weights)
+            e = eps.T.ravel()[:, None]
+            bigxe = bigx * e
+            m = bigx.shape[1]
+            xe = zeros((nobs, m))
+            for i in range(nobs):
+                xe[i, :] = bigxe[i::nobs].sum(0)[None, :]
+        else:
+            # Do not require blocking when not using GLS
+            k_tot = sum(map(lambda a: a.shape[1], x))
+            xe = empty((nobs, k_tot))
+            loc = 0
+            for i in range(k):
+                offset = x[i].shape[1]
+                xe[:, loc:loc+offset] = x[i] * eps[:, i:i+1]
+                loc += offset
+
         self._moments = xe
 
     def _xeex(self):

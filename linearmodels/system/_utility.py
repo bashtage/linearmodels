@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
-from numpy import cumsum, diag, eye, zeros
-from numpy.linalg import inv
-
-from linearmodels.utility import matrix_rank
+from numpy.linalg import inv, matrix_rank
 
 
 def blocked_column_product(x, s):
@@ -85,9 +82,19 @@ def blocked_inner_prod(x, s):
     """
     k = len(x)
     widths = list(map(lambda m: m.shape[1], x))
-    cum_width = cumsum([0] + widths)
+    s_is_diag = np.all((s - np.diag(np.diag(s))) == 0.0)
+
+    w0 = widths[0]
+    homogeneous = all([w == w0 for w in widths])
+    if homogeneous and not s_is_diag:
+        # Fast path when all x have same number of columns
+        # Slower than diag case when k is large since many 0s
+        x = np.hstack(x)
+        return x.T @ x * np.kron(s, np.ones((w0, w0)))
+
+    cum_width = np.cumsum([0] + widths)
     total = sum(widths)
-    out = zeros((total, total))
+    out = np.zeros((total, total))
 
     for i in range(k):
         xi = x[i]
@@ -97,7 +104,7 @@ def blocked_inner_prod(x, s):
         out[sel_i, sel_i] = prod
 
     # Short circuit if identity
-    if np.all((s - diag(diag(s))) == 0.0):
+    if s_is_diag:
         return out
 
     for i in range(k):
@@ -183,7 +190,7 @@ def blocked_full_inner_product(x, s):
 def inv_matrix_sqrt(s):
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
-    out = vals @ diag(vecs) @ vals.T
+    out = vals @ np.diag(vecs) @ vals.T
     return (out + out.T) / 2
 
 
@@ -261,7 +268,7 @@ class LinearConstraint(object):
     def _compute_transform(self):
         r = self._ra
         c, k = r.shape
-        m = eye(k) - r.T @ inv(r @ r.T) @ r
+        m = np.eye(k) - r.T @ inv(r @ r.T) @ r
         vals, vecs = np.linalg.eigh(m)
         vals = np.real(vals)
         vecs = np.real(vecs)
