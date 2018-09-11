@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.system.model &#8212; linearmodels 4.9+3.g77007ba documentation</title>
+    <title>linearmodels.system.model &#8212; linearmodels 4.9+5.gd8997ad documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+3.g77007ba documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+5.gd8997ad documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.9 (+3, g77007ba)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.9 (+5, gd8997ad)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -126,9 +126,7 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="n">asarray</span><span class="p">,</span> <span class="n">cumsum</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">hstack</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">nanmean</span><span class="p">,</span>
-                   <span class="n">ones</span><span class="p">,</span> <span class="n">ones_like</span><span class="p">,</span> <span class="n">reshape</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">solve</span><span class="p">,</span> <span class="n">matrix_rank</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">DataFrame</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.compat.numpy</span> <span class="k">import</span> <span class="n">lstsq</span>
@@ -144,7 +142,7 @@
     <span class="n">KernelWeightMatrix</span>
 <span class="kn">from</span> <span class="nn">linearmodels.system.results</span> <span class="k">import</span> <span class="n">GMMSystemResults</span><span class="p">,</span> <span class="n">SystemResults</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
-                                  <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">missing_warning</span><span class="p">)</span>
+                                  <span class="n">missing_warning</span><span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SUR&#39;</span><span class="p">,</span> <span class="s1">&#39;IV3SLS&#39;</span><span class="p">,</span> <span class="s1">&#39;IVSystemGMM&#39;</span><span class="p">]</span>
 
@@ -249,7 +247,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_clean_formula</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_prevent_autoconst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formula</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_prevent_autoconst</span><span class="p">(</span><span class="n">formula</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39; 0+&#39;</span> <span class="ow">in</span> <span class="n">formula</span> <span class="ow">or</span> <span class="s1">&#39; 0 +&#39;</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">):</span>
             <span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;~ 0 +&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">formula</span>
@@ -260,7 +259,7 @@
         <span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
         <span class="n">parsers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsers</span>
         <span class="n">weight_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_dict</span>
-        <span class="n">cln_fromula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_formula</span>
+        <span class="n">cln_formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_formula</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
@@ -273,12 +272,12 @@
                         <span class="n">weight_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">weight_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">cln_fromula</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+                <span class="n">cln_formula</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
-                <span class="n">base_key</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">base_key</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">part</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">part</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -295,7 +294,7 @@
                     <span class="n">key</span> <span class="o">=</span> <span class="n">base_key</span> <span class="o">+</span> <span class="s1">&#39;.</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
                     <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">parsers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">eval_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eval_env</span><span class="p">)</span>
-                <span class="n">cln_fromula</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+                <span class="n">cln_formula</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
                 <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">:</span>
                         <span class="n">weight_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -466,7 +465,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_equations</span> <span class="o">=</span> <span class="n">equations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
             <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_equations</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;sigma must be a square matrix with dimensions &#39;</span>
@@ -531,7 +530,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">dep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ndarray</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dep</span><span class="p">)))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dep</span><span class="p">)))</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eq_data</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)):</span>
                 <span class="n">dep</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="s1">&#39;dependent&#39;</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="n">dep_name</span><span class="p">)</span>
@@ -555,7 +554,7 @@
                 <span class="k">if</span> <span class="s1">&#39;weights&#39;</span> <span class="ow">in</span> <span class="n">eq_data</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">eq_data</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">ones</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IVData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dep</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="n">UNKNOWN_EQ_TYPE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="nb">vars</span><span class="p">))</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -589,7 +588,7 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">endog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">exog</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">instr</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">ndarray</span>
-            <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="n">nanmean</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
             <span class="n">w_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -630,12 +629,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nobs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-            <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
-            <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exog</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
-            <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endog</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
-            <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
-            <span class="n">missing</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="n">nulls</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span>
+                <span class="k">if</span> <span class="n">nulls</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                    <span class="n">missing</span> <span class="o">|=</span> <span class="n">nulls</span>
 
         <span class="n">missing_warning</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
@@ -786,7 +785,7 @@
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependent</span><span class="p">)</span>
         <span class="n">col_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">))</span>
-        <span class="n">col_idx</span> <span class="o">=</span> <span class="n">cumsum</span><span class="p">(</span><span class="n">col_sizes</span><span class="p">)</span>
+        <span class="n">col_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">col_sizes</span><span class="p">)</span>
         <span class="n">total_cols</span> <span class="o">=</span> <span class="n">col_idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_construct_xhat</span><span class="p">()</span>
         <span class="n">beta</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multivariate_ls_fit</span><span class="p">()</span>
@@ -799,13 +798,13 @@
         <span class="n">beta_hist</span> <span class="o">=</span> <span class="p">[</span><span class="n">beta</span><span class="p">]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">iter_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">delta</span> <span class="o">=</span> <span class="n">inf</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
         <span class="k">while</span> <span class="p">((</span><span class="n">iter_count</span> <span class="o">&lt;</span> <span class="n">iter_limit</span> <span class="ow">and</span> <span class="n">iterate</span><span class="p">)</span> <span class="ow">or</span> <span class="n">iter_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">delta</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
             <span class="n">beta</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls_estimate</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">nobs</span><span class="p">,</span> <span class="n">total_cols</span><span class="p">,</span> <span class="n">col_idx</span><span class="p">,</span>
                                                   <span class="n">full_cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">)</span>
             <span class="n">beta_hist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
             <span class="n">delta</span> <span class="o">=</span> <span class="n">beta_hist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">beta_hist</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-            <span class="n">delta</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
             <span class="n">iter_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">sigma_m12</span> <span class="o">=</span> <span class="n">inv_matrix_sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
@@ -813,8 +812,8 @@
         <span class="n">wx</span> <span class="o">=</span> <span class="n">blocked_diag_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="n">sigma_m12</span><span class="p">)</span>
         <span class="n">gls_eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">beta</span>
 
-        <span class="n">y</span> <span class="o">=</span> <span class="n">blocked_column_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">blocked_diag_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">blocked_column_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">blocked_diag_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">@</span> <span class="n">beta</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gls_finalize</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">full_sigma</span><span class="p">,</span> <span class="n">gls_eps</span><span class="p">,</span>
@@ -824,7 +823,7 @@
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wxhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wxhat</span><span class="p">)</span>
 
-        <span class="n">xpx</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">wxhat</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wxhat</span><span class="p">)))</span>
+        <span class="n">xpx</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">wxhat</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wxhat</span><span class="p">)))</span>
         <span class="n">xpy</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
             <span class="n">xpy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wxhat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">wy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -838,7 +837,7 @@
             <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
             <span class="n">eps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">wx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
             <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">beta</span><span class="p">,</span> <span class="n">eps</span>
 
@@ -868,15 +867,15 @@
             <span class="n">sigma</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma_scale</span><span class="p">(</span><span class="n">debiased</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">full_cov</span><span class="p">:</span>
-            <span class="n">sigma</span> <span class="o">=</span> <span class="n">diag</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span>
         <span class="n">sigma_inv</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
 
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wy</span><span class="p">)</span>
 
         <span class="n">xpx</span> <span class="o">=</span> <span class="n">blocked_inner_prod</span><span class="p">(</span><span class="n">wxhat</span><span class="p">,</span> <span class="n">sigma_inv</span><span class="p">)</span>
-        <span class="n">xpy</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">total_cols</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">xpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">total_cols</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-            <span class="n">sy</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="n">sy</span> <span class="o">+=</span> <span class="n">sigma_inv</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">wy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
             <span class="n">xpy</span><span class="p">[</span><span class="n">ci</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">ci</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">wxhat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">sy</span>
@@ -1142,7 +1141,7 @@
             <span class="n">total_ss</span> <span class="o">+=</span> <span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">total_ss</span>
             <span class="n">resid_ss</span> <span class="o">+=</span> <span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">resid_ss</span>
             <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
-        <span class="n">resid</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span>
 
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;resid_ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resid_ss</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;total_ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_ss</span>
@@ -1160,7 +1159,7 @@
             <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
             <span class="n">fitted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
             <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
-        <span class="n">fitted</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">fitted</span><span class="p">)</span>
+        <span class="n">fitted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">fitted</span><span class="p">)</span>
 
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitted</span>
 
@@ -1173,8 +1172,8 @@
 
         <span class="c1"># Covariance estimation</span>
         <span class="n">cov_est</span> <span class="o">=</span> <span class="n">COV_EST</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
-        <span class="n">gls_eps</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">gls_eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">gls_eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">gls_eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">gls_eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">gls_eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">eps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">k</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
         <span class="n">cov_est</span> <span class="o">=</span> <span class="n">cov_est</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wxhat</span><span class="p">,</span> <span class="n">gls_eps</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">full_sigma</span><span class="p">,</span> <span class="n">gls</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                           <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraints</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov</span>
@@ -1207,7 +1206,7 @@
         <span class="n">wresid</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">individual</span><span class="p">:</span>
             <span class="n">wresid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">wresid</span><span class="p">)</span>
-        <span class="n">wresid</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">wresid</span><span class="p">)</span>
+        <span class="n">wresid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">wresid</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wresid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wresid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_est</span><span class="o">.</span><span class="n">cov_config</span>
@@ -1615,7 +1614,7 @@
             <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
             <span class="n">eps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">wx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
             <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_est</span><span class="o">.</span><span class="n">sigma</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="n">wx</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
         <span class="n">vinv</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">iters</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1627,7 +1626,7 @@
             <span class="n">delta</span> <span class="o">=</span> <span class="n">beta_last</span> <span class="o">-</span> <span class="n">beta</span>
             <span class="k">if</span> <span class="n">vinv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">winv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-                <span class="n">xpz</span> <span class="o">=</span> <span class="n">blocked_cross_prod</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+                <span class="n">xpz</span> <span class="o">=</span> <span class="n">blocked_cross_prod</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
                 <span class="n">xpz</span> <span class="o">=</span> <span class="n">xpz</span> <span class="o">/</span> <span class="n">nobs</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">xpz</span> <span class="o">@</span> <span class="n">winv</span> <span class="o">@</span> <span class="n">xpz</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
                 <span class="n">vinv</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -1641,7 +1640,7 @@
                 <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
                 <span class="n">eps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">wx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
                 <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
-            <span class="n">eps</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
             <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">COV_TYPES</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
@@ -1657,7 +1656,7 @@
             <span class="n">b</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="n">loc</span><span class="p">:</span><span class="n">loc</span> <span class="o">+</span> <span class="n">nb</span><span class="p">]</span>
             <span class="n">eps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
             <span class="n">loc</span> <span class="o">+=</span> <span class="n">nb</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
         <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_results</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">cov</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">weps</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span>
                                       <span class="n">iters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">cov_config</span><span class="p">,</span> <span class="n">cov</span><span class="p">)</span></div>
@@ -1665,7 +1664,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_blocked_gmm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">xpz</span> <span class="o">=</span> <span class="n">blocked_cross_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="n">xpz</span> <span class="o">=</span> <span class="n">blocked_cross_prod</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
         <span class="n">wi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
         <span class="n">xpz_wi_zpx</span> <span class="o">=</span> <span class="n">xpz</span> <span class="o">@</span> <span class="n">wi</span> <span class="o">@</span> <span class="n">xpz</span><span class="o">.</span><span class="n">T</span>
         <span class="n">zpy</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1713,7 +1712,7 @@
         <span class="n">wresid</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">individual</span><span class="p">:</span>
             <span class="n">wresid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">individual</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">wresid</span><span class="p">)</span>
-        <span class="n">wresid</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">wresid</span><span class="p">)</span>
+        <span class="n">wresid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">wresid</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wresid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wresid</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;wmat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wmat</span>
         <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weight_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_type</span>
@@ -1852,7 +1851,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+3.g77007ba documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+5.gd8997ad documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
