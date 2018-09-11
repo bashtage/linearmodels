@@ -70,7 +70,7 @@ def test_linear_model_parameters(data):
     # 3,1
     block = np.zeros((nport, nport * (nf + 1)))
     row = col = 0
-    for i in range(nport):
+    for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
                 block[row, col] = lam[j - 1]
@@ -174,7 +174,7 @@ def test_linear_model_parameters_risk_free(data):
     # 3,1
     block = np.zeros((nport, nport * (nf + 1)))
     row = col = 0
-    for i in range(nport):
+    for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
                 block[row, col] = lam[j]
@@ -278,7 +278,7 @@ def test_linear_model_parameters_risk_free_gls(data):
     # 3,1
     block = np.zeros((nport, nport * (nf + 1)))
     row = col = 0
-    for i in range(nport):
+    for _ in range(nport):
         for j in range(nf + 1):
             if j != 0:
                 block[row, col] = lam[j]

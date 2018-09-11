@@ -67,7 +67,7 @@ def process_sigma(sigma):
 def process_variance(variance):
     key = ''
     new = [variance[0]]
-    for i, line in enumerate(variance[1:]):
+    for line in variance[1:]:
         if '\t\t' in line:
             key = line.split('\t')[0]
             continue

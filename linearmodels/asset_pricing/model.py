@@ -2,7 +2,6 @@
 Linear factor models for applications in asset pricing
 """
 import numpy as np
-from numpy.linalg import pinv
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 from scipy.optimize import minimize
@@ -16,7 +15,7 @@ from linearmodels.asset_pricing.results import (GMMFactorModelResults,
 from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.data import IVData
 from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
-                                  matrix_rank, missing_warning)
+                                  missing_warning)
 
 
 def callback_factory(obj, args, disp=1):
@@ -103,9 +102,9 @@ class TradedFactorModel(object):
             raise ValueError('portfolios must not contains a constant or equivalent.')
         if has_constant(f)[0]:
             raise ValueError('factors must not contain a constant or equivalent.')
-        if matrix_rank(f) < f.shape[1]:
+        if np.linalg.matrix_rank(f) < f.shape[1]:
             raise ValueError('Model cannot be estimated. factors do not have full column rank.')
-        if matrix_rank(p) < p.shape[1]:
+        if np.linalg.matrix_rank(p) < p.shape[1]:
             raise ValueError('Model cannot be estimated. portfolios do not have full column rank.')
 
     @property
@@ -212,13 +211,13 @@ class TradedFactorModel(object):
         fc = np.c_[np.ones((nobs, 1)), f]
         rp = f.mean(0)[:, None]
         fe = f - f.mean(0)
-        b = pinv(fc) @ p
+        b = np.linalg.pinv(fc) @ p
         eps = p - fc @ b
         alphas = b[:1].T
 
         nloading = (nfactor + 1) * nportfolio
         xpxi = np.eye(nloading + nfactor)
-        xpxi[:nloading, :nloading] = np.kron(np.eye(nportfolio), pinv(fc.T @ fc / nobs))
+        xpxi[:nloading, :nloading] = np.kron(np.eye(nportfolio), np.linalg.pinv(fc.T @ fc / nobs))
         f_rep = np.tile(fc, (1, nportfolio))
         eps_rep = np.tile(eps, (nfactor + 1, 1))  # 1 2 3 ... 25 1 2 3 ...
         eps_rep = eps_rep.ravel(order='F')
@@ -251,7 +250,7 @@ class TradedFactorModel(object):
 
         # Return values
         alpha_vcv = vcv[:nportfolio, :nportfolio]
-        stat = float(alphas.T @ pinv(alpha_vcv) @ alphas)
+        stat = float(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas)
         jstat = WaldTestStatistic(stat, 'All alphas are 0', nportfolio, name='J-statistic')
         params = b.T
         betas = b[1:].T

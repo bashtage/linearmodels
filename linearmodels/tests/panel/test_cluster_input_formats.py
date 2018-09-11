@@ -59,7 +59,7 @@ def test_string_input(data):
     temp = {}
     prim = list(map(lambda s: ''.join(s), list(product(ascii_lowercase, ascii_lowercase))))
 
-    for i, c in enumerate(clusters.T):
+    for i in range(clusters.shape[1]):
         name = 'effect.' + str(i)
         temp[name] = pd.Series(np.random.choice(prim, size=nt), index=y.index, name=name)
     clusters = pd.DataFrame(temp, index=y.index)
