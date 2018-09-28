@@ -26,7 +26,7 @@ def non_traded_model(request):
 
 
 @pytest.fixture(scope='module')
-def data(request):
+def data():
     premia = np.array([.1, .1, .1])
     out = generate_data(nportfolio=10, output='pandas', alpha=True, premia=premia)
     out['joined'] = concat([out.factors, out.portfolios], 1)

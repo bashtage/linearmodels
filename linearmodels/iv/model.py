@@ -278,7 +278,7 @@ class IVLIML(object):
             exog = parser.exog
             endog = parser.endog
         exog_endog = concat([exog, endog], 1)
-        x = exog_endog.values
+        x = asarray(exog_endog)
         params = atleast_2d(asarray(params))
         if params.shape[0] == 1:
             params = params.T
@@ -500,7 +500,7 @@ class IVLIML(object):
         index = self._index
         eps = self.resids(params)
         y = self.dependent.pandas
-        fitted = DataFrame(y.values - eps, y.index, ['fitted_values'])
+        fitted = DataFrame(asarray(y) - eps, y.index, ['fitted_values'])
         weps = self.wresids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
@@ -824,7 +824,7 @@ class IVGMM(IVLIML):
         wmat = inv(wz.T @ wz / nobs) if initial_weight is None else initial_weight
         sv = IV2SLS(self.dependent, self.exog, self.endog, self.instruments,
                     weights=self.weights)
-        _params = params = sv.fit().params.values[:, None]
+        _params = params = asarray(sv.fit().params)[:, None]
         # _params = params = self.estimate_parameters(wx, wy, wz, wmat)
 
         iters, norm = 1, 10 * tol + 1
@@ -1117,7 +1117,7 @@ class IVGMMCUE(IVGMM):
             res = IVGMM(self.dependent, exog, endog, instr,
                         weights=self.weights, weight_type=self._weight_type,
                         **self._weight_config).fit()
-            starting = res.params.values
+            starting = asarray(res.params)
         else:
             starting = asarray(starting)
             if len(starting) != self.exog.shape[1] + self.endog.shape[1]:

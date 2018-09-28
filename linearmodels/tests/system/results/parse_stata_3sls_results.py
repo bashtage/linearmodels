@@ -24,7 +24,7 @@ def process_block(results):
 
     def parse_block(block):
         values = pd.read_csv(StringIO('\n'.join(block)), header=None)
-        nums = values.iloc[:, -1].values
+        nums = np.asarray(values.iloc[:, -1])
         nums = np.reshape(nums, (len(nums) // 3, 3))
         values = pd.DataFrame(nums, index=values.iloc[::3, 0], columns=['param', 'tstat', 'pval'])
         values.index.name = ''

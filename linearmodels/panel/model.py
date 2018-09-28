@@ -293,7 +293,7 @@ class PooledOLS(object):
             self._not_null = ~missing
 
         w = self.weights.dataframe
-        if np.any(w.values <= 0):
+        if np.any(np.asarray(w) <= 0):
             raise ValueError('weights must be strictly positive.')
         w = w / w.mean()
         self.weights = PanelData(w)
@@ -547,7 +547,7 @@ class PooledOLS(object):
             else:
                 clusters = pd.DataFrame(group_ids)
 
-        cov_config_upd['clusters'] = clusters.values if clusters is not None else clusters
+        cov_config_upd['clusters'] = np.asarray(clusters) if clusters is not None else clusters
 
         return cov_est, cov_config_upd
 
@@ -1379,7 +1379,7 @@ class BetweenOLS(PooledOLS):
         dep = self.dependent.dataframe
         fitted = fitted.reindex(dep.index)
         effects = effects.reindex(dep.index)
-        idiosyncratic = pd.DataFrame(dep.values - fitted.values - effects.values,
+        idiosyncratic = pd.DataFrame(np.asarray(dep) - np.asarray(fitted) - np.asarray(effects),
                                      dep.index, ['idiosyncratic'])
 
         residual_ss = float(weps.T @ weps)
@@ -1738,7 +1738,7 @@ class RandomEffects(PooledOLS):
         wybar = self.dependent.mean('entity', weights=self.weights)
         wxbar = self.exog.mean('entity', weights=self.weights)
         params = lstsq(wxbar, wybar)[0]
-        wu = wybar.values - wxbar.values @ params
+        wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
         neffects = wu.shape[0]
@@ -1782,7 +1782,7 @@ class RandomEffects(PooledOLS):
         eps = weps / root_w
         index = self.dependent.index
         fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
-        effects = pd.DataFrame(self.dependent.values2d - fitted.values - eps, index,
+        effects = pd.DataFrame(self.dependent.values2d - np.asarray(fitted) - eps, index,
                                ['estimated_effects'])
         idiosyncratic = pd.DataFrame(eps, index, ['idiosyncratic'])
         residual_ss = float(weps.T @ weps)

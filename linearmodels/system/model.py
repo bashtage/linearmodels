@@ -616,7 +616,7 @@ class IV3SLS(object):
                 else:
                     exog_endog = IVData(endog).pandas
 
-                fitted = exog_endog.values @ b
+                fitted = np.asarray(exog_endog) @ b
                 fitted = DataFrame(fitted, index=exog_endog.index, columns=[label])
                 out[label] = fitted
             loc += kx

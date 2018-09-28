@@ -89,9 +89,9 @@ class LinearFactorModelResults(_SummaryStr):
         table.extend_right(SimpleTable(vals, stubs=stubs))
         smry.tables.append(table)
 
-        rp = self.risk_premia.values[:, None]
-        se = self.risk_premia_se.values[:, None]
-        tstats = (self.risk_premia / self.risk_premia_se).values
+        rp = np.asarray(self.risk_premia)[:, None]
+        se = np.asarray(self.risk_premia_se)[:, None]
+        tstats = np.asarray(self.risk_premia / self.risk_premia_se)
         pvalues = 2 - 2 * stats.norm.cdf(np.abs(tstats))
         ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[rp,
@@ -160,8 +160,8 @@ class LinearFactorModelResults(_SummaryStr):
         first = True
         for row in params.index:
             smry.tables.append(SimpleTable(['']))
-            smry.tables.append(self._single_table(params.loc[row].values[:, None],
-                                                  se.loc[row].values[:, None],
+            smry.tables.append(self._single_table(np.asarray(params.loc[row])[:, None],
+                                                  np.asarray(se.loc[row])[:, None],
                                                   row, param_names, first))
             first = False
 

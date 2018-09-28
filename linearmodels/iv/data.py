@@ -101,7 +101,7 @@ class IVData(object):
                 x = expand_categoricals(x, drop_first)
 
             self._pandas = x
-            self._ndarray = self._pandas.values
+            self._ndarray = np.asarray(self._pandas)
             if all_numeric or convert_dummies:
                 self._ndarray = self._ndarray.astype(np.float64)
             self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}

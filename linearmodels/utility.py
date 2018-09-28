@@ -1,9 +1,11 @@
+from linearmodels.compat.pandas import concat
+
 import functools
 from collections import OrderedDict
 from collections.abc import MutableMapping
 
 import numpy as np
-from pandas import DataFrame, Series, concat, MultiIndex
+from pandas import DataFrame, Series, MultiIndex
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
@@ -496,10 +498,10 @@ def missing_warning(missing):
 
 def param_table(results, title, pad_bottom=False):
     """Formatted standard parameter table"""
-    param_data = np.c_[results.params.values[:, None],
-                       results.std_errors.values[:, None],
-                       results.tstats.values[:, None],
-                       results.pvalues.values[:, None],
+    param_data = np.c_[np.asarray(results.params)[:, None],
+                       np.asarray(results.std_errors)[:, None],
+                       np.asarray(results.tstats)[:, None],
+                       np.asarray(results.pvalues)[:, None],
                        results.conf_int()]
     data = []
     for row in param_data:

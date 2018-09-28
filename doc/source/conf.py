@@ -207,16 +207,16 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'statsmodels': ('http://www.statsmodels.org/dev/', None),
-    'matplotlib': ('http://matplotlib.org/', None),
+    'statsmodels': ('https://www.statsmodels.org/dev/', None),
+    'matplotlib': ('https://matplotlib.org/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://docs.scipy.org/doc/numpy', None),
-    'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
-    'xarray': ('http://xarray.pydata.org/en/stable/', None)
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'xarray': ('https://xarray.pydata.org/en/stable/', None)
 }
 
-extlinks = {'issue': ('https://github.com/bashtage/arch/issues/%s', 'GH')}
+extlinks = {'issue': ('https://github.com/bashtage/linearmodels/issues/%s', 'GH')}
 
 
 doctest_global_setup = """
