@@ -58,9 +58,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "from linearmodels.datasets import munnell\n",
@@ -100,9 +98,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "grouped = data.groupby(['REGION','YR'])\n",
@@ -133,9 +129,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "from collections import OrderedDict\n",
@@ -159,9 +153,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "import pandas as pd\n",
@@ -700,7 +692,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.7.0"
   }
  },
  "nbformat": 4,

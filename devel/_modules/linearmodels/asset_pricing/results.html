@@ -16,14 +16,14 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.asset_pricing.results &#8212; linearmodels 4.9+5.gd8997ad documentation</title>
+    <title>linearmodels.asset_pricing.results &#8212; linearmodels 4.9+9.g09ba36c documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+5.gd8997ad documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+9.g09ba36c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.9 (+5, gd8997ad)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.9 (+9, g09ba36c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -199,9 +199,9 @@
         <span class="n">table</span><span class="o">.</span><span class="n">extend_right</span><span class="p">(</span><span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">))</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
 
-        <span class="n">rp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">tstats</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">rp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">tstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">risk_premia</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_premia_se</span><span class="p">)</span>
         <span class="n">pvalues</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tstats</span><span class="p">))</span>
         <span class="n">ci</span> <span class="o">=</span> <span class="n">rp</span> <span class="o">+</span> <span class="n">se</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">([[</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">]])</span>
         <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">rp</span><span class="p">,</span>
@@ -270,8 +270,8 @@
         <span class="n">first</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
             <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SimpleTable</span><span class="p">([</span><span class="s1">&#39;&#39;</span><span class="p">]))</span>
-            <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_single_table</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
-                                                  <span class="n">se</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
+            <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_single_table</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">],</span>
+                                                  <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">se</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">],</span>
                                                   <span class="n">row</span><span class="p">,</span> <span class="n">param_names</span><span class="p">,</span> <span class="n">first</span><span class="p">))</span>
             <span class="n">first</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -413,7 +413,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+5.gd8997ad documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9+9.g09ba36c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
