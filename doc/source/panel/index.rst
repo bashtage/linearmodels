@@ -7,13 +7,10 @@ reference to available estimation methods.
 after estimating a model as well as model specification tests. The covariance
 estimators are presented in :ref:`panel-module-reference-covariance`.
 
-:ref:`Basic Examples <panel/examples/examples.ipynb>` shows basic usage
-of the models using examples from Wooldridge's text books.
-:ref:`Using Formulas <panel/examples/using-formulas.ipynb>` shows how models
-can be specified using R-like formulas using patsy.
-:ref:`Data Formats <panel/examples/data-formats.ipynb>` described the
+`Basic Examples`_ shows basic usage of the models using examples from
+Wooldridge's text books. `Using Formulas`_ shows how models can be specified
+using R-like formulas using patsy. `Data Formats`_ described the
 alternative formats that can be used when specifying models.
-
 
 :ref:`panel-mathematical-notation` contains a concise explanation of the formulas
 used in estimating parameters, estimating covariances and conducting
@@ -37,3 +34,8 @@ until release 0.20.
    reference
    mathematical-formula
    faq
+
+
+.. _Basic Examples: panel/examples/examples.ipynb
+.. _Using Formulas: panel/examples/using-formulas.ipynb
+.. _Data Formats: panel/examples/data-formats.ipynb
