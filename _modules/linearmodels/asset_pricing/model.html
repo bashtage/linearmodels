@@ -16,14 +16,14 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.asset_pricing.model &#8212; linearmodels 4.9 documentation</title>
+    <title>linearmodels.asset_pricing.model &#8212; linearmodels 4.10 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.9</a>
+    ../../../index.html" class="text-logo">linearmodels 4.10</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -112,7 +112,6 @@
 <span class="sd">Linear factor models for applications in asset pricing</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">pinv</span>
 <span class="kn">from</span> <span class="nn">patsy.highlevel</span> <span class="k">import</span> <span class="n">dmatrix</span>
 <span class="kn">from</span> <span class="nn">patsy.missing</span> <span class="k">import</span> <span class="n">NAAction</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
@@ -126,7 +125,7 @@
 <span class="kn">from</span> <span class="nn">linearmodels.compat.numpy</span> <span class="k">import</span> <span class="n">lstsq</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv.data</span> <span class="k">import</span> <span class="n">IVData</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
-                                  <span class="n">matrix_rank</span><span class="p">,</span> <span class="n">missing_warning</span><span class="p">)</span>
+                                  <span class="n">missing_warning</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">callback_factory</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -213,9 +212,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;portfolios must not contains a constant or equivalent.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;factors must not contain a constant or equivalent.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Model cannot be estimated. factors do not have full column rank.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Model cannot be estimated. portfolios do not have full column rank.&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -322,13 +321,13 @@
         <span class="n">fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nobs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">f</span><span class="p">]</span>
         <span class="n">rp</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">fe</span> <span class="o">=</span> <span class="n">f</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">@</span> <span class="n">p</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">@</span> <span class="n">p</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="n">fc</span> <span class="o">@</span> <span class="n">b</span>
         <span class="n">alphas</span> <span class="o">=</span> <span class="n">b</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
 
         <span class="n">nloading</span> <span class="o">=</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">nportfolio</span>
         <span class="n">xpxi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nloading</span> <span class="o">+</span> <span class="n">nfactor</span><span class="p">)</span>
-        <span class="n">xpxi</span><span class="p">[:</span><span class="n">nloading</span><span class="p">,</span> <span class="p">:</span><span class="n">nloading</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nportfolio</span><span class="p">),</span> <span class="n">pinv</span><span class="p">(</span><span class="n">fc</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">fc</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">))</span>
+        <span class="n">xpxi</span><span class="p">[:</span><span class="n">nloading</span><span class="p">,</span> <span class="p">:</span><span class="n">nloading</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nportfolio</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">fc</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">fc</span> <span class="o">/</span> <span class="n">nobs</span><span class="p">))</span>
         <span class="n">f_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">))</span>
         <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="p">(</span><span class="n">nfactor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># 1 2 3 ... 25 1 2 3 ...</span>
         <span class="n">eps_rep</span> <span class="o">=</span> <span class="n">eps_rep</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
@@ -361,7 +360,7 @@
 
         <span class="c1"># Return values</span>
         <span class="n">alpha_vcv</span> <span class="o">=</span> <span class="n">vcv</span><span class="p">[:</span><span class="n">nportfolio</span><span class="p">,</span> <span class="p">:</span><span class="n">nportfolio</span><span class="p">]</span>
-        <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alphas</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">pinv</span><span class="p">(</span><span class="n">alpha_vcv</span><span class="p">)</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">)</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alphas</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">alpha_vcv</span><span class="p">)</span> <span class="o">@</span> <span class="n">alphas</span><span class="p">)</span>
         <span class="n">jstat</span> <span class="o">=</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="s1">&#39;All alphas are 0&#39;</span><span class="p">,</span> <span class="n">nportfolio</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;J-statistic&#39;</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">T</span>
         <span class="n">betas</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span>
@@ -819,8 +818,8 @@
         <span class="c1"># 1. Starting Values - use 2 pass</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">LinearFactorModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">portfolios</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="n">risk_free</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_risk_free</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-        <span class="n">betas</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">betas</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">lam</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">risk_premia</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">betas</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">risk_premia</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">sv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">betas</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">mu</span><span class="p">][:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moments</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="n">excess_returns</span><span class="p">)</span>
@@ -1009,7 +1008,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

@@ -67,7 +67,7 @@ man is married and a dummy indicating if the man is a union member.
    data = data.set_index(['nr','year'])
    dependent = data.lwage
    exog = sm.add_constant(data[['expersq','married','union']])
-   mod = PanelOLS(dependent, exog, entity_effect=True)
+   mod = PanelOLS(dependent, exog, entity_effects=True)
    res = mod.fit(cov_type='unadjusted')
    res
 
@@ -115,9 +115,9 @@ result is a summary table.
 
 
 Like statsmodels, panel models can be specified using a R-like formula. This model
-is identical to the previous. Note the use of the *special* variable ``EntityEffect``
+is identical to the previous. Note the use of the *special* variable ``EntityEffects``
 to include the fixed effects.
 
 .. code-block:: python
 
-    mod = PanelOLS.from_formula('lwage ~ 1 + expersq + union + married + EntityEffect',data)
+    mod = PanelOLS.from_formula('lwage ~ 1 + expersq + union + married + EntityEffects',data)

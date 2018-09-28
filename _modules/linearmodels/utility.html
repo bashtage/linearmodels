@@ -16,14 +16,14 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.utility &#8212; linearmodels 4.9 documentation</title>
+    <title>linearmodels.utility &#8212; linearmodels 4.10 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.9</a>
+    ../../index.html" class="text-logo">linearmodels 4.10</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -108,14 +108,14 @@
           <div class="document clearer body">
             
   <h1>Source code for linearmodels.utility</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span></span><span class="kn">from</span> <span class="nn">linearmodels.compat.pandas</span> <span class="k">import</span> <span class="n">concat</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="k">import</span> <span class="n">MutableMapping</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">log10</span><span class="p">,</span> <span class="n">sqrt</span>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">eigh</span><span class="p">,</span> <span class="n">matrix_rank</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">MultiIndex</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">MultiIndex</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">f</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="k">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_params</span>
 
@@ -252,8 +252,8 @@
         <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
 
     <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">aug_rank</span> <span class="o">=</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">x</span><span class="p">])</span>
-    <span class="n">rank</span> <span class="o">=</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_rank</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x_rank</span>
+    <span class="n">aug_rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">x</span><span class="p">])</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_rank</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x_rank</span>
 
     <span class="n">has_const</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">aug_rank</span> <span class="o">==</span> <span class="n">rank</span><span class="p">)</span>
     <span class="n">loc</span> <span class="o">=</span> <span class="kc">None</span>
@@ -278,8 +278,8 @@
 <span class="sd">    invsqrt : ndarray</span>
 <span class="sd">        Input to the power -1/2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">eigh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">vecs</span> <span class="o">@</span> <span class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span> <span class="o">@</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vecs</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span> <span class="o">@</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
 
 
 <div class="viewcode-block" id="WaldTestStatistic"><a class="viewcode-back" href="../../utility.html#linearmodels.utility.WaldTestStatistic">[docs]</a><span class="k">class</span> <span class="nc">WaldTestStatistic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -374,13 +374,13 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reason</span> <span class="o">=</span> <span class="n">reason</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">NaN</span><span class="p">,</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist_name</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Always returns NaN&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NaN</span>
+        <span class="sd">&quot;&quot;&quot;Always returns np.NaN&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -414,13 +414,13 @@
         <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_reason</span> <span class="o">=</span> <span class="s1">&#39;Test is not applicable to model specification&#39;</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">InapplicableTestStatistic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">NaN</span><span class="p">,</span> <span class="n">NaN</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InapplicableTestStatistic</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">df_denom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist_name</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Always returns NaN&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NaN</span>
+        <span class="sd">&quot;&quot;&quot;Always returns np.NaN&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">critical_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -481,12 +481,12 @@
 
 <span class="k">def</span> <span class="nf">_str</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Preferred basic formatter&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;        &#39;</span>
     <span class="n">av</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="n">digits</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">av</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">digits</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">av</span><span class="p">))</span>
+        <span class="n">digits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">av</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">digits</span> <span class="o">&gt;</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">digits</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">4</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0:8.4g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
@@ -533,7 +533,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">)):</span>
             <span class="n">_results</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-                <span class="n">_results</span><span class="p">[</span><span class="s1">&#39;Model &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">_results</span><span class="p">[</span><span class="s1">&#39;Model &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">res</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">_results</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">):</span>
             <span class="n">_results</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
@@ -608,10 +608,10 @@
 
 <span class="k">def</span> <span class="nf">param_table</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">pad_bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Formatted standard parameter table&quot;&quot;&quot;</span>
-    <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">results</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
-                       <span class="n">results</span><span class="o">.</span><span class="n">std_errors</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
-                       <span class="n">results</span><span class="o">.</span><span class="n">tstats</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
-                       <span class="n">results</span><span class="o">.</span><span class="n">pvalues</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">params</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">std_errors</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">tstats</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">pvalues</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span>
                        <span class="n">results</span><span class="o">.</span><span class="n">conf_int</span><span class="p">()]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">param_data</span><span class="p">:</span>
@@ -725,7 +725,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

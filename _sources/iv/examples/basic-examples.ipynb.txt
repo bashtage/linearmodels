@@ -318,9 +318,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "dep = ['wage']\n",
@@ -406,7 +404,7 @@
    "source": [
     "### Formula interface\n",
     "\n",
-    "This model was large and so it might be simpler to use a formula. While formulas are discussed in [detail in another notebook](iv/examples/using-formulas.ipynb), they use the formula language of patsy with an augmentation to specify the endogenous and instrumental variables. The generic form is\n",
+    "This model was large and so it might be simpler to use a formula. While formulas are discussed in [detail in another notebook](using-formulas.ipynb), they use the formula language of patsy with an augmentation to specify the endogenous and instrumental variables. The generic form is\n",
     "\n",
     "```\n",
     "dependent ~ exog + [endog ~ instr]\n",
@@ -467,9 +465,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "data = mroz.load()\n",
@@ -562,9 +558,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "u = res.resids\n",
@@ -597,9 +591,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "instr = ['fatheduc','motheduc','huseduc']\n",
@@ -746,7 +738,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.7.0"
   }
  },
  "nbformat": 4,

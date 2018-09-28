@@ -64,7 +64,7 @@ investment.
     data.year = data.year.astype(np.int64)
     from linearmodels import PanelOLS
     etdata = data.set_index(['firm','year'])
-    PanelOLS(etdata.invest,etdata[['value','capital']],entity_effect=True).fit(debiased=True)
+    PanelOLS(etdata.invest,etdata[['value','capital']],entity_effects=True).fit(debiased=True)
 
 
 ::

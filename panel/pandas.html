@@ -16,14 +16,14 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Comparison with pandas PanelOLS and FamaMacBeth &#8212; linearmodels 4.9 documentation</title>
+    <title>Comparison with pandas PanelOLS and FamaMacBeth &#8212; linearmodels 4.10 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Module Reference" href="reference.html" />
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples/using-formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.9</a>
+    ../index.html" class="text-logo">linearmodels 4.10</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -177,7 +177,7 @@ investment.</p>
 <span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">PanelOLS</span>
 <span class="n">etdata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;firm&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
-<span class="n">PanelOLS</span><span class="p">(</span><span class="n">etdata</span><span class="o">.</span><span class="n">invest</span><span class="p">,</span><span class="n">etdata</span><span class="p">[[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="s1">&#39;capital&#39;</span><span class="p">]],</span><span class="n">entity_effect</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">PanelOLS</span><span class="p">(</span><span class="n">etdata</span><span class="o">.</span><span class="n">invest</span><span class="p">,</span><span class="n">etdata</span><span class="p">[[</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="s1">&#39;capital&#39;</span><span class="p">]],</span><span class="n">entity_effects</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">debiased</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                          <span class="n">PanelOLS</span> <span class="n">Estimation</span> <span class="n">Summary</span>
@@ -298,7 +298,7 @@ time-entity data format.</p>
         <li class="right" >
           <a href="examples/using-formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.9 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
