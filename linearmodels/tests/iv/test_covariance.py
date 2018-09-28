@@ -55,7 +55,7 @@ def test_kernel_parzen():
         for i in range(k + 1):
             z = i / (k + 1)
             if z > 0.5:
-                w[i] = 2 * (1 - z ** 3)
+                w[i] = 2 * (1 - z) ** 3
             else:
                 w[i] = 1 - 6 * z ** 2 + 6 * z ** 3
         return w
