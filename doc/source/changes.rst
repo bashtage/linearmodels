@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+Version 4.10
+============
+* Fixed a bug where weights were incorrectly calculated for HAC covariances
+  when the weight function was `parzen` or `gallant` (:issue:`170`)
+
 Version 4.9
 ===========
 * Changed the return type of Wooldridge's over identification test when

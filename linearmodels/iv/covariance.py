@@ -168,7 +168,7 @@ def kernel_weight_parzen(bw, *args):
     """
     z = arange(bw + 1) / (bw + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
-    w[z > 0.5] = 2 * (1 - z[z > 0.5] ** 3)
+    w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
 
