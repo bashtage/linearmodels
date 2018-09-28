@@ -10,7 +10,7 @@ from linearmodels.utility import AttrDict
 
 
 @pytest.fixture
-def data(request):
+def data():
     moments = np.random.randn(500, 10)
     jacobian = np.random.rand(10, 8)
     jacobian_inv = np.eye(10)

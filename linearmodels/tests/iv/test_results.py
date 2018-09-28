@@ -1,7 +1,8 @@
-import pytest
+from numpy import asarray
 from numpy.testing import assert_allclose
 from pandas import DataFrame
 from pandas.testing import assert_series_equal
+import pytest
 
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
@@ -64,7 +65,7 @@ def test_fitted_predict(data, model):
     res = mod.fit()
     assert_series_equal(res.idiosyncratic, res.resids)
     y = mod.dependent.pandas
-    expected = y.values - res.resids.values[:, None]
+    expected = asarray(y) - asarray(res.resids)[:, None]
     expected = DataFrame(expected, y.index, ['fitted_values'])
     assert_frame_similar(expected, res.fitted_values)
     assert_allclose(expected, res.fitted_values)

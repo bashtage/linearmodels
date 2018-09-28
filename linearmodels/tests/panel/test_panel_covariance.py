@@ -20,7 +20,7 @@ class TestCovariance(object):
         cls.cluster1 = np.tile(np.arange(cls.n)[:, None], (cls.t, 1))
         cls.entity_ids = cls.cluster1
         cls.cluster2 = np.tile(np.arange(cls.t)[:, None], (cls.n, 1))
-        cls.cluster3 = np.random.random_integers(0, 10, (cls.n * cls.t, 1))
+        cls.cluster3 = np.random.randint(0, 10, (cls.n * cls.t, 1))
         cls.cluster4 = np.random.randint(0, 10, (cls.n * cls.t, 2))
         cls.cluster5 = np.random.randint(0, 10, (cls.n * cls.t, 3))
 

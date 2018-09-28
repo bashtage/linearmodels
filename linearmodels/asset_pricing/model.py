@@ -708,8 +708,8 @@ class LinearFactorModelGMM(LinearFactorModel):
         # 1. Starting Values - use 2 pass
         mod = LinearFactorModel(self.portfolios, self.factors, risk_free=self._risk_free)
         res = mod.fit()
-        betas = res.betas.values.ravel()
-        lam = res.risk_premia.values
+        betas = np.asarray(res.betas).ravel()
+        lam = np.asarray(res.risk_premia)
         mu = self.factors.ndarray.mean(0)
         sv = np.r_[betas, lam, mu][:, None]
         g = self._moments(sv, excess_returns)

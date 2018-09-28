@@ -14,22 +14,24 @@ from linearmodels.tests.panel._utility import (assert_results_equal, datatypes, 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
 
+def data_gen(missing, datatype):
+    missing = 0.20 if missing else 0.0
+    return generate_data(missing, datatype)
+
+
 @pytest.fixture(params=datatypes)
 def data(request):
-    return generate_data(0.0, request.param)
+    return data_gen(False, request.param)
 
 
 @pytest.fixture(params=datatypes)
 def missing_data(request):
-    return generate_data(0.20, request.param)
+    return data_gen(True, request.param)
 
 
 @pytest.fixture(params=list(product(datatypes, [True, False])))
 def both_data_types(request):
-    if request.param[1]:
-        return data(request)
-    else:
-        return missing_data(request)
+    return data_gen(request.param[1], request.param)
 
 
 def test_single_entity(data):

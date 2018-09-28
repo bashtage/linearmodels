@@ -39,7 +39,7 @@ class _Panel(object):
         self._frame = new_df
         i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
         self._shape = (i, j, k)
-        self._values = np.swapaxes(np.reshape(new_df.values.copy().T, (i, k, j)), 1, 2)
+        self._values = np.swapaxes(np.reshape(np.asarray(new_df).copy().T, (i, k, j)), 1, 2)
 
     @classmethod
     def from_array(cls, values, items, major_axis, minor_axis):
@@ -239,7 +239,7 @@ class PanelData(object):
     @property
     def values2d(self):
         """NumPy ndarray view of dataframe"""
-        return self._frame.values
+        return np.asarray(self._frame)
 
     @property
     def values3d(self):
@@ -402,7 +402,7 @@ class PanelData(object):
             else:
                 denom = weights.groupby(level=level).transform('sum')
                 weight_sum[level] = denom
-            return num.values / denom.values
+            return np.asarray(num) / np.asarray(denom)
 
         def demean_pass(frame, weights, root_w):
             levels = groups.shape[1]
@@ -430,15 +430,15 @@ class PanelData(object):
             current.index = self._frame.index
             return PanelData(current)
 
-        exclude = np.ptp(self._frame.values, 0) == 0
-        max_rmse = np.sqrt(self._frame.values.var(0).max())
-        scale = self._frame.std().values
+        exclude = np.ptp(np.asarray(self._frame), 0) == 0
+        max_rmse = np.sqrt(np.asarray(self._frame).var(0).max())
+        scale = np.asarray(self._frame.std())
         exclude = exclude | (scale < 1e-14 * max_rmse)
         replacement = np.maximum(scale, 1)
         scale[exclude] = replacement[exclude]
         scale = scale[None, :]
 
-        while np.max(np.abs(current.values - previous.values) / scale) > 1e-8:
+        while np.max(np.abs(np.asarray(current) - np.asarray(previous)) / scale) > 1e-8:
             previous = current
             current = demean_pass(previous, weights, root_w)
         current.index = self._frame.index
@@ -480,7 +480,7 @@ class PanelData(object):
             group_mu = self._frame.groupby(level=level).transform('mean')
             out = self._frame - group_mu
             if not return_panel:
-                return out.values
+                return np.asarray(out)
             return PanelData(out)
         else:
             w = weights.values2d
@@ -492,7 +492,7 @@ class PanelData(object):
             group_mu = weighted_sum / sum_weights
             out = np.sqrt(w) * (self._frame - group_mu)
             if not return_panel:
-                return out.values
+                return np.asarray(out)
             return PanelData(out)
 
     def __str__(self):
