@@ -3,3 +3,4 @@ pandas>= 0.19
 scipy>=0.18
 patsy
 statsmodels>=0.8
+cached_property>=1.5.1

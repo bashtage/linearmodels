@@ -1,6 +1,5 @@
 from linearmodels.compat.pandas import concat
 
-import functools
 from collections import OrderedDict
 from collections.abc import MutableMapping
 
@@ -321,52 +320,6 @@ class InapplicableTestStatistic(WaldTestStatistic):
         msg = "Irrelevant test statistic\n{reason}\n{name}"
         name = '' if self._name is None else self._name
         return msg.format(name=name, reason=self._reason)
-
-
-# cached_property taken from bottle.py
-# Copyright (c) 2016, Marcel Hellkamp.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-def update_wrapper(wrapper, wrapped, *a, **ka):
-    try:
-        functools.update_wrapper(wrapper, wrapped, *a, **ka)
-    except AttributeError:  # pragma: no cover
-        pass
-
-
-class CachedProperty(object):
-    """ A property that is only computed once per instance and then replaces
-        itself with an ordinary attribute. Deleting the attribute resets the
-        property. """
-
-    def __init__(self, func):
-        update_wrapper(self, func)
-        self.func = func
-
-    def __get__(self, obj, cls):
-        if obj is None:  # pragma: no cover
-            return self
-        value = obj.__dict__[self.func.__name__] = self.func(obj)
-        return value
-
-
-cached_property = CachedProperty
 
 
 def _str(v):
