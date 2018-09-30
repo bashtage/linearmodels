@@ -10,7 +10,7 @@ from scipy import stats
 
 import linearmodels
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic, InvalidTestStatistic,
-                                  WaldTestStatistic, cached_property, ensure_unique_column,
+                                  WaldTestStatistic, ensure_unique_column,
                                   format_wide, has_constant, inv_sqrth, missing_warning,
                                   panel_to_frame)
 
@@ -99,31 +99,6 @@ def test_inv_sqrth():
     invsq = inv_sqrth(xpx)
     prod = invsq @ xpx @ invsq - np.eye(10)
     assert_allclose(1 + prod, np.ones((10, 10)))
-
-
-def test_cached_property():
-    class A(object):
-        def __init__(self):
-            self.a_count = 0
-
-        @cached_property
-        def a(self):
-            self.a_count += 1
-            return 'a'
-
-    o = A()
-    o.__getattribute__('a')
-    assert o.a == 'a'
-    assert o.a_count == 1
-    assert o.a == 'a'
-    assert o.a_count == 1
-    delattr(o, 'a')
-    assert o.a == 'a'
-    assert o.a_count == 2
-
-    # To improve coverage
-    cp = cached_property(lambda x: x)
-    cp.__get__(cp, None)
 
 
 def test_ensure_unique_column():

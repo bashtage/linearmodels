@@ -5,12 +5,12 @@ import datetime as dt
 
 import numpy as np
 import pandas as pd
+from cached_property import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.compat.statsmodels import Summary
-from linearmodels.utility import (_str, _SummaryStr, cached_property,
-                                  pval_format)
+from linearmodels.utility import _str, _SummaryStr, pval_format
 
 
 class LinearFactorModelResults(_SummaryStr):

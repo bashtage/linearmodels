@@ -5,6 +5,7 @@ import datetime as dt
 from collections import OrderedDict
 
 import scipy.stats as stats
+from cached_property import cached_property
 from numpy import array, asarray, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
@@ -14,7 +15,7 @@ from statsmodels.iolib.table import default_txt_fmt
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, _ModelComparison,
-                                  _SummaryStr, _str, cached_property, pval_format)
+                                  _SummaryStr, _str, pval_format)
 
 
 def stub_concat(lists, sep='='):
