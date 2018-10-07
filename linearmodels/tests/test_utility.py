@@ -39,7 +39,7 @@ def test_missing_warning():
 def test_hasconstant():
     x = np.random.randn(100, 3)
     hc, loc = has_constant(x)
-    assert hc is False
+    assert bool(hc) is False
     assert loc is None
     x[:, 0] = 1
     hc, loc = has_constant(x)
