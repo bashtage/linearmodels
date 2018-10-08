@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+Since 4.10
+==========
+* Fixed a bug which failed to correctly check rank conditions when
+  specifying asset pricing models (:issue:`173`)
+
 Version 4.10
 ============
 * Fixed a bug where weights were incorrectly calculated for HAC covariances
