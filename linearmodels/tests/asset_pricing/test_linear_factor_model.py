@@ -314,3 +314,10 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(res.j_statistic.pval, 1 - stats.chi2(nport - nf - 1).cdf(jstat), rtol=1e-2)
 
     get_all(res)
+
+
+@pytest.mark.parametrize('output', ['numpy', 'pandas'])
+def test_infeasible(output):
+    data = generate_data(nfactor=10, nportfolio=20, nobs=10, output=output)
+    with pytest.raises(ValueError):
+        LinearFactorModel(data.portfolios, data.factors)

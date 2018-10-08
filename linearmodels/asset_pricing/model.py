@@ -99,13 +99,16 @@ class TradedFactorModel(object):
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         if has_constant(p)[0]:
-            raise ValueError('portfolios must not contains a constant or equivalent.')
+            raise ValueError('portfolios must not contains a constant or '
+                             'equivalent and must not have rank\n'
+                             'less than the dimension of the smaller shape.')
         if has_constant(f)[0]:
             raise ValueError('factors must not contain a constant or equivalent.')
         if np.linalg.matrix_rank(f) < f.shape[1]:
             raise ValueError('Model cannot be estimated. factors do not have full column rank.')
-        if np.linalg.matrix_rank(p) < p.shape[1]:
-            raise ValueError('Model cannot be estimated. portfolios do not have full column rank.')
+        if p.shape[0] < (f.shape[1] + 1):
+            raise ValueError('Model cannot be estimated. portfolios must have factors + 1 or '
+                             'more returns to\nestimate the model parameters.')
 
     @property
     def formula(self):

@@ -144,13 +144,14 @@ def has_constant(x, x_rank=None):
     aug_rank = np.linalg.matrix_rank(np.c_[np.ones((n, 1)), x])
     rank = np.linalg.matrix_rank(x) if x_rank is None else x_rank
 
-    has_const = bool(aug_rank == rank)
+    has_const = (aug_rank == rank) and x.shape[0] > x.shape[1]
+    has_const = has_const or rank < min(x.shape)
     loc = None
     if has_const:
         out = lstsq(x, np.ones((n, 1)))
         beta = out[0].ravel()
         loc = np.argmax(np.abs(beta) * x.var(0))
-    return has_const, loc
+    return bool(has_const), loc
 
 
 def inv_sqrth(x):
