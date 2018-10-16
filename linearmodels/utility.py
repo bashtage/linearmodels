@@ -19,6 +19,10 @@ missing_value_warning_msg = """
 Inputs contain missing values. Dropping rows with missing observations."""
 
 
+class InferenceUnavailableWarning(Warning):
+    pass
+
+
 class AttrDict(MutableMapping):
     """
     Ordered dictionary-like object that exposes keys as attributes

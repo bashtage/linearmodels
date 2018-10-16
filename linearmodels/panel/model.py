@@ -16,8 +16,8 @@ from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
-                                  ensure_unique_column, has_constant,
-                                  missing_warning, panel_to_frame)
+                                  ensure_unique_column, has_constant, MissingValueWarning,
+                                  missing_warning, panel_to_frame, InferenceUnavailableWarning)
 
 
 class PanelFormulaParser(object):
@@ -1839,13 +1839,43 @@ class FamaMacBeth(PooledOLS):
     implementation based on regressing all observation in a single
     time period is "as-if" time effects are included.
 
-    Parameter inference is made using the set T parameter estimates using
+    Parameter inference is made using the set of T parameter estimates with
     either the standard covariance estimator or a kernel-based covariance,
     depending on ``cov_type``.
     """
 
     def __init__(self, dependent, exog, *, weights=None):
         super(FamaMacBeth, self).__init__(dependent, exog, weights=weights)
+        self._validate_blocks()
+
+    def _validate_blocks(self):
+        x = self._x
+        root_w = np.sqrt(self._w)
+        wx = root_w * x
+
+        exog = self.exog.dataframe
+        wx = pd.DataFrame(wx[self._not_null], index=exog.notnull().index, columns=exog.columns)
+
+        def validate_block(ex):
+            return ex.shape[0] >= ex.shape[1] and matrix_rank(ex) == ex.shape[1]
+
+        valid_blocks = wx.groupby(level=1).apply(validate_block)
+        if not valid_blocks.any():
+            err = 'Model cannot be estimated. All blocks of time-series observations are rank\n' \
+                  'deficient, and so it is not possible to estimate any cross-sectional ' \
+                  'regressions.'
+            raise ValueError(err)
+        if valid_blocks.sum() < exog.shape[1]:
+            import warnings
+            warnings.warn('The number of time-series observation available to estimate '
+                          'cross-sectional\nregressions, {0}, is less than the number of '
+                          'parameters in the model. Parameter\ninference is not '
+                          'available.'.format(valid_blocks.sum()), InferenceUnavailableWarning)
+        elif valid_blocks.sum() < valid_blocks.shape[0]:
+            import warnings
+            warnings.warn('{0} of the time-series regressions cannot be estimated due to '
+                          'deficient rank.'.format(valid_blocks.shape[0] - valid_blocks.sum()),
+                          MissingValueWarning)
 
     def fit(self, cov_type='unadjusted', debiased=True, **cov_config):
         """
@@ -1903,7 +1933,7 @@ class FamaMacBeth(PooledOLS):
 
         def single(z: pd.DataFrame):
             exog = z.iloc[:, 1:].values
-            if exog.shape[0] < exog.shape[1]:
+            if exog.shape[0] < exog.shape[1] or matrix_rank(exog) != exog.shape[1]:
                 return pd.Series([np.nan] * len(z.columns), index=z.columns)
             dep = z.iloc[:, :1].values
             params = lstsq(exog, dep)[0]
