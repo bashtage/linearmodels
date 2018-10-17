@@ -1,14 +1,15 @@
 from itertools import product
 
 import numpy as np
-import pytest
 import pandas as pd
+import pytest
 from numpy.testing import assert_allclose
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
 from linearmodels.tests.panel._utility import generate_data, datatypes, assert_frame_similar
+from linearmodels.utility import MissingValueWarning, InferenceUnavailableWarning
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -99,3 +100,30 @@ def test_fitted_effects_residuals(data):
     expected.columns = ['estimated_effects']
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)
+
+
+@pytest.mark.filterwarnings('always::linearmodels.utility.MissingValueWarning')
+def test_block_size_warnings():
+    y = np.arange(12.0)[:, None]
+    x = np.ones((12, 3))
+    x[:, 1] = np.arange(12.0)
+    x[:, 2] = np.arange(12.0) ** 2
+    idx = pd.MultiIndex.from_product([['a', 'b', 'c'], pd.date_range('2000-1-1', periods=4)])
+    y = pd.DataFrame(y, index=idx, columns=['y'])
+    x = pd.DataFrame(x, index=idx, columns=['x1', 'x2', 'x3'])
+    with pytest.warns(MissingValueWarning):
+        FamaMacBeth(y.iloc[:11], x.iloc[:11])
+    with pytest.warns(InferenceUnavailableWarning):
+        FamaMacBeth(y.iloc[::4], x.iloc[::4])
+
+
+def test_block_size_error():
+    y = np.arange(12.0)[:, None]
+    x = np.ones((12, 2))
+    x[1::4, 1] = 2
+    x[2::4, 1] = 3
+    idx = pd.MultiIndex.from_product([['a', 'b', 'c'], pd.date_range('2000-1-1', periods=4)])
+    y = pd.DataFrame(y, index=idx, columns=['y'])
+    x = pd.DataFrame(x, index=idx, columns=['x1', 'x2'])
+    with pytest.raises(ValueError):
+        FamaMacBeth(y, x)
