@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.10+5.g7848a7b documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.10+7.g3f2ca10 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10+5.g7848a7b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10+7.g3f2ca10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.10 (+5, g7848a7b)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.10 (+7, g3f2ca10)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -126,8 +126,8 @@
                                         <span class="n">RandomEffectsResults</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
                                   <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span>
-                                  <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span>
-                                  <span class="n">missing_warning</span><span class="p">,</span> <span class="n">panel_to_frame</span><span class="p">)</span>
+                                  <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">MissingValueWarning</span><span class="p">,</span>
+                                  <span class="n">missing_warning</span><span class="p">,</span> <span class="n">panel_to_frame</span><span class="p">,</span> <span class="n">InferenceUnavailableWarning</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">PanelFormulaParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1949,13 +1949,43 @@
 <span class="sd">    implementation based on regressing all observation in a single</span>
 <span class="sd">    time period is &quot;as-if&quot; time effects are included.</span>
 
-<span class="sd">    Parameter inference is made using the set T parameter estimates using</span>
+<span class="sd">    Parameter inference is made using the set of T parameter estimates with</span>
 <span class="sd">    either the standard covariance estimator or a kernel-based covariance,</span>
 <span class="sd">    depending on ``cov_type``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FamaMacBeth</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_blocks</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+        <span class="n">root_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_w</span><span class="p">)</span>
+        <span class="n">wx</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">*</span> <span class="n">x</span>
+
+        <span class="n">exog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">dataframe</span>
+        <span class="n">wx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">wx</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_not_null</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">exog</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">exog</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">validate_block</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ex</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">ex</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span> <span class="o">==</span> <span class="n">ex</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">valid_blocks</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">validate_block</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="s1">&#39;Model cannot be estimated. All blocks of time-series observations are rank</span><span class="se">\n</span><span class="s1">&#39;</span> \
+                  <span class="s1">&#39;deficient, and so it is not possible to estimate any cross-sectional &#39;</span> \
+                  <span class="s1">&#39;regressions.&#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The number of time-series observation available to estimate &#39;</span>
+                          <span class="s1">&#39;cross-sectional</span><span class="se">\n</span><span class="s1">regressions, </span><span class="si">{0}</span><span class="s1">, is less than the number of &#39;</span>
+                          <span class="s1">&#39;parameters in the model. Parameter</span><span class="se">\n</span><span class="s1">inference is not &#39;</span>
+                          <span class="s1">&#39;available.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">InferenceUnavailableWarning</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> of the time-series regressions cannot be estimated due to &#39;</span>
+                          <span class="s1">&#39;deficient rank.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_blocks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">valid_blocks</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+                          <span class="n">MissingValueWarning</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FamaMacBeth.fit"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.FamaMacBeth.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2013,7 +2043,7 @@
 
         <span class="k">def</span> <span class="nf">single</span><span class="p">(</span><span class="n">z</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">exog</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
-            <span class="k">if</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">exog</span><span class="p">)</span> <span class="o">!=</span> <span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
             <span class="n">dep</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">dep</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -2116,7 +2146,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10+5.g7848a7b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.10+7.g3f2ca10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

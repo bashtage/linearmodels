@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.10+5.g7848a7b documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.10+7.g3f2ca10 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10+5.g7848a7b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10+7.g3f2ca10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.10 (+5, g7848a7b)</a>
+    ../../index.html" class="text-logo">linearmodels 4.10 (+7, g3f2ca10)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -359,8 +359,8 @@ use an OrderedDict which will preserve equation order in results. Keys
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Mon, Oct 08 2018
-Time:                        11:29:47
+Date:                Wed, Oct 17 2018
+Time:                        23:06:11
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -422,8 +422,8 @@ equation with braces <code class="docutils literal notranslate"><span class="pre
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Mon, Oct 08 2018
-Time:                        11:29:47
+Date:                Wed, Oct 17 2018
+Time:                        23:06:11
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -529,35 +529,35 @@ from those in the standard GLS model.</p>
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.6954
+Estimator:                        GLS   Overall R-squared:              0.6956
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Mon, Oct 08 2018
-Time:                        11:29:47
+Date:                Wed, Oct 17 2018
+Time:                        23:06:11
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0378     0.0098     3.8635     0.0001      0.0186      0.0570
-exper          0.0295     0.0155     1.8984     0.0576     -0.0010      0.0599
-expersq       -0.0005     0.0004    -1.1615     0.2454     -0.0012      0.0003
-union          0.3589     0.1049     3.4218     0.0006      0.1533      0.5645
-south         -0.1648     0.1157    -1.4246     0.1543     -0.3915      0.0619
-nrtheast      -0.1216     0.1360    -0.8936     0.3716     -0.3882      0.1451
-nrthcen       -0.1103     0.1245    -0.8861     0.3756     -0.3542      0.1337
-male           0.2390     0.0923     2.5907     0.0096      0.0582      0.4199
+educ           0.0401     0.0113     3.5577     0.0004      0.0180      0.0622
+exper          0.0303     0.0154     1.9596     0.0500  -5.789e-06      0.0606
+expersq       -0.0005     0.0004    -1.4599     0.1443     -0.0013      0.0002
+union          0.4274     0.1103     3.8745     0.0001      0.2112      0.6436
+south         -0.2398     0.1138    -2.1068     0.0351     -0.4628     -0.0167
+nrtheast      -0.1544     0.1389    -1.1114     0.2664     -0.4267      0.1179
+nrthcen       -0.1710     0.1273    -1.3431     0.1792     -0.4206      0.0786
+male           0.2279     0.1057     2.1569     0.0310      0.0208      0.4351
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.3650     0.0291     12.547     0.0000      0.3080      0.4220
-exper         -0.0854     0.0639    -1.3372     0.1811     -0.2107      0.0398
-expersq        0.0041     0.0017     2.4823     0.0131      0.0009      0.0074
-nrtheast      -1.0252     0.1988    -5.1578     0.0000     -1.4147     -0.6356
-married        0.4088     0.2021     2.0223     0.0431      0.0126      0.8050
-male           1.7880     0.1102     16.231     0.0000      1.5721      2.0039
+educ           0.3356     0.0253     13.261     0.0000      0.2860      0.3853
+exper         -0.0580     0.0574    -1.0101     0.3124     -0.1704      0.0545
+expersq        0.0035     0.0015     2.2596     0.0238      0.0005      0.0065
+nrtheast      -0.8753     0.1832    -4.7782     0.0000     -1.2343     -0.5162
+married        0.5929     0.1990     2.9799     0.0029      0.2029      0.9829
+male           1.8480     0.1476     12.522     0.0000      1.5587      2.1372
 ==============================================================================
 
 Covariance Estimator:
@@ -608,7 +608,7 @@ identical to passing one to the standard SUR.</p>
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10+5.g7848a7b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.10+7.g3f2ca10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>
