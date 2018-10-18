@@ -5,7 +5,7 @@ import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
 from pandas import DataFrame, date_range, Categorical, get_dummies, Series, datetime
-from pandas.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal, assert_index_equal
 
 from linearmodels.compat.pandas import is_string_dtype
 
@@ -15,7 +15,7 @@ except ImportError:
     pass
 
 from linearmodels.compat.numpy import lstsq
-from linearmodels.panel.data import PanelData
+from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import generate_data, datatypes, \
     MISSING_XARRAY
@@ -831,3 +831,15 @@ def test_named_index(data):
 
     assert pdata.dataframe.index.levels[0].name == 'entity'
     assert pdata.dataframe.index.levels[1].name == 'time'
+
+
+def test_fake_panel_properties(mi_df):
+    panel = _Panel(mi_df)
+    nentity, ntime = list(map(len, mi_df.index.levels))
+    nvar = mi_df.shape[1]
+    assert panel.shape == (nvar, ntime, nentity)
+    assert_index_equal(panel.items, mi_df.columns)
+    assert_index_equal(panel.major_axis, mi_df.index.levels[1])
+    assert_index_equal(panel.minor_axis, mi_df.index.levels[0])
+    df = panel.to_frame()
+    assert_frame_equal(df, mi_df)

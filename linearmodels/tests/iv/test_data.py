@@ -213,3 +213,9 @@ class TestDataHandler(object):
         s = pd.Series([1, 2, 'a', -3.0])
         with pytest.raises(ValueError):
             IVData(s)
+
+
+def test_duplicate_column_names():
+    x = pd.DataFrame(np.ones((3, 2)), columns=['x', 'x'])
+    with pytest.raises(ValueError):
+        IVData(x)

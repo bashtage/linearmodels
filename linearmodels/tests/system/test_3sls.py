@@ -13,6 +13,7 @@ from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls, 
 nexog = [3, [1, 2, 3, 4, 5]]
 nendog = [2, [1, 2, 1, 2, 1]]
 ninstr = [3, 2, [2, 3, 2, 3, 2]]
+
 const = [True, False]
 rho = [0.8, 0.0]
 common_exog = [True, False]
@@ -20,6 +21,16 @@ included_weights = [True, False]
 output_dict = [True, False]
 params = list(product(nexog, nendog, ninstr, const, rho, common_exog,
                       included_weights, output_dict))
+
+nexog = [[0, 1, 2]]
+nendog = [[1, 0, 1]]
+ninstr = [[2, 0, 1]]
+
+# Explicitly test variables that have no columns
+add_params = list(product(nexog, nendog, ninstr, const, rho, common_exog,
+                          included_weights, output_dict))
+
+params += add_params
 
 
 def gen_id(param):
@@ -71,14 +82,22 @@ def test_direct_simple(data):
         val = data[key]
         if isinstance(val, tuple):
             y.append(val[0])
-            x.append(np.concatenate([val[1], val[2]], 1))
-            z.append(np.concatenate([val[1], val[3]], 1))
+            nobs = val[0].shape[0]
+            v1 = val[1] if val[1] is not None else np.empty((nobs, 0))
+            v2 = val[2] if val[2] is not None else np.empty((nobs, 0))
+            v3 = val[3] if val[3] is not None else np.empty((nobs, 0))
+            x.append(np.concatenate([v1, v2], 1))
+            z.append(np.concatenate([v1, v3], 1))
             if len(val) == 5:
                 return  # weighted
         else:
             y.append(val['dependent'])
-            x.append(np.concatenate([val['exog'], val['endog']], 1))
-            z.append(np.concatenate([val['exog'], val['instruments']], 1))
+            nobs = val['dependent'].shape[0]
+            vexog = val['exog'] if val['exog'] is not None else np.empty((nobs, 0))
+            vendog = val['endog'] if val['endog'] is not None else np.empty((nobs, 0))
+            vinstr = val['instruments'] if val['instruments'] is not None else np.empty((nobs, 0))
+            x.append(np.concatenate([vexog, vendog], 1))
+            z.append(np.concatenate([vexog, vinstr], 1))
             if 'weights' in val:
                 return  # weighted
     out = simple_3sls(y, x, z)

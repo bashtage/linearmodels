@@ -244,7 +244,7 @@ def generate_simultaneous_data(n=500, nsystem=3, nexog=3, ninstr=2, const=True, 
     gaminv = np.linalg.inv(gam)
     y = x @ beta @ gaminv + eps @ gaminv
     eqns = {}
-    deps = convert_to_pandas(y, 'dependent')
+    deps = convert_to_pandas(np.squeeze(y), 'dependent')
     exogs = convert_to_pandas(x, 'exog')
     if const:
         exogs.columns = ['const'] + list(exogs.columns[1:])

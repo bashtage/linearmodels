@@ -1,7 +1,7 @@
 from itertools import product
 
 import numpy as np
-from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical
+from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical, Index
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
@@ -31,11 +31,12 @@ class _Panel(object):
     def __init__(self, df):
         self._items = df.columns
         index = df.index
-        self._major_axis = Series(index.levels[1][index.labels[1]]).unique()
-        self._minor_axis = Series(index.levels[0][index.labels[0]]).unique()
+        self._major_axis = Index(index.levels[1][index.labels[1]]).unique()
+        self._minor_axis = Index(index.levels[0][index.labels[0]]).unique()
         self._full_index = MultiIndex.from_product([self._minor_axis,
                                                     self._major_axis])
         new_df = df.reindex(self._full_index)
+        new_df.index.names = df.index.names
         self._frame = new_df
         i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
         self._shape = (i, j, k)
