@@ -1,10 +1,14 @@
 Change Log
 ----------
 
-Since 4.10
-==========
+Version 4.11
+============
+* Fixed a bug which did not correctly check the rank of the
+  cross-section regression in `FamaMacBeth` (:issue:`176`)
 * Fixed a bug which failed to correctly check rank conditions when
   specifying asset pricing models (:issue:`173`)
+* Switched to external package cached-property to manage caching instead of
+  custom and less-well-tested solution (:issue:`172`)
 
 Version 4.10
 ============
