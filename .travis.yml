@@ -64,7 +64,7 @@ matrix:
 before_install:
   - sudo apt-get install -y pandoc enchant
   - git fetch --tags
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh -nv
   - chmod +x miniconda3.sh
   - ./miniconda3.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
