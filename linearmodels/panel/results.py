@@ -667,7 +667,7 @@ class RandomEffectsResults(PanelResults):
         return self._theta
 
 
-def compare(results):
+def compare(results, precision='tstats'):
     """
     Compare the results of multiple models
 
@@ -676,12 +676,15 @@ def compare(results):
     results : {list, dict, OrderedDict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
+    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+        Estimator precision estimator to include in the comparrison output.
+        Default is 'tstats'.
 
     Returns
     -------
     comparison : PanelModelComparison
     """
-    return PanelModelComparison(results)
+    return PanelModelComparison(results, precision=precision)
 
 
 class PanelModelComparison(_ModelComparison):
@@ -693,11 +696,14 @@ class PanelModelComparison(_ModelComparison):
     results : {list, dict, OrderedDict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
+    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+        Estimator precision estimator to include in the comparrison output.
+        Default is 'tstats'.
     """
     _supported = (PanelEffectsResults, PanelResults, RandomEffectsResults)
 
-    def __init__(self, results):
-        super(PanelModelComparison, self).__init__(results)
+    def __init__(self, results, *, precision='tstats'):
+        super(PanelModelComparison, self).__init__(results, precision=precision)
 
     @property
     def rsquared_between(self):
@@ -755,17 +761,17 @@ class PanelModelComparison(_ModelComparison):
             vals[i] = [f(v) for v in vals[i]]
 
         params = self.params
-        tstats = self.tstats
+        precision = getattr(self, self._precision)
         params_fmt = []
         params_stub = []
         for i in range(len(params)):
             params_fmt.append([_str(v) for v in params.values[i]])
-            tstats_fmt = []
-            for v in tstats.values[i]:
+            precision_fmt = []
+            for v in precision.values[i]:
                 v_str = _str(v)
                 v_str = '({0})'.format(v_str) if v_str.strip() else v_str
-                tstats_fmt.append(v_str)
-            params_fmt.append(tstats_fmt)
+                precision_fmt.append(v_str)
+            params_fmt.append(precision_fmt)
             params_stub.append(params.index[i])
             params_stub.append(' ')
 
@@ -801,5 +807,6 @@ class PanelModelComparison(_ModelComparison):
         txt_fmt['header_align'] = 'r'
         table = SimpleTable(vals, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt)
         smry.tables.append(table)
-        smry.add_extra_txt(['T-stats reported in parentheses'])
+        prec_type = self._PRECISION_TYPES[self._precision]
+        smry.add_extra_txt(['{0} reported in parentheses'.format(prec_type)])
         return smry
