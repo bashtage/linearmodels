@@ -46,7 +46,7 @@ matrix:
     - SCIPY=1
     - PANDAS=0.22
     - XARRAY=0.10
-    - DOCBUILD=true
+    - DOCBUILD=true # TODO: Disabled due to breaks upstream
     - STATAMODELS=0.9
   - python: 3.6
     env:
@@ -69,7 +69,7 @@ before_install:
   - ./miniconda3.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda config --set always_yes true
-  - conda update conda
+  - conda update --all -q
   # Install packages
   - |
     if [[ ${USE_PYPI} = true ]]; then
@@ -77,6 +77,8 @@ before_install:
     else
       source ci/install-from-conda.sh
     fi;
+  - source ci/install-common.sh
+  - pip list
 
 install:
   - python setup.py develop
@@ -87,7 +89,8 @@ script:
   - |
     if [[ ${DOCBUILD} = true ]]; then
       sudo apt-get install -y enchant
-      pip install sphinxcontrib-spelling
+      pip install sphinxcontrib-spelling flake8
+      pip list
       cd doc
       make html
       make html

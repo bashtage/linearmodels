@@ -11,7 +11,7 @@ sphinx
 guzzle_sphinx_theme
 ipython
 nbsphinx
-nbconvert
+nbconvert!=5.4
 nbformat
 matplotlib
 seaborn
