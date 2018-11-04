@@ -30,7 +30,8 @@ def generated_data(request):
     return generate_data(missing, datatype, const=const, ntk=(91, 7, 5), other_effects=2)
 
 
-def test_single(data):
+@pytest.mark.parametrize('precision', ('tstats', 'std_errors', 'pvalues'))
+def test_single(data, precision):
     dependent = data.set_index(['nr', 'year']).lwage
     exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog, entity_effects=True).fit()
@@ -43,7 +44,8 @@ def test_single(data):
         getattr(comp, value)
 
 
-def test_multiple(data):
+@pytest.mark.parametrize('precision', ('tstats', 'std_errors', 'pvalues'))
+def test_multiple(data, precision):
     dependent = data.set_index(['nr', 'year']).lwage
     exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
@@ -53,13 +55,15 @@ def test_multiple(data):
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(['nr', 'year'])[['exper']]
     res4 = RandomEffects(dependent, exog).fit()
-    comp = compare([res, res2, res3, res4])
+    comp = compare([res, res2, res3, res4], precision=precision)
     assert len(comp.rsquared) == 4
     d = dir(comp)
     for value in d:
         if value.startswith('_'):
             continue
         getattr(comp, value)
+    with pytest.raises(ValueError):
+        compare([res, res2, res3, res4], precision='unknown')
 
 
 def test_multiple_no_effects(data):

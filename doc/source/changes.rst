@@ -1,10 +1,15 @@
 Change Log
 ----------
 
+Since 4.11 (Unreleased)
+=======================
+* Added an option in model comparrison (``compare``) to report standard
+  errors or pvalues instead of t-stats.  (:issue:`178`)
+
 Version 4.11
 ============
 * Fixed a bug which did not correctly check the rank of the
-  cross-section regression in `FamaMacBeth` (:issue:`176`)
+  cross-section regression in ``FamaMacBeth`` (:issue:`176`)
 * Fixed a bug which failed to correctly check rank conditions when
   specifying asset pricing models (:issue:`173`)
 * Switched to external package cached-property to manage caching instead of
@@ -13,16 +18,16 @@ Version 4.11
 Version 4.10
 ============
 * Fixed a bug where weights were incorrectly calculated for HAC covariances
-  when the weight function was `parzen` or `gallant` (:issue:`170`)
+  when the weight function was ``'parzen'`` or ``'gallant'`` (:issue:`170`)
 
 Version 4.9
 ===========
 * Changed the return type of Wooldridge's over identification test when
-  invalid to `InvalidTestStatistic`
+  invalid to ``InvalidTestStatistic``
 * Add typing information to IV models
-* Allow optimization parameters to be passed to `IVGMMCUE`
+* Allow optimization parameters to be passed to ``IVGMMCUE``
 * Removed internal use of pandas Panel
-* Improved performance in panel models when using `from_formula`
+* Improved performance in panel models when using ``from_formula``
 * Switched to retaining index column names when original input index is named
 * Modified tests that were not well conceived
 * Added spell check to documentation build
@@ -47,7 +52,7 @@ Version 4.5
 * Added System GMM estimator
 * Added automatic bandwidth for kernel-based GMM weighting estimators
 * Cleaned up HAC estimation across models
-* Added `predict` method to IV, Panel and System model to allow out-of-sample
+* Added ``predict`` method to IV, Panel and System model to allow out-of-sample
   prediction and simplify retrieval of in-sample results
 * Fixed small issues with Fama-MacBeth which previously ignored weights
 

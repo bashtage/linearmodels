@@ -376,8 +376,11 @@ class _ModelComparison(_SummaryStr):
     Base class for model comparisons
     """
     _supported = tuple([])
+    _PRECISION_TYPES = {'tstats': 'T-stats',
+                        'pvalues': 'P-values',
+                        'std_errors': 'Std. Errors'}
 
-    def __init__(self, results):
+    def __init__(self, results, *, precision='tstats'):
         if not isinstance(results, (dict, OrderedDict)):
             _results = OrderedDict()
             for i, res in enumerate(results):
@@ -393,6 +396,11 @@ class _ModelComparison(_SummaryStr):
         for key in self._results:
             if not isinstance(self._results[key], self._supported):
                 raise TypeError('Results from unknown model')
+        precision = precision.lower().replace('-', '_')
+        if precision not in ('tstats', 'pvalues', 'std_errors'):
+            raise ValueError('Unknown precision value. Must be one of \'tstats\', \'std_errors\' '
+                             'or \'pvalues\'.')
+        self._precision = precision
 
     def _get_series_property(self, name):
         out = ([(k, getattr(v, name)) for k, v in self._results.items()])
@@ -423,6 +431,11 @@ class _ModelComparison(_SummaryStr):
     def tstats(self):
         """Parameter t-stats for all models"""
         return self._get_series_property('tstats')
+
+    @property
+    def std_errors(self):
+        """Parameter t-stats for all models"""
+        return self._get_series_property('std_errors')
 
     @property
     def pvalues(self):

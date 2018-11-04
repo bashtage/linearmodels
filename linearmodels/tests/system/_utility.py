@@ -82,8 +82,9 @@ def generate_3sls_data(n=500, k=10, p=3, en=2, instr=3, const=True, rho=0.8, kap
         corr[_p:_p + _en, _p:_p + _en] = kappa * np.eye(_en)
         corr[_p:_p + _en, -1] = np.sqrt(1 - kappa ** 2) * np.ones(_en)
         corr[_p + _en:_p + _en + _instr, _p:_p + _en] = beta * np.ones((_instr, _en))
-        val = np.sqrt(1 - beta ** 2) / _instr * np.eye(_instr)
-        corr[_p + _en:_p + _en + _instr, _p + _en:_p + _en + _instr] = val
+        if _instr > 0:
+            val = np.sqrt(1 - beta ** 2) / _instr * np.eye(_instr)
+            corr[_p + _en:_p + _en + _instr, _p + _en:_p + _en + _instr] = val
         if common_exog:
             shocks = np.random.standard_normal((n, total))
             common_shocks = common_shocks if common_shocks is not None else shocks
