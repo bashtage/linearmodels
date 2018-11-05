@@ -5,7 +5,7 @@ import sys
 import pytest
 
 try:
-    import xarray  # flake8: noqa
+    import xarray  # noqa: F401
 
     MISSING_XARRAY = False
 except ImportError:

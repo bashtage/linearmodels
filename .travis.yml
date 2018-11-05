@@ -85,11 +85,12 @@ install:
 
 script:
   - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
+  - flake8 linearmodels
   - set -e
   - |
     if [[ ${DOCBUILD} = true ]]; then
       sudo apt-get install -y enchant
-      pip install sphinxcontrib-spelling flake8
+      pip install sphinxcontrib-spelling
       pip list
       cd doc
       make html

@@ -480,7 +480,7 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def sargan(self):
-        """
+        r"""
         Sargan test of overidentifying restrictions
 
         Returns
@@ -526,7 +526,7 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def basmann(self):
-        """
+        r"""
         Basmann's test of overidentifying restrictions
 
         Returns
@@ -853,7 +853,7 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def anderson_rubin(self):
-        """
+        r"""
         Anderson-Rubin test of overidentifying restrictions
 
         Returns
@@ -886,7 +886,7 @@ class IVResults(_CommonIVResults):
 
     @cached_property
     def basmann_f(self):
-        """
+        r"""
         Basmann's F test of overidentifying restrictions
 
         Returns
