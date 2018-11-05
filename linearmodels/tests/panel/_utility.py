@@ -9,7 +9,7 @@ from linearmodels.panel.data import PanelData
 from linearmodels.utility import panel_to_frame
 
 try:
-    import xarray  # flake8: noqa
+    import xarray  # noqa: F401
 
     MISSING_XARRAY = False
 except ImportError:
@@ -31,22 +31,22 @@ def lsdv(y: DataFrame, x: DataFrame, has_const=False, entity=False, time=False,
         cat.index = cat_index
         dummies = get_dummies(cat, drop_first=has_const)
         x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
-                         index=x.index,
-                         columns=list(x.columns) + list(dummies.columns))
+                      index=x.index,
+                      columns=list(x.columns) + list(dummies.columns))
     if time:
         cat = Categorical(temp.iloc[:, 1])
         cat.index = cat_index
         dummies = get_dummies(cat, drop_first=(has_const or entity))
         x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
-                         index=x.index,
-                         columns=list(x.columns) + list(dummies.columns))
+                      index=x.index,
+                      columns=list(x.columns) + list(dummies.columns))
     if general is not None:
         cat = Categorical(general)
         cat.index = cat_index
         dummies = get_dummies(cat, drop_first=(has_const or entity or time))
         x = DataFrame(np.c_[x.values, dummies.values.astype(np.float64)],
-                         index=x.index,
-                         columns=list(x.columns) + list(dummies.columns))
+                      index=x.index,
+                      columns=list(x.columns) + list(dummies.columns))
     w = np.ones_like(y)
 
     wy = w * y.values

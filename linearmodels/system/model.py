@@ -84,7 +84,7 @@ def _missing_weights(weights):
 
 
 def _parameters_from_xprod(xpx, xpy, constraints=None):
-    """
+    r"""
     Estimate regression parameters from cross produces
 
     Parameters

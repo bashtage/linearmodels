@@ -57,7 +57,7 @@ def blocked_diag_product(x, s):
 
 
 def blocked_inner_prod(x, s):
-    """
+    r"""
     Parameters
     ----------
     x : list of ndarray
@@ -123,7 +123,7 @@ def blocked_inner_prod(x, s):
 
 
 def blocked_cross_prod(x, z, s):
-    """
+    r"""
     Parameters
     ----------
     x : list of ndarray
@@ -160,7 +160,7 @@ def blocked_cross_prod(x, z, s):
 
 
 def blocked_full_inner_product(x, s):
-    """
+    r"""
     Parameters
     ----------
         x : ndarray

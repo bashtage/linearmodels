@@ -79,7 +79,7 @@ def _cov_kernel(z, w):
 
 
 def kernel_weight_bartlett(bw, *args):
-    """
+    r"""
     Kernel weights from a Bartlett kernel
 
     Parameters
@@ -365,7 +365,7 @@ class HomoskedasticCovariance(object):
 
 
 class HeteroskedasticCovariance(HomoskedasticCovariance):
-    """
+    r"""
     Covariance estimation for heteroskedastic data
 
     Parameters

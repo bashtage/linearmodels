@@ -308,7 +308,8 @@ class InapplicableTestStatistic(WaldTestStatistic):
         if reason is None:
             self._reason = 'Test is not applicable to model specification'
 
-        super(InapplicableTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1, name=name)
+        super(InapplicableTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1,
+                                                        name=name)
         self.dist_name = 'None'
 
     @property
