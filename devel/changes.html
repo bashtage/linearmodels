@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.11+3.g8d43680 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.11+7.g0eb3829 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+3.g8d43680 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+7.g0eb3829 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -60,7 +60,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.11 (+3, g8d43680)</a>
+    index.html" class="text-logo">linearmodels 4.11 (+7, g0eb3829)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -78,6 +78,7 @@
 <li class="toctree-l1"><a class="reference internal" href="plan.html">Module Plans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#since-4-11-unreleased">Since 4.11 (Unreleased)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-11">Version 4.11</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-10">Version 4.10</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-9">Version 4.9</a></li>
@@ -127,11 +128,18 @@
             
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="since-4-11-unreleased">
+<h2>Since 4.11 (Unreleased)<a class="headerlink" href="#since-4-11-unreleased" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added an option in model comparrison (<code class="docutils literal notranslate"><span class="pre">compare</span></code>) to report standard
+errors or pvalues instead of t-stats.  (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</li>
+</ul>
+</div>
 <div class="section" id="version-4-11">
 <h2>Version 4.11<a class="headerlink" href="#version-4-11" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Fixed a bug which did not correctly check the rank of the
-cross-section regression in <cite>FamaMacBeth</cite> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</li>
+cross-section regression in <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</li>
 <li>Fixed a bug which failed to correctly check rank conditions when
 specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</li>
 <li>Switched to external package cached-property to manage caching instead of
@@ -142,18 +150,18 @@ custom and less-well-tested solution (<a class="reference external" href="https:
 <h2>Version 4.10<a class="headerlink" href="#version-4-10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Fixed a bug where weights were incorrectly calculated for HAC covariances
-when the weight function was <cite>parzen</cite> or <cite>gallant</cite> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</li>
+when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</li>
 </ul>
 </div>
 <div class="section" id="version-4-9">
 <h2>Version 4.9<a class="headerlink" href="#version-4-9" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Changed the return type of Wooldridge’s over identification test when
-invalid to <cite>InvalidTestStatistic</cite></li>
+invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></li>
 <li>Add typing information to IV models</li>
-<li>Allow optimization parameters to be passed to <cite>IVGMMCUE</cite></li>
+<li>Allow optimization parameters to be passed to <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></li>
 <li>Removed internal use of pandas Panel</li>
-<li>Improved performance in panel models when using <cite>from_formula</cite></li>
+<li>Improved performance in panel models when using <code class="docutils literal notranslate"><span class="pre">from_formula</span></code></li>
 <li>Switched to retaining index column names when original input index is named</li>
 <li>Modified tests that were not well conceived</li>
 <li>Added spell check to documentation build</li>
@@ -186,7 +194,7 @@ construction</li>
 <li>Added System GMM estimator</li>
 <li>Added automatic bandwidth for kernel-based GMM weighting estimators</li>
 <li>Cleaned up HAC estimation across models</li>
-<li>Added <cite>predict</cite> method to IV, Panel and System model to allow out-of-sample
+<li>Added <code class="docutils literal notranslate"><span class="pre">predict</span></code> method to IV, Panel and System model to allow out-of-sample
 prediction and simplify retrieval of in-sample results</li>
 <li>Fixed small issues with Fama-MacBeth which previously ignored weights</li>
 </ul>
@@ -260,7 +268,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+3.g8d43680 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+7.g0eb3829 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

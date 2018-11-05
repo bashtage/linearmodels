@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.11+3.g8d43680 documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.11+7.g0eb3829 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+3.g8d43680 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+7.g0eb3829 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.11 (+3, g8d43680)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.11 (+7, g0eb3829)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -1337,7 +1337,7 @@
         <span class="k">return</span> <span class="n">smry</span></div>
 
 
-<div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;tstats&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compare the results of multiple models</span>
 
@@ -1346,12 +1346,15 @@
 <span class="sd">    results : {list, dict, OrderedDict}</span>
 <span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
 <span class="sd">        names.  An OrderedDict will preserve the model order the comparisons.</span>
+<span class="sd">    precision : {&#39;tstats&#39;,&#39;std_errors&#39;, &#39;std-errors&#39;, &#39;pvalues&#39;}</span>
+<span class="sd">        Estimator precision estimator to include in the comparrison output.</span>
+<span class="sd">        Default is &#39;tstats&#39;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    comparison : IVModelComparison</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">IVModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">IVModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IVModelComparison"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.IVModelComparison">[docs]</a><span class="k">class</span> <span class="nc">IVModelComparison</span><span class="p">(</span><span class="n">_ModelComparison</span><span class="p">):</span>
@@ -1363,11 +1366,14 @@
 <span class="sd">    results : {list, dict, OrderedDict}</span>
 <span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
 <span class="sd">        names.  An OrderedDict will preserve the model order the comparisons.</span>
+<span class="sd">    precision : {&#39;tstats&#39;,&#39;std_errors&#39;, &#39;std-errors&#39;, &#39;pvalues&#39;}</span>
+<span class="sd">        Estimator precision estimator to include in the comparrison output.</span>
+<span class="sd">        Default is &#39;tstats&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_supported</span> <span class="o">=</span> <span class="p">(</span><span class="n">IVResults</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">,</span> <span class="n">OLSResults</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">IVModelComparison</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;tstats&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IVModelComparison</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1409,17 +1415,17 @@
             <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
-        <span class="n">tstats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstats</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">)</span>
         <span class="n">params_fmt</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">params_stub</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
             <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
-            <span class="n">tstats_fmt</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tstats</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">precision_fmt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">precision</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="n">v_str</span> <span class="o">=</span> <span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="n">v_str</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">v_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">else</span> <span class="n">v_str</span>
-                <span class="n">tstats_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span>
-            <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tstats_fmt</span><span class="p">)</span>
+                <span class="n">precision_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span>
+            <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">precision_fmt</span><span class="p">)</span>
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
 
@@ -1453,7 +1459,8 @@
         <span class="n">txt_fmt</span><span class="p">[</span><span class="s1">&#39;header_align&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">,</span> <span class="n">txt_fmt</span><span class="o">=</span><span class="n">txt_fmt</span><span class="p">)</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;T-stats reported in parentheses&#39;</span><span class="p">])</span>
+        <span class="n">prec_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PRECISION_TYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">]</span>
+        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> reported in parentheses&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prec_type</span><span class="p">)])</span>
         <span class="k">return</span> <span class="n">smry</span></div>
 </pre></div>
 
@@ -1471,7 +1478,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+3.g8d43680 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+7.g0eb3829 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
