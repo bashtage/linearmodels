@@ -31,7 +31,7 @@ def proj(y, x):
     yhat : ndarray
         Projected values of y (nobs by nseries)
     """
-    return x @ np.linalg.pinv(x) @ y
+    return x @ (np.linalg.pinv(x) @ y)
 
 
 def annihilate(y, x):
