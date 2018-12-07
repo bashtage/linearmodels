@@ -3,8 +3,6 @@ from itertools import product
 import numpy as np
 import pandas as pd
 import pytest
-from numpy.testing import assert_allclose
-
 from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
@@ -12,7 +10,8 @@ from linearmodels.panel.model import PanelOLS, PooledOLS
 from linearmodels.tests.panel._utility import (assert_results_equal,
                                                generate_data, datatypes,
                                                assert_frame_similar)
-from linearmodels.utility import AttrDict
+from linearmodels.utility import AttrDict, MemoryWarning
+from numpy.testing import assert_allclose
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -1078,7 +1077,7 @@ def test_panel_effects_sanity(data):
 def test_fitted_effects_residuals(data, entity_eff, time_eff):
     mod = PanelOLS(data.y, data.x,
                    entity_effects=entity_eff,
-                   time_effects=entity_eff)
+                   time_effects=time_eff)
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
@@ -1096,3 +1095,30 @@ def test_fitted_effects_residuals(data, entity_eff, time_eff):
     expected.columns = ['estimated_effects']
     assert_allclose(res.estimated_effects, expected, atol=1e-8)
     assert_frame_similar(res.estimated_effects, expected)
+
+
+@pytest.mark.parametrize('weighted', [True, False])
+def test_low_memory(data, weighted):
+    if weighted:
+        mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True, time_effects=True)
+    else:
+        mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
+    res = mod.fit()
+
+    low_mem = mod.fit(low_memory=True)
+    assert_allclose(res.params, low_mem.params)
+
+
+def test_low_memory_auto():
+    x = np.random.standard_normal((1000, 1000))
+    e = np.random.standard_normal((1000, 1000))
+    eff = np.arange(1000)[:, None]
+    y = x + e + eff + eff.T
+    y = y.ravel()
+    x = np.reshape(x, (1000000, 1))
+    mi = pd.MultiIndex.from_product([np.arange(1000), np.arange(1000)])
+    y = pd.Series(y, index=mi)
+    x = pd.DataFrame(x, index=mi)
+    mod = PanelOLS(y, x, entity_effects=True, time_effects=True)
+    with pytest.warns(MemoryWarning):
+        mod.fit()

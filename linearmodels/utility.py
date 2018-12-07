@@ -19,6 +19,10 @@ missing_value_warning_msg = """
 Inputs contain missing values. Dropping rows with missing observations."""
 
 
+class MemoryWarning(Warning):
+    pass
+
+
 class InferenceUnavailableWarning(Warning):
     pass
 

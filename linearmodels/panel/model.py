@@ -17,7 +17,8 @@ from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
                                   ensure_unique_column, has_constant, MissingValueWarning,
-                                  missing_warning, panel_to_frame, InferenceUnavailableWarning)
+                                  missing_warning, panel_to_frame, InferenceUnavailableWarning,
+                                  MemoryWarning)
 
 
 class PanelFormulaParser(object):
@@ -914,7 +915,25 @@ class PanelOLS(PooledOLS):
         ybar = root_w @ lstsq(root_w, y)[0]
         return y, x, ybar, y_effects, x_effects
 
-    def _fast_path(self):
+    def _choose_twoway_algo(self):
+        if not (self.entity_effects and self.time_effects):
+            return False
+        nentity, nobs = self.dependent.nentity, self.dependent.nobs
+        nreg = min(nentity, nobs)
+        if nreg < self.exog.shape[1]:
+            return False
+        # MiB
+        reg_size = 8 * nentity * nobs * nreg // 2 ** 20
+        low_memory = reg_size > 2**10
+        if low_memory:
+            import warnings
+            warnings.warn('Using low-memory algorithm to estimate two-way model. Explicitly set '
+                          'low_memory=True to silence this message.  Set low_memory=False to use '
+                          'the standard algorithm that creates dummy variables for the smaller of '
+                          'the number of entities or number of time periods.', MemoryWarning)
+        return low_memory
+
+    def _fast_path(self, low_memory):
         """Dummy-variable free estimation without weights"""
         has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
@@ -943,8 +962,8 @@ class PanelOLS(PooledOLS):
             y = y.general_demean(groups)
             x = x.general_demean(groups)
         elif self.entity_effects and self.time_effects:
-            y = y.demean('both')
-            x = x.demean('both')
+            y = y.demean('both', low_memory=low_memory)
+            x = x.demean('both', low_memory=low_memory)
         elif self.entity_effects:
             y = y.demean('entity')
             x = x.demean('entity')
@@ -963,7 +982,7 @@ class PanelOLS(PooledOLS):
 
         return y, x, ybar
 
-    def _weighted_fast_path(self):
+    def _weighted_fast_path(self, low_memory):
         """Dummy-variable free estimation with weights"""
         has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
@@ -996,8 +1015,8 @@ class PanelOLS(PooledOLS):
             wy = y.general_demean(groups, weights=self.weights)
             wx = x.general_demean(groups, weights=self.weights)
         elif self.entity_effects and self.time_effects:
-            wy = y.demean('both', weights=self.weights)
-            wx = x.demean('both', weights=self.weights)
+            wy = y.demean('both', weights=self.weights, low_memory=low_memory)
+            wx = x.demean('both', weights=self.weights, low_memory=low_memory)
         elif self.entity_effects:
             wy = y.demean('entity', weights=self.weights)
             wx = x.demean('entity', weights=self.weights)
@@ -1076,8 +1095,8 @@ class PanelOLS(PooledOLS):
             return not self._is_effect_nested(effects, clusters)
         return True  # Default case for 2-way -- not completely clear
 
-    def fit(self, *, use_lsdv=False, cov_type='unadjusted', debiased=True, auto_df=True,
-            count_effects=True, **cov_config):
+    def fit(self, *, use_lsdv=False, low_memory=None, cov_type='unadjusted', debiased=True,
+            auto_df=True, count_effects=True, **cov_config):
         """
         Estimate model parameters
 
@@ -1087,6 +1106,12 @@ class PanelOLS(PooledOLS):
             Flag indicating to use the Least Squares Dummy Variable estimator
             to eliminate effects.  The default value uses only means and does
             note require constructing dummy variables for each effect.
+        low_memory : {bool, None}
+            Flag indicating whether to use a low-memory algorithm when a model
+            contains two-way fixed effects. If `None`, the choice is taken
+            automatically, and the low memory algorithm is used if the
+            required dummy variable array is both larger than then array of
+            regressors in the model and requires more than 1 GiB .
         cov_type : str, optional
             Name of covariance estimator. See Notes.
         debiased : bool, optional
@@ -1143,12 +1168,13 @@ class PanelOLS(PooledOLS):
 
         weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
+        low_memory = self._choose_twoway_algo() if low_memory is None else low_memory
         if use_lsdv:
             y, x, ybar, y_effects, x_effects = self._slow_path()
         elif not weighted:
-            y, x, ybar = self._fast_path()
+            y, x, ybar = self._fast_path(low_memory=low_memory)
         else:
-            y, x, ybar, y_effects, x_effects = self._weighted_fast_path()
+            y, x, ybar, y_effects, x_effects = self._weighted_fast_path(low_memory=low_memory)
 
         neffects = 0
         drop_first = self.has_constant

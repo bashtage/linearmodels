@@ -1,14 +1,13 @@
 from itertools import product
 
 import numpy as np
-from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical, Index
-
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
                                         is_string_like, concat)
 from linearmodels.utility import ensure_unique_column, panel_to_frame
+from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical, Index
 
 __all__ = ['PanelData']
 
@@ -338,6 +337,13 @@ class PanelData(object):
         """
         return np.asarray(self._frame.index.labels[1])[:, None]
 
+    def _demean_both_low_mem(self, weights):
+        groups = PanelData(DataFrame(np.c_[self.entity_ids, self.time_ids],
+                                     index=self._frame.index),
+                           convert_dummies=False,
+                           copy=False)
+        return self.general_demean(groups, weights=weights)
+
     def _demean_both(self, weights):
         """
         Entity and time demean
@@ -446,19 +452,23 @@ class PanelData(object):
 
         return PanelData(current)
 
-    def demean(self, group='entity', weights=None, return_panel=True):
+    def demean(self, group='entity', weights=None, return_panel=True, low_memory=False):
         """
         Demeans data by either entity or time group
 
         Parameters
         ----------
-        group : {'entity', 'time'}
+        group : {'entity', 'time', 'both'}
             Group to use in demeaning
         weights : PanelData, optional
             Weights to implement weighted averaging
         return_panel : bool
             Flag indicating to return a PanelData object. If False, a 2-d
             NumPy representation of the panel is returned
+        low_memory : bool
+            Flag indicating whether to use a low memory implementation
+            that avoids constructing dummy variables. Only relevant when
+            group is 'both'
 
         Returns
         -------
@@ -474,7 +484,10 @@ class PanelData(object):
         if group not in ('entity', 'time', 'both'):
             raise ValueError
         if group == 'both':
-            return self._demean_both(weights)
+            if not low_memory:
+                return self._demean_both(weights)
+            else:
+                return self._demean_both_low_mem(weights)
 
         level = 0 if group == 'entity' else 1
         if weights is None:

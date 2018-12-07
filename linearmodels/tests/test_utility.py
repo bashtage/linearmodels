@@ -186,6 +186,7 @@ def test_format_wide():
 
 @pytest.mark.skipif(MISSING_PANEL, reason='pd.Panel is not installed')
 @pytest.mark.filterwarnings('ignore::FutureWarning')
+@pytest.mark.filterwarnings('ignore::DeprecationWarning')
 def test_panel_to_midf():
     x = np.random.standard_normal((3, 7, 100))
     expected = pd.Panel(x).to_frame()
