@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Further Examples &#8212; linearmodels 4.11+11.g16e9943 documentation</title>
+    <title>Further Examples &#8212; linearmodels 4.11+14.gb696f66 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+11.g16e9943 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11 (+11, g16e9943)</a>
+    ../../index.html" class="text-logo">linearmodels 4.11 (+14, gb696f66)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -570,8 +570,8 @@ leads to an <strong>increase</strong> in out-of-pocket drug expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Mon, Nov 19 2018   P-value (F-stat)                0.0000
-Time:                        00:31:37   Distribution:                  chi2(6)
+Date:                Sat, Dec 08 2018   P-value (F-stat)                0.0000
+Time:                        23:07:43   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -618,8 +618,8 @@ expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Mon, Nov 19 2018   P-value (F-stat)                0.0000
-Time:                        00:31:37   Distribution:                  chi2(6)
+Date:                Sat, Dec 08 2018   P-value (F-stat)                0.0000
+Time:                        23:07:43   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -751,8 +751,8 @@ output of the non-linear optimizer used to estimate the parameters.</p>
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 1.045365
          Iterations: 10
-         Function evaluations: 678
-         Gradient evaluations: 74
+         Function evaluations: 660
+         Gradient evaluations: 72
 </pre></div></div>
 </div>
 </div>
@@ -806,20 +806,20 @@ Adj. R-squared              0.1765        0.0634         0.0409        0.0409   
 F-statistic                 2262.6        2000.9         1882.3        1955.4        1952.6           1700.8        1949.2
 P-value (F-stat)            0.0000        0.0000         0.0000        0.0000        0.0000           0.0000        0.0000
 ==================     ===========   ===========   ============   ===========   ===========      ===========   ===========
-age                        -0.0035       -0.0132        -0.0141       -0.0141       -0.0142          -0.0119       -0.0142
-                         (-1.8228)     (-4.4092)      (-5.0834)     (-4.8753)     (-4.8773)        (-1.8928)     (-4.8969)
-blhisp                     -0.1513       -0.2174        -0.2237       -0.2237       -0.2231          -0.2091       -0.2236
-                         (-4.4353)     (-5.5052)      (-5.7805)     (-5.6514)     (-5.6344)        (-4.1662)     (-5.6421)
-const                       5.8611        6.7872         6.8752        6.8752        6.8778           6.7277        6.8847
-                          (37.320)      (25.246)       (28.030)      (26.660)      (26.658)         (13.299)      (26.657)
-female                      0.0578       -0.0204        -0.0278       -0.0278       -0.0282          -0.0245       -0.0288
-                          (2.2797)     (-0.6257)      (-0.8933)     (-0.8653)     (-0.8752)        (-0.8398)     (-0.8928)
 hi_empunion                 0.0739       -0.8976        -0.9899       -0.9899       -0.9933          -1.0359       -1.0002
                           (2.8441)     (-4.0592)      (-5.1501)     (-4.8386)     (-4.8530)        (-5.0683)     (-4.8810)
-linc                        0.0105        0.0870         0.0943        0.0943        0.0945           0.0957        0.0950
-                          (0.7646)      (3.8436)       (4.4400)      (4.3079)      (4.3142)         (6.4934)      (4.3333)
+const                       5.8611        6.7872         6.8752        6.8752        6.8778           6.7277        6.8847
+                          (37.320)      (25.246)       (28.030)      (26.660)      (26.658)         (13.299)      (26.657)
 totchr                      0.4404        0.4503         0.4512        0.4512        0.4510           0.4482        0.4510
                           (47.049)      (44.157)       (42.942)      (43.769)      (43.738)         (33.833)      (43.701)
+female                      0.0578       -0.0204        -0.0278       -0.0278       -0.0282          -0.0245       -0.0288
+                          (2.2797)     (-0.6257)      (-0.8933)     (-0.8653)     (-0.8752)        (-0.8398)     (-0.8928)
+age                        -0.0035       -0.0132        -0.0141       -0.0141       -0.0142          -0.0119       -0.0142
+                         (-1.8228)     (-4.4092)      (-5.0834)     (-4.8753)     (-4.8773)        (-1.8928)     (-4.8969)
+linc                        0.0105        0.0870         0.0943        0.0943        0.0945           0.0957        0.0950
+                          (0.7646)      (3.8436)       (4.4400)      (4.3079)      (4.3142)         (6.4934)      (4.3333)
+blhisp                     -0.1513       -0.2174        -0.2237       -0.2237       -0.2231          -0.2091       -0.2236
+                         (-4.4353)     (-5.5052)      (-5.7805)     (-5.6514)     (-5.6344)        (-4.1662)     (-5.6421)
 ==================== ============= ============= ============== ============= =============    ============= =============
 Instruments                             ssiratio       ssiratio      ssiratio      ssiratio         ssiratio      ssiratio
                                                          multlc        multlc        multlc           multlc        multlc
@@ -855,7 +855,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b75e17eba90
+WaldTestStatistic, id: 0x7f7e0c1a0780
 </pre></div>
 </div>
 </div>
@@ -882,7 +882,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x2b75e1d4a3c8
+WaldTestStatistic, id: 0x7f7e112fb2b0
 </pre></div>
 </div>
 </div>
@@ -912,7 +912,7 @@ not be correlated with the dependent variable.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-25.34541049976766
+25.345410499815817
 </pre></div></div>
 </div>
 <p>Wooldridge’s regression-based test of exogeneity is robust to
@@ -939,7 +939,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b75e1cd36a0
+WaldTestStatistic, id: 0x7f7e08505518
 </pre></div>
 </div>
 </div>
@@ -967,7 +967,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b75e1cd3588
+WaldTestStatistic, id: 0x7f7e08505828
 </pre></div>
 </div>
 </div>
@@ -998,7 +998,7 @@ there is no evidence that against the null.</p>
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x2b75e19cf390
+WaldTestStatistic, id: 0x7f7e08b7fb38
 </pre></div>
 </div>
 </div>
@@ -1027,7 +1027,7 @@ endogenous.</p>
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x2b75e21f5160
+WaldTestStatistic, id: 0x7f7e0835cbe0
 </pre></div>
 </div>
 </div>
@@ -1074,20 +1074,20 @@ Adj. R-squared              0.0634        0.1763       -0.0651       -0.9064    
 F-statistic                 2000.9        2250.6        1734.1        950.64        2262.6
 P-value (F-stat)            0.0000        0.0000        0.0000        0.0000        0.0000
 ==================     ===========   ===========   ===========   ===========   ===========
-age                        -0.0132       -0.0031       -0.0177       -0.0335       -0.0035
-                         (-4.4092)     (-0.7521)     (-3.7086)     (-2.3433)     (-1.8228)
-blhisp                     -0.2174       -0.1484       -0.2479       -0.3559       -0.1513
-                         (-5.5052)     (-3.5639)     (-5.0727)     (-3.2425)     (-4.4353)
 const                       6.7872        5.8201        7.2145        8.7267        5.8611
                           (25.246)      (15.267)      (16.326)      (6.4196)      (37.320)
-female                     -0.0204        0.0613       -0.0565       -0.1842        0.0578
-                         (-0.6257)      (1.6066)     (-1.2596)     (-1.5312)      (2.2797)
-hi_empunion                -0.8976        0.1170       -1.3459       -2.9323        0.0739
-                         (-4.0592)      (0.3254)     (-3.1760)     (-2.0908)      (2.8441)
-linc                        0.0870        0.0071        0.1223        0.2473        0.0105
-                          (3.8436)      (0.2280)      (3.2965)      (2.1876)      (0.7646)
 totchr                      0.4503        0.4399        0.4548        0.4710        0.4404
                           (44.157)      (43.834)      (39.193)      (23.163)      (47.049)
+female                     -0.0204        0.0613       -0.0565       -0.1842        0.0578
+                         (-0.6257)      (1.6066)     (-1.2596)     (-1.5312)      (2.2797)
+age                        -0.0132       -0.0031       -0.0177       -0.0335       -0.0035
+                         (-4.4092)     (-0.7521)     (-3.7086)     (-2.3433)     (-1.8228)
+linc                        0.0870        0.0071        0.1223        0.2473        0.0105
+                          (3.8436)      (0.2280)      (3.2965)      (2.1876)      (0.7646)
+blhisp                     -0.2174       -0.1484       -0.2479       -0.3559       -0.1513
+                         (-5.5052)     (-3.5639)     (-5.0727)     (-3.2425)     (-4.4353)
+hi_empunion                -0.8976        0.1170       -1.3459       -2.9323        0.0739
+                         (-4.0592)      (0.3254)     (-3.1760)     (-2.0908)      (2.8441)
 ==================== ============= ============= ============= ============= =============
 Instruments               ssiratio     lowincome        multlc        firmsz
 ------------------------------------------------------------------------------------------
@@ -1283,7 +1283,7 @@ T-stats reported in parentheses
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1.0001153166806425
+1.0001153166806431
 </pre></div></div>
 </div>
 <div class="section" id="IV2SLS-as-OLS">
@@ -1357,7 +1357,7 @@ blhisp       -0.151307 -0.151307
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+11.g16e9943 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

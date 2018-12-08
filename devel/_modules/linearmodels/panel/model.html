@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.11+11.g16e9943 documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.11+14.gb696f66 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+11.g16e9943 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.11 (+11, g16e9943)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.11 (+14, gb696f66)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -127,7 +127,8 @@
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
                                   <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span>
                                   <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">has_constant</span><span class="p">,</span> <span class="n">MissingValueWarning</span><span class="p">,</span>
-                                  <span class="n">missing_warning</span><span class="p">,</span> <span class="n">panel_to_frame</span><span class="p">,</span> <span class="n">InferenceUnavailableWarning</span><span class="p">)</span>
+                                  <span class="n">missing_warning</span><span class="p">,</span> <span class="n">panel_to_frame</span><span class="p">,</span> <span class="n">InferenceUnavailableWarning</span><span class="p">,</span>
+                                  <span class="n">MemoryWarning</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">PanelFormulaParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1024,7 +1025,25 @@
         <span class="n">ybar</span> <span class="o">=</span> <span class="n">root_w</span> <span class="o">@</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">root_w</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span>
 
-    <span class="k">def</span> <span class="nf">_fast_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_choose_twoway_algo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">nentity</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">nentity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">nobs</span>
+        <span class="n">nreg</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nentity</span><span class="p">,</span> <span class="n">nobs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nreg</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># MiB</span>
+        <span class="n">reg_size</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">nentity</span> <span class="o">*</span> <span class="n">nobs</span> <span class="o">*</span> <span class="n">nreg</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">20</span>
+        <span class="n">low_memory</span> <span class="o">=</span> <span class="n">reg_size</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">10</span>
+        <span class="k">if</span> <span class="n">low_memory</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Using low-memory algorithm to estimate two-way model. Explicitly set &#39;</span>
+                          <span class="s1">&#39;low_memory=True to silence this message.  Set low_memory=False to use &#39;</span>
+                          <span class="s1">&#39;the standard algorithm that creates dummy variables for the smaller of &#39;</span>
+                          <span class="s1">&#39;the number of entities or number of time periods.&#39;</span><span class="p">,</span> <span class="n">MemoryWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">low_memory</span>
+
+    <span class="k">def</span> <span class="nf">_fast_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low_memory</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dummy-variable free estimation without weights&quot;&quot;&quot;</span>
         <span class="n">has_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
@@ -1053,8 +1072,8 @@
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">general_demean</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">general_demean</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span>
@@ -1073,7 +1092,7 @@
 
         <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span>
 
-    <span class="k">def</span> <span class="nf">_weighted_fast_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_weighted_fast_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low_memory</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Dummy-variable free estimation with weights&quot;&quot;&quot;</span>
         <span class="n">has_effect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">values2d</span>
@@ -1106,8 +1125,8 @@
             <span class="n">wy</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">general_demean</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
             <span class="n">wx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">general_demean</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span><span class="p">:</span>
-            <span class="n">wy</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
-            <span class="n">wx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">wy</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
+            <span class="n">wx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span><span class="p">:</span>
             <span class="n">wy</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
             <span class="n">wx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">demean</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
@@ -1186,8 +1205,8 @@
             <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_effect_nested</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="n">clusters</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Default case for 2-way -- not completely clear</span>
 
-<div class="viewcode-block" id="PanelOLS.fit"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">use_lsdv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">auto_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">count_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
+<div class="viewcode-block" id="PanelOLS.fit"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">use_lsdv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">auto_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">count_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate model parameters</span>
 
@@ -1197,6 +1216,12 @@
 <span class="sd">            Flag indicating to use the Least Squares Dummy Variable estimator</span>
 <span class="sd">            to eliminate effects.  The default value uses only means and does</span>
 <span class="sd">            note require constructing dummy variables for each effect.</span>
+<span class="sd">        low_memory : {bool, None}</span>
+<span class="sd">            Flag indicating whether to use a low-memory algorithm when a model</span>
+<span class="sd">            contains two-way fixed effects. If `None`, the choice is taken</span>
+<span class="sd">            automatically, and the low memory algorithm is used if the</span>
+<span class="sd">            required dummy variable array is both larger than then array of</span>
+<span class="sd">            regressors in the model and requires more than 1 GiB .</span>
 <span class="sd">        cov_type : str, optional</span>
 <span class="sd">            Name of covariance estimator. See Notes.</span>
 <span class="sd">        debiased : bool, optional</span>
@@ -1253,12 +1278,13 @@
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">y_effects</span> <span class="o">=</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">low_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_choose_twoway_algo</span><span class="p">()</span> <span class="k">if</span> <span class="n">low_memory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">low_memory</span>
         <span class="k">if</span> <span class="n">use_lsdv</span><span class="p">:</span>
             <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slow_path</span><span class="p">()</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">weighted</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_path</span><span class="p">()</span>
+            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_fast_path</span><span class="p">()</span>
+            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
 
         <span class="n">neffects</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">drop_first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span>
@@ -2146,7 +2172,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+11.g16e9943 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
