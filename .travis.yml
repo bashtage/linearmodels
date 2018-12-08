@@ -1,6 +1,6 @@
 language: python
 
-dist: trusty
+dist: xenial
 sudo: required
 
 git:
@@ -30,24 +30,23 @@ matrix:
     - NUMPY=1.12
     - SCIPY=0.18
     - PANDAS=0.20
-    - STATAMODELS=0.8
+    - STATSMODELS=0.8
   - python: 3.6
     env:
-    - PYTHON=3.6
+    - PYTHON=3.6.7
     - NUMPY=1.13
     - SCIPY=1.0
     - PANDAS=0.21
     - XARRAY=0.9
-    - STATAMODELS=0.8
+    - STATSMODELS=0.8
   - python: 3.6
     env:
-    - PYTHON=3.6
+    - PYTHON=3.6.7
     - NUMPY=1.14
     - SCIPY=1
     - PANDAS=0.22
     - XARRAY=0.10
-    - DOCBUILD=true
-    - STATAMODELS=0.9
+    - STATSMODELS=0.9
   - python: 3.6
     env:
     - PYTHON=3.7
@@ -55,11 +54,13 @@ matrix:
     - SCIPY=1.1
     - PANDAS=0.23
     - XARRAY=0.10
-    - STATAMODELS=0.9
+    - STATSMODELS=0.9
     - OPENBLAS=1
   - python: 3.6
     env:
     - USE_PYPI=true
+    - XARRAY=0.11
+    - DOCBUILD=true
 
 before_install:
   - sudo apt-get install -y pandoc enchant
