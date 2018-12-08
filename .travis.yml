@@ -13,7 +13,6 @@ env:
     - SKIPSLOW=""
     - DOCTR_PUSH_TYPE=""
     - XARRAY=
-    - EXTRA_PINS=
     - OPENBLAS=0
     - USE_PYPI=false
     - PYTHONHASHSEED=0
@@ -34,23 +33,20 @@ matrix:
     - STATSMODELS=0.8
   - python: 3.6
     env:
-    - PYTHON=3.6
+    - PYTHON=3.6.7
     - NUMPY=1.13
     - SCIPY=1.0
     - PANDAS=0.21
     - XARRAY=0.9
     - STATSMODELS=0.8
-    - MKL=2019.0
   - python: 3.6
     env:
-    - PYTHON=3.6
+    - PYTHON=3.6.7
     - NUMPY=1.14
     - SCIPY=1
     - PANDAS=0.22
     - XARRAY=0.10
-    - DOCBUILD=true
     - STATSMODELS=0.9
-    - MKL=2019.0
   - python: 3.6
     env:
     - PYTHON=3.7
@@ -63,6 +59,8 @@ matrix:
   - python: 3.6
     env:
     - USE_PYPI=true
+    - XARRAY=0.11
+    - DOCBUILD=true
 
 before_install:
   - sudo apt-get install -y pandoc enchant

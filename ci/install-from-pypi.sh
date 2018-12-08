@@ -4,4 +4,4 @@ conda create -n linearmodels-test python
 source activate linearmodels-test
 pip install numpy scipy pandas matplotlib matplotlib seaborn
 pip install statsmodels
-if [[ ! -z ${XARRAY} ]]; then pip install xarray; fi
+if [[ ! -z ${XARRAY} ]]; then pip install xarray==${XARRAY}; fi
