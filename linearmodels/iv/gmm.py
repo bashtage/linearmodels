@@ -356,7 +356,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     * ``clusters``: Array containing the cluster indices.  See
       :class:`~linearmodels.covariance.OneWayClusteredCovariance`
 
-    See also
+    See Also
     --------
     linearmodels.iv.covariance.HomoskedasticCovariance,
     linearmodels.iv.covariance.HeteroskedasticCovariance,
