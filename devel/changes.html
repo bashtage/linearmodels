@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.11+14.gb696f66 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.11+15.gbb0c797 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -60,7 +60,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.11 (+14, gb696f66)</a>
+    index.html" class="text-logo">linearmodels 4.11 (+15, gbb0c797)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -131,15 +131,21 @@
 <div class="section" id="since-4-11-unreleased">
 <h2>Since 4.11 (Unreleased)<a class="headerlink" href="#since-4-11-unreleased" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added an option in model comparrison (<code class="docutils literal notranslate"><span class="pre">compare</span></code>) to report standard
-errors or pvalues instead of t-stats.  (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</li>
+<li>Added a low-memory option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
+that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
+and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
+used whenever constructing the dummy variable array would require more than
+1 GiB. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</li>
+<li>Added an option in model comparison (<a class="reference internal" href="iv/results.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
+<a class="reference internal" href="panel/results.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
+instead of t-stats. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</li>
 </ul>
 </div>
 <div class="section" id="version-4-11">
 <h2>Version 4.11<a class="headerlink" href="#version-4-11" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Fixed a bug which did not correctly check the rank of the
-cross-section regression in <code class="docutils literal notranslate"><span class="pre">FamaMacBeth</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</li>
+cross-section regression in <a class="reference internal" href="panel/models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</li>
 <li>Fixed a bug which failed to correctly check rank conditions when
 specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</li>
 <li>Switched to external package cached-property to manage caching instead of
@@ -159,9 +165,10 @@ when the weight function was <code class="docutils literal notranslate"><span cl
 <li>Changed the return type of Wooldridge’s over identification test when
 invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></li>
 <li>Add typing information to IV models</li>
-<li>Allow optimization parameters to be passed to <code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></li>
+<li>Allow optimization parameters to be passed to <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></li>
 <li>Removed internal use of pandas Panel</li>
-<li>Improved performance in panel models when using <code class="docutils literal notranslate"><span class="pre">from_formula</span></code></li>
+<li>Improved performance in panel models when using
+<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></li>
 <li>Switched to retaining index column names when original input index is named</li>
 <li>Modified tests that were not well conceived</li>
 <li>Added spell check to documentation build</li>
@@ -268,7 +275,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+14.gb696f66 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

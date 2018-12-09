@@ -3,13 +3,19 @@ Change Log
 
 Since 4.11 (Unreleased)
 =======================
-* Added an option in model comparrison (``compare``) to report standard
-  errors or pvalues instead of t-stats.  (:issue:`178`)
+* Added a low-memory option to :func:`~linearmodels.panel.model.PanelOLS.fit`
+  that avoids constructing dummy variables. Only used when both ``entity_effects``
+  and ``time_effects`` are ``True``. By default, the low memory algorithm will be
+  used whenever constructing the dummy variable array would require more than
+  1 GiB. (:issue:`182`)
+* Added an option in model comparison (:func:`~linearmodels.iv.results.compare` and
+  :func:`~linearmodels.panel.results.compare`) to report standard errors or pvalues
+  instead of t-stats. (:issue:`178`)
 
 Version 4.11
 ============
 * Fixed a bug which did not correctly check the rank of the
-  cross-section regression in ``FamaMacBeth`` (:issue:`176`)
+  cross-section regression in :class:`~linearmodels.panel.model.FamaMacBeth` (:issue:`176`)
 * Fixed a bug which failed to correctly check rank conditions when
   specifying asset pricing models (:issue:`173`)
 * Switched to external package cached-property to manage caching instead of
@@ -25,9 +31,10 @@ Version 4.9
 * Changed the return type of Wooldridge's over identification test when
   invalid to ``InvalidTestStatistic``
 * Add typing information to IV models
-* Allow optimization parameters to be passed to ``IVGMMCUE``
+* Allow optimization parameters to be passed to :class:`~linearmodels.iv.model.IVGMMCUE`
 * Removed internal use of pandas Panel
-* Improved performance in panel models when using ``from_formula``
+* Improved performance in panel models when using
+  :func:`~linearmodels.panel.model.PanelOLS.from_formula`
 * Switched to retaining index column names when original input index is named
 * Modified tests that were not well conceived
 * Added spell check to documentation build
