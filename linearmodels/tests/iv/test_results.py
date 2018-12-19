@@ -22,7 +22,7 @@ def model(request):
 
 def result_checker(res):
     for attr in dir(res):
-        if attr.startswith('_') or attr in ('test_linear_constraint',):
+        if attr.startswith('_') or attr in ('test_linear_constraint', 'wald_test'):
             continue
         if attr == 'first_stage':
             result_checker(getattr(res, attr))

@@ -6,17 +6,16 @@ from collections import OrderedDict
 
 import scipy.stats as stats
 from cached_property import cached_property
-from numpy import array, asarray, c_, diag, empty, log, ones, sqrt, zeros
+from numpy import array, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
-from patsy import DesignInfo
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic, _ModelComparison,
-                                  _SummaryStr, _str, pval_format)
+                                  _SummaryStr, _str, pval_format, quadratic_form_test)
 
 
 def stub_concat(lists, sep='='):
@@ -411,7 +410,7 @@ class OLSResults(_SummaryStr):
 
         return smry
 
-    def test_linear_constraint(self, restriction=None, value=None, *, formula=None):
+    def wald_test(self, restriction=None, value=None, *, formula=None):
         r"""
         Test linear equality constraints using a Wald test
 
@@ -461,25 +460,14 @@ class OLSResults(_SummaryStr):
         >>> formula = 'exper = I(exper**2) = 0'
         >>> res.test_linear_constraint(formula=formula)
         """
-        if formula is not None and restriction is not None:
-            raise ValueError('restriction and formula cannot be used'
-                             'simultaneously.')
-        if formula is not None:
-            di = DesignInfo(list(self.params.index))
-            lc = di.linear_constraint(formula)
-            restriction, value = lc.coefs, lc.constants
-        restriction = asarray(restriction)
-        if value is None:
-            value = zeros(restriction.shape[0])
-        value = asarray(value).ravel()[:, None]
-        diff = restriction @ self.params.values[:, None] - value
-        rcov = restriction @ self.cov @ restriction.T
-        stat = float(diff.T @ inv(rcov) @ diff)
-        df = restriction.shape[0]
-        null = 'Linear equality constraint is valid'
-        name = 'Linear Equality Hypothesis Test'
+        return quadratic_form_test(self._params, self.cov, restriction=restriction,
+                                   value=value, formula=formula)
 
-        return WaldTestStatistic(stat, null, df, name=name)
+    def test_linear_constraint(self, restriction=None, value=None, *, formula=None):
+        import warnings
+        warnings.warn('test_linear_constraint is deprecated.  Use wald_test '
+                      'instead.', DeprecationWarning)
+        return self.wald_test(restriction, value, formula=formula)
 
 
 class _CommonIVResults(OLSResults):

@@ -111,9 +111,13 @@ def test_linear_restriction(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type='robust')
     nvar = len(res.params)
     q = np.eye(nvar)
-    ts = res.test_linear_constraint(q, np.zeros(nvar))
+    ts = res.wald_test(q, np.zeros(nvar))
     p = res.params.values[:, None]
     c = res.cov.values
     stat = float(p.T @ np.linalg.inv(c) @ p)
     assert_allclose(stat, ts.stat)
     assert ts.df == nvar
+
+    formula = ' = '.join(res.params.index) + ' = 0'
+    ts2 = res.wald_test(formula=formula)
+    assert_allclose(ts.stat, ts2.stat)

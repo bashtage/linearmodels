@@ -8,7 +8,8 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.utility import (_ModelComparison, _SummaryStr, _str, pval_format)
+from linearmodels.utility import (_ModelComparison, _SummaryStr, _str, pval_format,
+                                  quadratic_form_test)
 
 __all__ = ['PanelResults', 'PanelEffectsResults', 'RandomEffectsResults']
 
@@ -512,6 +513,73 @@ class PanelResults(_SummaryStr):
     def loglik(self):
         """Log-likelihood of model"""
         return self._loglik
+
+    def wald_test(self, restriction=None, value=None, *, formula=None):
+        r"""
+        Test linear equality constraints using a Wald test
+
+        Parameters
+        ----------
+        restriction : {ndarray, DataFrame}, optional
+            q by nvar array containing linear weights to apply to parameters
+            when forming the restrictions. It is not possible to use both
+            restriction and formula.
+        value : {ndarray, Series}, optional
+            q element array containing the restricted values.
+        formula : Union[str, list[str]], optional
+            patsy linear constrains. The simplest formats are one of:
+
+              * A single comma-separated string such as 'x1=0, x2+x3=1'
+              * A list of strings where each element is a single constraint
+                such as ['x1=0', 'x2+x3=1']
+              * A single string without commas to test simple constraints such
+                as 'x1=x2=x3=0'
+
+            It is not possible to use both restriction and formula.
+
+        Returns
+        -------
+        t: WaldTestStatistic
+            Test statistic for null that restrictions are valid.
+
+        Notes
+        -----
+        Hypothesis test examines whether :math:`H_0:C\theta=v` where the
+        matrix C is ``restriction`` and v is ``value``. The test statistic
+        has a :math:`\chi^2_q` distribution where q is the number of rows in C.
+
+        Examples
+        --------
+        >>> from linearmodels.datasets import wage_panel
+        >>> import statsmodels.api as sm
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> data = wage_panel.load()
+        >>> year = pd.Categorical(data.year)
+        >>> data = data.set_index(['nr', 'year'])
+        >>> data['year'] = year
+        >>> from linearmodels.panel import PanelOLS
+        >>> exog_vars = ['expersq', 'union', 'married', 'year']
+        >>> exog = sm.add_constant(data[exog_vars])
+
+        >>> mod = PanelOLS(data.lwage, exog, entity_effects=True)
+        >>> fe_res = mod.fit()
+
+        Test the restriction that union and married have 0 coefficients
+
+        >>> restriction = np.zeros((2, 11))
+        >>> restriction[0, 2] = 1
+        >>> restriction[1, 3] = 1
+        >>> value = np.array([0, 0])
+        >>> fe_res.wald_test(restriction, value)
+
+        The same test using formulas
+
+        >>> formula = 'union = married = 0'
+        >>> fe_res.wald_test(formula=formula)
+        """
+        return quadratic_form_test(self.params, self.cov, restriction=restriction,
+                                   value=value, formula=formula)
 
 
 class PanelEffectsResults(PanelResults):
