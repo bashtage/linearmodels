@@ -9,6 +9,7 @@ from cached_property import cached_property
 from numpy import array, asarray, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
+from patsy import DesignInfo
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
@@ -410,17 +411,28 @@ class OLSResults(_SummaryStr):
 
         return smry
 
-    def test_linear_constraint(self, restriction, value):
+    def test_linear_constraint(self, restriction=None, value=None, *, formula=None):
         r"""
         Test linear equality constraints using a Wald test
 
         Parameters
         ----------
-        restriction : {ndarray, DataFrame}
+        restriction : {ndarray, DataFrame}, optional
             q by nvar array containing linear weights to apply to parameters
-            when forming the restrictions.
-        value : {ndarray, Series}
-            q element array containing the restricted values
+            when forming the restrictions. It is not possible to use both
+            restriction and formula.
+        value : {ndarray, Series}, optional
+            q element array containing the restricted values.
+        formula : Union[str, list[str]], optional
+            patsy linear constrains. The simplest formats are one of:
+
+              * A single comma-separated string such as 'x1=0, x2+x3=1'
+              * A list of strings where each element is a single constraint
+                such as ['x1=0', 'x2+x3=1']
+              * A single string without commas to test simple constraints such
+                as 'x1=x2=x3=0'
+
+            It is not possible to use both restriction and formula.
 
         Returns
         -------
@@ -432,15 +444,41 @@ class OLSResults(_SummaryStr):
         Hypothesis test examines whether :math:`H_0:C\theta=v` where the
         matrix C is ``restriction`` and v is ``value``. The test statistic
         has a :math:`\chi^2_q` distribution where q is the number of rows in C.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IV2SLS
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]'
+        >>> res = IV2SLS.from_formula(formula, data).fit()
+        >>> restriction = np.array([[0, 1, 0, 0, 0],
+                                    [0, 0, 1, 0, 0]])
+        >>> value = np.array([0, 0])
+        >>> res.test_linear_constraint(restriction, value)
+
+        >>> formula = 'exper = I(exper**2) = 0'
+        >>> res.test_linear_constraint(formula=formula)
         """
+        if formula is not None and restriction is not None:
+            raise ValueError('restriction and formula cannot be used'
+                             'simultaneously.')
+        if formula is not None:
+            di = DesignInfo(list(self.params.index))
+            lc = di.linear_constraint(formula)
+            restriction, value = lc.coefs, lc.constants
         restriction = asarray(restriction)
-        value = asarray(value)[:, None]
+        if value is None:
+            value = zeros(restriction.shape[0])
+        value = asarray(value).ravel()[:, None]
         diff = restriction @ self.params.values[:, None] - value
         rcov = restriction @ self.cov @ restriction.T
         stat = float(diff.T @ inv(rcov) @ diff)
         df = restriction.shape[0]
         null = 'Linear equality constraint is valid'
         name = 'Linear Equality Hypothesis Test'
+
         return WaldTestStatistic(stat, null, df, name=name)
 
 

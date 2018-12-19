@@ -48,6 +48,17 @@ except ImportError:  # pragma: no cover
                                     is_categorical, is_categorical_dtype,
                                     is_datetime64_any_dtype, is_string_like)
 
+
+def get_codes(index):
+    """
+    Tries .codes before falling back to .labels
+    """
+    try:
+        return index.codes
+    except AttributeError:
+        return index.labels
+
+
 __all__ = ['is_string_dtype', 'is_numeric_dtype', 'is_categorical',
            'is_string_like', 'is_categorical_dtype', 'is_datetime64_any_dtype',
-           'concat']
+           'concat', 'get_codes']
