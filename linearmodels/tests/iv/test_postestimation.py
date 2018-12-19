@@ -1,13 +1,13 @@
 import os
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
-from statsmodels.api import add_constant
 
+import pandas as pd
 from linearmodels.iv import IV2SLS, IVGMM
 from linearmodels.utility import AttrDict
+from statsmodels.api import add_constant
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 

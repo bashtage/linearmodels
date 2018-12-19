@@ -1,6 +1,7 @@
-from linearmodels import IV3SLS, IVSystemGMM, IV2SLS, IVGMM
-from linearmodels.tests.system._utility import generate_3sls_data_v2
 from numpy.testing import assert_allclose
+
+from linearmodels import IV2SLS, IV3SLS, IVGMM, IVSystemGMM
+from linearmodels.tests.system._utility import generate_3sls_data_v2
 
 
 def test_gmm_3sls_equiv():

@@ -7,8 +7,8 @@ Important cases
 """
 
 import numpy as np
-import pandas as pd
 
+import pandas as pd
 from linearmodels.compat.pandas import concat
 from linearmodels.tests.system._utility import generate_data
 

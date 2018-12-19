@@ -16,23 +16,30 @@ from collections import Mapping, OrderedDict
 from functools import reduce
 
 import numpy as np
-from numpy.linalg import inv, solve, matrix_rank
-from pandas import Series, concat, DataFrame
+from numpy.linalg import inv, matrix_rank, solve
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
-from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
-    blocked_cross_prod, blocked_diag_product, blocked_inner_prod, inv_matrix_sqrt
+from linearmodels.system._utility import (LinearConstraint,
+                                          blocked_column_product,
+                                          blocked_cross_prod,
+                                          blocked_diag_product,
+                                          blocked_inner_prod, inv_matrix_sqrt)
 from linearmodels.system.covariance import (GMMHeteroskedasticCovariance,
-                                            GMMHomoskedasticCovariance, HeteroskedasticCovariance,
-                                            HomoskedasticCovariance, KernelCovariance,
-                                            GMMKernelCovariance)
-from linearmodels.system.gmm import HeteroskedasticWeightMatrix, HomoskedasticWeightMatrix, \
-    KernelWeightMatrix
+                                            GMMHomoskedasticCovariance,
+                                            GMMKernelCovariance,
+                                            HeteroskedasticCovariance,
+                                            HomoskedasticCovariance,
+                                            KernelCovariance)
+from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
+                                     HomoskedasticWeightMatrix,
+                                     KernelWeightMatrix)
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.utility import (AttrDict, InvalidTestStatistic, WaldTestStatistic, has_constant,
+from linearmodels.utility import (AttrDict, InvalidTestStatistic,
+                                  WaldTestStatistic, has_constant,
                                   missing_warning)
+from pandas import DataFrame, Series, concat
 
 __all__ = ['SUR', 'IV3SLS', 'IVSystemGMM']
 

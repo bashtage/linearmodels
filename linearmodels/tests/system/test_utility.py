@@ -1,13 +1,15 @@
-from linearmodels.compat.numpy import lstsq
-
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.system._utility import LinearConstraint, blocked_column_product, \
-    blocked_cross_prod, blocked_diag_product, blocked_full_inner_product, blocked_inner_prod, \
-    inv_matrix_sqrt
+import pandas as pd
+from linearmodels.compat.numpy import lstsq
+from linearmodels.system._utility import (LinearConstraint,
+                                          blocked_column_product,
+                                          blocked_cross_prod,
+                                          blocked_diag_product,
+                                          blocked_full_inner_product,
+                                          blocked_inner_prod, inv_matrix_sqrt)
 
 
 @pytest.fixture(params=(3, np.arange(1, 6)), ids=['common-size', 'different-size'])

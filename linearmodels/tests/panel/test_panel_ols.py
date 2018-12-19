@@ -1,17 +1,18 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
+from numpy.testing import assert_allclose
+
+import pandas as pd
 from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
-from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes,
-                                               assert_frame_similar)
+from linearmodels.tests.panel._utility import (assert_frame_similar,
+                                               assert_results_equal, datatypes,
+                                               generate_data)
 from linearmodels.utility import AttrDict, MemoryWarning
-from numpy.testing import assert_allclose
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 

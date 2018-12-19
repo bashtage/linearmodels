@@ -4,22 +4,23 @@ import numpy as np
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas import DataFrame, date_range, Categorical, get_dummies, Series, datetime
-from pandas.testing import assert_frame_equal, assert_index_equal
 
+from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import is_string_dtype
+from linearmodels.panel.data import PanelData, _Panel
+from linearmodels.panel.model import PanelOLS
+from linearmodels.tests.panel._utility import (MISSING_XARRAY, datatypes,
+                                               generate_data)
+from linearmodels.utility import panel_to_frame
+from pandas import (Categorical, DataFrame, Series, date_range, datetime,
+                    get_dummies)
+from pandas.testing import assert_frame_equal, assert_index_equal
 
 try:
     import xarray as xr
 except ImportError:
     pass
 
-from linearmodels.compat.numpy import lstsq
-from linearmodels.panel.data import PanelData, _Panel
-from linearmodels.panel.model import PanelOLS
-from linearmodels.tests.panel._utility import generate_data, datatypes, \
-    MISSING_XARRAY
-from linearmodels.utility import panel_to_frame
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 

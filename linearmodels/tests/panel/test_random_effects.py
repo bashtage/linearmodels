@@ -1,12 +1,13 @@
 from itertools import product
 
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
+import pandas as pd
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
-from linearmodels.tests.panel._utility import generate_data, datatypes, assert_frame_similar
+from linearmodels.tests.panel._utility import (assert_frame_similar, datatypes,
+                                               generate_data)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 

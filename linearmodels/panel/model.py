@@ -1,9 +1,9 @@
 import numpy as np
-import pandas as pd
 from numpy.linalg import matrix_rank
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 
+import pandas as pd
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
@@ -16,10 +16,11 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
-                                  InvalidTestStatistic, WaldTestStatistic,
-                                  ensure_unique_column, has_constant, MissingValueWarning,
-                                  missing_warning, panel_to_frame, InferenceUnavailableWarning,
-                                  MemoryWarning)
+                                  InferenceUnavailableWarning,
+                                  InvalidTestStatistic, MemoryWarning,
+                                  MissingValueWarning, WaldTestStatistic,
+                                  ensure_unique_column, has_constant,
+                                  missing_warning, panel_to_frame)
 
 
 class PanelFormulaParser(object):

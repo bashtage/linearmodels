@@ -6,15 +6,16 @@ from itertools import product
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
-from pandas import DataFrame, Series, concat
-from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.iv.model import _OLS as OLS
-from linearmodels.system._utility import blocked_column_product, blocked_diag_product, \
-    inv_matrix_sqrt
+from linearmodels.system._utility import (blocked_column_product,
+                                          blocked_diag_product,
+                                          inv_matrix_sqrt)
 from linearmodels.system.model import SUR
 from linearmodels.tests.system._utility import generate_data, simple_sur
 from linearmodels.utility import AttrDict, InvalidTestStatistic
+from pandas import DataFrame, Series, concat
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 p = [3, [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]]
 const = [True, False]

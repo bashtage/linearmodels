@@ -3,14 +3,14 @@ from itertools import product
 
 import numpy as np
 import pytest
-from pandas import Series, concat
-from pandas.testing import assert_series_equal, assert_frame_equal
 
-from linearmodels import SUR, IVSystemGMM, IV3SLS
-from linearmodels.formula import sur, iv_system_gmm, iv_3sls
+from linearmodels import IV3SLS, SUR, IVSystemGMM
+from linearmodels.formula import iv_3sls, iv_system_gmm, sur
 from linearmodels.system.model import SystemFormulaParser
 from linearmodels.tests.system._utility import generate_3sls_data_v2
 from linearmodels.utility import AttrDict
+from pandas import Series, concat
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 data = generate_3sls_data_v2(k=2, const=False)
 joined = []

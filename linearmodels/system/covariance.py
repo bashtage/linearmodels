@@ -2,7 +2,8 @@ from numpy import empty, eye, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
 from linearmodels.asset_pricing.covariance import _HACMixin
-from linearmodels.system._utility import (blocked_cross_prod, blocked_diag_product,
+from linearmodels.system._utility import (blocked_cross_prod,
+                                          blocked_diag_product,
                                           blocked_inner_prod)
 from linearmodels.utility import AttrDict
 
