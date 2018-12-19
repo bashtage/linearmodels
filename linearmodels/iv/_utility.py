@@ -145,7 +145,7 @@ class IVFormulaParser(object):
         exog = self.components['exog']
         exog = dmatrix(exog, self._data, eval_env=self._eval_env,
                        return_type='dataframe', NA_action=self._na_action)
-        return exog
+        return self._empty_check(exog)
 
     @property
     def endog(self):
@@ -153,7 +153,7 @@ class IVFormulaParser(object):
         endog = self.components['endog']
         endog = dmatrix('0 + ' + endog, self._data, eval_env=self._eval_env,
                         return_type='dataframe', NA_action=self._na_action)
-        return endog
+        return self._empty_check(endog)
 
     @property
     def instruments(self):
@@ -161,9 +161,14 @@ class IVFormulaParser(object):
         instr = self.components['instruments']
         instr = dmatrix('0 + ' + instr, self._data, eval_env=self._eval_env,
                         return_type='dataframe', NA_action=self._na_action)
-        return instr
+
+        return self._empty_check(instr)
 
     @property
     def components(self):
         """Dictionary containing the string components of the formula"""
         return self._components
+
+    @staticmethod
+    def _empty_check(arr):
+        return None if arr.shape[1] == 0 else arr

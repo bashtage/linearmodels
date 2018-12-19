@@ -169,7 +169,9 @@ class IVLIML(object):
             warnings.warn('kappa and fuller should not normally be used '
                           'simultaneously.  Identical results can be computed '
                           'using kappa only', UserWarning)
-        if endog is None or instruments is None:
+        nendog = min(getattr(endog, 'shape', (0,)))
+        ninstr = min(getattr(instruments, 'shape', (0,)))
+        if endog is None or instruments is None or not nendog or not ninstr:
             self._result_container = OLSResults
             self._method = 'OLS'
         self._formula = None
