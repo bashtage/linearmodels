@@ -1,7 +1,8 @@
-import numpy as np
-
-import pandas as pd
 from linearmodels.compat.numpy import lstsq
+
+import numpy as np
+import pandas as pd
+
 from linearmodels.utility import AttrDict
 
 

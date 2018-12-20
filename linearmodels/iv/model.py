@@ -4,6 +4,7 @@ Instrumental variable estimators
 from numpy import (any, array, asarray, atleast_2d, average, c_, isscalar,
                    logical_not, nanmean, ones, ptp, sqrt)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
+from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -21,7 +22,6 @@ from linearmodels.typing import Numeric, OptionalNumeric
 from linearmodels.typing.iv import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
                                   missing_warning)
-from pandas import DataFrame, Series, concat
 
 __all__ = ['COVARIANCE_ESTIMATORS', 'WEIGHT_MATRICES', 'IVGMM', 'IVLIML', 'IV2SLS',
            'IVGMMCUE', '_OLS']

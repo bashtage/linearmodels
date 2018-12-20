@@ -3,12 +3,12 @@ import string
 import warnings
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pandas as pd
+import pytest
 from scipy import stats
 
 import linearmodels
-import pandas as pd
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InvalidTestStatistic, WaldTestStatistic,
                                   ensure_unique_column, format_wide,

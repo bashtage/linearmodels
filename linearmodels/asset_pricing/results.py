@@ -1,15 +1,16 @@
 """
 Results for linear factor models
 """
+from linearmodels.compat.statsmodels import Summary
+
 import datetime as dt
 
-import numpy as np
 from cached_property import cached_property
+import numpy as np
+import pandas as pd
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
-import pandas as pd
-from linearmodels.compat.statsmodels import Summary
 from linearmodels.utility import _str, _SummaryStr, pval_format
 
 

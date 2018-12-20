@@ -1,8 +1,8 @@
 import numpy as np
-import pytest
 from numpy import cos, pi, sin
 from numpy.linalg import inv
 from numpy.testing import assert_allclose, assert_equal
+import pytest
 
 from linearmodels.iv.covariance import (ClusteredCovariance,
                                         HeteroskedasticCovariance,

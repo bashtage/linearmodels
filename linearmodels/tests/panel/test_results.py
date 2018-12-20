@@ -2,9 +2,10 @@ from collections import OrderedDict
 from itertools import product
 
 import numpy as np
+from numpy.testing import assert_allclose
+from pandas.testing import assert_series_equal
 import pytest
 import statsmodels.api as sm
-from numpy.testing import assert_allclose
 
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
@@ -12,7 +13,6 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
 from linearmodels.panel.results import compare
 from linearmodels.tests.panel._utility import datatypes, generate_data
-from pandas.testing import assert_series_equal
 
 
 @pytest.fixture(params=[wage_panel.load()])

@@ -1,22 +1,23 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
-import datetime as dt
-from collections import OrderedDict
+from linearmodels.compat.statsmodels import Summary
 
-import scipy.stats as stats
+from collections import OrderedDict
+import datetime as dt
+
 from cached_property import cached_property
 from numpy import array, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
+from pandas import DataFrame, Series, concat, to_numeric
+import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
-from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
                                   _ModelComparison, _str, _SummaryStr,
                                   pval_format, quadratic_form_test)
-from pandas import DataFrame, Series, concat, to_numeric
 
 
 def stub_concat(lists, sep='='):

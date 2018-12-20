@@ -2,10 +2,11 @@
 Important cases
 
 """
+from linearmodels.compat.pandas import concat
+
 import os
 import subprocess
 
-from linearmodels.compat.pandas import concat
 from linearmodels.tests.system._utility import generate_simultaneous_data
 
 data = generate_simultaneous_data()

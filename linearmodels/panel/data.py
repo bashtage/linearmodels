@@ -1,15 +1,16 @@
-from itertools import product
-
-import numpy as np
-
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import (concat, get_codes, is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
                                         is_string_like)
-from linearmodels.utility import ensure_unique_column, panel_to_frame
+
+from itertools import product
+
+import numpy as np
 from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
                     get_dummies)
+
+from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ['PanelData']
 

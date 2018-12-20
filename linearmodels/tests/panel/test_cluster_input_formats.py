@@ -2,9 +2,9 @@ from itertools import product
 from string import ascii_lowercase
 
 import numpy as np
+import pandas as pd
 import pytest
 
-import pandas as pd
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import datatypes, generate_data

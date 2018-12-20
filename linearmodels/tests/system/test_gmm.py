@@ -1,11 +1,14 @@
+from linearmodels.compat.pandas import concat
+
 from collections import OrderedDict
 from itertools import product
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+from pandas import DataFrame, Series
+from pandas.testing import assert_frame_equal, assert_series_equal
+import pytest
 
-from linearmodels.compat.pandas import concat
 from linearmodels.iv.covariance import kernel_weight_parzen
 from linearmodels.system import IV3SLS, IVSystemGMM
 from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
@@ -14,8 +17,6 @@ from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
 from linearmodels.tests.system._utility import (generate_3sls_data_v2,
                                                 simple_gmm)
 from linearmodels.utility import AttrDict
-from pandas import DataFrame, Series
-from pandas.testing import assert_frame_equal, assert_series_equal
 
 params = list(product([1, 2], [True, False]))
 

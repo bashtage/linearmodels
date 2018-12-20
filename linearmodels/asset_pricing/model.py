@@ -1,6 +1,8 @@
 """
 Linear factor models for applications in asset pricing
 """
+from linearmodels.compat.numpy import lstsq
+
 import numpy as np
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
@@ -12,7 +14,6 @@ from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
                                                    KernelWeight)
 from linearmodels.asset_pricing.results import (GMMFactorModelResults,
                                                 LinearFactorModelResults)
-from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.data import IVData
 from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
                                   missing_warning)

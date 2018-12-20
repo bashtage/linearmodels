@@ -1,6 +1,6 @@
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
                                                    HeteroskedasticWeight,

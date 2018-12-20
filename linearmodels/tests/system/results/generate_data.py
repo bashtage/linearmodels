@@ -6,10 +6,11 @@ Important cases
 3. Constraints across equations
 """
 
-import numpy as np
-
-import pandas as pd
 from linearmodels.compat.pandas import concat
+
+import numpy as np
+import pandas as pd
+
 from linearmodels.tests.system._utility import generate_data
 
 basic_data = generate_data(n=200, k=3, p=[2, 3, 4], const=True, seed=0)

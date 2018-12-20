@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
 import numpy as np
-import pytest
 from numpy.testing import assert_equal
-
 import pandas as pd
-from linearmodels.iv.data import IVData
 from pandas.testing import assert_frame_equal, assert_series_equal
+import pytest
+
+from linearmodels.iv.data import IVData
 
 try:
     import xarray as xr

@@ -1,10 +1,11 @@
+from linearmodels.compat.numpy import lstsq
+
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 from scipy import stats
 
 from linearmodels.asset_pricing.model import LinearFactorModel
-from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.covariance import (_cov_kernel, kernel_optimal_bandwidth,
                                         kernel_weight_bartlett)
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all

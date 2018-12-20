@@ -1,11 +1,12 @@
+from linearmodels.compat.numpy import lstsq
+from linearmodels.compat.pandas import get_codes
+
 import numpy as np
 from numpy.linalg import matrix_rank
+import pandas as pd
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 
-import pandas as pd
-from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import get_codes
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
                                            CovarianceManager, DriscollKraay,
                                            FamaMacBethCovariance,

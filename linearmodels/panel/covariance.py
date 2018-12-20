@@ -1,11 +1,11 @@
-import numpy as np
 from cached_property import cached_property
+import numpy as np
 from numpy.linalg import inv
+from pandas import DataFrame
 
 from linearmodels.iv.covariance import (CLUSTER_ERR, KERNEL_LOOKUP,
                                         _cov_cluster, _cov_kernel,
                                         kernel_optimal_bandwidth)
-from pandas import DataFrame
 
 __all__ = ['HomoskedasticCovariance', 'HeteroskedasticCovariance',
            'ClusteredCovariance', 'DriscollKraay', 'CovarianceManager']

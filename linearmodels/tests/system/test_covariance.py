@@ -1,6 +1,6 @@
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from linearmodels.iv.covariance import (kernel_weight_bartlett,
                                         kernel_weight_parzen)

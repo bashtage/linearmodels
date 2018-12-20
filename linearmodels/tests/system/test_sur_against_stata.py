@@ -1,10 +1,10 @@
 from collections import OrderedDict
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
-
 import pandas as pd
+import pytest
+
 from linearmodels.system import SUR
 from linearmodels.tests.system.results.generate_data import (basic_data,
                                                              common_data,

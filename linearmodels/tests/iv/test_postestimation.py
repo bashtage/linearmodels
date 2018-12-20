@@ -1,11 +1,11 @@
 import os
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pandas as pd
+import pytest
 from statsmodels.api import add_constant
 
-import pandas as pd
 from linearmodels.iv import IV2SLS, IVGMM
 from linearmodels.utility import AttrDict
 

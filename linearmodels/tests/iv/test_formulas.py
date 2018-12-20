@@ -1,12 +1,13 @@
-import numpy as np
-import pytest
-from numpy.testing import assert_allclose, assert_equal
-
 from linearmodels.compat.pandas import concat
-from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
-from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+
+import numpy as np
+from numpy.testing import assert_allclose, assert_equal
 from pandas import Categorical, DataFrame
 from pandas.testing import assert_frame_equal
+import pytest
+
+from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 
 
 @pytest.fixture(scope='module',

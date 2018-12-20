@@ -11,14 +11,16 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
-import textwrap
+from linearmodels.compat.numpy import lstsq
+
 from collections import Mapping, OrderedDict
 from functools import reduce
+import textwrap
 
 import numpy as np
 from numpy.linalg import inv, matrix_rank, solve
+from pandas import DataFrame, Series, concat
 
-from linearmodels.compat.numpy import lstsq
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
 from linearmodels.system._utility import (LinearConstraint,
@@ -39,7 +41,6 @@ from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.utility import (AttrDict, InvalidTestStatistic,
                                   WaldTestStatistic, has_constant,
                                   missing_warning)
-from pandas import DataFrame, Series, concat
 
 __all__ = ['SUR', 'IV3SLS', 'IVSystemGMM']
 

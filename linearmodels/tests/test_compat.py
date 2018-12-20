@@ -1,9 +1,10 @@
+from linearmodels.compat.pandas import concat
+
 import numpy as np
+from pandas import DataFrame, Series, date_range
 import pytest
 
-from linearmodels.compat.pandas import concat
 from linearmodels.utility import AttrDict
-from pandas import DataFrame, Series, date_range
 
 
 @pytest.fixture('module')

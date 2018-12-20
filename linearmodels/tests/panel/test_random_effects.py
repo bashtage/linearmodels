@@ -1,9 +1,9 @@
 from itertools import product
 
-import pytest
 from numpy.testing import assert_allclose
-
 import pandas as pd
+import pytest
+
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
 from linearmodels.tests.panel._utility import (access_attributes,

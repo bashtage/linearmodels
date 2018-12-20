@@ -1,14 +1,15 @@
+from linearmodels.compat.statsmodels import Summary
+
 import datetime as dt
 
-import numpy as np
 from cached_property import cached_property
+import numpy as np
+from pandas import DataFrame, Series, concat
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
-from linearmodels.compat.statsmodels import Summary
 from linearmodels.utility import (AttrDict, _str, _SummaryStr, format_wide,
                                   param_table, pval_format)
-from pandas import DataFrame, Series, concat
 
 __all__ = ['SystemResults', 'SystemEquationResult', 'GMMSystemResults']
 

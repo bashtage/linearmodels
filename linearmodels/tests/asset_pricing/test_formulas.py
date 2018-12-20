@@ -1,12 +1,13 @@
+from linearmodels.compat.pandas import concat
+
 import numpy as np
+from pandas.testing import assert_frame_equal
 import pytest
 
 from linearmodels.asset_pricing.model import (LinearFactorModel,
                                               LinearFactorModelGMM,
                                               TradedFactorModel)
-from linearmodels.compat.pandas import concat
 from linearmodels.tests.asset_pricing._utility import generate_data
-from pandas.testing import assert_frame_equal
 
 FORMULA_FACTORS = 'factor_1 + factor_2 + factor_3'
 FORMULA_PORT = 'port_1 + port_2 + port_3 + port_4 + port_5 + port_6 + port_7 + ' \

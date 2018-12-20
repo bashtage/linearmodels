@@ -1,7 +1,8 @@
-import os
 from io import StringIO
+import os
 
 import pandas as pd
+
 from linearmodels.utility import AttrDict
 
 filename = 'stata-sur-results.txt'

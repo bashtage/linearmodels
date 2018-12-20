@@ -1,10 +1,10 @@
 from itertools import product
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
-
 import pandas as pd
+import pytest
+
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS

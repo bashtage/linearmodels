@@ -1,7 +1,8 @@
-import numpy as np
-
-import pandas as pd
 from linearmodels.compat.pandas import concat
+
+import numpy as np
+import pandas as pd
+
 from linearmodels.panel.data import PanelData
 from linearmodels.utility import panel_to_frame
 

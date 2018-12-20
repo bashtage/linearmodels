@@ -13,10 +13,9 @@ Will also test other configurations - small, covariance-estimators, constant
 
 """
 import numpy as np
-import statsmodels.api as sm
 from numpy.random import multivariate_normal, seed
-
 import pandas as pd
+import statsmodels.api as sm
 
 seed(12345)
 

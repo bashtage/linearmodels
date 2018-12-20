@@ -1,6 +1,6 @@
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
+import pytest
 
 from linearmodels.asset_pricing.model import LinearFactorModelGMM
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all

@@ -1,9 +1,9 @@
-import os
 from io import StringIO
+import os
 
 import numpy as np
-
 import pandas as pd
+
 from linearmodels.utility import AttrDict
 
 base = os.path.split(os.path.abspath(__file__))[0]

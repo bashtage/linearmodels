@@ -1,11 +1,12 @@
+from linearmodels.compat.numpy import lstsq
+
 from itertools import product
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
-
 import pandas as pd
-from linearmodels.compat.numpy import lstsq
+import pytest
+
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
 from linearmodels.tests.panel._utility import (access_attributes,

@@ -1,9 +1,10 @@
-import numpy as np
-import pytest
-from numpy.testing import assert_allclose
-
-import pandas as pd
 from linearmodels.compat.numpy import lstsq
+
+import numpy as np
+from numpy.testing import assert_allclose
+import pandas as pd
+import pytest
+
 from linearmodels.system._utility import (LinearConstraint,
                                           blocked_column_product,
                                           blocked_cross_prod,

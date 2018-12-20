@@ -1,7 +1,8 @@
-import pytest
-from numpy.testing import assert_allclose
-
 from linearmodels.compat.pandas import concat
+
+from numpy.testing import assert_allclose
+import pytest
+
 from linearmodels.system import IV3SLS, SUR
 from linearmodels.tests.system._utility import generate_simultaneous_data
 from linearmodels.tests.system.results.parse_stata_3sls_results import results
