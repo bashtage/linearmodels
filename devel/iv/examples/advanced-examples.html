@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Further Examples &#8212; linearmodels 4.11+15.gbb0c797 documentation</title>
+    <title>Further Examples &#8212; linearmodels 4.11+22.gff064c4 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,6 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Using formulas to specify models" href="using-formulas.html" />
@@ -50,7 +51,7 @@
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11 (+15, gbb0c797)</a>
+    ../../index.html" class="text-logo">linearmodels 4.11 (+22, gff064c4)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -178,18 +179,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -229,9 +230,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -239,7 +240,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -288,25 +289,55 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Further-Examples">
 <h1>Further Examples<a class="headerlink" href="#Further-Examples" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="Linear-Instrumental-Variables-Regression">
 <h2>Linear Instrumental-Variables Regression<a class="headerlink" href="#Linear-Instrumental-Variables-Regression" title="Permalink to this headline">¶</a></h2>
-<p>These examples follow those in <strong>Chapter 6</strong> of <em>Microeconometrics Using
-Stata</em> by Cameron &amp; Trivedi.</p>
+<p>These examples follow those in <strong>Chapter 6</strong> of <em>Microeconometrics Using Stata</em> by Cameron &amp; Trivedi.</p>
 <p>The first step is to import the main estimator for linear IV models:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - standard two-stage least squares</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class
-estimators</li>
+<li><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class estimators</li>
 <li><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using
-continuously updating</li>
+<li><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -317,15 +348,9 @@ continuously updating</li>
 </div>
 <div class="section" id="Importing-data">
 <h2>Importing data<a class="headerlink" href="#Importing-data" title="Permalink to this headline">¶</a></h2>
-<p>The data uses comes from the Medical Expenditure Panel Survey (MEPS) and
-includes data on out-of-pocket drug expenditure (in logs), individual
-characteristics, whether an individual was insured through an employer
-or union (a likely endogenous variable), and some candidate instruments
-including the percentage of income from Social Security Income, the size
-of the individual’s firm and whether the firm has multiple locations.</p>
+<p>The data uses comes from the Medical Expenditure Panel Survey (MEPS) and includes data on out-of-pocket drug expenditure (in logs), individual characteristics, whether an individual was insured through an employer or union (a likely endogenous variable), and some candidate instruments including the percentage of income from Social Security Income, the size of the individual’s firm and whether the firm has multiple locations.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -374,11 +399,9 @@ vgh               vg or good health
 
 </pre></div></div>
 </div>
-<p>Next the data – dependent, endogenous and controls – are summarized.
-The controls are grouped into a list to simplify model building.</p>
+<p>Next the data – dependent, endogenous and controls – are summarized. The controls are grouped into a list to simplify model building.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -411,8 +434,7 @@ max        5.744476      1.000000
 </div>
 <p>It is also worth examining the instruments.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -435,14 +457,9 @@ min        0.000000      0.000000      0.000000      0.000000
 max        9.250620      1.000000      1.000000     50.000000
 </pre></div></div>
 </div>
-<p>And finally the simple correlation between the endogenous variable and
-the instruments. Instruments must be correlated to be relevant (but also
-must be exogenous, which can’t be examined using simple correlation).
-The correlation of <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is especially low, which might lead to the
-weak instruments problem if used exclusively.</p>
+<p>And finally the simple correlation between the endogenous variable and the instruments. Instruments must be correlated to be relevant (but also must be exogenous, which can’t be examined using simple correlation). The correlation of <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is especially low, which might lead to the weak instruments problem if used exclusively.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -451,11 +468,10 @@ weak instruments problem if used exclusively.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="output_area docutils container">
+<div class="output_area rendered_html docutils container">
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -526,11 +542,9 @@ weak instruments problem if used exclusively.</p>
 </table>
 </div></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">add_constant</span></code> from <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> is used to simplify the process of
-adding a constant column to the data.</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_constant</span></code> from <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> is used to simplify the process of adding a constant column to the data.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -543,14 +557,10 @@ adding a constant column to the data.</p>
 </div>
 <div class="section" id="2SLS-as-OLS">
 <h2>2SLS as OLS<a class="headerlink" href="#2SLS-as-OLS" title="Permalink to this headline">¶</a></h2>
-<p>Before examining the IV estimators, it is worth noting that 2SLS nests
-the OLS estimator, so that a call to <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> using <code class="docutils literal notranslate"><span class="pre">None</span></code> for the
-endogenous and instruments will produce OLS estimates of parameters.</p>
-<p>The OLS estimates indicate that insurance through an employer or union
-leads to an <strong>increase</strong> in out-of-pocket drug expenditure.</p>
+<p>Before examining the IV estimators, it is worth noting that 2SLS nests the OLS estimator, so that a call to <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> using <code class="docutils literal notranslate"><span class="pre">None</span></code> for the endogenous and instruments will produce OLS estimates of parameters.</p>
+<p>The OLS estimates indicate that insurance through an employer or union leads to an <strong>increase</strong> in out-of-pocket drug expenditure.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -570,8 +580,8 @@ leads to an <strong>increase</strong> in out-of-pocket drug expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Sun, Dec 09 2018   P-value (F-stat)                0.0000
-Time:                        00:01:46   Distribution:                  chi2(6)
+Date:                Thu, Dec 20 2018   P-value (F-stat)                0.0000
+Time:                        12:32:06   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -591,14 +601,9 @@ blhisp         -0.1513     0.0341    -4.4353     0.0000     -0.2182     -0.0844
 </div>
 <div class="section" id="Just-identified-2SLS">
 <h2>Just identified 2SLS<a class="headerlink" href="#Just-identified-2SLS" title="Permalink to this headline">¶</a></h2>
-<p>The just identified two-stage LS estimator uses as many instruments as
-endogenous variables. In this example there is one of each, using the
-SSI ratio as the instrument. The with the instrument, the effect of
-insurance through employer or union has a strong negative effect on drug
-expenditure.</p>
+<p>The just identified two-stage LS estimator uses as many instruments as endogenous variables. In this example there is one of each, using the SSI ratio as the instrument. The with the instrument, the effect of insurance through employer or union has a strong negative effect on drug expenditure.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -618,8 +623,8 @@ expenditure.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Sun, Dec 09 2018   P-value (F-stat)                0.0000
-Time:                        00:01:46   Distribution:                  chi2(6)
+Date:                Thu, Dec 20 2018   P-value (F-stat)                0.0000
+Time:                        12:32:06   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -644,11 +649,9 @@ Debiased: False
 </div>
 <div class="section" id="Multiple-Instruments">
 <h2>Multiple Instruments<a class="headerlink" href="#Multiple-Instruments" title="Permalink to this headline">¶</a></h2>
-<p>Using multiple instruments only requires expanding the data array in the
-instruments input.</p>
+<p>Using multiple instruments only requires expanding the data array in the instruments input.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -664,17 +667,13 @@ instruments input.</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> is the classic homoskedastic estimator</li>
 <li><code class="docutils literal notranslate"><span class="pre">'robust'</span></code> is robust to heteroskedasticity</li>
-<li><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for
-additional sources of dependence between the model scores</li>
-<li><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust
-covariance estimator</li>
+<li><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for additional sources of dependence between the model scores</li>
+<li><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust covariance estimator</li>
 </ul>
 <p>The default is <code class="docutils literal notranslate"><span class="pre">'robust'</span></code>.</p>
-<p>These are all passed using the keyword input <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>. Using
-clustered requires also passing the clustering variable(s).</p>
+<p>These are all passed using the keyword input <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>. Using clustered requires also passing the clustering variable(s).</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -686,17 +685,10 @@ clustered requires also passing the clustering variable(s).</p>
 </div>
 <div class="section" id="GMM-Estimation">
 <h2>GMM Estimation<a class="headerlink" href="#GMM-Estimation" title="Permalink to this headline">¶</a></h2>
-<p>GMM estimation can be more efficient than 2SLS when there are more than
-one instrument. By default, 2-step efficient GMM is used (assuming the
-weighting matrix is correctly specified). It is possible to iterate
-until convergence using the optional keyword input <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>, which
-is naturally 2 by default. Generally, GMM-CUE would be preferred to
-using multiple iterations of standard GMM.</p>
-<p>The default weighting matrix is robust to heteroskedasticity (but not
-clustering).</p>
+<p>GMM estimation can be more efficient than 2SLS when there are more than one instrument. By default, 2-step efficient GMM is used (assuming the weighting matrix is correctly specified). It is possible to iterate until convergence using the optional keyword input <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>, which is naturally 2 by default. Generally, GMM-CUE would be preferred to using multiple iterations of standard GMM.</p>
+<p>The default weighting matrix is robust to heteroskedasticity (but not clustering).</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -708,13 +700,9 @@ clustering).</p>
 </div>
 <div class="section" id="Changing-the-weighting-matrix-structure-in-GMM-estimation">
 <h2>Changing the weighting matrix structure in GMM estimation<a class="headerlink" href="#Changing-the-weighting-matrix-structure-in-GMM-estimation" title="Permalink to this headline">¶</a></h2>
-<p>The weighting matrix in the GMM objective function can be altered when
-creating the model. This example uses clustered weight by age. The
-covariance estimator should usually match the weighting matrix, and so
-clustering is also used here.</p>
+<p>The weighting matrix in the GMM objective function can be altered when creating the model. This example uses clustered weight by age. The covariance estimator should usually match the weighting matrix, and so clustering is also used here.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -727,14 +715,9 @@ clustering is also used here.</p>
 </div>
 <div class="section" id="Continuously-updating-GMM">
 <h2>Continuously updating GMM<a class="headerlink" href="#Continuously-updating-GMM" title="Permalink to this headline">¶</a></h2>
-<p>The continuously updating GMM estimator simultaneously optimizes the
-moment conditions and the weighting matrix. It can be more efficient (in
-the second order sense) than standard 2-step GMM, although it can also
-be fragile. Here the optional input <code class="docutils literal notranslate"><span class="pre">display</span></code> is used to produce the
-output of the non-linear optimizer used to estimate the parameters.</p>
+<p>The continuously updating GMM estimator simultaneously optimizes the moment conditions and the weighting matrix. It can be more efficient (in the second order sense) than standard 2-step GMM, although it can also be fragile. Here the optional input <code class="docutils literal notranslate"><span class="pre">display</span></code> is used to produce the output of the non-linear optimizer used to estimate the parameters.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -758,19 +741,10 @@ Warning: Desired error not necessarily achieved due to precision loss.
 </div>
 <div class="section" id="Comparing-results">
 <h2>Comparing results<a class="headerlink" href="#Comparing-results" title="Permalink to this headline">¶</a></h2>
-<p>The function <code class="docutils literal notranslate"><span class="pre">compare</span></code> can be used to compare the results of multiple
-models, possibly with different variables, estimators and/or
-instruments. Usually a dictionary or <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is used to hold
-results since the keys are used as model names. The advantage of an
-<code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is that it will preserve the order of the models in the
-presentation.</p>
-<p>With the expectation of the OLS estimate, the parameter estimates are
-fairly consistent. Standard errors vary slightly although the
-conclusions reached are not sensitive to the choice of covariance
-estimator either. T-stats are reported in parentheses.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">compare</span></code> can be used to compare the results of multiple models, possibly with different variables, estimators and/or instruments. Usually a dictionary or <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is used to hold results since the keys are used as model names. The advantage of an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> is that it will preserve the order of the models in the presentation.</p>
+<p>With the expectation of the OLS estimate, the parameter estimates are fairly consistent. Standard errors vary slightly although the conclusions reached are not sensitive to the choice of covariance estimator either. T-stats are reported in parentheses.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -831,12 +805,9 @@ T-stats reported in parentheses
 </div>
 <div class="section" id="Testing-endogeneity">
 <h2>Testing endogeneity<a class="headerlink" href="#Testing-endogeneity" title="Permalink to this headline">¶</a></h2>
-<p>The Durbin test is a classic of endogeneity which compares OLS estimates
-with 2SLS and exploits the fact that OLS estimates will be relatively
-efficient. Durbin’s test is not robust to heteroskedasticity.</p>
+<p>The Durbin test is a classic of endogeneity which compares OLS estimates with 2SLS and exploits the fact that OLS estimates will be relatively efficient. Durbin’s test is not robust to heteroskedasticity.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -845,8 +816,7 @@ efficient. Durbin’s test is not robust to heteroskedasticity.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -855,15 +825,13 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f57a46be160
+WaldTestStatistic, id: 0x7f9c245f87f0
 </pre></div>
 </div>
 </div>
-<p>The Wu-Hausman test is a variant of the Durbin test that uses a slightly
-different form.</p>
+<p>The Wu-Hausman test is a variant of the Durbin test that uses a slightly different form.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -872,8 +840,7 @@ different form.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -882,19 +849,13 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7f57a2210f98
+WaldTestStatistic, id: 0x7f9c0a765ac8
 </pre></div>
 </div>
 </div>
-<p>The test statistic can be directly replicated using the squared t-stat
-in a 2-stage approach where the first stage regresses the endogenous
-variable on the controls and instrument and the second stage regresses
-the dependent variable on the controls, the endogenous regressor and the
-residuals. If the regressor was in fact exogenous, the residuals should
-not be correlated with the dependent variable.</p>
+<p>The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals. If the regressor was in fact exogenous, the residuals should not be correlated with the dependent variable.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -915,12 +876,9 @@ not be correlated with the dependent variable.</p>
 25.34541049974397
 </pre></div></div>
 </div>
-<p>Wooldridge’s regression-based test of exogeneity is robust to
-heteroskedasticity since it inherits the covariance estimator from the
-model. Here there is little difference.</p>
+<p>Wooldridge’s regression-based test of exogeneity is robust to heteroskedasticity since it inherits the covariance estimator from the model. Here there is little difference.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -929,8 +887,7 @@ model. Here there is little difference.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -939,16 +896,13 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f57a1a25518
+WaldTestStatistic, id: 0x7f9c03859390
 </pre></div>
 </div>
 </div>
-<p>Wooldridge’s score test is an alternative to the regression test,
-although it usually has slightly less power since it is an LM rather
-than a Wald type test.</p>
+<p>Wooldridge’s score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -957,8 +911,7 @@ than a Wald type test.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -967,20 +920,15 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f57a1a25828
+WaldTestStatistic, id: 0x7f9c038596a0
 </pre></div>
 </div>
 </div>
 <div class="section" id="Exogeneity-Testing">
 <h3>Exogeneity Testing<a class="headerlink" href="#Exogeneity-Testing" title="Permalink to this headline">¶</a></h3>
-<p>When there is more than one instrument (the model is overidentified),
-the J test can be used in GMM models to test whether the model is
-overidentified – in other words, whether the instruments are actually
-exogenous (assuming they are relevant). In the case with 2 instruments
-there is no evidence that against the null.</p>
+<p>When there is more than one instrument (the model is overidentified), the J test can be used in GMM models to test whether the model is overidentified – in other words, whether the instruments are actually exogenous (assuming they are relevant). In the case with 2 instruments there is no evidence that against the null.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -989,8 +937,7 @@ there is no evidence that against the null.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -998,16 +945,13 @@ there is no evidence that against the null.</p>
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f57a20a3b70
+WaldTestStatistic, id: 0x7f9c03ec99e8
 </pre></div>
 </div>
 </div>
-<p>When all instruments are included the story changes, and some of the
-additional instrument (<code class="docutils literal notranslate"><span class="pre">lowincome</span></code> or <code class="docutils literal notranslate"><span class="pre">firmsz</span></code>) appear to be
-endogenous.</p>
+<p>When all instruments are included the story changes, and some of the additional instrument (<code class="docutils literal notranslate"><span class="pre">lowincome</span></code> or <code class="docutils literal notranslate"><span class="pre">firmsz</span></code>) appear to be endogenous.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1018,8 +962,7 @@ endogenous.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -1027,7 +970,7 @@ endogenous.</p>
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7f57a1900be0
+WaldTestStatistic, id: 0x7f9c0376aa58
 </pre></div>
 </div>
 </div>
@@ -1035,16 +978,9 @@ WaldTestStatistic, id: 0x7f57a1900be0
 </div>
 <div class="section" id="Single-Instrument-Regressions">
 <h2>Single Instrument Regressions<a class="headerlink" href="#Single-Instrument-Regressions" title="Permalink to this headline">¶</a></h2>
-<p>It can be useful to run the just identified regressions to see how the
-IV estimate varies by instrument. The OLS model is included for
-comparison. The coefficient when using <code class="docutils literal notranslate"><span class="pre">lowincome</span></code> is very similar to
-the OLS as is the <span class="math notranslate nohighlight">\(R^2\)</span> which indicates this variable may be
-endogenous. The coefficient using <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is also very different, but
-this is probably due to the low correlation between <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> and the
-endogenous regressor so that this is a weak instrument.</p>
+<p>It can be useful to run the just identified regressions to see how the IV estimate varies by instrument. The OLS model is included for comparison. The coefficient when using <code class="docutils literal notranslate"><span class="pre">lowincome</span></code> is very similar to the OLS as is the <span class="math notranslate nohighlight">\(R^2\)</span> which indicates this variable may be endogenous. The coefficient using <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> is also very different, but this is probably due to the low correlation between <code class="docutils literal notranslate"><span class="pre">firmsz</span></code> and the endogenous regressor so that this is a weak instrument.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1097,14 +1033,9 @@ T-stats reported in parentheses
 </div>
 <div class="section" id="First-Stage-Diagnostics">
 <h3>First Stage Diagnostics<a class="headerlink" href="#First-Stage-Diagnostics" title="Permalink to this headline">¶</a></h3>
-<p>First stage diagnostics are available to assess whether the instruments
-appear to be credible for the endogenous regressor. The Partial
-F-statistic is the F-statistic for all instruments once controls have
-been partialed out. In the case of a single instrument, it is just the
-squared t-stat.</p>
+<p>First stage diagnostics are available to assess whether the instruments appear to be credible for the endogenous regressor. The Partial F-statistic is the F-statistic for all instruments once controls have been partialed out. In the case of a single instrument, it is just the squared t-stat.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1148,13 +1079,9 @@ T-stats reported in parentheses
 T-stats use same covariance type as original model
 </pre></div></div>
 </div>
-<p>The F-statistic actually has a <span class="math notranslate nohighlight">\(chi^2\)</span> distribution since it is
-just a Wald test that all of the coefficients are 0. This breaks the
-“rule-of-thumb” but it can be applied by dividing the F-stat by the
-number of instruments.</p>
+<p>The F-statistic actually has a <span class="math notranslate nohighlight">\(chi^2\)</span> distribution since it is just a Wald test that all of the coefficients are 0. This breaks the “rule-of-thumb” but it can be applied by dividing the F-stat by the number of instruments.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1210,14 +1137,9 @@ T-stats use same covariance type as original model
 </div>
 <div class="section" id="LIML">
 <h2>LIML<a class="headerlink" href="#LIML" title="Permalink to this headline">¶</a></h2>
-<p>The LIML estimator and related k-class estimators can be used through
-<code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>. LIML can have better finite sample properties if the model
-is not strongly identified. By default the <span class="math notranslate nohighlight">\(\kappa\)</span> parameter is
-estimated. In this dataset it is very close to 1 and to the results for
-LIML are similar to 2SLS (they would be exact if <span class="math notranslate nohighlight">\(\kappa=1\)</span>).</p>
+<p>The LIML estimator and related k-class estimators can be used through <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>. LIML can have better finite sample properties if the model is not strongly identified. By default the <span class="math notranslate nohighlight">\(\kappa\)</span> parameter is estimated. In this dataset it is very close to 1 and to the results for LIML are similar to 2SLS (they would be exact if <span class="math notranslate nohighlight">\(\kappa=1\)</span>).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1269,8 +1191,7 @@ T-stats reported in parentheses
 </div>
 <p>The estimated value of <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1288,11 +1209,9 @@ T-stats reported in parentheses
 </div>
 <div class="section" id="IV2SLS-as-OLS">
 <h3>IV2SLS as OLS<a class="headerlink" href="#IV2SLS-as-OLS" title="Permalink to this headline">¶</a></h3>
-<p>As one final check, the “OLS” version of <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> is compared to
-<code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> <code class="docutils literal notranslate"><span class="pre">OLS</span></code> command. The parameters are identical.</p>
+<p>As one final check, the “OLS” version of <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> is compared to <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> <code class="docutils literal notranslate"><span class="pre">OLS</span></code> command. The parameters are identical.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1357,7 +1276,7 @@ blhisp       -0.151307 -0.151307
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Data Formats for Panel Data Analysis &#8212; linearmodels 4.11+15.gbb0c797 documentation</title>
+    <title>Data Formats for Panel Data Analysis &#8212; linearmodels 4.11+22.gff064c4 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,6 +24,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Examples" href="examples.html" />
@@ -50,7 +51,7 @@
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11 (+15, gbb0c797)</a>
+    ../../index.html" class="text-logo">linearmodels 4.11 (+22, gff064c4)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -180,18 +181,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -231,9 +232,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -241,7 +242,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -290,32 +291,54 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Data-Formats-for-Panel-Data-Analysis">
 <h1>Data Formats for Panel Data Analysis<a class="headerlink" href="#Data-Formats-for-Panel-Data-Analysis" title="Permalink to this headline">¶</a></h1>
 <p>There are two primary methods to express data:</p>
 <ul class="simple">
-<li>MultiIndex DataFrames where the outer index is the entity and the
-inner is the time index. This requires using pandas.</li>
-<li>3D structures were dimension 0 (outer) is variable, dimension 1 is
-time index and dimension 2 is the entity index. It is also possible
-to use a 2D data structure with dimensions (t, n) which is treated as
-a 3D data structure having dimensions (1, t, n). These 3D data
-structures can be pandas, NumPy or xarray.</li>
+<li>MultiIndex DataFrames where the outer index is the entity and the inner is the time index. This requires using pandas.</li>
+<li>3D structures were dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index. It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray.</li>
 </ul>
 <div class="section" id="Multi-Index-DataFrames">
 <h2>Multi Index DataFrames<a class="headerlink" href="#Multi-Index-DataFrames" title="Permalink to this headline">¶</a></h2>
-<p>The most precise data format to use is a MultiIndex <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This
-is the most precise since only single columns can preserve all types
-within a panel. For example, it is not possible to span a single
-Categorical variable across multiple columns when using a pandas
-<code class="docutils literal notranslate"><span class="pre">Panel</span></code>.</p>
-<p>This example uses the job training data to construct a MultiIndex
-<code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> using the <code class="docutils literal notranslate"><span class="pre">set_index</span></code> command. The entity index is
-<code class="docutils literal notranslate"><span class="pre">fcode</span></code> and the time index is <code class="docutils literal notranslate"><span class="pre">year</span></code>.</p>
+<p>The most precise data format to use is a MultiIndex <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This is the most precise since only single columns can preserve all types within a panel. For example, it is not possible to span a single Categorical variable across multiple columns when using a pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code>.</p>
+<p>This example uses the job training data to construct a MultiIndex <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> using the <code class="docutils literal notranslate"><span class="pre">set_index</span></code> command. The entity index is <code class="docutils literal notranslate"><span class="pre">fcode</span></code> and the time index is <code class="docutils literal notranslate"><span class="pre">year</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -354,11 +377,9 @@ Categorical variable across multiple columns when using a pandas
 [5 rows x 30 columns]
 </pre></div></div>
 </div>
-<p>Here <code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the multi index using the firm code
-(entity) and year (time).</p>
+<p>Here <code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the multi index using the firm code (entity) and year (time).</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -399,12 +420,9 @@ fcode  year
 [5 rows x 28 columns]
 </pre></div></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> can be used to initialized the model.
-When only referencing a single series, the <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">Series</span></code>
-representation can be used.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> can be used to initialized the model. When only referencing a single series, the <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">Series</span></code> representation can be used.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -424,8 +442,8 @@ representation can be used.</p>
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0288
-Time:                        00:02:04   Log-likelihood                   -90.459
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0288
+Time:                        12:32:23   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -455,7 +473,7 @@ Included effects: Entity
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="stderr output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 /home/travis/build/bashtage/linearmodels/linearmodels/utility.py:472: MissingValueWarning:
 Inputs contain missing values. Dropping rows with missing observations.
@@ -465,19 +483,10 @@ Inputs contain missing values. Dropping rows with missing observations.
 </div>
 <div class="section" id="pandas-Panels-and-DataFrames">
 <h2>pandas Panels and DataFrames<a class="headerlink" href="#pandas-Panels-and-DataFrames" title="Permalink to this headline">¶</a></h2>
-<p>An alternative formal is to use pandas Panels ad DataFrames. Panels
-should be formatted with <code class="docutils literal notranslate"><span class="pre">items</span></code> containing distinct variables,
-<code class="docutils literal notranslate"><span class="pre">major_axis</span></code> holding the time dimension and <code class="docutils literal notranslate"><span class="pre">minor_axis</span></code> holding the
-entity index. Here we transform the MultiIndex DataFrame to a panel to
-demonstrate this format.</p>
-<p>A single index DataFrame can also be used and is treated as being a
-single item slice of a Panel, and so the items should contain the time
-series dimension and the columns should contain entities. Note that
-using the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> version loses information about variable names,
-which is not usually desirable.</p>
+<p>An alternative formal is to use pandas Panels ad DataFrames. Panels should be formatted with <code class="docutils literal notranslate"><span class="pre">items</span></code> containing distinct variables, <code class="docutils literal notranslate"><span class="pre">major_axis</span></code> holding the time dimension and <code class="docutils literal notranslate"><span class="pre">minor_axis</span></code> holding the entity index. Here we transform the MultiIndex DataFrame to a panel to demonstrate this format.</p>
+<p>A single index DataFrame can also be used and is treated as being a single item slice of a Panel, and so the items should contain the time series dimension and the columns should contain entities. Note that using the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> version loses information about variable names, which is not usually desirable.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -491,7 +500,7 @@ which is not usually desirable.</p>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="stderr output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 /home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/ipykernel_launcher.py:1: FutureWarning:
 Panel is deprecated and will be removed in a future version.
@@ -503,8 +512,7 @@ Pandas provides a `.to_xarray()` method to help automate this conversion.
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -516,13 +524,9 @@ Minor_axis axis: 410032 to 419486
 </pre></div>
 </div>
 </div>
-<p>When using panels, it is best to input the panel which requires
-selecting using <code class="docutils literal notranslate"><span class="pre">[[</span></code><em>var</em><code class="docutils literal notranslate"><span class="pre">]]</span></code> so ensure that the variable(s)
-selected still has 3 dimensions. This retains information about variable
-name.</p>
+<p>When using panels, it is best to input the panel which requires selecting using <code class="docutils literal notranslate"><span class="pre">[[</span></code><em>var</em><code class="docutils literal notranslate"><span class="pre">]]</span></code> so ensure that the variable(s) selected still has 3 dimensions. This retains information about variable name.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -541,8 +545,8 @@ name.</p>
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0288
-Time:                        00:02:04   Log-likelihood                   -90.459
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0288
+Time:                        12:32:23   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -572,7 +576,7 @@ Included effects: Entity
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="stderr output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 /home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/pandas/core/indexing.py:1147: FutureWarning:
 Panel is deprecated and will be removed in a future version.
@@ -581,7 +585,7 @@ Alternatively, you can use the xarray package http://xarray.pydata.org/en/stable
 Pandas provides a `.to_xarray()` method to help automate this conversion.
 
   allow_dups=True)
-/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:191: FutureWarning:
+/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:193: FutureWarning:
 Panel is deprecated and will be removed in a future version.
 The recommended way to represent these types of 3-dimensional data are with a MultiIndex on a DataFrame, via the Panel.to_frame() method
 Alternatively, you can use the xarray package http://xarray.pydata.org/en/stable/.
@@ -590,11 +594,9 @@ Pandas provides a `.to_xarray()` method to help automate this conversion.
   self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
 </pre></div></div>
 </div>
-<p>Using DataFrames removes this information and so the generic <em>Dep</em> and
-<em>Exog</em> are used.</p>
+<p>Using DataFrames removes this information and so the generic <em>Dep</em> and <em>Exog</em> are used.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -613,8 +615,8 @@ Pandas provides a `.to_xarray()` method to help automate this conversion.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0288
-Time:                        00:02:04   Log-likelihood                   -90.459
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0288
+Time:                        12:32:23   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -644,13 +646,9 @@ Included effects: Entity
 </div>
 <div class="section" id="NumPy-arrays">
 <h2>NumPy arrays<a class="headerlink" href="#NumPy-arrays" title="Permalink to this headline">¶</a></h2>
-<p>NumPy arrays are treated identically to pandas Panel and single index
-DataFrames. In particular, using <code class="docutils literal notranslate"><span class="pre">panel.values</span></code> and <code class="docutils literal notranslate"><span class="pre">df.values</span></code> will
-produce identical results. The main difference between NumPy and pandas
-is that NumPy loses all label information.</p>
+<p>NumPy arrays are treated identically to pandas Panel and single index DataFrames. In particular, using <code class="docutils literal notranslate"><span class="pre">panel.values</span></code> and <code class="docutils literal notranslate"><span class="pre">df.values</span></code> will produce identical results. The main difference between NumPy and pandas is that NumPy loses all label information.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -669,8 +667,8 @@ is that NumPy loses all label information.</p>
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0288
-Time:                        00:02:04   Log-likelihood                   -90.459
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0288
+Time:                        12:32:23   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -700,17 +698,10 @@ Included effects: Entity
 </div>
 <div class="section" id="xarray-DataArrays">
 <h2>xarray DataArrays<a class="headerlink" href="#xarray-DataArrays" title="Permalink to this headline">¶</a></h2>
-<p>xarray is a relatively new entrant into the set of packages used for
-data structures. The data structures provided by <code class="docutils literal notranslate"><span class="pre">xarray</span></code> are relevant
-in the context of panel models since pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> is scheduled for
-removal in the futures, and so the only 3d data format that will remain
-viable is an <code class="docutils literal notranslate"><span class="pre">xarray</span></code> <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>s are similar to
-pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> although <code class="docutils literal notranslate"><span class="pre">DataArrays</span></code> use some difference notation.
-In principle it is possible to express the same information in a
+<p>xarray is a relatively new entrant into the set of packages used for data structures. The data structures provided by <code class="docutils literal notranslate"><span class="pre">xarray</span></code> are relevant in the context of panel models since pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> is scheduled for removal in the futures, and so the only 3d data format that will remain viable is an <code class="docutils literal notranslate"><span class="pre">xarray</span></code> <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>s are similar to pandas <code class="docutils literal notranslate"><span class="pre">Panel</span></code> although <code class="docutils literal notranslate"><span class="pre">DataArrays</span></code> use some difference notation. In principle it is possible to express the same information in a
 <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> as one can in a <code class="docutils literal notranslate"><span class="pre">Panel</span></code></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -720,8 +711,7 @@ In principle it is possible to express the same information in a
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -741,8 +731,7 @@ Coordinates:
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -761,8 +750,8 @@ Coordinates:
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0288
-Time:                        00:02:04   Log-likelihood                   -90.459
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0288
+Time:                        12:32:23   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -792,13 +781,9 @@ Included effects: Entity
 </div>
 <div class="section" id="Conversion-of-Categorical-and-Strings-to-Dummies">
 <h2>Conversion of Categorical and Strings to Dummies<a class="headerlink" href="#Conversion-of-Categorical-and-Strings-to-Dummies" title="Permalink to this headline">¶</a></h2>
-<p>Categorical or string variables are treated as factors and so are
-converted to dummies. The first category is always dropped. If this is
-not desirable, you should manually convert the data to dummies before
-estimating a model.</p>
+<p>Categorical or string variables are treated as factors and so are converted to dummies. The first category is always dropped. If this is not desirable, you should manually convert the data to dummies before estimating a model.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -812,11 +797,9 @@ estimating a model.</p>
 </pre></div>
 </div>
 </div>
-<p>Here year has been converted to a string which is then used in the model
-to produce year dummies.</p>
+<p>Here year has been converted to a string which is then used in the model to produce year dummies.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -850,8 +833,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0934
-Time:                        00:02:04   Log-likelihood                   -78.765
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0934
+Time:                        12:32:23   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -882,8 +865,7 @@ Included effects: Entity
 </div>
 <p>Using <code class="docutils literal notranslate"><span class="pre">categorical</span></code>s has the same effect.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -917,8 +899,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Sun, Dec 09 2018   R-squared (Overall):             -0.0934
-Time:                        00:02:04   Log-likelihood                   -78.765
+Date:                Thu, Dec 20 2018   R-squared (Overall):             -0.0934
+Time:                        12:32:24   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -983,7 +965,7 @@ Included effects: Entity
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+15.gbb0c797 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
