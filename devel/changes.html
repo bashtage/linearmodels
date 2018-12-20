@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.11+22.gff064c4 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.11+23.g9bd5dde documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -51,7 +51,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+23.g9bd5dde documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.11 (+22, gff064c4)</a>
+    index.html" class="text-logo">linearmodels 4.11 (+23, g9bd5dde)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -132,6 +132,10 @@
 <div class="section" id="since-4-11-unreleased">
 <h2>Since 4.11 (Unreleased)<a class="headerlink" href="#since-4-11-unreleased" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li>Fixed a bug where IV models estimated with only exogenous regressors where
+not being correctly labeled as OLS models in output (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</li>
+<li>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</li>
+<li>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></li>
 <li>Added a low-memory option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
 that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
 and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
@@ -276,7 +280,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+23.g9bd5dde documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

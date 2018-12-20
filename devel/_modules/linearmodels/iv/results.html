@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.11+22.gff064c4 documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.11+23.g9bd5dde documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+23.g9bd5dde documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -54,7 +54,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.11 (+22, gff064c4)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.11 (+23, g9bd5dde)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -564,13 +564,22 @@
 <span class="sd">        &gt;&gt;&gt; data = wage.load()</span>
 <span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]&#39;</span>
 <span class="sd">        &gt;&gt;&gt; res = IV2SLS.from_formula(formula, data).fit()</span>
+
+<span class="sd">        Testing the experience is not needed in the model</span>
+
 <span class="sd">        &gt;&gt;&gt; restriction = np.array([[0, 1, 0, 0, 0],</span>
 <span class="sd">                                    [0, 0, 1, 0, 0]])</span>
 <span class="sd">        &gt;&gt;&gt; value = np.array([0, 0])</span>
-<span class="sd">        &gt;&gt;&gt; res.test_linear_constraint(restriction, value)</span>
+<span class="sd">        &gt;&gt;&gt; res.wald_test(restriction, value)</span>
 
-<span class="sd">        &gt;&gt;&gt; formula = &#39;exper = I(exper**2) = 0&#39;</span>
-<span class="sd">        &gt;&gt;&gt; res.test_linear_constraint(formula=formula)</span>
+<span class="sd">        Using the formula interface to test the same restrictions</span>
+
+<span class="sd">        &gt;&gt;&gt; formula = &#39;exper = I(exper ** 2) = 0&#39;</span>
+<span class="sd">        &gt;&gt;&gt; res.wald_test(formula=formula)</span>
+
+<span class="sd">        Using the formula interface with a list</span>
+
+<span class="sd">        &gt;&gt;&gt; res.wald_test(formula=[&#39;exper = 0&#39;, &#39;I(exper ** 2) = 0&#39;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">quadratic_form_test</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="n">restriction</span><span class="p">,</span>
                                    <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">)</span></div>
@@ -1507,7 +1516,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+22.gff064c4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+23.g9bd5dde documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
