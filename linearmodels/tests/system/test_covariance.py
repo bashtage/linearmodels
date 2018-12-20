@@ -2,12 +2,17 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from linearmodels.iv.covariance import kernel_weight_parzen, kernel_weight_bartlett
-from linearmodels.system.covariance import GMMHeteroskedasticCovariance, \
-    GMMHomoskedasticCovariance, HeteroskedasticCovariance, HomoskedasticCovariance, \
-    KernelCovariance, GMMKernelCovariance
-from linearmodels.system.gmm import HomoskedasticWeightMatrix, HeteroskedasticWeightMatrix, \
-    KernelWeightMatrix
+from linearmodels.iv.covariance import (kernel_weight_bartlett,
+                                        kernel_weight_parzen)
+from linearmodels.system.covariance import (GMMHeteroskedasticCovariance,
+                                            GMMHomoskedasticCovariance,
+                                            GMMKernelCovariance,
+                                            HeteroskedasticCovariance,
+                                            HomoskedasticCovariance,
+                                            KernelCovariance)
+from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
+                                     HomoskedasticWeightMatrix,
+                                     KernelWeightMatrix)
 from linearmodels.system.model import IV3SLS
 from linearmodels.tests.system._utility import generate_3sls_data_v2
 

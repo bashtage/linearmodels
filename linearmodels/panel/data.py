@@ -1,13 +1,15 @@
 from itertools import product
 
 import numpy as np
+
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import (is_categorical,
+from linearmodels.compat.pandas import (concat, get_codes, is_categorical,
                                         is_datetime64_any_dtype,
                                         is_numeric_dtype, is_string_dtype,
-                                        is_string_like, concat)
+                                        is_string_like)
 from linearmodels.utility import ensure_unique_column, panel_to_frame
-from pandas import DataFrame, Panel, Series, MultiIndex, get_dummies, Categorical, Index
+from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+                    get_dummies)
 
 __all__ = ['PanelData']
 
@@ -30,8 +32,8 @@ class _Panel(object):
     def __init__(self, df):
         self._items = df.columns
         index = df.index
-        self._major_axis = Index(index.levels[1][index.labels[1]]).unique()
-        self._minor_axis = Index(index.levels[0][index.labels[0]]).unique()
+        self._major_axis = Index(index.levels[1][get_codes(index)[1]]).unique()
+        self._minor_axis = Index(index.levels[0][get_codes(index)[0]]).unique()
         self._full_index = MultiIndex.from_product([self._minor_axis,
                                                     self._major_axis])
         new_df = df.reindex(self._full_index)
@@ -305,13 +307,13 @@ class PanelData(object):
     def time(self):
         """List of time index names"""
         index = self._frame.index
-        return list(index.levels[1][index.labels[1]].unique())
+        return list(index.levels[1][get_codes(index)[1]].unique())
 
     @property
     def entities(self):
         """List of entity index names"""
         index = self._frame.index
-        return list(index.levels[0][index.labels[0]].unique())
+        return list(index.levels[0][get_codes(index)[0]].unique())
 
     @property
     def entity_ids(self):
@@ -323,7 +325,7 @@ class PanelData(object):
         id : ndarray
             2d array containing entity ids corresponding dataframe view
         """
-        return np.asarray(self._frame.index.labels[0])[:, None]
+        return np.asarray(get_codes(self._frame.index)[0])[:, None]
 
     @property
     def time_ids(self):
@@ -335,7 +337,7 @@ class PanelData(object):
         id : ndarray
             2d array containing time ids corresponding dataframe view
         """
-        return np.asarray(self._frame.index.labels[1])[:, None]
+        return np.asarray(get_codes(self._frame.index)[1])[:, None]
 
     def _demean_both_low_mem(self, weights):
         groups = PanelData(DataFrame(np.c_[self.entity_ids, self.time_ids],
@@ -630,7 +632,7 @@ class PanelData(object):
         if group not in ('entity', 'time'):
             raise ValueError
         axis = 0 if group == 'entity' else 1
-        labels = self._frame.index.labels
+        labels = get_codes(self._frame.index)
         levels = self._frame.index.levels
         cat = Categorical(levels[axis][labels[axis]])
         dummies = get_dummies(cat, drop_first=drop_first)

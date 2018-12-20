@@ -1,17 +1,19 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
+from numpy.testing import assert_allclose
+
+import pandas as pd
 from linearmodels.compat.numpy import lstsq
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
-from linearmodels.tests.panel._utility import (assert_results_equal,
-                                               generate_data, datatypes,
-                                               assert_frame_similar)
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar,
+                                               assert_results_equal, datatypes,
+                                               generate_data)
 from linearmodels.utility import AttrDict, MemoryWarning
-from numpy.testing import assert_allclose
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -798,51 +800,26 @@ def test_panel_other_incorrect_size(data):
 def test_results_access(data):
     mod = PanelOLS(data.y, data.x, entity_effects=True)
     res = mod.fit()
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     mod = PanelOLS(data.y, data.x, other_effects=data.c)
     res = mod.fit()
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     mod = PanelOLS(data.y, data.x, time_effects=True, entity_effects=True)
     res = mod.fit()
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     mod = PanelOLS(data.y, data.x)
     res = mod.fit()
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     const = PanelData(data.y).copy()
     const.dataframe.iloc[:, :] = 1
     const.dataframe.columns = ['const']
     mod = PanelOLS(data.y, const)
     res = mod.fit()
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_alt_rsquared(data):

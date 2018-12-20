@@ -3,15 +3,16 @@ import string
 import warnings
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 from scipy import stats
 
 import linearmodels
-from linearmodels.utility import (AttrDict, InapplicableTestStatistic, InvalidTestStatistic,
-                                  WaldTestStatistic, ensure_unique_column,
-                                  format_wide, has_constant, inv_sqrth, missing_warning,
+import pandas as pd
+from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
+                                  InvalidTestStatistic, WaldTestStatistic,
+                                  ensure_unique_column, format_wide,
+                                  has_constant, inv_sqrth, missing_warning,
                                   panel_to_frame)
 
 MISSING_PANEL = 'Panel' not in dir(pd)

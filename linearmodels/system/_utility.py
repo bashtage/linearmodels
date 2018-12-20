@@ -1,6 +1,7 @@
 import numpy as np
-import pandas as pd
 from numpy.linalg import inv, matrix_rank
+
+import pandas as pd
 
 
 def blocked_column_product(x, s):

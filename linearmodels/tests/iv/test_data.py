@@ -1,9 +1,12 @@
 from collections import OrderedDict
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_equal
+
+import pandas as pd
+from linearmodels.iv.data import IVData
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 try:
     import xarray as xr
@@ -11,9 +14,6 @@ try:
     MISSING_XARRAY = False
 except ImportError:
     MISSING_XARRAY = True
-
-from pandas.testing import assert_frame_equal, assert_series_equal
-from linearmodels.iv.data import IVData
 
 
 class TestDataHandler(object):

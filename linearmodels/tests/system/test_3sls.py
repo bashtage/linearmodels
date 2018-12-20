@@ -3,12 +3,13 @@ from itertools import product
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.system.model import IV3SLS
-from linearmodels.tests.system._utility import generate_3sls_data, simple_3sls, \
-    generate_3sls_data_v2
+from linearmodels.tests.system._utility import (generate_3sls_data,
+                                                generate_3sls_data_v2,
+                                                simple_3sls)
+from pandas import DataFrame
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 nexog = [3, [1, 2, 3, 4, 5]]
 nendog = [2, [1, 2, 1, 2, 1]]

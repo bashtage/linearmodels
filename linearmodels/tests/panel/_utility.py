@@ -1,12 +1,12 @@
 import numpy as np
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
-from pandas import DataFrame, Categorical, get_dummies, date_range
-from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
-from linearmodels.utility import panel_to_frame
+from linearmodels.utility import AttrDict, panel_to_frame
+from pandas import Categorical, DataFrame, date_range, get_dummies
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 try:
     import xarray  # noqa: F401
@@ -14,7 +14,6 @@ try:
     MISSING_XARRAY = False
 except ImportError:
     MISSING_XARRAY = True
-from linearmodels.utility import AttrDict
 
 datatypes = ['numpy', 'pandas']
 if not MISSING_XARRAY:
@@ -178,3 +177,12 @@ def assert_frame_similar(result, expected):
     e = expected.copy()
     e.iloc[:, :] = 0.0
     assert_frame_equal(r, e)
+
+
+def access_attributes(result):
+    d = dir(result)
+    for key in d:
+        if not key.startswith('_') and key not in ('wald_test',):
+            val = getattr(result, key)
+            if callable(val):
+                val()

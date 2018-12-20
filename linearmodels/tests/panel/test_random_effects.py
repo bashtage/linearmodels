@@ -1,12 +1,14 @@
 from itertools import product
 
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
+import pandas as pd
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
-from linearmodels.tests.panel._utility import generate_data, datatypes, assert_frame_similar
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar, datatypes,
+                                               generate_data)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -44,12 +46,7 @@ def test_random_effects_small_sample(data):
 def test_results_access(data):
     mod = RandomEffects(data.y, data.x)
     res = mod.fit(debiased=False)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_fitted_effects_residuals(data):

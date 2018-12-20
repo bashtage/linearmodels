@@ -2,15 +2,16 @@ from itertools import product
 
 import numpy as np
 import pytest
+
+from linearmodels.formula import (between_ols, fama_macbeth,
+                                  first_difference_ols, panel_ols, pooled_ols,
+                                  random_effects)
+from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
+                                      FirstDifferenceOLS, PanelFormulaParser,
+                                      PanelOLS, PooledOLS, RandomEffects)
+from linearmodels.tests.panel._utility import datatypes, generate_data
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
-
-from linearmodels.formula import (between_ols, first_difference_ols, panel_ols,
-                                  pooled_ols, random_effects, fama_macbeth)
-from linearmodels.panel.model import (BetweenOLS, FirstDifferenceOLS, PanelOLS,
-                                      PooledOLS, RandomEffects, FamaMacBeth,
-                                      PanelFormulaParser)
-from linearmodels.tests.panel._utility import generate_data, datatypes
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 

@@ -4,22 +4,23 @@ import numpy as np
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas import DataFrame, date_range, Categorical, get_dummies, Series, datetime
-from pandas.testing import assert_frame_equal, assert_index_equal
 
-from linearmodels.compat.pandas import is_string_dtype
+from linearmodels.compat.numpy import lstsq
+from linearmodels.compat.pandas import get_codes, is_string_dtype
+from linearmodels.panel.data import PanelData, _Panel
+from linearmodels.panel.model import PanelOLS
+from linearmodels.tests.panel._utility import (MISSING_XARRAY, datatypes,
+                                               generate_data)
+from linearmodels.utility import panel_to_frame
+from pandas import (Categorical, DataFrame, Series, date_range, datetime,
+                    get_dummies)
+from pandas.testing import assert_frame_equal, assert_index_equal
 
 try:
     import xarray as xr
 except ImportError:
     pass
 
-from linearmodels.compat.numpy import lstsq
-from linearmodels.panel.data import PanelData, _Panel
-from linearmodels.panel.model import PanelOLS
-from linearmodels.tests.panel._utility import generate_data, datatypes, \
-    MISSING_XARRAY
-from linearmodels.utility import panel_to_frame
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -496,7 +497,7 @@ def test_demean_weighted(data):
     w.drop(missing)
 
     entity_demean = x.demean('entity', weights=w)
-    d = get_dummies(Categorical(x.index.labels[0]))
+    d = get_dummies(Categorical(get_codes(x.index)[0]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -507,7 +508,7 @@ def test_demean_weighted(data):
                     1 + np.abs(e))
 
     time_demean = x.demean('time', weights=w)
-    d = get_dummies(Categorical(x.index.labels[1]))
+    d = get_dummies(Categorical(get_codes(x.index)[1]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -525,7 +526,7 @@ def test_mean_weighted(data):
     x.drop(missing)
     w.drop(missing)
     entity_mean = x.mean('entity', weights=w)
-    c = x.index.levels[0][x.index.labels[0]]
+    c = x.index.levels[0][get_codes(x.index)[0]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
@@ -536,7 +537,7 @@ def test_mean_weighted(data):
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean('time', weights=w)
-    c = x.index.levels[1][x.index.labels[1]]
+    c = x.index.levels[1][get_codes(x.index)[1]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[time_mean.index]
     d = d.values

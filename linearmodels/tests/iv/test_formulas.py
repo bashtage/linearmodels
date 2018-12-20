@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_equal
-from pandas import DataFrame, Categorical
-from pandas.testing import assert_frame_equal
 
 from linearmodels.compat.pandas import concat
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from pandas import Categorical, DataFrame
+from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture(scope='module',
@@ -268,3 +268,12 @@ def test_single_character_names(data, model_and_func):
     model, func = model_and_func
     mod = model.from_formula(fmla, data)
     mod.fit()
+
+
+def test_ols_formula(data):
+    # GH 185
+    data = data.copy()
+    fmla = 'y ~ 1 + x1'
+    mod = IV2SLS.from_formula(fmla, data)
+    res = mod.fit()
+    assert 'OLS Estimation Summary' in str(res)

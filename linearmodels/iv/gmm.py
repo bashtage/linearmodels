@@ -5,7 +5,8 @@ from numpy import asarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                        _cov_cluster, _cov_kernel, kernel_optimal_bandwidth)
+                                        _cov_cluster, _cov_kernel,
+                                        kernel_optimal_bandwidth)
 
 
 class HomoskedasticWeightMatrix(object):

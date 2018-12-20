@@ -2,17 +2,17 @@ import warnings
 from collections import OrderedDict
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas.util.testing import assert_series_equal
 from statsmodels.api import add_constant
 
+import pandas as pd
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
 from linearmodels.utility import AttrDict
+from pandas.util.testing import assert_series_equal
 
 
 @pytest.fixture(scope='module')

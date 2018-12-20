@@ -3,14 +3,14 @@ from itertools import product
 
 import numpy as np
 import pytest
-from pandas import Series, concat
-from pandas.testing import assert_series_equal, assert_frame_equal
 
-from linearmodels import SUR, IVSystemGMM, IV3SLS
-from linearmodels.formula import sur, iv_system_gmm, iv_3sls
+from linearmodels import IV3SLS, SUR, IVSystemGMM
+from linearmodels.formula import iv_3sls, iv_system_gmm, sur
 from linearmodels.system.model import SystemFormulaParser
 from linearmodels.tests.system._utility import generate_3sls_data_v2
 from linearmodels.utility import AttrDict
+from pandas import Series, concat
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 data = generate_3sls_data_v2(k=2, const=False)
 joined = []
@@ -112,7 +112,7 @@ def test_predict_partial(config):
 
     eqns = AttrDict()
     for key in mod._equations:
-        eqns[key] = {k: v for k, v in mod._equations[key].items() if v.shape[1] > 0}
+        eqns[key] = {k: v for k, v in mod._equations[key].items() if v is not None}
     pred4 = res.predict(equations=eqns, dataframe=True)
     assert_frame_equal(pred2, pred4)
 
@@ -143,10 +143,19 @@ def test_parser(config):
     instr = parser.instruments
     for key in orig_data:
         eq = orig_data[key]
-        assert_frame_equal(exog[key], eq['exog'])
+        if exog[key] is None:
+            assert eq['exog'] is None
+        else:
+            assert_frame_equal(exog[key], eq['exog'])
         assert_frame_equal(dep[key], eq['dependent'])
-        assert_frame_equal(endog[key], eq['endog'])
-        assert_frame_equal(instr[key], eq['instruments'])
+        if endog[key] is None:
+            assert eq['endog'] is None
+        else:
+            assert_frame_equal(endog[key], eq['endog'])
+        if instr[key] is None:
+            assert eq['instruments'] is None
+        else:
+            assert_frame_equal(instr[key], eq['instruments'])
 
     labels = parser.equation_labels
     for label in labels:

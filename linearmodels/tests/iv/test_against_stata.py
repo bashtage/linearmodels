@@ -2,11 +2,11 @@ import os
 from copy import deepcopy
 
 import numpy as np
-import pandas as pd
 import pytest
 import statsmodels.api as sm
 from numpy.testing import assert_allclose
 
+import pandas as pd
 from linearmodels.iv import IV2SLS, IVGMM, IVLIML
 from linearmodels.tests.iv.results.read_stata_results import process_results
 

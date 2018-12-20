@@ -1,14 +1,14 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
+import pandas as pd
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import (AbsorbingEffectError, AmbiguityError,
                                       PanelOLS)
-from linearmodels.tests.panel._utility import generate_data, lsdv, datatypes
+from linearmodels.tests.panel._utility import datatypes, generate_data, lsdv
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 

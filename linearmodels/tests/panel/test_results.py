@@ -1,16 +1,18 @@
 from collections import OrderedDict
 from itertools import product
 
+import numpy as np
 import pytest
 import statsmodels.api as sm
-from pandas.testing import assert_series_equal
+from numpy.testing import assert_allclose
 
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
 from linearmodels.panel.results import compare
-from linearmodels.tests.panel._utility import generate_data, datatypes
+from linearmodels.tests.panel._utility import datatypes, generate_data
+from pandas.testing import assert_series_equal
 
 
 @pytest.fixture(params=[wage_panel.load()])
@@ -137,3 +139,28 @@ def test_predict_no_selection(generated_data):
         res.predict(fitted=False)
     with pytest.raises(ValueError):
         res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)
+
+
+def test_wald_test(data):
+    dependent = data.set_index(['nr', 'year']).lwage
+    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
+
+    restriction = np.zeros((2, 4))
+    restriction[0, 2] = 1
+    restriction[1, 3] = 1
+    t1 = res.wald_test(restriction)
+    t2 = res.wald_test(restriction, np.zeros(2))
+    formula = 'married = union = 0'
+    t3 = res.wald_test(formula=formula)
+    p = res.params.values[:, None]
+    c = np.asarray(res.cov)
+    c = c[-2:, -2:]
+    p = p[-2:]
+    direct = p.T @ np.linalg.inv(c) @ p
+    assert_allclose(direct, t1.stat)
+    assert_allclose(direct, t2.stat)
+    assert_allclose(direct, t3.stat)
+
+    with pytest.raises(ValueError):
+        res.wald_test(restriction, np.zeros(2), formula=formula)

@@ -1,10 +1,11 @@
 import numpy as np
-import pandas as pd
 from numpy.linalg import matrix_rank
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 
+import pandas as pd
 from linearmodels.compat.numpy import lstsq
+from linearmodels.compat.pandas import get_codes
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
                                            CovarianceManager, DriscollKraay,
                                            FamaMacBethCovariance,
@@ -15,10 +16,11 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
-                                  InvalidTestStatistic, WaldTestStatistic,
-                                  ensure_unique_column, has_constant, MissingValueWarning,
-                                  missing_warning, panel_to_frame, InferenceUnavailableWarning,
-                                  MemoryWarning)
+                                  InferenceUnavailableWarning,
+                                  InvalidTestStatistic, MemoryWarning,
+                                  MissingValueWarning, WaldTestStatistic,
+                                  ensure_unique_column, has_constant,
+                                  missing_warning, panel_to_frame)
 
 
 class PanelFormulaParser(object):
@@ -1399,7 +1401,7 @@ class BetweenOLS(PooledOLS):
         fitted = pd.DataFrame(self.exog.values2d @ params, index, ['fitted_values'])
         eps = y - x @ params
         effects = pd.DataFrame(eps, self.dependent.entities, ['estimated_effects'])
-        entities = fitted.index.levels[0][fitted.index.labels[0]]
+        entities = fitted.index.levels[0][get_codes(fitted.index)[0]]
         effects = effects.loc[entities]
         effects.index = fitted.index
         dep = self.dependent.dataframe
@@ -1792,7 +1794,7 @@ class RandomEffects(PooledOLS):
         wy = root_w * self.dependent.values2d
         wx = root_w * self.exog.values2d
         index = self.dependent.index
-        reindex = index.levels[0][index.labels[0]]
+        reindex = index.levels[0][get_codes(index)[0]]
         wybar = (theta * wybar).loc[reindex]
         wxbar = (theta * wxbar).loc[reindex]
         wy -= wybar.values

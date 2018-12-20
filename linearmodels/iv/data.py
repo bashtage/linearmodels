@@ -4,11 +4,11 @@ A data abstraction that allow multiple input data formats
 import copy
 
 import numpy as np
-import pandas as pd
 
-from linearmodels.compat.pandas import (is_categorical, is_categorical_dtype,
-                                        is_numeric_dtype, is_string_dtype,
-                                        is_string_like, concat)
+import pandas as pd
+from linearmodels.compat.pandas import (concat, is_categorical,
+                                        is_categorical_dtype, is_numeric_dtype,
+                                        is_string_dtype, is_string_like)
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are supported'

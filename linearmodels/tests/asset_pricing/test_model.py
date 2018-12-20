@@ -1,10 +1,10 @@
 import numpy as np
-import pandas as pd
 import pytest
 import statsmodels.api as sm
 from numpy.testing import assert_allclose, assert_equal
 from scipy import stats
 
+import pandas as pd
 from linearmodels.asset_pricing.model import (LinearFactorModel,
                                               LinearFactorModelGMM,
                                               TradedFactorModel)

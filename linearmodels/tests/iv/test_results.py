@@ -1,13 +1,13 @@
+import pytest
 from numpy import asarray
 from numpy.testing import assert_allclose
-from pandas import DataFrame
-from pandas.testing import assert_series_equal
-import pytest
 
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.tests.iv._utility import generate_data
 from linearmodels.tests.panel._utility import assert_frame_similar
+from pandas import DataFrame
+from pandas.testing import assert_series_equal
 
 
 @pytest.fixture(scope='module')
@@ -22,7 +22,7 @@ def model(request):
 
 def result_checker(res):
     for attr in dir(res):
-        if attr.startswith('_') or attr in ('test_linear_constraint',):
+        if attr.startswith('_') or attr in ('test_linear_constraint', 'wald_test'):
             continue
         if attr == 'first_stage':
             result_checker(getattr(res, attr))

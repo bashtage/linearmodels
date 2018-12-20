@@ -1,15 +1,18 @@
 from itertools import product
 
 import numpy as np
-import pandas as pd
 import pytest
 from numpy.testing import assert_allclose
 
+import pandas as pd
+from linearmodels.compat.pandas import get_codes
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
-from linearmodels.tests.panel._utility import (assert_results_equal, datatypes, generate_data,
-                                               assert_frame_similar)
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar,
+                                               assert_results_equal, datatypes,
+                                               generate_data)
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
 
@@ -228,12 +231,7 @@ def test_unknown_covariance(data):
 def test_results_access(data):
     mod = BetweenOLS(data.y, data.x)
     res = mod.fit(debiased=False)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_alt_rsquared(data):
@@ -333,7 +331,7 @@ def test_fitted_effects_residuals(both_data_types):
     assert_frame_similar(res.fitted_values, expected)
 
     index = mod.dependent.dataframe.index
-    reindex = index.levels[0][index.labels[0]]
+    reindex = index.levels[0][get_codes(index)[0]]
     resids = res.resids.copy()
     resids = resids.reindex(reindex)
     resids.index = index

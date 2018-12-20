@@ -1,10 +1,9 @@
 """
 Instrumental variable estimators
 """
-from numpy import (any, array, asarray, average, c_, isscalar, logical_not,
-                   ones, sqrt, nanmean, atleast_2d)
+from numpy import (any, array, asarray, atleast_2d, average, c_, isscalar,
+                   logical_not, nanmean, ones, ptp, sqrt)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
-from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -22,6 +21,7 @@ from linearmodels.typing import Numeric, OptionalNumeric
 from linearmodels.typing.iv import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
                                   missing_warning)
+from pandas import DataFrame, Series, concat
 
 __all__ = ['COVARIANCE_ESTIMATORS', 'WEIGHT_MATRICES', 'IVGMM', 'IVLIML', 'IV2SLS',
            'IVGMMCUE', '_OLS']
@@ -169,7 +169,7 @@ class IVLIML(object):
             warnings.warn('kappa and fuller should not normally be used '
                           'simultaneously.  Identical results can be computed '
                           'using kappa only', UserWarning)
-        if endog is None or instruments is None:
+        if endog is None and instruments is None:
             self._result_container = OLSResults
             self._method = 'OLS'
         self._formula = None
@@ -478,7 +478,7 @@ class IVLIML(object):
         return logical_not(self._drop_locs)
 
     def _f_statistic(self, params, cov, debiased):
-        non_const = ~(self._x.ptp(0) == 0)
+        non_const = ~(ptp(self._x, 0) == 0)
         test_params = params[non_const]
         test_cov = cov[non_const][:, non_const]
         test_stat = test_params.T @ inv(test_cov) @ test_params

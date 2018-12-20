@@ -2,7 +2,9 @@
 Covariance estimation for 2SLS and LIML IV estimators
 """
 from numpy import (arange, argsort, asarray, ceil, cos, empty, int64, ones, pi,
-                   r_, sin, sum as npsum, unique, where, zeros)
+                   r_, sin)
+from numpy import sum as npsum
+from numpy import unique, where, zeros
 from numpy.linalg import inv, pinv
 
 CLUSTER_ERR = """

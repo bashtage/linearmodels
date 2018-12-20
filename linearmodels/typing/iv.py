@@ -1,6 +1,7 @@
 from typing import Union
 
 import numpy as np
+
 import pandas as pd
 
 base_data_types = [np.ndarray, pd.DataFrame, pd.Series]

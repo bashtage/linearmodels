@@ -1,14 +1,14 @@
-from linearmodels.compat.pandas import concat
-
 from collections import OrderedDict
 from collections.abc import MutableMapping
 
 import numpy as np
-from pandas import DataFrame, Series, MultiIndex
+from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 from linearmodels.compat.numpy import lstsq
+from linearmodels.compat.pandas import concat
+from pandas import DataFrame, MultiIndex, Series
 
 
 class MissingValueWarning(Warning):
@@ -575,3 +575,25 @@ def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
     df.index.set_levels(final_levels, [0, 1], inplace=True)
     df.index.names = ['major', 'minor']
     return df
+
+
+def quadratic_form_test(params, cov, restriction=None, value=None, formula=None):
+    if formula is not None and restriction is not None:
+        raise ValueError('restriction and formula cannot be used'
+                         'simultaneously.')
+    if formula is not None:
+        di = DesignInfo(list(params.index))
+        lc = di.linear_constraint(formula)
+        restriction, value = lc.coefs, lc.constants
+    restriction = np.asarray(restriction)
+    if value is None:
+        value = np.zeros(restriction.shape[0])
+    value = np.asarray(value).ravel()[:, None]
+    diff = restriction @ params.values[:, None] - value
+    rcov = restriction @ cov @ restriction.T
+    stat = float(diff.T @ np.linalg.inv(rcov) @ diff)
+    df = restriction.shape[0]
+    null = 'Linear equality constraint is valid'
+    name = 'Linear Equality Hypothesis Test'
+
+    return WaldTestStatistic(stat, null, df, name=name)
