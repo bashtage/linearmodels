@@ -3,6 +3,10 @@ Change Log
 
 Since 4.11 (Unreleased)
 =======================
+* Fixed a bug where IV models estimated with only exogenous regressors where
+  not being correctly labeled as OLS models in output (:issue:`185`)
+* Added ``wald_test`` to panel-model results.
+* Renamed ``test_linear_constraint`` to ``wald_test``
 * Added a low-memory option to :func:`~linearmodels.panel.model.PanelOLS.fit`
   that avoids constructing dummy variables. Only used when both ``entity_effects``
   and ``time_effects`` are ``True``. By default, the low memory algorithm will be

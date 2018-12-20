@@ -453,13 +453,22 @@ class OLSResults(_SummaryStr):
         >>> data = wage.load()
         >>> formula = 'np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]'
         >>> res = IV2SLS.from_formula(formula, data).fit()
+
+        Testing the experience is not needed in the model
+
         >>> restriction = np.array([[0, 1, 0, 0, 0],
                                     [0, 0, 1, 0, 0]])
         >>> value = np.array([0, 0])
-        >>> res.test_linear_constraint(restriction, value)
+        >>> res.wald_test(restriction, value)
 
-        >>> formula = 'exper = I(exper**2) = 0'
-        >>> res.test_linear_constraint(formula=formula)
+        Using the formula interface to test the same restrictions
+
+        >>> formula = 'exper = I(exper ** 2) = 0'
+        >>> res.wald_test(formula=formula)
+
+        Using the formula interface with a list
+
+        >>> res.wald_test(formula=['exper = 0', 'I(exper ** 2) = 0'])
         """
         return quadratic_form_test(self._params, self.cov, restriction=restriction,
                                    value=value, formula=formula)
