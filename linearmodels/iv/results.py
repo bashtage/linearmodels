@@ -8,6 +8,8 @@ import scipy.stats as stats
 from cached_property import cached_property
 from numpy import array, c_, diag, empty, log, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
+from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv._utility import annihilate, proj
@@ -15,8 +17,6 @@ from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
                                   _ModelComparison, _str, _SummaryStr,
                                   pval_format, quadratic_form_test)
 from pandas import DataFrame, Series, concat, to_numeric
-from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
-from statsmodels.iolib.table import default_txt_fmt
 
 
 def stub_concat(lists, sep='='):
@@ -467,7 +467,8 @@ class OLSResults(_SummaryStr):
     def test_linear_constraint(self, restriction=None, value=None, *, formula=None):
         import warnings
         warnings.warn('test_linear_constraint is deprecated.  Use wald_test '
-                      'instead.', DeprecationWarning)
+                      'instead. This method will be unavailable after June 2019.',
+                      DeprecationWarning)
         return self.wald_test(restriction, value, formula=formula)
 
 

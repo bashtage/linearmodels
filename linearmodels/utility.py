@@ -4,11 +4,11 @@ from collections.abc import MutableMapping
 import numpy as np
 from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
+from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import concat
 from pandas import DataFrame, MultiIndex, Series
-from statsmodels.iolib.summary import SimpleTable, fmt_params
 
 
 class MissingValueWarning(Warning):

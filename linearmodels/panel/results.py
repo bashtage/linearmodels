@@ -3,13 +3,13 @@ import datetime as dt
 import numpy as np
 from cached_property import cached_property
 from scipy import stats
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.utility import (_ModelComparison, _str, _SummaryStr,
                                   pval_format, quadratic_form_test)
 from pandas import DataFrame, Series, concat
-from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 __all__ = ['PanelResults', 'PanelEffectsResults', 'RandomEffectsResults']
 

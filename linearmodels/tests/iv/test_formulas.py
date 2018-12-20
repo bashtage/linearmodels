@@ -268,3 +268,12 @@ def test_single_character_names(data, model_and_func):
     model, func = model_and_func
     mod = model.from_formula(fmla, data)
     mod.fit()
+
+
+def test_ols_formula(data):
+    # GH 185
+    data = data.copy()
+    fmla = 'y ~ 1 + x1'
+    mod = IV2SLS.from_formula(fmla, data)
+    res = mod.fit()
+    assert 'OLS Estimation Summary' in str(res)

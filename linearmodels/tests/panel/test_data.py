@@ -6,7 +6,7 @@ from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
 
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import is_string_dtype
+from linearmodels.compat.pandas import get_codes, is_string_dtype
 from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import (MISSING_XARRAY, datatypes,
@@ -497,7 +497,7 @@ def test_demean_weighted(data):
     w.drop(missing)
 
     entity_demean = x.demean('entity', weights=w)
-    d = get_dummies(Categorical(x.index.labels[0]))
+    d = get_dummies(Categorical(get_codes(x.index)[0]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -508,7 +508,7 @@ def test_demean_weighted(data):
                     1 + np.abs(e))
 
     time_demean = x.demean('time', weights=w)
-    d = get_dummies(Categorical(x.index.labels[1]))
+    d = get_dummies(Categorical(get_codes(x.index)[1]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -526,7 +526,7 @@ def test_mean_weighted(data):
     x.drop(missing)
     w.drop(missing)
     entity_mean = x.mean('entity', weights=w)
-    c = x.index.levels[0][x.index.labels[0]]
+    c = x.index.levels[0][get_codes(x.index)[0]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
@@ -537,7 +537,7 @@ def test_mean_weighted(data):
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean('time', weights=w)
-    c = x.index.levels[1][x.index.labels[1]]
+    c = x.index.levels[1][get_codes(x.index)[1]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[time_mean.index]
     d = d.values

@@ -3,11 +3,11 @@ import os
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
+from statsmodels.api import add_constant
 
 import pandas as pd
 from linearmodels.iv import IV2SLS, IVGMM
 from linearmodels.utility import AttrDict
-from statsmodels.api import add_constant
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 
@@ -121,3 +121,6 @@ def test_linear_restriction(data):
     formula = ' = '.join(res.params.index) + ' = 0'
     ts2 = res.wald_test(formula=formula)
     assert_allclose(ts.stat, ts2.stat)
+
+    with pytest.deprecated_call():
+        res.test_linear_constraint(q, np.zeros(nvar))

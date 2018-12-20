@@ -8,7 +8,8 @@ import pandas as pd
 from linearmodels.compat.numpy import lstsq
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
-from linearmodels.tests.panel._utility import (assert_frame_similar, datatypes,
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar, datatypes,
                                                generate_data)
 from linearmodels.utility import (InferenceUnavailableWarning,
                                   MissingValueWarning)
@@ -53,13 +54,7 @@ def test_fama_macbeth(data):
     ntime = e_params.shape[0]
     cov = e_params.T @ e_params / ntime / (ntime - 1)
     assert_allclose(cov, res.cov.values)
-
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_unknown_cov_type(data):
@@ -75,13 +70,7 @@ def test_fama_macbeth_kernel_smoke(data):
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='qs')
     FamaMacBeth(data.y, data.x).fit(cov_type='kernel', bandwidth=3)
     res = FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='andrews')
-
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_fitted_effects_residuals(data):

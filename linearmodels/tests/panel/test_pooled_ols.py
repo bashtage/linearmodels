@@ -8,7 +8,8 @@ import pandas as pd
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PooledOLS
-from linearmodels.tests.panel._utility import (assert_frame_similar,
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar,
                                                assert_results_equal, datatypes,
                                                generate_data)
 
@@ -85,21 +86,11 @@ def test_rank_deficient_array(data):
 def test_results_access(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=False)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     mod = PooledOLS(data.y, data.x)
     res = mod.fit(debiased=True)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
     if not isinstance(data.x, pd.DataFrame):
         return
@@ -107,12 +98,7 @@ def test_results_access(data):
     x.iloc[:, :] = 1
     mod = PooledOLS(data.y, x)
     res = mod.fit(debiased=False)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_alt_rsquared(data):

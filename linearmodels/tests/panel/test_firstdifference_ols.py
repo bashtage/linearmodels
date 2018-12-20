@@ -7,7 +7,8 @@ from numpy.testing import assert_allclose
 import pandas as pd
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.model import FirstDifferenceOLS
-from linearmodels.tests.panel._utility import (assert_frame_similar,
+from linearmodels.tests.panel._utility import (access_attributes,
+                                               assert_frame_similar,
                                                assert_results_equal, datatypes,
                                                generate_data)
 
@@ -160,12 +161,7 @@ def test_first_difference_errors(data):
 def test_results_access(data):
     mod = FirstDifferenceOLS(data.y, data.x)
     res = mod.fit(debiased=False)
-    d = dir(res)
-    for key in d:
-        if not key.startswith('_'):
-            val = getattr(res, key)
-            if callable(val):
-                val()
+    access_attributes(res)
 
 
 def test_firstdifference_error(data):

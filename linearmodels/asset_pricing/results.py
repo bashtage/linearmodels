@@ -6,11 +6,11 @@ import datetime as dt
 import numpy as np
 from cached_property import cached_property
 from scipy import stats
+from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 import pandas as pd
 from linearmodels.compat.statsmodels import Summary
 from linearmodels.utility import _str, _SummaryStr, pval_format
-from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 
 class LinearFactorModelResults(_SummaryStr):

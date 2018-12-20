@@ -3,9 +3,9 @@ from itertools import product
 
 import numpy as np
 import pytest
+import statsmodels.api as sm
 from numpy.testing import assert_allclose
 
-import statsmodels.api as sm
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
@@ -161,3 +161,6 @@ def test_wald_test(data):
     assert_allclose(direct, t1.stat)
     assert_allclose(direct, t2.stat)
     assert_allclose(direct, t3.stat)
+
+    with pytest.raises(ValueError):
+        res.wald_test(restriction, np.zeros(2), formula=formula)

@@ -177,3 +177,12 @@ def assert_frame_similar(result, expected):
     e = expected.copy()
     e.iloc[:, :] = 0.0
     assert_frame_equal(r, e)
+
+
+def access_attributes(result):
+    d = dir(result)
+    for key in d:
+        if not key.startswith('_') and key not in ('wald_test',):
+            val = getattr(result, key)
+            if callable(val):
+                val()
