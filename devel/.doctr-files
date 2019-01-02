@@ -170,6 +170,7 @@ devel/_static/jquery.js
 devel/_static/jquery.min.map
 devel/_static/js/bootstrap.js
 devel/_static/js/bootstrap.min.js
+devel/_static/language_data.js
 devel/_static/minus.png
 devel/_static/plus.png
 devel/_static/pygments.css
