@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.model &#8212; linearmodels 4.11+24.g70de95e documentation</title>
+    <title>linearmodels.iv.model &#8212; linearmodels 4.11+26.g97aebd1 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+24.g70de95e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+26.g97aebd1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -55,7 +55,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.11 (+24, g70de95e)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.11 (+26, g97aebd1)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -488,16 +488,31 @@
         <span class="n">q</span> <span class="o">=</span> <span class="n">vpmzv_sqinv</span> <span class="o">@</span> <span class="p">(</span><span class="n">ex1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">ex1</span><span class="p">)</span> <span class="o">@</span> <span class="n">vpmzv_sqinv</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
 
-<div class="viewcode-block" id="IVLIML.fit"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVLIML.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
+<div class="viewcode-block" id="IVLIML.fit"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVLIML.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate model parameters</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">            Name of covariance estimator to use</span>
+<span class="sd">            Name of covariance estimator to use. Supported covariance</span>
+<span class="sd">            estimators are:</span>
+
+<span class="sd">            * &#39;unadjusted&#39;, &#39;homoskedastic&#39; - Classic homoskedastic inference</span>
+<span class="sd">            * &#39;robust&#39;, &#39;heteroskedastic&#39; - Heteroskedasticity robust inference</span>
+<span class="sd">            * &#39;kernel&#39; - Heteroskedasticity and autocorrelation robust</span>
+<span class="sd">              inference</span>
+<span class="sd">            * &#39;cluster&#39; - One-way cluster dependent inference.</span>
+<span class="sd">              Heteroskedasticity robust</span>
+
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment.</span>
 <span class="sd">        **cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator</span>
+<span class="sd">            Additional parameters to pass to covariance estimator. The list</span>
+<span class="sd">            of optional parameters differ according to ``cov_type``. See</span>
+<span class="sd">            the documentation of the alternative covariance estimators for</span>
+<span class="sd">            the complete list of available commands.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -510,6 +525,13 @@
 <span class="sd">        The see the docstring of specific covariance estimator for a list of</span>
 <span class="sd">        supported options. Defaults are used if no covariance configuration</span>
 <span class="sd">        is provided.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.iv.covariance.HomoskedasticCovariance</span>
+<span class="sd">        linearmodels.iv.covariance.HeteroskedasticCovariance</span>
+<span class="sd">        linearmodels.iv.covariance.KernelCovariance</span>
+<span class="sd">        linearmodels.iv.covariance.ClusteredCovariance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">liml_kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_kappa</span><span class="p">()</span>
@@ -524,6 +546,7 @@
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_parameters</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">kappa</span><span class="p">)</span>
 
         <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">COVARIANCE_ESTIMATORS</span><span class="p">[</span><span class="n">cov_type</span><span class="p">]</span>
+        <span class="n">cov_config</span><span class="p">[</span><span class="s1">&#39;debiased&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_config</span><span class="p">[</span><span class="s1">&#39;kappa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kappa</span>
         <span class="n">cov_config_copy</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">if</span> <span class="s1">&#39;center&#39;</span> <span class="ow">in</span> <span class="n">cov_config_copy</span><span class="p">:</span>
@@ -885,7 +908,7 @@
         <span class="k">return</span> <span class="n">inv</span><span class="p">(</span><span class="n">xpz</span> <span class="o">@</span> <span class="n">w</span> <span class="o">@</span> <span class="n">xpz</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">xpz</span> <span class="o">@</span> <span class="n">w</span> <span class="o">@</span> <span class="n">zpy</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IVGMM.fit"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVGMM.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">iter_limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">initial_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
+            <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate model parameters</span>
 
@@ -905,30 +928,34 @@
 <span class="sd">            specified, uses the average outer-product of the set containing</span>
 <span class="sd">            the exogenous variables and instruments.</span>
 <span class="sd">        cov_type : str, optional</span>
-<span class="sd">                Name of covariance estimator to use</span>
+<span class="sd">            Name of covariance estimator to use. Available covariance</span>
+<span class="sd">            functions are:</span>
+
+<span class="sd">            * &#39;unadjusted&#39;, &#39;homoskedastic&#39; - Assumes moment conditions are</span>
+<span class="sd">              homoskedastic</span>
+<span class="sd">            * &#39;robust&#39;, &#39;heteroskedastic&#39; - Allows for heteroskedasticity but</span>
+<span class="sd">              not autocorrelation</span>
+<span class="sd">            * &#39;kernel&#39; - Allows for heteroskedasticity and autocorrelation</span>
+<span class="sd">            * &#39;cluster&#39; - Allows for one-way cluster dependence</span>
+
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment.</span>
 <span class="sd">        **cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator</span>
+<span class="sd">            Additional parameters to pass to covariance estimator. Supported</span>
+<span class="sd">            parameters depend on specific covariance structure assumed. See</span>
+<span class="sd">            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details</span>
+<span class="sd">            on the available options. Defaults are used if no covariance</span>
+<span class="sd">            configuration is provided.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        results : IVGMMResults</span>
 <span class="sd">            Results container</span>
 
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        Additional covariance parameters depend on specific covariance used.</span>
-<span class="sd">        The see the docstring of specific covariance estimator for a list of</span>
-<span class="sd">        supported options. Defaults are used if no covariance configuration</span>
-<span class="sd">        is provided.</span>
-
-<span class="sd">        Available covariance functions are:</span>
-
-<span class="sd">        * &#39;unadjusted&#39;, &#39;homoskedastic&#39; - Assumes moment conditions are</span>
-<span class="sd">          homoskedastic</span>
-<span class="sd">        * &#39;robust&#39;, &#39;heteroskedastic&#39; - Allows for heteroskedasticity by not</span>
-<span class="sd">          autocorrelation</span>
-<span class="sd">        * &#39;kernel&#39; - Allows for heteroskedasticity and autocorrelation</span>
-<span class="sd">        * &#39;cluster&#39; - Allows for one-way cluster dependence</span>
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="n">wy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -953,6 +980,7 @@
             <span class="n">norm</span> <span class="o">=</span> <span class="n">delta</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">vinv</span> <span class="o">@</span> <span class="n">delta</span>
             <span class="n">iters</span> <span class="o">+=</span> <span class="mi">1</span>
 
+        <span class="n">cov_config</span><span class="p">[</span><span class="s1">&#39;debiased&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">IVGMMCovariance</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span>
                                         <span class="n">cov_type</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
 
@@ -1182,8 +1210,8 @@
 
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">res</span><span class="o">.</span><span class="n">nit</span></div>
 
-<div class="viewcode-block" id="IVGMMCUE.fit"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVGMMCUE.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">starting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">opt_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
+<div class="viewcode-block" id="IVGMMCUE.fit"><a class="viewcode-back" href="../../../iv/methods.html#linearmodels.iv.model.IVGMMCUE.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">starting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;robust&#39;</span><span class="p">,</span> <span class="n">debiased</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">opt_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate model parameters</span>
 
@@ -1196,12 +1224,19 @@
 <span class="sd">            Flag indicating whether to display optimization output</span>
 <span class="sd">        cov_type : str, optional</span>
 <span class="sd">            Name of covariance estimator to use</span>
+<span class="sd">        debiased : bool, optional</span>
+<span class="sd">            Flag indicating whether to debiased the covariance estimator using</span>
+<span class="sd">            a degree of freedom adjustment.</span>
 <span class="sd">        opt_options : dict, optional</span>
 <span class="sd">            Additional options to pass to scipy.optimize.minimize when</span>
 <span class="sd">            optimizing the objective function. If not provided, defers to</span>
 <span class="sd">            scipy to choose an appropriate optimizer.</span>
 <span class="sd">        **cov_config</span>
-<span class="sd">            Additional parameters to pass to covariance estimator</span>
+<span class="sd">            Additional parameters to pass to covariance estimator. Supported</span>
+<span class="sd">            parameters depend on specific covariance structure assumed. See</span>
+<span class="sd">            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details</span>
+<span class="sd">            on the available options. Defaults are used if no covariance</span>
+<span class="sd">            configuration is provided.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1210,14 +1245,12 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Additional covariance parameters depend on specific covariance used.</span>
-<span class="sd">        The see the docstring of specific covariance estimator for a list of</span>
-<span class="sd">        supported options. Defaults are used if no covariance configuration</span>
-<span class="sd">        is provided.</span>
-
 <span class="sd">        Starting values are computed by IVGMM.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        linearmodels.iv.gmm.IVGMMCovariance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">weight_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight</span><span class="o">.</span><span class="n">weight_matrix</span>
         <span class="k">if</span> <span class="n">starting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1240,6 +1273,7 @@
         <span class="n">eps</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">@</span> <span class="n">params</span>
         <span class="n">wmat</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">weight_matrix</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
 
+        <span class="n">cov_config</span><span class="p">[</span><span class="s1">&#39;debiased&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debiased</span>
         <span class="n">cov_estimator</span> <span class="o">=</span> <span class="n">IVGMMCovariance</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span>
                                         <span class="o">**</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov_estimator</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">)</span>
@@ -1293,7 +1327,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+24.g70de95e documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11+26.g97aebd1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
