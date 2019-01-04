@@ -376,16 +376,31 @@ class IVLIML(object):
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
         return min(eigvalsh(q))
 
-    def fit(self, *, cov_type='robust', **cov_config):
+    def fit(self, *, cov_type='robust', debiased=False, **cov_config):
         """
         Estimate model parameters
 
         Parameters
         ----------
         cov_type : str, optional
-            Name of covariance estimator to use
+            Name of covariance estimator to use. Supported covariance
+            estimators are:
+
+            * 'unadjusted', 'homoskedastic' - Classic homoskedastic inference
+            * 'robust', 'heteroskedastic' - Heteroskedasticity robust inference
+            * 'kernel' - Heteroskedasticity and autocorrelation robust
+              inference
+            * 'cluster' - One-way cluster dependent inference.
+              Heteroskedasticity robust
+
+        debiased : bool, optional
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
         **cov_config
-            Additional parameters to pass to covariance estimator
+            Additional parameters to pass to covariance estimator. The list
+            of optional parameters differ according to ``cov_type``. See
+            the documentation of the alternative covariance estimators for
+            the complete list of available commands.
 
         Returns
         -------
@@ -398,6 +413,13 @@ class IVLIML(object):
         The see the docstring of specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
+
+        See also
+        --------
+        linearmodels.iv.covariance.HomoskedasticCovariance
+        linearmodels.iv.covariance.HeteroskedasticCovariance
+        linearmodels.iv.covariance.KernelCovariance
+        linearmodels.iv.covariance.ClusteredCovariance
         """
         wy, wx, wz = self._wy, self._wx, self._wz
         liml_kappa = self._estimate_kappa()
@@ -412,6 +434,7 @@ class IVLIML(object):
         params = self.estimate_parameters(wx, wy, wz, kappa)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        cov_config['debiased'] = debiased
         cov_config['kappa'] = kappa
         cov_config_copy = {k: v for k, v in cov_config.items()}
         if 'center' in cov_config_copy:
@@ -773,7 +796,7 @@ class IVGMM(IVLIML):
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
     def fit(self, *, iter_limit=2, tol=1e-4, initial_weight=None,
-            cov_type='robust', **cov_config):
+            cov_type='robust', debiased=False, **cov_config):
         """
         Estimate model parameters
 
@@ -793,30 +816,34 @@ class IVGMM(IVLIML):
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
         cov_type : str, optional
-                Name of covariance estimator to use
+            Name of covariance estimator to use. Available covariance
+            functions are:
+
+            * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+              homoskedastic
+            * 'robust', 'heteroskedastic' - Allows for heteroskedasticity but
+              not autocorrelation
+            * 'kernel' - Allows for heteroskedasticity and autocorrelation
+            * 'cluster' - Allows for one-way cluster dependence
+
+        debiased : bool, optional
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
         **cov_config
-            Additional parameters to pass to covariance estimator
+            Additional parameters to pass to covariance estimator. Supported
+            parameters depend on specific covariance structure assumed. See
+            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details
+            on the available options. Defaults are used if no covariance
+            configuration is provided.
 
         Returns
         -------
         results : IVGMMResults
             Results container
 
-        Notes
-        -----
-        Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of
-        supported options. Defaults are used if no covariance configuration
-        is provided.
-
-        Available covariance functions are:
-
-        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
-          homoskedastic
-        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
-          autocorrelation
-        * 'kernel' - Allows for heteroskedasticity and autocorrelation
-        * 'cluster' - Allows for one-way cluster dependence
+        See also
+        --------
+        linearmodels.iv.gmm.IVGMMCovariance
         """
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs = wy.shape[0]
@@ -841,6 +868,7 @@ class IVGMM(IVLIML):
             norm = delta.T @ vinv @ delta
             iters += 1
 
+        cov_config['debiased'] = debiased
         cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat,
                                         cov_type, **cov_config)
 
@@ -1070,8 +1098,8 @@ class IVGMMCUE(IVGMM):
 
         return res.x[:, None], res.nit
 
-    def fit(self, *, starting=None, display=False, cov_type='robust', opt_options=None,
-            **cov_config):
+    def fit(self, *, starting=None, display=False, cov_type='robust', debiased=False,
+            opt_options=None, **cov_config):
         r"""
         Estimate model parameters
 
@@ -1084,12 +1112,19 @@ class IVGMMCUE(IVGMM):
             Flag indicating whether to display optimization output
         cov_type : str, optional
             Name of covariance estimator to use
+        debiased : bool, optional
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
         opt_options : dict, optional
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer.
         **cov_config
-            Additional parameters to pass to covariance estimator
+            Additional parameters to pass to covariance estimator. Supported
+            parameters depend on specific covariance structure assumed. See
+            :class:`linearmodels.iv.gmm.IVGMMCovariance` for details
+            on the available options. Defaults are used if no covariance
+            configuration is provided.
 
         Returns
         -------
@@ -1098,14 +1133,12 @@ class IVGMMCUE(IVGMM):
 
         Notes
         -----
-        Additional covariance parameters depend on specific covariance used.
-        The see the docstring of specific covariance estimator for a list of
-        supported options. Defaults are used if no covariance configuration
-        is provided.
-
         Starting values are computed by IVGMM.
-        """
 
+        See also
+        --------
+        linearmodels.iv.gmm.IVGMMCovariance
+        """
         wy, wx, wz = self._wy, self._wx, self._wz
         weight_matrix = self._weight.weight_matrix
         if starting is None:
@@ -1128,6 +1161,7 @@ class IVGMMCUE(IVGMM):
         eps = wy - wx @ params
         wmat = inv(weight_matrix(wx, wz, eps))
 
+        cov_config['debiased'] = debiased
         cov_estimator = IVGMMCovariance(wx, wy, wz, params, wmat, cov_type,
                                         **cov_config)
         results = self._post_estimation(params, cov_estimator, cov_type)
