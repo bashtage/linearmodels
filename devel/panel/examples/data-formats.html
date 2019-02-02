@@ -361,12 +361,12 @@ div.rendered_html tbody tr:hover {
 3  1987  410440    12.0   1560000.0  10500.0    NaN     NaN    12.0      0
 4  1988  410440    13.0   1970000.0  11000.0    NaN     NaN    12.0      0
 
-   grant    ...     grant_1  clscrap  cgrant  clemploy   clsales    lavgsal  \
-0      0    ...           0      NaN       0       NaN       NaN  10.463100
-1      0    ...           0      NaN       0  0.270027 -0.088949  10.518670
-2      0    ...           0      NaN       0 -0.063013  0.130621  10.571320
-3      0    ...           0      NaN       0       NaN       NaN   9.259130
-4      0    ...           0      NaN       0  0.080043  0.233347   9.305651
+   grant  ...  grant_1  clscrap  cgrant  clemploy   clsales    lavgsal  \
+0      0  ...        0      NaN       0       NaN       NaN  10.463100
+1      0  ...        0      NaN       0  0.270027 -0.088949  10.518670
+2      0  ...        0      NaN       0 -0.063013  0.130621  10.571320
+3      0  ...        0      NaN       0       NaN       NaN   9.259130
+4      0  ...        0      NaN       0  0.080043  0.233347   9.305651
 
    clavgsal  cgrant_1   chrsemp  clhrsemp
 0       NaN       NaN       NaN       NaN
@@ -402,13 +402,13 @@ fcode  year
 410440 1987    12.0   1560000.0  10500.0    NaN     NaN    12.0      0      0
        1988    13.0   1970000.0  11000.0    NaN     NaN    12.0      0      0
 
-             d89  d88    ...     grant_1  clscrap  cgrant  clemploy   clsales  \
-fcode  year              ...
-410032 1987    0    0    ...           0      NaN       0       NaN       NaN
-       1988    0    1    ...           0      NaN       0  0.270027 -0.088949
-       1989    1    0    ...           0      NaN       0 -0.063013  0.130621
-410440 1987    0    0    ...           0      NaN       0       NaN       NaN
-       1988    0    1    ...           0      NaN       0  0.080043  0.233347
+             d89  d88  ...  grant_1  clscrap  cgrant  clemploy   clsales  \
+fcode  year            ...
+410032 1987    0    0  ...        0      NaN       0       NaN       NaN
+       1988    0    1  ...        0      NaN       0  0.270027 -0.088949
+       1989    1    0  ...        0      NaN       0 -0.063013  0.130621
+410440 1987    0    0  ...        0      NaN       0       NaN       NaN
+       1988    0    1  ...        0      NaN       0  0.080043  0.233347
 
                lavgsal  clavgsal  cgrant_1   chrsemp  clhrsemp
 fcode  year
@@ -443,8 +443,8 @@ fcode  year
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0288
-Time:                        17:40:22   Log-likelihood                   -90.459
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:36:34   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -546,8 +546,8 @@ Minor_axis axis: 410032 to 419486
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0288
-Time:                        17:40:22   Log-likelihood                   -90.459
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:36:34   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -579,13 +579,13 @@ Included effects: Entity
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/pandas/core/indexing.py:1147: FutureWarning:
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/pandas/core/indexing.py:1207: FutureWarning:
 Panel is deprecated and will be removed in a future version.
 The recommended way to represent these types of 3-dimensional data are with a MultiIndex on a DataFrame, via the Panel.to_frame() method
 Alternatively, you can use the xarray package http://xarray.pydata.org/en/stable/.
 Pandas provides a `.to_xarray()` method to help automate this conversion.
 
-  allow_dups=True)
+  copy=True, allow_dups=True)
 /home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:194: FutureWarning:
 Panel is deprecated and will be removed in a future version.
 The recommended way to represent these types of 3-dimensional data are with a MultiIndex on a DataFrame, via the Panel.to_frame() method
@@ -616,8 +616,8 @@ Pandas provides a `.to_xarray()` method to help automate this conversion.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0288
-Time:                        17:40:23   Log-likelihood                   -90.459
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:36:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -668,8 +668,8 @@ Included effects: Entity
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0288
-Time:                        17:40:23   Log-likelihood                   -90.459
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:36:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -751,8 +751,8 @@ Coordinates:
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0288
-Time:                        17:40:23   Log-likelihood                   -90.459
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:36:35   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -834,8 +834,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0934
-Time:                        17:40:23   Log-likelihood                   -78.765
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0934
+Time:                        20:36:35   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -900,8 +900,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Jan 04 2019   R-squared (Overall):             -0.0934
-Time:                        17:40:23   Log-likelihood                   -78.765
+Date:                Sat, Feb 02 2019   R-squared (Overall):             -0.0934
+Time:                        20:36:35   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
