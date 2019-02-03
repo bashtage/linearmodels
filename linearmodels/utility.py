@@ -182,7 +182,7 @@ def inv_sqrth(x):
 
 class WaldTestStatistic(object):
     """
-    Test statistic holder for Wald-type iv
+    Test statistic holder for Wald-type tests
 
     Parameters
     ----------
