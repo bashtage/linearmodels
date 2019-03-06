@@ -122,3 +122,17 @@ def test_drop_singletons():
     remain = in_2core_graph(cats)
     expected = in_2core_graph_slow(cats)
     assert_array_equal(remain, expected)
+
+
+def test_drop_singletons_pandas():
+    rs = np.random.RandomState(0)
+    c1 = rs.randint(0, 10000, (40000, 1))
+    c2 = rs.randint(0, 20000, (40000, 1))
+    df = [pd.Series(['{0}{1}'.format(let, c) for c in cat.ravel()], dtype='category')
+          for let, cat in zip('AB', (c1, c2))]
+    df = pd.concat(df, 1)
+    df.columns = ['cat1', 'cat2']
+    cats = df
+    remain = in_2core_graph(cats)
+    expected = in_2core_graph_slow(cats)
+    assert_array_equal(remain, expected)

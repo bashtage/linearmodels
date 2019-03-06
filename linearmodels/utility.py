@@ -27,6 +27,10 @@ class InferenceUnavailableWarning(Warning):
     pass
 
 
+class SingletonWarning(Warning):
+    pass
+
+
 class AttrDict(MutableMapping):
     """
     Ordered dictionary-like object that exposes keys as attributes

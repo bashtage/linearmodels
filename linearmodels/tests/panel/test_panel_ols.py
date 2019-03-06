@@ -1088,3 +1088,33 @@ def test_low_memory_auto():
     mod = PanelOLS(y, x, entity_effects=True, time_effects=True)
     with pytest.warns(MemoryWarning):
         mod.fit()
+
+
+def test_singleton_removal():
+    entities = []
+    for i in range(6):
+        entities.extend(['entity.{j}'.format(j=j) for j in range(6 - i)])
+    nobs = len(entities)
+    times = np.arange(nobs) % 6
+    index = pd.MultiIndex.from_arrays((entities, times))
+    cols = ['x{0}'.format(i) for i in range(3)]
+    x = pd.DataFrame(np.random.randn(nobs, 3), index=index, columns=cols)
+    y = pd.DataFrame(np.random.randn(nobs, 1), index=index)
+    mod = PanelOLS(y, x, singletons=False, entity_effects=True, time_effects=True)
+    res = mod.fit()
+
+    mod = PanelOLS(y, x, singletons=True, entity_effects=True, time_effects=True)
+    res_with = mod.fit()
+    assert_allclose(res.params, res_with.params)
+
+
+def test_masked_singleton_removal():
+    nobs = 8
+    entities = ['A', 'B', 'C', 'D'] * 2
+    times = [0, 1, 1, 1, 1, 2, 2, 2]
+    index = pd.MultiIndex.from_arrays((entities, times))
+    x = pd.DataFrame(np.random.randn(nobs, 1), index=index, columns=['x'])
+    y = pd.DataFrame(np.random.randn(nobs, 1), index=index)
+    mod = PanelOLS(y, x, singletons=False, entity_effects=True, time_effects=True)
+    res = mod.fit()
+    assert res.nobs == 6

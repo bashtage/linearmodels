@@ -1,8 +1,13 @@
 Change Log
 ----------
 
-Since 4.11 (Unreleased)
-=======================
+Version 4.12
+============
+* Added an option to drop singleton observations in
+  :class:`~linearmodels.panel.model.PanelOLS` by setting the keyword argument
+  ``singletons=False``. When ``False``, singelton observations are dropped
+  before the model is fit, so the the result is *as-if* the observations were
+  never in ``exog`` or ``dependent``.
 * Added a method to construct the 2-core graph for 2-way effects models, which
   allows singleton observations with no effect on estimated slopes to be
   excluded. (:issue:`191`)
