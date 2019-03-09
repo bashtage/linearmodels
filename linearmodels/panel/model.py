@@ -6,6 +6,8 @@ from numpy.linalg import matrix_rank
 import pandas as pd
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
+from scipy.sparse.csc import csc_matrix
+from scipy.sparse.linalg import lsmr
 
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
                                            CovarianceManager, DriscollKraay,
@@ -16,12 +18,20 @@ from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
+from linearmodels.panel.utility import dummy_matrix
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InferenceUnavailableWarning,
                                   InvalidTestStatistic, MemoryWarning,
                                   MissingValueWarning, WaldTestStatistic,
                                   ensure_unique_column, has_constant,
                                   missing_warning, panel_to_frame)
+
+
+def panel_structure_stats(ids, name):
+    bc = np.bincount(ids)
+    index = ['mean', 'median', 'max', 'min', 'total']
+    out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
+    return pd.Series(out, index=index, name=name)
 
 
 class PanelFormulaParser(object):
@@ -221,16 +231,10 @@ class PooledOLS(object):
     def _info(self):
         """Information about panel structure"""
 
-        def stats(ids, name):
-            bc = np.bincount(ids)
-            index = ['mean', 'median', 'max', 'min', 'total']
-            out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
-            return pd.Series(out, index=index, name=name)
-
-        entity_info = stats(self.dependent.entity_ids.squeeze(),
-                            'Observations per entity')
-        time_info = stats(self.dependent.time_ids.squeeze(),
-                          'Observations per time period')
+        entity_info = panel_structure_stats(self.dependent.entity_ids.squeeze(),
+                                            'Observations per entity')
+        time_info = panel_structure_stats(self.dependent.time_ids.squeeze(),
+                                          'Observations per time period')
         other_info = None
 
         return entity_info, time_info, other_info
@@ -755,6 +759,7 @@ class PanelOLS(PooledOLS):
         self._time_effects = time_effects
         self._other_effect_cats = None
         self._other_effects = self._validate_effects(other_effects)
+        self._has_effect = entity_effects or time_effects or self.other_effects
 
     def __str__(self):
         out = super(PanelOLS, self).__str__()
@@ -870,15 +875,64 @@ class PanelOLS(PooledOLS):
         mod.formula = formula
         return mod
 
+    def _lsmr_path(self):
+        """Sparse implementation, works for all scenarios"""
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        w = self.weights.values2d
+        root_w = np.sqrt(w)
+        wybar = root_w * (w.T @ y / w.sum())
+        wy = root_w * y
+        wx = root_w * x
+        if not self._has_effect:
+            return wy, wx, wybar, 0, 0
+
+        wy_gm = wybar
+        wx_gm = root_w * (w.T @ x / w.sum())
+        root_w_sparse = csc_matrix(root_w)
+
+        cats = []
+        if self.entity_effects:
+            cats.append(self.dependent.entity_ids)
+        if self.time_effects:
+            cats.append(self.dependent.time_ids)
+        if self.other_effects:
+            cats.append(self._other_effect_cats.values2d)
+        cats = np.concatenate(cats, 1)
+
+        wd = dummy_matrix(cats)
+        if self._is_weighted:
+            wd = wd.multiply(root_w_sparse)
+
+        wx_mean = np.column_stack(
+            [lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0] for i in range(x.shape[1])])
+        wy_mean = (lsmr(wd, wy, atol=1e-8, btol=1e-8)[0])[:, None]
+        wx_mean = csc_matrix(wx_mean)
+        wy_mean = csc_matrix(wy_mean)
+
+        # Purge fitted, weighted values
+        wx = wx - (wd @ wx_mean).A
+        wy = wy - (wd @ wy_mean).A
+
+        if self.has_constant:
+            wy += wy_gm
+            wx += wx_gm
+        else:
+            wybar = 0
+
+        y_effects = y - wy / root_w
+        x_effects = x - wx / root_w
+
+        return wy, wx, wybar, y_effects, x_effects
+
     def _slow_path(self):
         """Frisch-Waugh-Lovell implementation, works for all scenarios"""
-        has_effect = self.entity_effects or self.time_effects or self.other_effects
         w = self.weights.values2d
         root_w = np.sqrt(w)
 
         y = root_w * self.dependent.values2d
         x = root_w * self.exog.values2d
-        if not has_effect:
+        if not self._has_effect:
             ybar = root_w @ lstsq(root_w, y)[0]
             return y, x, ybar, 0, 0
 
@@ -927,7 +981,7 @@ class PanelOLS(PooledOLS):
             return False
         # MiB
         reg_size = 8 * nentity * nobs * nreg // 2 ** 20
-        low_memory = reg_size > 2**10
+        low_memory = reg_size > 2 ** 10
         if low_memory:
             import warnings
             warnings.warn('Using low-memory algorithm to estimate two-way model. Explicitly set '
@@ -938,12 +992,11 @@ class PanelOLS(PooledOLS):
 
     def _fast_path(self, low_memory):
         """Dummy-variable free estimation without weights"""
-        has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
         x = self.exog.values2d
         ybar = y.mean(0)
 
-        if not has_effect:
+        if not self._has_effect:
             return y, x, ybar
 
         y_gm = ybar
@@ -987,14 +1040,13 @@ class PanelOLS(PooledOLS):
 
     def _weighted_fast_path(self, low_memory):
         """Dummy-variable free estimation with weights"""
-        has_effect = self.entity_effects or self.time_effects or self.other_effects
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
         root_w = np.sqrt(w)
         wybar = root_w * (w.T @ y / w.sum())
 
-        if not has_effect:
+        if not self._has_effect:
             wy = root_w * self.dependent.values2d
             wx = root_w * self.exog.values2d
             return wy, wx, wybar, 0, 0
@@ -1044,12 +1096,6 @@ class PanelOLS(PooledOLS):
     def _info(self):
         """Information about model effects and panel structure"""
 
-        def stats(ids, name):
-            bc = np.bincount(ids)
-            index = ['mean', 'median', 'max', 'min', 'total']
-            out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
-            return pd.Series(out, index=index, name=name)
-
         entity_info, time_info, other_info = super(PanelOLS, self)._info()
 
         if self.other_effects:
@@ -1057,7 +1103,7 @@ class PanelOLS(PooledOLS):
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 name = 'Observations per group (' + str(c) + ')'
-                other_info.append(stats(oe[c].values.astype(np.int32), name))
+                other_info.append(panel_structure_stats(oe[c].values.astype(np.int32), name))
             other_info = pd.DataFrame(other_info)
 
         return entity_info, time_info, other_info
@@ -1077,8 +1123,7 @@ class PanelOLS(PooledOLS):
         return np.all(is_nested)
 
     def _determine_df_adjustment(self, cov_type, **cov_config):
-        has_effect = self.entity_effects or self.time_effects or self.other_effects
-        if cov_type != 'clustered' or not has_effect:
+        if cov_type != 'clustered' or not self._has_effect:
             return True
         num_effects = self.entity_effects + self.time_effects
         if self.other_effects:
@@ -1098,7 +1143,8 @@ class PanelOLS(PooledOLS):
             return not self._is_effect_nested(effects, clusters)
         return True  # Default case for 2-way -- not completely clear
 
-    def fit(self, *, use_lsdv=False, low_memory=None, cov_type='unadjusted', debiased=True,
+    def fit(self, *, use_lsdv=False, use_lsmr=False, low_memory=None, cov_type='unadjusted',
+            debiased=True,
             auto_df=True, count_effects=True, **cov_config):
         """
         Estimate model parameters
@@ -1109,6 +1155,9 @@ class PanelOLS(PooledOLS):
             Flag indicating to use the Least Squares Dummy Variable estimator
             to eliminate effects.  The default value uses only means and does
             note require constructing dummy variables for each effect.
+        use_lsmr : bool, optional
+            Flag indicating to use LSDV with the Sparse Equations and Least
+            Squares estimator to eliminate the fixed effects.
         low_memory : {bool, None}
             Flag indicating whether to use a low-memory algorithm when a model
             contains two-way fixed effects. If `None`, the choice is taken
@@ -1172,7 +1221,9 @@ class PanelOLS(PooledOLS):
         weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
         low_memory = self._choose_twoway_algo() if low_memory is None else low_memory
-        if use_lsdv:
+        if use_lsmr:
+            y, x, ybar, y_effects, x_effects = self._lsmr_path()
+        elif use_lsdv:
             y, x, ybar, y_effects, x_effects = self._slow_path()
         elif not weighted:
             y, x, ybar = self._fast_path(low_memory=low_memory)
