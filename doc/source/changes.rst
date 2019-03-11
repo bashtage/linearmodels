@@ -3,6 +3,10 @@ Change Log
 
 Since 4.11 (Unreleased)
 =======================
+* Added support for LSMR estimation of parameters in
+  :func:`~linearmodels.panel.model.PanelOLS.fit` through the keyword argument
+  ``use_lsmr``. LSMR is a sparse estimation method that can be used to extend
+  :class:`~linearmodels.panel.model.PanelOLS` to more than two effects.
 * Fixed a bug where IV models estimated with only exogenous regressors where
   not being correctly labeled as OLS models in output (:issue:`185`)
 * Added ``wald_test`` to panel-model results.

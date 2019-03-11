@@ -142,24 +142,31 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 
 
-def assert_results_equal(res1, res2, test_fit=True, test_df=True):
+def assert_results_equal(res1, res2, test_fit=True, test_df=True, strict=True):
     n = min(res1.params.shape[0], res2.params.shape[0])
 
-    assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
-    assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
-    assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n])
-    assert_frame_equal(res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n])
-    assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
+    assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n],
+                        check_less_precise=not strict)
+    assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n],
+                        check_less_precise=not strict)
+    assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n],
+                        check_less_precise=not strict)
+    assert_frame_equal(res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n],
+                       check_less_precise=not strict)
+    assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n],
+                       check_less_precise=not strict)
+
     assert_allclose(res1.s2, res2.s2)
 
+    rtol = 1e-7 if strict else 1e-4
     delta = 1 + (res1.resids.values - res2.resids.values) / max(
         res1.resids.std(),
         res2.resids.std())
-    assert_allclose(delta, np.ones_like(delta))
+    assert_allclose(delta, np.ones_like(delta), rtol=rtol)
     delta = 1 + (res1.wresids.values - res2.wresids.values) / max(
         res1.wresids.std(),
         res2.wresids.std())
-    assert_allclose(delta, np.ones_like(delta))
+    assert_allclose(delta, np.ones_like(delta), rtol=rtol)
 
     if test_df:
         assert_allclose(res1.df_model, res2.df_model)

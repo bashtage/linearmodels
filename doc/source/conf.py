@@ -225,7 +225,7 @@ import numpy as np
 import pandas as pd
 
 entities = ['entity.{0}'.format(i) for i in range(100)]
-time = list(range(10)) 
+time = list(range(10))
 mi = pd.MultiIndex.from_product((entities,time), names=('entities','time'))
 panel_data = pd.DataFrame(np.random.randn(1000,5), index=mi, columns=['y','x1','x2','x3','x4'])
 y = panel_data.y

@@ -61,6 +61,24 @@ def time_eff(request):
     return request.param
 
 
+perms = [p for p in product([True, False], [True, False], [True, False], [0, 1, 2]) if
+         sum(p[1:]) <= 2]
+ids = []
+for p in perms:
+    str_id = 'weighted' if p[0] else 'unweighted'
+    str_id += '-entity_effects' if p[1] else ''
+    str_id += '-time_effects' if p[2] else ''
+    str_id += '-{0}_other_effects'.format(p[3]) if p[3] else ''
+    ids.append(str_id)
+
+
+@pytest.fixture(params=perms, ids=ids)
+def lsdv_config(request):
+    weights, entity_effects, time_effects, other_effects = request.param
+    return AttrDict(weights=weights, entity_effects=entity_effects, time_effects=time_effects,
+                    other_effects=other_effects)
+
+
 def test_const_data_only(const_data):
     y, x = const_data.y, const_data.x
     mod = PanelOLS(y, x)
@@ -960,52 +978,22 @@ def test_other_weighted_smoke(data):
 
 
 @pytest.mark.slow
-def test_lsdv_options(data):
-    mod = PanelOLS(data.y, data.x, weights=data.w)
+def test_methods_equivalent(data, lsdv_config):
+    other_effects = None
+    if lsdv_config.other_effects == 1:
+        other_effects = PanelData(data.c).dataframe.iloc[:, [0]]
+    elif lsdv_config.other_effects == 2:
+        other_effects = data.c
+    weights = data.w if lsdv_config.weights else None
+    mod = PanelOLS(data.y, data.x, weights=weights,
+                   entity_effects=lsdv_config.entity_effects,
+                   time_effects=lsdv_config.time_effects,
+                   other_effects=other_effects)
     res1 = mod.fit()
     res2 = mod.fit(use_lsdv=True)
+    res3 = mod.fit(use_lsmr=True)
     assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, time_effects=True)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, time_effects=True, entity_effects=True)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    c1 = PanelData(data.c).dataframe.iloc[:, [0]]
-    mod = PanelOLS(data.y, data.x, entity_effects=True, other_effects=c1)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, time_effects=True, other_effects=c1)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, weights=data.w, entity_effects=True, other_effects=c1)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, weights=data.w, time_effects=True, other_effects=c1)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
-
-    mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c)
-    res1 = mod.fit()
-    res2 = mod.fit(use_lsdv=True)
-    assert_results_equal(res1, res2)
+    assert_results_equal(res2, res3, strict=False)
 
 
 def test_rsquared_inclusive_equivalence(data):
