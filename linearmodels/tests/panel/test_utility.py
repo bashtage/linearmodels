@@ -1,3 +1,5 @@
+from linearmodels.compat.numpy import isin
+
 import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
@@ -6,7 +8,8 @@ import scipy.sparse.coo
 import scipy.sparse.csc
 import scipy.sparse.csr
 
-from linearmodels.panel.utility import dummy_matrix
+from linearmodels.panel.utility import (dummy_matrix, in_2core_graph,
+                                        in_2core_graph_slow)
 
 formats = {'csc': scipy.sparse.csc.csc_matrix, 'csr': scipy.sparse.csr.csr_matrix,
            'coo': scipy.sparse.coo.coo_matrix, 'array': np.ndarray}
@@ -60,3 +63,62 @@ def test_dummy_pandas():
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 3, 3, 3, 3], dtype=np.int32)
     assert_array_equal(np.squeeze(np.asarray(out.sum(0), dtype=np.int32)), expected)
+
+
+def test_drop_singletons_single():
+    rs = np.random.RandomState(0)
+    cats = rs.randint(0, 10000, (40000, 1))
+    retain = in_2core_graph_slow(cats)
+    nonsingletons = cats[retain]
+    cats = pd.Series(cats[:, 0])
+    vc = cats.value_counts()
+    expected = np.sort(np.asarray(vc.index[vc > 1]))
+    assert_array_equal(np.unique(nonsingletons), expected)
+    assert vc[vc > 1].sum() == nonsingletons.shape[0]
+    singletons = np.asarray(vc.index[vc == 1])
+    assert nonsingletons.shape[0] == (40000 - singletons.shape[0])
+    assert not np.any(isin(nonsingletons, singletons))
+
+
+def test_drop_singletons_slow():
+    rs = np.random.RandomState(0)
+    c1 = rs.randint(0, 10000, (40000, 1))
+    c2 = rs.randint(0, 20000, (40000, 1))
+    cats = np.concatenate([c1, c2], 1)
+    retain = in_2core_graph_slow(cats)
+    nonsingletons = cats[retain]
+    for col in (c1, c2):
+        uniq, counts = np.unique(col, return_counts=True)
+        assert not np.any(isin(col[retain], uniq[counts == 1]))
+
+    idx = np.arange(40000)
+
+    cols = {'c1': c1.copy(), 'c2': c2.copy()}
+    for i in range(40000):
+        last = cols['c1'].shape[0]
+        for col in cols:
+            keep = in_2core_graph_slow(cols[col])
+            for col2 in cols:
+                cols[col2] = cols[col2][keep]
+            idx = idx[keep]
+        if cols['c1'].shape[0] == last:
+            break
+
+    expected = np.concatenate([c1[idx], c2[idx]], 1)
+    assert_array_equal(nonsingletons, expected)
+    expected = np.concatenate([cols['c1'], cols['c2']], 1)
+    assert_array_equal(nonsingletons, expected)
+
+    dummies = dummy_matrix(cats, format='csr')
+    to_drop = dummies[~retain]
+    assert to_drop.sum() == 2 * (~retain).sum()
+
+
+def test_drop_singletons():
+    rs = np.random.RandomState(0)
+    c1 = rs.randint(0, 10000, (40000, 1))
+    c2 = rs.randint(0, 20000, (40000, 1))
+    cats = np.concatenate([c1, c2], 1)
+    remain = in_2core_graph(cats)
+    expected = in_2core_graph_slow(cats)
+    assert_array_equal(remain, expected)
