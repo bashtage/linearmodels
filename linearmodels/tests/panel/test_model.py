@@ -181,19 +181,35 @@ def test_weight_ambiguity(data):
         PanelOLS(y, x, weights=weights)
 
 
-def test_absorbing_effect(data):
-    if not isinstance(data.x, pd.DataFrame):
-        return
+@pytest.mark.parametrize('intercept', [True, False])
+def test_absorbing_effect(data, intercept):
     x = data.x.copy()
-    nentity = len(x.index.levels[0])
-    ntime = len(x.index.levels[1])
-    temp = data.x.iloc[:, 0].copy()
-    temp.values[:] = 1.0
-    temp.values[:(ntime * (nentity // 2))] = 0
-    x['Intercept'] = 1.0
-    x['absorbed'] = temp
-    with pytest.raises(AbsorbingEffectError):
-        PanelOLS(data.y, x, entity_effects=True).fit()
+    if isinstance(data.x, pd.DataFrame):
+        nentity = len(x.index.levels[0])
+        ntime = len(x.index.levels[1])
+        temp = data.x.iloc[:, 0].copy()
+        temp.values[:] = 1.0
+        temp.values[:(ntime * (nentity // 2))] = 0
+
+        if intercept:
+            x['Intercept'] = 1.0
+        x['absorbed'] = temp
+    else:
+        intercept_vals = np.ones((1, x.shape[1], x.shape[2]))
+        absorbed = np.ones((1, x.shape[1], x.shape[2]))
+        absorbed[:, :, :x.shape[2] // 2] = 0
+        if intercept:
+            extra = [x, intercept_vals, absorbed]
+        else:
+            extra = [x, absorbed]
+        x = np.concatenate(extra, 0)
+
+    with pytest.raises(AbsorbingEffectError) as exc_info:
+        mod = PanelOLS(data.y, x, entity_effects=True)
+        mod.fit()
+    var_names = mod.exog.vars
+    assert var_names[3] in str(exc_info.value)
+    assert (' ' * (2 - intercept) + var_names[-1]) in str(exc_info.value)
 
 
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')

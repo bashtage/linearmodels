@@ -132,6 +132,11 @@ absorbing_error_msg = """
 The model cannot be estimated. The included effects have fully absorbed
 one or more of the variables. This occurs when one or more of the dependent
 variable is perfectly explained using the effects included in the model.
+
+The following variables or variable combinations have been fully absorbed
+or have become perfectly collinear after effects are removed:
+
+{absorbed_variables}
 """
 
 
@@ -1246,7 +1251,20 @@ class PanelOLS(PooledOLS):
 
         if self.entity_effects or self.time_effects or self.other_effects:
             if matrix_rank(x) < x.shape[1]:
-                raise AbsorbingEffectError(absorbing_error_msg)
+                xpx = x.T @ x
+                vals, vecs = np.linalg.eigh(xpx)
+                tol = vals.max() * self.exog.shape[1] * np.finfo(np.float64).eps
+                absorbed = vals < tol
+                nabsorbed = absorbed.sum()
+                absorbed_vecs = vecs[:, absorbed]
+                exog_vars = self.exog.vars
+                rows = []
+                for i in range(nabsorbed):
+                    vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
+                    rows.append(' ' * 10 + ', '.join((exog_vars[vi] for vi in vars_idx)))
+                absorbed_variables = '\n'.join(rows)
+                msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
+                raise AbsorbingEffectError(msg)
 
         params = lstsq(x, y)[0]
         nobs = self.dependent.dataframe.shape[0]
