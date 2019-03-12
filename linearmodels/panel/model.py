@@ -566,7 +566,7 @@ class PooledOLS(object):
             else:
                 clusters = pd.DataFrame(group_ids)
         if self._singleton_index is not None and clusters is not None:
-            clusters = clusters.loc(~self._singleton_index)
+            clusters = clusters.loc[~self._singleton_index]
 
         cov_config_upd['clusters'] = np.asarray(clusters) if clusters is not None else clusters
 
@@ -780,6 +780,8 @@ class PanelOLS(PooledOLS):
         self._drop_singletons()
 
     def _collect_effects(self):
+        if not self._has_effect:
+            return np.empty((self.dependent.shape[0], 0))
         effects = []
         if self.entity_effects:
             effects.append(np.asarray(self.dependent.entity_ids).squeeze())
@@ -792,8 +794,7 @@ class PanelOLS(PooledOLS):
         return np.column_stack(effects)
 
     def _drop_singletons(self):
-        has_effects = self.entity_effects or self.time_effects or self.other_effects is not None
-        if self._singletons or not has_effects:
+        if self._singletons or not self._has_effect:
             return
         effects = self._collect_effects()
         retain = in_2core_graph(effects)
@@ -1187,12 +1188,7 @@ class PanelOLS(PooledOLS):
         if clusters is None:  # No clusters
             return True
 
-        effects = [self._other_effect_cats] if self.other_effects else []
-        if self.entity_effects:
-            effects.append(self.dependent.entity_ids)
-        if self.time_effects:
-            effects.append(self.dependent.time_ids)
-        effects = np.column_stack(effects)
+        effects = self._collect_effects()
         if num_effects == 1:
             return not self._is_effect_nested(effects, clusters)
         return True  # Default case for 2-way -- not completely clear

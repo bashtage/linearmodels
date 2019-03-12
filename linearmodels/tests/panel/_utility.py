@@ -57,7 +57,8 @@ def lsdv(y: DataFrame, x: DataFrame, has_const=False, entity=False, time=False,
     return params[:nvar]
 
 
-def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0, rng=None):
+def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects=0, rng=None,
+                  num_cats=4):
     if rng is None:
         np.random.seed(12345)
     else:
@@ -75,7 +76,13 @@ def generate_data(missing, datatype, const=False, ntk=(971, 7, 5), other_effects
     else:
         cats = ['cat.' + str(i) for i in range(other_effects)]
     if other_effects:
-        c = np.random.randint(0, 4, (other_effects, t, n))
+        if not isinstance(num_cats, list):
+            num_cats = [num_cats] * other_effects
+        c = []
+        for i in range(other_effects):
+            nc = num_cats[i]
+            c.append(np.random.randint(0, nc, (1, t, n)))
+        c = np.concatenate(c, 0)
 
     vcats = ['varcat.' + str(i) for i in range(2)]
     vc2 = np.ones((2, t, 1)) @ np.random.randint(0, n // 2, (2, 1, n))

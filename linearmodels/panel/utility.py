@@ -48,7 +48,7 @@ def dummy_matrix(cats, format='csc', drop='first', drop_all=False):
         rows = np.arange(nobs)
         ucats, inverse = np.unique(codes[:, i], return_inverse=True)
         ncategories = len(ucats)
-        bits = min([i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories)])
+        bits = min([i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories + total_dummies)])
         replacements = np.arange(ncategories, dtype='int{:d}'.format(bits))
         cols = replacements[inverse]
         if i == 0 and not drop_all:
@@ -91,10 +91,10 @@ def _remove_node(node, meta, orig_dest):
     node : int
         ID of the node to remove
     meta : ndarray
-        Array with rows containins node, count, and address where
-        address is used to find the first occurence in orig_desk
+        Array with rows containing node, count, and address where
+        address is used to find the first occurrence in orig_desk
     orig_dest : ndarray
-        Array with rows containins origin and destination nodes
+        Array with rows containing origin and destination nodes
 
     Returns
     -------
@@ -145,10 +145,10 @@ def _drop_singletons(meta, orig_dest):
     Parameters
     ----------
     meta : ndarray
-        Array with rows containins node, count, and address where
-        address is used to find the first occurence in orig_desk
+        Array with rows containing node, count, and address where
+        address is used to find the first occurrence in orig_desk
     orig_dest : ndarray
-        Array with rows containins origin and destination nodes
+        Array with rows containing origin and destination nodes
     """
     for i in range(meta.shape[0]):
         if meta[i, 1] == 1:
