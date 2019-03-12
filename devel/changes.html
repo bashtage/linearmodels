@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.11+31.g0cbee93 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.11+33.g6a466c5 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+31.g0cbee93 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.11 (+31, g0cbee93)</a>
+    index.html" class="text-logo">linearmodels 4.11 (+33, g6a466c5)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -133,12 +133,15 @@
 <div class="section" id="since-4-11-unreleased">
 <h2>Since 4.11 (Unreleased)<a class="headerlink" href="#since-4-11-unreleased" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li>Added a method to construct the 2-core graph for 2-way effects models, which
+allows singleton observations with no effect on estimated slopes to be
+excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</li>
 <li>Added support for LSMR estimation of parameters in
 <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
 <code class="docutils literal notranslate"><span class="pre">use_lsmr</span></code>. LSMR is a sparse estimation method that can be used to extend
 <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</li>
 <li>Fixed a bug where IV models estimated with only exogenous regressors where
-not being correctly labeled as OLS models in output (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</li>
+not being correctly labeled as OLS models in output. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</li>
 <li>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></li>
 <li>Added a low-memory option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
@@ -285,7 +288,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+31.g0cbee93 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">
