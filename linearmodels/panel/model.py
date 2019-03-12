@@ -18,13 +18,14 @@ from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
-from linearmodels.panel.utility import dummy_matrix
+from linearmodels.panel.utility import dummy_matrix, in_2core_graph
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InferenceUnavailableWarning,
                                   InvalidTestStatistic, MemoryWarning,
-                                  MissingValueWarning, WaldTestStatistic,
-                                  ensure_unique_column, has_constant,
-                                  missing_warning, panel_to_frame)
+                                  MissingValueWarning, SingletonWarning,
+                                  WaldTestStatistic, ensure_unique_column,
+                                  has_constant, missing_warning,
+                                  panel_to_frame)
 
 
 def panel_structure_stats(ids, name):
@@ -192,6 +193,7 @@ class PooledOLS(object):
                                                  DriscollKraay, ACCovariance)
         self._original_index = self.dependent.index.copy()
         self._validate_data()
+        self._singleton_index = None
 
     def __str__(self):
         out = '{name} \nNum exog: {num_exog}, Constant: {has_constant}'
@@ -274,6 +276,13 @@ class PooledOLS(object):
             raise ValueError('Weights do not have a supported shape.')
         return PanelData(frame)
 
+    def _check_exog_rank(self):
+        x = self.exog.values2d
+        rank_of_x = matrix_rank(x)
+        if rank_of_x < x.shape[1]:
+            raise ValueError('exog does not have full column rank.')
+        return rank_of_x
+
     def _validate_data(self):
         """Check input shape and remove missing"""
         y = self._y = self.dependent.values2d
@@ -305,10 +314,7 @@ class PooledOLS(object):
             raise ValueError('weights must be strictly positive.')
         w = w / w.mean()
         self.weights = PanelData(w)
-
-        rank_of_x = matrix_rank(x)
-        if rank_of_x < x.shape[1]:
-            raise ValueError('exog does not have full column rank.')
+        rank_of_x = self._check_exog_rank()
         self._constant, self._constant_index = has_constant(x, rank_of_x)
 
     @property
@@ -554,6 +560,8 @@ class PooledOLS(object):
                 clusters[name] = group_ids
             else:
                 clusters = pd.DataFrame(group_ids)
+        if self._singleton_index is not None and clusters is not None:
+            clusters = clusters.loc(~self._singleton_index)
 
         cov_config_upd['clusters'] = np.asarray(clusters) if clusters is not None else clusters
 
@@ -716,6 +724,8 @@ class PanelOLS(PooledOLS):
     other_effects : array-like, optional
         Category codes to use for any effects that are not entity or time
         effects. Each variable is treated as an effect.
+    singletons : bool, optional
+        Flag indicating whether to drop singleton observation
 
     Notes
     -----
@@ -752,14 +762,53 @@ class PanelOLS(PooledOLS):
     """
 
     def __init__(self, dependent, exog, *, weights=None, entity_effects=False, time_effects=False,
-                 other_effects=None):
+                 other_effects=None, singletons=True):
         super(PanelOLS, self).__init__(dependent, exog, weights=weights)
 
         self._entity_effects = entity_effects
         self._time_effects = time_effects
         self._other_effect_cats = None
+        self._singletons = singletons
         self._other_effects = self._validate_effects(other_effects)
         self._has_effect = entity_effects or time_effects or self.other_effects
+        self._singleton_index = None
+        self._drop_singletons()
+
+    def _collect_effects(self):
+        effects = []
+        if self.entity_effects:
+            effects.append(np.asarray(self.dependent.entity_ids).squeeze())
+        if self.time_effects:
+            effects.append(np.asarray(self.dependent.time_ids).squeeze())
+        if self.other_effects:
+            other = self._other_effect_cats.dataframe
+            for col in other:
+                effects.append(np.asarray(other[col]).squeeze())
+        return np.column_stack(effects)
+
+    def _drop_singletons(self):
+        has_effects = self.entity_effects or self.time_effects or self.other_effects is not None
+        if self._singletons or not has_effects:
+            return
+        effects = self._collect_effects()
+        retain = in_2core_graph(effects)
+
+        if np.all(retain):
+            return
+
+        import warnings as warn
+        nobs = retain.shape[0]
+        ndropped = nobs - retain.sum()
+        warn.warn('{0} singleton observations dropped'.format(ndropped), SingletonWarning)
+        drop = ~retain
+        self._singleton_index = drop
+        self.dependent.drop(drop)
+        self.exog.drop(drop)
+        self.weights.drop(drop)
+        if self.other_effects:
+            self._other_effect_cats.drop(drop)
+        # Reverify exog matrix
+        self._check_exog_rank()
 
     def __str__(self):
         out = super(PanelOLS, self).__str__()
@@ -1203,7 +1252,7 @@ class PanelOLS(PooledOLS):
         * 'clustered` - One or two way clustering.  Configuration options are:
 
           * ``clusters`` - Input containing containing 1 or 2 variables.
-            Clusters should be integer values, although other types will
+            Clusters should be integer valued, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
@@ -1252,6 +1301,7 @@ class PanelOLS(PooledOLS):
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
+        # Check clusters if singletons were removed
         cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
         if auto_df:
             count_effects = self._determine_df_adjustment(cov_type, **cov_config)
