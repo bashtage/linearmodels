@@ -58,6 +58,7 @@ matrix:
     - OPENBLAS=1
   - python: 3.6
     env:
+    - PYTHON=3.7
     - USE_PYPI=true
     - XARRAY=0.11
     - DOCBUILD=true

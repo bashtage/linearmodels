@@ -3,12 +3,15 @@ Change Log
 
 Since 4.11 (Unreleased)
 =======================
+* Added a method to construct the 2-core graph for 2-way effects models, which
+  allows singleton observations with no effect on estimated slopes to be
+  excluded. (:issue:`191`)
 * Added support for LSMR estimation of parameters in
   :func:`~linearmodels.panel.model.PanelOLS.fit` through the keyword argument
   ``use_lsmr``. LSMR is a sparse estimation method that can be used to extend
   :class:`~linearmodels.panel.model.PanelOLS` to more than two effects.
 * Fixed a bug where IV models estimated with only exogenous regressors where
-  not being correctly labeled as OLS models in output (:issue:`185`)
+  not being correctly labeled as OLS models in output. (:issue:`185`)
 * Added ``wald_test`` to panel-model results.
 * Renamed ``test_linear_constraint`` to ``wald_test``
 * Added a low-memory option to :func:`~linearmodels.panel.model.PanelOLS.fit`
