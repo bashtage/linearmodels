@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.11+33.g6a466c5 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.11+37.g535401c documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+37.g535401c documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.11 (+33, g6a466c5)</a>
+    index.html" class="text-logo">linearmodels 4.11 (+37, g535401c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -80,7 +80,7 @@
 <li class="toctree-l1"><a class="reference internal" href="plan.html">Module Plans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#since-4-11-unreleased">Since 4.11 (Unreleased)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-4-12">Version 4.12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-11">Version 4.11</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-10">Version 4.10</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-9">Version 4.9</a></li>
@@ -130,9 +130,14 @@
             
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="since-4-11-unreleased">
-<h2>Since 4.11 (Unreleased)<a class="headerlink" href="#since-4-11-unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-4-12">
+<h2>Version 4.12<a class="headerlink" href="#version-4-12" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li>Added an option to drop singleton observations in
+<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> by setting the keyword argument
+<code class="docutils literal notranslate"><span class="pre">singletons=False</span></code>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, singelton observations are dropped
+before the model is fit, so the the result is <em>as-if</em> the observations were
+never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</li>
 <li>Added a method to construct the 2-core graph for 2-way effects models, which
 allows singleton observations with no effect on estimated slopes to be
 excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</li>
@@ -288,7 +293,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.11+37.g535401c documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Models for Panel Data &#8212; linearmodels 4.11+33.g6a466c5 documentation</title>
+    <title>Models for Panel Data &#8212; linearmodels 4.11+37.g535401c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -52,7 +52,7 @@
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.11+37.g535401c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -64,7 +64,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.11 (+33, g6a466c5)</a>
+    ../index.html" class="text-logo">linearmodels 4.11 (+37, g535401c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -136,7 +136,7 @@
 <h2>Fixed Effect Estimation<a class="headerlink" href="#fixed-effect-estimation" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.panel.model.PanelOLS">
-<em class="property">class </em><code class="descname">PanelOLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>*</em>, <em>weights=None</em>, <em>entity_effects=False</em>, <em>time_effects=False</em>, <em>other_effects=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#PanelOLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.PanelOLS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">PanelOLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>*</em>, <em>weights=None</em>, <em>entity_effects=False</em>, <em>time_effects=False</em>, <em>other_effects=None</em>, <em>singletons=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/model.html#PanelOLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.model.PanelOLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>One- and two-way fixed effects estimator for panel data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -152,6 +152,7 @@ the weight should be homoskedastic.</li>
 <li><strong>time_effects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag whether to include time effects in the model</li>
 <li><strong>other_effects</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Category codes to use for any effects that are not entity or time
 effects. Each variable is treated as an effect.</li>
+<li><strong>singletons</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to drop singleton observation</li>
 </ul>
 </td>
 </tr>
@@ -237,7 +238,7 @@ if <code class="docutils literal notranslate"><span class="pre">auto_df=False</s
 White’s estimator</li>
 <li>‘clustered` - One or two way clustering.  Configuration options are:<ul>
 <li><code class="docutils literal notranslate"><span class="pre">clusters</span></code> - Input containing containing 1 or 2 variables.
-Clusters should be integer values, although other types will
+Clusters should be integer valued, although other types will
 be coerced to integer values by treating as categorical variables</li>
 <li><code class="docutils literal notranslate"><span class="pre">cluster_entity</span></code> - Boolean flag indicating to use entity
 clusters</li>
@@ -1395,7 +1396,7 @@ missing in the model data.</td>
         <li class="right" >
           <a href="reference.html" title="Module Reference"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.11+33.g6a466c5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.11+37.g535401c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
