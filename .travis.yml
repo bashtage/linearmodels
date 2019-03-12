@@ -47,7 +47,7 @@ matrix:
     - PANDAS=0.22
     - XARRAY=0.10
     - STATSMODELS=0.9
-  - python: 3.6
+  - python: 3.7
     env:
     - PYTHON=3.7
     - NUMPY=1.15
@@ -56,7 +56,7 @@ matrix:
     - XARRAY=0.10
     - STATSMODELS=0.9
     - OPENBLAS=1
-  - python: 3.6
+  - python: 3.7
     env:
     - PYTHON=3.7
     - USE_PYPI=true

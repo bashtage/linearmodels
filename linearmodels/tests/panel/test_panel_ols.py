@@ -36,6 +36,17 @@ def large_data(request):
     return generate_data(missing, datatype, const=const, ntk=(51, 71, 5), other_effects=2)
 
 
+singleton_ids = [i for i, p in zip(ids, perms) if p[1] == 'pandas' and not p[-1]]
+singleton_perms = [p for p in perms if p[1] == 'pandas' and not p[-1]]
+
+
+@pytest.fixture(params=singleton_perms, ids=singleton_ids)
+def singleton_data(request):
+    missing, datatype, const = request.param
+    return generate_data(missing, datatype, const=const, ntk=(91, 15, 5), other_effects=2,
+                         num_cats=[5 * 91, 15])
+
+
 perms = list(product(missing, datatypes))
 ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 
@@ -1118,3 +1129,31 @@ def test_masked_singleton_removal():
     mod = PanelOLS(y, x, singletons=False, entity_effects=True, time_effects=True)
     res = mod.fit()
     assert res.nobs == 6
+
+
+def test_singleton_removal_other_effects(data):
+    mod_keep = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c, singletons=True)
+    res_keep = mod_keep.fit()
+
+    mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c, singletons=False)
+    res = mod.fit(cov_type='clustered', clusters=data.vc1)
+
+    assert res.nobs <= res_keep.nobs
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize('other_effects', [1, 2])
+def test_singleton_removal_mixed(singleton_data, other_effects):
+    if other_effects == 1:
+        other_effects = PanelData(singleton_data.c).dataframe.iloc[:, [0]]
+    elif other_effects == 2:
+        other_effects = singleton_data.c
+    mod = PanelOLS(singleton_data.y, singleton_data.x,
+                   other_effects=other_effects)
+    res_keep = mod.fit(use_lsmr=True)
+
+    mod = PanelOLS(singleton_data.y, singleton_data.x,
+                   other_effects=other_effects, singletons=False)
+    res = mod.fit(cov_type='clustered', clusters=singleton_data.vc2, use_lsmr=True)
+    assert_allclose(res_keep.params, res.params)
+    assert res.nobs <= res_keep.nobs
