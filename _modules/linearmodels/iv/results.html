@@ -16,14 +16,16 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.11 documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.12 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   
@@ -42,7 +44,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +55,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.11</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -111,21 +113,23 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Results containers and post-estimation diagnostics for IV models</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
 
-<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+
 <span class="kn">from</span> <span class="nn">cached_property</span> <span class="k">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">to_numeric</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.summary</span> <span class="k">import</span> <span class="n">SimpleTable</span><span class="p">,</span> <span class="n">fmt_2cols</span><span class="p">,</span> <span class="n">fmt_params</span>
 <span class="kn">from</span> <span class="nn">statsmodels.iolib.table</span> <span class="k">import</span> <span class="n">default_txt_fmt</span>
 
-<span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
 <span class="kn">from</span> <span class="nn">linearmodels.iv._utility</span> <span class="k">import</span> <span class="n">annihilate</span><span class="p">,</span> <span class="n">proj</span>
-<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span> <span class="n">_ModelComparison</span><span class="p">,</span>
-                                  <span class="n">_SummaryStr</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">WaldTestStatistic</span><span class="p">,</span>
+                                  <span class="n">_ModelComparison</span><span class="p">,</span> <span class="n">_str</span><span class="p">,</span> <span class="n">_SummaryStr</span><span class="p">,</span>
+                                  <span class="n">pval_format</span><span class="p">,</span> <span class="n">quadratic_form_test</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">stub_concat</span><span class="p">(</span><span class="n">lists</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;=&#39;</span><span class="p">):</span>
@@ -447,7 +451,7 @@
         <span class="n">top_left</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Dep. Variable:&#39;</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                     <span class="p">(</span><span class="s1">&#39;Estimator:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span><span class="p">),</span>
                     <span class="p">(</span><span class="s1">&#39;No. Observations:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s1">&#39;Date:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%a, %b </span><span class="si">%d</span><span class="s1"> %Y&#39;</span><span class="p">)),</span>
+                    <span class="p">(</span><span class="s1">&#39;Date:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%a</span><span class="s1">, %b </span><span class="si">%d</span><span class="s1"> %Y&#39;</span><span class="p">)),</span>
                     <span class="p">(</span><span class="s1">&#39;Time:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">)),</span>
                     <span class="p">(</span><span class="s1">&#39;Cov. Estimator:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">),</span>
                     <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
@@ -520,17 +524,28 @@
 
         <span class="k">return</span> <span class="n">smry</span>
 
-<div class="viewcode-block" id="OLSResults.test_linear_constraint"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.test_linear_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">test_linear_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="OLSResults.wald_test"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults.wald_test">[docs]</a>    <span class="k">def</span> <span class="nf">wald_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test linear equality constraints using a Wald test</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        restriction : {ndarray, DataFrame}</span>
+<span class="sd">        restriction : {ndarray, DataFrame}, optional</span>
 <span class="sd">            q by nvar array containing linear weights to apply to parameters</span>
-<span class="sd">            when forming the restrictions.</span>
-<span class="sd">        value : {ndarray, Series}</span>
-<span class="sd">            q element array containing the restricted values</span>
+<span class="sd">            when forming the restrictions. It is not possible to use both</span>
+<span class="sd">            restriction and formula.</span>
+<span class="sd">        value : {ndarray, Series}, optional</span>
+<span class="sd">            q element array containing the restricted values.</span>
+<span class="sd">        formula : Union[str, list[str]], optional</span>
+<span class="sd">            patsy linear constrains. The simplest formats are one of:</span>
+
+<span class="sd">              * A single comma-separated string such as &#39;x1=0, x2+x3=1&#39;</span>
+<span class="sd">              * A list of strings where each element is a single constraint</span>
+<span class="sd">                such as [&#39;x1=0&#39;, &#39;x2+x3=1&#39;]</span>
+<span class="sd">              * A single string without commas to test simple constraints such</span>
+<span class="sd">                as &#39;x1=x2=x3=0&#39;</span>
+
+<span class="sd">            It is not possible to use both restriction and formula.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -542,16 +557,41 @@
 <span class="sd">        Hypothesis test examines whether :math:`H_0:C\theta=v` where the</span>
 <span class="sd">        matrix C is ``restriction`` and v is ``value``. The test statistic</span>
 <span class="sd">        has a :math:`\chi^2_q` distribution where q is the number of rows in C.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.datasets import wage</span>
+<span class="sd">        &gt;&gt;&gt; from linearmodels.iv import IV2SLS</span>
+<span class="sd">        &gt;&gt;&gt; data = wage.load()</span>
+<span class="sd">        &gt;&gt;&gt; formula = &#39;np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]&#39;</span>
+<span class="sd">        &gt;&gt;&gt; res = IV2SLS.from_formula(formula, data).fit()</span>
+
+<span class="sd">        Testing the experience is not needed in the model</span>
+
+<span class="sd">        &gt;&gt;&gt; restriction = np.array([[0, 1, 0, 0, 0],</span>
+<span class="sd">                                    [0, 0, 1, 0, 0]])</span>
+<span class="sd">        &gt;&gt;&gt; value = np.array([0, 0])</span>
+<span class="sd">        &gt;&gt;&gt; res.wald_test(restriction, value)</span>
+
+<span class="sd">        Using the formula interface to test the same restrictions</span>
+
+<span class="sd">        &gt;&gt;&gt; formula = &#39;exper = I(exper ** 2) = 0&#39;</span>
+<span class="sd">        &gt;&gt;&gt; res.wald_test(formula=formula)</span>
+
+<span class="sd">        Using the formula interface with a list</span>
+
+<span class="sd">        &gt;&gt;&gt; res.wald_test(formula=[&#39;exper = 0&#39;, &#39;I(exper ** 2) = 0&#39;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">restriction</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">restriction</span><span class="p">)</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">diff</span> <span class="o">=</span> <span class="n">restriction</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">value</span>
-        <span class="n">rcov</span> <span class="o">=</span> <span class="n">restriction</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">@</span> <span class="n">restriction</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">stat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">inv</span><span class="p">(</span><span class="n">rcov</span><span class="p">)</span> <span class="o">@</span> <span class="n">diff</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">restriction</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">null</span> <span class="o">=</span> <span class="s1">&#39;Linear equality constraint is valid&#39;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Linear Equality Hypothesis Test&#39;</span>
-        <span class="k">return</span> <span class="n">WaldTestStatistic</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">null</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">quadratic_form_test</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="n">restriction</span><span class="p">,</span>
+                                   <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">test_linear_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">restriction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;test_linear_constraint is deprecated.  Use wald_test &#39;</span>
+                      <span class="s1">&#39;instead. This method will be unavailable after June 2019.&#39;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">_CommonIVResults</span><span class="p">(</span><span class="n">OLSResults</span><span class="p">):</span>
@@ -590,7 +630,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">sargan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sargan test of overidentifying restrictions</span>
 
 <span class="sd">        Returns</span>
@@ -636,7 +676,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">basmann</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Basmann&#39;s test of overidentifying restrictions</span>
 
 <span class="sd">        Returns</span>
@@ -963,7 +1003,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">anderson_rubin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Anderson-Rubin test of overidentifying restrictions</span>
 
 <span class="sd">        Returns</span>
@@ -996,7 +1036,7 @@
 
     <span class="nd">@cached_property</span>
     <span class="k">def</span> <span class="nf">basmann_f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Basmann&#39;s F test of overidentifying restrictions</span>
 
 <span class="sd">        Returns</span>
@@ -1337,7 +1377,7 @@
         <span class="k">return</span> <span class="n">smry</span></div>
 
 
-<div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<div class="viewcode-block" id="compare"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.compare">[docs]</a><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;tstats&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compare the results of multiple models</span>
 
@@ -1346,12 +1386,15 @@
 <span class="sd">    results : {list, dict, OrderedDict}</span>
 <span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
 <span class="sd">        names.  An OrderedDict will preserve the model order the comparisons.</span>
+<span class="sd">    precision : {&#39;tstats&#39;,&#39;std_errors&#39;, &#39;std-errors&#39;, &#39;pvalues&#39;}</span>
+<span class="sd">        Estimator precision estimator to include in the comparrison output.</span>
+<span class="sd">        Default is &#39;tstats&#39;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    comparison : IVModelComparison</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">IVModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">IVModelComparison</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="IVModelComparison"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.IVModelComparison">[docs]</a><span class="k">class</span> <span class="nc">IVModelComparison</span><span class="p">(</span><span class="n">_ModelComparison</span><span class="p">):</span>
@@ -1363,11 +1406,14 @@
 <span class="sd">    results : {list, dict, OrderedDict}</span>
 <span class="sd">        Set of results to compare.  If a dict, the keys will be used as model</span>
 <span class="sd">        names.  An OrderedDict will preserve the model order the comparisons.</span>
+<span class="sd">    precision : {&#39;tstats&#39;,&#39;std_errors&#39;, &#39;std-errors&#39;, &#39;pvalues&#39;}</span>
+<span class="sd">        Estimator precision estimator to include in the comparrison output.</span>
+<span class="sd">        Default is &#39;tstats&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_supported</span> <span class="o">=</span> <span class="p">(</span><span class="n">IVResults</span><span class="p">,</span> <span class="n">IVGMMResults</span><span class="p">,</span> <span class="n">OLSResults</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">IVModelComparison</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="s1">&#39;tstats&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IVModelComparison</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rsquared_adj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1409,17 +1455,17 @@
             <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
-        <span class="n">tstats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tstats</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">)</span>
         <span class="n">params_fmt</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">params_stub</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
             <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
-            <span class="n">tstats_fmt</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tstats</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">precision_fmt</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">precision</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="n">v_str</span> <span class="o">=</span> <span class="n">_str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="n">v_str</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">v_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">else</span> <span class="n">v_str</span>
-                <span class="n">tstats_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span>
-            <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tstats_fmt</span><span class="p">)</span>
+                <span class="n">precision_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_str</span><span class="p">)</span>
+            <span class="n">params_fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">precision_fmt</span><span class="p">)</span>
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="n">params_stub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
 
@@ -1453,7 +1499,8 @@
         <span class="n">txt_fmt</span><span class="p">[</span><span class="s1">&#39;header_align&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">models</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">stubs</span><span class="o">=</span><span class="n">stubs</span><span class="p">,</span> <span class="n">txt_fmt</span><span class="o">=</span><span class="n">txt_fmt</span><span class="p">)</span>
         <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;T-stats reported in parentheses&#39;</span><span class="p">])</span>
+        <span class="n">prec_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PRECISION_TYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">]</span>
+        <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> reported in parentheses&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prec_type</span><span class="p">)])</span>
         <span class="k">return</span> <span class="n">smry</span></div>
 </pre></div>
 
@@ -1471,7 +1518,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

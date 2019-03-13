@@ -16,14 +16,16 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.11 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.12 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Module Reference" href="../reference.html" />
@@ -50,7 +52,7 @@
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +63,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11</a>
+    ../../index.html" class="text-logo">linearmodels 4.12</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -178,18 +180,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -229,9 +231,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -239,7 +241,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -288,38 +290,58 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Using-formulas-to-specify-models">
 <h1>Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="Basic-Usage">
 <h2>Basic Usage<a class="headerlink" href="#Basic-Usage" title="Permalink to this headline">¶</a></h2>
-<p>Formulas provide an alternative method to specify a model. The formulas
-used here utilize <a class="reference external" href="http://patsy.readthedocs.io/en/latest/">patsy</a> are
-similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>,
-although they use an enhanced syntax to allow identification of
-endogenous regressors. The basis formula syntax for a single variable
-regression would be</p>
+<p>Formulas provide an alternative method to specify a model. The formulas used here utilize <a class="reference external" href="http://patsy.readthedocs.io/en/latest/">patsy</a> are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>, although they use an enhanced syntax to allow identification of endogenous regressors. The basis formula syntax for a single variable regression would be</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">~</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">x</span>
 </pre></div>
 </div>
-<p>where the <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates that a constant should be included and <code class="docutils literal notranslate"><span class="pre">x</span></code>
-is the regressor. In the context of an instrumental variables model, it
-is necessary to mark variables as endogenous and to provide a list of
-instruments that are included only in the model for the endogenous
-variables. In a basic single regressor model, this would be specified
-using <code class="docutils literal notranslate"><span class="pre">[]</span></code> to surround an inner model.</p>
+<p>where the <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates that a constant should be included and <code class="docutils literal notranslate"><span class="pre">x</span></code> is the regressor. In the context of an instrumental variables model, it is necessary to mark variables as endogenous and to provide a list of instruments that are included only in the model for the endogenous variables. In a basic single regressor model, this would be specified using <code class="docutils literal notranslate"><span class="pre">[]</span></code> to surround an inner model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">~</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span> <span class="o">~</span> <span class="n">z</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>In this expression, <code class="docutils literal notranslate"><span class="pre">x</span></code> is now marked as endogenous and <code class="docutils literal notranslate"><span class="pre">z</span></code> is an
-instrument. Any exogenous variable will automatically be used when
-instrumenting <code class="docutils literal notranslate"><span class="pre">x</span></code> so there is no need to repeat these here (in this
-example, the “first stage” would include a constant and z).</p>
+<p>In this expression, <code class="docutils literal notranslate"><span class="pre">x</span></code> is now marked as endogenous and <code class="docutils literal notranslate"><span class="pre">z</span></code> is an instrument. Any exogenous variable will automatically be used when instrumenting <code class="docutils literal notranslate"><span class="pre">x</span></code> so there is no need to repeat these here (in this example, the “first stage” would include a constant and z).</p>
 </div>
 <div class="section" id="Multiple-Endogenous-Variables">
 <h2>Multiple Endogenous Variables<a class="headerlink" href="#Multiple-Endogenous-Variables" title="Permalink to this headline">¶</a></h2>
-<p>Multiple endogenous variables are specified in a similar manner. The
-basic concept is that any model can be expressed as</p>
+<p>Multiple endogenous variables are specified in a similar manner. The basic concept is that any model can be expressed as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span> <span class="o">+</span> <span class="p">[</span> <span class="n">endog</span> <span class="o">~</span> <span class="n">instruments</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -331,36 +353,22 @@ basic concept is that any model can be expressed as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dep</span> <span class="o">~</span> <span class="n">exog</span> <span class="o">+</span> <span class="n">instruments</span>
 </pre></div>
 </div>
-<p>are valid patsy formulas. This means that multiple endogenous regressors
-or instruments should be joined with <code class="docutils literal notranslate"><span class="pre">+</span></code>, but that the first
-endogenous or first instrument should not have a leading <code class="docutils literal notranslate"><span class="pre">+</span></code>. A simple
-example with 2 endogenous variables and 3 instruments would be</p>
+<p>are valid patsy formulas. This means that multiple endogenous regressors or instruments should be joined with <code class="docutils literal notranslate"><span class="pre">+</span></code>, but that the first endogenous or first instrument should not have a leading <code class="docutils literal notranslate"><span class="pre">+</span></code>. A simple example with 2 endogenous variables and 3 instruments would be</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">~</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">x3</span>  <span class="o">+</span> <span class="p">[</span> <span class="n">x4</span> <span class="o">+</span> <span class="n">x5</span> <span class="o">~</span> <span class="n">z1</span> <span class="o">+</span> <span class="n">z2</span> <span class="o">+</span> <span class="n">z3</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>In this example, the “submodels” <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x1</span> <span class="pre">+</span> <span class="pre">x2</span> <span class="pre">+x3</span> <span class="pre">+</span> <span class="pre">x4</span> <span class="pre">+</span> <span class="pre">x5</span></code> and
-<code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x1</span> <span class="pre">+</span> <span class="pre">x2</span> <span class="pre">+</span> <span class="pre">x3</span> <span class="pre">+</span> <span class="pre">z1</span> <span class="pre">+</span> <span class="pre">z2</span> <span class="pre">+z3</span></code> are both valid patsy expressions.</p>
+<p>In this example, the “submodels” <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x1</span> <span class="pre">+</span> <span class="pre">x2</span> <span class="pre">+x3</span> <span class="pre">+</span> <span class="pre">x4</span> <span class="pre">+</span> <span class="pre">x5</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">~</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">x1</span> <span class="pre">+</span> <span class="pre">x2</span> <span class="pre">+</span> <span class="pre">x3</span> <span class="pre">+</span> <span class="pre">z1</span> <span class="pre">+</span> <span class="pre">z2</span> <span class="pre">+z3</span></code> are both valid patsy expressions.</p>
 </div>
 <div class="section" id="Standard-patsy">
 <h2>Standard patsy<a class="headerlink" href="#Standard-patsy" title="Permalink to this headline">¶</a></h2>
-<p>Aside from this change, the standard rules of patsy apply, and so it is
-possible to use mathematical expression or other patsy-specific
-features. See the <a class="reference external" href="http://patsy.readthedocs.io/en/latest/quickstart.html">patsy
-quickstart</a>
-for some examples of what is possible.</p>
+<p>Aside from this change, the standard rules of patsy apply, and so it is possible to use mathematical expression or other patsy-specific features. See the <a class="reference external" href="http://patsy.readthedocs.io/en/latest/quickstart.html">patsy quickstart</a> for some examples of what is possible.</p>
 </div>
 <div class="section" id="MEPS-data">
 <h2>MEPS data<a class="headerlink" href="#MEPS-data" title="Permalink to this headline">¶</a></h2>
-<p>This example shows the use of formulas to estimate both IV and OLS
-models using the <a class="reference external" href="https://meps.ahrq.gov">medical expenditure panel
-survey</a>. The model measures the effect of
-various characteristics on the log of drug expenditure and instruments
-the variable that measures where a subject was insured through a union
-with their social security to income ratio.</p>
+<p>This example shows the use of formulas to estimate both IV and OLS models using the <a class="reference external" href="https://meps.ahrq.gov">medical expenditure panel survey</a>. The model measures the effect of various characteristics on the log of drug expenditure and instruments the variable that measures where a subject was insured through a union with their social security to income ratio.</p>
 <p>This first block imports the data and numpy.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -413,13 +421,9 @@ vgh               vg or good health
 </div>
 <div class="section" id="Estimating-a-model-with-a-formula">
 <h3>Estimating a model with a formula<a class="headerlink" href="#Estimating-a-model-with-a-formula" title="Permalink to this headline">¶</a></h3>
-<p>This model uses a formula which is input using the <code class="docutils literal notranslate"><span class="pre">from_formula</span></code>
-interface. Unlike direct initialization, this interface takes the
-formula and a DataFrame containing the data necessary to evaluate the
-formula.</p>
+<p>This model uses a formula which is input using the <code class="docutils literal notranslate"><span class="pre">from_formula</span></code> interface. Unlike direct initialization, this interface takes the formula and a DataFrame containing the data necessary to evaluate the formula.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -429,8 +433,7 @@ formula.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -449,8 +452,8 @@ formula.</p>
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Wed, Oct 17 2018   P-value (F-stat)                0.0000
-Time:                        23:27:06   Distribution:                  chi2(6)
+Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
+Time:                        08:55:41   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -475,11 +478,9 @@ Debiased: False
 </div>
 <div class="section" id="Mathematical-expression-in-formulas">
 <h3>Mathematical expression in formulas<a class="headerlink" href="#Mathematical-expression-in-formulas" title="Permalink to this headline">¶</a></h3>
-<p>Standard patsy expression, such as using mathematical expressions, can
-be readily used.</p>
+<p>Standard patsy expression, such as using mathematical expressions, can be readily used.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -492,11 +493,9 @@ be readily used.</p>
 </div>
 <div class="section" id="OLS">
 <h3>OLS<a class="headerlink" href="#OLS" title="Permalink to this headline">¶</a></h3>
-<p>Omitting the block that marks a variable as endogenous will produce OLS
-– just like using <code class="docutils literal notranslate"><span class="pre">None</span></code> for both <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code>.</p>
+<p>Omitting the block that marks a variable as endogenous will produce OLS – just like using <code class="docutils literal notranslate"><span class="pre">None</span></code> for both <code class="docutils literal notranslate"><span class="pre">endog</span></code> and <code class="docutils literal notranslate"><span class="pre">instruments</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -512,13 +511,13 @@ be readily used.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-                          IV-2SLS Estimation Summary
+                            OLS Estimation Summary
 ==============================================================================
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
-Estimator:                    IV-2SLS   Adj. R-squared:                 0.1765
+Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Wed, Oct 17 2018   P-value (F-stat)                0.0000
-Time:                        23:27:06   Distribution:                  chi2(6)
+Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
+Time:                        08:55:41   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -538,12 +537,9 @@ hi_empunion     0.0739     0.0260     2.8441     0.0045      0.0230      0.1248
 </div>
 <div class="section" id="Comparing-results">
 <h3>Comparing results<a class="headerlink" href="#Comparing-results" title="Permalink to this headline">¶</a></h3>
-<p>The function <code class="docutils literal notranslate"><span class="pre">compare</span></code> can be used to compare the result of multiple
-models. Here dropping <code class="docutils literal notranslate"><span class="pre">female</span></code> from the IV regression improves the
-<span class="math notranslate nohighlight">\(R^2\)</span>.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">compare</span></code> can be used to compare the result of multiple models. Here dropping <code class="docutils literal notranslate"><span class="pre">female</span></code> from the IV regression improves the <span class="math notranslate nohighlight">\(R^2\)</span>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -562,7 +558,7 @@ models. Here dropping <code class="docutils literal notranslate"><span class="pr
                                 IV          IV-formula           OLS
 --------------------------------------------------------------------
 Dep. Variable             ldrugexp     np.log(drugexp)      ldrugexp
-Estimator                  IV-2SLS             IV-2SLS       IV-2SLS
+Estimator                  IV-2SLS             IV-2SLS           OLS
 No. Observations             10089               10089         10089
 Cov. Est.                   robust              robust        robust
 R-squared                   0.0640              0.0659        0.1770
@@ -572,18 +568,18 @@ P-value (F-stat)            0.0000              0.0000        0.0000
 ==================     ===========   =================   ===========
 Intercept                   6.7872              6.7709        5.8611
                           (25.246)            (26.353)      (37.320)
-age                        -0.0132             -0.0132       -0.0035
-                         (-4.4092)           (-4.4237)     (-1.8228)
-blhisp                     -0.2174             -0.2168       -0.1513
-                         (-5.5052)           (-5.5252)     (-4.4353)
-female                     -0.0204                            0.0578
-                         (-0.6257)                          (2.2797)
-hi_empunion                -0.8976             -0.8892        0.0739
-                         (-4.0592)           (-4.1653)      (2.8441)
-linc                        0.0870              0.0873        0.0105
-                          (3.8436)            (3.8348)      (0.7646)
 totchr                      0.4503              0.4498        0.4404
                           (44.157)            (44.453)      (47.049)
+female                     -0.0204                            0.0578
+                         (-0.6257)                          (2.2797)
+age                        -0.0132             -0.0132       -0.0035
+                         (-4.4092)           (-4.4237)     (-1.8228)
+linc                        0.0870              0.0873        0.0105
+                          (3.8436)            (3.8348)      (0.7646)
+blhisp                     -0.2174             -0.2168       -0.1513
+                         (-5.5052)           (-5.5252)     (-4.4353)
+hi_empunion                -0.8976             -0.8892        0.0739
+                         (-4.0592)           (-4.1653)      (2.8441)
 ==================== ============= =================== =============
 Instruments               ssiratio            ssiratio
 --------------------------------------------------------------------
@@ -628,7 +624,7 @@ T-stats reported in parentheses
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

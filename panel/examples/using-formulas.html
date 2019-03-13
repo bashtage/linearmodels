@@ -16,14 +16,16 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.11 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.12 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Comparison with pandas PanelOLS and FamaMacBeth" href="../pandas.html" />
@@ -50,7 +52,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +63,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11</a>
+    ../../index.html" class="text-logo">linearmodels 4.12</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -180,18 +182,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -231,9 +233,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -241,7 +243,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -290,38 +292,55 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Using-formulas-to-specify-models">
 <h1>Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this headline">¶</a></h1>
-<p>All of the models can be specified using formulas. The formulas used
-here utilize <a class="reference external" href="http://patsy.readthedocs.io/en/latest/">patsy</a> are
-similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The
-basis formula syntax for a single variable regression would be</p>
+<p>All of the models can be specified using formulas. The formulas used here utilize <a class="reference external" href="http://patsy.readthedocs.io/en/latest/">patsy</a> are similar to those in <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. The basis formula syntax for a single variable regression would be</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">~</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">x</span>
 </pre></div>
 </div>
-<p>The formulas used with <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> and
-<code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> are completely standard and are identical to
-<a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. <code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> is
-nearly identical with the caveat that the model <em>cannot</em> include an
-intercept.</p>
-<p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>, which implements effects (entity, time or other) has a
-small extension to the formula which allows entity effects or time
-effects (or both) to be specified as part of the formula. While it is
-not possible to specify other effects using the formula interface, these
-can be included as an optional parameter when using a formula.</p>
+<p>The formulas used with <code class="docutils literal notranslate"><span class="pre">BetweenOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">PooledOLS</span></code> and <code class="docutils literal notranslate"><span class="pre">RandomEffects</span></code> are completely standard and are identical to <a class="reference external" href="http://www.statsmodels.org">statsmodels</a>. <code class="docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code> is nearly identical with the caveat that the model <em>cannot</em> include an intercept.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code>, which implements effects (entity, time or other) has a small extension to the formula which allows entity effects or time effects (or both) to be specified as part of the formula. While it is not possible to specify other effects using the formula interface, these can be included as an optional parameter when using a formula.</p>
 <div class="section" id="Loading-and-preparing-data">
 <h2>Loading and preparing data<a class="headerlink" href="#Loading-and-preparing-data" title="Permalink to this headline">¶</a></h2>
-<p>When using formulas, a MultiIndex pandas dataframe where the index is
-entity-time is <strong>required</strong>. Here the Grunfeld data, from “The
-Determinants of Corporate Investment”, provided by
-<a class="reference external" href="http://www.statsmodels.org/stable/datasets/generated/grunfeld.html">statsmodels</a>,
-is used to illustrate the use of formulas. This dataset contains data on
-firm investment, market value and the stock of plant capital.</p>
+<p>When using formulas, a MultiIndex pandas dataframe where the index is entity-time is <strong>required</strong>. Here the Grunfeld data, from “The Determinants of Corporate Investment”, provided by <a class="reference external" href="http://www.statsmodels.org/stable/datasets/generated/grunfeld.html">statsmodels</a>, is used to illustrate the use of formulas. This dataset contains data on firm investment, market value and the stock of plant capital.</p>
 <p><code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the index using variables from the dataset.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -349,14 +368,9 @@ b&#39;General Motors&#39; 1935.0   317.6  3078.5      2.8
 </div>
 <div class="section" id="PanelOLS-with-Entity-Effects">
 <h2>PanelOLS with Entity Effects<a class="headerlink" href="#PanelOLS-with-Entity-Effects" title="Permalink to this headline">¶</a></h2>
-<p>Entity effects are specified using the special command
-<code class="docutils literal notranslate"><span class="pre">EntityEffects</span></code>. By default a constant is not included, and so if a
-constant is desired, <code class="docutils literal notranslate"><span class="pre">1+</span></code> should be included in the formula. When
-including effects, the model and fit are identical whether a constant is
-included or not.</p>
+<p>Entity effects are specified using the special command <code class="docutils literal notranslate"><span class="pre">EntityEffects</span></code>. By default a constant is not included, and so if a constant is desired, <code class="docutils literal notranslate"><span class="pre">1+</span></code> should be included in the formula. When including effects, the model and fit are identical whether a constant is included or not.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -376,8 +390,8 @@ included or not.</p>
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8223
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.8132
-Time:                        23:27:18   Log-likelihood                   -1167.4
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.8132
+Time:                        08:55:53   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -408,13 +422,9 @@ Included effects: Entity
 </div>
 <div class="section" id="PanelOLS-with-Entity-Effects-and-a-constant">
 <h2>PanelOLS with Entity Effects and a constant<a class="headerlink" href="#PanelOLS-with-Entity-Effects-and-a-constant" title="Permalink to this headline">¶</a></h2>
-<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When
-a constant is included in the model, and additional constraint is
-imposed that the number of the effects is 0. This allows the constant to
-be identified using the grand mean of the dependent and the regressors.</p>
+<p>The constant can be explicitly included using the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span></code> notation. When a constant is included in the model, and additional constraint is imposed that the number of the effects is 0. This allows the constant to be identified using the grand mean of the dependent and the regressors.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -433,8 +443,8 @@ be identified using the grand mean of the dependent and the regressors.</p>
 Dep. Variable:                 invest   R-squared:                        0.7667
 Estimator:                   PanelOLS   R-squared (Between):              0.8193
 No. Observations:                 220   R-squared (Within):               0.7667
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.8071
-Time:                        23:27:18   Log-likelihood                   -1167.4
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.8071
+Time:                        08:55:54   Log-likelihood                   -1167.4
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      340.08
 Entities:                          11   P-value                           0.0000
@@ -466,13 +476,9 @@ Included effects: Entity
 </div>
 <div class="section" id="Panel-with-Entity-and-Time-Effects">
 <h2>Panel with Entity and Time Effects<a class="headerlink" href="#Panel-with-Entity-and-Time-Effects" title="Permalink to this headline">¶</a></h2>
-<p>Time effects can be similarly included using <code class="docutils literal notranslate"><span class="pre">TimeEffect</span></code>. In many
-models, time effects can be consistently estimated and so they could be
-equivalently included in the set of regressors using a categorical
-variable.</p>
+<p>Time effects can be similarly included using <code class="docutils literal notranslate"><span class="pre">TimeEffect</span></code>. In many models, time effects can be consistently estimated and so they could be equivalently included in the set of regressors using a categorical variable.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -491,8 +497,8 @@ variable.</p>
 Dep. Variable:                 invest   R-squared:                        0.7253
 Estimator:                   PanelOLS   R-squared (Between):              0.7944
 No. Observations:                 220   R-squared (Within):               0.7566
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.7856
-Time:                        23:27:18   Log-likelihood                   -1153.0
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.7856
+Time:                        08:55:54   Log-likelihood                   -1153.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      248.15
 Entities:                          11   P-value                           0.0000
@@ -524,11 +530,9 @@ Included effects: Entity, Time
 </div>
 <div class="section" id="Between-OLS">
 <h2>Between OLS<a class="headerlink" href="#Between-OLS" title="Permalink to this headline">¶</a></h2>
-<p>The other panel models are straight-forward and are included for
-completeness.</p>
+<p>The other panel models are straight-forward and are included for completeness.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -548,8 +552,8 @@ completeness.</p>
 Dep. Variable:                 invest   R-squared:                        0.8644
 Estimator:                 BetweenOLS   R-squared (Between):              0.8644
 No. Observations:                  11   R-squared (Within):               0.4195
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.7616
-Time:                        23:27:18   Log-likelihood                   -61.997
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.7616
+Time:                        08:55:54   Log-likelihood                   -61.997
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      25.500
 Entities:                          11   P-value                           0.0003
@@ -575,11 +579,9 @@ capital        0.0297     0.1746     0.1700     0.8692     -0.3730      0.4323
 </div>
 <div class="section" id="First-Difference-OLS">
 <h2>First Difference OLS<a class="headerlink" href="#First-Difference-OLS" title="Permalink to this headline">¶</a></h2>
-<p>The first difference model must never include a constant since this is
-not identified after differencing.</p>
+<p>The first difference model must never include a constant since this is not identified after differencing.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -598,8 +600,8 @@ not identified after differencing.</p>
 Dep. Variable:                 invest   R-squared:                        0.4287
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.8643
 No. Observations:                 209   R-squared (Within):               0.7539
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.8461
-Time:                        23:27:18   Log-likelihood                   -1071.1
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.8461
+Time:                        08:55:54   Log-likelihood                   -1071.1
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      77.679
 Entities:                          11   P-value                           0.0000
@@ -624,12 +626,9 @@ capital        0.2786     0.0449     6.1990     0.0000      0.1900      0.3673
 </div>
 <div class="section" id="Pooled-OLS">
 <h2>Pooled OLS<a class="headerlink" href="#Pooled-OLS" title="Permalink to this headline">¶</a></h2>
-<p>The pooled OLS estimator is a special case of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> when there
-are no effects. It is effectively identical to <code class="docutils literal notranslate"><span class="pre">OLS</span></code> in
-<code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> (or <code class="docutils literal notranslate"><span class="pre">WLS</span></code>) but is included for completeness.</p>
+<p>The pooled OLS estimator is a special case of <code class="docutils literal notranslate"><span class="pre">PanelOLS</span></code> when there are no effects. It is effectively identical to <code class="docutils literal notranslate"><span class="pre">OLS</span></code> in <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> (or <code class="docutils literal notranslate"><span class="pre">WLS</span></code>) but is included for completeness.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -648,8 +647,8 @@ are no effects. It is effectively identical to <code class="docutils literal not
 Dep. Variable:                 invest   R-squared:                        0.8179
 Estimator:                  PooledOLS   R-squared (Between):              0.8426
 No. Observations:                 220   R-squared (Within):               0.7357
-Date:                Wed, Oct 17 2018   R-squared (Overall):              0.8179
-Time:                        23:27:18   Log-likelihood                   -1301.3
+Date:                Wed, Mar 13 2019   R-squared (Overall):              0.8179
+Time:                        08:55:54   Log-likelihood                   -1301.3
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      487.28
 Entities:                          11   P-value                           0.0000
@@ -708,7 +707,7 @@ capital        0.2275     0.0242     9.3904     0.0000      0.1798      0.2753
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

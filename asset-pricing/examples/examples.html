@@ -16,14 +16,16 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Examples &#8212; linearmodels 4.11 documentation</title>
+    <title>Examples &#8212; linearmodels 4.12 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Using Formulas" href="formulas.html" />
@@ -50,7 +52,7 @@
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Linear Factor Models for Asset Pricing</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +63,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11</a>
+    ../../index.html" class="text-logo">linearmodels 4.12</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -177,18 +179,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -228,9 +230,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -238,7 +240,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -287,29 +289,53 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Examples">
 <h1>Examples<a class="headerlink" href="#Examples" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="General-Setup">
 <h2>General Setup<a class="headerlink" href="#General-Setup" title="Permalink to this headline">¶</a></h2>
-<p>Models include factors and returns. Factors can be traded or non-traded.
-Common examples of traded assets include the excess return on the market
-and the size and value factors. Examples of non-traded assets include
-macroeconomic shocks and measures of uncertainty.</p>
-<p>Models are tested using a set of test portfolios. Test portfolios are
-often excess returns although they do not need to be.</p>
+<p>Models include factors and returns. Factors can be traded or non-traded. Common examples of traded assets include the excess return on the market and the size and value factors. Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.</p>
+<p>Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be.</p>
 </div>
 <div class="section" id="Import-data">
 <h2>Import data<a class="headerlink" href="#Import-data" title="Permalink to this headline">¶</a></h2>
-<p>The data used comes from Ken French’s
-<a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a>
-and includes 4 factor returns, the excess market, the size factor, the
-value factor and the momentum factor. The available test portfolios
-include the 12 industry portfolios, a subset of the size-value two way
-sort, and a subset of the size-momentum two way sort.</p>
+<p>The data used comes from Ken French’s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -370,11 +396,9 @@ S5M5     Large firms, winners
 </div>
 <div class="section" id="Transform-the-portfolios-to-be-excesses">
 <h2>Transform the portfolios to be excesses<a class="headerlink" href="#Transform-the-portfolios-to-be-excesses" title="Permalink to this headline">¶</a></h2>
-<p>Subtract the risk-free rate from the test portfolios since these are not
-zero-investment.</p>
+<p>Subtract the risk-free rate from the test portfolios since these are not zero-investment.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -385,20 +409,11 @@ zero-investment.</p>
 </div>
 <div class="section" id="1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)">
 <h2>1-Step Estimation using Seemingly Unrelated Regression (SUR)<a class="headerlink" href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" title="Permalink to this headline">¶</a></h2>
-<p>When the factors are traded assets, they must price themselves, and so
-the observed factor returns can be used to consistently estimate the
-expected factor returns. This also allows a set of seemingly unrelated
-regressions where each test portfolio is regressed on the factors and a
-constant to estimate factor loadings and <span class="math notranslate nohighlight">\(\alpha\)</span>s.</p>
-<p>Note that when using this type of model, it is essential that the test
-portfolios are excess returns. This is not a requirement of the other
-factor model estimators.</p>
-<p>This specification is a CAP-M since only the market is included. The
-J-statistic tests whether all model <span class="math notranslate nohighlight">\(\alpha\)</span>s are 0. The CAP-M
-is unsurprisingly unable to price the test portfolios.</p>
+<p>When the factors are traded assets, they must price themselves, and so the observed factor returns can be used to consistently estimate the expected factor returns. This also allows a set of seemingly unrelated regressions where each test portfolio is regressed on the factors and a constant to estimate factor loadings and <span class="math notranslate nohighlight">\(\alpha\)</span>s.</p>
+<p>Note that when using this type of model, it is essential that the test portfolios are excess returns. This is not a requirement of the other factor model estimators.</p>
+<p>This specification is a CAP-M since only the market is included. The J-statistic tests whether all model <span class="math notranslate nohighlight">\(\alpha\)</span>s are 0. The CAP-M is unsurprisingly unable to price the test portfolios.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -421,8 +436,8 @@ is unsurprisingly unable to price the test portfolios.</p>
 No. Test Portfolios:                  9   R-squared:                      0.6910
 No. Factors:                          1   J-statistic:                    70.034
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(9)
-Time:                          23:26:18
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(9)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -437,13 +452,10 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>The factor set is expanded to include both the size and the value
-factors.</p>
-<p>While the extra factors lower the J statistic and increases the
-<span class="math notranslate nohighlight">\(R^2\)</span>, the model is still easily rejected.</p>
+<p>The factor set is expanded to include both the size and the value factors.</p>
+<p>While the extra factors lower the J statistic and increases the <span class="math notranslate nohighlight">\(R^2\)</span>, the model is still easily rejected.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -464,8 +476,8 @@ factors.</p>
 No. Test Portfolios:                  9   R-squared:                      0.8971
 No. Factors:                          3   J-statistic:                    53.271
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(9)
-Time:                          23:26:18
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(9)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -482,11 +494,9 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>Changing the test portfolios to include only the industry portfolios
-does not allow factors to price the assets.</p>
+<p>Changing the test portfolios to include only the industry portfolios does not allow factors to price the assets.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -509,8 +519,8 @@ does not allow factors to price the assets.</p>
 No. Test Portfolios:                 12   R-squared:                      0.7118
 No. Factors:                          3   J-statistic:                    61.617
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                 chi2(12)
-Time:                          23:26:18
+Date:                  Wed, Mar 13 2019   Distribution:                 chi2(12)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -527,13 +537,9 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>The estimated factor loadings (<span class="math notranslate nohighlight">\(\beta\)</span>s) can be displayed using
-the <code class="docutils literal notranslate"><span class="pre">betas</span></code> property. There is reasonable dispersion in the factor
-loadings for all of the factors, except possibly the market which are
-all close to unity.</p>
+<p>The estimated factor loadings (<span class="math notranslate nohighlight">\(\beta\)</span>s) can be displayed using the <code class="docutils literal notranslate"><span class="pre">betas</span></code> property. There is reasonable dispersion in the factor loadings for all of the factors, except possibly the market which are all close to unity.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -562,8 +568,7 @@ Other  1.109851  0.304442  0.237830
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -574,12 +579,11 @@ Other  1.109851  0.304442  0.237830
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x2b7c7e838ef0&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f86d8b3cf98&gt;
 </pre></div>
 </div>
 </div>
@@ -590,12 +594,9 @@ Other  1.109851  0.304442  0.237830
 <img alt="../../_images/asset-pricing_examples_examples_14_1.png" src="../../_images/asset-pricing_examples_examples_14_1.png" />
 </div>
 </div>
-<p>Similarly the <span class="math notranslate nohighlight">\(\alpha\)</span>s can be displayed. These are monthly
-returns, and so scaling by 12 shows annualized returns. Healthcare has
-the largest pricing error.</p>
+<p>Similarly the <span class="math notranslate nohighlight">\(\alpha\)</span>s can be displayed. These are monthly returns, and so scaling by 12 shows annualized returns. Healthcare has the largest pricing error.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -604,8 +605,7 @@ the largest pricing error.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -628,15 +628,10 @@ Name: alpha, dtype: float64
 </div>
 <div class="section" id="2-Step-Estimation">
 <h2>2-Step Estimation<a class="headerlink" href="#2-Step-Estimation" title="Permalink to this headline">¶</a></h2>
-<p>When one of more factors are not returns on traded assets, it is
-necessary to use a two-step procedure (or GMM). In the 2-step estimator,
-the first estimates factor loadings and the second uses the factor
-loadings to estimate the risk premia.</p>
-<p>Here all four factors are used to attempt to price the size-momentum
-portfolios.</p>
+<p>When one of more factors are not returns on traded assets, it is necessary to use a two-step procedure (or GMM). In the 2-step estimator, the first estimates factor loadings and the second uses the factor loadings to estimate the risk premia.</p>
+<p>Here all four factors are used to attempt to price the size-momentum portfolios.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -659,8 +654,8 @@ portfolios.</p>
 No. Test Portfolios:                  9   R-squared:                      0.9051
 No. Factors:                          4   J-statistic:                    36.929
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(5)
-Time:                          23:26:19
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(5)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -679,8 +674,7 @@ See full_summary for complete results
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -705,15 +699,9 @@ S5M3  0.946214 -0.200052  0.095270 -0.100067
 S5M5  1.078098 -0.046531 -0.069780  0.467172
 </pre></div></div>
 </div>
-<p>The identification requirements for this model are the the
-<span class="math notranslate nohighlight">\(\beta\)</span>s have unique variation – this requires some
-cross-sectional differences in exposures and that the loadings are not
-excessively correlated. Since these test portfolios do not attempt to
-sort on value, it is relatively non-dispersed and also correlated with
-both the market and size. This might make the inference unreliable.</p>
+<p>The identification requirements for this model are the the <span class="math notranslate nohighlight">\(\beta\)</span>s have unique variation – this requires some cross-sectional differences in exposures and that the loadings are not excessively correlated. Since these test portfolios do not attempt to sort on value, it is relatively non-dispersed and also correlated with both the market and size. This might make the inference unreliable.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -733,11 +721,9 @@ HML   -0.733916  0.638056  1.000000  0.002744
 Mom   -0.253675 -0.015628  0.002744  1.000000
 </pre></div></div>
 </div>
-<p>The size factor was insignificant and so is dropped. This does not have
-much of an effect on the estimates.</p>
+<p>The size factor was insignificant and so is dropped. This does not have much of an effect on the estimates.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -759,8 +745,8 @@ much of an effect on the estimates.</p>
 No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    36.406
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:19
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -777,14 +763,10 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>The risk-free rate can be optionally estimated. This is useful in case
-excess returns are not available of if the risk-free rate used to
-construct the excess returns might be misspecified.</p>
-<p>Here the estimated risk-free rate is small and insignificant and has
-little impact on the model J-statistic.</p>
+<p>The risk-free rate can be optionally estimated. This is useful in case excess returns are not available of if the risk-free rate used to construct the excess returns might be misspecified.</p>
+<p>Here the estimated risk-free rate is small and insignificant and has little impact on the model J-statistic.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -804,10 +786,10 @@ little impact on the model J-statistic.</p>
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    36.015
+No. Factors:                          3   J-statistic:                    35.998
 No. Observations:                   819   P-value                         0.0000
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(5)
-Time:                          23:26:19
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(5)
+Time:                          08:54:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -825,15 +807,10 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>The default covariance estimator allows for heteroskedasticity but
-assumes there is no autocorrelation in the model errors or factor
-returns. Kernel-based HAC estimators (e.g. Newey-West) can be used by
-setting <code class="docutils literal notranslate"><span class="pre">cov_type='kernel'</span></code>.</p>
-<p>This reduces the J-statistic indicating there might be some serial
-correlation although the model is still firmly rejected.</p>
+<p>The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns. Kernel-based HAC estimators (e.g. Newey-West) can be used by setting <code class="docutils literal notranslate"><span class="pre">cov_type='kernel'</span></code>.</p>
+<p>This reduces the J-statistic indicating there might be some serial correlation although the model is still firmly rejected.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -852,8 +829,8 @@ correlation although the model is still firmly rejected.</p>
 No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    25.841
 No. Observations:                   819   P-value                         0.0002
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:19
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:54:59
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -873,18 +850,10 @@ See full_summary for complete results
 </div>
 <div class="section" id="GMM-Estimation">
 <h2>GMM Estimation<a class="headerlink" href="#GMM-Estimation" title="Permalink to this headline">¶</a></h2>
-<p>The final estimator is the GMM estimator which is similar to estimating
-the 2-step model in a single step. In practice the GMM estimator is
-estimated at least twice, once to get an consistent estimate of the
-covariance of the moment conditions and the second time to efficiently
-estimate parameters.</p>
-<p>The GMM estimator does not have a closed form and so a non-linear
-optimizer is required. The default output prints the progress every 10
-iterations. Here the model is fit twice, which is the standard method to
-implement efficient GMM.</p>
+<p>The final estimator is the GMM estimator which is similar to estimating the 2-step model in a single step. In practice the GMM estimator is estimated at least twice, once to get an consistent estimate of the covariance of the moment conditions and the second time to efficiently estimate parameters.</p>
+<p>The GMM estimator does not have a closed form and so a non-linear optimizer is required. The default output prints the progress every 10 iterations. Here the model is fit twice, which is the standard method to implement efficient GMM.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -900,33 +869,32 @@ implement efficient GMM.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582798576
-Iteration: 10, Objective: 28.102586628841085
-Iteration: 20, Objective: 26.361384225098814
-Iteration: 30, Objective: 26.019665332881438
-Iteration: 40, Objective: 22.325343252968807
+Iteration: 0, Objective: 47.7579158281536
+Iteration: 10, Objective: 28.102585978540016
+Iteration: 20, Objective: 26.36138444308664
+Iteration: 30, Objective: 26.019665978073238
+Iteration: 40, Objective: 22.32534325297982
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 4387
-         Gradient evaluations: 125
-Iteration: 0, Objective: 22.519350243813953
-Iteration: 10, Objective: 22.303730103901476
-Iteration: 20, Objective: 22.2264266103978
-Iteration: 30, Objective: 22.193086954668352
-Iteration: 40, Objective: 22.066871363530623
+         Function evaluations: 4107
+         Gradient evaluations: 117
+Iteration: 0, Objective: 22.519350309967106
+Iteration: 10, Objective: 22.303730290851778
+Iteration: 20, Objective: 22.226426842203495
+Iteration: 30, Objective: 22.193082206609574
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.066871
-         Iterations: 42
-         Function evaluations: 5017
-         Gradient evaluations: 143
+         Iterations: 40
+         Function evaluations: 1996
+         Gradient evaluations: 57
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.067
 No. Observations:                   819   P-value                         0.0012
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:23
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:55:02
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -943,15 +911,10 @@ HeteroskedasticCovariance
 See full_summary for complete results
 </pre></div></div>
 </div>
-<p>Kernel HAC estimators can be used with this estimator as well. Using a
-kernel HAC covariance also implies a Kernel HAC weighting matrix
-estimator.</p>
-<p>Here the GMM estimator along with the HAC estimator indicates that these
-factors might be able to price this set of 9 test portfolios. <code class="docutils literal notranslate"><span class="pre">disp=0</span></code>
-is used to suppress iterative output.</p>
+<p>Kernel HAC estimators can be used with this estimator as well. Using a kernel HAC covariance also implies a Kernel HAC weighting matrix estimator.</p>
+<p>Here the GMM estimator along with the HAC estimator indicates that these factors might be able to price this set of 9 test portfolios. <code class="docutils literal notranslate"><span class="pre">disp=0</span></code> is used to suppress iterative output.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -970,8 +933,8 @@ is used to suppress iterative output.</p>
 No. Test Portfolios:                  9   R-squared:                      0.7901
 No. Factors:                          3   J-statistic:                    13.833
 No. Observations:                   819   P-value                         0.0316
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:27
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:55:06
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -990,15 +953,10 @@ See full_summary for complete results
 </div>
 <div class="section" id="Iterating-until-convergence">
 <h3>Iterating until convergence<a class="headerlink" href="#Iterating-until-convergence" title="Permalink to this headline">¶</a></h3>
-<p>The standard approach is efficient and uses 2-steps. The first
-consistently estimates parameters using a sub-optimal weighting matrix,
-and the second uses the optimal weighting matrix conditional using the
-first stage estimates.</p>
-<p>This method can be repeated until convergence, or for a fixed number of
-steps using the <code class="docutils literal notranslate"><span class="pre">steps</span></code> keyword argument.</p>
+<p>The standard approach is efficient and uses 2-steps. The first consistently estimates parameters using a sub-optimal weighting matrix, and the second uses the optimal weighting matrix conditional using the first stage estimates.</p>
+<p>This method can be repeated until convergence, or for a fixed number of steps using the <code class="docutils literal notranslate"><span class="pre">steps</span></code> keyword argument.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1012,53 +970,53 @@ steps using the <code class="docutils literal notranslate"><span class="pre">ste
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582798576
-Iteration: 25, Objective: 26.280319474124468
+Iteration: 0, Objective: 47.7579158281536
+Iteration: 25, Objective: 26.280319705662176
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 4387
-         Gradient evaluations: 125
-Iteration: 0, Objective: 22.519350243813953
-Iteration: 25, Objective: 22.222217316212298
+         Function evaluations: 4107
+         Gradient evaluations: 117
+Iteration: 0, Objective: 22.519350309967106
+Iteration: 25, Objective: 22.222217553041116
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.066871
-         Iterations: 42
-         Function evaluations: 5017
-         Gradient evaluations: 143
-Iteration: 0, Objective: 22.094157055696357
-Iteration: 25, Objective: 22.091266625369062
+         Iterations: 40
+         Function evaluations: 1996
+         Gradient evaluations: 57
+Iteration: 0, Objective: 22.094157056737618
+Iteration: 25, Objective: 22.091266633429072
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.089908
          Iterations: 37
-         Function evaluations: 3967
-         Gradient evaluations: 113
-Iteration: 0, Objective: 22.088798291361837
-Iteration: 25, Objective: 22.088771432824533
-Warning: Desired error not necessarily achieved due to precision loss.
+         Function evaluations: 2987
+         Gradient evaluations: 85
+Iteration: 0, Objective: 22.08879829415768
+Iteration: 25, Objective: 22.08877143276393
+Optimization terminated successfully.
          Current function value: 22.088753
          Iterations: 38
-         Function evaluations: 4072
-         Gradient evaluations: 116
-Iteration: 0, Objective: 22.088622388104568
+         Function evaluations: 1960
+         Gradient evaluations: 56
+Iteration: 0, Objective: 22.0886223966312
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.088622
          Iterations: 4
-         Function evaluations: 2881
-         Gradient evaluations: 82
-Iteration: 0, Objective: 22.08862231136532
+         Function evaluations: 2216
+         Gradient evaluations: 63
+Iteration: 0, Objective: 22.08862231992411
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.088622
          Iterations: 3
-         Function evaluations: 2637
-         Gradient evaluations: 75
+         Function evaluations: 2077
+         Gradient evaluations: 59
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.089
 No. Observations:                   819   P-value                         0.0012
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:37
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:55:12
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1078,15 +1036,10 @@ See full_summary for complete results
 </div>
 <div class="section" id="Continuously-Updating-Estimator">
 <h3>Continuously Updating Estimator<a class="headerlink" href="#Continuously-Updating-Estimator" title="Permalink to this headline">¶</a></h3>
-<p>The Continuously Updating Estimator (CUE) is optionally available using
-the flag <code class="docutils literal notranslate"><span class="pre">use_cue</span></code>. CUE jointly minimizes the J-statistic as a
-function of the moment conditions and the weighting matrix, rather than
-iterating between minimizing the J-statistic for a fixed weighting
-matrix and updating the weighting matrix.</p>
+<p>The Continuously Updating Estimator (CUE) is optionally available using the flag <code class="docutils literal notranslate"><span class="pre">use_cue</span></code>. CUE jointly minimizes the J-statistic as a function of the moment conditions and the weighting matrix, rather than iterating between minimizing the J-statistic for a fixed weighting matrix and updating the weighting matrix.</p>
 <p>Here the results are essentially the same as in the iterative approach.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1100,32 +1053,32 @@ matrix and updating the weighting matrix.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Iteration: 0, Objective: 47.75791582798576
-Iteration: 10, Objective: 28.102586628841085
-Iteration: 20, Objective: 26.361384225098814
-Iteration: 30, Objective: 26.019665332881438
-Iteration: 40, Objective: 22.325343252968807
+Iteration: 0, Objective: 47.7579158281536
+Iteration: 10, Objective: 28.102585978540016
+Iteration: 20, Objective: 26.36138444308664
+Iteration: 30, Objective: 26.019665978073238
+Iteration: 40, Objective: 22.32534325297982
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 4387
-         Gradient evaluations: 125
-Iteration: 0, Objective: 22.52447643707134
-Iteration: 10, Objective: 22.386051692670158
-Iteration: 20, Objective: 22.33980268044575
-Iteration: 30, Objective: 22.308305712408124
+         Function evaluations: 4107
+         Gradient evaluations: 117
+Iteration: 0, Objective: 22.524475517892316
+Iteration: 10, Objective: 22.38605013681296
+Iteration: 20, Objective: 22.33980376111844
+Iteration: 30, Objective: 22.308308217633346
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.077574
          Iterations: 38
-         Function evaluations: 3442
-         Gradient evaluations: 98
+         Function evaluations: 4772
+         Gradient evaluations: 136
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7903
 No. Factors:                          3   J-statistic:                    22.719
 No. Observations:                   819   P-value                         0.0009
-Date:                  Wed, Oct 17 2018   Distribution:                  chi2(6)
-Time:                          23:26:42
+Date:                  Wed, Mar 13 2019   Distribution:                  chi2(6)
+Time:                          08:55:18
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -1179,7 +1132,7 @@ See full_summary for complete results
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Linear Factor Models for Asset Pricing</a> &#187;</li> 
       </ul>
     </div>

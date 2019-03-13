@@ -16,14 +16,16 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.11 documentation</title>
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.12 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Module Reference" href="../reference.html" />
@@ -50,7 +52,7 @@
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +63,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.11</a>
+    ../../index.html" class="text-logo">linearmodels 4.12</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -178,18 +180,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -229,9 +231,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -239,7 +241,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -288,28 +290,56 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="section" id="Three-stage-Least-Squares-(3SLS)">
 <h1>Three-stage Least Squares (3SLS)<a class="headerlink" href="#Three-stage-Least-Squares-(3SLS)" title="Permalink to this headline">¶</a></h1>
-<p>This example demonstrates how a system of simultaneous equations can be
-jointly estimated using three-stage least squares (3SLS). The
-simultaneous equations model the wage and number of hours worked. The
-two equations are</p>
+<p>This example demonstrates how a system of simultaneous equations can be jointly estimated using three-stage least squares (3SLS). The simultaneous equations model the wage and number of hours worked. The two equations are</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{eqnarray}
 hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \beta_4 kidslt6 + \beta_5 nwifeinc + \epsilon^h_i
 \\
 \ln(wage) &amp; = &amp; \gamma_0 + \gamma_1 hours + \gamma_2 educ + \gamma_3 educ^2 + \gamma_4 exper + \epsilon^w_i
 \end{eqnarray}\end{split}\]</div>
-<p>Each equation has a single exogenous variables. The instruments for the
-endogenous variables are the regressors that appear in one equation but
-not the other.</p>
+<p>Each equation has a single exogenous variables. The instruments for the endogenous variables are the regressors that appear in one equation but not the other.</p>
 <div class="section" id="Data">
 <h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
 <p>The data set is the MORZ data set from Wooldridge (2002).</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -318,11 +348,9 @@ not the other.</p>
 </pre></div>
 </div>
 </div>
-<p>Here the relevant variables are selected and missing observations are
-dropped to avoid warnings.</p>
+<p>Here the relevant variables are selected and missing observations are dropped to avoid warnings.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -338,8 +366,7 @@ dropped to avoid warnings.</p>
 <li><code class="docutils literal notranslate"><span class="pre">SUR</span></code> - system estimation without endogenous variables</li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -350,12 +377,9 @@ dropped to avoid warnings.</p>
 </div>
 <div class="section" id="Formulas">
 <h2>Formulas<a class="headerlink" href="#Formulas" title="Permalink to this headline">¶</a></h2>
-<p>These examples use the formula interface. This is usually simpler when
-models have exogenous regressors, endogenous regressors and instruments.
-The syntax is the same as in the 2SLS models.</p>
+<p>These examples use the formula interface. This is usually simpler when models have exogenous regressors, endogenous regressors and instruments. The syntax is the same as in the 2SLS models.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -377,8 +401,8 @@ The syntax is the same as in the 2SLS models.</p>
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Wed, Oct 17 2018   P-value (F-stat)                0.0000
-Time:                        23:27:30   Distribution:                  chi2(5)
+Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
+Time:                        08:56:06   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -400,8 +424,7 @@ Debiased: False
 </div>
 <p>The <span class="math notranslate nohighlight">\(\ln\)</span> wage model can be similarly specified and estimated</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -423,8 +446,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Wed, Oct 17 2018   P-value (F-stat)                0.0000
-Time:                        23:27:30   Distribution:                  chi2(4)
+Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
+Time:                        08:56:06   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -443,15 +466,10 @@ Unadjusted Covariance (Homoskedastic)
 Debiased: False
 </pre></div></div>
 </div>
-<p>A system can be specified using a dictionary for formulas. The
-dictionary keys are used as equation labels. Aside from this simple
-change, the syntax is identical.</p>
-<p>Here the model is estimated using <code class="docutils literal notranslate"><span class="pre">method='ols'</span></code> which will just
-simultaneously estimate the two equations but will produce estimates
-that are identical to separate equations.</p>
+<p>A system can be specified using a dictionary for formulas. The dictionary keys are used as equation labels. Aside from this simple change, the syntax is identical.</p>
+<p>Here the model is estimated using <code class="docutils literal notranslate"><span class="pre">method='ols'</span></code> which will just simultaneously estimate the two equations but will produce estimates that are identical to separate equations.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -472,8 +490,8 @@ that are identical to separate equations.</p>
 Estimator:                        OLS   Overall R-squared:              0.1903
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Oct 17 2018
-Time:                        23:27:30
+Date:                Wed, Mar 13 2019
+Time:                        08:56:06
 
 
                   Equation: hours, Dependent Variable: hours
@@ -509,12 +527,9 @@ Covariance Estimator:
 Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 </pre></div></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">method='gls'</span></code> will use GLS estimates which can be more
-efficient than the usual estimates. Here only the first equation
-changes. This is due to the structure of the problem.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">method='gls'</span></code> will use GLS estimates which can be more efficient than the usual estimates. Here only the first equation changes. This is due to the structure of the problem.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -535,8 +550,8 @@ changes. This is due to the structure of the problem.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Oct 17 2018
-Time:                        23:27:30
+Date:                Wed, Mar 13 2019
+Time:                        08:56:06
 
 
                   Equation: hours, Dependent Variable: hours
@@ -575,19 +590,16 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </div>
 <div class="section" id="Direct-Model-Specification">
 <h2>Direct Model Specification<a class="headerlink" href="#Direct-Model-Specification" title="Permalink to this headline">¶</a></h2>
-<p>The model can be directly specified using a dictionary of dictionaries
-where the inner dictionaries contain the 4 components of the model:</p>
+<p>The model can be directly specified using a dictionary of dictionaries where the inner dictionaries contain the 4 components of the model:</p>
 <ul class="simple">
 <li>dependent - The dependent variable</li>
 <li>exog - Exogenous regressors</li>
 <li>endog - Endogenous regressors</li>
 <li>instruments - Instrumental variables</li>
 </ul>
-<p>The estimates are the same. This interface is more useful for
-programmatically generating and estimating models.</p>
+<p>The estimates are the same. This interface is more useful for programmatically generating and estimating models.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -618,8 +630,8 @@ programmatically generating and estimating models.</p>
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Oct 17 2018
-Time:                        23:27:30
+Date:                Wed, Mar 13 2019
+Time:                        08:56:07
 
 
                   Equation: hours, Dependent Variable: hours
@@ -659,24 +671,12 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 </div>
 <div class="section" id="System-GMM-Estimation">
 <h1>System GMM Estimation<a class="headerlink" href="#System-GMM-Estimation" title="Permalink to this headline">¶</a></h1>
-<p>System GMM is an alternative to 3SLS estimation. It is the natural
-extension to GMM estimation of IV models. It makes weaker assumptions
-about instruments than 3SLS does. In particular, instruments are assumed
-exogenous on an equation-by-equation basis rather than the 3SLS
-assumption that all instruments are exogenous in all equations.</p>
-<p>The system GMM estimator is similar to the 3SLS estimator except that it
-requires making a choice about the moment weighting estimator. Valid
-options for the weighting estimator are <code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> or
-<code class="docutils literal notranslate"><span class="pre">'homoskedastic'</span></code> which assumes that residuals are conditionally
-homoskedastic or <code class="docutils literal notranslate"><span class="pre">'robust'</span></code> or <code class="docutils literal notranslate"><span class="pre">'heteroskedastic'</span></code> which allows for
-conditional heteroskedasticity.</p>
-<p>The System GMM estimator also supports iterative application where it is
-possible to iterate until convergence.</p>
-<p>Here the examples make use of the same data as in the 3SLS example and
-only use the formula interface. The default uses 2-step (efficient) GMM.</p>
+<p>System GMM is an alternative to 3SLS estimation. It is the natural extension to GMM estimation of IV models. It makes weaker assumptions about instruments than 3SLS does. In particular, instruments are assumed exogenous on an equation-by-equation basis rather than the 3SLS assumption that all instruments are exogenous in all equations.</p>
+<p>The system GMM estimator is similar to the 3SLS estimator except that it requires making a choice about the moment weighting estimator. Valid options for the weighting estimator are <code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> or <code class="docutils literal notranslate"><span class="pre">'homoskedastic'</span></code> which assumes that residuals are conditionally homoskedastic or <code class="docutils literal notranslate"><span class="pre">'robust'</span></code> or <code class="docutils literal notranslate"><span class="pre">'heteroskedastic'</span></code> which allows for conditional heteroskedasticity.</p>
+<p>The System GMM estimator also supports iterative application where it is possible to iterate until convergence.</p>
+<p>Here the examples make use of the same data as in the 3SLS example and only use the formula interface. The default uses 2-step (efficient) GMM.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -698,8 +698,8 @@ only use the formula interface. The default uses 2-step (efficient) GMM.</p>
 Estimator:          2-Step System GMM   Overall R-squared:              0.0121
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Oct 17 2018
-Time:                        23:27:30
+Date:                Wed, Mar 13 2019
+Time:                        08:56:07
 
 
                   Equation: hours, Dependent Variable: hours
@@ -737,12 +737,9 @@ Weight Estimator:
 Homoskedastic (Unadjusted) Weighting (Debiased: False, Center: False)
 </pre></div></div>
 </div>
-<p>Robust weighting can be used by setting the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code>. The number
-of iterations can be set using <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>. Overall the parameters do
-not meaningfully change.</p>
+<p>Robust weighting can be used by setting the <code class="docutils literal notranslate"><span class="pre">weight_type</span></code>. The number of iterations can be set using <code class="docutils literal notranslate"><span class="pre">iter_limit</span></code>. Overall the parameters do not meaningfully change.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -764,8 +761,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
 No. Equations.:                       2   Cov. Estimator:                 robust
 No. Observations:                   428   Num. Constraints:                 None
-Date:                  Wed, Oct 17 2018
-Time:                          23:27:30
+Date:                  Wed, Mar 13 2019
+Time:                          08:56:07
 
 
                   Equation: hours, Dependent Variable: hours
@@ -838,7 +835,7 @@ Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

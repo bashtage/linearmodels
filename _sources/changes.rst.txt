@@ -1,24 +1,56 @@
 Change Log
 ----------
 
-Since 4.10
-==========
+Version 4.12
+============
+* Added an option to drop singleton observations in
+  :class:`~linearmodels.panel.model.PanelOLS` by setting the keyword argument
+  ``singletons=False``. When ``False``, singelton observations are dropped
+  before the model is fit, so the the result is *as-if* the observations were
+  never in ``exog`` or ``dependent``.
+* Added a method to construct the 2-core graph for 2-way effects models, which
+  allows singleton observations with no effect on estimated slopes to be
+  excluded. (:issue:`191`)
+* Added support for LSMR estimation of parameters in
+  :func:`~linearmodels.panel.model.PanelOLS.fit` through the keyword argument
+  ``use_lsmr``. LSMR is a sparse estimation method that can be used to extend
+  :class:`~linearmodels.panel.model.PanelOLS` to more than two effects.
+* Fixed a bug where IV models estimated with only exogenous regressors where
+  not being correctly labeled as OLS models in output. (:issue:`185`)
+* Added ``wald_test`` to panel-model results.
+* Renamed ``test_linear_constraint`` to ``wald_test``
+* Added a low-memory option to :func:`~linearmodels.panel.model.PanelOLS.fit`
+  that avoids constructing dummy variables. Only used when both ``entity_effects``
+  and ``time_effects`` are ``True``. By default, the low memory algorithm will be
+  used whenever constructing the dummy variable array would require more than
+  1 GiB. (:issue:`182`)
+* Added an option in model comparison (:func:`~linearmodels.iv.results.compare` and
+  :func:`~linearmodels.panel.results.compare`) to report standard errors or pvalues
+  instead of t-stats. (:issue:`178`)
+
+Version 4.11
+============
+* Fixed a bug which did not correctly check the rank of the
+  cross-section regression in :class:`~linearmodels.panel.model.FamaMacBeth` (:issue:`176`)
 * Fixed a bug which failed to correctly check rank conditions when
   specifying asset pricing models (:issue:`173`)
+* Switched to external package cached-property to manage caching instead of
+  custom and less-well-tested solution (:issue:`172`)
 
 Version 4.10
 ============
 * Fixed a bug where weights were incorrectly calculated for HAC covariances
-  when the weight function was `parzen` or `gallant` (:issue:`170`)
+  when the weight function was ``'parzen'`` or ``'gallant'`` (:issue:`170`)
 
 Version 4.9
 ===========
 * Changed the return type of Wooldridge's over identification test when
-  invalid to `InvalidTestStatistic`
+  invalid to ``InvalidTestStatistic``
 * Add typing information to IV models
-* Allow optimization parameters to be passed to `IVGMMCUE`
+* Allow optimization parameters to be passed to :class:`~linearmodels.iv.model.IVGMMCUE`
 * Removed internal use of pandas Panel
-* Improved performance in panel models when using `from_formula`
+* Improved performance in panel models when using
+  :func:`~linearmodels.panel.model.PanelOLS.from_formula`
 * Switched to retaining index column names when original input index is named
 * Modified tests that were not well conceived
 * Added spell check to documentation build
@@ -43,7 +75,7 @@ Version 4.5
 * Added System GMM estimator
 * Added automatic bandwidth for kernel-based GMM weighting estimators
 * Cleaned up HAC estimation across models
-* Added `predict` method to IV, Panel and System model to allow out-of-sample
+* Added ``predict`` method to IV, Panel and System model to allow out-of-sample
   prediction and simplify retrieval of in-sample results
 * Fixed small issues with Fama-MacBeth which previously ignored weights
 
