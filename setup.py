@@ -2,7 +2,9 @@ import glob
 import os
 import sys
 
-from setuptools import find_packages, setup
+from Cython.Build import cythonize
+
+from setuptools import Extension, find_packages, setup
 
 import versioneer
 
@@ -77,6 +79,10 @@ for filename in glob.iglob('./examples/**', recursive=True):
     if '.png' in filename:
         additional_files.append(filename)
 
+extensions = [Extension('linearmodels.panel.lsmr.lsmr',
+          ['linearmodels/panel/lsmr/lsmr.pyx'])
+              ]
+
 setup(
     cmdclass=versioneer.get_cmdclass(),
     name='linearmodels',
@@ -111,4 +117,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering',
     ],
+    ext_modules=cythonize(extensions)
 )
