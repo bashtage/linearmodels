@@ -1,7 +1,9 @@
 import glob
 import os
 import sys
-
+import numpy
+from numpy.distutils.misc_util import get_info
+import pkg_resources
 from Cython.Build import cythonize
 
 from setuptools import Extension, find_packages, setup
@@ -79,8 +81,18 @@ for filename in glob.iglob('./examples/**', recursive=True):
     if '.png' in filename:
         additional_files.append(filename)
 
+includes = [numpy.get_include()]
+includes += [pkg_resources.resource_filename('numpy', 'core/include')]
+includes = list(set(includes))
+numpy_math_libs = get_info('npymath')
+include_dirs = includes + numpy_math_libs['include_dirs']
+libraries = numpy_math_libs['libraries']
+library_dirs = numpy_math_libs['library_dirs']
 extensions = [Extension('linearmodels.panel.lsmr.lsmr',
-          ['linearmodels/panel/lsmr/lsmr.pyx'])
+                        ['linearmodels/panel/lsmr/lsmr.pyx'],
+                        include_dirs=include_dirs,
+                        libraries=libraries,
+                        library_dirs=library_dirs)
               ]
 
 setup(

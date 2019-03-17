@@ -1,10 +1,15 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, cdivision=True
 cimport cython
+cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdlib cimport malloc, free
+from libc.float cimport DBL_MAX
+from scipy.linalg.cython_blas cimport dscal, ddot, dnrm2
+#dscal(int *n, d *da, d *dx, int *incx)
 cdef double ZERO = 0.0
 cdef double ONE = 1.0
 cdef double ONEPT = 1.1
+cdef int ONE_INT = 1
 
 cdef enum termination_flag:
   lsmr_stop_x0              = 0
@@ -31,6 +36,7 @@ cdef struct lsmr_options:
     int print_freq_itn
     int unit_diagnostics
     int unit_error
+
 
 cdef void initialize_lsmr_options(lsmr_options* options):
     options.atol = 1e-6
@@ -145,10 +151,11 @@ cdef void localVEnqueue(lsmr_keep *keep, int n, double* v):
 cdef inline double dot_product(double* a, double* b, int n):
     # TODO: Replace with Blas level 1 function
     #  ddot(n, a, 1, b, 1)
-    cdef int i
-    cdef double d
-    for i in range(i):
-        d += a[i] * b[i]
+    return ddot(&n, a, &ONE_INT, b, &ONE_INT)
+#    cdef int i
+#    cdef double d
+#    for i in range(i):
+#        d += a[i] * b[i]
 
 cdef void localVOrtho(lsmr_keep *keep, int n, double* v):
     cdef int localOrthoCount, offset, i
@@ -164,17 +171,193 @@ cdef void localVOrtho(lsmr_keep *keep, int n, double* v):
         for i in range(n):
             v[i] -= d * keep.localV[offset+i]
 
-cdef void branch_10():
+cdef bint allocate(double *array, int* array_size, int size):
+    array = <double *>malloc(size * sizeof(double))
+    array_size[0] = size
+    return array == NULL and size > 0
+
+cdef bint allocate_2d(double *array, int* array_rows, int* array_cols, int rows, int cols):
+    array = <double *>malloc(rows * cols * sizeof(double))
+    array_rows[0] = rows
+    array_cols[0] = cols
+    return array == NULL and (cols * rows) > 0
+
+cdef bint allocated(int array_size):
+    return array_size > 0
+
+cdef bint allocated_2d(int array_rows, int array_cols):
+    return (array_rows * array_cols) > 0
+
+cdef deallocate(double *array):
+    free(array)
+    return True
+
+cdef void branch_10(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+    cdef int i
+    cdef double alpha_inv
+#     keep%alpha = dnrm2 (n, v, 1)
+    keep.alpha = dnrm2(&n, v, &ONE_INT)
+#     if (keep%alpha .gt. zero) call dscal (n, (one/keep%alpha), v, 1)
+    if keep.alpha > 0:
+        alpha_inv = ONE/keep.alpha
+        dscal(&n, &alpha_inv, v, &ONE_INT)
+#     ! Exit if A'b = 0.
+#     inform%normr  = keep%beta
+    inform.normr = keep.beta
+#     inform%normAPr = keep%alpha * keep%beta
+    inform.normAPr = keep.alpha * keep.beta
+#     if (inform%normAPr .eq. zero) then
+#        inform%normy = zero
+#        goto 800
+#     end if
+    if inform.normAPr == ZERO:
+        inform.normy = ZERO
+        branch_800()
+        return
+#     ! Initialization for local reorthogonalization.
+#
+#     keep%localOrtho = .false.
+    keep.localOrtho = False
+#     if (keep%localVecs .gt. 0) then
+#        keep%localPointer    = 1
+#        keep%localOrtho      = .true.
+#        keep%localVQueueFull = .false.
+#        keep%localV(1:n,1)   = v(1:n)
+#     end if
+    if keep.localVecs > 0:
+        keep.localPointer = 1
+        keep.localOrtho = True
+        keep.localVQueueFull = False
+        for i in range(n):
+            keep.localV[i] = v[i]
+#
+#     ! Initialize variables for 1st iteration.
+#
+#     keep%zetabar  = keep%alpha*keep%beta
+#     keep%alphabar = keep%alpha
+#     keep%rho      = 1
+#     keep%rhobar   = 1
+#     keep%cbar     = 1
+#     keep%sbar     = 0
+    keep.zetabar = keep.alpha * keep.beta
+    keep.alphabar = keep.alpha
+    keep.rho = 1
+    keep.rhobar = 1
+    keep.cbar = 1
+    keep.sbar = 0
+#
+#     keep%h(1:n)    = v(1:n)
+#     keep%hbar(1:n) = zero
+    for i in range(n):
+        keep.h[i] = v[i]
+        keep.hbar[i] = ZERO
+#
+#     ! Initialize variables for estimation of ||r||.
+#
+#     keep%betadd      = keep%beta
+#     keep%betad       = 0
+#     keep%rhodold     = 1
+#     keep%tautildeold = 0
+#     keep%thetatilde  = 0
+#     keep%zeta        = 0
+#     keep%d           = 0
+    keep.betadd = keep.beta
+    keep.betad = 0
+    keep.rhodold = 1
+    keep.tautildeold = 0
+    keep.thetatilde = 0
+    keep.zeta = 0
+    keep.d = 0
+#
+#     ! Initialize variables for estimation of ||AP|| and cond(AP).
+#
+#     keep%normA2  = keep%alpha**2
+#     keep%maxrbar = zero
+#     keep%minrbar = huge(one)
+    keep.normA2 = keep.alpha ** 2
+    keep.maxrbar = ZERO
+    keep.minrbar = DBL_MAX
+
+#
+#     inform%normb  = keep%beta
+    inform.normb = keep.beta
+#
+#     ! Items for use in stopping rules (needed for control%options = 3 only).
+#     keep%ctol   = zero
+    keep.ctol = ZERO
+#     if (options%conlim .gt. zero) keep%ctol = one/options%conlim
+    if options.conlim > 0:
+        keep.ctol = ONE / options.conlim
+#
+#     ! Heading for iteration log.
+#
+    # TODO: Implement printing
+#     if (keep%show) then
+#        if (options%ctest .eq. 3) then
+#           if (keep%damped) then
+#              write (keep%nout,1300)
+#           else
+#              write (keep%nout,1200)
+#           end if
+#           test1 = one
+#           test2 = keep%alpha / keep%beta
+#           write (keep%nout,1500) &
+#                inform%itn,y(1),inform%normr,inform%normAPr,test1,test2
+#        else if (options%ctest .eq. 2) then
+#           if (keep%damped) then
+#              write (keep%nout,1350)
+#           else
+#              write (keep%nout,1250)
+#           end if
+#           write (keep%nout,1500) inform%itn,y(1),inform%normr,inform%normAPr
+#        else
+#           ! simple printing
+#           write (keep%nout,1400)
+#           write (keep%nout,1600) inform%itn,y(1)
+#        end if
+#     end if
+    branch_100(action, m, n, u, v, y, keep, options, inform)
+    return
+
+cdef void branch_20(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
     pass
 
-cdef void branch_20():
+cdef void branch_30(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
     pass
 
-cdef void branch_30():
+cdef void branch_40(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
     pass
 
-cdef void branch_40():
+cdef void branch_100(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+    cdef double neg_alpha
+#        inform%itn = inform%itn + 1
+    inform.itn += 1
+#
+#        !----------------------------------------------------------------
+#        ! Perform the next step of the bidiagonalization to obtain the
+#        ! next beta, u, alpha, v.  These satisfy
+#        !     beta*u = A*v  - alpha*u,
+#        !    alpha*v = A'*u -  beta*v.
+#        !----------------------------------------------------------------
+#        call dscal (m,(- keep%alpha), u, 1)
+    neg_alpha = -keep.alpha
+    dscal(&m, &neg_alpha, u, &ONE_INT)
+#        action = 2             !  call Aprod1(m, n, v, u), i.e., u = u + AP*v
+    action[0] = 2
+#        keep%branch = 2
+    keep.branch = 1
+#        return
+    return
+
+cdef void branch_800():
     pass
+
+#cdef double dnrm2(int n, double *x, int incx):
+#    # TODO: Shim
+#    return 0.0
+
+#cdef void dscal(int n, double a, double *x,int incx):
+#    pass
 
 cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, damp=None):
     # TODO: intrinsic   :: abs, dot_product, min, max, sqrt
@@ -185,35 +368,27 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     cdef double alphahat, betaacute, betacheck, betahat, c, chat, \
         ctildeold, rhobarold, rhoold, rhotemp, rhotildeold,\
         rtol, s, shat, stildeold, t1, taud, test1, test2, test3,\
-        thetabar, thetanew, thetatildeold, dnrm2
+        thetabar, thetanew, thetatildeold
+
+    cdef double beta_inv
 
     cdef char* enter = ' Enter LSMR.'
     cdef char* exitt = ' Exit  LSMR.'
 
-    cdef char** msg = <char**> malloc(10 * sizeof(char*))
-    cdef char* msg0 = 'The exact solution is  x = 0 '
-    cdef char* msg1 = 'Ax - b is small enough, given atol, btol'
-    cdef char* msg2 = 'The least-squares solution is good enough, given atol '
-    cdef char* msg3 = 'The estimate of cond(Abar) has exceeded conlim'
-    cdef char* msg4 = 'Ax - b is small enough for this machine '
-    cdef char* msg5 = 'The LS solution is good enough for this machine '
-    cdef char* msg6 = 'Cond(Abar) seems to be too large for this machine '
-    cdef char* msg7 = 'The iteration limit has been reached'
-    cdef char* msg8 =' Allocation error'
-    cdef char* msg9 = 'Deallocation error '
-    cdef char* msg10 = 'Error: m or n is out-of-range '
-    msg[0] = msg0
-    msg[1] = msg1
-    msg[2] = msg2
-    msg[3] = msg3
-    msg[4] = msg4
-    msg[5] = msg5
-    msg[6] = msg6
-    msg[7] = msg7
-    msg[8] = msg8
-    msg[9] = msg9
-    msg[10] = msg10
-    
+
+    msg = [
+    'The exact solution is  x = 0 ',
+    'Ax - b is small enough, given atol, btol',
+    'The least-squares solution is good enough, given atol ',
+    'The estimate of cond(Abar) has exceeded conlim',
+    'Ax - b is small enough for this machine ',
+    'The LS solution is good enough for this machine ',
+    'Cond(Abar) seems to be too large for this machine ',
+    'The iteration limit has been reached',
+    ' Allocation error',
+    'Deallocation error ',
+    'Error: m or n is out-of-range ']
+
     # on first call, initialize keep%branch and keep%flag
     if action[0] == 0:
        keep.branch = 0
@@ -224,13 +399,13 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
         return
 
     if keep.branch == 1:
-        branch_10()
+        branch_10(action, m, n, u, v, y, keep, options, inform)
     elif keep.branch == 2:
-        branch_20()
+        branch_20(action, m, n, u, v, y, keep, options, inform)
     elif keep.branch == 3:
-        branch_30()
+        branch_30(action, m, n, u, v, y, keep, options, inform)
     elif keep.branch == 4:
-        branch_40()
+        branch_40(action, m, n, u, v, y, keep, options, inform)
 
 #     ! Initialize.
     inform.flag = 0
@@ -258,20 +433,22 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
                 damp_str = damp
             else:
                 damp_str = 'N/A'
-            output_1000.format(action=enter, rows=m, columns=n, damp=damp_str, atol=options.atol,
+            message = output_1000.format(action=enter, rows=m, columns=n, damp=damp_str, atol=options.atol,
                                btol=options.btol, conlim=options.conlim, intlim=options.itnlim,
                                localSize=keep.localVecs)
+
         else:
-            output_1100.format(enter=enter, rows=m, columns=n, damp=damp_str, itnlim=options.itnlim,
+            message = output_1100.format(enter=enter, rows=m, columns=n, damp=damp_str, itnlim=options.itnlim,
                                localSize=keep.localVecs)
+        print(message)
 
     # quick check of m and n
     if (n < 1) or (m < 1):
        inform.flag = lsmr_stop_m_oor
        keep.flag   = lsmr_stop_m_oor
        if keep.show_err:
-           write (keep.nout_err,'(a)') msg(lsmr_stop_m_oor)
-       action = 0
+           print(msg[lsmr_stop_m_oor])
+       action[0] = 0
        return
     
 
@@ -281,7 +458,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     if keep.itn_test <= 0:
         keep.itn_test = min(n,10)
     keep.damped = False
-    if (present_damp):
+    if present_damp:
         keep.damped = (damp > ZERO)
     keep.itnlim = options.itnlim
     if options.itnlim <= 0:
@@ -290,82 +467,89 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     #  allocate workspace (only do this if arrays not already allocated
     #  eg for an earlier problem)
 #
-    if not allocated(keep.h):
-       allocate( keep.h(n), stat = inform.stat )
-       if inform.stat != 0:
-          inform.flag = lsmr_stop_allocation
-          keep.flag   = lsmr_stop_allocation
-          if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-          action = 0
-          return
-    else if (size(keep.h) < n):
-       deallocate (keep.h, stat = inform.stat)
-       if (inform.stat != 0):
-          inform.flag = lsmr_stop_deallocation
-          keep.flag   = lsmr_stop_deallocation
-          if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_deallocation)
-          action = 0
-          return
-       else
-          allocate( keep.h(n), stat = inform.stat )
-          if ( inform.stat != 0 ):
-             inform.flag = lsmr_stop_allocation
-             keep.flag   = lsmr_stop_allocation
-             if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-             action = 0
-             return
-#
-    if not allocated(keep.hbar):
-       allocate( keep.hbar(n), stat = inform.stat )
-       if ( inform.stat != 0 ):
-          inform.flag = lsmr_stop_allocation
-          keep.flag   = lsmr_stop_allocation
-          if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-          action = 0
-          return
-    else if (size(keep.hbar) < n) then
-       deallocate (keep.hbar, stat = inform.stat)
-       if (inform.stat != 0) then
-          inform.flag = lsmr_stop_deallocation
-          keep.flag   = lsmr_stop_deallocation
-          if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_deallocation)
-          action = 0
-          return
-       else
-          allocate( keep.hbar(n), stat = inform.stat )
-          if ( inform.stat != 0 ) then
-             inform.flag = lsmr_stop_allocation
-             keep.flag   = lsmr_stop_allocation
-             if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-             action = 0
-             return
-#
-    if keep.localVecs > 0:
-       if not allocated(keep.localV):
-          allocate( keep.localV(n,keep.localVecs), stat = inform.stat )
-          if ( inform.stat != 0 ) then
-             inform.flag = lsmr_stop_allocation
-             keep.flag   = lsmr_stop_allocation
-             if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-             action = 0
-             return
-          end if
-       else if ((size(keep.localV,1) < n) .or. &
-            (size(keep.localV,2) < keep.localVecs)) then
-          deallocate (keep.localV, stat = inform.stat)
-          if (inform.stat != 0) then
-             inform.flag = lsmr_stop_deallocation
-             keep.flag   = lsmr_stop_deallocation
-             if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_deallocation)
-             action = 0
-             return
-          else:
-             allocate( keep.localV(n,keep.localVecs), stat = inform.stat )
-             if ( inform.stat != 0 ) then
+    if not allocated(keep.h_n):
+        inform.stat = allocate(keep.h, &keep.h_n, n)
+        if inform.stat != 0:
+            inform.flag = lsmr_stop_allocation
+            keep.flag   = lsmr_stop_allocation
+            if (keep.show_err):
+                print(msg[lsmr_stop_allocation])
+            action[0] = 0
+            return
+    elif keep.h_n < n:
+        inform.stat = deallocate(keep.h)
+        if inform.stat != 0:
+            inform.flag = lsmr_stop_deallocation
+            keep.flag   = lsmr_stop_deallocation
+            if keep.show_err:
+                print(msg[lsmr_stop_deallocation])
+            action[0] = 0
+            return
+        else:
+            inform.stat = allocate(keep.h, &keep.h_n, n)
+            if inform.stat != 0:
                 inform.flag = lsmr_stop_allocation
                 keep.flag   = lsmr_stop_allocation
-                if (keep.show_err) write (keep.nout_err,'(a)') msg(lsmr_stop_allocation)
-                action = 0
+                if keep.show_err:
+                    print(msg[lsmr_stop_allocation])
+            action[0] = 0
+            return
+#
+    if not allocated(keep.hbar_n):
+        inform.stat = allocate(keep.hbar, &keep.hbar_n, n)
+        if inform.stat != 0:
+            inform.flag = lsmr_stop_allocation
+            keep.flag   = lsmr_stop_allocation
+            if keep.show_err:
+                print(msg[lsmr_stop_allocation])
+            action[0] = 0
+            return
+    elif keep.hbar_n < n:
+        inform.stat = deallocate(keep.hbar)
+        if inform.stat != 0:
+            inform.flag = lsmr_stop_deallocation
+            keep.flag   = lsmr_stop_deallocation
+            if keep.show_err:
+                print(msg[lsmr_stop_deallocation])
+            action[0] = 0
+            return
+        else:
+            inform.stat = allocate(keep.hbar, &keep.hbar_n, n)
+            if inform.stat != 0:
+                inform.flag = lsmr_stop_allocation
+                keep.flag = lsmr_stop_allocation
+                if keep.show_err:
+                    print(msg[lsmr_stop_allocation])
+                action[0] = 0
+                return
+#
+    if keep.localVecs > 0:
+        if not allocated_2d(keep.localV_n, keep.localV_m):
+            inform.stat = allocate_2d(keep.localV, &keep.localV_n, &keep.localV_m, n, keep.localVecs)
+            if inform.stat != 0:
+                inform.flag = lsmr_stop_allocation
+                keep.flag   = lsmr_stop_allocation
+                if keep.show_err:
+                    print(msg[lsmr_stop_allocation])
+                action[0] = 0
+                return
+    elif keep.localV_n < n or keep.localV_m < keep.localVecs:
+        inform.stat = deallocate(keep.localV)
+        if inform.stat != 0:
+            inform.flag = lsmr_stop_deallocation
+            keep.flag   = lsmr_stop_deallocation
+            if keep.show_err:
+                print(msg[lsmr_stop_deallocation])
+            action[0] = 0
+            return
+        else:
+            inform.stat = allocate_2d(keep.localV, &keep.localV_n, &keep.localV_m, n, keep.localVecs)
+            if inform.stat != 0:
+                inform.flag = lsmr_stop_allocation
+                keep.flag   = lsmr_stop_allocation
+                if keep.show_err:
+                    print(msg[lsmr_stop_allocation])
+                action[0] = 0
                 return
 
 #
@@ -373,24 +557,25 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     # Set up the first vectors u and v for the bidiagonalization.
     # These satisfy  beta*u = b,  alpha*v = A(transpose)*u.
     #-------------------------------------------------------------------
-    v(1:n) = zero
-    y(1:n) = zero
+    for i in range(n):
+        v[i] = ZERO
+        y[i] = ZERO
 #
-    keep.alpha  = zero
-    keep.beta   = dnrm2 (m, u, 1)
+    keep.alpha  = ZERO
+    keep.beta   = dnrm2(&m, u, &ONE_INT)
 #
-    if (keep.beta > zero) then
-       call dscal (m, (one/keep.beta), u, 1)
-       action = 1                  # call Aprod2(m, n, v, u), i.e., v = P'A'*u
-       keep.branch = 1
-       return
+    if keep.beta > ZERO:
+        beta_inv = ONE/keep.beta
+        dscal(&m, &beta_inv, u, &ONE_INT)
+        action[0] = 1
+        keep.branch = 1
+        return
 #
-    else
-      # Exit if b=0.
-       inform.normAP = -one
-       inform.condAP = -one
-       goto 800
-    end if
+    else:
+       # Exit if b=0.
+        inform.normAP = -ONE
+        inform.condAP = -ONE
+        branch_800()
 
 # Copyright (c) 2010, 2012 David Fong, Michael Saunders, Stanford University
 # Copyright (c) 2014-2016 Science and Technology Facilites Council (STFC)
@@ -661,7 +846,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #        inform%flag = lsmr_stop_m_oor
 #        keep%flag   = lsmr_stop_m_oor
 #        if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_m_oor)
-#        action = 0
+#        action[0] = 0
 #        return
 #     end if
 # 
@@ -683,7 +868,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #           inform%flag = lsmr_stop_allocation
 #           keep%flag   = lsmr_stop_allocation
 #           if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#           action = 0
+#           action[0] = 0
 #           return
 #        end if
 #     else if (size(keep%h) .lt. n) then
@@ -692,7 +877,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #           inform%flag = lsmr_stop_deallocation
 #           keep%flag   = lsmr_stop_deallocation
 #           if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_deallocation)
-#           action = 0
+#           action[0] = 0
 #           return
 #        else
 #           allocate( keep%h(n), stat = inform%stat )
@@ -700,7 +885,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #              inform%flag = lsmr_stop_allocation
 #              keep%flag   = lsmr_stop_allocation
 #              if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#              action = 0
+#              action[0] = 0
 #              return
 #           end if
 #        end if
@@ -712,7 +897,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #           inform%flag = lsmr_stop_allocation
 #           keep%flag   = lsmr_stop_allocation
 #           if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#           action = 0
+#           action[0] = 0
 #           return
 #        end if
 #     else if (size(keep%hbar) .lt. n) then
@@ -721,7 +906,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #           inform%flag = lsmr_stop_deallocation
 #           keep%flag   = lsmr_stop_deallocation
 #           if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_deallocation)
-#           action = 0
+#           action[0] = 0
 #           return
 #        else
 #           allocate( keep%hbar(n), stat = inform%stat )
@@ -729,7 +914,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #              inform%flag = lsmr_stop_allocation
 #              keep%flag   = lsmr_stop_allocation
 #              if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#              action = 0
+#              action[0] = 0
 #              return
 #           end if
 #        end if
@@ -742,7 +927,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #              inform%flag = lsmr_stop_allocation
 #              keep%flag   = lsmr_stop_allocation
 #              if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#              action = 0
+#              action[0] = 0
 #              return
 #           end if
 #        else if ((size(keep%localV,1) .lt. n) .or. &
@@ -752,7 +937,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #              inform%flag = lsmr_stop_deallocation
 #              keep%flag   = lsmr_stop_deallocation
 #              if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_deallocation)
-#              action = 0
+#              action[0] = 0
 #              return
 #           else
 #              allocate( keep%localV(n,keep%localVecs), stat = inform%stat )
@@ -760,7 +945,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #                 inform%flag = lsmr_stop_allocation
 #                 keep%flag   = lsmr_stop_allocation
 #                 if (keep%show_err) write (keep%nout_err,'(a)') msg(lsmr_stop_allocation)
-#                 action = 0
+#                 action[0] = 0
 #                 return
 #              end if
 #           end if
@@ -779,7 +964,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 # 
 #     if (keep%beta .gt. zero) then
 #        call dscal (m, (one/keep%beta), u, 1)
-#        action = 1                  ! call Aprod2(m, n, v, u), i.e., v = P'A'*u
+#        action[0] = 1                  ! call Aprod2(m, n, v, u), i.e., v = P'A'*u
 #        keep%branch = 1
 #        return
 # 
@@ -888,7 +1073,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #        !    alpha*v = A'*u -  beta*v.
 #        !----------------------------------------------------------------
 #        call dscal (m,(- keep%alpha), u, 1)
-#        action = 2             !  call Aprod1(m, n, v, u), i.e., u = u + AP*v
+#        action[0] = 2             !  call Aprod1(m, n, v, u), i.e., u = u + AP*v
 #        keep%branch = 2
 #        return
 # 
@@ -901,7 +1086,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #              call localVEnqueue     ! Store old v for local reorthog'n of new v.
 #           end if
 #           call dscal (n, (- keep%beta), v, 1)
-#           action = 1            ! call Aprod2(m, n, v, u), i.e., v = v + P'A'*u
+#           action[0] = 1            ! call Aprod2(m, n, v, u), i.e., v = v + P'A'*u
 #           keep%branch = 3
 #           return
 #        end if
@@ -1050,7 +1235,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #           ! see if it is time to return to the user to test convergence
 #           if (mod(keep%test_count,keep%itn_test) .eq. 0) then
 #              keep%test_count = 0
-#              action = 3
+#              action[0] = 3
 #              keep%branch = 4
 #              return
 #           end if
@@ -1134,7 +1319,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 #     end if
 # 
 #     ! terminate
-#     action = 0
+#     action[0] = 0
 #     return
 # 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1200,3 +1385,7 @@ a, 5x, 'flag    =', i2,    15x, 'itn     =', i8      &
 """
 output_2100 = "a, 5x, 'flag    =', i2,   15x,'itn     =', i8"
 output_3000 = "{a}, {5x}, {a}"
+
+
+def tester(double[::1] a, double[::1] b, int n):
+    return dot_product(&a[0],&b[0],n)
