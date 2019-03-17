@@ -188,7 +188,7 @@ cdef bint allocated(int array_size):
 cdef bint allocated_2d(int array_rows, int array_cols):
     return (array_rows * array_cols) > 0
 
-cdef deallocate(double *array):
+cdef bint deallocate(double *array):
     free(array)
     return True
 
@@ -320,13 +320,101 @@ cdef void branch_10(int* action, int m, int n, double *u, double *v, double *y, 
     return
 
 cdef void branch_20(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
-    pass
+    cdef double beta_inv, neg_beta
+    # keep%beta   = dnrm2 (m, u, 1)
+    keep.beta = dnrm2(&m, u, &ONE_INT)
+ 
+    # if (keep%beta .gt. zero) then
+    if keep.beta > 0:
+        beta_inv = ONE / keep.beta
+        # call dscal (m, (one/keep%beta), u, 1)
+        dscal(&m, &beta_inv, u, &ONE_INT)
+        # if (keep%localOrtho) then ! Store v into the circular buffer localV
+        if keep.localOrtho:
+            # call localVEnqueue     ! Store old v for local reorthog'n of new            localVEnqueue(keep, n, v)
+            localVEnqueue(keep, n, v)
+            # call dscal (n, (- keep%beta), v, 1)
+            neg_beta = -keep.beta
+            dscal(&n, &neg_beta, v, &ONE_INT)
+            # action = 1            ! call Aprod2(m, n, v, u), i.e., v = v + P'A'*u
+            action[0] = 1
+            # keep%branch = 3
+            keep.branch = 3
+            return
+    branch_30(action, m, n, u, v, y, keep, options, inform)
+
 
 cdef void branch_30(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
     pass
 
 cdef void branch_40(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
-    pass
+    # prnt = .false.
+    cdef bint prnt = False
+    # if (keep%show) then
+    if keep.show:
+    # if (inform%itn .le.               options%print_freq_itn) prnt = .true.
+        prnt = inform.itn <= options.print_freq_itn
+        # if (inform%itn .ge. (keep%itnlim-options%print_freq_itn)) prnt = .true.
+        prnt |= inform.itn >= (keep.itnlim - options.print_freq_itn)
+        # if (mod(inform%itn,options%print_freq_itn)  .eq.       0) prnt = .true.
+        prnt |= (inform.itn % options.print_freq_itn) == 0
+        # if (options%ctest .eq. 3) then
+        if options.ctest == 3:
+            pass
+            # TODO: Need these values here
+            # if (test3 .le.  (onept*keep%ctol   )) prnt = .true.
+            # prnt |= test3 <= ONEPT*keep.ctol
+            # if (test2 .le.  (onept*options%atol)) prnt = .true.
+            # prnt |= test2 <= ONEPT*options.atol
+            # if (test1 .le.  (onept*rtol        )) prnt = .true.
+            # prnt |= test1 <= ONEPT*rtol
+        # if (inform%flag .ne.  0) prnt = .true.
+        prnt |= inform.flag != 0
+    if prnt:
+        # TODO
+        print('TODO: iteration display')
+#        !----------------------------------------------------------------
+#        ! See if it is time to print something.
+#        !----------------------------------------------------------------
+# 
+#           if (prnt) then        ! Print a line for this iteration
+#              ! Check whether to print a heading first
+#              if (keep%pcount .ge. options%print_freq_head) then
+#                 keep%pcount = 0
+#                 if (options%ctest .eq. 3) then
+#                    if (keep%damped) then
+#                       write (keep%nout,1300)
+#                    else
+#                       write (keep%nout,1200)
+#                    end if
+#                 else if (options%ctest .eq. 2) then
+#                    if (keep%damped) then
+#                       write (keep%nout,1350)
+#                    else
+#                       write (keep%nout,1250)
+#                    end if
+#                 else
+#                    write (keep%nout,1400)
+#                 end if
+#              end if
+#              keep%pcount = keep%pcount + 1
+#              if (options%ctest .eq. 3) then
+#                 write (keep%nout,1500) &
+#                      inform%itn,y(1),inform%normr,inform%normAPr,    &
+#                      test1,test2,inform%normAP,inform%condAP
+#              else if (options%ctest.eq.2) then
+#                 write (keep%nout,1500) inform%itn,y(1),inform%normr, &
+#                      inform%normAPr,inform%normAP,inform%condAP
+#              else
+#                 write (keep%nout,1600) inform%itn,y(1)
+#              end if
+#           end if
+#        end if
+# 
+    # if (inform%flag .eq. 0) goto 100
+    if inform.flag == 0:
+        branch_100(action, m, n, u, v, y, keep, options, inform)
+
 
 cdef void branch_100(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
     cdef double neg_alpha
@@ -362,7 +450,8 @@ cdef void branch_800():
 cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, damp=None):
     # TODO: intrinsic   :: abs, dot_product, min, max, sqrt
 
-    cdef present_damp = damp is not None
+    cdef bint present_damp = damp is not None
+    cdef double damp_val = damp if present_damp else 0.0
     cdef int localOrthoCount
     cdef bint prnt
     cdef double alphahat, betaacute, betacheck, betahat, c, chat, \
@@ -385,7 +474,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     'The LS solution is good enough for this machine ',
     'Cond(Abar) seems to be too large for this machine ',
     'The iteration limit has been reached',
-    ' Allocation error',
+    'Allocation error',
     'Deallocation error ',
     'Error: m or n is out-of-range ']
 
@@ -427,18 +516,17 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     keep.show_err  = keep.nout_err >= 0
 #
     if keep.show:
-        damp_str = damp if present_damp else 'N/A'
         if options.ctest == 3:
             if present_damp:
                 damp_str = damp
             else:
                 damp_str = 'N/A'
-            message = output_1000.format(action=enter, rows=m, columns=n, damp=damp_str, atol=options.atol,
+            message = output_1000.format(action=enter, rows=m, columns=n, damp=damp, atol=options.atol,
                                btol=options.btol, conlim=options.conlim, intlim=options.itnlim,
                                localSize=keep.localVecs)
 
         else:
-            message = output_1100.format(enter=enter, rows=m, columns=n, damp=damp_str, itnlim=options.itnlim,
+            message = output_1100.format(enter=enter, rows=m, columns=n, damp=damp, itnlim=options.itnlim,
                                localSize=keep.localVecs)
         print(message)
 
@@ -459,7 +547,7 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
         keep.itn_test = min(n,10)
     keep.damped = False
     if present_damp:
-        keep.damped = (damp > ZERO)
+        keep.damped = damp_val > ZERO
     keep.itnlim = options.itnlim
     if options.itnlim <= 0:
         keep.itnlim = 4*n
@@ -1385,7 +1473,3 @@ a, 5x, 'flag    =', i2,    15x, 'itn     =', i8      &
 """
 output_2100 = "a, 5x, 'flag    =', i2,   15x,'itn     =', i8"
 output_3000 = "{a}, {5x}, {a}"
-
-
-def tester(double[::1] a, double[::1] b, int n):
-    return dot_product(&a[0],&b[0],n)
