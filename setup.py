@@ -92,7 +92,10 @@ extensions = [Extension('linearmodels.panel.lsmr.lsmr',
                         ['linearmodels/panel/lsmr/lsmr.pyx'],
                         include_dirs=include_dirs,
                         libraries=libraries,
-                        library_dirs=library_dirs)
+                        library_dirs=library_dirs,
+                        extra_compile_args=["-Zi", "/Od"], # DEBUG
+                        extra_link_args=["-debug"], # DEBUG
+                        )
               ]
 
 setup(
