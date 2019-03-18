@@ -1068,12 +1068,12 @@ contains
                   exitt,inform%normAP,inform%condAP, &
                   exitt,inform%normb, inform%normy,  &
                   exitt,inform%normr,inform%normAPr
-       else
-          write (keep%nout, 2100)                    &
-               exitt,inform%flag,inform%itn
+          else
+             write (keep%nout, 2100)                 &
+                  exitt,inform%flag,inform%itn
+          end if
+          write (keep%nout, 3000) exitt, msg(inform%flag)
        end if
-       write (keep%nout, 3000) exitt, msg(inform%flag)
-    end if
 
     ! terminate
     action = 0
