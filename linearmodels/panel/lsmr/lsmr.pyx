@@ -359,12 +359,14 @@ cdef struct lsmr_options_s:
     # In which case, must hold an estimate of the relative error in the data
     # defining the matrix A.  For example, if A is accurate to about 6 digits,
     # set atol = 1.0e-6.
+
     double btol
     # real(wp)    :: btol = sqrt(epsilon(one))
     # Used if ctest = 3 (Fong and Saunders stopping criteria)
     # In which case, must hold an estimate of the relative error in the data
     # defining the rhs b.  For example, if b is
     # accurate to about 6 digits, set btol = 1.0e-6.
+
     double conlim
     # real(wp)    :: conlim = 1/(10*sqrt(epsilon(one)))
     # Used if ctest = 3 (Fong and Saunders stopping criteria)
@@ -486,7 +488,7 @@ cdef struct lsmr_inform:
     #  lsmr_stop_LS      The least-squares solution is good enough for this
     #                    machine. options%ctest = 3 only.
     #
-    # lmsr_stop_condAP    The estimate of cond(Abar) seems to be too large
+    # lsmr_stop_condAP    The estimate of cond(Abar) seems to be too large
     #                    for this machine. options%ctest = 3 only.
     #
     # lsmr_stop_itnlim       :  The iteration limit has been reached.
@@ -585,13 +587,19 @@ cdef struct lsmr_keep_s:
     double zetabar
     double zetaold
     int branch
+
+ctypedef lsmr_keep_s lsmr_keep
+
+cdef struct lsmr_extra_s:
     # Additional types to pass between functions
     double test1
     double test2
     double test3
     double rtol
+    double damp
+    bint damped
 
-ctypedef lsmr_keep_s lsmr_keep
+ctypedef lsmr_extra_s lsmr_extra
 
 cdef void initialize_lsmr_keep(lsmr_keep* keep):
     keep.branch = 0
@@ -601,14 +609,18 @@ cdef void initialize_lsmr_keep(lsmr_keep* keep):
     keep.localV_m = 0
 
 cdef double d2norm(double a, double b):
+    """
+    Returns sqrt( a**2 + b**2 ) with precautions to avoid overflow
+    """
     scale = abs(a) + abs(b)
     if scale > 0:
         return scale * sqrt((a/scale)**2 + (b/scale)**2)
     return 0.0
 
 cdef bint lsmr_free_double(lsmr_keep* keep):
-    # Routine to deallocate components of keep. Failure is indicated
-    # by nonzero stat value. No printing.
+    """
+    Deallocate components of keep.
+    """
     cdef bint status = 0
     if keep.h_n > 0:
         free(keep.h)
@@ -625,7 +637,7 @@ cdef bint lsmr_free_double(lsmr_keep* keep):
 
 
 cdef void localVEnqueue(lsmr_keep *keep, int n, double* v):
-    # Store v into the circular buffer keep%localV.
+    """Store v into the circular buffer keep.localV."""
     cdef int i, offset
     if keep.localPointer < keep.localVecs:
         keep.localPointer += 1
@@ -637,20 +649,31 @@ cdef void localVEnqueue(lsmr_keep *keep, int n, double* v):
         keep.localV[offset + i] = v[i]
 
 cdef void localVOrtho(lsmr_keep *keep, int n, double* v):
+    """Perform local reorthogonalization of current v."""
+    # do localOrthoCount = 1, keep%localOrthoLimit
+    # real(wp)  :: d
+    cdef double d
     cdef int localOrthoCount, offset, i
 
+    # if (keep%localVQueueFull) then
     if keep.localVQueueFull:
+        # keep%localOrthoLimit = keep%localVecs
         keep.localOrthoLimit = keep.localVecs
+    # else
     else:
+        # keep%localOrthoLimit = keep%localPointer
         keep.localOrthoLimit = keep.localPointer
 
+    # do localOrthoCount = 1, keep%localOrthoLimit
     for localOrthoCount in range(keep.localOrthoLimit):
         offset = localOrthoCount*n
+        # d = dot_product(v,keep%localV(1:n,localOrthoCount))
         d = dot_product(v,&(keep.localV[offset]), n)
+        # v(1:n) = v(1:n) - d * keep%localV(1:n,localOrthoCount)
         for i in range(n):
             v[i] -= d * keep.localV[offset+i]
 
-cdef void goto_10(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+cdef void goto_10(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
     cdef int i
     cdef double alpha_inv
     # keep%alpha = dnrm2 (n, v, 1)
@@ -670,7 +693,7 @@ cdef void goto_10(int* action, int m, int n, double *u, double *v, double *y, ls
     # end if
     if inform.normAPr == ZERO:
         inform.normy = ZERO
-        goto_800(action, m, n, u, v, y, keep, options, inform)
+        goto_800(action, m, n, u, v, y, keep, options, inform, extra)
         return
     # Initialization for local reorthogonalization.
     # keep%localOrtho = .false.
@@ -767,10 +790,10 @@ cdef void goto_10(int* action, int m, int n, double *u, double *v, double *y, ls
 #           write (keep%nout,1600) inform%itn,y(1)
 #        end if
 #     end if
-    goto_100(action, m, n, u, v, y, keep, options, inform)
+    goto_100(action, m, n, u, v, y, keep, options, inform, extra)
     return
 
-cdef void goto_20(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+cdef void goto_20(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
     cdef double beta_inv, neg_beta
     # keep%beta   = dnrm2 (m, u, 1)
     keep.beta = dnrm2(&m, u, &ONE_INT)
@@ -792,11 +815,11 @@ cdef void goto_20(int* action, int m, int n, double *u, double *v, double *y, ls
             # keep%branch = 3
             keep.branch = 3
             return
-    goto_30(action, m, n, u, v, y, keep, options, inform)
+    goto_30(action, m, n, u, v, y, keep, options, inform, extra)
 
 
-cdef void goto_30(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
-    cdef double inv_alpha
+cdef void goto_30(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
+    cdef double inv_alpha, alphahat , shat, chat
     # if (keep%beta .gt. zero) then
     if keep.beta > 0:
         # if (keep%localOrtho) then ! Perform local reorthogonalization of V.
@@ -811,147 +834,213 @@ cdef void goto_30(int* action, int m, int n, double *u, double *v, double *y, ls
             inv_alpha = ONE/keep.alpha
             dscal(&n, &inv_alpha, v, &ONE_INT)
 
-    # ! At this point, beta = beta_{k+1}, alpha = alpha_{k+1}.
+    # At this point, beta = beta_{k+1}, alpha = alpha_{k+1}.
     #
-    # !----------------------------------------------------------------
-    # ! Construct rotation Qhat_{k,2k+1}.
-    #
+    # ----------------------------------------------------------------
+    # Construct rotation Qhat_{k,2k+1}.
     # alphahat = keep%alphabar
+    alphahat = keep.alphabar
     # chat     = keep%alphabar/alphahat
+    chat = keep.alphabar/alphahat
     # shat     = zero
+    shat = ZERO
     # if (present_damp) then
-    #    if (damp .ne. zero) then
-    #       alphahat = d2norm(keep%alphabar, damp)
-    #       chat     = keep%alphabar/alphahat
-    #       shat     = damp/alphahat
-    #    end if
-    # end if
-    #
-    # ! Use a plane rotation (Q_i) to turn B_i to R_i.
-    #
+    if extra.damped:
+        # if (damp .ne. zero) then
+        if extra.damp > 0:
+            # alphahat = d2norm(keep%alphabar, damp)
+            alphahat = d2norm(keep.alphabar, extra.damp)
+            # chat     = keep%alphabar/alphahat
+            chat = keep.alphabar/alphahat
+            # shat     = damp/alphahat
+            shat = extra.damp/alphahat
+
+    # Use a plane rotation (Q_i) to turn B_i to R_i.
     # rhoold   = keep%rho
+    rhoold = keep.rho
     # keep%rho = d2norm(alphahat, keep%beta)
+    keep.rho = d2norm(alphahat, keep.beta)
     # c        = alphahat/keep%rho
+    c = alphahat/keep.rho
     # s        = keep%beta/keep%rho
+    s = keep.beta/keep.rho
     # thetanew = s*keep%alpha
+    thetanew = s*keep.alpha
     # keep%alphabar = c*keep%alpha
-    #
-    # ! Use a plane rotation (Qbar_i) to turn R_i^T into R_i^bar.
+    keep.alphabar = c*keep.alpha
+
+    # Use a plane rotation (Qbar_i) to turn R_i^T into R_i^bar.
     #
     # rhobarold      = keep%rhobar
+    rhobarold = keep.rhobar
     # keep%zetaold   = keep%zeta
+    keep.zetaold = keep.zeta
     # thetabar       = keep%sbar*keep%rho
+    thetabar = keep.sbar*keep.rho
     # rhotemp        = keep%cbar*keep%rho
+    rhotemp = keep.cbar*keep.rho
     # keep%rhobar    = d2norm(keep%cbar*keep%rho, thetanew)
+    keep.rhobar = d2norm(keep.cbar*keep.rho, thetanew)
     # keep%cbar      = keep%cbar*keep%rho/keep%rhobar
+    keep.cbar = keep.cbar*keep.rho/keep.rhobar
     # keep%sbar      = thetanew/keep%rhobar
+    keep.sbar = thetanew/keep.rhobar
     # keep%zeta      =   keep%cbar*keep%zetabar
+    keep.zeta =   keep.cbar*keep.zetabar
     # keep%zetabar   = - keep%sbar*keep%zetabar
-    #
-    # ! Update h, h_hat, y.
-    #
+    keep.zetabar = - keep.sbar*keep.zetabar
+
+    # Update h, h_hat, y.
     # keep%hbar(1:n)  = keep%h(1:n) - &
     #      (thetabar*keep%rho/(rhoold*rhobarold))*keep%hbar(1:n)
+    for i in range(n):
+        keep.hbar[i] -= keep.hbar[i] - (thetabar*keep.rho/(rhoold*rhobarold))*keep.hbar[i]
     # y(1:n)          = y(1:n) +      &
     #      (keep%zeta/(keep%rho*keep%rhobar))*keep%hbar(1:n)
     # keep%h(1:n)     = v(1:n) - (thetanew/keep%rho)*keep%h(1:n)
-    #
-    # ! Estimate ||r||.
-    #
-    # ! Apply rotation Qhat_{k,2k+1}.
+    for i in range(n):
+        y[i] += (keep.zeta/(keep.rho*keep.rhobar))*keep.hbar[i]
+        keep.h[i] = v[i] - (thetanew/keep.rho)*keep.h[i]
+
+    # Estimate ||r||.
+
+    # Apply rotation Qhat_{k,2k+1}.
     # betaacute =   chat* keep%betadd
+    betaacute =   chat* keep.betadd
     # betacheck = - shat* keep%betadd
-    #
+    betacheck = - shat* keep.betadd
+
     # ! Apply rotation Q_{k,k+1}.
     # betahat      =   c*betaacute
+    betahat      =   c*betaacute
     # keep%betadd  = - s*betaacute
-    #
+    keep.betadd  = - s*betaacute
+
     # ! Apply rotation Qtilde_{k-1}.
     # ! betad = betad_{k-1} here.
-    #
+
     # thetatildeold = keep%thetatilde
+    thetatildeold = keep.thetatilde
     # rhotildeold   = d2norm(keep%rhodold, thetabar)
+    rhotildeold = d2norm(keep.rhodold, thetabar)
     # ctildeold     = keep%rhodold/rhotildeold
+    ctildeold = keep.rhodold/rhotildeold
     # stildeold     = thetabar/rhotildeold
+    stildeold = thetabar/rhotildeold
     # keep%thetatilde    = stildeold* keep%rhobar
+    keep.thetatilde = stildeold* keep.rhobar
     # keep%rhodold       =   ctildeold* keep%rhobar
+    keep.rhodold =   ctildeold* keep.rhobar
     # keep%betad         = - stildeold*keep%betad + ctildeold*betahat
+    keep.betad = - stildeold*keep.betad + ctildeold*betahat
     #
     # ! betad   = betad_k here.
     # ! rhodold = rhod_k  here.
     #
     # keep%tautildeold                                                       &
     #          = (keep%zetaold - thetatildeold*keep%tautildeold)/rhotildeold
+    keep.tautildeold = (keep.zetaold - thetatildeold*keep.tautildeold)/rhotildeold
     # taud     = (keep%zeta - keep%thetatilde*keep%tautildeold)/keep%rhodold
+    taud     = (keep.zeta - keep.thetatilde*keep.tautildeold)/keep.rhodold
     # keep%d   = keep%d + betacheck**2
+    keep.d   = keep.d + betacheck**2
     #
     # if ((options%ctest .eq. 2) .or. (options%ctest .eq. 3)) then
-    #    inform%normr  = sqrt(keep%d + (keep%betad - taud)**2 + keep%betadd**2)
-    #
-    #    ! Estimate ||A||.
-    #    keep%normA2   = keep%normA2 + keep%beta**2
-    #    inform%normAP  = sqrt(keep%normA2)
-    #    keep%normA2   = keep%normA2 + keep%alpha**2
-    #
-    #    ! Estimate cond(A).
-    #    keep%maxrbar    = max(keep%maxrbar,rhobarold)
-    #    if (inform%itn .gt. 1) then
-    #       keep%minrbar = min(keep%minrbar,rhobarold)
-    #    end if
-    #    inform%condAP    = max(keep%maxrbar,rhotemp)/min(keep%minrbar,rhotemp)
-    #
-    #    ! Compute norms for convergence testing.
-    #    inform%normAPr  = abs(keep%zetabar)
-    #    inform%normy   = dnrm2(n, y, 1)
-    # end if
-    #
-    #
-    # if (inform%itn .ge. keep%itnlim) inform%flag = lsmr_stop_itnlim
-    # if (options%ctest.eq.3) then
-    #
-    #    !----------------------------------------------------------------
-    #    ! Test for convergence.
-    #    !----------------------------------------------------------------
-    #
-    #    ! Now use these norms to estimate certain other quantities,
-    #    ! some of which will be small near a solution.
-    #
-    #    test1   = inform%normr / inform%normb
-    #    test2   = inform%normAPr / (inform%normAP*inform%normr)
-    #    test3   = one/inform%condAP
-    #
-    #    t1      = test1 / (one + inform%normAP*inform%normy/inform%normb)
-    #    rtol    = options%btol + &
-    #                options%atol*inform%normAP*inform%normy/inform%normb
-    #
-    #    ! The following tests guard against extremely small values of
-    #    ! atol, btol or ctol.  (The user may have set any or all of
-    #    ! the parameters atol, btol, conlim  to 0.)
-    #    ! The effect is equivalent to the normal tests using
-    #    ! atol = eps,  btol = eps,  conlim = 1/eps.
-    #
-    #    if (one+test3 .le. one) inform%flag = lmsr_stop_condAP
-    #    if (one+test2 .le. one) inform%flag = lsmr_stop_LS
-    #    if (one+t1    .le. one) inform%flag = lsmr_stop_Ax
-    #
-    #    ! Allow for tolerances set by the user.
-    #
-    #    if (  test3   .le. keep%ctol   ) inform%flag = lsmr_stop_ill
-    #    if (  test2   .le. options%atol) inform%flag = lsmr_stop_LS_atol
-    #    if (  test1   .le. rtol        ) inform%flag = lsmr_stop_compatible
-    #
-    # else
-    #    ! see if it is time to return to the user to test convergence
-    #    if (mod(keep%test_count,keep%itn_test) .eq. 0) then
-    #       keep%test_count = 0
-    #       action[0] = 3
-    #       keep%branch = 4
-    #       return
-    #    end if
-    # end if
-    pass
+    if options.ctest == 2 or options.ctest == 3:
+        # inform%normr  = sqrt(keep%d + (keep%betad - taud)**2 + keep%betadd**2)
+        inform.normr = sqrt(keep.d + (keep.betad - taud)**2 + keep.betadd**2)
+        # ! Estimate ||A||.
+        # keep%normA2   = keep%normA2 + keep%beta**2
+        keep.normA2   = keep.normA2 + keep.beta**2
+        # inform%normAP  = sqrt(keep%normA2)
+        inform.normAP  = sqrt(keep.normA2)
+        # keep%normA2   = keep%normA2 + keep%alpha**2
+        keep.normA2   = keep.normA2 + keep.alpha**2
 
-cdef void goto_40(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+        # Estimate cond(A).
+        # keep%maxrbar    = max(keep%maxrbar,rhobarold)
+        keep.maxrbar    = max(keep.maxrbar,rhobarold)
+        # if (inform%itn .gt. 1) then
+        if inform.itn > 1:
+        #    keep%minrbar = min(keep%minrbar,rhobarold)
+            keep.minrbar = min(keep.minrbar,rhobarold)
+        # inform%condAP    = max(keep%maxrbar,rhotemp)/min(keep%minrbar,rhotemp)
+        inform.condAP    = max(keep.maxrbar,rhotemp)/min(keep.minrbar,rhotemp)
+
+        # Compute norms for convergence testing.
+        # inform%normAPr  = abs(keep%zetabar)
+        inform.normAPr  = abs(keep.zetabar)
+        # inform%normy   = dnrm2(n, y, 1)
+        inform.normy   = dnrm2(&n, y, &ONE_INT)
+
+    # if (inform%itn .ge. keep%itnlim) inform%flag = lsmr_stop_itnlim
+    if inform.itn >= keep.itnlim:
+        inform.flag = lsmr_stop_itnlim
+    # if (options%ctest.eq.3) then
+    if options.ctest == 3:
+        # ----------------------------------------------------------------
+        #  Test for convergence.
+        # ----------------------------------------------------------------
+        #
+        #  Now use these norms to estimate certain other quantities,
+        #  some of which will be small near a solution.
+
+        # test1   = inform%normr / inform%normb
+        extra.test1 = inform.normr / inform.normb
+        # test2   = inform%normAPr / (inform%normAP*inform%normr)
+        extra.test2 = inform.normAPr / (inform.normAP*inform.normr)
+        # test3   = one/inform%condAP
+        extra.test3 = ONE/inform.condAP
+
+        # t1      = test1 / (one + inform%normAP*inform%normy/inform%normb)
+        t1 = extra.test1 / (ONE + inform.normAP*inform.normy/inform.normb)
+        # rtol    = options%btol + &
+        #                options%atol*inform%normAP*inform%normy/inform%normb
+        extra.rtol = options.btol + options.atol*inform.normAP*inform.normy/inform.normb
+
+        #  The following tests guard against extremely small values of
+        #  atol, btol or ctol.  (The user may have set any or all of
+        #  the parameters atol, btol, conlim  to 0.)
+        #  The effect is equivalent to the normal tests using
+        #  atol = eps,  btol = eps,  conlim = 1/eps.
+        #
+        #    if (one+test3 .le. one) inform%flag = lsmr_stop_condAP
+        if ONE+extra.test3 <= ONE:
+            inform.flag = lsmr_stop_condAP
+        #    if (one+test2 .le. one) inform%flag = lsmr_stop_LS
+        if ONE+extra.test2 <= ONE:
+            inform.flag = lsmr_stop_LS
+        #    if (one+t1    .le. one) inform%flag = lsmr_stop_Ax
+        if ONE+t1    <= ONE:
+            inform.flag = lsmr_stop_Ax
+
+        #  Allow for tolerances set by the user.
+        #    if (  test3   .le. keep%ctol   ) inform%flag = lsmr_stop_ill
+        if extra.test3 <= keep.ctol:
+            inform.flag = lsmr_stop_ill
+        #    if (  test2   .le. options%atol) inform%flag = lsmr_stop_LS_atol
+        if extra.test2   <= options.atol:
+            inform.flag = lsmr_stop_LS_atol
+        #    if (  test1   .le. rtol        ) inform%flag = lsmr_stop_compatible
+        if extra.test1 <= extra.rtol:
+            inform.flag = lsmr_stop_compatible
+    # else
+    else:
+        # see if it is time to return to the user to test convergence
+        # if (mod(keep%test_count,keep%itn_test) .eq. 0) then
+        if (keep.test_count % keep.itn_test) == 0:
+            # keep%test_count = 0
+            keep.test_count = 0
+            # action[0] = 3
+            action[0] = 3
+            # keep%branch = 4
+            keep.branch = 4
+            # return
+            return
+    goto_40(action, m, n, u, v, y, keep, options, inform, extra)
+    return
+
+cdef void goto_40(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
     # prnt = .false.
     cdef bint prnt = False
     # if (keep%show) then
@@ -966,11 +1055,11 @@ cdef void goto_40(int* action, int m, int n, double *u, double *v, double *y, ls
         if options.ctest == 3:
             pass
             # if (test3 .le.  (onept*keep%ctol   )) prnt = .true.
-            prnt |= keep.test3 <= ONEPT*keep.ctol
+            prnt |= extra.test3 <= ONEPT*keep.ctol
             # if (test2 .le.  (onept*options%atol)) prnt = .true.
-            prnt |= keep.test2 <= ONEPT*options.atol
+            prnt |= extra.test2 <= ONEPT*options.atol
             # if (test1 .le.  (onept*rtol        )) prnt = .true.
-            prnt |= keep.test1 <= ONEPT*keep.rtol
+            prnt |= extra.test1 <= ONEPT*extra.rtol
         # if (inform%flag .ne.  0) prnt = .true.
         prnt |= inform.flag != 0
     if prnt:
@@ -1016,10 +1105,13 @@ cdef void goto_40(int* action, int m, int n, double *u, double *v, double *y, ls
 # 
     # if (inform%flag .eq. 0) goto 100
     if inform.flag == 0:
-        goto_100(action, m, n, u, v, y, keep, options, inform)
+        goto_100(action, m, n, u, v, y, keep, options, inform, extra)
+        return
+    goto_800(action, m, n, u, v, y, keep, options, inform, extra)
+    return
 
 
-cdef void goto_100(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+cdef void goto_100(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
     cdef double neg_alpha
     
     # inform%itn = inform%itn + 1
@@ -1040,7 +1132,7 @@ cdef void goto_100(int* action, int m, int n, double *u, double *v, double *y, l
     # return
     return
 
-cdef void goto_800(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform):
+cdef void goto_800(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra):
     keep.flag = inform.flag
     # keep%flag = inform%flag
     if keep.show:
@@ -1063,7 +1155,16 @@ cdef void goto_800(int* action, int m, int n, double *u, double *v, double *y, l
     # terminate
     action[0] = 0
 
-cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, double damp=0.0):
+cdef void lsmr_error(int* action, lsmr_keep* keep, lsmr_inform* inform, int error_code):
+    inform.flag = error_code
+    keep.flag   = error_code
+    if keep.show_err:
+        print(MSG[error_code])
+        action[0] = 0
+    return
+
+
+cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, double *y, lsmr_keep* keep, lsmr_options* options, lsmr_inform* inform, lsmr_extra* extra, double damp=0.0):
     cdef bint present_damp = damp > 0.0
     cdef int localOrthoCount
     cdef bint prnt
@@ -1084,16 +1185,16 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
         return
 
     if keep.branch == 1:
-        goto_10(action, m, n, u, v, y, keep, options, inform)
+        goto_10(action, m, n, u, v, y, keep, options, inform, extra)
         return
     elif keep.branch == 2:
-        goto_20(action, m, n, u, v, y, keep, options, inform)
+        goto_20(action, m, n, u, v, y, keep, options, inform, extra)
         return
     elif keep.branch == 3:
-        goto_30(action, m, n, u, v, y, keep, options, inform)
+        goto_30(action, m, n, u, v, y, keep, options, inform, extra)
         return
     elif keep.branch == 4:
-        goto_40(action, m, n, u, v, y, keep, options, inform)
+        goto_40(action, m, n, u, v, y, keep, options, inform, extra)
         return
 
 #     ! Initialize.
@@ -1133,13 +1234,8 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
 
     # quick check of m and n
     if (n < 1) or (m < 1):
-       inform.flag = lsmr_stop_m_oor
-       keep.flag   = lsmr_stop_m_oor
-       if keep.show_err:
-           print(MSG[lsmr_stop_m_oor])
-       action[0] = 0
-       return
-    
+        lsmr_error(action, keep, inform, lsmr_stop_m_oor)
+        return
 
     keep.pcount = 0  # print counter
     keep.test_count = 0  # testing for convergence counter
@@ -1158,89 +1254,52 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     if not allocated(keep.h_n):
         inform.stat = allocate(keep.h, &keep.h_n, n)
         if inform.stat != 0:
-            inform.flag = lsmr_stop_allocation
-            keep.flag   = lsmr_stop_allocation
-            if (keep.show_err):
-                print(MSG[lsmr_stop_allocation])
-            action[0] = 0
+            lsmr_error(action, keep, inform, lsmr_stop_allocation)
             return
     elif keep.h_n < n:
         inform.stat = deallocate(keep.h)
         if inform.stat != 0:
-            inform.flag = lsmr_stop_deallocation
-            keep.flag   = lsmr_stop_deallocation
-            if keep.show_err:
-                print(MSG[lsmr_stop_deallocation])
-            action[0] = 0
+            lsmr_error(action, keep, inform, lsmr_stop_deallocation)
             return
         else:
             inform.stat = allocate(keep.h, &keep.h_n, n)
             if inform.stat != 0:
-                inform.flag = lsmr_stop_allocation
-                keep.flag   = lsmr_stop_allocation
-                if keep.show_err:
-                    print(MSG[lsmr_stop_allocation])
-            action[0] = 0
-            return
+                lsmr_error(action, keep, inform, lsmr_stop_allocation)
+                return
 #
     if not allocated(keep.hbar_n):
         inform.stat = allocate(keep.hbar, &keep.hbar_n, n)
         if inform.stat != 0:
-            inform.flag = lsmr_stop_allocation
-            keep.flag   = lsmr_stop_allocation
-            if keep.show_err:
-                print(MSG[lsmr_stop_allocation])
-            action[0] = 0
+            lsmr_error(action, keep, inform, lsmr_stop_allocation)
             return
     elif keep.hbar_n < n:
         inform.stat = deallocate(keep.hbar)
         if inform.stat != 0:
-            inform.flag = lsmr_stop_deallocation
-            keep.flag   = lsmr_stop_deallocation
-            if keep.show_err:
-                print(MSG[lsmr_stop_deallocation])
-            action[0] = 0
+            lsmr_error(action, keep, inform, lsmr_stop_deallocation)
             return
         else:
             inform.stat = allocate(keep.hbar, &keep.hbar_n, n)
             if inform.stat != 0:
-                inform.flag = lsmr_stop_allocation
-                keep.flag = lsmr_stop_allocation
-                if keep.show_err:
-                    print(MSG[lsmr_stop_allocation])
-                action[0] = 0
+                lsmr_error(action, keep, inform, lsmr_stop_allocation)
                 return
-#
+
     if keep.localVecs > 0:
         if not allocated_2d(keep.localV_n, keep.localV_m):
             inform.stat = allocate_2d(keep.localV, &keep.localV_n, &keep.localV_m, n, keep.localVecs)
             if inform.stat != 0:
-                inform.flag = lsmr_stop_allocation
-                keep.flag   = lsmr_stop_allocation
-                if keep.show_err:
-                    print(MSG[lsmr_stop_allocation])
-                action[0] = 0
+                lsmr_error(action, keep, inform, lsmr_stop_allocation)
                 return
     elif keep.localV_n < n or keep.localV_m < keep.localVecs:
         inform.stat = deallocate(keep.localV)
         if inform.stat != 0:
-            inform.flag = lsmr_stop_deallocation
-            keep.flag   = lsmr_stop_deallocation
-            if keep.show_err:
-                print(MSG[lsmr_stop_deallocation])
-            action[0] = 0
+            lsmr_error(action, keep, inform, lsmr_stop_deallocation)
             return
         else:
             inform.stat = allocate_2d(keep.localV, &keep.localV_n, &keep.localV_m, n, keep.localVecs)
             if inform.stat != 0:
-                inform.flag = lsmr_stop_allocation
-                keep.flag   = lsmr_stop_allocation
-                if keep.show_err:
-                    print(MSG[lsmr_stop_allocation])
-                action[0] = 0
+                lsmr_error(action, keep, inform, lsmr_stop_allocation)
                 return
 
-#
     #-------------------------------------------------------------------
     # Set up the first vectors u and v for the bidiagonalization.
     # These satisfy  beta*u = b,  alpha*v = A(transpose)*u.
@@ -1248,19 +1307,20 @@ cdef void lsmr_solve_double(int* action, int m, int n, double *u, double *v, dou
     for i in range(n):
         v[i] = ZERO
         y[i] = ZERO
-#
+
     keep.alpha  = ZERO
     keep.beta   = dnrm2(&m, u, &ONE_INT)
-#
+
     if keep.beta > ZERO:
         beta_inv = ONE/keep.beta
         dscal(&m, &beta_inv, u, &ONE_INT)
         action[0] = 1
         keep.branch = 1
         return
-#
+
     else:
        # Exit if b=0.
         inform.normAP = -ONE
         inform.condAP = -ONE
-        goto_800(action, m, n, u, v, y, keep, options, inform)
+        goto_800(action, m, n, u, v, y, keep, options, inform, extra)
+        return
