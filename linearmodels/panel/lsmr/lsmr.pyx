@@ -248,11 +248,11 @@ OUTPUT['1000'] = """
        
  The matrix A has {rows} rows and {columns} columns   
     damp   = {damp}         
-    options.atol   = {atol} 
-    options.btol   = {btol} 
-    options.conlim = {conlim}  
-    options.itnlim = {itnlim}     
-    options.localSize (no. of vectors for local reorthogonalization) = {local_vecs}
+    options.atol   =   {atol: >#5.2E} 
+    options.btol   =   {btol: >#5.2E} 
+    options.conlim =   {conlim: >#5.2E}  
+    options.itnlim =   {itnlim: 8d}     
+    options.localSize (no. of vectors for local reorthogonalization) = {local_vecs: 8d}
 """
 OUTPUT['1050'] = OUTPUT['1000']
 OUTPUT['1100'] = """
@@ -264,28 +264,25 @@ OUTPUT['1100'] = """
 """
 OUTPUT['1150'] = OUTPUT['1100']
 OUTPUT['1200'] = """
-Itn       y(1)            norm r       P'A'r    Compatible    LS      norm AP   cond AP
-"""
+   Itn       y(1)            norm r       P'A'r    Compatible    LS      norm AP   cond AP"""
 OUTPUT['1250'] = """
-   Itn       y(1)            norm r       P'A'r    norm AP   cond AP
-"""
+   Itn       y(1)            norm r       P'A'r    norm AP   cond AP"""
 OUTPUT['1300'] = """
-   Itn       y(1)           norm rbar    Abar'rbar Compatible    LS    norm Abar cond Abar
-"""
+   Itn       y(1)           norm rbar    Abar'rbar Compatible    LS    norm Abar cond Abar"""
 OUTPUT['1350'] = """
-   Itn       y(1)           norm rbar    Abar'rbar norm Abar cond Abar')
-"""
+   Itn       y(1)           norm rbar    Abar'rbar norm Abar cond Abar"""
 OUTPUT['1400'] = "   Itn       y[0]"
-OUTPUT['1500'] = "{itn:d}  {y0:0.4g}  {normr:0.4g} {normAPr:0.4g} {extra1} {extra2} {extra3} {extra4}"
-OUTPUT['1600'] = "{itn:d}  {y0}"
+OUTPUT['1500-4'] = "  {itn: 4d} {y0: > #10.9E} {normr: > #10.9E} {normAPr: > #4.2E}"
+OUTPUT['1500-6'] = OUTPUT['1500-4'] + ' {extra1: > #4.2E} {extra2: > #4.2E}'
+OUTPUT['1500-8'] = OUTPUT['1500-6'] + ' {extra3: > #4.2E} {extra4: > #4.2E}'
+OUTPUT['1600'] = "  {itn: 4d} {y0: > #10.9E}"
 OUTPUT['2000'] = """
-{status}    flag    = {flag:d}        itn     = {itn:d}
-{status}    normAP  = {normAP}      condAP  = {condAP}
-{status}    normb   = {normb}       normy   = {normy}
-{status}    normr   = {normr}       normAPr = {normAPr}
-"""
+{status}    flag    =  {flag: <5d}             itn     = {itn: 8d}
+{status}    normAP  = {normAP: > #9.5E}       condAP  = {condAP: > #9.5E}
+{status}    normb   = {normb: > #9.5E}       normy   = {normy: > #9.5E}
+{status}    normr   = {normr: > #9.5E}       normAPr = {normAPr: > #9.5E}"""
 OUTPUT['2100'] = "{status}    flag    = {flag:d}        itn     = {itn:d}"
-OUTPUT['3000'] = "{status}    {message}"  #  "{a}, {5x}, {a}"
+OUTPUT['3000'] = "{status}    {message}"
 
 cdef enum termination_flag:
     lsmr_stop_x0 = 0
@@ -776,9 +773,9 @@ cdef void goto_10(int *action, int m, int n, double *u, double *v, double *y, ls
             extra.test2 = keep.alpha / keep.beta
             # write (keep%nout,1500) &
             #   inform%itn,y(1),inform%normr,inform%normAPr,test1,test2
-            print(OUTPUT['1500'].format(itn=inform.itn, y0=y[0], normr=inform.normr,
+            print(OUTPUT['1500-6'].format(itn=inform.itn, y0=y[0], normr=inform.normr,
                                         normAPr=inform.normAPr, extra1=extra.test1,
-                                        extra2=extra.test2, extra3='', extra4=''))
+                                        extra2=extra.test2))
             # else if (options%ctest .eq. 2) then
         elif options.ctest == 2:
             # if (keep%damped) then
@@ -790,9 +787,7 @@ cdef void goto_10(int *action, int m, int n, double *u, double *v, double *y, ls
                 # write (keep%nout,1250)
                 print(OUTPUT['1250'])
             # write (keep%nout,1500) inform%itn,y(1),inform%normr,inform%normAPr
-            print(OUTPUT['1500'].format(itn=inform.itn, y0=y[0], normr=inform.normr,
-                                        normAPr=inform.normAPr, extra1='', extra2='',
-                                        extra3='', extra4=''))
+            print(OUTPUT['1500-4'].format(itn=inform.itn, y0=y[0], normr=inform.normr, normAPr=inform.normAPr))
         # else
         else:
             # simple printing
@@ -809,7 +804,6 @@ cdef void goto_20(int *action, int m, int n, double *u, double *v, double *y, ls
     cdef double beta_inv, neg_beta
     # keep%beta   = dnrm2 (m, u, 1)
     keep.beta = dnrm2(&m, u, &ONE_INT)
-
     # if (keep%beta .gt. zero) then
     if keep.beta > 0:
         beta_inv = ONE / keep.beta
@@ -817,16 +811,16 @@ cdef void goto_20(int *action, int m, int n, double *u, double *v, double *y, ls
         dscal(&m, &beta_inv, u, &ONE_INT)
         # if (keep%localOrtho) then ! Store v into the circular buffer localV
         if keep.localOrtho:
-            # call localVEnqueue     ! Store old v for local reorthog'n of new            localVEnqueue(keep, n, v)
+            # call localVEnqueue     ! Store old v for local reorthog'n of new
             localVEnqueue(keep, n, v)
-            # call dscal (n, (- keep%beta), v, 1)
-            neg_beta = -keep.beta
-            dscal(&n, &neg_beta, v, &ONE_INT)
-            # action = 1            ! call Aprod2(m, n, v, u), i.e., v = v + P'A'*u
-            action[0] = 1
-            # keep%branch = 3
-            keep.branch = 3
-            return
+        # call dscal (n, (- keep%beta), v, 1)
+        neg_beta = -keep.beta
+        dscal(&n, &neg_beta, v, &ONE_INT)
+        # action = 1            ! call Aprod2(m, n, v, u), i.e., v = v + P'A'*u
+        action[0] = 1
+        # keep%branch = 3
+        keep.branch = 3
+        return
     goto_30(action, m, n, u, v, y, keep, options, inform, extra)
 
 cdef void goto_30(int *action, int m, int n, double *u, double *v, double *y, lsmr_keep *keep,
@@ -906,7 +900,7 @@ cdef void goto_30(int *action, int m, int n, double *u, double *v, double *y, ls
     # keep%hbar(1:n)  = keep%h(1:n) - &
     #      (thetabar*keep%rho/(rhoold*rhobarold))*keep%hbar(1:n)
     for i in range(n):
-        keep.hbar[i] -= keep.h[i] - (thetabar * keep.rho / (rhoold * rhobarold)) * keep.hbar[i]
+        keep.hbar[i] = keep.h[i] - (thetabar * keep.rho / (rhoold * rhobarold)) * keep.hbar[i]
     # y(1:n)          = y(1:n) +      &
     #      (keep%zeta/(keep%rho*keep%rhobar))*keep%hbar(1:n)
     # keep%h(1:n)     = v(1:n) - (thetanew/keep%rho)*keep%h(1:n)
@@ -1113,16 +1107,16 @@ cdef void goto_40(int *action, int m, int n, double *u, double *v, double *y, ls
             # write (keep%nout,1500) &
             #    inform%itn,y(1),inform%normr,inform%normAPr,    &
             #    test1,test2,inform%normAP,inform%condAP
-            print(OUTPUT['1500'].format(itn=inform.itn,y0=y[0],normr=inform.normr,normAPr=inform.normAPr,
-                                        extra1=extra.test1,extra2=extra.test2,
-                                        extra3=inform.normAP,extra4=inform.condAP))
+            print(OUTPUT['1500-8'].format(itn=inform.itn,y0=y[0],normr=inform.normr,normAPr=inform.normAPr,
+                                          extra1=extra.test1,extra2=extra.test2,
+                                          extra3=inform.normAP,extra4=inform.condAP))
         # else if (options%ctest.eq.2) then
         elif options.ctest == 2:
             # write (keep%nout,1500) inform%itn,y(1),inform%normr, &
             #      inform%normAPr,inform%normAP,inform%condAP
-            print(OUTPUT['1500'].format(itn=inform.itn,y0=y[0],normr=inform.normr,
-                                        normAPr=inform.normAPr, extra1=inform.normAP,
-                                        extra2=inform.condAP, extra3='', extra4=''))
+            print(OUTPUT['1500-6'].format(itn=inform.itn,y0=y[0],normr=inform.normr,
+                                          normAPr=inform.normAPr, extra1=inform.normAP,
+                                          extra2=inform.condAP))
         # else
         else:
             # write (keep%nout,1600) inform%itn,y(1)
@@ -1417,25 +1411,26 @@ def experiment():
     for i in range(m):
         u[i] = b[i]
     cdef bint done = False
-    options.print_freq_itn = 1
+    options.print_freq_itn = 100
     options.print_freq_head = 10
     while not done:
         lsmr_solve_double(&action, m, n, &u[0], &v[0], &x[0], keep, &options, &inform, &extra, damp)
+
         if action == 0:
             print("Exit LSMR with inform.flag = {0:d} "
                   "and inform.itn = {1:d}\n".format(inform.flag, inform.itn))
             print("LS solution is:\n")
-            for i in range(n):
-                print(x[i])
-            print('\n')
+            xout = [x[i] for i in range(n)]
+            print(', '.join(map('{:0.2f}'.format, xout)))
             done = True
-            break
         elif action == 1:
             matrix_mult_trans(m, n, ptr, row, val, u, v)
         elif action == 2:
             matrix_mult(m, n, ptr, row, val, v, u)
         else:
             raise NotImplementedError(f'action: {action}')
+
+
     free(keep.h)
     free(keep.hbar)
     free(keep)
