@@ -216,6 +216,7 @@ eps    =  the relative precision of floating-point arithmetic.
 LSMR  minimizes the function normr with respect to y.
 """
 cimport cython
+import numpy as np
 cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdlib cimport malloc, free
@@ -1435,4 +1436,77 @@ def experiment():
     free(keep.hbar)
     free(keep)
     #lsmr_free_double(keep)
+
+
+cdef class LSMR(object):
+    cdef lsmr_keep *keep
+    cdef lsmr_options *options
+    cdef lsmr_inform *inform
+    cdef lsmr_extra *extra
+    cdef double *h
+    cdef double *hbar
+    cdef double *localVecs
+    cdef np.ndarray x
+
+    def __init__(self, dependent, exog):
+        cdef double[::1] u, v, x_arr, dep_arr
+        cdef int m, n, i
+        cdef int action = 0
+        cdef bint done = False
+
+
+        m, n = exog.shape
+        self.keep = <lsmr_keep *> malloc(sizeof(lsmr_keep))
+        initialize_lsmr_keep(self.keep)
+        self.options = <lsmr_options *>malloc(sizeof(lsmr_options))
+        initialize_lsmr_options(self.options)
+        self.options.unit_diagnostics = -1
+        self.inform = <lsmr_inform *>malloc(sizeof(lsmr_inform))
+        self.extra = <lsmr_extra *>malloc(sizeof(lsmr_extra))
+
+        self.h = <double *> malloc(n * sizeof(double))
+        self.hbar = <double *> malloc(n * sizeof(double))
+        self.keep.h = self.h
+        self.keep.h_n = n
+        self.keep.hbar = self.hbar
+        self.keep.hbar_n = n
+        u = <np.ndarray>np.empty(m)
+        v = <np.ndarray>np.empty(n)
+        self.x = np.empty(n)
+        x_arr = <np.ndarray>self.x
+        dep_arr = <np.ndarray> dependent
+        for i in range(m):
+            u[i] = dep_arr[i]
+        while not done:
+            lsmr_solve_double(&action, m, n, &u[0], &v[0], &x_arr[0], self.keep, self.options,
+                              self.inform, self.extra, 0.0)
+            if action == 0:
+                print("Exit LSMR with inform.flag = {0:d} "
+                      "and inform.itn = {1:d}\n".format(self.inform.flag, self.inform.itn))
+                print("LS solution is:\n")
+                xout = [x_arr[i] for i in range(n)]
+                print(', '.join(map('{:0.2f}'.format, xout)))
+                done = True
+            elif action == 1:
+                # Compute v = v + A'*u without altering u */
+                # matrix_mult_trans(m, n, ptr, row, val, u, v)
+                v += exog.T.dot(u)
+            elif action == 2:
+                # Compute u = u + A*v  without altering v
+                u += exog.dot(v)
+                #matrix_mult(m, n, ptr, row, val, v, u)
+            else:
+                raise NotImplementedError(f'action: {action}')
+
+    @property
+    def beta(self):
+        return np.asarray(self.x)
+
+    def __dealloc__(self):
+        free(self.h)
+        free(self.hbar)
+        free(self.keep)
+        free(self.options)
+        free(self.inform)
+        free(self.extra)
 
