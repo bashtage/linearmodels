@@ -593,7 +593,6 @@ cdef struct lsmr_extra_s:
     double test3
     double rtol
     double damp
-    bint damped
 
 ctypedef lsmr_extra_s lsmr_extra
 
@@ -854,7 +853,7 @@ cdef void goto_30(int *action, int m, int n, double *u, double *v, double *y, ls
     # shat     = zero
     shat = ZERO
     # if (present_damp) then
-    if extra.damped:
+    if keep.damped:
         # if (damp .ne. zero) then
         if extra.damp > 0:
             # alphahat = d2norm(keep%alphabar, damp)
