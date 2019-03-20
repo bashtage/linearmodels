@@ -1361,7 +1361,7 @@ cdef void lsmr_solve_double(int *action, int m, int n, double *u, double *v, dou
 
 
 # Takes b and computes u = u + A * v (A in CSC format)
-cdef void csc_matrix_mult(int m, int n, int *ptr, int *row, double *val, double *v, double *u):
+cdef void csc_matrix_mult(int m, int n, int *ptr, int *row, double *val, double *v, double *u) nogil:
     cdef int i, j, k
     for j in range(0, n):
         for k in range(ptr[j], ptr[j+1]):
@@ -1369,7 +1369,7 @@ cdef void csc_matrix_mult(int m, int n, int *ptr, int *row, double *val, double 
             u[i] += val[k]*v[j]
 
 
-cdef void dense_matrix_mult(int m, int n, double *a, double *v, double *u):
+cdef void dense_matrix_mult(int m, int n, double *a, double *v, double *u) nogil:
     # C = alpha A * B + beta C
     # (m,n)    (m,k)(k,n)   (m,n)
     # u = 1 exog * v + 1 u
@@ -1380,7 +1380,7 @@ cdef void dense_matrix_mult(int m, int n, double *a, double *v, double *u):
     cdef double one_d = 1
     dgemm("N", "N", &m, &one_i, &n, &one_d, a, &m, v, &n, &one_d, u, &m)
 
-cdef void dense_matrix_mult_trans(int m, int n, double *a, double *u, double *v):
+cdef void dense_matrix_mult_trans(int m, int n, double *a, double *u, double *v) nogil:
     # v = 1 exog' * u + 1 v
     # (n,1)  (n,m) (m,1) (n,1)
     cdef int one_i = 1
@@ -1388,7 +1388,7 @@ cdef void dense_matrix_mult_trans(int m, int n, double *a, double *u, double *v)
     dgemm("T", "N", &n, &one_i, &m, &one_d, a, &m, u, &m, &one_d, v, &n)
 
 # Takes b and computes v = v + A^T * u (A in CSC format) */
-cdef void csc_matrix_mult_trans(int m, int n, int *ptr, int *row, double *val, double *u, double *v):
+cdef void csc_matrix_mult_trans(int m, int n, int *ptr, int *row, double *val, double *u, double *v) nogil:
     cdef int i, j, k
     for j in range(n):
         for k in range(ptr[j], ptr[j+1]):
@@ -1492,12 +1492,9 @@ cdef class LSMR(object):
         if dense:
             exog = np.asarray(exog, dtype=np.double, order='F')
             exog_arr = <np.ndarray> exog
-        else:
-            if isinstance(exog, csc_matrix):
-                raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix with '
-                                'dtype double.')
-            elif exog.dtype != np.double:
-                raise TypeError('exog must have dtype double (or float64)')
+        elif not isinstance(exog, csc_matrix) or exog.dtype != np.double:
+            raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix with '
+                            'dtype double.')
 
         if precondition:
             exog2 = exog ** 2 if dense else exog.multiply(exog)
@@ -1526,8 +1523,8 @@ cdef class LSMR(object):
             elif action == 1:
                 # Compute v = v + A'*u without altering u */
                 if dense:
-                    # v += exog.T.dot(u)
-                    dense_matrix_mult_trans(self.m, self.n, &exog_arr[0,0], &u[0], &v[0])
+                    v += exog.T.dot(u)
+                    # dense_matrix_mult_trans(self.m, self.n, &exog_arr[0,0], &u[0], &v[0])
                 else:
                     csc_matrix_mult_trans(self.m, self.n, &indptr[0], &indices[0], &data[0],
                                           &u[0], &v[0])
@@ -1535,8 +1532,8 @@ cdef class LSMR(object):
             elif action == 2:
                 # Compute u = u + A*v  without altering v
                 if dense:
-                    # u += exog.dot(v)
-                    dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
+                    u += exog.dot(v)
+                    #dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
                 else:
                     csc_matrix_mult(self.m, self.n, &indptr[0], &indices[0], &data[0], &v[0],
                                     &u[0])
