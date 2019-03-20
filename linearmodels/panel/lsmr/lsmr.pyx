@@ -215,7 +215,6 @@ eps    =  the relative precision of floating-point arithmetic.
 
 LSMR  minimizes the function normr with respect to y.
 """
-cimport cython
 import numpy as np
 cimport numpy as np
 from libc.math cimport sqrt
