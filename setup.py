@@ -81,6 +81,13 @@ for filename in glob.iglob('./examples/**', recursive=True):
     if '.png' in filename:
         additional_files.append(filename)
 
+
+directives = {'linetrace': True, 'binding':True}
+macros = [('NPY_NO_DEPRECATED_API', '1'),
+          ('NPY_1_7_API_VERSION', '1')]
+macros.append(('CYTHON_TRACE', '1'))
+
+
 includes = [numpy.get_include()]
 includes += [pkg_resources.resource_filename('numpy', 'core/include')]
 includes = list(set(includes))
@@ -92,7 +99,8 @@ extensions = [Extension('linearmodels.panel.lsmr.lsmr',
                         ['linearmodels/panel/lsmr/lsmr.pyx'],
                         include_dirs=include_dirs,
                         libraries=libraries,
-                        library_dirs=library_dirs)
+                        library_dirs=library_dirs,
+                        define_macros=macros)
               ]
 
 setup(
@@ -129,5 +137,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering',
     ],
-    ext_modules=cythonize(extensions)
+    ext_modules=cythonize(extensions, compiler_directives=directives,force=True)
 )

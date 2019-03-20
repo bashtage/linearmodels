@@ -2,11 +2,10 @@
 [run]
 source = linearmodels
 branch = True
-include =
-    */linearmodels/*
 omit =
     */results/*
     */_version.py
+plugins = Cython.Coverage
 
 [report]
 # Regexes for lines to exclude from consideration
