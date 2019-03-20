@@ -222,6 +222,7 @@ from libc.math cimport sqrt
 from libc.stdlib cimport malloc, free
 from libc.float cimport DBL_MAX, DBL_EPSILON
 from scipy.linalg.cython_blas cimport dscal, ddot, dnrm2
+from scipy.sparse.csc import csc_matrix
 
 cdef double ZERO = 0.0
 cdef double ONE = 1.0
@@ -1439,6 +1440,53 @@ def experiment():
 
 
 cdef class LSMR(object):
+    """
+    Sparse Equations and Least Squares estimator
+
+    Parameters
+    ----------
+    dependent : array-like
+        Array of dependent values (nobs,)
+    exog : {ndarray, csc_matrix}
+        Array or sparse matrix of containing the exogenous variables
+        (nobs, nvar)
+    precondition : bool
+
+
+    Notes
+    -----
+    Solves the least squares problem
+
+    .. math::
+
+        \arg\min_x ||Ax - b||^2 + c^2 ||x||
+
+    where ``A`` is ``exog`` and ``b`` is ``dependent``. The
+    method used is equivalent to solving the equation
+
+    .. math::
+
+        (A'A + c^2I)x = A'b
+
+    If :math:`A` has reduced rank, then the solution is equivalent to
+
+    .. math::
+
+        \arg\min_x ||x||, Ax=b
+
+    This class uses code ported from SPRAL: The Sparse Parallel
+    Robust Algorithm Library [3]_ to Cython.
+
+    References
+    ----------
+    .. [1] D. C.-L. Fong and M. A. Saunders, "LSMR: An iterative algorithm
+       for sparse least-squares problems", SIAM J. Sci. Comput., vol. 33,
+       pp. 2950-2971, 2011. https://arxiv.org/abs/1006.0758
+
+    .. [2] LSMR Software, https://web.stanford.edu/group/SOL/software/lsmr/
+
+    .. [3] SPRAL, https://github.com/ralna/spral
+    """
     cdef lsmr_keep *keep
     cdef lsmr_options *options
     cdef lsmr_inform *inform
@@ -1448,14 +1496,39 @@ cdef class LSMR(object):
     cdef double *localVecs
     cdef np.ndarray x
 
-    def __init__(self, dependent, exog):
-        cdef double[::1] u, v, x_arr, dep_arr
+    def __init__(self, dependent, exog, precondition=True):
+        cdef int[::1] indptr, indices
+        cdef double[::1] u, v, x_arr, dep_arr, data
         cdef int m, n, i
         cdef int action = 0
-        cdef bint done = False
+        cdef bint dense, done = False
 
-
+        dependent = np.asarray(dependent)
+        dense = isinstance(exog, np.ndarray)
+        sqrt_norm2 = np.ones(m)
         m, n = exog.shape
+        if not dense and not isinstance(exog, csc_matrix):
+            raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix.')
+
+        if dense and precondition:
+            sqrt_norm2 = np.sqrt((exog ** 2).sum(0))
+            # TODO: Should used a tol here
+            #   Also drop columns with 0 norm2
+        elif precondition:
+            sqrt_norm2 = np.sqrt((exog.multiply(exog)).sum(0)).A.squeeze()
+            # TODO: Should used a tol here
+            #   Also drop columns with 0 norm2
+
+        sqrt_norm2[sqrt_norm2 == 0.0] = 1
+        exog = exog.copy()
+        for i in range(n):
+            exog[:,i] /= sqrt_norm2[i]
+
+        if not dense:
+            indptr = <np.ndarray> exog.indptr
+            indices = <np.ndarray> exog.indices
+            data = <np.ndarray> exog.data
+
         self.keep = <lsmr_keep *> malloc(sizeof(lsmr_keep))
         initialize_lsmr_keep(self.keep)
         self.options = <lsmr_options *>malloc(sizeof(lsmr_options))
@@ -1489,14 +1562,23 @@ cdef class LSMR(object):
                 done = True
             elif action == 1:
                 # Compute v = v + A'*u without altering u */
-                # matrix_mult_trans(m, n, ptr, row, val, u, v)
-                v += exog.T.dot(u)
+                if dense:
+                    v += exog.T.dot(u)
+                else:
+                    matrix_mult_trans(m, n, &indptr[0], &indices[0], &data[0], &u[0], &v[0])
+
             elif action == 2:
                 # Compute u = u + A*v  without altering v
-                u += exog.dot(v)
-                #matrix_mult(m, n, ptr, row, val, v, u)
+                if dense:
+                    u += exog.dot(v)
+                else:
+                    matrix_mult(m, n, &indptr[0], &indices[0], &data[0], &v[0], &u[0])
             else:
                 raise NotImplementedError(f'action: {action}')
+
+        if precondition:
+            for i in range(m):
+                self.x[i] /= sqrt_norm2[i]
 
     @property
     def beta(self):
@@ -1509,4 +1591,3 @@ cdef class LSMR(object):
         free(self.options)
         free(self.inform)
         free(self.extra)
-
