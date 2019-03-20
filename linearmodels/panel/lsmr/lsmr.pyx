@@ -1,4 +1,4 @@
-# cython: language_level=3, boundscheck=False, wraparound=False, cdivision=True
+# cython: language_level=3, boundscheck=False, wraparound=False, cdivision=True, infer_types=False, initializedcheck=False
 """
 Copyright (c) 2010, 2012 David Fong, Michael Saunders, Stanford University
 Copyright (c) 2014-2016 Science and Technology Facilites Council (STFC)
@@ -826,7 +826,9 @@ cdef void goto_20(int *action, int m, int n, double *u, double *v, double *y, ls
 
 cdef void goto_30(int *action, int m, int n, double *u, double *v, double *y, lsmr_keep *keep,
                   lsmr_options *options, lsmr_inform *inform, lsmr_extra *extra) except *:
-    cdef double inv_alpha, alphahat, shat, chat
+    cdef double inv_alpha, alphahat, betaacute, betacheck, betahat, c, chat, ctildeold, rhobarold,\
+        rhoold,  rhotemp, rhotildeold, s, shat, stildeold, t1, taud, thetabar, thetanew, \
+        thetatildeold
     # if (keep%beta .gt. zero) then
     if keep.beta > 0:
         # if (keep%localOrtho) then ! Perform local reorthogonalization of V.
@@ -1532,7 +1534,7 @@ cdef class LSMR(object):
                 # Compute u = u + A*v  without altering v
                 if dense:
                     u += exog.dot(v)
-                    #dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
+                    # dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
                 else:
                     csc_matrix_mult(self.m, self.n, &indptr[0], &indices[0], &data[0], &v[0],
                                     &u[0])
@@ -1545,6 +1547,17 @@ cdef class LSMR(object):
     @property
     def beta(self):
         return np.asarray(self.x)
+
+    @property
+    def info(self):
+        return {'flag':self.inform.flag,
+                'itn':self.inform.itn,
+                'norm_b':self.inform.normb,
+                'norm_ap':self.inform.normAP,
+                'cond_ap':self.inform.condAP,
+                'norm_r':self.inform.normr,
+                'norm_apr':self.inform.normAPr,
+                'norm_y':self.inform.normy}
 
     def __dealloc__(self):
         free(self.h)
@@ -1560,3 +1573,20 @@ cdef class LSMR(object):
         print("LS solution is:\n")
         xout = [self.x[i] for i in range(self.n)]
         print(', '.join(map('{:0.2f}'.format, xout)))
+
+
+cpdef void py_dense_matrix_mult(a, v, u):
+    # C = alpha A * B + beta C
+    # (m,n)    (m,k)(k,n)   (m,n)
+    # u = 1 exog * v + 1 u
+    # (m,1)    (m,n) (n,1)  (m,1)
+    # u = u + exog.dot(v)
+    # cdef void dgemm(char *transa, char *transb, int *m, int *n, int *k, d *alpha, d *a, int *lda, d *b, int *ldb, d *beta, d *c, int *ldc) nogil
+    cdef int one_i = 1
+    cdef double one_d = 1
+    cdef int m = a.shape[0]
+    cdef int n = v.shape[0]
+    cdef double[::1, :] a_arr = <np.ndarray>a
+    cdef double[::1, :] v_arr = <np.ndarray>v
+    cdef double[::1, :] u_arr = <np.ndarray>u
+    dgemm("N", "N", &m, &one_i, &n, &one_d, &a_arr[0,0], &m, &v_arr[0,0], &n, &one_d, &u_arr[0,0], &m)
