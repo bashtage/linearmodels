@@ -221,7 +221,7 @@ cimport numpy as np
 from libc.math cimport sqrt
 from libc.stdlib cimport malloc, free
 from libc.float cimport DBL_MAX, DBL_EPSILON
-from scipy.linalg.cython_blas cimport dscal, ddot, dnrm2
+from scipy.linalg.cython_blas cimport dscal, ddot, dnrm2, dgemm
 from scipy.sparse.csc import csc_matrix
 
 cdef double ZERO = 0.0
@@ -1361,7 +1361,7 @@ cdef void lsmr_solve_double(int *action, int m, int n, double *u, double *v, dou
 
 
 # Takes b and computes u = u + A * v (A in CSC format)
-cdef void matrix_mult(int m, int n, int *ptr, int *row, double *val, double *v, double *u):
+cdef void csc_matrix_mult(int m, int n, int *ptr, int *row, double *val, double *v, double *u):
     cdef int i, j, k
     for j in range(0, n):
         for k in range(ptr[j], ptr[j+1]):
@@ -1369,74 +1369,31 @@ cdef void matrix_mult(int m, int n, int *ptr, int *row, double *val, double *v, 
             u[i] += val[k]*v[j]
 
 
+cdef void dense_matrix_mult(int m, int n, double *a, double *v, double *u):
+    # C = alpha A * B + beta C
+    # (m,n)    (m,k)(k,n)   (m,n)
+    # u = 1 exog * v + 1 u
+    # (m,1)    (m,n) (n,1)  (m,1)
+    # u = u + exog.dot(v)
+    # cdef void dgemm(char *transa, char *transb, int *m, int *n, int *k, d *alpha, d *a, int *lda, d *b, int *ldb, d *beta, d *c, int *ldc) nogil
+    cdef int one_i = 1
+    cdef double one_d = 1
+    dgemm("N", "N", &m, &one_i, &n, &one_d, a, &m, v, &n, &one_d, u, &m)
+
+cdef void dense_matrix_mult_trans(int m, int n, double *a, double *u, double *v):
+    # v = 1 exog' * u + 1 v
+    # (n,1)  (n,m) (m,1) (n,1)
+    cdef int one_i = 1
+    cdef double one_d = 1
+    dgemm("T", "N", &n, &one_i, &m, &one_d, a, &m, u, &m, &one_d, v, &n)
+
 # Takes b and computes v = v + A^T * u (A in CSC format) */
-cdef void matrix_mult_trans(int m, int n, int *ptr, int *row, double *val, double *u, double *v):
+cdef void csc_matrix_mult_trans(int m, int n, int *ptr, int *row, double *val, double *u, double *v):
     cdef int i, j, k
     for j in range(n):
         for k in range(ptr[j], ptr[j+1]):
             i = row[k]
             v[j] += val[k]*u[i]
-
-
-def experiment():
-    cdef int i
-    cdef lsmr_extra extra
-    cdef lsmr_options options
-    cdef lsmr_keep *keep
-    cdef lsmr_inform inform
-
-    keep = <lsmr_keep *> malloc(sizeof(lsmr_keep))
-    keep.h = <double *> malloc(100*sizeof(double))
-    keep.h_n = 100
-    keep.hbar = <double *> malloc(100*sizeof(double))
-    keep.hbar_n = 100
-
-    initialize_lsmr_options(&options)
-    initialize_lsmr_keep(keep)
-
-    cdef int m = 5, n = 3
-    cdef int ptr[4]
-    ptr[:] = [   0,             3,         5,                 9 ]
-    cdef int row[9]
-    row[:] = [  0,   2,   3,   1,   3,    0,   2,    3,   4 ]
-    cdef double val[9]
-    val[:] = [ 1.0, 2.0, 5.0, 2.0, 3.0, -1.0, 2.0, -2.0, 6.0 ]
-    #  Data for rhs b
-    cdef double b[5]
-    b[:] = [1.0, 1.0, 1.0, 1.0, 1.0]
-    cdef double damp = 0.0
-    # prepare for LSMR calls (using no preconditioning) */
-    cdef int action = 0;
-    cdef double u[5]
-    cdef double v[3]
-    cdef double x[3]
-    for i in range(m):
-        u[i] = b[i]
-    cdef bint done = False
-    options.print_freq_itn = 100
-    options.print_freq_head = 10
-    while not done:
-        lsmr_solve_double(&action, m, n, &u[0], &v[0], &x[0], keep, &options, &inform, &extra, damp)
-
-        if action == 0:
-            print("Exit LSMR with inform.flag = {0:d} "
-                  "and inform.itn = {1:d}\n".format(inform.flag, inform.itn))
-            print("LS solution is:\n")
-            xout = [x[i] for i in range(n)]
-            print(', '.join(map('{:0.2f}'.format, xout)))
-            done = True
-        elif action == 1:
-            matrix_mult_trans(m, n, ptr, row, val, u, v)
-        elif action == 2:
-            matrix_mult(m, n, ptr, row, val, v, u)
-        else:
-            raise NotImplementedError(f'action: {action}')
-
-
-    free(keep.h)
-    free(keep.hbar)
-    free(keep)
-    #lsmr_free_double(keep)
 
 
 cdef class LSMR(object):
@@ -1446,10 +1403,10 @@ cdef class LSMR(object):
     Parameters
     ----------
     dependent : array-like
-        Array of dependent values (nobs,)
+        Array of dependent values (nobs,). Must have dtype double.
     exog : {ndarray, csc_matrix}
         Array or sparse matrix of containing the exogenous variables
-        (nobs, nvar)
+        (nobs, nvar). Must have dtype double.
     precondition : bool
 
 
@@ -1495,40 +1452,18 @@ cdef class LSMR(object):
     cdef double *hbar
     cdef double *localVecs
     cdef np.ndarray x
+    cdef int m, n
 
-    def __init__(self, dependent, exog, precondition=True):
+    def __init__(self, dependent, exog, bint precondition=True):
         cdef int[::1] indptr, indices
-        cdef double[::1] u, v, x_arr, dep_arr, data
-        cdef int m, n, i
+        cdef double[::1] u, v, dep_arr, data, x_arr
+        cdef double[::1,:] exog_arr
+        cdef int i
         cdef int action = 0
         cdef bint dense, done = False
 
-        dependent = np.asarray(dependent)
-        dense = isinstance(exog, np.ndarray)
-        sqrt_norm2 = np.ones(m)
-        m, n = exog.shape
-        if not dense and not isinstance(exog, csc_matrix):
-            raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix.')
-
-        if dense and precondition:
-            sqrt_norm2 = np.sqrt((exog ** 2).sum(0))
-            # TODO: Should used a tol here
-            #   Also drop columns with 0 norm2
-        elif precondition:
-            sqrt_norm2 = np.sqrt((exog.multiply(exog)).sum(0)).A.squeeze()
-            # TODO: Should used a tol here
-            #   Also drop columns with 0 norm2
-
-        sqrt_norm2[sqrt_norm2 == 0.0] = 1
-        exog = exog.copy()
-        for i in range(n):
-            exog[:,i] /= sqrt_norm2[i]
-
-        if not dense:
-            indptr = <np.ndarray> exog.indptr
-            indices = <np.ndarray> exog.indices
-            data = <np.ndarray> exog.data
-
+        self.m, self.n = exog.shape
+        # Initialize memory
         self.keep = <lsmr_keep *> malloc(sizeof(lsmr_keep))
         initialize_lsmr_keep(self.keep)
         self.options = <lsmr_options *>malloc(sizeof(lsmr_options))
@@ -1537,48 +1472,79 @@ cdef class LSMR(object):
         self.inform = <lsmr_inform *>malloc(sizeof(lsmr_inform))
         self.extra = <lsmr_extra *>malloc(sizeof(lsmr_extra))
 
-        self.h = <double *> malloc(n * sizeof(double))
-        self.hbar = <double *> malloc(n * sizeof(double))
+        self.h = <double *> malloc(self.n * sizeof(double))
+        self.hbar = <double *> malloc(self.n * sizeof(double))
         self.keep.h = self.h
-        self.keep.h_n = n
+        self.keep.h_n = self.n
         self.keep.hbar = self.hbar
-        self.keep.hbar_n = n
-        u = <np.ndarray>np.empty(m)
-        v = <np.ndarray>np.empty(n)
-        self.x = np.empty(n)
+        self.keep.hbar_n = self.n
+
+        u = <np.ndarray>np.empty(self.m)
+        v = <np.ndarray>np.empty(self.n)
+        self.x = np.empty(self.n)
         x_arr = <np.ndarray>self.x
         dep_arr = <np.ndarray> dependent
-        for i in range(m):
+
+        dependent = np.asarray(dependent, dtype=np.double)
+        dense = isinstance(exog, np.ndarray)
+        sqrt_norm2 = np.ones(self.m)
+
+        if dense:
+            exog = np.asarray(exog, dtype=np.double, order='F')
+            exog_arr = <np.ndarray> exog
+        else:
+            if isinstance(exog, csc_matrix):
+                raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix with '
+                                'dtype double.')
+            elif exog.dtype != np.double:
+                raise TypeError('exog must have dtype double (or float64)')
+
+        if precondition:
+            exog2 = exog ** 2 if dense else exog.multiply(exog)
+            # TODO: Should used a tol here
+            #  Also drop columns with 0 norm2
+            sqrt_norm2 = np.sqrt(np.asarray(exog2.sum(0))).squeeze()
+            sqrt_norm2[sqrt_norm2 == 0.0] = 1
+            exog = exog.copy()
+            for i in range(self.n):
+                exog[:,i] /= sqrt_norm2[i]
+
+        if not dense:
+            indptr = <np.ndarray> exog.indptr
+            indices = <np.ndarray> exog.indices
+            data = <np.ndarray> exog.data
+
+        # Initial value for residual
+        for i in range(self.m):
             u[i] = dep_arr[i]
+
         while not done:
-            lsmr_solve_double(&action, m, n, &u[0], &v[0], &x_arr[0], self.keep, self.options,
-                              self.inform, self.extra, 0.0)
+            lsmr_solve_double(&action, self.m, self.n, &u[0], &v[0], &x_arr[0], self.keep,
+                              self.options, self.inform, self.extra, 0.0)
             if action == 0:
-                print("Exit LSMR with inform.flag = {0:d} "
-                      "and inform.itn = {1:d}\n".format(self.inform.flag, self.inform.itn))
-                print("LS solution is:\n")
-                xout = [x_arr[i] for i in range(n)]
-                print(', '.join(map('{:0.2f}'.format, xout)))
                 done = True
             elif action == 1:
                 # Compute v = v + A'*u without altering u */
                 if dense:
-                    v += exog.T.dot(u)
+                    # v += exog.T.dot(u)
+                    dense_matrix_mult_trans(self.m, self.n, &exog_arr[0,0], &u[0], &v[0])
                 else:
-                    matrix_mult_trans(m, n, &indptr[0], &indices[0], &data[0], &u[0], &v[0])
+                    csc_matrix_mult_trans(self.m, self.n, &indptr[0], &indices[0], &data[0],
+                                          &u[0], &v[0])
 
             elif action == 2:
                 # Compute u = u + A*v  without altering v
                 if dense:
-                    u += exog.dot(v)
+                    # u += exog.dot(v)
+                    dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
                 else:
-                    matrix_mult(m, n, &indptr[0], &indices[0], &data[0], &v[0], &u[0])
+                    csc_matrix_mult(self.m, self.n, &indptr[0], &indices[0], &data[0], &v[0],
+                                    &u[0])
             else:
                 raise NotImplementedError(f'action: {action}')
 
         if precondition:
-            for i in range(m):
-                self.x[i] /= sqrt_norm2[i]
+            self.x /= sqrt_norm2
 
     @property
     def beta(self):
@@ -1591,3 +1557,10 @@ cdef class LSMR(object):
         free(self.options)
         free(self.inform)
         free(self.extra)
+
+    cdef void print_exit(self):
+        print("Exit LSMR with inform.flag = {0:d} "
+              "and inform.itn = {1:d}\n".format(self.inform.flag, self.inform.itn))
+        print("LS solution is:\n")
+        xout = [self.x[i] for i in range(self.n)]
+        print(', '.join(map('{:0.2f}'.format, xout)))
