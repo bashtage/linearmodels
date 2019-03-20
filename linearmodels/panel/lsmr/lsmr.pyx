@@ -1,4 +1,4 @@
-# cython: language_level=3, boundscheck=False, wraparound=False, cdivision=True, infer_types=False, initializedcheck=False
+# cython: language_level=3, boundscheck=False, wraparound=False, cdivision=True, infer_types=False, initializedcheck=False, linetrace=True
 """
 Copyright (c) 2010, 2012 David Fong, Michael Saunders, Stanford University
 Copyright (c) 2014-2016 Science and Technology Facilites Council (STFC)
@@ -217,11 +217,13 @@ LSMR  minimizes the function normr with respect to y.
 """
 import numpy as np
 cimport numpy as np
+from cpython.pycapsule cimport PyCapsule_New, PyCapsule_IsValid, PyCapsule_GetPointer
 from libc.math cimport sqrt
 from libc.stdlib cimport malloc, free
 from libc.float cimport DBL_MAX, DBL_EPSILON
 from scipy.linalg.cython_blas cimport dscal, ddot, dnrm2, dgemm
-from scipy.sparse.csc import csc_matrix
+from scipy.sparse import csc_matrix, issparse
+
 
 cdef double ZERO = 0.0
 cdef double ONE = 1.0
@@ -630,10 +632,10 @@ cdef bint lsmr_free_double(lsmr_keep *keep):
 
     return status
 
-cdef void localVEnqueue(lsmr_keep *keep, int n, double*v):
+cdef void localVEnqueue(lsmr_keep *keep, int n, double *v):
     """Store v into the circular buffer keep.localV."""
     cdef int i, offset
-    if keep.localPointer < keep.localVecs:
+    if keep.localPointer < (keep.localVecs - 1):  # -1 due ot 0 index
         keep.localPointer += 1
     else:
         keep.localPointer = 0
@@ -1245,27 +1247,29 @@ cdef void lsmr_solve_double(int *action, int m, int n, double *u, double *v, dou
             if damp > ZERO:
                 # write (keep%nout, 1000) enter,m,n,damp,options%atol,&
                 #      options%btol,options%conlim,options%itnlim,keep%localVecs
-                print(OUTPUT['1000'].format(status=ENTER, rows=m, columns=n, damp=damp, atol=options.atol,
-                                            btol=options.btol, conlim=options.conlim,
-                                            itnlim=options.itnlim, local_vecs=keep.localVecs))
+                print(OUTPUT['1000'].format(status=ENTER, rows=m, columns=n, damp=damp,
+                                            atol=options.atol, btol=options.btol,
+                                            conlim=options.conlim, itnlim=options.itnlim,
+                                            local_vecs=keep.localVecs))
             # else
             else:
                 # write (keep%nout, 1050) enter,m,n,options%atol,&
                 #      options%btol,options%conlim,options%itnlim,keep%localVecs
-                print(OUTPUT['1050'].format(status=ENTER, rows=m, columns=n, damp='N/A', atol=options.atol,
-                                            btol=options.btol, conlim=options.conlim,
-                                            itnlim=options.itnlim, local_vecs=keep.localVecs))
+                print(OUTPUT['1050'].format(status=ENTER, rows=m, columns=n, damp='N/A',
+                                            atol=options.atol, btol=options.btol,
+                                            conlim=options.conlim, itnlim=options.itnlim,
+                                            local_vecs=keep.localVecs))
         # else
         else:
             if damp > ZERO:
                 # write (keep%nout, 1100) enter,m,n,damp,options%itnlim,keep%localVecs
-                OUTPUT['1100'].format(status=ENTER, rows=m, columns=n, damp=damp, itnlim=options.itnlim,
-                                      local_vecs=keep.localVecs)
+                print(OUTPUT['1100'].format(status=ENTER, rows=m, columns=n, damp=damp,
+                                            itnlim=options.itnlim, local_vecs=keep.localVecs))
             # else
             else:
                 # write (keep%nout, 1150) enter,m,n,options%itnlim,keep%localVecs
-                OUTPUT['1150'].format(status=ENTER, rows=m, columns=n, damp='N/A', itnlim=options.itnlim,
-                                      local_vecs=keep.localVecs)
+                print(OUTPUT['1150'].format(status=ENTER, rows=m, columns=n, damp='N/A',
+                                            itnlim=options.itnlim, local_vecs=keep.localVecs))
 
     # quick check of m and n
     if (n < 1) or (m < 1):
@@ -1395,6 +1399,114 @@ cdef void csc_matrix_mult_trans(int m, int n, int *ptr, int *row, double *val, d
             i = row[k]
             v[j] += val[k]*u[i]
 
+cdef class LSMROptions(object):
+    cdef int _ctest, _itnlim, _itn_test, _localSize, _print_freq_head, _print_freq_itn, \
+        _unit_diagnostics, _unit_error
+    cdef double _atol, _btol, _conlim
+    cdef lsmr_options *options
+    cdef public object capsule
+
+    def __init__(self, disp=False):
+        self.options = <lsmr_options *> malloc(sizeof(lsmr_options))
+        initialize_lsmr_options(self.options)
+        if not disp:
+            self.options.unit_diagnostics = -1
+        self.capsule = PyCapsule_New(<void *>self.options, "lsmr_options", NULL)
+
+    def __dealloc__(self):
+        free(self.options)
+
+    @property
+    def ctest(self):
+        return self.options.ctest
+
+    @ctest.setter
+    def ctest(self, int value):
+        self.options.ctest = value
+
+    @property
+    def atol(self):
+        return self.options.atol
+
+    @atol.setter
+    def atol(self, double value):
+        self.options.atol = value
+
+    @property
+    def btol(self):
+        return self.options.btol
+
+    @btol.setter
+    def btol(self, double value):
+        self.options.btol = value
+
+    @property
+    def conlim(self):
+        return self.options.conlim
+
+    @conlim.setter
+    def conlim(self, double value):
+        self.options.conlim = value
+
+    @property
+    def itnlim(self):
+        return self.options.itnlim
+
+    @itnlim.setter
+    def itnlim(self, int value):
+        self.options.itnlim = value
+
+    @property
+    def itn_test(self):
+        return self.options.itn_test
+
+    @itn_test.setter
+    def itn_test(self, int value):
+        self.options.itn_test = value
+
+    @property
+    def localSize(self):
+        return self.options.localSize
+
+    @localSize.setter
+    def localSize(self, int value):
+        self.options.localSize = value
+
+    @property
+    def print_freq_head(self):
+        return self.options.print_freq_head
+
+    @print_freq_head.setter
+    def print_freq_head(self, int value):
+        self.options.print_freq_head = value
+
+    @property
+    def print_freq_itn(self):
+        return self.options.print_freq_itn
+
+    @print_freq_itn.setter
+    def print_freq_itn(self, int value):
+        self.options.print_freq_itn = value
+
+    @property
+    def unit_diagnostics(self):
+        return self.options.unit_diagnostics
+
+    @unit_diagnostics.setter
+    def unit_diagnostics(self, int value):
+        self.options.unit_diagnostics = value
+
+    @property
+    def unit_error(self):
+        return self.options.unit_error
+
+    @unit_error.setter
+    def unit_error(self, int value):
+        self.options.unit_error = value
+
+    cdef lsmr_options* get_options(self):
+        return self.options
+
 
 cdef class LSMR(object):
     """
@@ -1402,13 +1514,14 @@ cdef class LSMR(object):
 
     Parameters
     ----------
-    dependent : array-like
-        Array of dependent values (nobs,). Must have dtype double.
-    exog : {ndarray, csc_matrix}
+    a : {ndarray, sparse}
         Array or sparse matrix of containing the exogenous variables
         (nobs, nvar). Must have dtype double.
+    b : array-like
+        Array of dependent values (nobs,). Must have dtype double.
     precondition : bool
-
+        Flag indicating whether a should be pre-conditioned to have unit 2-norm before
+        estimation to improve convergence.
 
     Notes
     -----
@@ -1450,25 +1563,26 @@ cdef class LSMR(object):
     cdef lsmr_extra *extra
     cdef double *h
     cdef double *hbar
-    cdef double *localVecs
+    cdef double *localV
     cdef np.ndarray x
     cdef int m, n
 
-    def __init__(self, dependent, exog, bint precondition=True):
-        cdef int[::1] indptr, indices
-        cdef double[::1] u, v, dep_arr, data, x_arr
+    def __init__(self, a, b, bint precondition=True, bint disp=False, local_vecs=0):
+        cdef int[::1] a_indptr, a_indices
+        cdef double[::1] u, v, b_arr, a_data, x_arr, sqrt_norm2_arr
         cdef double[::1,:] exog_arr
-        cdef int i
+        cdef int i, j, idx
         cdef int action = 0
         cdef bint dense, done = False
 
-        self.m, self.n = exog.shape
+        self.m, self.n = a.shape
         # Initialize memory
         self.keep = <lsmr_keep *> malloc(sizeof(lsmr_keep))
         initialize_lsmr_keep(self.keep)
         self.options = <lsmr_options *>malloc(sizeof(lsmr_options))
         initialize_lsmr_options(self.options)
-        self.options.unit_diagnostics = -1
+        if not disp:
+            self.options.unit_diagnostics = -1
         self.inform = <lsmr_inform *>malloc(sizeof(lsmr_inform))
         self.extra = <lsmr_extra *>malloc(sizeof(lsmr_extra))
 
@@ -1478,42 +1592,60 @@ cdef class LSMR(object):
         self.keep.h_n = self.n
         self.keep.hbar = self.hbar
         self.keep.hbar_n = self.n
+        if local_vecs:
+            local_vecs = min(local_vecs, self.m, self.n)
+            self.localV = <double *> malloc(self.n * local_vecs * sizeof(double))
+            self.keep.localV = self.localV
+            self.keep.localV_n = self.n
+            self.keep.localV_m = local_vecs
+            self.options.localSize = local_vecs
 
         u = <np.ndarray>np.empty(self.m)
         v = <np.ndarray>np.empty(self.n)
         self.x = np.empty(self.n)
         x_arr = <np.ndarray>self.x
-        dep_arr = <np.ndarray> dependent
+        b_arr = <np.ndarray> b
 
-        dependent = np.asarray(dependent, dtype=np.double)
-        dense = isinstance(exog, np.ndarray)
+        b = np.asarray(b, dtype=np.double)
+        dense = not issparse(a)
         sqrt_norm2 = np.ones(self.m)
 
         if dense:
-            exog = np.asarray(exog, dtype=np.double, order='F')
-            exog_arr = <np.ndarray> exog
-        elif not isinstance(exog, csc_matrix) or exog.dtype != np.double:
-            raise TypeError('If exog is not a (dense) ndarray, it must be a csc_matrix with '
+            a = np.asarray(a, dtype=np.double, order='F')
+            exog_arr = <np.ndarray> a
+        elif not issparse(a) or a.dtype != np.double:
+            raise TypeError('If a is not a (dense) ndarray, it must be a csc_matrix with '
                             'dtype double.')
+        elif issparse(a) and not isinstance(a, csc_matrix):
+            a = csc_matrix(a, dtype=np.double)
 
         if precondition:
-            exog2 = exog ** 2 if dense else exog.multiply(exog)
+            exog2 = a ** 2 if dense else a.multiply(a)
             # TODO: Should used a tol here
             #  Also drop columns with 0 norm2
             sqrt_norm2 = np.sqrt(np.asarray(exog2.sum(0))).squeeze()
             sqrt_norm2[sqrt_norm2 == 0.0] = 1
-            exog = exog.copy()
-            for i in range(self.n):
-                exog[:,i] /= sqrt_norm2[i]
-
-        if not dense:
-            indptr = <np.ndarray> exog.indptr
-            indices = <np.ndarray> exog.indices
-            data = <np.ndarray> exog.data
+            a = a.copy()
+            if dense:
+                a /= sqrt_norm2
+            else:
+                a_indptr = <np.ndarray> a.indptr
+                a_indices = <np.ndarray> a.indices
+                a_data = <np.ndarray> a.data
+                sqrt_norm2_arr = <np.ndarray> sqrt_norm2
+                idx = 0
+                for i in range(self.n):
+                    for j in range(a_indptr[i+1] - a_indptr[i]):
+                        a_data[idx] /= sqrt_norm2_arr[i]
+                        idx += 1
+        elif not precondition and not dense:
+            a_indptr = <np.ndarray> a.indptr
+            a_indices = <np.ndarray> a.indices
+            a_data = <np.ndarray> a.data
 
         # Initial value for residual
         for i in range(self.m):
-            u[i] = dep_arr[i]
+            u[i] = b_arr[i]
 
         while not done:
             lsmr_solve_double(&action, self.m, self.n, &u[0], &v[0], &x_arr[0], self.keep,
@@ -1523,19 +1655,18 @@ cdef class LSMR(object):
             elif action == 1:
                 # Compute v = v + A'*u without altering u */
                 if dense:
-                    v += exog.T.dot(u)
-                    # dense_matrix_mult_trans(self.m, self.n, &exog_arr[0,0], &u[0], &v[0])
+                    # v += exog.T.dot(u)
+                    dense_matrix_mult_trans(self.m, self.n, &exog_arr[0,0], &u[0], &v[0])
                 else:
-                    csc_matrix_mult_trans(self.m, self.n, &indptr[0], &indices[0], &data[0],
+                    csc_matrix_mult_trans(self.m, self.n, &a_indptr[0], &a_indices[0], &a_data[0],
                                           &u[0], &v[0])
-
             elif action == 2:
                 # Compute u = u + A*v  without altering v
                 if dense:
-                    u += exog.dot(v)
-                    # dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
+                    # u += exog.dot(v)
+                    dense_matrix_mult(self.m, self.n, &exog_arr[0,0], &v[0], &u[0])
                 else:
-                    csc_matrix_mult(self.m, self.n, &indptr[0], &indices[0], &data[0], &v[0],
+                    csc_matrix_mult(self.m, self.n, &a_indptr[0], &a_indices[0], &a_data[0], &v[0],
                                     &u[0])
             else:
                 raise NotImplementedError(f'action: {action}')
@@ -1565,27 +1696,3 @@ cdef class LSMR(object):
         free(self.options)
         free(self.inform)
         free(self.extra)
-
-    cdef void print_exit(self):
-        print("Exit LSMR with inform.flag = {0:d} "
-              "and inform.itn = {1:d}\n".format(self.inform.flag, self.inform.itn))
-        print("LS solution is:\n")
-        xout = [self.x[i] for i in range(self.n)]
-        print(', '.join(map('{:0.2f}'.format, xout)))
-
-
-cpdef void py_dense_matrix_mult(a, v, u):
-    # C = alpha A * B + beta C
-    # (m,n)    (m,k)(k,n)   (m,n)
-    # u = 1 exog * v + 1 u
-    # (m,1)    (m,n) (n,1)  (m,1)
-    # u = u + exog.dot(v)
-    # cdef void dgemm(char *transa, char *transb, int *m, int *n, int *k, d *alpha, d *a, int *lda, d *b, int *ldb, d *beta, d *c, int *ldc) nogil
-    cdef int one_i = 1
-    cdef double one_d = 1
-    cdef int m = a.shape[0]
-    cdef int n = v.shape[0]
-    cdef double[::1, :] a_arr = <np.ndarray>a
-    cdef double[::1, :] v_arr = <np.ndarray>v
-    cdef double[::1, :] u_arr = <np.ndarray>u
-    dgemm("N", "N", &m, &one_i, &n, &one_d, &a_arr[0,0], &m, &v_arr[0,0], &n, &one_d, &u_arr[0,0], &m)

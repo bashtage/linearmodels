@@ -1,10 +1,10 @@
-from linearmodels.panel.lsmr.lsmr import LSMR, py_dense_matrix_mult
+from linearmodels.panel.lsmr.lsmr import LSMR
 import numpy as np
 from scipy.sparse.csc import csc_matrix
 import time
 y = np.random.randn(10000)
 x = np.random.randn(10000, 10)
-LSMR(y, x, precondition=False)
+LSMR(x, y, precondition=True)
 
 
 x = [[1.0, 0.0, -1.0],
@@ -17,18 +17,18 @@ xc = csc_matrix(x)
 y = np.ones(5)
 itn = [100]
 print(itn)
-l = LSMR(y, x, precondition=False)
+l = LSMR(x, y, precondition=True)
 print(l.info)
 itn.append(l.info['itn'])
 
-l = LSMR(y, xc, precondition=False)
+l = LSMR(xc, y, precondition=True)
 print(l.info)
 itn.append(l.info['itn'])
 sqrt_norm2 = np.sqrt((xc.multiply(xc)).sum(0)).A.squeeze()
 xn = xc.copy()
 for i in range(xn.shape[1]):
     xn[:,i] /= sqrt_norm2[i]
-l = LSMR(y, xn, precondition=False)
+l = LSMR(xn, y, precondition=True)
 print(l.info)
 itn.append(l.info['itn'])
 print(min(itn))
@@ -52,7 +52,7 @@ c3 = c.copy()
 dgemm(1.,a,b,1,c3,0,0,1)
 #print(c2-c3)
 c4 = c.copy()
-py_dense_matrix_mult(a,b,c4)
+
 #print(c4)
 
 """
