@@ -1,7 +1,7 @@
 from linearmodels.compat.numpy import isin
 
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 import pytest
 import scipy.sparse.coo
@@ -9,10 +9,12 @@ import scipy.sparse.csc
 import scipy.sparse.csr
 
 from linearmodels.panel.utility import (dummy_matrix, in_2core_graph,
-                                        in_2core_graph_slow)
+                                        in_2core_graph_slow, preconditioner)
 
 formats = {'csc': scipy.sparse.csc.csc_matrix, 'csr': scipy.sparse.csr.csr_matrix,
            'coo': scipy.sparse.coo.coo_matrix, 'array': np.ndarray}
+
+pytestmark = pytest.mark.filterwarnings('ignore:the matrix subclass:PendingDeprecationWarning')
 
 
 @pytest.fixture('module', params=formats)
@@ -26,11 +28,12 @@ def test_dummy_format(format):
     cats[5:, 0] = 1
     cats[10:, 0] = 2
     cats[:, 1] = np.arange(15) % 5
-    out = dummy_matrix(cats, format=code)
+    out, cond = dummy_matrix(cats, format=code, precondition=False)
     assert isinstance(out, expected_type)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 3, 3, 3, 3], dtype=np.int32)
     assert_array_equal(np.squeeze(np.asarray(out.sum(0), dtype=np.int32)), expected)
+    assert_array_equal(cond, np.ones(out.shape[1]))
 
 
 def test_dummy_last():
@@ -39,7 +42,7 @@ def test_dummy_last():
     cats[10:, 0] = 2
     cats[:, 1] = np.arange(15) % 5
     cats[-1, 1] = 0
-    out = dummy_matrix(cats, drop='last')
+    out, _ = dummy_matrix(cats, drop='last', precondition=False)
     assert isinstance(out, scipy.sparse.csc.csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 4, 3, 3, 3], dtype=np.int32)
@@ -51,18 +54,32 @@ def test_invalid_format():
     cats = np.zeros([10, 1], dtype=np.int8)
     cats[5:, 0] = 1
     with pytest.raises(ValueError):
-        dummy_matrix(cats, format='unknown')
+        dummy_matrix(cats, format='unknown', precondition=False)
 
 
 def test_dummy_pandas():
     c1 = pd.Series(pd.Categorical(['a'] * 5 + ['b'] * 5 + ['c'] * 5))
     c2 = pd.Series(pd.Categorical(['A', 'B', 'C', 'D', 'E'] * 3))
     cats = pd.concat([c1, c2], 1)
-    out = dummy_matrix(cats, drop='last')
+    out, _ = dummy_matrix(cats, drop='last', precondition=False)
     assert isinstance(out, scipy.sparse.csc.csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 3, 3, 3, 3], dtype=np.int32)
     assert_array_equal(np.squeeze(np.asarray(out.sum(0), dtype=np.int32)), expected)
+
+
+def test_dummy_precondition():
+    c1 = pd.Series(pd.Categorical(['a'] * 5 + ['b'] * 5 + ['c'] * 5))
+    c2 = pd.Series(pd.Categorical(['A', 'B', 'C', 'D', 'E'] * 3))
+    cats = pd.concat([c1, c2], 1)
+    out_arr, cond_arr = dummy_matrix(cats, format='array', drop='last', precondition=True)
+    out_csc, cond_csc = dummy_matrix(cats, format='csc', drop='last', precondition=True)
+    out_csr, cond_csr = dummy_matrix(cats, format='csr', drop='last', precondition=True)
+    assert_allclose((out_arr ** 2).sum(0), np.ones(out_arr.shape[1]))
+    assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_arr.shape[1]))
+    assert_allclose(cond_arr, cond_csc)
+    assert_allclose(cond_csr, cond_csc)
+    assert isinstance(out_csr, scipy.sparse.csr_matrix)
 
 
 def test_drop_singletons_single():
@@ -109,7 +126,7 @@ def test_drop_singletons_slow():
     expected = np.concatenate([cols['c1'], cols['c2']], 1)
     assert_array_equal(nonsingletons, expected)
 
-    dummies = dummy_matrix(cats, format='csr')
+    dummies, _ = dummy_matrix(cats, format='csr', precondition=False)
     to_drop = dummies[~retain]
     assert to_drop.sum() == 2 * (~retain).sum()
 
@@ -136,3 +153,35 @@ def test_drop_singletons_pandas():
     remain = in_2core_graph(cats)
     expected = in_2core_graph_slow(cats)
     assert_array_equal(remain, expected)
+
+
+def test_preconditioner_copy():
+    rs = np.random.RandomState(0)
+    values = rs.standard_normal((100, 10))
+    orig = values.copy()
+    val_cond, cond = preconditioner(values, copy=True)
+    assert_allclose(np.sqrt((orig ** 2).sum(0)), cond)
+    assert id(val_cond) != id(values)
+    assert_array_equal(orig, values)
+
+
+def test_preconditioner_sparse():
+    rs = np.random.RandomState(0)
+    values = scipy.sparse.csc_matrix(rs.standard_normal((100, 10)))
+    orig = values.copy()
+    val_cond, cond = preconditioner(values, copy=True)
+    assert_allclose(np.sqrt((values.multiply(values)).sum(0).A1), cond)
+    assert id(val_cond) != id(values)
+    assert_array_equal(orig.A, values.A)
+
+
+def test_preconditioner_subclass():
+    class subarray(np.ndarray):
+        pass
+
+    rs = np.random.RandomState(0)
+    values = rs.standard_normal((100, 10))
+    values = values.view(subarray)
+    val_cond, cond = preconditioner(values, copy=True)
+    assert_allclose(np.sqrt((values ** 2).sum(0)), cond)
+    assert type(val_cond) == type(values)

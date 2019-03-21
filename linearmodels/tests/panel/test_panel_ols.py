@@ -16,7 +16,8 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                generate_data)
 from linearmodels.utility import AttrDict, MemoryWarning
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning',
+                                        'ignore:the matrix subclass:PendingDeprecationWarning')
 
 missing = [0.0, 0.02, 0.20]
 has_const = [True, False]
@@ -1101,6 +1102,7 @@ def test_low_memory_auto():
         mod.fit()
 
 
+@pytest.mark.filterwarnings('ignore::linearmodels.utility.SingletonWarning')
 def test_singleton_removal():
     entities = []
     for i in range(6):
@@ -1119,6 +1121,7 @@ def test_singleton_removal():
     assert_allclose(res.params, res_with.params)
 
 
+@pytest.mark.filterwarnings('ignore::linearmodels.utility.SingletonWarning')
 def test_masked_singleton_removal():
     nobs = 8
     entities = ['A', 'B', 'C', 'D'] * 2
@@ -1142,6 +1145,7 @@ def test_singleton_removal_other_effects(data):
 
 
 @pytest.mark.slow
+@pytest.mark.filterwarnings('ignore::linearmodels.utility.SingletonWarning')
 @pytest.mark.parametrize('other_effects', [1, 2])
 def test_singleton_removal_mixed(singleton_data, other_effects):
     if other_effects == 1:
