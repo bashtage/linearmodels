@@ -6,7 +6,7 @@ from numpy.linalg import matrix_rank
 import pandas as pd
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
-from scipy.sparse.csc import csc_matrix
+from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
 
 from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
@@ -955,19 +955,27 @@ class PanelOLS(PooledOLS):
             cats.append(self._other_effect_cats.values2d)
         cats = np.concatenate(cats, 1)
 
-        wd = dummy_matrix(cats)
+        wd, cond = dummy_matrix(cats, precondition=True)
         if self._is_weighted:
             wd = wd.multiply(root_w_sparse)
 
-        wx_mean = np.column_stack(
-            [lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0] for i in range(x.shape[1])])
-        wy_mean = (lsmr(wd, wy, atol=1e-8, btol=1e-8)[0])[:, None]
+        wx_mean = []
+        for i in range(x.shape[1]):
+            cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
+            cond_mean /= cond
+            wx_mean.append(cond_mean)
+        wx_mean = np.column_stack(wx_mean)
+        wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
+        wy_mean /= cond
+        wy_mean = wy_mean[:, None]
+
         wx_mean = csc_matrix(wx_mean)
         wy_mean = csc_matrix(wy_mean)
 
         # Purge fitted, weighted values
-        wx = wx - (wd @ wx_mean).A
-        wy = wy - (wd @ wy_mean).A
+        sp_cond = diags(cond, format='csc')
+        wx = wx - (wd @ sp_cond @ wx_mean).A
+        wy = wy - (wd @ sp_cond @ wy_mean).A
 
         if self.has_constant:
             wy += wy_gm
@@ -1270,15 +1278,17 @@ class PanelOLS(PooledOLS):
 
         weighted = np.any(self.weights.values2d != 1.0)
         y_effects = x_effects = 0
-        low_memory = self._choose_twoway_algo() if low_memory is None else low_memory
+
         if use_lsmr:
             y, x, ybar, y_effects, x_effects = self._lsmr_path()
         elif use_lsdv:
             y, x, ybar, y_effects, x_effects = self._slow_path()
-        elif not weighted:
-            y, x, ybar = self._fast_path(low_memory=low_memory)
         else:
-            y, x, ybar, y_effects, x_effects = self._weighted_fast_path(low_memory=low_memory)
+            low_memory = self._choose_twoway_algo() if low_memory is None else low_memory
+            if not weighted:
+                y, x, ybar = self._fast_path(low_memory=low_memory)
+            else:
+                y, x, ybar, y_effects, x_effects = self._weighted_fast_path(low_memory=low_memory)
 
         neffects = 0
         drop_first = self.has_constant

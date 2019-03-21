@@ -7,7 +7,57 @@ import pandas as pd
 import scipy.sparse as sp
 
 
-def dummy_matrix(cats, format='csc', drop='first', drop_all=False):
+def preconditioner(d, *, copy=False):
+    """
+    Parameters
+    ----------
+    d : array-like
+        Array to precondition
+    copy : bool
+        Flag indicating whether the operation should be in-place, if possible.
+        If True, when a new array will always be returned.
+
+    Returns
+    -------
+        d : array-like
+            Array with same type as input array. If copy is False, and d is
+            an ndarray or a csc_matrix, then the operation is inplace
+        cond : ndarray
+            Array of conditioning numbers defined as the square root of the column
+            2-norms (nvar,)
+    """
+    # Dense path
+    if not sp.issparse(d):
+        klass = None if type(d) == np.ndarray else d.__class__
+        d_id = id(d)
+        d = np.asarray(d)
+        if id(d) == d_id or copy:
+            d = d.copy()
+        cond = np.sqrt((d**2).sum(0))
+        d /= cond
+        if klass is not None:
+            d = d.view(klass)
+        return d, cond
+
+    klass = None
+    if not isinstance(d, sp.csc_matrix):
+        klass = d.__class__
+        d = sp.csc_matrix(d)
+    elif copy:
+        d = d.copy()
+
+    cond = np.sqrt(d.multiply(d).sum(0)).A1
+    locs = np.zeros_like(d.indices)
+    locs[d.indptr[1:-1]] = 1
+    locs = np.cumsum(locs)
+    d.data /= np.take(cond, locs)
+    if klass is not None:
+        d = klass(d)
+
+    return d, cond
+
+
+def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, precondition=True):
     """
     Parameters
     ----------
@@ -27,14 +77,17 @@ def dummy_matrix(cats, format='csc', drop='first', drop_all=False):
         Exclude either the first or last category
     drop_all : bool
         Flag indicating whether all sets of dummies should exclude one category
+    precondition : bool
+        Flag indicating whether the columns of the dummy matrix should be
+        preconditioned to have unit 2-norm.
 
     Returns
     -------
     dummies : array-like
         Array, either sparse or dense, of size nobs x ncats containing the
         dummy variable values
-    labels : list[str]
-        List of dummy variable labels
+    cond : ndarray
+        Conditioning number of each column
     """
     if isinstance(cats, pd.DataFrame):
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
@@ -81,7 +134,12 @@ def dummy_matrix(cats, format='csc', drop='first', drop_all=False):
     if format == 'array':
         out = out.toarray()
 
-    return out
+    if precondition:
+        out, cond = preconditioner(out, copy=False)
+    else:
+        cond = np.ones(out.shape[1])
+
+    return out, cond
 
 
 def _remove_node(node, meta, orig_dest):

@@ -58,8 +58,8 @@ extensions = ['sphinx.ext.autodoc',
               ]
 
 try:
-    import sphinxcontrib.spelling
-except ImportError as err:
+    import sphinxcontrib.spelling  # noqa: F401
+except ImportError as err:  # noqa: F841
     pass
 else:
     extensions.append('sphinxcontrib.spelling')

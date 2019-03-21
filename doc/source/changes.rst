@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+Since Version 4.12
+==================
+* Added preconditioning to the dummy variable matrix when ``use_lsmr=True``
+  in :func:`~linearmodels.panel.model.PanelOLS.fit`. In models with many
+  effects, this can reduce run time by a factor of 4 or more.
+
 Version 4.12
 ============
 * Added an option to drop singleton observations in
