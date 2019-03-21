@@ -16,7 +16,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.12 documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.12+2.gd00605c documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+2.gd00605c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -55,7 +55,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.12</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12 (+2, gd00605c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -118,7 +118,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">patsy.highlevel</span> <span class="k">import</span> <span class="n">ModelDesc</span><span class="p">,</span> <span class="n">dmatrix</span>
 <span class="kn">from</span> <span class="nn">patsy.missing</span> <span class="k">import</span> <span class="n">NAAction</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csc</span> <span class="k">import</span> <span class="n">csc_matrix</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="k">import</span> <span class="n">csc_matrix</span><span class="p">,</span> <span class="n">diags</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">import</span> <span class="n">lsmr</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.panel.covariance</span> <span class="k">import</span> <span class="p">(</span><span class="n">ACCovariance</span><span class="p">,</span> <span class="n">ClusteredCovariance</span><span class="p">,</span>
@@ -1067,19 +1067,27 @@
             <span class="n">cats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_other_effect_cats</span><span class="o">.</span><span class="n">values2d</span><span class="p">)</span>
         <span class="n">cats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">wd</span> <span class="o">=</span> <span class="n">dummy_matrix</span><span class="p">(</span><span class="n">cats</span><span class="p">)</span>
+        <span class="n">wd</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">dummy_matrix</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">precondition</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_weighted</span><span class="p">:</span>
             <span class="n">wd</span> <span class="o">=</span> <span class="n">wd</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">root_w_sparse</span><span class="p">)</span>
 
-        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wx</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
-        <span class="n">wy_mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">wx_mean</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">cond_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wx</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">cond_mean</span> <span class="o">/=</span> <span class="n">cond</span>
+            <span class="n">wx_mean</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cond_mean</span><span class="p">)</span>
+        <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">wx_mean</span><span class="p">)</span>
+        <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">lsmr</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">btol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">wy_mean</span> <span class="o">/=</span> <span class="n">cond</span>
+        <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">wy_mean</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
         <span class="n">wx_mean</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="n">wx_mean</span><span class="p">)</span>
         <span class="n">wy_mean</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="n">wy_mean</span><span class="p">)</span>
 
         <span class="c1"># Purge fitted, weighted values</span>
-        <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
-        <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">sp_cond</span> <span class="o">=</span> <span class="n">diags</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+        <span class="n">wx</span> <span class="o">=</span> <span class="n">wx</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wx_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">wy</span> <span class="o">=</span> <span class="n">wy</span> <span class="o">-</span> <span class="p">(</span><span class="n">wd</span> <span class="o">@</span> <span class="n">sp_cond</span> <span class="o">@</span> <span class="n">wy_mean</span><span class="p">)</span><span class="o">.</span><span class="n">A</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span><span class="p">:</span>
             <span class="n">wy</span> <span class="o">+=</span> <span class="n">wy_gm</span>
@@ -1382,15 +1390,17 @@
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">y_effects</span> <span class="o">=</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">low_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_choose_twoway_algo</span><span class="p">()</span> <span class="k">if</span> <span class="n">low_memory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">low_memory</span>
+
         <span class="k">if</span> <span class="n">use_lsmr</span><span class="p">:</span>
             <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lsmr_path</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">use_lsdv</span><span class="p">:</span>
             <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slow_path</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">weighted</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
+            <span class="n">low_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_choose_twoway_algo</span><span class="p">()</span> <span class="k">if</span> <span class="n">low_memory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">low_memory</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">weighted</span><span class="p">:</span>
+                <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
 
         <span class="n">neffects</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">drop_first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_constant</span>
@@ -2292,7 +2302,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+2.gd00605c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
