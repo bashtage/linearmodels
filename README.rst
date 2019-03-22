@@ -1,7 +1,8 @@
 Linear Models
 =============
 
-|Build Status| |codecov| |Codacy Badge| |codebeat badge|
+|Build Status| |codecov| |Codacy Badge| |codebeat badge| |Code Quality:
+Python| |Total Alerts|
 
 Linear (regression) models for Python. Extends
 `statsmodels <http://www.statsmodels.org>`__ with Panel regression,
@@ -142,6 +143,7 @@ is possible that older versions work.
 -  pandas (0.20+)
 -  statsmodels (0.8+)
 -  xarray (0.9+, optional)
+-  cython (optional)
 
 Testing
 ~~~~~~~
@@ -169,3 +171,7 @@ Documentation
    :target: https://www.codacy.com/app/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade
 .. |codebeat badge| image:: https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243
    :target: https://codebeat.co/projects/github-com-bashtage-linearmodels-master
+.. |Code Quality: Python| image:: https://img.shields.io/lgtm/grade/python/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18
+   :target: https://lgtm.com/projects/g/bashtage/linearmodels/context:python
+.. |Total Alerts| image:: https://img.shields.io/lgtm/alerts/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18
+   :target: https://lgtm.com/projects/g/bashtage/linearmodels/alerts

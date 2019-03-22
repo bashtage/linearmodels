@@ -1,5 +1,5 @@
-numpy>=1.11
-pandas>= 0.19
+numpy>=1.12
+pandas>=0.20
 scipy>=0.18
 patsy
 statsmodels>=0.8
