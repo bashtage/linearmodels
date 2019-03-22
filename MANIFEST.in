@@ -1,7 +1,7 @@
 global-include *.csv *.py *.dta *.ipynb *.png
 
 recursive-include doc/source *
-recursive-include linearmodels/tests *.txt *.csv
+recursive-include linearmodels/tests *.txt *.csv *.dta
 recursive-include linearmodels/datasets *.csv.bz
 recursive-include examples *
 include versioneer.py

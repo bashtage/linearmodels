@@ -141,6 +141,17 @@ def test_drop_singletons():
     assert_array_equal(remain, expected)
 
 
+def test_drop_singletons_large():
+    rs = np.random.RandomState(1234)
+    m = 2000000
+    c1 = rs.randint(0, m // 3, m)
+    c2 = rs.randint(0, m // 20, m)
+    cats = np.column_stack([c1, c2])
+    retain = in_2core_graph(cats)
+    expected = in_2core_graph_slow(cats)
+    assert_array_equal(retain, expected)
+
+
 def test_drop_singletons_pandas():
     rs = np.random.RandomState(0)
     c1 = rs.randint(0, 10000, (40000, 1))
