@@ -6,6 +6,13 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
+try:
+    from linearmodels.panel._utility import _drop_singletons
+
+    HAS_CYTHON = True
+except ImportError:
+    HAS_CYTHON = False
+
 
 def preconditioner(d, *, copy=False):
     """
@@ -33,7 +40,7 @@ def preconditioner(d, *, copy=False):
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = np.sqrt((d**2).sum(0))
+        cond = np.sqrt((d ** 2).sum(0))
         d /= cond
         if klass is not None:
             d = d.view(klass)
@@ -196,7 +203,7 @@ def _remove_node(node, meta, orig_dest):
     return next_node, next_count
 
 
-def _drop_singletons(meta, orig_dest):
+def _py_drop_singletons(meta, orig_dest):
     """
     Loop through the nodes and recursively drop singleton chains
 
@@ -215,6 +222,10 @@ def _drop_singletons(meta, orig_dest):
             while next_count == 1:
                 # Follow singleton chains
                 next_node, next_count = _remove_node(next_node, meta, orig_dest)
+
+
+if not HAS_CYTHON:
+    _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
 def in_2core_graph(cats):
@@ -257,11 +268,7 @@ def in_2core_graph(cats):
         col_order.remove(i)
         col_order = [i] + col_order
         temp = zero_cats[:, col_order]
-        # Only need unique sort for first, since this is used to reverse later
-        if i == 0:
-            idx = np.lexsort(temp.T[::-1])
-        else:
-            idx = np.argsort(temp[:, 0])
+        idx = np.argsort(temp[:, 0])
         orig_dest.append(temp[idx])
         if i == 0:
             inverter = np.empty_like(zero_cats[:, 0])
@@ -271,7 +278,14 @@ def in_2core_graph(cats):
     #    node_id, count, offset
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
-    meta = np.column_stack([node_id, count, offset])
+
+    def min_dtype(*args):
+        bits = max([np.log2(max(arg.max(), 1)) for arg in args])
+        return 'int{0}'.format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
+
+    dtype = min_dtype(offset, node_id, count, orig_dest)
+    meta = np.column_stack([node_id.astype(dtype), count.astype(dtype), offset.astype(dtype)])
+    orig_dest = orig_dest.astype(dtype)
 
     singletons = np.any(meta[:, 1] == 1)
     while singletons:

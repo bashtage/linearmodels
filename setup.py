@@ -2,7 +2,15 @@ import glob
 import os
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import Extension, find_packages, setup
+
+try:
+    from Cython.Build import cythonize
+    import numpy
+
+    HAS_CYTHON = True
+except ImportError:
+    HAS_CYTHON = False
 
 import versioneer
 
@@ -34,6 +42,7 @@ try:
 
 except (ImportError, OSError):
     import warnings
+
     warnings.warn("Unable to convert README.md to README.rst", UserWarning)
     description = open('README.md').read()
 
@@ -77,6 +86,19 @@ for filename in glob.iglob('./examples/**', recursive=True):
     if '.png' in filename:
         additional_files.append(filename)
 
+if HAS_CYTHON:
+    macros = [('NPY_NO_DEPRECATED_API', '1'),
+              ('NPY_1_7_API_VERSION', '1')]
+    # macros.append(('CYTHON_TRACE', '1'))
+    directives = {}  # {'linetrace': True, 'binding':True}
+    extensions = [Extension('linearmodels.panel._utility',
+                            ['linearmodels/panel/_utility.pyx'],
+                            define_macros=macros,
+                            include_dirs=[numpy.get_include()])]
+    extensions = cythonize(extensions, compiler_directives=directives, force=True)
+else:
+    extensions = []
+
 setup(
     cmdclass=versioneer.get_cmdclass(),
     name='linearmodels',
@@ -111,4 +133,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering',
     ],
+    ext_modules=extensions
 )
