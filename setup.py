@@ -2,17 +2,24 @@ import glob
 import os
 import sys
 
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from setuptools import Extension, find_packages, setup
 
-try:
-    from Cython.Build import cythonize
-    import numpy
-
-    HAS_CYTHON = True
-except ImportError:
-    HAS_CYTHON = False
-
 import versioneer
+
+FAILED_COMPILER_ERROR = """
+******************************************************************************
+*                               WARNING                                      *
+******************************************************************************
+
+Unable to build binary modules for linearmodels.  These are not required
+to run any code in the package, and only provide speed-ups for a small subset
+of models.
+
+******************************************************************************
+*                               WARNING                                      *
+******************************************************************************
+"""
 
 if sys.version_info < (3, 5):
     sys.exit('Requires Python 3.5 or later due to use of @ operator.')
@@ -34,7 +41,7 @@ try:
         windows_line_ending = '\r\n'
         linux_line_ending = '\n'
 
-        description = pypandoc.convert('README.md', 'rst')
+        description = pypandoc.convert_file('README.md', 'rst')
         description = description.replace(windows_line_ending, linux_line_ending)
         description = description.replace(osx_line_ending, linux_line_ending)
         with open('README.rst', 'w') as rst:
@@ -77,61 +84,73 @@ for filename in glob.iglob('./linearmodels/datasets/**', recursive=True):
         additional_files.append(filename.replace('./linearmodels/', ''))
 
 for filename in glob.iglob('./linearmodels/tests/**', recursive=True):
-    if '.txt' in filename:
-        additional_files.append(filename.replace('./linearmodels/', ''))
-    if '.csv' in filename:
+    if '.txt' in filename or '.csv' in filename or '.dta' in filename:
         additional_files.append(filename.replace('./linearmodels/', ''))
 
 for filename in glob.iglob('./examples/**', recursive=True):
     if '.png' in filename:
         additional_files.append(filename)
 
-if HAS_CYTHON:
-    macros = [('NPY_NO_DEPRECATED_API', '1'),
-              ('NPY_1_7_API_VERSION', '1')]
-    # macros.append(('CYTHON_TRACE', '1'))
-    directives = {}  # {'linetrace': True, 'binding':True}
-    extensions = [Extension('linearmodels.panel._utility',
-                            ['linearmodels/panel/_utility.pyx'],
-                            define_macros=macros,
-                            include_dirs=[numpy.get_include()])]
-    extensions = cythonize(extensions, compiler_directives=directives, force=True)
-else:
-    extensions = []
 
-setup(
-    cmdclass=versioneer.get_cmdclass(),
-    name='linearmodels',
-    license='NCSA',
-    description='Instrumental Variable and Linear Panel models for Python',
-    version=versioneer.get_version(),
-    packages=find_packages(),
-    package_dir={'linearmodels': './linearmodels'},
-    author='Kevin Sheppard',
-    author_email='kevin.k.sheppard@gmail.com',
-    url='http://github.com/bashtage/linearmodels',
-    long_description=description,
-    install_requires=open('requirements.txt').read().split('\n'),
-    include_package_data=True,
-    package_data={'linearmodels': additional_files},
-    keywords=['linear models', 'regression', 'instrumental variables', 'IV',
-              'panel', 'fixed effects', 'clustered', 'heteroskedasticity',
-              'endogeneity', 'instruments', 'statistics',
-              'statistical inference', 'econometrics'],
-    zip_safe=False,
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: End Users/Desktop',
-        'Intended Audience :: Financial and Insurance Industry',
-        'Intended Audience :: Science/Research',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'License :: OSI Approved',
-        'Operating System :: MacOS :: MacOS X',
-        'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX',
-        'Programming Language :: Python',
-        'Topic :: Scientific/Engineering',
-    ],
-    ext_modules=extensions
-)
+def run_setup(binary=True):
+    extensions = []
+    if binary:
+        from Cython.Build import cythonize
+        import numpy
+        macros = [('NPY_NO_DEPRECATED_API', '1'),
+                  ('NPY_1_7_API_VERSION', '1')]
+        # macros.append(('CYTHON_TRACE', '1'))
+        directives = {}  # {'linetrace': True, 'binding':True}
+        extension = Extension('linearmodels.panel._utility',
+                              ['linearmodels/panel/_utility.pyx'],
+                              define_macros=macros,
+                              include_dirs=[numpy.get_include()])
+        extensions.append(extension)
+        extensions = cythonize(extensions, compiler_directives=directives, force=True)
+
+    setup(cmdclass=versioneer.get_cmdclass(),
+          name='linearmodels',
+          license='NCSA',
+          description='Instrumental Variable and Linear Panel models for Python',
+          version=versioneer.get_version(),
+          packages=find_packages(),
+          package_dir={'linearmodels': './linearmodels'},
+          author='Kevin Sheppard',
+          author_email='kevin.k.sheppard@gmail.com',
+          url='http://github.com/bashtage/linearmodels',
+          long_description=description,
+          install_requires=open('requirements.txt').read().split('\n'),
+          include_package_data=True,
+          package_data={'linearmodels': additional_files},
+          keywords=['linear models', 'regression', 'instrumental variables', 'IV',
+                    'panel', 'fixed effects', 'clustered', 'heteroskedasticity',
+                    'endogeneity', 'instruments', 'statistics',
+                    'statistical inference', 'econometrics'],
+          zip_safe=False,
+          classifiers=[
+              'Development Status :: 5 - Production/Stable',
+              'Intended Audience :: End Users/Desktop',
+              'Intended Audience :: Financial and Insurance Industry',
+              'Intended Audience :: Science/Research',
+              'Programming Language :: Python :: 3.5',
+              'Programming Language :: Python :: 3.6',
+              'Programming Language :: Python :: 3.7',
+              'License :: OSI Approved',
+              'Operating System :: MacOS :: MacOS X',
+              'Operating System :: Microsoft :: Windows',
+              'Operating System :: POSIX',
+              'Programming Language :: Python',
+              'Topic :: Scientific/Engineering',
+          ],
+          ext_modules=extensions
+          )
+
+
+try:
+    run_setup(binary=True)
+except (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError, ValueError,
+        ImportError):
+    run_setup(binary=False)
+    import warnings
+
+    warnings.warn(FAILED_COMPILER_ERROR, UserWarning)

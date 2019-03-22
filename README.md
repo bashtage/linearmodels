@@ -137,6 +137,7 @@ is possible that older versions work.
 * pandas (0.20+)
 * statsmodels (0.8+)
 * xarray (0.9+, optional)
+* cython (optional)
 
 ### Testing
 
