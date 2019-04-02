@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -138,16 +136,14 @@
 <dt id="linearmodels.iv.results.IVResults.anderson_rubin">
 <code class="descname">anderson_rubin</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.anderson_rubin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Anderson-Rubin test of overidentifying restrictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The Anderson-Rubin test examines whether the value of <span class="math notranslate nohighlight">\(\kappa\)</span>
 computed for the LIML estimator is sufficiently close to one to
@@ -161,16 +157,14 @@ indicate the model is not overidentified. The test statistic is</p>
 <dt id="linearmodels.iv.results.IVResults.basmann">
 <code class="descname">basmann</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basmann’s test of overidentifying restrictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Requires more instruments than endogenous variables</p>
 <p>Tests is a small-sample version of Sargan’s test that has the same
@@ -190,16 +184,14 @@ endogenous regressors.</p>
 <dt id="linearmodels.iv.results.IVResults.basmann_f">
 <code class="descname">basmann_f</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann_f" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basmann’s F test of overidentifying restrictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Basmann’s F test examines whether the value of <span class="math notranslate nohighlight">\(\kappa\)</span>
 computed for the LIML estimator is sufficiently close to one to
@@ -213,18 +205,17 @@ indicate the model is not overidentified. The test statistic is</p>
 <dt id="linearmodels.iv.results.IVResults.conf_int">
 <code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
@@ -275,19 +266,18 @@ indicate the model is not overidentified. The test statistic is</p>
 <dt id="linearmodels.iv.results.IVResults.durbin">
 <code class="descname">durbin</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.durbin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Durbin’s test of exogeneity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
-are jointly tested.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Test statistic is difference between sum of squared OLS and sum of
 squared IV residuals where each set of residuals has been projected
@@ -312,17 +302,15 @@ matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
 <dt id="linearmodels.iv.results.IVResults.f_statistic">
 <code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
-are zero.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Despite name, always implemented using a quadratic-form test based on
 estimated parameter covariance. Default is to use a chi2 distribution
@@ -336,16 +324,14 @@ estimator and so is robust against the same specification issues.</p>
 <dt id="linearmodels.iv.results.IVResults.first_stage">
 <code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.first_stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>First stage regression results</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -406,32 +392,28 @@ of parameters and inclusion of effects, if any.</p>
 <dt id="linearmodels.iv.results.IVResults.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
-<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
-constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</p></li>
+<li><p><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
+constructed using a formula.</p></li>
+<li><p><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</p></li>
+<li><p><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</p></li>
+<li><p><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
-observations will not be returned.</li>
+observations will not be returned.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
 (fitted values) will be returned.</p>
@@ -483,16 +465,14 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.IVResults.sargan">
 <code class="descname">sargan</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.sargan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sargan test of overidentifying restrictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Requires more instruments than endogenous variables</p>
 <p>Tests the ratio of re-projected IV regression residual variance to
@@ -520,14 +500,11 @@ of instruments and the number of endogenous regressors.</p>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1038.g7a33ef0ba)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -546,38 +523,34 @@ of instruments and the number of endogenous regressors.</p>
 <dt id="linearmodels.iv.results.IVResults.wald_test">
 <code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
 when forming the restrictions. It is not possible to use both
-restriction and formula.</li>
-<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</li>
-<li><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
+restriction and formula.</p></li>
+<li><p><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</p></li>
+<li><p><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
 <blockquote>
 <div><ul>
-<li>A single comma-separated string such as ‘x1=0, x2+x3=1’</li>
-<li>A list of strings where each element is a single constraint
-such as [‘x1=0’, ‘x2+x3=1’]</li>
-<li>A single string without commas to test simple constraints such
-as ‘x1=x2=x3=0’</li>
+<li><p>A single comma-separated string such as ‘x1=0, x2+x3=1’</p></li>
+<li><p>A list of strings where each element is a single constraint
+such as [‘x1=0’, ‘x2+x3=1’]</p></li>
+<li><p>A single string without commas to test simple constraints such
+as ‘x1=x2=x3=0’</p></li>
 </ul>
 </div></blockquote>
 <p>It is not possible to use both restriction and formula.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
@@ -613,16 +586,14 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.IVResults.wooldridge_overid">
 <code class="descname">wooldridge_overid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_overid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s score test of overidentification</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Wooldridge’s test examines whether there is correlation between the
 model residuals and the component of the instruments that is
@@ -642,16 +613,14 @@ variables.  The test is computed as a regression</p>
 <dt id="linearmodels.iv.results.IVResults.wooldridge_regression">
 <code class="descname">wooldridge_regression</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_regression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s regression test of exogeneity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Wooldridge’s test examines whether there is correlation between the
 components of the endogenous variables that cannot be explained by
@@ -671,16 +640,14 @@ identical to the covariance estimator used with <code class="docutils literal no
 <dt id="linearmodels.iv.results.IVResults.wooldridge_score">
 <code class="descname">wooldridge_score</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s score test of exogeneity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Wooldridge’s test examines whether there is correlation between the
 errors produced when the endogenous variable are treated as
@@ -706,19 +673,18 @@ variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogen
 <dt id="linearmodels.iv.results.IVResults.wu_hausman">
 <code class="descname">wu_hausman</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wu_hausman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wu_hausman" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wu-Hausman test of exogeneity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
-are jointly tested.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Test statistic is difference between sum of squared OLS and sum of
 squared IV residuals where each set of residuals has been projected
@@ -751,19 +717,18 @@ matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
 <dt id="linearmodels.iv.results.IVGMMResults.c_stat">
 <code class="descname">c_stat</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults.c_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.c_stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>C-test of endogeneity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
-are jointly tested.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> – Object containing test statistic, p-value, distribution and null</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – List of variables to test for exogeneity.  If None, all variables
+are jointly tested.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Object containing test statistic, p-value, distribution and null</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The C statistic iv the difference between the model estimated by
 assuming one or more of the endogenous variables is actually
@@ -793,18 +758,17 @@ tested.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.conf_int">
 <code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
@@ -855,17 +819,15 @@ tested.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.f_statistic">
 <code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
-are zero.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Despite name, always implemented using a quadratic-form test based on
 estimated parameter covariance. Default is to use a chi2 distribution
@@ -879,16 +841,14 @@ estimator and so is robust against the same specification issues.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.first_stage">
 <code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.first_stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>First stage regression results</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>first</strong> – Object containing results for diagnosing instrument relevance issues.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#linearmodels.iv.results.FirstStageResults" title="linearmodels.iv.results.FirstStageResults">FirstStageResults</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -925,16 +885,14 @@ of parameters and inclusion of effects, if any.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.j_stat">
 <code class="descname">j_stat</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.j_stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>J-test of overidentifying restrictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>j</strong> – J statistic  test of overidentifying restrictions</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>j</strong> – J statistic  test of overidentifying restrictions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The J statistic tests whether the moment conditions are sufficiently
 close to zero to indicate that the model is not overidentified. The
@@ -982,32 +940,28 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 <dt id="linearmodels.iv.results.IVGMMResults.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
-<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
-constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</p></li>
+<li><p><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
+constructed using a formula.</p></li>
+<li><p><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</p></li>
+<li><p><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</p></li>
+<li><p><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
-observations will not be returned.</li>
+observations will not be returned.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
 (fitted values) will be returned.</p>
@@ -1067,14 +1021,11 @@ values corresponding to the original model specification.</p>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1038.g7a33ef0ba)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1093,38 +1044,34 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.wald_test">
 <code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
 when forming the restrictions. It is not possible to use both
-restriction and formula.</li>
-<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</li>
-<li><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
+restriction and formula.</p></li>
+<li><p><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</p></li>
+<li><p><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
 <blockquote>
 <div><ul>
-<li>A single comma-separated string such as ‘x1=0, x2+x3=1’</li>
-<li>A list of strings where each element is a single constraint
-such as [‘x1=0’, ‘x2+x3=1’]</li>
-<li>A single string without commas to test simple constraints such
-as ‘x1=x2=x3=0’</li>
+<li><p>A single comma-separated string such as ‘x1=0, x2+x3=1’</p></li>
+<li><p>A list of strings where each element is a single constraint
+such as [‘x1=0’, ‘x2+x3=1’]</p></li>
+<li><p>A single string without commas to test simple constraints such
+as ‘x1=x2=x3=0’</p></li>
 </ul>
 </div></blockquote>
 <p>It is not possible to use both restriction and formula.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
@@ -1189,18 +1136,17 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.OLSResults.conf_int">
 <code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Confidence level for interval</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ci</strong> – Confidence interval of the form [lower, upper] for each parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
@@ -1251,17 +1197,15 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.OLSResults.f_statistic">
 <code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
-are zero.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>f</strong> – Test statistic for null all coefficients excluding constant terms
+are zero.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Despite name, always implemented using a quadratic-form test based on
 estimated parameter covariance. Default is to use a chi2 distribution
@@ -1329,32 +1273,28 @@ of parameters and inclusion of effects, if any.</p>
 <dt id="linearmodels.iv.results.OLSResults.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</li>
-<li><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</li>
-<li><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
-constructed using a formula.</li>
-<li><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</li>
-<li><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</li>
-<li><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exog</strong> (<em>array-like</em>) – Exogenous values to use in out-of-sample prediction (nobs by nexog)</p></li>
+<li><p><strong>endog</strong> (<em>array-like</em>) – Endogenous values to use in out-of-sample prediction (nobs by nendog)</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>optional</em>) – DataFrame to use for out-of-sample predictions when model was
+constructed using a formula.</p></li>
+<li><p><strong>fitted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the fitted values</p></li>
+<li><p><strong>idiosyncratic</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to include the estimated idiosyncratic shock</p></li>
+<li><p><strong>missing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to adjust for dropped observations.  If True, the
 values returned will have the same size as the original input data
 before filtering missing values.  If False, then missing
-observations will not be returned.</li>
+observations will not be returned.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – DataFrame containing columns for all selected outputs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>exog</cite>, <cite>endog</cite> and <cite>data</cite> are all <cite>None</cite>, in-sample predictions
 (fitted values) will be returned.</p>
@@ -1414,14 +1354,11 @@ values corresponding to the original model specification.</p>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1038.g7a33ef0ba)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1440,38 +1377,34 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.OLSResults.wald_test">
 <code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.wald_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>restriction</strong> (<em>{ndarray</em><em>, </em><em>DataFrame}</em><em>, </em><em>optional</em>) – q by nvar array containing linear weights to apply to parameters
 when forming the restrictions. It is not possible to use both
-restriction and formula.</li>
-<li><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</li>
-<li><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
+restriction and formula.</p></li>
+<li><p><strong>value</strong> (<em>{ndarray</em><em>, </em><em>Series}</em><em>, </em><em>optional</em>) – q element array containing the restricted values.</p></li>
+<li><p><strong>formula</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) – <p>patsy linear constrains. The simplest formats are one of:</p>
 <blockquote>
 <div><ul>
-<li>A single comma-separated string such as ‘x1=0, x2+x3=1’</li>
-<li>A list of strings where each element is a single constraint
-such as [‘x1=0’, ‘x2+x3=1’]</li>
-<li>A single string without commas to test simple constraints such
-as ‘x1=x2=x3=0’</li>
+<li><p>A single comma-separated string such as ‘x1=0, x2+x3=1’</p></li>
+<li><p>A list of strings where each element is a single constraint
+such as [‘x1=0’, ‘x2+x3=1’]</p></li>
+<li><p>A single string without commas to test simple constraints such
+as ‘x1=x2=x3=0’</p></li>
 </ul>
 </div></blockquote>
 <p>It is not possible to use both restriction and formula.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>t</strong> – Test statistic for null that restrictions are valid.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utility.html#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic">WaldTestStatistic</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Hypothesis test examines whether <span class="math notranslate nohighlight">\(H_0:C\theta=v\)</span> where the
 matrix C is <code class="docutils literal notranslate"><span class="pre">restriction</span></code> and v is <code class="docutils literal notranslate"><span class="pre">value</span></code>. The test statistic
@@ -1515,46 +1448,38 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.compare">
 <code class="descname">compare</code><span class="sig-paren">(</span><em>results</em>, <em>*</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare the results of multiple models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
-names.  An OrderedDict will preserve the model order the comparisons.</li>
-<li><strong>precision</strong> (<em>{'tstats'</em><em>,</em><em>'std_errors'</em><em>, </em><em>'std-errors'</em><em>, </em><em>'pvalues'}</em>) – Estimator precision estimator to include in the comparrison output.
-Default is ‘tstats’.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</p></li>
+<li><p><strong>precision</strong> (<em>{'tstats'</em><em>,</em><em>'std_errors'</em><em>, </em><em>'std-errors'</em><em>, </em><em>'pvalues'}</em>) – Estimator precision estimator to include in the comparrison output.
+Default is ‘tstats’.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>comparison</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.iv.results.IVModelComparison" title="linearmodels.iv.results.IVModelComparison">IVModelComparison</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>comparison</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.iv.results.IVModelComparison" title="linearmodels.iv.results.IVModelComparison">IVModelComparison</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="class">
 <dt id="linearmodels.iv.results.IVModelComparison">
 <em class="property">class </em><code class="descname">IVModelComparison</code><span class="sig-paren">(</span><em>results</em>, <em>*</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison of multiple models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
-names.  An OrderedDict will preserve the model order the comparisons.</li>
-<li><strong>precision</strong> (<em>{'tstats'</em><em>,</em><em>'std_errors'</em><em>, </em><em>'std-errors'</em><em>, </em><em>'pvalues'}</em>) – Estimator precision estimator to include in the comparrison output.
-Default is ‘tstats’.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<em>{list</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>OrderedDict}</em>) – Set of results to compare.  If a dict, the keys will be used as model
+names.  An OrderedDict will preserve the model order the comparisons.</p></li>
+<li><p><strong>precision</strong> (<em>{'tstats'</em><em>,</em><em>'std_errors'</em><em>, </em><em>'std-errors'</em><em>, </em><em>'pvalues'}</em>) – Estimator precision estimator to include in the comparrison output.
+Default is ‘tstats’.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVModelComparison.cov_estimator">
 <code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
@@ -1615,14 +1540,11 @@ Default is ‘tstats’.</li>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1038.g7a33ef0ba)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1641,53 +1563,50 @@ Default is ‘tstats’.</li>
 <dt id="linearmodels.iv.results.FirstStageResults.diagnostics">
 <code class="descname">diagnostics</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.diagnostics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post estimation diagnostics of first-stage fit</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>res</strong> – DataFrame where each endogenous variable appears as a row and
-the columns contain alternative measures.  The columns are:<ul class="simple">
-<li>rsquared - R-squared from regression of endogenous on exogenous
-and instruments</li>
-<li>partial.rsquared - R-squared from regression of the exogenous
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p><strong>res</strong> – DataFrame where each endogenous variable appears as a row and
+the columns contain alternative measures.  The columns are:</p>
+<ul class="simple">
+<li><p>rsquared - R-squared from regression of endogenous on exogenous
+and instruments</p></li>
+<li><p>partial.rsquared - R-squared from regression of the exogenous
 variable on instruments where both the exogenous variable and
 the instrument have been orthogonalized to the exogenous
-regressors in the model.</li>
-<li>f.stat - Test that all coefficients are zero in the model
+regressors in the model.</p></li>
+<li><p>f.stat - Test that all coefficients are zero in the model
 used to estimate the partial R-squared. Uses a standard F-test
 when the covariance estimator is unadjusted - otherwise uses a
-Wald test statistic with a chi2 distribution.</li>
-<li>f.pval - P-value of the test that all coefficients are zero
-in the model used to estimate the partial R-squared</li>
-<li>f.dist - Distribution of f.stat</li>
-<li>shea.rsquared - Shea’s r-squared which measures the correlation
+Wald test statistic with a chi2 distribution.</p></li>
+<li><p>f.pval - P-value of the test that all coefficients are zero
+in the model used to estimate the partial R-squared</p></li>
+<li><p>f.dist - Distribution of f.stat</p></li>
+<li><p>shea.rsquared - Shea’s r-squared which measures the correlation
 between the projected and orthogonalized instrument on the
 orthogonalized endogenous regressor where the orthogonalization
-is with respect to the other included variables in the model.</li>
+is with respect to the other included variables in the model.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.FirstStageResults.individual">
 <code class="descname">individual</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.individual" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual model results from first-stage regressions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>res</strong> – Dictionary containing first stage estimation results. Keys are
-the variable names of the endogenous regressors.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>res</strong> – Dictionary containing first stage estimation results. Keys are
+the variable names of the endogenous regressors.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1696,14 +1615,11 @@ the variable names of the endogenous regressors.</td>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1038.g7a33ef0ba)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

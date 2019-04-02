@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -128,26 +126,26 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>There are three estimators for linear factor asset pricing models:</p>
 <ul class="simple">
-<li><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
+<li><p><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a> implements
 an estimator which is appropriate when all factors are traded assets. When
-this is the case, the model can be estimated using regressions as a SUR.</li>
-<li><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
+this is the case, the model can be estimated using regressions as a SUR.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a> implements
 a general purpose estimator based on the 2-step strategy where the first
 step estimated the factor loadings and the second step estimates the risk
 premia using the estimates from the first step.  This model is appropriate
-for both traded and non-traded factors.</li>
-<li><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
+for both traded and non-traded factors.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a> implements
 a version of the 2-step model using GMM.  The GMM estimator is relatively
 efficient and so should be preferred. The continuously updating version can
-is available using an options when fitting the model (<code class="docutils literal notranslate"><span class="pre">use_cue=True</span></code>).</li>
+is available using an options when fitting the model (<code class="docutils literal notranslate"><span class="pre">use_cue=True</span></code>).</p></li>
 </ul>
 <p>All estimators implement both standard heteroskedasticity robust inference (the
 default) as well as kernel-based HAC estimators using eights based on the
 Bartlett kernel (Newey-West), the Parzen kernel or the Quadratic-Spectral kernel.</p>
 <p>The basic usage is the same for all three estimators.  Two inputs are required:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">portfolios</span></code> - The test portfolios.  A T by P array of portfolio returns.</li>
-<li><code class="docutils literal notranslate"><span class="pre">factors</span></code> - The priced factors. A T by K array of factor returns or shocks.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">portfolios</span></code> - The test portfolios.  A T by P array of portfolio returns.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">factors</span></code> - The priced factors. A T by K array of factor returns or shocks.</p></li>
 </ul>
 <p>This example makes use of some data from
 <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">Ken French’s data library</a>.

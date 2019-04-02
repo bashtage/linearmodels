@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -332,10 +330,10 @@ div.rendered_html tbody tr:hover {
 <p>These examples follow those in <strong>Chapter 6</strong> of <em>Microeconometrics Using Stata</em> by Cameron &amp; Trivedi.</p>
 <p>The first step is to import the main estimator for linear IV models:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - standard two-stage least squares</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class estimators</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - standard two-stage least squares</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class estimators</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -581,8 +579,8 @@ max        9.250620      1.000000      1.000000     50.000000
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Fri, Mar 22 2019   P-value (F-stat)                0.0000
-Time:                        17:10:28   Distribution:                  chi2(6)
+Date:                Tue, Apr 02 2019   P-value (F-stat)                0.0000
+Time:                        20:37:16   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -624,8 +622,8 @@ blhisp         -0.1513     0.0341    -4.4353     0.0000     -0.2182     -0.0844
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Fri, Mar 22 2019   P-value (F-stat)                0.0000
-Time:                        17:10:28   Distribution:                  chi2(6)
+Date:                Tue, Apr 02 2019   P-value (F-stat)                0.0000
+Time:                        20:37:16   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -666,10 +664,10 @@ Debiased: False
 <h2>Alternative covariance estimators<a class="headerlink" href="#Alternative-covariance-estimators" title="Permalink to this headline">¶</a></h2>
 <p>All estimator allow for three types of parameter covariance estimator:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> is the classic homoskedastic estimator</li>
-<li><code class="docutils literal notranslate"><span class="pre">'robust'</span></code> is robust to heteroskedasticity</li>
-<li><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for additional sources of dependence between the model scores</li>
-<li><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust covariance estimator</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> is the classic homoskedastic estimator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'robust'</span></code> is robust to heteroskedasticity</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for additional sources of dependence between the model scores</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust covariance estimator</p></li>
 </ul>
 <p>The default is <code class="docutils literal notranslate"><span class="pre">'robust'</span></code>.</p>
 <p>These are all passed using the keyword input <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>. Using clustered requires also passing the clustering variable(s).</p>
@@ -826,7 +824,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f716c3fd630
+WaldTestStatistic, id: 0x7f096deeed30
 </pre></div>
 </div>
 </div>
@@ -850,7 +848,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7f716c125be0
+WaldTestStatistic, id: 0x7f096b811da0
 </pre></div>
 </div>
 </div>
@@ -897,7 +895,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f716bb9a908
+WaldTestStatistic, id: 0x7f096b4a57b8
 </pre></div>
 </div>
 </div>
@@ -921,7 +919,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f716b77c438
+WaldTestStatistic, id: 0x7f096b05c320
 </pre></div>
 </div>
 </div>
@@ -946,7 +944,7 @@ WaldTestStatistic, id: 0x7f716b77c438
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f716bf04390
+WaldTestStatistic, id: 0x7f096b811240
 </pre></div>
 </div>
 </div>
@@ -971,7 +969,7 @@ WaldTestStatistic, id: 0x7f716bf04390
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7f716b725470
+WaldTestStatistic, id: 0x7f096b036358
 </pre></div>
 </div>
 </div>

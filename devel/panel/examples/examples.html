@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -334,7 +332,7 @@ div.rendered_html tbody tr:hover {
 <h2>Loading data<a class="headerlink" href="#Loading-data" title="Permalink to this headline">¶</a></h2>
 <p>These examples all make use of the wage panel from</p>
 <ol class="upperalpha simple" start="6">
-<li>Vella and M. Verbeek (1998), “Whose Wages Do Unions Raise? A Dynamic Model of Unionism and Wage Rate Determination for Young Men,” <em>Journal of Applied Econometrics</em> 13, 163-183.</li>
+<li><p>Vella and M. Verbeek (1998), “Whose Wages Do Unions Raise? A Dynamic Model of Unionism and Wage Rate Determination for Young Men,” <em>Journal of Applied Econometrics</em> 13, 163-183.</p></li>
 </ol>
 <p>The data set consists of wages and characteristics for men during the 1980s. The entity identifier is <code class="docutils literal notranslate"><span class="pre">nr</span></code> and the time identified is <code class="docutils literal notranslate"><span class="pre">year</span></code>. This data is used extensively in Chapter 14 of <em>Introduction to Econometrics</em> by Jeffrey Wooldridge.</p>
 <p>Here a <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is used to hold the data in a format that can be understood as a panel. Before setting the index, a year <code class="docutils literal notranslate"><span class="pre">Categorical</span></code> is created which facilitated making dummies.</p>
@@ -423,8 +421,8 @@ nr year
 Dep. Variable:                  lwage   R-squared:                        0.1893
 Estimator:                  PooledOLS   R-squared (Between):              0.2066
 No. Observations:                4360   R-squared (Within):               0.1692
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.1893
-Time:                        17:10:54   Log-likelihood                   -2982.0
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.1893
+Time:                        20:37:41   Log-likelihood                   -2982.0
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      72.459
 Entities:                         545   P-value                           0.0000
@@ -500,8 +498,8 @@ year.1987      0.1738     0.0494     3.5165     0.0004      0.0769      0.2707
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:              RandomEffects   R-squared (Between):              0.1853
 No. Observations:                4360   R-squared (Within):               0.1799
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.1828
-Time:                        17:10:54   Log-likelihood                   -1622.5
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.1828
+Time:                        20:37:41   Log-likelihood                   -1622.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      68.409
 Entities:                         545   P-value                           0.0000
@@ -652,8 +650,8 @@ Name: Variance Decomposition, dtype: float64
 Dep. Variable:                  lwage   R-squared:                        0.2155
 Estimator:                 BetweenOLS   R-squared (Between):              0.2155
 No. Observations:                 545   R-squared (Within):               0.1141
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.1686
-Time:                        17:10:55   Log-likelihood                   -194.54
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.1686
+Time:                        20:37:42   Log-likelihood                   -194.54
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      24.633
 Entities:                         545   P-value                           0.0000
@@ -719,8 +717,8 @@ union          0.2587     0.0460     5.6214     0.0000      0.1683      0.3491
 Dep. Variable:                  lwage   R-squared:                        0.1806
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):               0.1806
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.0807
-Time:                        17:10:55   Log-likelihood                   -1324.8
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.0807
+Time:                        20:37:42   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      83.851
 Entities:                         545   P-value                           0.0000
@@ -789,8 +787,8 @@ Included effects: Entity
 Dep. Variable:                  lwage   R-squared:                        0.0216
 Estimator:                   PanelOLS   R-squared (Between):             -0.0052
 No. Observations:                4360   R-squared (Within):              -0.4809
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.2253
-Time:                        17:10:55   Log-likelihood                   -1324.8
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.2253
+Time:                        20:37:42   Log-likelihood                   -1324.8
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      27.959
 Entities:                         545   P-value                           0.0000
@@ -854,8 +852,8 @@ estimator, effects count as lost degrees of freedom. When using entity effects a
 Dep. Variable:                  lwage   R-squared:                        0.0268
 Estimator:         FirstDifferenceOLS   R-squared (Between):              0.5491
 No. Observations:                3815   R-squared (Within):               0.1763
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.5328
-Time:                        17:10:55   Log-likelihood                   -2305.5
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.5328
+Time:                        20:37:42   Log-likelihood                   -2305.5
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      26.208
 Entities:                         545   P-value                           0.0000
@@ -1082,8 +1080,8 @@ Name: occupation, dtype: int64
 Dep. Variable:                  lwage   R-squared:                        0.1866
 Estimator:                  PooledOLS   R-squared (Between):              0.2027
 No. Observations:                4360   R-squared (Within):               0.1679
-Date:                Fri, Mar 22 2019   R-squared (Overall):              0.1866
-Time:                        17:10:55   Log-likelihood                   -2989.2
+Date:                Tue, Apr 02 2019   R-squared (Overall):              0.1866
+Time:                        20:37:42   Log-likelihood                   -2989.2
 Cov. Estimator:             Clustered
                                         F-statistic:                      142.61
 Entities:                         545   P-value                           0.0000

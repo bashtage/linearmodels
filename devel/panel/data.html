@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -136,30 +134,26 @@
 <dt id="linearmodels.panel.data.PanelData">
 <em class="property">class </em><code class="descname">PanelData</code><span class="sig-paren">(</span><em>x</em>, <em>var_name='x'</em>, <em>convert_dummies=True</em>, <em>drop_first=True</em>, <em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstraction to handle alternative formats for panel data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>Panel</em><em>, </em><em>DataArray}</em>) – Input data</li>
-<li><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
-xarray DataArrays</li>
-<li><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
-should be converted to dummy variables</li>
-<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to drop first dummy category when converting</li>
-<li><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to copy the input. Only has an effect when
-x is a DataFrame</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>Panel</em><em>, </em><em>DataArray}</em>) – Input data</p></li>
+<li><p><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
+xarray DataArrays</p></li>
+<li><p><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
+should be converted to dummy variables</p></li>
+<li><p><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to drop first dummy category when converting</p></li>
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to copy the input. Only has an effect when
+x is a DataFrame</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Data can be either 2- or 3-dimensional. The three key dimensions are</p>
 <ul class="simple">
-<li>nvar - number of variables</li>
-<li>nobs - number of time periods</li>
-<li>nentity - number of entities</li>
+<li><p>nvar - number of variables</p></li>
+<li><p>nobs - number of time periods</p></li>
+<li><p>nentity - number of entities</p></li>
 </ul>
 <p>All 3-d inputs should be in the form (nvar, nobs, nentity). With one
 exception, 2-d inputs are treated as (nobs, nentity) so that the input
@@ -171,19 +165,15 @@ precise format to use since pandas Panels do not preserve all variable
 type information across transformations between Panel and MultiIndex
 DataFrame. MultiIndex Series are also accepted and treated as single
 column MultiIndex DataFrames.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If the input type is not supported</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input has the wrong number of dimensions or a MultiIndex
-DataFrame does not have 2 levels</li>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><strong>TypeError</strong></a> – If the input type is not supported</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If the input has the wrong number of dimensions or a MultiIndex
+    DataFrame does not have 2 levels</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.copy">
 <code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.copy" title="Permalink to this definition">¶</a></dt>
@@ -194,18 +184,17 @@ DataFrame does not have 2 levels</li>
 <dt id="linearmodels.panel.data.PanelData.count">
 <code class="descname">count</code><span class="sig-paren">(</span><em>group='entity'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count number of observations by entity or time</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to count</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>count</strong> – Counts according to type. Either (entity by var) or (time by var)</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to count</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>count</strong> – Counts according to type. Either (entity by var) or (time by var)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -218,29 +207,25 @@ DataFrame does not have 2 levels</li>
 <dt id="linearmodels.panel.data.PanelData.demean">
 <code class="descname">demean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em>, <em>return_panel=True</em>, <em>low_memory=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.demean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Demeans data by either entity or time group</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'</em><em>, </em><em>'both'}</em>) – Group to use in demeaning</li>
-<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</li>
-<li><strong>return_panel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to return a PanelData object. If False, a 2-d
-NumPy representation of the panel is returned</li>
-<li><strong>low_memory</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to use a low memory implementation
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'</em><em>, </em><em>'both'}</em>) – Group to use in demeaning</p></li>
+<li><p><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</p></li>
+<li><p><strong>return_panel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to return a PanelData object. If False, a 2-d
+NumPy representation of the panel is returned</p></li>
+<li><p><strong>low_memory</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to use a low memory implementation
 that avoids constructing dummy variables. Only relevant when
-group is ‘both’</li>
+group is ‘both’</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>demeaned</strong> – Demeaned data according to type</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>demeaned</strong> – Demeaned data according to type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If weights are provided, the values returned will be scaled by
 the square root of the weights so that they can be used in WLS
@@ -250,40 +235,33 @@ estimation.</p>
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.drop">
 <code class="descname">drop</code><span class="sig-paren">(</span><em>locs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.drop" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>locs</strong> (<em>ndarray</em>) – Boolean array indicating observations to drop with reference to
-the dataframe view of the data</td>
-</tr>
-</tbody>
-</table>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>locs</strong> (<em>ndarray</em>) – Boolean array indicating observations to drop with reference to
+the dataframe view of the data</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.dummies">
 <code class="descname">dummies</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>drop_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.dummies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate entity or time dummies</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em><em>, </em><em>optional</em>) – Type of dummies to generate</li>
-<li><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the dummy column corresponding to the first
-entity or time period should be dropped</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em><em>, </em><em>optional</em>) – Type of dummies to generate</p></li>
+<li><p><strong>drop_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating that the dummy column corresponding to the first
+entity or time period should be dropped</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dummies</strong> – Dummy variables</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>dummies</strong> – Dummy variables</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -296,56 +274,48 @@ entity or time period should be dropped</li>
 <dt id="linearmodels.panel.data.PanelData.entity_ids">
 <code class="descname">entity_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entity_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get array containing entity group membership information</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>id</strong> – 2d array containing entity ids corresponding dataframe view</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>id</strong> – 2d array containing entity ids corresponding dataframe view</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.first_difference">
 <code class="descname">first_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.first_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.first_difference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute first differences of variables</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>diffs</strong> – Differenced values</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>diffs</strong> – Differenced values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.general_demean">
 <code class="descname">general_demean</code><span class="sig-paren">(</span><em>groups</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.general_demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.general_demean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multi-way demeaning using only groupby</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>groups</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a>) – Arrays with the same size containing group identifiers</li>
-<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to use in the weighted demeaning</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groups</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a>) – Arrays with the same size containing group identifiers</p></li>
+<li><p><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to use in the weighted demeaning</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>demeaned</strong> – Weighted, demeaned data according to groups</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>demeaned</strong> – Weighted, demeaned data according to groups</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData">PanelData</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Iterates until convergence</p>
 </dd></dl>
@@ -366,24 +336,20 @@ entity or time period should be dropped</li>
 <dt id="linearmodels.panel.data.PanelData.mean">
 <code class="descname">mean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute data mean by either entity or time group</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</li>
-<li><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>{'entity'</em><em>, </em><em>'time'}</em>) – Group to use in demeaning</p></li>
+<li><p><strong>weights</strong> (<a class="reference internal" href="#linearmodels.panel.data.PanelData" title="linearmodels.panel.data.PanelData"><em>PanelData</em></a><em>, </em><em>optional</em>) – Weights to implement weighted averaging</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mean</strong> – Data mean according to type. Either (entity by var) or (time by var)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>mean</strong> – Data mean according to type. Either (entity by var) or (time by var)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -432,16 +398,14 @@ entity or time period should be dropped</li>
 <dt id="linearmodels.panel.data.PanelData.time_ids">
 <code class="descname">time_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get array containing time membership information</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>id</strong> – 2d array containing time ids corresponding dataframe view</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>id</strong> – 2d array containing time ids corresponding dataframe view</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">

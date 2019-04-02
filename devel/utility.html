@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -120,25 +118,21 @@
 <dt id="linearmodels.utility.WaldTestStatistic">
 <em class="property">class </em><code class="descname">WaldTestStatistic</code><span class="sig-paren">(</span><em>stat</em>, <em>null</em>, <em>df</em>, <em>df_denom=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#WaldTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test statistic holder for Wald-type tests</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The test statistic</li>
-<li><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A statement of the test’s null hypothesis</li>
-<li><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Degree of freedom.</li>
-<li><strong>df_denom</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Numerator degree of freedom.  If provided, uses an
-F(df, df_denom) distribution.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The test statistic</p></li>
+<li><p><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A statement of the test’s null hypothesis</p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Degree of freedom.</p></li>
+<li><p><strong>df_denom</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Numerator degree of freedom.  If provided, uses an
+F(df, df_denom) distribution.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.utility.InvalidTestStatistic" title="linearmodels.utility.InvalidTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#linearmodels.utility.InvalidTestStatistic" title="linearmodels.utility.InvalidTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.utility.WaldTestStatistic.critical_values">
@@ -170,21 +164,17 @@ F(df, df_denom) distribution.</li>
 <dt id="linearmodels.utility.InvalidTestStatistic">
 <em class="property">class </em><code class="descname">InvalidTestStatistic</code><span class="sig-paren">(</span><em>reason</em>, <em>*</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#InvalidTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class returned if a requested test is not valid for a model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reason</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Explanation why test is invalid</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Explanation why test is invalid</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.utility.InvalidTestStatistic.critical_values">

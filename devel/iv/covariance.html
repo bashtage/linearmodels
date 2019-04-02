@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -134,22 +132,18 @@
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance">
 <em class="property">class </em><code class="descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for homoskedastic data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</li>
-<li><strong>y</strong> (<em>ndarray</em>) – Series modeled (nobs by 1)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
-<li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Series modeled (nobs by 1)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</p></li>
+<li><p><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
 <div class="math notranslate nohighlight">
@@ -192,22 +186,18 @@
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for heteroskedastic data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</li>
-<li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
-<li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</p></li>
+<li><p><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
 <div class="math notranslate nohighlight">
@@ -252,24 +242,20 @@
 <dt id="linearmodels.iv.covariance.ClusteredCovariance">
 <em class="property">class </em><code class="descname">ClusteredCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>clusters=None</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#ClusteredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for clustered data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</li>
-<li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
-<li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>clusters</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Cluster group assignment.  If not provided, uses clusters of 1.
-Either nobs by ncluster where ncluster is 1 or 2.</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</p></li>
+<li><p><strong>clusters</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Cluster group assignment.  If not provided, uses clusters of 1.
+Either nobs by ncluster where ncluster is 1 or 2.</p></li>
+<li><p><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
 <div class="math notranslate nohighlight">
@@ -317,31 +303,27 @@ of groups..</p>
 <dt id="linearmodels.iv.covariance.KernelCovariance">
 <em class="property">class </em><code class="descname">KernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weighted (HAC) covariance estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</li>
-<li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
-<li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Kernel name. Supported kernels are:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Kernel name. Supported kernels are:</p>
 <ul>
-<li>’bartlett’, ‘newey-west’ - Triangular kernel</li>
-<li>’qs’, ‘quadratic-spectral’, ‘andrews’ - Quadratic spectral kernel</li>
-<li>’parzen’, ‘gallant’ - Parzen’s kernel;</li>
+<li><p>’bartlett’, ‘newey-west’ - Triangular kernel</p></li>
+<li><p>’qs’, ‘quadratic-spectral’, ‘andrews’ - Quadratic spectral kernel</p></li>
+<li><p>’parzen’, ‘gallant’ - Parzen’s kernel;</p></li>
 </ul>
-</li>
-<li><strong>bandwidth</strong> (<em>{int</em><em>, </em><em>None}</em>) – Non-negative bandwidth to use with kernel. If None, automatic
-bandwidth selection is used.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</li>
-<li><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</li>
+</p></li>
+<li><p><strong>bandwidth</strong> (<em>{int</em><em>, </em><em>None}</em>) – Non-negative bandwidth to use with kernel. If None, automatic
+bandwidth selection is used.</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use a small-sample adjustment</p></li>
+<li><p><strong>kappa</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Value of kappa in k-class estimator</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is estimated using</p>
 <div class="math notranslate nohighlight">
@@ -363,8 +345,8 @@ by n / (n-k).</p>
 <p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
 <span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.iv.covariance.KernelCovariance.cov">
@@ -398,18 +380,17 @@ by n / (n-k).</p>
 <dt id="linearmodels.iv.covariance.kernel_weight_bartlett">
 <code class="descclassname">covariance.</code><code class="descname">kernel_weight_bartlett</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a Bartlett kernel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
 \[w_i = 1 - i / (m + 1), \, i &lt; m\]</div>
@@ -419,18 +400,17 @@ by n / (n-k).</p>
 <dt id="linearmodels.iv.covariance.kernel_weight_parzen">
 <code class="descclassname">covariance.</code><code class="descname">kernel_weight_parzen</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a Parzen kernel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum lag to used in kernel</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}z_i &amp; = i / (m+1)                    \\
@@ -442,24 +422,20 @@ w_i &amp;  = 2(1-z_i)^3, z &gt; 0.5\end{split}\]</div>
 <dt id="linearmodels.iv.covariance.kernel_weight_quadratic_spectral">
 <code class="descclassname">covariance.</code><code class="descname">kernel_weight_quadratic_spectral</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a quadratic-spectral kernel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bw</strong> (<em>{int</em><em>, </em><em>float}</em>) – Maximum lag to used in kernel</li>
-<li><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Positive number of weight to return</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bw</strong> (<em>{int</em><em>, </em><em>float}</em>) – Maximum lag to used in kernel</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Positive number of weight to return</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weights</strong> – Weight array  ordered by lag position (maxlag + 1)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Unlike the Bartlett or Parzen kernels, the QS kernel is not truncated at
 a specific lag, and so weights are computed for all available lags in

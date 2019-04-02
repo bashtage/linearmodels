@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -134,51 +132,47 @@
 <dt id="linearmodels.iv.gmm.IVGMMCovariance">
 <em class="property">class </em><code class="descname">IVGMMCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>w</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#IVGMMCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for GMM models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</li>
-<li><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</li>
-<li><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</li>
-<li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in GMM estimation</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Covariance estimator to use  Valid choices are</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (nobs by nvar)</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Series ,modeled (nobs by 1)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Instruments used for endogenous regressors (nobs by ninstr)</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – Estimated model parameters (nvar by 1)</p></li>
+<li><p><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in GMM estimation</p></li>
+<li><p><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Covariance estimator to use  Valid choices are</p>
 <ul>
-<li>’unadjusted’, ‘homoskedastic’ - Assumes moment conditions are
-homoskedastic</li>
-<li>’robust’, ‘heteroskedastic’ - Allows for heteroskedasticity by not
-autocorrelation</li>
-<li>’kernel’ - Allows for heteroskedasticity and autocorrelation</li>
-<li>’cluster’ - Allows for one-way cluster dependence</li>
+<li><p>’unadjusted’, ‘homoskedastic’ - Assumes moment conditions are
+homoskedastic</p></li>
+<li><p>’robust’, ‘heteroskedastic’ - Allows for heteroskedasticity by not
+autocorrelation</p></li>
+<li><p>’kernel’ - Allows for heteroskedasticity and autocorrelation</p></li>
+<li><p>’cluster’ - Allows for one-way cluster dependence</p></li>
 </ul>
-</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the covariance estimator</li>
-<li><strong>cov_config</strong> – Optional keyword arguments that are specific to a particular cov_type</li>
+</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the covariance estimator</p></li>
+<li><p><strong>cov_config</strong> – Optional keyword arguments that are specific to a particular cov_type</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Optional keyword argument for specific covariance estimators:</p>
 <p><strong>kernel</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">kernel</span></code>: Name of kernel to use.  See
+<li><p><code class="docutils literal notranslate"><span class="pre">kernel</span></code>: Name of kernel to use.  See
 <code class="xref py py-class docutils literal notranslate"><span class="pre">KernelCovariance</span></code> for details on
-available kernels</li>
-<li><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>: Bandwidth to use when computing the weight.  If not
-provided, nobs - 2 is used.</li>
+available kernels</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bandwidth</span></code>: Bandwidth to use when computing the weight.  If not
+provided, nobs - 2 is used.</p></li>
 </ul>
 <p><strong>cluster</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">clusters</span></code>: Array containing the cluster indices.  See
-<code class="xref py py-class docutils literal notranslate"><span class="pre">OneWayClusteredCovariance</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clusters</span></code>: Array containing the cluster indices.  See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OneWayClusteredCovariance</span></code></p></li>
 </ul>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance" title="linearmodels.iv.covariance.HomoskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HomoskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HeteroskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.KernelCovariance</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.OneWayClusteredCovariance</span></code></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance" title="linearmodels.iv.covariance.HomoskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HomoskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HeteroskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.KernelCovariance</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.OneWayClusteredCovariance</span></code></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance.cov">
@@ -210,19 +204,15 @@ provided, nobs - 2 is used.</li>
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix">
 <em class="property">class </em><code class="descname">HomoskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Homoskedastic (unadjusted) weight estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
-the mean before computing the weight matrix.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
+the mean before computing the weight matrix.</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
 <div class="math notranslate nohighlight">
@@ -234,40 +224,34 @@ W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>config</strong> – Dictionary containing weight estimator configuration information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary containing weight estimator configuration information</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix">
 <code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weight</strong> – Covariance of GMM moment conditions.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weight</strong> – Covariance of GMM moment conditions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -276,19 +260,15 @@ W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix">
 <em class="property">class </em><code class="descname">HeteroskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust weight estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
-the mean before computing the weight matrix.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
+the mean before computing the weight matrix.</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The weight matrix estimator is</p>
 <div class="math notranslate nohighlight">
@@ -299,40 +279,34 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>config</strong> – Dictionary containing weight estimator configuration information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary containing weight estimator configuration information</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix">
 <code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weight</strong> – Covariance of GMM moment conditions.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weight</strong> – Covariance of GMM moment conditions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -341,29 +315,25 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix">
 <em class="property">class </em><code class="descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>center=False</em>, <em>debiased=False</em>, <em>optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity, autocorrelation robust weight estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of kernel weighting function to use</li>
-<li><strong>bandwidth</strong> (<em>{int</em><em>, </em><em>None}</em><em>, </em><em>optional</em>) – Bandwidth to use when computing kernel weights</li>
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
-the mean before computing the weight matrix.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</li>
-<li><strong>optimal_bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to estimate the optimal bandwidth, when
-bandwidth is None.  If False, nobs - 2 is used</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of kernel weighting function to use</p></li>
+<li><p><strong>bandwidth</strong> (<em>{int</em><em>, </em><em>None}</em><em>, </em><em>optional</em>) – Bandwidth to use when computing kernel weights</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
+the mean before computing the weight matrix.</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</p></li>
+<li><p><strong>optimal_bw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to estimate the optimal bandwidth, when
+bandwidth is None.  If False, nobs - 2 is used</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Supported kernels:</p>
 <ul class="simple">
-<li>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</li>
-<li>‘parzen’, ‘gallant’ - Parzen’s kernel</li>
-<li>‘qs’, ‘quadratic-spectral’, ‘andrews’ - The quadratic spectral kernel</li>
+<li><p>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</p></li>
+<li><p>‘parzen’, ‘gallant’ - Parzen’s kernel</p></li>
+<li><p>‘qs’, ‘quadratic-spectral’, ‘andrews’ - The quadratic spectral kernel</p></li>
 </ul>
 <div class="math notranslate nohighlight">
 \[\begin{split}g_i &amp; =z_i \epsilon_i \\
@@ -372,8 +342,8 @@ W &amp; =n^{-1}(\Gamma_0+\sum_{j=1}^{n-1}k(j)(\Gamma_j+\Gamma_j')) \\
 <p>where <span class="math notranslate nohighlight">\(k(j)\)</span> is the kernel weight for lag j and <span class="math notranslate nohighlight">\(z_i\)</span>
 contains both the exogenous regressors and instruments..</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.bandwidth">
@@ -385,40 +355,34 @@ contains both the exogenous regressors and instruments..</p>
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>config</strong> – Dictionary containing weight estimator configuration information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary containing weight estimator configuration information</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix">
 <code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weight</strong> – Covariance of GMM moment conditions.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weight</strong> – Covariance of GMM moment conditions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -427,58 +391,48 @@ contains both the exogenous regressors and instruments..</p>
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix">
 <em class="property">class </em><code class="descname">OneWayClusteredWeightMatrix</code><span class="sig-paren">(</span><em>clusters</em>, <em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clustered (one-way) weight estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clusters</strong> (<em>ndarray</em>) – Array indicating cluster membership</li>
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
-the mean before computing the weight matrix.</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusters</strong> (<em>ndarray</em>) – Array indicating cluster membership</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to center the moment conditions by subtracting
+the mean before computing the weight matrix.</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to use small-sample adjustments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config">
 <code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>config</strong> – Dictionary containing weight estimator configuration information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary containing weight estimator configuration information</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix">
 <code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</li>
-<li><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – Model regressors (exog and endog), (nobs by nvar)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Model instruments (exog and instruments), (nobs by ninstr)</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model errors (nobs by 1)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weight</strong> – Covariance of GMM moment conditions.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>weight</strong> – Covariance of GMM moment conditions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

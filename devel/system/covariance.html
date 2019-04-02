@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -138,23 +136,19 @@
 <dt id="linearmodels.system.covariance.HomoskedasticCovariance">
 <em class="property">class </em><code class="descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>*</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Homoskedastic covariance estimation for system regression</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>list of ndarray</em>) – List of regressor arrays (ndependent)</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
-<li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
-assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</li>
-<li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list of ndarray</em>) – List of regressor arrays (ndependent)</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</p></li>
+<li><p><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to compute the GLS covariance estimator.  If False,
+assume OLS was used</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to apply a small sample adjustment</p></li>
+<li><p><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
 <div class="math notranslate nohighlight">
@@ -190,22 +184,18 @@ not used, the covariance is estimated by</p>
 <dt id="linearmodels.system.covariance.HeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedastic covariance estimation for system regression</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
-<li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
-assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</p></li>
+<li><p><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+assume OLS was used</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
 <div class="math notranslate nohighlight">
@@ -244,33 +234,29 @@ residuals and the weighted X matrix <span class="math notranslate nohighlight">\
 <dt id="linearmodels.system.covariance.KernelCovariance">
 <em class="property">class </em><code class="descname">KernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>eps</em>, <em>sigma</em>, <em>full_sigma</em>, <em>*</em>, <em>gls=False</em>, <em>debiased=False</em>, <em>constraints=None</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel (HAC) covariance estimation for system regression</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</li>
-<li><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</li>
-<li><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
-assume OLS was used</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list of ndarray</em>) – ndependent element list of regressor</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – Model residuals, ndependent by nobs</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em>) – Covariance matrix estimator of eps</p></li>
+<li><p><strong>gls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to compute the GLS covariance estimator.  If False,
+assume OLS was used</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to apply a small sample adjustment</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
-<li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
-<li>’parzen’, ‘gallant’ : Parzen’s kernel</li>
-<li>’qs’, ‘quadratic-spectral’, ‘andrews’ : Quadratic spectral kernel</li>
+<li><p>’bartlett’, ‘newey-west’ : Bartlett’s kernel</p></li>
+<li><p>’parzen’, ‘gallant’ : Parzen’s kernel</p></li>
+<li><p>’qs’, ‘quadratic-spectral’, ‘andrews’ : Quadratic spectral kernel</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
-bandwidth will be estimated.</li>
+</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+bandwidth will be estimated.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If GLS is used, the covariance is estimated by</p>
 <div class="math notranslate nohighlight">
@@ -283,8 +269,8 @@ based on the model residuals and the weighted X matrix <span class="math notrans
 \[(X'X)^{-1}\hat{S}(X'X)^{-1}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\hat{S}\)</span> is a estimator of the covariance of the model scores.</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.system.covariance.KernelCovariance.bandwidth">
@@ -328,23 +314,19 @@ based on the model residuals and the weighted X matrix <span class="math notrans
 <dt id="linearmodels.system.covariance.GMMHomoskedasticCovariance">
 <em class="property">class </em><code class="descname">GMMHomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMHomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMHomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</li>
-<li><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
-equation in the system</li>
-<li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</li>
-<li><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</li>
-<li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</p></li>
+<li><p><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
+equation in the system</p></li>
+<li><p><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</p></li>
+<li><p><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
 <div class="math notranslate nohighlight">
@@ -372,23 +354,19 @@ moments in the system</p>
 <dt id="linearmodels.system.covariance.GMMHeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">GMMHeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMHeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMHeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</li>
-<li><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
-equation in the system</li>
-<li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</li>
-<li><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</li>
-<li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</p></li>
+<li><p><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
+equation in the system</p></li>
+<li><p><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</p></li>
+<li><p><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
 <div class="math notranslate nohighlight">
@@ -415,34 +393,30 @@ equation in the system</li>
 <dt id="linearmodels.system.covariance.GMMKernelCovariance">
 <em class="property">class </em><code class="descname">GMMKernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>w</em>, <em>*</em>, <em>sigma=None</em>, <em>debiased=False</em>, <em>constraints=None</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/covariance.html#GMMKernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.covariance.GMMKernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator for IV system estimation with homoskedastic data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</li>
-<li><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</li>
-<li><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
-equation in the system</li>
-<li><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</li>
-<li><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</li>
-<li><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model regressors for each equation in the system</p></li>
+<li><p><strong>z</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>) – List containing the model instruments for each equation in the system</p></li>
+<li><p><strong>eps</strong> (<em>ndarray</em>) – nobs by neq array of residuals where each column corresponds an
+equation in the system</p></li>
+<li><p><strong>w</strong> (<em>ndarray</em>) – Weighting matrix used in estimation</p></li>
+<li><p><strong>sigma</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Residual covariance used in estimation</p></li>
+<li><p><strong>constraints</strong> (<em>{None</em><em>, </em><em>LinearConstraint}</em><em>, </em><em>optional</em>) – Constraints used in estimation, if any</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Name of kernel to use.  Supported kernels include:</p>
 <blockquote>
 <div><ul>
-<li>’bartlett’, ‘newey-west’ : Bartlett’s kernel</li>
-<li>’parzen’, ‘gallant’ : Parzen’s kernel</li>
-<li>’qs’, ‘quadratic-spectral’, ‘andrews’ : Quadratic spectral kernel</li>
+<li><p>’bartlett’, ‘newey-west’ : Bartlett’s kernel</p></li>
+<li><p>’parzen’, ‘gallant’ : Parzen’s kernel</p></li>
+<li><p>’qs’, ‘quadratic-spectral’, ‘andrews’ : Quadratic spectral kernel</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
-bandwidth will be estimated.</li>
+</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Bandwidth to use for the kernel.  If not provided the optimal
+bandwidth will be estimated.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The covariance is estimated by</p>
 <div class="math notranslate nohighlight">

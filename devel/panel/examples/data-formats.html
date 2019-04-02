@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -331,8 +329,8 @@ div.rendered_html tbody tr:hover {
 <h1>Data Formats for Panel Data Analysis<a class="headerlink" href="#Data-Formats-for-Panel-Data-Analysis" title="Permalink to this headline">¶</a></h1>
 <p>There are two primary methods to express data:</p>
 <ul class="simple">
-<li>MultiIndex DataFrames where the outer index is the entity and the inner is the time index. This requires using pandas.</li>
-<li>3D structures were dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index. It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray.</li>
+<li><p>MultiIndex DataFrames where the outer index is the entity and the inner is the time index. This requires using pandas.</p></li>
+<li><p>3D structures were dimension 0 (outer) is variable, dimension 1 is time index and dimension 2 is the entity index. It is also possible to use a 2D data structure with dimensions (t, n) which is treated as a 3D data structure having dimensions (1, t, n). These 3D data structures can be pandas, NumPy or xarray.</p></li>
 </ul>
 <div class="section" id="Multi-Index-DataFrames">
 <h2>Multi Index DataFrames<a class="headerlink" href="#Multi-Index-DataFrames" title="Permalink to this headline">¶</a></h2>
@@ -443,8 +441,8 @@ fcode  year
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.0288
-Time:                        17:10:50   Log-likelihood                   -90.459
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:37:37   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -524,8 +522,8 @@ Inputs contain missing values. Dropping rows with missing observations.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.0288
-Time:                        17:10:50   Log-likelihood                   -90.459
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:37:37   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -629,8 +627,8 @@ Data variables:
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.0288
-Time:                        17:10:50   Log-likelihood                   -90.459
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.0288
+Time:                        20:37:37   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -712,8 +710,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.0934
-Time:                        17:10:51   Log-likelihood                   -78.765
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.0934
+Time:                        20:37:38   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -778,8 +776,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Mar 22 2019   R-squared (Overall):             -0.0934
-Time:                        17:10:51   Log-likelihood                   -78.765
+Date:                Tue, Apr 02 2019   R-squared (Overall):             -0.0934
+Time:                        20:37:38   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002

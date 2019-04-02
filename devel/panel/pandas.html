@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -135,41 +133,41 @@ dropped it in 0.20.  <a class="reference internal" href="models.html#linearmodel
 and <a class="reference internal" href="models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.panel.model.FamaMacBeth</span></code></a>  provide
 a similar set of functionality with a few notable differences:</p>
 <ol class="arabic simple">
-<li>When using a MultiIndex DataFrame, this package expects the MultiIndex
+<li><p>When using a MultiIndex DataFrame, this package expects the MultiIndex
 to be of the form entity-time. pandas used time-entity.  It is simple to
-transform one to the other using the one-liner.</li>
+transform one to the other using the one-liner.</p></li>
 </ol>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;entity&#39;</span><span class="p">,</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
-<li>Effects are implemented in <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code> using differencing
+<li><p>Effects are implemented in <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code> using differencing
 and so even very large models (100000 entities +) can be quickly
 estimated. The version in pandas used LSDV which is not feasible in
-large models and can be slow in moderately large model.</li>
-<li>Effects are not explicitly estimated nor are they reported in model summaries.
+large models and can be slow in moderately large model.</p></li>
+<li><p>Effects are not explicitly estimated nor are they reported in model summaries.
 Effects are usually not consistent (e.g., entity effects in a large-N
 panel) and so it does not usually make sense to report them with parameter
 estimates.  Effects that can be consistent estimated can be included as
-dummies (e.g. time effects in a model with fixed T but large-N).</li>
-<li>R-squared definitions differ.  The default R-squared in <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code>
+dummies (e.g. time effects in a model with fixed T but large-N).</p></li>
+<li><p>R-squared definitions differ.  The default R-squared in <code class="docutils literal notranslate"><span class="pre">linearmodels</span></code>
 reports the fit after included effects are removed.
 <a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> also provides a set of R-squared measures
 that measure the fit of the model parameters using alternative models.
 These are only meaningful for models that only include entity effects.
 An R-squared measure that is defined similarly to the R-squared in pandas
 is available in the <a class="reference internal" href="results.html#linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive" title="linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rsquared_inclusive</span></code></a>
-property.</li>
-<li>Models are first specified then explicitly fit using the <a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
+property.</p></li>
+<li><p>Models are first specified then explicitly fit using the <a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
 method. Fit options, such as the choice of covariance estimator, are
-provided when fitting the model.</li>
-<li>The intercept must be explicitly included if desired.  If a model with effects
+provided when fitting the model.</p></li>
+<li><p>The intercept must be explicitly included if desired.  If a model with effects
 is estimated without an intercept, then all effects are included.  If a
 model is estimated with an intercept, the estimated model is demeaned to
 using the restriction that the sum of the effects is 0 so that the intercept
-is meaningful.</li>
-<li>Other statistics, such as F-stats, differ since inconsistent effects are
-not included in the test statistic.</li>
+is meaningful.</p></li>
+<li><p>Other statistics, such as F-stats, differ since inconsistent effects are
+not included in the test statistic.</p></li>
 </ol>
 <p>Here the difference is presented using the canonical Grunfeld data on
 investment.</p>

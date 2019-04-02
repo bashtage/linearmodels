@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -136,23 +134,19 @@
 <dt id="linearmodels.system.model.SUR">
 <em class="property">class </em><code class="descname">SUR</code><span class="sig-paren">(</span><em>equations</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Seemingly unrelated regression estimation (SUR/SURE)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent and exogenous variable
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent and exogenous variable
 values.  Each key is an equations label and must be a string. Each
 value must be either a tuple of the form (dependent,
 exog, [weights]) or a dictionary with keys ‘dependent’ and ‘exog’ and
-the optional key ‘weights’.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
-provided, FGLS is implemented based on an estimate of sigma.</li>
+the optional key ‘weights’.</p></li>
+<li><p><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
+provided, FGLS is implemented based on an estimate of sigma.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
@@ -191,18 +185,14 @@ no instruments.</p>
 <dl class="method">
 <dt id="linearmodels.system.model.SUR.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.add_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</li>
-<li><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</p></li>
+<li><p><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
 <div class="math notranslate nohighlight">
@@ -215,60 +205,54 @@ parameters.</p>
 <dt id="linearmodels.system.model.SUR.constraints">
 <code class="descname">constraints</code><a class="headerlink" href="#linearmodels.system.model.SUR.constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model constraints</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cons</strong> – Constraint object</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">LinearConstraint</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>cons</strong> – Constraint object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>LinearConstraint</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.SUR.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>method=None</em>, <em>full_cov=True</em>, <em>iterate=False</em>, <em>iter_limit=100</em>, <em>tol=1e-06</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
 using OLS only if all regressors are identical. The other two
-arguments force the use of GLS or OLS.</li>
-<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
-when estimating the model with GLS</li>
-<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
-iterations have been completed</li>
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+arguments force the use of GLS or OLS.</p></li>
+<li><p><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+when estimating the model with GLS</p></li>
+<li><p><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+iterations have been completed</p></li>
+<li><p><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</p></li>
+<li><p><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
-<li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
-<li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
-covariance estimator</li>
-<li>’kernel’ - Allows for heteroskedasticity and autocorrelation</li>
+<li><p>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</p></li>
+<li><p>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
+covariance estimator</p></li>
+<li><p>’kernel’ - Allows for heteroskedasticity and autocorrelation</p></li>
 </ul>
-</li>
-<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
-estimators support debiased which employs a small-sample adjustment</li>
+</p></li>
+<li><p><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
+estimators support debiased which employs a small-sample adjustment</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>results</strong> – Estimation results</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -282,32 +266,28 @@ estimators support debiased which employs a small-sample adjustment</li>
 <dt id="linearmodels.system.model.SUR.from_formula">
 <em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>sigma=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify a SUR using the formula interface</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
 the dictionary represents a single equation. See Notes for a
-description of the accepted syntax</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
-not provided, FGLS is implemented based on an estimate of sigma.</li>
-<li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
+description of the accepted syntax</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</p></li>
+<li><p><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
+not provided, FGLS is implemented based on an estimate of sigma.</p></li>
+<li><p><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
 data.  If an equation label is not a key weights, the weights will
-be set to unity</li>
+be set to unity</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Models can be specified in one of two ways. The first uses curly
 braces to encapsulate equations.  The second uses a dictionary
@@ -345,24 +325,20 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <dt id="linearmodels.system.model.SUR.multivariate_ls">
 <em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#SUR.multivariate_ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.SUR.multivariate_ls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for specification of multivariate regression models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
-<li><strong>exog</strong> (<em>array-like</em>) – nobs by nvar array of exogenous regressors common to all models</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</p></li>
+<li><p><strong>exog</strong> (<em>array-like</em>) – nobs by nvar array of exogenous regressors common to all models</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR">SUR</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Utility function to simplify the construction of multivariate
 regression models which all use the same regressors. Constructs
@@ -385,48 +361,42 @@ exogenous variable.</p>
 <dt id="linearmodels.system.model.SUR.param_names">
 <code class="descname">param_names</code><a class="headerlink" href="#linearmodels.system.model.SUR.param_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model parameter names</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>names</strong> – Normalized, unique model parameter names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.SUR.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.SUR.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</p></li>
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
 If predictions are not required for one of more of the model equations,
-these keys can be omitted.</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
-from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+these keys can be omitted.</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</p></li>
+<li><p><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
 Predictions from models constructed using formulas can
@@ -456,12 +426,10 @@ estimated model.</p>
 <dt id="linearmodels.system.model.IV3SLS">
 <em class="property">class </em><code class="descname">IV3SLS</code><span class="sig-paren">(</span><em>equations</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Three-stage Least Squares (3SLS) Estimator</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
@@ -474,14 +442,12 @@ if all variables in an equation are endogenous. Alternatively, ‘exog’
 can contain either an empty array or <cite>None</cite> to indicate that an
 equation contains no exogenous regressors. Similarly ‘endog’ and
 ‘instruments’ can either be omitted or may contain an empty array (or
-<cite>None</cite>) if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
-provided, FGLS is implemented based on an estimate of sigma.</li>
+<cite>None</cite>) if all variables in an equation are exogenous.</p></li>
+<li><p><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
+provided, FGLS is implemented based on an estimate of sigma.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Estimates a set of regressions which are seemingly unrelated in the sense
 that separate estimation would lead to consistent parameter estimates.
@@ -520,18 +486,14 @@ satisfied, a GLS estimator of the form</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.add_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.add_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</li>
-<li><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</p></li>
+<li><p><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
 <div class="math notranslate nohighlight">
@@ -544,60 +506,54 @@ parameters.</p>
 <dt id="linearmodels.system.model.IV3SLS.constraints">
 <code class="descname">constraints</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model constraints</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cons</strong> – Constraint object</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">LinearConstraint</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>cons</strong> – Constraint object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>LinearConstraint</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>method=None</em>, <em>full_cov=True</em>, <em>iterate=False</em>, <em>iter_limit=100</em>, <em>tol=1e-06</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>{None</em><em>, </em><em>'gls'</em><em>, </em><em>'ols'}</em>) – Estimation method.  Default auto selects based on regressors,
 using OLS only if all regressors are identical. The other two
-arguments force the use of GLS or OLS.</li>
-<li><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
-when estimating the model with GLS</li>
-<li><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
-iterations have been completed</li>
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+arguments force the use of GLS or OLS.</p></li>
+<li><p><strong>full_cov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating whether to utilize information in correlations
+when estimating the model with GLS</p></li>
+<li><p><strong>iterate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Flag indicating to iterate GLS until convergence of iter limit
+iterations have been completed</p></li>
+<li><p><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</p></li>
+<li><p><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
-<li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
-<li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
-covariance estimator</li>
-<li>’kernel’ - Allows for heteroskedasticity and autocorrelation</li>
+<li><p>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</p></li>
+<li><p>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
+covariance estimator</p></li>
+<li><p>’kernel’ - Allows for heteroskedasticity and autocorrelation</p></li>
 </ul>
-</li>
-<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
-estimators support debiased which employs a small-sample adjustment</li>
+</p></li>
+<li><p><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
+estimators support debiased which employs a small-sample adjustment</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>results</strong> – Estimation results</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="results.html#linearmodels.system.results.SystemResults" title="linearmodels.system.results.SystemResults">SystemResults</a></p>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="covariance.html#linearmodels.system.covariance.HomoskedasticCovariance" title="linearmodels.system.covariance.HomoskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HomoskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.HeteroskedasticCovariance" title="linearmodels.system.covariance.HeteroskedasticCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.HeteroskedasticCovariance()</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.system.covariance.KernelCovariance" title="linearmodels.system.covariance.KernelCovariance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">linearmodels.system.covariance.KernelCovariance()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -611,32 +567,28 @@ estimators support debiased which employs a small-sample adjustment</li>
 <dt id="linearmodels.system.model.IV3SLS.from_formula">
 <em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>sigma=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify a 3SLS using the formula interface</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
 the dictionary represents a single equation. See Notes for a
-description of the accepted syntax</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
-not provided, FGLS is implemented based on an estimate of sigma.</li>
-<li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
+description of the accepted syntax</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</p></li>
+<li><p><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If
+not provided, FGLS is implemented based on an estimate of sigma.</p></li>
+<li><p><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
 data.  If an equation label is not a key weights, the weights will
-be set to unity</li>
+be set to unity</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Models can be specified in one of two ways. The first uses curly
 braces to encapsulate equations.  The second uses a dictionary
@@ -676,26 +628,22 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <dt id="linearmodels.system.model.IV3SLS.multivariate_ls">
 <em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>endog=None</em>, <em>instruments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.multivariate_ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.multivariate_ls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for specification of multivariate IV models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
-<li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
-<li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</p></li>
+<li><p><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</p></li>
+<li><p><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</p></li>
+<li><p><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>At least one of exog or endog must be provided.</p>
 <p>Utility function to simplify the construction of multivariate IV
@@ -708,48 +656,42 @@ exogenous, endogenous and instrumental variables.</p>
 <dt id="linearmodels.system.model.IV3SLS.param_names">
 <code class="descname">param_names</code><a class="headerlink" href="#linearmodels.system.model.IV3SLS.param_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model parameter names</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>names</strong> – Normalized, unique model parameter names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.IV3SLS.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IV3SLS.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IV3SLS.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</p></li>
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
 If predictions are not required for one of more of the model equations,
-these keys can be omitted.</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
-from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+these keys can be omitted.</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</p></li>
+<li><p><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
 Predictions from models constructed using formulas can
@@ -779,29 +721,25 @@ estimated model.</p>
 <dt id="linearmodels.system.model.IVSystemGMM">
 <em class="property">class </em><code class="descname">IVSystemGMM</code><span class="sig-paren">(</span><em>equations</em>, <em>*</em>, <em>sigma=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IVSystemGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM" title="Permalink to this definition">¶</a></dt>
 <dd><p>System Generalized Method of Moments (GMM) estimation of linear IV models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing dependent, exogenous, endogenous
 and instrumental variables.  Each key is an equations label and must
 be a string. Each value must be either a tuple of the form (dependent,
 exog, endog, instrument[, weights]) or a dictionary with keys ‘dependent’,
 ‘exog’.  The dictionary may contain optional keys for ‘endog’,
 ‘instruments’, and ‘weights’. Endogenous and/or Instrument can be empty
-if all variables in an equation are exogenous.</li>
-<li><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
+if all variables in an equation are exogenous.</p></li>
+<li><p><strong>sigma</strong> (<em>array-like</em>) – Prespecified residual covariance to use in GLS estimation. If not
 provided, FGLS is implemented based on an estimate of sigma. Only used
-if weight_type is ‘unadjusted’</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</li>
-<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
-function</li>
+if weight_type is ‘unadjusted’</p></li>
+<li><p><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of moment condition weight function to use in the GMM estimation</p></li>
+<li><p><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Estimates a linear model using GMM. Each equation is of the form</p>
 <div class="math notranslate nohighlight">
@@ -834,18 +772,14 @@ by</p>
 <dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.add_constraints">
 <code class="descname">add_constraints</code><span class="sig-paren">(</span><em>r</em>, <em>q=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.add_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</li>
-<li><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>DataFrame</em>) – Constraint matrix. nconstraints by nparameters</p></li>
+<li><p><strong>q</strong> (<em>Series</em><em>, </em><em>optional</em>) – Constraint values (nconstraints).  If not set, set to 0</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Constraints are of the form</p>
 <div class="math notranslate nohighlight">
@@ -858,52 +792,46 @@ parameters.</p>
 <dt id="linearmodels.system.model.IVSystemGMM.constraints">
 <code class="descname">constraints</code><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model constraints</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>cons</strong> – Constraint object</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">LinearConstraint</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>cons</strong> – Constraint object</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>LinearConstraint</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>iter_limit=2</em>, <em>tol=1e-06</em>, <em>initial_weight=None</em>, <em>cov_type='robust'</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IVSystemGMM.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</li>
-<li><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</li>
-<li><strong>initial_weight</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Initial weighting matrix to use in the first step. If not
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iter_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Maximum number of iterations for iterative GLS</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Tolerance to use when checking for convergence in iterative GLS</p></li>
+<li><p><strong>initial_weight</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Initial weighting matrix to use in the first step. If not
 specified, uses the average outer-product of the set containing
-the exogenous variables and instruments.</li>
-<li><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
+the exogenous variables and instruments.</p></li>
+<li><p><strong>cov_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of covariance estimator. Valid options are</p>
 <ul>
-<li>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</li>
-<li>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
-covariance estimator</li>
+<li><p>’unadjusted’, ‘homoskedastic’ - Classic covariance estimator</p></li>
+<li><p>’robust’, ‘heteroskedastic’ - Heteroskedasticity robust
+covariance estimator</p></li>
 </ul>
-</li>
-<li><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
-estimators support debiased which employs a small-sample adjustment</li>
+</p></li>
+<li><p><strong>**cov_config</strong> – Additional parameters to pass to covariance estimator. All
+estimators support debiased which employs a small-sample adjustment</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>results</strong> – Estimation results</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="results.html#linearmodels.system.results.GMMSystemResults" title="linearmodels.system.results.GMMSystemResults">GMMSystemResults</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>results</strong> – Estimation results</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="results.html#linearmodels.system.results.GMMSystemResults" title="linearmodels.system.results.GMMSystemResults">GMMSystemResults</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -916,39 +844,35 @@ estimators support debiased which employs a small-sample adjustment</li>
 <dt id="linearmodels.system.model.IVSystemGMM.from_formula">
 <em class="property">classmethod </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/model.html#IVSystemGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify a 3SLS using the formula interface</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<em>{str</em><em>, </em><em>dict-like}</em>) – Either a string or a dictionary of strings where each value in
 the dictionary represents a single equation. See Notes for a
-description of the accepted syntax</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</li>
-<li><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
+description of the accepted syntax</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Frame containing named variables</p></li>
+<li><p><strong>weights</strong> (<em>dict-like</em>) – Dictionary like object (e.g. a DataFrame) containing variable
 weights.  Each entry must have the same number of observations as
 data.  If an equation label is not a key weights, the weights will
-be set to unity</li>
-<li><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of moment condition weight function to use in the GMM
+be set to unity</p></li>
+<li><p><strong>weight_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <p>Name of moment condition weight function to use in the GMM
 estimation. Valid options are:</p>
 <ul>
-<li>’unadjusted’, ‘homoskedastic’ - Assume moments are homoskedastic</li>
-<li>’robust’, ‘heteroskedastic’ - Allow for heteroskedasticity</li>
+<li><p>’unadjusted’, ‘homoskedastic’ - Assume moments are homoskedastic</p></li>
+<li><p>’robust’, ‘heteroskedastic’ - Allow for heteroskedasticity</p></li>
 </ul>
-</li>
-<li><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
-function</li>
+</p></li>
+<li><p><strong>**weight_config</strong> – Additional keyword arguments to pass to the moment condition weight
+function</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IVSystemGMM" title="linearmodels.system.model.IVSystemGMM">IVSystemGMM</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.IVSystemGMM" title="linearmodels.system.model.IVSystemGMM">IVSystemGMM</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Models can be specified in one of two ways. The first uses curly
 braces to encapsulate equations.  The second uses a dictionary
@@ -988,26 +912,22 @@ in a dictionary.  Best practice is to use an Ordered Dictionary</p>
 <dt id="linearmodels.system.model.IVSystemGMM.multivariate_ls">
 <em class="property">classmethod </em><code class="descname">multivariate_ls</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>endog=None</em>, <em>instruments=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.multivariate_ls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for specification of multivariate IV models</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</li>
-<li><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</li>
-<li><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</li>
-<li><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dependent</strong> (<em>array-like</em>) – nobs by ndep array of dependent variables</p></li>
+<li><p><strong>exog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nexog array of exogenous regressors common to all models</p></li>
+<li><p><strong>endog</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by nendog array of endogenous regressors common to all models</p></li>
+<li><p><strong>instruments</strong> (<em>array-like</em><em>, </em><em>optional</em>) – nobs by ninstr array of instruments to use in all equations</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>model</strong> – Model instance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>model</strong> – Model instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS">IV3SLS</a></p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>At least one of exog or endog must be provided.</p>
 <p>Utility function to simplify the construction of multivariate IV
@@ -1020,48 +940,42 @@ exogenous, endogenous and instrumental variables.</p>
 <dt id="linearmodels.system.model.IVSystemGMM.param_names">
 <code class="descname">param_names</code><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.param_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model parameter names</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>names</strong> – Normalized, unique model parameter names</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>names</strong> – Normalized, unique model parameter names</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.model.IVSystemGMM.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>equations=None</em>, <em>data=None</em>, <em>eval_env=8</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.model.IVSystemGMM.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</li>
-<li><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>array-like</em>) – Model parameters (nvar by 1)</p></li>
+<li><p><strong>equations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary-like structure containing exogenous and endogenous
 variables.  Each key is an equations label and must
 match the labels used to fir the model. Each value must be either a tuple
 of the form (exog, endog) or a dictionary with keys ‘exog’ and ‘endog’.
 If predictions are not required for one of more of the model equations,
-these keys can be omitted.</li>
-<li><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
-from a formula</li>
-<li><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</li>
+these keys can be omitted.</p></li>
+<li><p><strong>data</strong> (<em>DataFrame</em>) – Values to use when making predictions from a model constructed
+from a formula</p></li>
+<li><p><strong>eval_env</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Depth of use when evaluating formulas using Patsy.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>predictions</strong> – Fitted values from supplied data and parameters</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If <cite>data</cite> is not none, then <cite>equations</cite> must be none.
 Predictions from models constructed using formulas can

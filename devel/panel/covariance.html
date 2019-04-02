@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -138,25 +136,21 @@
 <dt id="linearmodels.panel.covariance.HomoskedasticCovariance">
 <em class="property">class </em><code class="descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>entity_ids</em>, <em>time_ids</em>, <em>*</em>, <em>debiased=False</em>, <em>extra_df=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Homoskedastic covariance estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</li>
-<li><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</li>
-<li><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</p></li>
+<li><p><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</p></li>
+<li><p><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
 columns in x, e.g., fixed effects.  Covariance estimators are always
-adjusted for extra_df irrespective of the setting of debiased</li>
+adjusted for extra_df irrespective of the setting of debiased</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
 <div class="math notranslate nohighlight">
@@ -208,25 +202,21 @@ adjusted for extra_df irrespective of the setting of debiased</li>
 <dt id="linearmodels.panel.covariance.HeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>entity_ids</em>, <em>time_ids</em>, <em>*</em>, <em>debiased=False</em>, <em>extra_df=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation using White estimator</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</li>
-<li><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</li>
-<li><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</p></li>
+<li><p><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</p></li>
+<li><p><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
 columns in x, e.g., fixed effects.  Covariance estimators are always
-adjusted for extra_df irrespective of the setting of debiased</li>
+adjusted for extra_df irrespective of the setting of debiased</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
 <div class="math notranslate nohighlight">
@@ -278,33 +268,29 @@ adjusted for extra_df irrespective of the setting of debiased</li>
 <dt id="linearmodels.panel.covariance.ClusteredCovariance">
 <em class="property">class </em><code class="descname">ClusteredCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>entity_ids</em>, <em>time_ids</em>, <em>*</em>, <em>debiased=False</em>, <em>extra_df=0</em>, <em>clusters=None</em>, <em>group_debias=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#ClusteredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.ClusteredCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>One-way (Rogers) or two-way clustered covariance estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>y</strong> (<em>ndarray</em>) – nobs by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – nobs by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</li>
-<li><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</li>
-<li><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – nobs by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – nobs by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</p></li>
+<li><p><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</p></li>
+<li><p><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
 columns in x, e.g., fixed effects.  Covariance estimators are always
-adjusted for extra_df irrespective of the setting of debiased</li>
-<li><strong>clusters</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – nobs by 1 or nobs by 2 array of cluster group ids</li>
-<li><strong>group_debias</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to apply small-number of groups adjustment</li>
+adjusted for extra_df irrespective of the setting of debiased</p></li>
+<li><p><strong>clusters</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – nobs by 1 or nobs by 2 array of cluster group ids</p></li>
+<li><p><strong>group_debias</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to apply small-number of groups adjustment</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cov</strong> – Estimated parameter covariance</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cov</strong> – Estimated parameter covariance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The estimator of the covariance is</p>
 <div class="math notranslate nohighlight">
@@ -363,34 +349,30 @@ observations.</p>
 <dt id="linearmodels.panel.covariance.DriscollKraay">
 <em class="property">class </em><code class="descname">DriscollKraay</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>entity_ids</em>, <em>time_ids</em>, <em>*</em>, <em>debiased=False</em>, <em>extra_df=0</em>, <em>kernel='newey-west'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#DriscollKraay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.DriscollKraay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Driscoll-Kraay heteroskedasticity-autocorrelation robust covariance estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</li>
-<li><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</li>
-<li><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</p></li>
+<li><p><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</p></li>
+<li><p><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
 columns in x, e.g., fixed effects.  Covariance estimators are always
-adjusted for extra_df irrespective of the setting of debiased</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
-thumb value is used.</li>
+adjusted for extra_df irrespective of the setting of debiased</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
+thumb value is used.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Supported kernels:</p>
 <ul class="simple">
-<li>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</li>
-<li>‘quadratic-spectral’, ‘qs’, ‘andrews’ - Quadratic-Spectral Kernel</li>
-<li>‘parzen’, ‘gallant’ - Parzen kernel</li>
+<li><p>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</p></li>
+<li><p>‘quadratic-spectral’, ‘qs’, ‘andrews’ - Quadratic-Spectral Kernel</p></li>
+<li><p>‘parzen’, ‘gallant’ - Parzen kernel</p></li>
 </ul>
 <p>Bandwidth is set to the common value for the Bartlett kernel if not
 provided.</p>
@@ -447,35 +429,31 @@ provided.</p>
 <dt id="linearmodels.panel.covariance.ACCovariance">
 <em class="property">class </em><code class="descname">ACCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>entity_ids</em>, <em>time_ids</em>, <em>*</em>, <em>debiased=False</em>, <em>extra_df=0</em>, <em>kernel='newey-west'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#ACCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.ACCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Autocorrelation robust covariance estimation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</li>
-<li><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</li>
-<li><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – variables by 1 array of estimated model parameters</p></li>
+<li><p><strong>entity_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of entity ids</p></li>
+<li><p><strong>time_ids</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of time ids</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>extra_df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Additional degrees of freedom consumed by models beyond the number of
 columns in x, e.g., fixed effects.  Covariance estimators are always
-adjusted for extra_df irrespective of the setting of debiased</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
-thumb value is used.</li>
+adjusted for extra_df irrespective of the setting of debiased</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
+thumb value is used.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Estimator is robust to autocorrelation but no cross-sectional correlation.</p>
 <p>Supported kernels:</p>
 <ul class="simple">
-<li>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</li>
-<li>‘quadratic-spectral’, ‘qs’, ‘andrews’ - Quadratic-Spectral Kernel</li>
-<li>‘parzen’, ‘gallant’ - Parzen kernel</li>
+<li><p>‘bartlett’, ‘newey-west’ - Bartlett’s kernel</p></li>
+<li><p>‘quadratic-spectral’, ‘qs’, ‘andrews’ - Quadratic-Spectral Kernel</p></li>
+<li><p>‘parzen’, ‘gallant’ - Parzen kernel</p></li>
 </ul>
 <p>Bandwidth is set to the common value for the Bartlett kernel if not
 provided.</p>
@@ -533,21 +511,17 @@ provided.</p>
 <dt id="linearmodels.panel.covariance.FamaMacBethCovariance">
 <em class="property">class </em><code class="descname">FamaMacBethCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>all_params</em>, <em>*</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#FamaMacBethCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust covariance estimator for Fama-MacBeth</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – (variables by 1) array of estimated model parameters</li>
-<li><strong>all_params</strong> (<em>ndarray</em>) – (nobs by variables) array of all estimated model parameters</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – (variables by 1) array of estimated model parameters</p></li>
+<li><p><strong>all_params</strong> (<em>ndarray</em>) – (nobs by variables) array of all estimated model parameters</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is the sample covariance of the set of all estimated
 parameters.</p>
@@ -590,24 +564,20 @@ parameters.</p>
 <dt id="linearmodels.panel.covariance.FamaMacBethKernelCovariance">
 <em class="property">class </em><code class="descname">FamaMacBethKernelCovariance</code><span class="sig-paren">(</span><em>y</em>, <em>x</em>, <em>params</em>, <em>all_params</em>, <em>*</em>, <em>debiased=False</em>, <em>kernel='newey-west'</em>, <em>bandwidth=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/covariance.html#FamaMacBethKernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.covariance.FamaMacBethKernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>HAC estimator for Fama-MacBeth estimator</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</li>
-<li><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</li>
-<li><strong>params</strong> (<em>ndarray</em>) – (variables by 1) array of estimated model parameters</li>
-<li><strong>all_params</strong> (<em>ndarray</em>) – (nobs by variables) array of all estimated model parameters</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
-thumb value is used.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>ndarray</em>) – (entity x time) by 1 stacked array of dependent</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>) – (entity x time) by variables stacked array of exogenous</p></li>
+<li><p><strong>params</strong> (<em>ndarray</em>) – (variables by 1) array of estimated model parameters</p></li>
+<li><p><strong>all_params</strong> (<em>ndarray</em>) – (nobs by variables) array of all estimated model parameters</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating whether to debias the estimator</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>options</em>) – Name of one of the supported kernels</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer to use as bandwidth.  If not provided a rule-of-
+thumb value is used.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Covariance is a Kernel covariance of all estimated parameters.</p>
 <dl class="attribute">

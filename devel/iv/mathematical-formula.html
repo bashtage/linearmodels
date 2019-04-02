@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -237,7 +235,7 @@ freedom is <span class="math notranslate nohighlight">\(n-k\)</span>.</p>
 F &amp; =\hat{\beta}_{-}^{\prime}\hat{V}_{-}^{-1}\dot{\hat{\beta}_{-}}\end{aligned}\]</div>
 <p>where the notation <span class="math notranslate nohighlight">\(\hat{\beta}_{-}\)</span> indicates that the constant
 is excluded from <span class="math notranslate nohighlight">\(\hat{\beta}\)</span> and <span class="math notranslate nohighlight">\(\hat{V}_{-}\)</span> indicates
-that the row and column corresponding to a constant are excluded. <a class="footnote-reference" href="#id3" id="id1">[1]</a>
+that the row and column corresponding to a constant are excluded. <a class="footnote-reference brackets" href="#id3" id="id1">1</a>
 The test statistic is distributed as <span class="math notranslate nohighlight">\(\chi_{k-k_{c}}^{2}.\)</span> If the
 debiased flag is set, then the test statistic <span class="math notranslate nohighlight">\(F\)</span> is transformed
 as <span class="math notranslate nohighlight">\(F/\left(k-k_{c}\right)\)</span> and a <span class="math notranslate nohighlight">\(F_{k-k_{c},n-k}\)</span>
@@ -283,7 +281,7 @@ the number of groups.</p>
 <p>If the debiased flag is used to perform a small-sample adjustment, all
 estimators except the clustered covariance are rescaled by
 <span class="math notranslate nohighlight">\(\left(n-k\right)/n\)</span>. The clustered covariance is rescaled by
-<span class="math notranslate nohighlight">\(\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)\)</span>. <a class="footnote-reference" href="#id4" id="id2">[2]</a></p>
+<span class="math notranslate nohighlight">\(\left(\left(n-k\right)\left(n-1\right)/n^{2}\right)\left(\left(g-1\right)/g\right)\)</span>. <a class="footnote-reference brackets" href="#id4" id="id2">2</a></p>
 </div>
 <div class="section" id="standard-errors">
 <h3>Standard Errors<a class="headerlink" href="#standard-errors" title="Permalink to this headline">¶</a></h3>
@@ -535,18 +533,18 @@ variances, the lower the value reported by Shea’s <span class="math notranslat
 <p><strong>Kernel weights</strong></p>
 <p>In all formulas, <span class="math notranslate nohighlight">\(m\)</span> is the kernel bandwidth parameter.</p>
 <ul>
-<li><p class="first">Bartlett</p>
+<li><p>Bartlett</p>
 <div class="math notranslate nohighlight">
 \[w_{i}=1-\frac{i}{m+1},\,i&lt;m\]</div>
 </li>
-<li><p class="first">Parzen</p>
+<li><p>Parzen</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 z_{i} &amp; =\frac{i}{m+1},\,i&lt;m\\
 w_{i} &amp; =1-6z_{i}^{2}+6z_{i}^{3},z\leq0.5\\
 w_{i} &amp; =2(1-z_{i})^{3},z&gt;0.5\end{aligned}\end{split}\]</div>
 </li>
-<li><p class="first">Quadratic-Spectral</p>
+<li><p>Quadratic-Spectral</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 z_{i} &amp; =\frac{6\pi i}{5m}\\
@@ -564,32 +562,28 @@ tests. These are executed in order and so once a constant is detected,
 the others are not executed. The simplest method to ensure that a
 constant is correctly detected is to include a columns of 1s.</p>
 <ol class="arabic simple">
-<li>A column with only 1.0s</li>
-<li>A column with a maximum minus minimum equal to 0 and that is not all
-0s.</li>
-<li>Whether the rank of <span class="math notranslate nohighlight">\(X\)</span> is the same as
+<li><p>A column with only 1.0s</p></li>
+<li><p>A column with a maximum minus minimum equal to 0 and that is not all
+0s.</p></li>
+<li><p>Whether the rank of <span class="math notranslate nohighlight">\(X\)</span> is the same as
 <span class="math notranslate nohighlight">\(\left[1_{N}\:X\right]\)</span>. If these are the same, then the model
-contains a constant equivalent (e.g., dummies for all categories).</li>
+contains a constant equivalent (e.g., dummies for all categories).</p></li>
 </ol>
-<table class="docutils footnote" frame="void" id="id3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If the model contains an implicit constant, e.g., all categories of a
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>If the model contains an implicit constant, e.g., all categories of a
 dummy, one of the categories is excluded when computing the test
 statistic. The choice of category to drop has no effect and is
 equivalent to reparameterizing the model with a constant and
-excluding one category of dummy.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>This somewhat non-obvious choice is driven by Stata compatibility.</td></tr>
-</tbody>
-</table>
+excluding one category of dummy.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>This somewhat non-obvious choice is driven by Stata compatibility.</p>
+</dd>
+</dl>
 <p class="rubric">References</p>
-<p>Sources used in writing the code include <a class="reference internal" href="../references.html#baltagi" id="id5">[Baltagi]</a>, <a class="reference internal" href="../references.html#baumetal" id="id6">[BaumEtAl]</a> and <a class="reference internal" href="../references.html#cametal" id="id7">[CamEtAl]</a>,
-<a class="reference internal" href="../references.html#camtri05" id="id8">[CamTri05]</a>, <a class="reference internal" href="../references.html#camtri09" id="id9">[CamTri09]</a>, <a class="reference internal" href="../references.html#greene" id="id10">[Greene]</a>, <a class="reference internal" href="../references.html#newwes94" id="id11">[NewWes94]</a>, <a class="reference internal" href="../references.html#stata" id="id12">[Stata]</a>, <a class="reference internal" href="../references.html#wool10" id="id13">[Wool10]</a> and <a class="reference internal" href="../references.html#wool12" id="id14">[Wool12]</a>.</p>
+<p>Sources used in writing the code include <a class="reference internal" href="../references.html#baltagi" id="id5"><span>[Baltagi]</span></a>, <a class="reference internal" href="../references.html#baumetal" id="id6"><span>[BaumEtAl]</span></a> and <a class="reference internal" href="../references.html#cametal" id="id7"><span>[CamEtAl]</span></a>,
+<a class="reference internal" href="../references.html#camtri05" id="id8"><span>[CamTri05]</span></a>, <a class="reference internal" href="../references.html#camtri09" id="id9"><span>[CamTri09]</span></a>, <a class="reference internal" href="../references.html#greene" id="id10"><span>[Greene]</span></a>, <a class="reference internal" href="../references.html#newwes94" id="id11"><span>[NewWes94]</span></a>, <a class="reference internal" href="../references.html#stata" id="id12"><span>[Stata]</span></a>, <a class="reference internal" href="../references.html#wool10" id="id13"><span>[Wool10]</span></a> and <a class="reference internal" href="../references.html#wool12" id="id14"><span>[Wool12]</span></a>.</p>
 </div>
 </div>
 

@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -329,8 +327,8 @@ div.rendered_html tbody tr:hover {
 <h1>Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this headline">¶</a></h1>
 <p>Formulas can be used to specify models using mostly standard <a class="reference external" href="https://patsy.readthedocs.io/">patsy</a> syntax. Since system estimation is more complicated than the specification of a single model, there are two methods available to specify a system:</p>
 <ul class="simple">
-<li>Dictionary of formulas</li>
-<li>Single formula separated using {}</li>
+<li><p>Dictionary of formulas</p></li>
+<li><p>Single formula separated using {}</p></li>
 </ul>
 <p>These examples use data on fringe benefits from F. Vella (1993), “A Simple Estimator for Simultaneous Models with Censored Endogenous Regressors” which appears in Wooldridge (2002). The model consists of two equations, one for hourly wage and the other for hourly benefits. The initial model uses the same regressors in both equations.</p>
 <div class="nbinput nblast docutils container">
@@ -381,8 +379,8 @@ div.rendered_html tbody tr:hover {
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Mar 22 2019
-Time:                        17:11:11
+Date:                Tue, Apr 02 2019
+Time:                        20:37:58
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -442,8 +440,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Mar 22 2019
-Time:                        17:11:12
+Date:                Tue, Apr 02 2019
+Time:                        20:37:58
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -540,35 +538,35 @@ Labeled
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.6741
+Estimator:                        GLS   Overall R-squared:              0.7094
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Mar 22 2019
-Time:                        17:11:12
+Date:                Tue, Apr 02 2019
+Time:                        20:37:58
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0298     0.0109     2.7283     0.0064      0.0084      0.0513
-exper          0.0433     0.0177     2.4418     0.0146      0.0085      0.0780
-expersq       -0.0008     0.0004    -1.8048     0.0711     -0.0016   6.775e-05
-union          0.3747     0.1067     3.5121     0.0004      0.1656      0.5838
-south         -0.1847     0.1196    -1.5440     0.1226     -0.4191      0.0498
-nrtheast      -0.1279     0.1532    -0.8347     0.4039     -0.4281      0.1724
-nrthcen       -0.1216     0.1215    -1.0003     0.3172     -0.3598      0.1167
-male           0.2408     0.0989     2.4345     0.0149      0.0469      0.4347
+educ           0.0367     0.0112     3.2727     0.0011      0.0147      0.0587
+exper          0.0401     0.0155     2.5929     0.0095      0.0098      0.0704
+expersq       -0.0007     0.0004    -1.9784     0.0479     -0.0015  -6.788e-06
+union          0.3958     0.1076     3.6791     0.0002      0.1850      0.6067
+south         -0.2476     0.1211    -2.0438     0.0410     -0.4850     -0.0102
+nrtheast      -0.2615     0.1326    -1.9719     0.0486     -0.5215     -0.0016
+nrthcen       -0.2833     0.1327    -2.1343     0.0328     -0.5435     -0.0231
+male           0.2345     0.0902     2.5988     0.0094      0.0576      0.4113
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.3317     0.0244     13.601     0.0000      0.2839      0.3796
-exper         -0.0218     0.0506    -0.4308     0.6666     -0.1211      0.0774
-expersq        0.0023     0.0013     1.7365     0.0825     -0.0003      0.0048
-nrtheast      -0.6485     0.1661    -3.9049     0.0001     -0.9741     -0.3230
-married        0.6904     0.1900     3.6348     0.0003      0.3181      1.0627
-male           1.6964     0.1316     12.893     0.0000      1.4385      1.9543
+educ           0.3404     0.0240     14.155     0.0000      0.2933      0.3876
+exper         -0.0697     0.0543    -1.2836     0.1993     -0.1760      0.0367
+expersq        0.0036     0.0014     2.6174     0.0089      0.0009      0.0064
+nrtheast      -1.0457     0.1734    -6.0304     0.0000     -1.3856     -0.7058
+married        0.6479     0.2177     2.9760     0.0029      0.2212      1.0746
+male           2.0021     0.1109     18.053     0.0000      1.7847      2.2195
 ==============================================================================
 
 Covariance Estimator:

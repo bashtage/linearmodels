@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -135,38 +133,32 @@
 <dt id="linearmodels.asset_pricing.covariance.HeteroskedasticCovariance">
 <em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>xe</em>, <em>*</em>, <em>jacobian=None</em>, <em>inv_jacobian=None</em>, <em>center=True</em>, <em>debiased=False</em>, <em>df=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust covariance estimator</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>xe</strong> (<em>ndarray</em>) – Scores/moment conditions</li>
-<li><strong>jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Jacobian.  One and only one of jacobian and inv_jacobian must
-be provided</li>
-<li><strong>inv_jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-be provided</li>
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to center the scores when computing the covariance</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use a debiased estimator</li>
-<li><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Degree of freedom value ot use if debiasing</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xe</strong> (<em>ndarray</em>) – Scores/moment conditions</p></li>
+<li><p><strong>jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Jacobian.  One and only one of jacobian and inv_jacobian must
+be provided</p></li>
+<li><p><strong>inv_jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Inverse jacobian.  One and only one of jacobian and inv_jacobian must
+be provided</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to center the scores when computing the covariance</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use a debiased estimator</p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Degree of freedom value ot use if debiasing</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute parameter covariance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>c</strong> – Parameter covariance</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>c</strong> – Parameter covariance</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -185,16 +177,14 @@ be provided</li>
 <dt id="linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.s">
 <code class="descname">s</code><a class="headerlink" href="#linearmodels.asset_pricing.covariance.HeteroskedasticCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score/moment condition covariance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>s</strong> – Covariance of the scores or moment conditions</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>s</strong> – Covariance of the scores or moment conditions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -212,29 +202,25 @@ be provided</li>
 <dt id="linearmodels.asset_pricing.covariance.KernelCovariance">
 <em class="property">class </em><code class="descname">KernelCovariance</code><span class="sig-paren">(</span><em>xe</em>, <em>*</em>, <em>jacobian=None</em>, <em>inv_jacobian=None</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>center=True</em>, <em>debiased=False</em>, <em>df=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/asset_pricing/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.asset_pricing.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity-autocorrelation (HAC) robust covariance estimator</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>xe</strong> (<em>ndarray</em>) – Scores/moment conditions</li>
-<li><strong>jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Jacobian.  One and only one of jacobian and inv_jacobian must
-be provided</li>
-<li><strong>inv_jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-be provided</li>
-<li><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Kernel name. See notes for available kernels.</li>
-<li><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer bandwidth</li>
-<li><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to center the scores when computing the covariance</li>
-<li><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use a debiased estimator</li>
-<li><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Degree of freedom value ot use if debiasing</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xe</strong> (<em>ndarray</em>) – Scores/moment conditions</p></li>
+<li><p><strong>jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Jacobian.  One and only one of jacobian and inv_jacobian must
+be provided</p></li>
+<li><p><strong>inv_jacobian</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Inverse jacobian.  One and only one of jacobian and inv_jacobian must
+be provided</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Kernel name. See notes for available kernels.</p></li>
+<li><p><strong>bandwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Non-negative integer bandwidth</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to center the scores when computing the covariance</p></li>
+<li><p><strong>debiased</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag indicating to use a debiased estimator</p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Degree of freedom value ot use if debiasing</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="../iv/covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
 <dl class="attribute">
 <dt id="linearmodels.asset_pricing.covariance.KernelCovariance.bandwidth">
@@ -246,16 +232,14 @@ be provided</li>
 <dt id="linearmodels.asset_pricing.covariance.KernelCovariance.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.asset_pricing.covariance.KernelCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute parameter covariance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>c</strong> – Parameter covariance</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>c</strong> – Parameter covariance</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -280,16 +264,14 @@ be provided</li>
 <dt id="linearmodels.asset_pricing.covariance.KernelCovariance.s">
 <code class="descname">s</code><a class="headerlink" href="#linearmodels.asset_pricing.covariance.KernelCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score/moment condition covariance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>s</strong> – Covariance of the scores or moment conditions</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>s</strong> – Covariance of the scores or moment conditions</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
