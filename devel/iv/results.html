@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Estimation Results &#8212; linearmodels 4.12+6.ga659a0b documentation</title>
+    <title>Estimation Results &#8212; linearmodels 4.12+8.g5e3183f documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+6.ga659a0b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.12 (+6, ga659a0b)</a>
+    ../index.html" class="text-logo">linearmodels 4.12 (+8, g5e3183f)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -224,42 +224,77 @@ indicate the model is not overidentified. The test statistic is</p>
 <dt id="linearmodels.iv.results.IVResults.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.cov_config">
 <code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.cov_estimator">
 <code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.cov_type">
 <code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.debiased">
 <code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.df_model">
 <code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.df_resid">
 <code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -338,12 +373,22 @@ estimator and so is robust against the same specification issues.</p>
 <dt id="linearmodels.iv.results.IVResults.fitted_values">
 <code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.has_constant">
 <code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -356,36 +401,66 @@ from the data. It has the same dimension as the dependent data.
 The shape and nature of resids depends on the model estimated. These
 estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.kappa">
 <code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.method">
 <code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.model_ss">
 <code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.nobs">
 <code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -435,30 +510,55 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.IVResults.resid_ss">
 <code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.rsquared">
 <code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.rsquared_adj">
 <code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.s2">
 <code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -504,6 +604,9 @@ of instruments and the number of endogenous regressors.</p>
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -511,6 +614,11 @@ of instruments and the number of endogenous regressors.</p>
 <dt id="linearmodels.iv.results.IVResults.total_ss">
 <code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -667,6 +775,11 @@ variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogen
 <dt id="linearmodels.iv.results.IVResults.wresids">
 <code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -777,42 +890,77 @@ tested.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_config">
 <code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_estimator">
 <code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_type">
 <code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.debiased">
 <code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.df_model">
 <code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.df_resid">
 <code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -855,12 +1003,22 @@ estimator and so is robust against the same specification issues.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.fitted_values">
 <code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.has_constant">
 <code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -873,12 +1031,22 @@ from the data. It has the same dimension as the dependent data.
 The shape and nature of resids depends on the model estimated. These
 estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.iterations">
 <code class="descname">iterations</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterations used in GMM estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -910,30 +1078,55 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 <dt id="linearmodels.iv.results.IVGMMResults.kappa">
 <code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.method">
 <code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.model_ss">
 <code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.nobs">
 <code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -983,30 +1176,55 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.resid_ss">
 <code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.rsquared">
 <code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.rsquared_adj">
 <code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.s2">
 <code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1025,6 +1243,9 @@ values corresponding to the original model specification.</p>
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1032,6 +1253,11 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.IVGMMResults.total_ss">
 <code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1107,24 +1333,44 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.IVGMMResults.weight_config">
 <code class="descname">weight_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighting matrix configuration used in estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.weight_matrix">
 <code class="descname">weight_matrix</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight matrix used in the final-step GMM estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.weight_type">
 <code class="descname">weight_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighting matrix method used in estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.wresids">
 <code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1155,42 +1401,77 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.OLSResults.cov">
 <code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.cov_config">
 <code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.cov_estimator">
 <code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.cov_type">
 <code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.debiased">
 <code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.df_model">
 <code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.df_resid">
 <code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1219,12 +1500,22 @@ estimator and so is robust against the same specification issues.</p>
 <dt id="linearmodels.iv.results.OLSResults.fitted_values">
 <code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.has_constant">
 <code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1237,36 +1528,66 @@ from the data. It has the same dimension as the dependent data.
 The shape and nature of resids depends on the model estimated. These
 estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.kappa">
 <code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.method">
 <code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.model_ss">
 <code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.nobs">
 <code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.params">
 <code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1316,30 +1637,55 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.OLSResults.resid_ss">
 <code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.resids">
 <code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.rsquared">
 <code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.rsquared_adj">
 <code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.s2">
 <code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1358,6 +1704,9 @@ values corresponding to the original model specification.</p>
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1365,6 +1714,11 @@ values corresponding to the original model specification.</p>
 <dt id="linearmodels.iv.results.OLSResults.total_ss">
 <code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1440,6 +1794,11 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <dt id="linearmodels.iv.results.OLSResults.wresids">
 <code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1484,12 +1843,22 @@ Default is ‘tstats’.</p></li>
 <dt id="linearmodels.iv.results.IVModelComparison.cov_estimator">
 <code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator descriptions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVModelComparison.estimator_method">
 <code class="descname">estimator_method</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation methods</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1526,6 +1895,11 @@ Default is ‘tstats’.</p></li>
 <dt id="linearmodels.iv.results.IVModelComparison.rsquared_adj">
 <code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficients of determination (R**2)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -1543,6 +1917,9 @@ Default is ‘tstats’.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1619,6 +1996,9 @@ the variable names of the endogenous regressors.</p>
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1068.ga251e4cd4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1659,7 +2039,7 @@ the variable names of the endogenous regressors.</p>
         <li class="right" >
           <a href="methods.html" title="Estimation Methods"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+6.ga659a0b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
