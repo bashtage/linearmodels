@@ -1,10 +1,12 @@
 """
 A data abstraction that allow multiple input data formats
 """
+from typing import Tuple, List, Any, Dict
+
 from linearmodels.compat.pandas import (concat, is_categorical,
                                         is_categorical_dtype, is_numeric_dtype,
                                         is_string_dtype, is_string_like)
-
+from linearmodels.typing.data import ArrayLike
 import copy
 
 import numpy as np
@@ -44,7 +46,8 @@ class IVData(object):
         Flag indicating to drop first dummy category
     """
 
-    def __init__(self, x, var_name='x', nobs=None, convert_dummies=True, drop_first=True):
+    def __init__(self, x: ArrayLike, var_name: str = 'x', nobs: int = None,
+                 convert_dummies: bool = True, drop_first: bool = True):
 
         if isinstance(x, IVData):
             self.__dict__.update(copy.deepcopy(x.__dict__))
@@ -71,7 +74,8 @@ class IVData(object):
             else:
                 cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
             self._pandas = pd.DataFrame(x, index=index, columns=cols)
-            self._labels = {0: index, 1: cols}
+            self._row_labels = index
+            self._col_labels = cols
 
         elif isinstance(x, (pd.Series, pd.DataFrame)):
             if isinstance(x, pd.Series):
@@ -104,7 +108,8 @@ class IVData(object):
             self._ndarray = np.asarray(self._pandas)
             if all_numeric or convert_dummies:
                 self._ndarray = self._ndarray.astype(np.float64)
-            self._labels = {i: list(label) for i, label in zip(range(x.ndim), x.axes)}
+            self._row_labels = list(x.axes[0])
+            self._col_labels = list(x.axes[1])
 
         else:
             try:
@@ -116,14 +121,14 @@ class IVData(object):
                     x = xr.concat([x], dim=var_name).transpose()
 
                 index = list(x.coords[x.dims[0]].values)
-                cols = x.coords[x.dims[1]].values
-                if is_numeric_dtype(cols.dtype):
-                    cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
-                cols = list(cols)
+                xr_cols = x.coords[x.dims[1]].values
+                if is_numeric_dtype(xr_cols.dtype):
+                    xr_cols = [var_name + '.{0}'.format(i) for i in range(x.shape[1])]
+                xr_cols = list(xr_cols)
                 self._ndarray = x.values.astype(np.float64)
-                self._pandas = pd.DataFrame(self._ndarray, columns=cols,
-                                            index=index)
-                self._labels = {0: index, 1: cols}
+                self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
+                self._row_labels = index
+                self._col_labels = xr_cols
             else:
                 raise TypeError(type_err)
 
@@ -134,46 +139,46 @@ class IVData(object):
                 raise ValueError(msg)
 
     @property
-    def pandas(self):
+    def pandas(self) -> pd.DataFrame:
         """DataFrame view of data"""
         return self._pandas
 
     @property
-    def ndarray(self):
+    def ndarray(self) -> np.ndarray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple[int, int]:
         """Tuple containing shape"""
         return self._ndarray.shape
 
     @property
-    def ndim(self):
+    def ndim(self) -> int:
         """Number of dimensions"""
         return self._ndarray.ndim
 
     @property
-    def cols(self):
+    def cols(self) -> List[Any]:
         """Column labels"""
-        return self._labels[1]
+        return self._col_labels
 
     @property
-    def rows(self):
+    def rows(self) -> List[Any]:
         """Row labels (index)"""
-        return self._labels[0]
+        return self._row_labels
 
     @property
-    def labels(self):
+    def labels(self) -> Dict[int, Any]:
         """Dictionary containing row and column labels keyed by axis"""
-        return self._labels
+        return {0: self._row_labels, 1: self._col_labels}
 
     @property
-    def isnull(self):
+    def isnull(self) -> pd.Series:
         return np.any(self._pandas.isnull(), axis=1)
 
-    def drop(self, locs):
+    def drop(self, locs) -> None:
         locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
-        self._labels[0] = list(pd.Series(self._labels[0]).loc[~locs])
+        self._row_labels = list(pd.Series(self._row_labels).loc[~locs])

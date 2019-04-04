@@ -4,3 +4,4 @@ scipy>=0.18
 patsy
 statsmodels>=0.8
 cached_property>=1.5.1
+mypy_extensions>=0.4

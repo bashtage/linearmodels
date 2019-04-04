@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 Numeric = Union[int, float]
-OptionalNumeric = Union[int, float, None]
+OptionalNumeric = Optional[Union[int, float]]

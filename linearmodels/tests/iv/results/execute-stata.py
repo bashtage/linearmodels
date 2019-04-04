@@ -63,6 +63,6 @@ with open('temp.do', 'w') as stata:
                 stata.write('\n')
 
 do_file = join(os.getcwd(), 'temp.do')
-cmd = [STATA_PATH, '/e', 'do', do_file]
-print(' '.join(cmd))
-subprocess.call(cmd)
+stata_cmd = [STATA_PATH, '/e', 'do', do_file]
+print(' '.join(stata_cmd))
+subprocess.call(stata_cmd)
