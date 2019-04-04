@@ -1,8 +1,10 @@
 """
 Instrumental variable estimators
 """
+from typing import Dict, Any, Union, Type
+
 from numpy import (any, array, asarray, atleast_2d, average, c_, isscalar,
-                   logical_not, nanmean, ones, ptp, sqrt)
+                   logical_not, nanmean, ones, ptp, sqrt, ndarray, all as npall)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
@@ -19,9 +21,11 @@ from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
                                  OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.typing import Numeric, OptionalNumeric
-from linearmodels.typing.iv import ArrayLike, OptionalArrayLike
+from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
                                   missing_warning)
+
+IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
 
 __all__ = ['COVARIANCE_ESTIMATORS', 'WEIGHT_MATRICES', 'IVGMM', 'IVLIML', 'IV2SLS',
            'IVGMMCUE', '_OLS']
@@ -156,7 +160,7 @@ class IVLIML(object):
             if additional:
                 self._method += '(' + ', '.join(additional) + ')'
         if not hasattr(self, '_result_container'):
-            self._result_container = IVResults
+            self._result_container = IVResults  # type: IVResultType
 
         self._kappa = kappa
         self._fuller = fuller
@@ -172,10 +176,11 @@ class IVLIML(object):
         if endog is None and instruments is None:
             self._result_container = OLSResults
             self._method = 'OLS'
-        self._formula = None
+        self._formula = ''
 
     @staticmethod
-    def from_formula(formula, data, *, weights=None, fuller=0, kappa=None):
+    def from_formula(formula: str, data: DataFrame, *, weights: OptionalArrayLike = None,
+                     fuller: float = 0, kappa: OptionalNumeric = None):
         """
         Parameters
         ----------
@@ -226,7 +231,9 @@ class IVLIML(object):
         mod.formula = formula
         return mod
 
-    def predict(self, params, *, exog=None, endog=None, data=None, eval_env=4):
+    def predict(self, params: ArrayLike, *, exog: OptionalArrayLike = None,
+                endog: OptionalArrayLike = None, data: DataFrame = None,
+                eval_env: int = 4) -> DataFrame:
         """
         Predict values for additional data
 
@@ -273,7 +280,7 @@ class IVLIML(object):
         if exog is not None or endog is not None:
             exog = IVData(exog).pandas
             endog = IVData(endog).pandas
-        else:
+        elif data is not None:
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
@@ -287,12 +294,12 @@ class IVLIML(object):
         return pred
 
     @property
-    def formula(self):
+    def formula(self) -> str:
         """Formula used to create the model"""
         return self._formula
 
     @formula.setter
-    def formula(self, value):
+    def formula(self, value: str):
         """Formula used to create the model"""
         self._formula = value
 
@@ -313,11 +320,11 @@ class IVLIML(object):
                              'full column rank')
         self._has_constant, self._const_loc = has_constant(x)
 
-    def _drop_missing(self):
+    def _drop_missing(self) -> ndarray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing = any(c_[[dh.isnull for dh in data]], 0)
+        missing = any(c_[[dh.isnull for dh in data]], 0)  # type: ndarray
         if any(missing):
-            if all(missing):
+            if npall(missing):
                 raise ValueError('All observations contain missing data. '
                                  'Model cannot be estimated.')
             self.dependent.drop(missing)
@@ -330,7 +337,7 @@ class IVLIML(object):
         return missing
 
     @staticmethod
-    def estimate_parameters(x, y, z, kappa):
+    def estimate_parameters(x: ndarray, y: ndarray, z: ndarray, kappa: Numeric) -> ndarray:
         """
         Parameter estimation without error checking
 
@@ -360,7 +367,7 @@ class IVLIML(object):
         p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
         return inv(p1) @ p2
 
-    def _estimate_kappa(self):
+    def _estimate_kappa(self) -> float:
         y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
         e = c_[y, x[:, ~is_exog]]
@@ -376,7 +383,8 @@ class IVLIML(object):
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
         return min(eigvalsh(q))
 
-    def fit(self, *, cov_type='robust', debiased=False, **cov_config):
+    def fit(self, *, cov_type: str = 'robust', debiased: bool = False,
+            **cov_config: Any):
         """
         Estimate model parameters
 
@@ -424,31 +432,33 @@ class IVLIML(object):
         wy, wx, wz = self._wy, self._wx, self._wz
         liml_kappa = self._estimate_kappa()
         kappa = self._kappa
-        if kappa is None:
-            kappa = liml_kappa
+        if kappa is not None:
+            est_kappa = kappa
+        else:
+            est_kappa = liml_kappa
 
         if self._fuller != 0:
             nobs, ninstr = wz.shape
-            kappa -= self._fuller / (nobs - ninstr)
+            est_kappa -= self._fuller / (nobs - ninstr)
 
-        params = self.estimate_parameters(wx, wy, wz, kappa)
+        params = self.estimate_parameters(wx, wy, wz, est_kappa)
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['debiased'] = debiased
-        cov_config['kappa'] = kappa
+        cov_config['kappa'] = est_kappa
         cov_config_copy = {k: v for k, v in cov_config.items()}
         if 'center' in cov_config_copy:
             del cov_config_copy['center']
         cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config_copy)
 
-        results = {'kappa': kappa,
+        results = {'kappa': est_kappa,
                    'liml_kappa': liml_kappa}
         pe = self._post_estimation(params, cov_estimator, cov_type)
         results.update(pe)
 
         return self._result_container(results, self)
 
-    def wresids(self, params):
+    def wresids(self, params: ndarray):
         """
         Compute weighted model residuals
 
@@ -469,7 +479,7 @@ class IVLIML(object):
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params):
+    def resids(self, params: ndarray):
         """
         Compute model residuals
 
@@ -500,7 +510,7 @@ class IVLIML(object):
         """Locations of observations included in estimation"""
         return logical_not(self._drop_locs)
 
-    def _f_statistic(self, params, cov, debiased):
+    def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
         non_const = ~(ptp(self._x, 0) == 0)
         test_params = params[non_const]
         test_cov = cov[non_const][:, non_const]
@@ -518,7 +528,7 @@ class IVLIML(object):
 
         return wald
 
-    def _post_estimation(self, params, cov_estimator, cov_type):
+    def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
         columns = self._columns
         index = self._index
         eps = self.resids(params)
@@ -608,7 +618,7 @@ class IV2SLS(IVLIML):
                                      weights=weights, fuller=0, kappa=1)
 
     @staticmethod
-    def from_formula(formula, data, *, weights=None):
+    def from_formula(formula: str, data: DataFrame, *, weights: OptionalArrayLike = None):
         """
         Parameters
         ----------
@@ -717,7 +727,8 @@ class IVGMM(IVLIML):
         self._weight_config = self._weight.config
 
     @staticmethod
-    def from_formula(formula, data, *, weights=None, weight_type='robust', **weight_config):
+    def from_formula(formula: str, data: DataFrame, *, weights: OptionalArrayLike = None,
+                     weight_type: str = 'robust', **weight_config: Any):
         """
         Parameters
         ----------
@@ -768,7 +779,7 @@ class IVGMM(IVLIML):
         return mod
 
     @staticmethod
-    def estimate_parameters(x, y, z, w):
+    def estimate_parameters(x: ndarray, y: ndarray, z: ndarray, w: ndarray):
         """
         Parameters
         ----------
@@ -795,8 +806,8 @@ class IVGMM(IVLIML):
         zpy = z.T @ y
         return inv(xpz @ w @ xpz.T) @ (xpz @ w @ zpy)
 
-    def fit(self, *, iter_limit=2, tol=1e-4, initial_weight=None,
-            cov_type='robust', debiased=False, **cov_config):
+    def fit(self, *, iter_limit: int = 2, tol: float = 1e-4, initial_weight: ndarray = None,
+            cov_type: str = 'robust', debiased: bool = False, **cov_config: Any):
         """
         Estimate model parameters
 
@@ -879,7 +890,7 @@ class IVGMM(IVLIML):
 
         return self._result_container(results, self)
 
-    def _gmm_post_estimation(self, params, weight_mat, iters):
+    def _gmm_post_estimation(self, params: ndarray, weight_mat: ndarray, iters: int):
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
         gmm_specific = {'weight_mat': DataFrame(weight_mat, columns=instr, index=instr),
@@ -890,7 +901,7 @@ class IVGMM(IVLIML):
 
         return gmm_specific
 
-    def _j_statistic(self, params, weight_mat):
+    def _j_statistic(self, params: ndarray, weight_mat: ndarray):
         """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
@@ -961,7 +972,8 @@ class IVGMMCUE(IVGMM):
             weight_config['center'] = True
 
     @staticmethod
-    def from_formula(formula, data, *, weights=None, weight_type='robust', **weight_config):
+    def from_formula(formula: str, data: DataFrame, *, weights: OptionalArrayLike = None,
+                     weight_type: str = 'robust', **weight_config: Any):
         """
         Parameters
         ----------
@@ -1010,7 +1022,7 @@ class IVGMMCUE(IVGMM):
         mod.formula = formula
         return mod
 
-    def j(self, params, x, y, z):
+    def j(self, params: ndarray, x: ndarray, y: ndarray, z: ndarray):
         r"""
         Optimization target
 
@@ -1055,7 +1067,8 @@ class IVGMMCUE(IVGMM):
         g_bar = (z * eps).mean(0)
         return nobs * g_bar.T @ w @ g_bar.T
 
-    def estimate_parameters(self, starting, x, y, z, display=False, opt_options=None):
+    def estimate_parameters(self, starting: ndarray, x: ndarray, y: ndarray, z: ndarray,
+                            display: bool = False, opt_options: Dict[str, Any] = None):
         r"""
         Parameters
         ----------
@@ -1098,8 +1111,9 @@ class IVGMMCUE(IVGMM):
 
         return res.x[:, None], res.nit
 
-    def fit(self, *, starting=None, display=False, cov_type='robust', debiased=False,
-            opt_options=None, **cov_config):
+    def fit(self, *, starting: ndarray = None, display: bool = False, cov_type: str = 'robust',
+            debiased: bool = False, opt_options: Dict[str, Any] = None,
+            **cov_config: Any):
         r"""
         Estimate model parameters
 

@@ -1,4 +1,8 @@
+from typing import Dict, Tuple
+from linearmodels.typing.data import OptionalDataFrame
+from numpy import ndarray
 import numpy as np
+from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 
@@ -15,7 +19,7 @@ The original Patsy error was:
 """
 
 
-def proj(y, x):
+def proj(y: ndarray, x: ndarray) -> ndarray:
     """
     Projection of y on x from y
 
@@ -34,7 +38,7 @@ def proj(y, x):
     return x @ (np.linalg.pinv(x) @ y)
 
 
-def annihilate(y, x):
+def annihilate(y: ndarray, x: ndarray) -> ndarray:
     """
     Remove projection of y on x from y
 
@@ -71,12 +75,12 @@ class IVFormulaParser(object):
     The general structure of a formula is `dep ~ exog + [endog ~ instr]`
     """
 
-    def __init__(self, formula, data, eval_env=2):
+    def __init__(self, formula: str, data: DataFrame, eval_env: int = 2):
         self._formula = formula
         self._data = data
         self._na_action = NAAction(on_NA='raise', NA_types=[])
         self._eval_env = eval_env
-        self._components = {}
+        self._components = {}  # type: Dict[str, str]
         self._parse()
 
     def _parse(self):
@@ -115,16 +119,16 @@ class IVFormulaParser(object):
         self._components = comp
 
     @property
-    def eval_env(self):
+    def eval_env(self) -> int:
         """Set or get the eval env depth"""
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value):
+    def eval_env(self, value: int):
         self._eval_env = value
 
     @property
-    def data(self):
+    def data(self) -> Tuple[OptionalDataFrame, ...]:
         """Returns a tuple containing the dependent, exog, endog and instruments"""
         self._eval_env += 1
         out = self.dependent, self.exog, self.endog, self.instruments
@@ -132,7 +136,7 @@ class IVFormulaParser(object):
         return out
 
     @property
-    def dependent(self):
+    def dependent(self) -> DataFrame:
         """Dependent variable"""
         dep = self.components['dependent']
         dep = dmatrix('0 + ' + dep, self._data, eval_env=self._eval_env,
@@ -140,7 +144,7 @@ class IVFormulaParser(object):
         return dep
 
     @property
-    def exog(self):
+    def exog(self) -> OptionalDataFrame:
         """Exogenous variables"""
         exog = self.components['exog']
         exog = dmatrix(exog, self._data, eval_env=self._eval_env,
@@ -148,7 +152,7 @@ class IVFormulaParser(object):
         return self._empty_check(exog)
 
     @property
-    def endog(self):
+    def endog(self) -> OptionalDataFrame:
         """Endogenous variables"""
         endog = self.components['endog']
         endog = dmatrix('0 + ' + endog, self._data, eval_env=self._eval_env,
@@ -156,7 +160,7 @@ class IVFormulaParser(object):
         return self._empty_check(endog)
 
     @property
-    def instruments(self):
+    def instruments(self) -> OptionalDataFrame:
         """Instruments"""
         instr = self.components['instruments']
         instr = dmatrix('0 + ' + instr, self._data, eval_env=self._eval_env,
@@ -165,10 +169,10 @@ class IVFormulaParser(object):
         return self._empty_check(instr)
 
     @property
-    def components(self):
+    def components(self) -> Dict[str, str]:
         """Dictionary containing the string components of the formula"""
         return self._components
 
     @staticmethod
-    def _empty_check(arr):
+    def _empty_check(arr: DataFrame) -> OptionalDataFrame:
         return None if arr.shape[1] == 0 else arr

@@ -384,7 +384,7 @@ class _ModelComparison(_SummaryStr):
     """
     Base class for model comparisons
     """
-    _supported = tuple([])
+    _supported = tuple()
     _PRECISION_TYPES = {'tstats': 'T-stats',
                         'pvalues': 'P-values',
                         'std_errors': 'Std. Errors'}

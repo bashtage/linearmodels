@@ -30,7 +30,7 @@ configs = {'xtreg {vars}, be vce(conventional)': 'between-conventional-',
            'regress {vars} [aweight=w], vce(robust)': 'pooled-robust-weighted',
            'regress {vars} [aweight=w], vce(cluster firm_id)': 'pooled-cluster-weighted'}
 
-od = OrderedDict()
+od = OrderedDict()  # type: OrderedDict
 for key in sorted(configs.keys()):
     od[key] = configs[key]
 
