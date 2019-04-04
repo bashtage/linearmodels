@@ -1202,8 +1202,7 @@ class PanelOLS(PooledOLS):
         return True  # Default case for 2-way -- not completely clear
 
     def fit(self, *, use_lsdv=False, use_lsmr=False, low_memory=None, cov_type='unadjusted',
-            debiased=True,
-            auto_df=True, count_effects=True, **cov_config):
+            debiased=True, auto_df=True, count_effects=True, **cov_config):
         """
         Estimate model parameters
 

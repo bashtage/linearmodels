@@ -1,10 +1,10 @@
 """
 Instrumental variable estimators
 """
-from typing import Dict, Any, Union, Type
+from typing import Any, Dict, Type, Union
 
-from numpy import (any, array, asarray, atleast_2d, average, c_, isscalar,
-                   logical_not, nanmean, ones, ptp, sqrt, ndarray, all as npall)
+from numpy import (all as npall, any, array, asarray, atleast_2d, average, c_,
+                   isscalar, logical_not, nanmean, ndarray, ones, ptp, sqrt)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize

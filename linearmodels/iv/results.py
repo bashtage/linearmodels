@@ -1,14 +1,14 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
-from typing import Union, Dict, Any, List
-
 from linearmodels.compat.statsmodels import Summary
 
 from collections import OrderedDict
 import datetime as dt
+from typing import Any, Dict, List, Union
+
 from cached_property import cached_property
-from numpy import array, c_, diag, empty, log, ones, sqrt, zeros, ndarray
+from numpy import array, c_, diag, empty, log, ndarray, ones, sqrt, zeros
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
 import scipy.stats as stats

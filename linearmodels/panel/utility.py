@@ -81,7 +81,8 @@ def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, preconditi
         * 'array' - dense numpy ndarray
 
     drop: {'first', 'last'}
-        Exclude either the first or last category
+        Exclude either the first or last category. This only applies when
+        cats contains more than one column, unless `drop_all` is True.
     drop_all : bool
         Flag indicating whether all sets of dummies should exclude one category
     precondition : bool

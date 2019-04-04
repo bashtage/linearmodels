@@ -1,10 +1,12 @@
 from typing import Dict, Tuple
-from linearmodels.typing.data import OptionalDataFrame
-from numpy import ndarray
+
 import numpy as np
+from numpy import ndarray
 from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
+
+from linearmodels.typing.data import OptionalDataFrame
 
 PARSING_ERROR = """
 Conversion of formula blocks to DataFrames using patsy failed.

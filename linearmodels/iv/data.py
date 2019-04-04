@@ -1,16 +1,26 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from typing import Tuple, List, Any, Dict
-
 from linearmodels.compat.pandas import (concat, is_categorical,
                                         is_categorical_dtype, is_numeric_dtype,
                                         is_string_dtype, is_string_like)
-from linearmodels.typing.data import ArrayLike
+
 import copy
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+
+from linearmodels.typing.data import ArrayLike
+
+iv_data_types = (np.ndarray, pd.DataFrame, pd.Series)
+try:
+    import xarray as xr
+
+    HAS_XARRAY = True
+    iv_data_types = iv_data_types + (xr.DataArray,)
+except ImportError:
+    HAS_XARRAY = False
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are supported'
