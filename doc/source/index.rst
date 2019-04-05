@@ -54,6 +54,7 @@ Estimation and inference in some common linear models:
    panel/index
    asset-pricing/index
    system/index
+   absorbing/index
    utility
    plan
    contributing
