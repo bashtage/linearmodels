@@ -186,7 +186,7 @@ class OLSResults(_SummaryStr):
     @property
     def nobs(self) -> int:
         """Number of observations"""
-        return self.model.endog.shape[0]
+        return self.model.dependent.shape[0]
 
     @property
     def df_resid(self) -> int:

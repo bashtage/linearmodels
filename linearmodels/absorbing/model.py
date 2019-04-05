@@ -1,21 +1,24 @@
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import is_categorical, to_numpy
 
-from typing import Iterable, List, Union
+from typing import Any, Iterable, List, Union
 
-from numpy import (column_stack, dtype, empty, int8, int16, int32, int64,
-                   ndarray, zeros)
-from numpy.linalg import matrix_rank
+from numpy import (asarray, average, column_stack, dtype, empty, int8, int16,
+                   int32, int64, ndarray, ones, sqrt, zeros)
+from numpy.linalg import inv, matrix_rank
 from pandas import Categorical, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
 
 from linearmodels.iv.data import IVData
+from linearmodels.iv.model import COVARIANCE_ESTIMATORS
+from linearmodels.iv.results import OLSResults
 from linearmodels.panel.model import AbsorbingEffectError, absorbing_error_msg
 from linearmodels.panel.utility import dummy_matrix, preconditioner
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+from linearmodels.utility import WaldTestStatistic
 
 SCALAR_DTYPES = {'int8': int8, 'int16': int16, 'int32': int32, 'int64': int64}
 
@@ -52,8 +55,8 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, **lsmr_options) -> ndarray:
     default_opts.update(lsmr_options)
     resids = []
     for i in range(y.shape[1]):
-        beta = lsmr(x, y, **default_opts)[0]
-        resid = y - (x.dot(csc_matrix(beta[:, None]))).A
+        beta = lsmr(x, y[:, i:i + 1], **default_opts)[0]
+        resid = y[:, i:i + 1] - (x.dot(csc_matrix(beta[:, None]))).A
         resids.append(resid)
 
     return column_stack(resids)
@@ -310,25 +313,40 @@ class AbsorbingLS(object):
     """
     def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike = None,
                  absorb: InteractionVar = None,
-                 interactions: Union[InteractionVar, Iterable[InteractionVar]] = None):
+                 interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
+                 weights: OptionalArrayLike = None):
 
         self._dependent = IVData(dependent, 'dependent')
+        nobs = self._dependent.shape[0]
         self._exog = IVData(exog, 'exog')
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
             self._absorb_inter = Interaction.from_frame(absorb)
         elif absorb is None:
-            self._absorb_inter = Interaction(None, None, self._dependent.shape[0])
+            self._absorb_inter = Interaction(None, None, nobs)
         elif isinstance(absorb, Interaction):
             self._absorb_inter = absorb
         else:
-            raise TypeError('absort must ba a DataFrame or an Interaction')
+            raise TypeError('absorb must ba a DataFrame or an Interaction')
+        if weights is None:
+            nobs = self._dependent.shape[0]
+            self._weights = IVData(ones(nobs), 'weights')
+        else:
+            self._weights = IVData(weights, 'weights')
 
         self._interactions = interactions
         self._interaction_list = []  # type: List[Interaction]
         self._prepare_interactions()
         self._absorbed_dependent = None
         self._absorbed_exog = None
+        self._x = None
+
+        self._columns = self._exog.cols
+        self._index = self._dependent.rows
+        self._method = 'OLS'
+        self._original_index = self._dependent.pandas.index
+        # TODO: check formally
+        self._has_constant = True
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -368,6 +386,26 @@ class AbsorbingLS(object):
             return self._absorbed_exog
         raise RuntimeError('fit must be called once before absorbed_exog is available')
 
+    @property
+    def weights(self):
+        return self._weights
+
+    @property
+    def dependent(self):
+        return self._dependent
+
+    @property
+    def exog(self):
+        return self._exog
+
+    @property
+    def has_constant(self):
+        return self._has_constant
+
+    @property
+    def instruments(self):
+        return IVData(None, 'instrument', nobs=self._dependent.shape[0])
+
     def _prepare_interactions(self):
         if self._interactions is None:
             return
@@ -384,7 +422,55 @@ class AbsorbingLS(object):
                 else:
                     raise TypeError('interactions must contain DataFrames or Interactions')
 
-    def fit(self, lsmr_options: dict = None):
+    def fit(self, *, cov_type: str = 'robust', debiased: bool = False, lsmr_options: dict = None,
+            **cov_config: Any):
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        cov_type : str, optional
+            Name of covariance estimator to use. Supported covariance
+            estimators are:
+
+            * 'unadjusted', 'homoskedastic' - Classic homoskedastic inference
+            * 'robust', 'heteroskedastic' - Heteroskedasticity robust inference
+            * 'kernel' - Heteroskedasticity and autocorrelation robust
+              inference
+            * 'cluster' - One-way cluster dependent inference.
+              Heteroskedasticity robust
+
+        debiased : bool, optional
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
+        **cov_config
+            Additional parameters to pass to covariance estimator. The list
+            of optional parameters differ according to ``cov_type``. See
+            the documentation of the alternative covariance estimators for
+            the complete list of available commands.
+        lsmr_options: dict
+            Dictionary of options to pass to scipy.sparse.linalg.lsmr
+
+        Returns
+        -------
+        results : OLSResults
+            Results container
+
+        Notes
+        -----
+        Additional covariance parameters depend on specific covariance used.
+        The see the docstring of specific covariance estimator for a list of
+        supported options. Defaults are used if no covariance configuration
+        is provided.
+
+        See also
+        --------
+        linearmodels.iv.covariance.HomoskedasticCovariance
+        linearmodels.iv.covariance.HeteroskedasticCovariance
+        linearmodels.iv.covariance.KernelCovariance
+        linearmodels.iv.covariance.ClusteredCovariance
+        """
+
         # Build regressor matrix
         regressors = []
         if self._absorb is not None:
@@ -412,17 +498,115 @@ class AbsorbingLS(object):
                                              columns=self._dependent.pandas.columns)
         self._absorbed_exog = DataFrame(exog_resid, index=self._exog.pandas.index,
                                         columns=self._exog.pandas.columns)
+        self._x = self._absorbed_exog
         if self._exog is None:
             # TODO early return, only absorbed
-            return np.empty((0,))
+            params = np.empty((0,))
+        else:
+            if matrix_rank(dep_resid) < dep_resid.shape[1]:
+                # TODO: Refactor algo to find absorbed from panel
+                # TODO: Move error to common location
+                msg = absorbing_error_msg.format(absorbed_variables='unknown')
+                raise AbsorbingEffectError(msg)
+            params = lstsq(exog_resid, dep_resid)[0]
 
-        if matrix_rank(dep_resid) < dep_resid.shape[1]:
-            # TODO: Refactor algo to find absorbed from panel
-            # TODO: Move error to common location
-            msg = absorbing_error_msg.format(absorbed_variables='unknown')
-            raise AbsorbingEffectError(msg)
-        b = lstsq(exog_resid, dep_resid)[0]
-        return b
+        cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
+        cov_config['debiased'] = debiased
+        cov_config['kappa'] = 0.0
+        cov_config_copy = {k: v for k, v in cov_config.items()}
+        if 'center' in cov_config_copy:
+            del cov_config_copy['center']
+        cov_estimator = cov_estimator(exog_resid, dep_resid, dep_resid, params, **cov_config_copy)
+
+        results = {'kappa': 0.0,
+                   'liml_kappa': 0.0}
+        pe = self._post_estimation(params, cov_estimator, cov_type)
+        results.update(pe)
+
+        return OLSResults(results, self)
+
+    def resids(self, params: ndarray):
+        """
+        Compute model residuals
+
+        Parameters
+        ----------
+        params : ndarray
+            Model parameters (nvar by 1)
+
+        Returns
+        -------
+        resids : ndarray
+            Model residuals
+        """
+        return to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
+
+    def wresids(self, params: ndarray):
+        # TODO: weights
+        return self.resids(params)
+
+    def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
+        # TODO: Constant
+        # non_const = ~(ptp(self._x, 0) == 0)
+        test_params = params  # [non_const]
+        test_cov = cov  # [non_const][:, non_const]
+        test_stat = test_params.T @ inv(test_cov) @ test_params
+        test_stat = float(test_stat)
+        nobs, nvar = self._absorbed_exog.shape
+        null = 'All parameters ex. constant are zero'
+        name = 'Model F-statistic'
+        df = test_params.shape[0]
+        if debiased:
+            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar,
+                                     name=name)
+        else:
+            wald = WaldTestStatistic(test_stat, null, df, name=name)
+
+        return wald
+
+    def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
+        columns = self._columns
+        index = self._index
+        eps = self.resids(params)
+        y = self._absorbed_dependent
+        # TODO: save effects
+        # TODO: effects in fitted? self._effects
+        fitted = DataFrame(asarray(y) - eps, y.index, ['fitted_values'])
+        weps = self.wresids(params)
+        cov = cov_estimator.cov
+        debiased = cov_estimator.debiased
+
+        residual_ss = (weps.T @ weps)
+
+        w = self.weights.ndarray
+        e = self._dependent.ndarray * sqrt(w)
+        if True:  # self.has_constant: TODO: constant
+            e = e - sqrt(self.weights.ndarray) * average(self._dependent.ndarray, weights=w)
+
+        total_ss = float(e.T @ e)
+        r2 = 1 - residual_ss / total_ss
+
+        fstat = self._f_statistic(params, cov, debiased)
+        out = {'params': Series(params.squeeze(), columns, name='parameter'),
+               'eps': Series(eps.squeeze(), index=index, name='residual'),
+               'weps': Series(weps.squeeze(), index=index, name='weighted residual'),
+               'cov': DataFrame(cov, columns=columns, index=columns),
+               's2': float(cov_estimator.s2),
+               'debiased': debiased,
+               'residual_ss': float(residual_ss),
+               'total_ss': float(total_ss),
+               'r2': float(r2),
+               'fstat': fstat,
+               'vars': columns,
+               'instruments': [],
+               'cov_config': cov_estimator.config,
+               'cov_type': cov_type,
+               'method': self._method,
+               'cov_estimator': cov_estimator,
+               'fitted': fitted,
+               'original_index': self._original_index}
+
+        return out
 
 
 if __name__ == '__main__':
@@ -438,15 +622,16 @@ if __name__ == '__main__':
     import numpy as np
     import pandas as pd
 
-    n = 5000000
+    n = 50000
     rs = np.random.RandomState(0)
     cats = pd.concat([pd.Series(pd.Categorical(rs.randint(n // 7, size=n)))], 1)
     effects = rs.standard_normal((n, 1))
-    x = pd.DataFrame(rs.standard_normal((n, 1)))
+    x = pd.DataFrame(rs.standard_normal((n, 3)))
     y = pd.DataFrame(
-        x.to_numpy() + rs.standard_normal((n, 1)) + effects[cats.to_numpy().squeeze()])
+        x.to_numpy().sum(1)[:, None] + rs.standard_normal((n, 1)) + effects[
+            cats.to_numpy().squeeze()])
 
     ia = pd.concat([pd.Series(rs.standard_normal((n))),
                     pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
     mod = AbsorbingLS(y, x, cats, ia)
-    print(mod.fit({'show': True}))
+    print(mod.fit(lsmr_options={'show': True}))
