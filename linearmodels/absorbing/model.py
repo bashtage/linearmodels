@@ -1,16 +1,19 @@
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import is_categorical, to_numpy
 
+from collections import defaultdict
+from hashlib import sha1
 from typing import Any, Iterable, List, Union
 
 from numpy import (asarray, average, column_stack, dtype, empty, int8, int16,
                    int32, int64, ndarray, ones, sqrt, zeros)
-from numpy.linalg import inv, matrix_rank
+from numpy.linalg import matrix_rank
 from pandas import Categorical, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
 
+from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import COVARIANCE_ESTIMATORS
 from linearmodels.iv.results import OLSResults
@@ -18,12 +21,19 @@ from linearmodels.panel.model import AbsorbingEffectError, absorbing_error_msg
 from linearmodels.panel.utility import dummy_matrix, preconditioner
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
-from linearmodels.utility import WaldTestStatistic
 
 SCALAR_DTYPES = {'int8': int8, 'int16': int16, 'int32': int32, 'int64': int64}
 
+_VARIABLE_CACHE = defaultdict(dict)
 
-def lsmr_annihilate(x: csc_matrix, y: ndarray, **lsmr_options) -> ndarray:
+
+def clear_cache():
+    """Clear the variable cache"""
+    for key in _VARIABLE_CACHE:
+        del _VARIABLE_CACHE[key]
+
+
+def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_options) -> ndarray:
     r"""
     Removes projection of x on y from y
 
@@ -33,6 +43,9 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, **lsmr_options) -> ndarray:
         Sparse array of regressors
     y : ndarray
         Array with shape (nobs, nvar)
+    use_cache : bool
+        Flag indicating whether results should be stored in the cache,
+        and retrieved if available.
     lsmr_options: dict
         Dictionary of options to pass to scipy.sparse.linalg.lsmr
 
@@ -51,12 +64,36 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, **lsmr_options) -> ndarray:
 
     where :math:`\hat{\beta}` is computed using lsmr.
     """
+
+    check_cache = False
+    regressor_hash = ''
+
+    if use_cache:
+        hasher = sha1()
+        hasher.update(x.data.data)
+        hasher.update(x.indptr.data)
+        hasher.update(x.indptr.data)
+        regressor_hash = hasher.hexdigest()
+        check_cache = regressor_hash in _VARIABLE_CACHE
+
     default_opts = dict(atol=1e-8, btol=1e-8, show=False)
     default_opts.update(lsmr_options)
     resids = []
     for i in range(y.shape[1]):
-        beta = lsmr(x, y[:, i:i + 1], **default_opts)[0]
-        resid = y[:, i:i + 1] - (x.dot(csc_matrix(beta[:, None]))).A
+        _y = y[:, i:i + 1]
+
+        variable_digest = ''
+        if check_cache:
+            hasher = sha1()
+            hasher.update(_y.data)
+            variable_digest = hasher.hexdigest()
+
+        if check_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
+            resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
+        else:
+            beta = lsmr(x, _y, **default_opts)[0]
+            resid = y[:, i:i + 1] - (x.dot(csc_matrix(beta[:, None]))).A
+            _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
 
     return column_stack(resids)
@@ -311,6 +348,7 @@ class AbsorbingLS(object):
 
     TODO
     """
+
     def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike = None,
                  absorb: InteractionVar = None,
                  interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
@@ -347,6 +385,8 @@ class AbsorbingLS(object):
         self._original_index = self._dependent.pandas.index
         # TODO: check formally
         self._has_constant = True
+        self._nobs = self._dependent.shape[0]
+        self._num_params = 0
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -423,7 +463,7 @@ class AbsorbingLS(object):
                     raise TypeError('interactions must contain DataFrames or Interactions')
 
     def fit(self, *, cov_type: str = 'robust', debiased: bool = False, lsmr_options: dict = None,
-            **cov_config: Any):
+            use_cache: bool = True, **cov_config: Any):
         """
         Estimate model parameters
 
@@ -448,8 +488,14 @@ class AbsorbingLS(object):
             of optional parameters differ according to ``cov_type``. See
             the documentation of the alternative covariance estimators for
             the complete list of available commands.
-        lsmr_options: dict
+        lsmr_options : dict
             Dictionary of options to pass to scipy.sparse.linalg.lsmr
+        use_cache : bool
+            Flag indicating whether the variables, once purged from the
+            absorbed variables and interactions, should be stored in the cache,
+            and retrieved if available. Cache can dramatically speed up
+            re-fitting large models when the set of absorbed variables and
+            interactions are identical.
 
         Returns
         -------
@@ -485,9 +531,9 @@ class AbsorbingLS(object):
         lsmr_options = {} if lsmr_options is None else lsmr_options
         if regressors:
             absorb_x = sp.hstack(regressors)
-            dep_resid = lsmr_annihilate(absorb_x, dep, **lsmr_options)
+            dep_resid = lsmr_annihilate(absorb_x, dep, use_cache, **lsmr_options)
             if self._exog is not None:
-                exog_resid = lsmr_annihilate(absorb_x, exog, **lsmr_options)
+                exog_resid = lsmr_annihilate(absorb_x, exog, use_cache, **lsmr_options)
             else:
                 exog_resid = empty((dep_resid.shape[0], 0))
         else:
@@ -501,7 +547,7 @@ class AbsorbingLS(object):
         self._x = self._absorbed_exog
         if self._exog is None:
             # TODO early return, only absorbed
-            params = np.empty((0,))
+            params = empty((0,))
         else:
             if matrix_rank(dep_resid) < dep_resid.shape[1]:
                 # TODO: Refactor algo to find absorbed from panel
@@ -509,6 +555,7 @@ class AbsorbingLS(object):
                 msg = absorbing_error_msg.format(absorbed_variables='unknown')
                 raise AbsorbingEffectError(msg)
             params = lstsq(exog_resid, dep_resid)[0]
+            self._num_params += dep_resid.shape[1]
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['debiased'] = debiased
@@ -546,23 +593,10 @@ class AbsorbingLS(object):
         return self.resids(params)
 
     def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
-        # TODO: Constant
-        # non_const = ~(ptp(self._x, 0) == 0)
-        test_params = params  # [non_const]
-        test_cov = cov  # [non_const][:, non_const]
-        test_stat = test_params.T @ inv(test_cov) @ test_params
-        test_stat = float(test_stat)
-        nobs, nvar = self._absorbed_exog.shape
-        null = 'All parameters ex. constant are zero'
-        name = 'Model F-statistic'
-        df = test_params.shape[0]
-        if debiased:
-            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar,
-                                     name=name)
-        else:
-            wald = WaldTestStatistic(test_stat, null, df, name=name)
+        const_loc = find_constant(self._exog.ndarray)
+        resid_df = self._nobs - self._num_params
 
-        return wald
+        return f_statistic(params, cov, debiased, resid_df, const_loc)
 
     def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
         columns = self._columns
@@ -622,7 +656,7 @@ if __name__ == '__main__':
     import numpy as np
     import pandas as pd
 
-    n = 50000
+    n = 1000000
     rs = np.random.RandomState(0)
     cats = pd.concat([pd.Series(pd.Categorical(rs.randint(n // 7, size=n)))], 1)
     effects = rs.standard_normal((n, 1))
@@ -634,4 +668,5 @@ if __name__ == '__main__':
     ia = pd.concat([pd.Series(rs.standard_normal((n))),
                     pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
     mod = AbsorbingLS(y, x, cats, ia)
+    print(mod.fit(lsmr_options={'show': True}))
     print(mod.fit(lsmr_options={'show': True}))

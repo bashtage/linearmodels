@@ -4,12 +4,13 @@ Instrumental variable estimators
 from typing import Any, Dict, Type, Union
 
 from numpy import (all as npall, any, array, asarray, atleast_2d, average, c_,
-                   isscalar, logical_not, nanmean, ndarray, ones, ptp, sqrt)
+                   isscalar, logical_not, nanmean, ndarray, ones, sqrt)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (ClusteredCovariance,
                                         HeteroskedasticCovariance,
                                         HomoskedasticCovariance,
@@ -511,22 +512,9 @@ class IVLIML(object):
         return logical_not(self._drop_locs)
 
     def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
-        non_const = ~(ptp(self._x, 0) == 0)
-        test_params = params[non_const]
-        test_cov = cov[non_const][:, non_const]
-        test_stat = test_params.T @ inv(test_cov) @ test_params
-        test_stat = float(test_stat)
+        const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
-        null = 'All parameters ex. constant are zero'
-        name = 'Model F-statistic'
-        df = test_params.shape[0]
-        if debiased:
-            wald = WaldTestStatistic(test_stat / df, null, df, nobs - nvar,
-                                     name=name)
-        else:
-            wald = WaldTestStatistic(test_stat, null, df, name=name)
-
-        return wald
+        return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
         columns = self._columns
