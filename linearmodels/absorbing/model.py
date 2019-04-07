@@ -1,8 +1,7 @@
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import is_categorical, to_numpy
+from linearmodels.compat.pandas import is_categorical, to_numpy, get_codes
 
 from collections import defaultdict
-from hashlib import sha1
 from typing import Any, Iterable, List, Union
 
 from numpy import (asarray, average, column_stack, dtype, empty, int8, int16,
@@ -21,6 +20,11 @@ from linearmodels.panel.model import AbsorbingEffectError, absorbing_error_msg
 from linearmodels.panel.utility import dummy_matrix, preconditioner
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+
+try:
+    from xxhash import xxh64 as hash_func
+except ImportError:
+    from hashlib import sha1 as hash_func
 
 SCALAR_DTYPES = {'int8': int8, 'int16': int16, 'int32': int32, 'int64': int64}
 
@@ -69,7 +73,7 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_op
     regressor_hash = ''
 
     if use_cache:
-        hasher = sha1()
+        hasher = hash_func()
         hasher.update(x.data.data)
         hasher.update(x.indptr.data)
         hasher.update(x.indptr.data)
@@ -84,7 +88,7 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_op
 
         variable_digest = ''
         if check_cache:
-            hasher = sha1()
+            hasher = hash_func()
             hasher.update(_y.data)
             variable_digest = hasher.hexdigest()
 
@@ -123,7 +127,7 @@ def category_product(cats: AnyPandas) -> Series:
         if not is_categorical(cats[c]):
             raise TypeError('cats must contain only categorical variables')
         col = cats[c]
-        max_code = col.cat.codes.max()
+        max_code = get_codes(col.cat).max()
         size = 1
         while max_code >= 2 ** size:
             size += 1
@@ -138,7 +142,7 @@ def category_product(cats: AnyPandas) -> Series:
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
     for i, col in enumerate(cats):
-        codes += (cats[col].cat.codes.astype(dtype_val) << SCALAR_DTYPES[dtype_str](cum_size))
+        codes += (get_codes(cats[col].cat).astype(dtype_val) << SCALAR_DTYPES[dtype_str](cum_size))
         cum_size += sizes[i]
     return Series(Categorical(codes), index=cats.index)
 
@@ -155,7 +159,7 @@ def category_interaction(cat: Series) -> csc_matrix:
     dummies : csc_matrix
         Sparse matrix of dummies with unit column norm
     """
-    codes = category_product(cat).cat.codes
+    codes = get_codes(category_product(cat).cat)
     return dummy_matrix(codes[:, None])[0]
 
 
@@ -173,7 +177,7 @@ def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas) -> csc_matr
     interact : csc_matrix
         Sparse matrix of dummy interactions with unit column norm
     """
-    codes = category_product(cat).cat.codes
+    codes = get_codes(category_product(cat).cat)
     dummies = dummy_matrix(codes[:, None], precondition=False)[0]
     dummies.data[:] = to_numpy(cont).flat
     return preconditioner(dummies)[0]
@@ -185,7 +189,7 @@ class Interaction(object):
 
     Parameters
     ----------
-    cats : {ndarray, Series, DataFrame, DataArray}, optional
+    cat : {ndarray, Series, DataFrame, DataArray}, optional
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
         are converted to Categorical Series, column-by-column. cats has
@@ -301,6 +305,27 @@ class Interaction(object):
         else:  # empty interaction
             return csc_matrix(empty((self._cat_data.shape[0], 0)))
 
+    def hash(self):
+        """
+        Construct a hash that will be invariant for any permutation of
+        inputs that produce the same fit when used as regressors"""
+        # Sorted hashes of any categoricals
+        hasher = hash_func()
+        cat_hashes = []
+        cat = self.cat
+        for col in cat:
+            hasher.update(get_codes(self.cat[col].cat).data)
+            cat_hashes.append(hasher.hexdigest())
+            hasher.reset()
+        cat_hashes = tuple(sorted(cat_hashes))
+        hashes = []
+        cont = self.cont
+        for col in cont:
+            hasher.update(to_numpy(cont[col]).data)
+            hashes.append(cat_hashes + (hasher.hexdigest(),))
+            hasher.reset()
+        return sorted(hashes)
+
     @staticmethod
     def from_frame(frame: DataFrame) -> 'Interaction':
         """
@@ -340,6 +365,52 @@ class Interaction(object):
 
 
 InteractionVar = Union[DataFrame, Interaction]
+
+
+class AbsorbingRegressor():
+
+    def __init__(self, *, cat: DataFrame = None, cont: DataFrame = None,
+                 interactions: List[Interaction] = None):
+        self._cat = cat
+        self._cont = cont
+        self._interactions = interactions
+        self._regressors = None
+
+    def hash(self):
+        hashes = []
+        hasher = hash_func()
+        if self._cat is not None:
+            for col in self._cat:
+                hasher.update(get_codes(self._cat[col].cat).data)
+                hashes.append(hasher.hexdigest())
+                hasher.reset()
+        if self._cont is not None:
+            for col in self._cont:
+                hasher.update(to_numpy(self._cont[col]).data)
+                hashes.append(hasher.hexdigest())
+                hasher.reset()
+        for interact in self._interactions:
+            hashes.append(interact.hash())
+        return tuple(sorted(hashes))
+
+    @property
+    def regressors(self) -> csc_matrix:
+        if self._regressors is not None:
+            return self._regressors
+
+        regressors = []
+
+        if self._cat is not None and self._cat.shape[1] > 0:
+            regressors.append(dummy_matrix(self._cat)[0])
+        if self._cont is not None and self._cont.shape[1] > 0:
+            regressors.append(csc_matrix(to_numpy(self._cont)))
+        if self._interactions is not None:
+            regressors.extend([interact.sparse for interact in self._interactions])
+
+        # TODO: This is wrong
+        self._regressors = sp.hstack(regressors)
+
+        return self._regressors
 
 
 class AbsorbingLS(object):
@@ -516,24 +587,16 @@ class AbsorbingLS(object):
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
-
-        # Build regressor matrix
-        regressors = []
-        if self._absorb is not None:
-            if self._absorb_inter.cat.shape[1] > 0:
-                regressors.append(dummy_matrix(self._absorb_inter.cat)[0])
-            if self._absorb_inter.cont.shape[1] > 0:
-                regressors.append(csc_matrix(to_numpy(self._absorb_inter.cont)))
-        if self._interactions is not None:
-            regressors.extend([interact.sparse for interact in self._interaction_list])
+        areg = AbsorbingRegressor(self._absorb_inter.cat, self._absorb_inter.cont,
+                                  self._interaction_list)
+        regressors = areg.regressors
         dep = self._dependent.ndarray
         exog = self._exog.ndarray
         lsmr_options = {} if lsmr_options is None else lsmr_options
-        if regressors:
-            absorb_x = sp.hstack(regressors)
-            dep_resid = lsmr_annihilate(absorb_x, dep, use_cache, **lsmr_options)
+        if regressors.shape[1] > 0:
+            dep_resid = lsmr_annihilate(regressors, dep, use_cache, **lsmr_options)
             if self._exog is not None:
-                exog_resid = lsmr_annihilate(absorb_x, exog, use_cache, **lsmr_options)
+                exog_resid = lsmr_annihilate(regressors, exog, use_cache, **lsmr_options)
             else:
                 exog_resid = empty((dep_resid.shape[0], 0))
         else:
@@ -667,6 +730,8 @@ if __name__ == '__main__':
 
     ia = pd.concat([pd.Series(rs.standard_normal((n))),
                     pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
+    interact = Interaction.from_frame(ia)
+    print(interact.hash())
     mod = AbsorbingLS(y, x, cats, ia)
     print(mod.fit(lsmr_options={'show': True}))
     print(mod.fit(lsmr_options={'show': True}))
