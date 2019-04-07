@@ -1,17 +1,16 @@
-from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import is_categorical, to_numpy, get_codes
-
 from collections import defaultdict
-from typing import Any, Iterable, List, Union
+from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Union
 
+import scipy.sparse as sp
 from numpy import (asarray, average, column_stack, dtype, empty, int8, int16,
-                   int32, int64, ndarray, ones, sqrt, zeros)
+                   int32, int64, nanmean, ndarray, ones, sqrt, zeros)
 from numpy.linalg import matrix_rank
 from pandas import Categorical, DataFrame, Series
-import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
 
+from linearmodels.compat.numpy import lstsq
+from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import COVARIANCE_ESTIMATORS
@@ -28,7 +27,7 @@ except ImportError:
 
 SCALAR_DTYPES = {'int8': int8, 'int16': int16, 'int32': int32, 'int64': int64}
 
-_VARIABLE_CACHE = defaultdict(dict)
+_VARIABLE_CACHE = defaultdict(dict)  # type: DefaultDict[Hashable, Dict[str, ndarray]]
 
 
 def clear_cache():
@@ -37,7 +36,8 @@ def clear_cache():
         del _VARIABLE_CACHE[key]
 
 
-def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_options) -> ndarray:
+def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, x_hash=None,
+                    **lsmr_options) -> ndarray:
     r"""
     Removes projection of x on y from y
 
@@ -50,6 +50,8 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_op
     use_cache : bool
         Flag indicating whether results should be stored in the cache,
         and retrieved if available.
+    x_hash : object
+        Hashable object representing the values in x
     lsmr_options: dict
         Dictionary of options to pass to scipy.sparse.linalg.lsmr
 
@@ -69,16 +71,17 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_op
     where :math:`\hat{\beta}` is computed using lsmr.
     """
 
-    check_cache = False
     regressor_hash = ''
 
     if use_cache:
-        hasher = hash_func()
-        hasher.update(x.data.data)
-        hasher.update(x.indptr.data)
-        hasher.update(x.indptr.data)
-        regressor_hash = hasher.hexdigest()
-        check_cache = regressor_hash in _VARIABLE_CACHE
+        if x_hash is None:
+            hasher = hash_func()
+            hasher.update(x.data.data)
+            hasher.update(x.indptr.data)
+            hasher.update(x.indptr.data)
+            regressor_hash = hasher.hexdigest()
+        else:
+            regressor_hash = x_hash
 
     default_opts = dict(atol=1e-8, btol=1e-8, show=False)
     default_opts.update(lsmr_options)
@@ -87,12 +90,12 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, **lsmr_op
         _y = y[:, i:i + 1]
 
         variable_digest = ''
-        if check_cache:
+        if use_cache:
             hasher = hash_func()
             hasher.update(_y.data)
             variable_digest = hasher.hexdigest()
 
-        if check_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
+        if use_cache and variable_digest in _VARIABLE_CACHE[regressor_hash]:
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
@@ -232,13 +235,18 @@ class Interaction(object):
     _iv_data = IVData(None, 'none', 1)
 
     def __init__(self, cat: OptionalArrayLike = None, cont: OptionalArrayLike = None,
-                 nobs: int = None):
+                 nobs: int = None, weights: OptionalArrayLike = None):
         self._cat = cat
         self._cont = cont
         self._cat_data = self._iv_data
         self._cont_data = self._iv_data
+        self._weights = weights
         self._nobs = nobs
         self._check_data()
+
+    @property
+    def nobs(self):
+        return self._nobs
 
     def _check_data(self):
         cat, cont = self._cat, self._cont
@@ -251,6 +259,7 @@ class Interaction(object):
             else:
                 raise ValueError('nobs must be provided when cat and cont are None')
             return
+        self._nobs = nobs
 
         self._cat_data = IVData(cat, 'cat', nobs=nobs, convert_dummies=False)
         self._cont_data = IVData(cont, 'cont', nobs=nobs, convert_dummies=False)
@@ -261,6 +270,10 @@ class Interaction(object):
         if convert:
             cat_data = DataFrame({col: cat_data[col].astype('category') for col in cat_data})
             self._cat_data = IVData(cat_data, 'cat', convert_dummies=False)
+        self._weight_data = IVData(self._weights, 'weights', nobs=nobs)
+        if self._weight_data.shape[1] > 0:
+            if np.any(self._weight_data <= 0.0):
+                raise ValueError('weights must be all positive')
 
     @property
     def cat(self) -> DataFrame:
@@ -293,18 +306,26 @@ class Interaction(object):
 
         where :math:`|c_i|` is the number distinct categories in column i.
         """
+        sp_weights = None if self._weights is None else sp.spdiags(self._weight_data.ndarray)
+
+        def weight(m):
+            if self._weights is not None:
+                return sp_weights.dot(m)
+            return m
+
         if self.cat.shape[1] and self.cont.shape[1]:
             out = []
             for col in self.cont:
-                out.append(category_continuous_interaction(self.cat, self.cont[col]))
+                out.append(weight(category_continuous_interaction(self.cat, self.cont[col])))
             return sp.hstack(out)
         elif self.cat.shape[1]:
-            return category_interaction(category_product(self.cat))
+            return weight(category_interaction(category_product(self.cat)))
         elif self.cont.shape[1]:
-            return csc_matrix(self._cont_data.ndarray)
+            return weight(csc_matrix(self._cont_data.ndarray))
         else:  # empty interaction
             return csc_matrix(empty((self._cat_data.shape[0], 0)))
 
+    @property
     def hash(self):
         """
         Construct a hash that will be invariant for any permutation of
@@ -314,20 +335,27 @@ class Interaction(object):
         cat_hashes = []
         cat = self.cat
         for col in cat:
-            hasher.update(get_codes(self.cat[col].cat).data)
+            hasher.update(to_numpy(get_codes(self.cat[col].cat)).data)
             cat_hashes.append(hasher.hexdigest())
             hasher.reset()
         cat_hashes = tuple(sorted(cat_hashes))
         hashes = []
         cont = self.cont
+        if self._weights is None:
+            weight_hash = tuple([])
+        else:
+            hasher.update(self._weight_data.ndarray)
+            weight_hash = (hasher.hexdigest(),)
+
         for col in cont:
             hasher.update(to_numpy(cont[col]).data)
-            hashes.append(cat_hashes + (hasher.hexdigest(),))
+            hashes.append(cat_hashes + (hasher.hexdigest(),) + weight_hash)
             hasher.reset()
+
         return sorted(hashes)
 
     @staticmethod
-    def from_frame(frame: DataFrame) -> 'Interaction':
+    def from_frame(frame: DataFrame, weights: DataFrame = None) -> 'Interaction':
         """
         Convenience function the simplifies using a DataFrame
 
@@ -361,7 +389,7 @@ class Interaction(object):
         """
         cat_cols = [col for col in frame if is_categorical(frame[col])]
         cont_cols = [col for col in frame if col not in cat_cols]
-        return Interaction(frame[cat_cols], frame[cont_cols], nobs=frame.shape[0])
+        return Interaction(frame[cat_cols], frame[cont_cols], nobs=frame.shape[0], weights=weights)
 
 
 InteractionVar = Union[DataFrame, Interaction]
@@ -374,30 +402,27 @@ class AbsorbingRegressor():
         self._cat = cat
         self._cont = cont
         self._interactions = interactions
-        self._regressors = None
 
+    @property
     def hash(self):
         hashes = []
         hasher = hash_func()
         if self._cat is not None:
             for col in self._cat:
-                hasher.update(get_codes(self._cat[col].cat).data)
-                hashes.append(hasher.hexdigest())
+                hasher.update(to_numpy(get_codes(self._cat[col].cat)).data)
+                hashes.append((hasher.hexdigest(),))
                 hasher.reset()
         if self._cont is not None:
             for col in self._cont:
                 hasher.update(to_numpy(self._cont[col]).data)
-                hashes.append(hasher.hexdigest())
+                hashes.append((hasher.hexdigest(),))
                 hasher.reset()
         for interact in self._interactions:
-            hashes.append(interact.hash())
+            hashes.extend(interact.hash)
         return tuple(sorted(hashes))
 
     @property
     def regressors(self) -> csc_matrix:
-        if self._regressors is not None:
-            return self._regressors
-
         regressors = []
 
         if self._cat is not None and self._cat.shape[1] > 0:
@@ -407,10 +432,10 @@ class AbsorbingRegressor():
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 
-        # TODO: This is wrong
-        self._regressors = sp.hstack(regressors)
-
-        return self._regressors
+        if regressors:
+            return sp.hstack(regressors)
+        else:
+            return csc_matrix(empty((0, 0)))
 
 
 class AbsorbingLS(object):
@@ -426,7 +451,7 @@ class AbsorbingLS(object):
                  weights: OptionalArrayLike = None):
 
         self._dependent = IVData(dependent, 'dependent')
-        nobs = self._dependent.shape[0]
+        self._nobs = nobs = self._dependent.shape[0]
         self._exog = IVData(exog, 'exog')
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
@@ -437,11 +462,8 @@ class AbsorbingLS(object):
             self._absorb_inter = absorb
         else:
             raise TypeError('absorb must ba a DataFrame or an Interaction')
-        if weights is None:
-            nobs = self._dependent.shape[0]
-            self._weights = IVData(ones(nobs), 'weights')
-        else:
-            self._weights = IVData(weights, 'weights')
+        self._weights = weights
+        self._check_weights()
 
         self._interactions = interactions
         self._interaction_list = []  # type: List[Interaction]
@@ -450,14 +472,42 @@ class AbsorbingLS(object):
         self._absorbed_exog = None
         self._x = None
 
+        self._check_shape()
+        self._original_index = self._dependent.pandas.index
+        self._drop_missing()
         self._columns = self._exog.cols
         self._index = self._dependent.rows
         self._method = 'OLS'
-        self._original_index = self._dependent.pandas.index
         # TODO: check formally
         self._has_constant = True
-        self._nobs = self._dependent.shape[0]
         self._num_params = 0
+
+    def _drop_missing(self):
+        pass
+        # TODO: implement
+
+    def _check_weights(self):
+        if self._weights is None:
+            nobs = self._dependent.shape[0]
+            self._weighted = False
+            self._weight_data = IVData(ones(nobs), 'weights')
+        else:
+            self._weighted = True
+            weights = IVData(self._weights).ndarray
+            weights = weights / nanmean(weights)
+            self._weight_data = IVData(weights, var_name='weights', nobs=self._nobs)
+
+    def _check_shape(self):
+        nobs = self._nobs
+        if self._exog.shape[0] != nobs:
+            raise ValueError('exog and dependent have different number of observations')
+        if self._absorb is not None:
+            if self._absorb_inter.nobs != nobs:
+                raise ValueError('absorb and dependent have different number of observations')
+        for interact in self._interaction_list:
+            if interact.nobs != nobs:
+                raise ValueError('interactions ({0}) and dependent have different number of '
+                                 'observations'.format(str(interact)))
 
     @property
     def absorbed_dependent(self) -> DataFrame:
@@ -499,7 +549,7 @@ class AbsorbingLS(object):
 
     @property
     def weights(self):
-        return self._weights
+        return self._weight_data
 
     @property
     def dependent(self):
@@ -518,18 +568,19 @@ class AbsorbingLS(object):
         return IVData(None, 'instrument', nobs=self._dependent.shape[0])
 
     def _prepare_interactions(self):
+        w = self._weights if self._weighted else None
         if self._interactions is None:
             return
         elif isinstance(self._interactions, DataFrame):
-            self._interaction_list = [Interaction.from_frame(self._interactions)]
+            self._interaction_list = [Interaction.from_frame(self._interactions, weights=w)]
         elif isinstance(self._interactions, Interaction):
-            self._interaction_list = [self._interactions]
+            self._interaction_list = [self._interactions.add_weights(weights=w)]
         else:
             for interact in self._interactions:
                 if isinstance(interact, DataFrame):
-                    self._interaction_list.append(Interaction.from_frame(interact))
+                    self._interaction_list.append(Interaction.from_frame(interact, weights=w))
                 elif isinstance(interact, Interaction):
-                    self._interaction_list.append(interact)
+                    self._interaction_list.append(interact.add_weights(weights=w))
                 else:
                     raise TypeError('interactions must contain DataFrames or Interactions')
 
@@ -587,16 +638,18 @@ class AbsorbingLS(object):
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
-        areg = AbsorbingRegressor(self._absorb_inter.cat, self._absorb_inter.cont,
-                                  self._interaction_list)
+        areg = AbsorbingRegressor(cat=self._absorb_inter.cat, cont=self._absorb_inter.cont,
+                                  interactions=self._interaction_list)
         regressors = areg.regressors
         dep = self._dependent.ndarray
         exog = self._exog.ndarray
         lsmr_options = {} if lsmr_options is None else lsmr_options
         if regressors.shape[1] > 0:
-            dep_resid = lsmr_annihilate(regressors, dep, use_cache, **lsmr_options)
+
+            dep_resid = lsmr_annihilate(regressors, dep, use_cache, areg.hash, **lsmr_options)
             if self._exog is not None:
-                exog_resid = lsmr_annihilate(regressors, exog, use_cache, **lsmr_options)
+                exog_resid = lsmr_annihilate(regressors, exog, use_cache, areg.hash,
+                                             **lsmr_options)
             else:
                 exog_resid = empty((dep_resid.shape[0], 0))
         else:
@@ -731,7 +784,7 @@ if __name__ == '__main__':
     ia = pd.concat([pd.Series(rs.standard_normal((n))),
                     pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
     interact = Interaction.from_frame(ia)
-    print(interact.hash())
+    print(interact.hash)
     mod = AbsorbingLS(y, x, cats, ia)
     print(mod.fit(lsmr_options={'show': True}))
     print(mod.fit(lsmr_options={'show': True}))
