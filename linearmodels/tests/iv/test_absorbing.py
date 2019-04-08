@@ -10,11 +10,13 @@ import pytest
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 
+from linearmodels.iv._utility import annihilate
 from linearmodels.iv.absorbing import (_VARIABLE_CACHE, AbsorbingLS,
                                        AbsorbingRegressor, Interaction,
                                        category_continuous_interaction,
                                        category_interaction, category_product,
                                        clear_cache)
+from linearmodels.iv.model import _OLS
 from linearmodels.panel.utility import dummy_matrix
 from linearmodels.utility import AttrDict
 
@@ -174,7 +176,7 @@ configs = product([0, 3],  # k
                   [0, 1]  # ncont
                   )
 
-configs = [c for c in configs if c[2] or c[5] or c[9]]
+configs = [c for c in configs if (c[2] or c[5] or c[9]) and (c[0] or c[1])]
 id_str = 'k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, ' \
          'cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}'
 ids = [id_str.format(*config) for config in configs]
@@ -185,9 +187,30 @@ def data(request):
     return generate_data(*request.param)
 
 
+configs_ols = product([0, 3],  # k
+                      [False, True],  # constant
+                      [1, 2, 0],  # factors
+                      [50],  # density
+                      [500],  # nobs
+                      [0, 1],  # cont interactions
+                      ['interaction'],  # format
+                      [False],  # singleton
+                      [False, True],  # weighted
+                      [0, 1]  # ncont
+                      )
+
+configs_ols = [c for c in configs_ols if (c[2] or c[5] or c[9]) and (c[0] or c[1])]
+id_str = 'k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, ' \
+         'cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}'
+ids_ols = [id_str.format(*config) for config in configs_ols]
+
+
+@pytest.fixture(scope='module', params=configs_ols, ids=ids_ols)
+def ols_data(request):
+    return generate_data(*request.param)
+
+
 def test_smoke(data):
-    if data.x.shape[1] == 0:
-        return
     mod = AbsorbingLS(data.y, data.x, absorb=data.absorb, interactions=data.interactions,
                       weights=data.weights)
     mod.fit()
@@ -371,4 +394,55 @@ def test_empty_absorbing_regressor():
     assert areg.regressors.shape == (0, 0)
     assert areg.hash == tuple()
 
-# TODO: Check cache works
+
+def test_against_ols(ols_data):
+    # TODO: Weighted
+    mod = AbsorbingLS(ols_data.y, ols_data.x, absorb=ols_data.absorb,
+                      interactions=ols_data.interactions)
+    # weights=ols_data.weights)
+    res = mod.fit()
+    absorb = []
+    has_dummy = False
+    if ols_data.absorb is not None:
+        absorb.append(to_numpy(ols_data.absorb.cont))
+        if ols_data.absorb.cat.shape[1] > 0:
+            absorb.append(dummy_matrix(ols_data.absorb.cat, precondition=False)[0].A)
+        has_dummy = ols_data.absorb.cat.shape[1] > 0
+    if ols_data.interactions is not None:
+        for interact in ols_data.interactions:
+            absorb.append(interact.sparse.A)
+    _x = ols_data.x
+    if absorb:
+        absorb = np.column_stack(absorb)
+        if np.any(np.ptp(_x, 0) == 0) and has_dummy:
+            absorb = annihilate(absorb, np.ones((absorb.shape[0], 1)))
+        rank = np.linalg.matrix_rank(absorb)
+        if rank < absorb.shape[1]:
+            a, b = np.linalg.eig(absorb.T @ absorb)
+            order = np.argsort(a)[::-1]
+            a, b = a[order], b[:, order]
+            z = absorb @ b
+            absorb = z[:, :rank]
+        _x = np.column_stack([_x, absorb])
+    ols_mod = _OLS(ols_data.y, _x)
+    ols_res = ols_mod.fit()
+    p_absorb = res.params
+    p1 = ols_res.params[:res.params.shape[0]]
+    assert_allclose(p_absorb, p1)
+
+
+def test_cache():
+    gen = generate_data(2, True, 2, format='pandas', ncont=0, cont_interactions=1)
+    first = len(_VARIABLE_CACHE)
+    mod = AbsorbingLS(gen.y, gen.x, absorb=gen.absorb.iloc[:, :1], interactions=gen.interactions)
+    mod.fit()
+    second = len(_VARIABLE_CACHE)
+    mod = AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
+    mod.fit()
+    third = len(_VARIABLE_CACHE)
+    assert third - second == 1
+    assert second - first == 1
+    mod = AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
+    mod.fit()
+    fourth = len(_VARIABLE_CACHE)
+    assert fourth - third == 0
