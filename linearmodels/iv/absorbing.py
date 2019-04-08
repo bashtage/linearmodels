@@ -4,7 +4,7 @@ from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Union
 
-from numpy import (any as npany, asarray, ascontiguousarray, average,
+from numpy import (any as npany, arange, asarray, ascontiguousarray, average,
                    column_stack, dtype, empty, empty_like, int8, int16, int32,
                    int64, nanmean, ndarray, ones, ptp, sqrt, where, zeros)
 from numpy.linalg import matrix_rank
@@ -41,9 +41,8 @@ def _reset(hasher):
 
 
 def clear_cache():
-    """Clear the variable cache"""
-    for key in _VARIABLE_CACHE:
-        del _VARIABLE_CACHE[key]
+    """Clear the absorbed variable cache"""
+    _VARIABLE_CACHE.clear()
 
 
 def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, x_hash=None,
@@ -162,12 +161,14 @@ def category_product(cats: AnyPandas) -> Series:
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(cat: Series) -> csc_matrix:
+def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
     """
     Parameters
     ----------
     cat : Series
         Categorical series to convert to dummy variables
+    precondition : bool
+        Flag whether dummies should be preconditioned
 
     Returns
     -------
@@ -175,10 +176,11 @@ def category_interaction(cat: Series) -> csc_matrix:
         Sparse matrix of dummies with unit column norm
     """
     codes = get_codes(category_product(cat).cat)
-    return dummy_matrix(codes[:, None])[0]
+    return dummy_matrix(codes[:, None], precondition=precondition)[0]
 
 
-def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas) -> csc_matrix:
+def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas,
+                                    precondition: bool = True) -> csc_matrix:
     """
     Parameters
     ----------
@@ -186,6 +188,8 @@ def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas) -> csc_matr
         Categorical series to convert to dummy variables
     cont : {Series, DataFrame}
         Continuous variable values to use in the dummy interaction
+    precondition : bool
+        Flag whether dummies should be preconditioned
 
     Returns
     -------
@@ -193,9 +197,11 @@ def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas) -> csc_matr
         Sparse matrix of dummy interactions with unit column norm
     """
     codes = get_codes(category_product(cat).cat)
-    dummies = dummy_matrix(codes[:, None], precondition=False)[0]
-    dummies.data[:] = to_numpy(cont).flat
-    return preconditioner(dummies)[0]
+    interact = csc_matrix((to_numpy(cont).flat, (arange(codes.shape[0]), codes)))
+    if not precondition:
+        return interact
+    else:
+        return preconditioner(interact)[0]
 
 
 class Interaction(object):
@@ -220,7 +226,7 @@ class Interaction(object):
     Examples
     --------
     >>> import numpy as np
-    >>> from linearmodels.absorbing.model import Interaction
+    >>> from linearmodels.iv.absorbing import Interaction
     >>> rs = np.random.RandomState(0)
     >>> n = 100000
     >>> cats = rs.randint(2,size=n)  # binary dummy
@@ -316,10 +322,11 @@ class Interaction(object):
         if self.cat.shape[1] and self.cont.shape[1]:
             out = []
             for col in self.cont:
-                out.append(category_continuous_interaction(self.cat, self.cont[col]))
-            return sp.hstack(out)
+                out.append(category_continuous_interaction(self.cat, self.cont[col],
+                                                           precondition=False))
+            return sp.hstack(out, format='csc')
         elif self.cat.shape[1]:
-            return category_interaction(category_product(self.cat))
+            return category_interaction(category_product(self.cat), precondition=False)
         elif self.cont.shape[1]:
             return csc_matrix(self._cont_data.ndarray)
         else:  # empty interaction
@@ -339,9 +346,9 @@ class Interaction(object):
             cat_hashes.append(hasher.hexdigest())
             hasher = _reset(hasher)
         cat_hashes = tuple(sorted(cat_hashes))
+
         hashes = []
         cont = self.cont
-
         for col in cont:
             hasher.update(ascontiguousarray(to_numpy(cont[col]).data))
             hashes.append(cat_hashes + (hasher.hexdigest(),))
@@ -369,7 +376,7 @@ class Interaction(object):
         Examples
         --------
         >>> import numpy as np
-        >>> from linearmodels.absorbing.model import Interaction
+        >>> from linearmodels.iv.absorbing import Interaction
         >>> import pandas as pd
         >>> rs = np.random.RandomState(0)
         >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(i+2,size=n)))
@@ -390,7 +397,21 @@ class Interaction(object):
 InteractionVar = Union[DataFrame, Interaction]
 
 
-class AbsorbingRegressor():
+class AbsorbingRegressor(object):
+    """
+    Constructed weights sparse matrix from components
+
+    Parameters
+    ----------
+    cat : DataFrame
+        List of categorical variables (factors) to absorb
+    cont : DataFrame
+        List of continuous variables to absorb
+    interactions : List[Interaction]
+        List of included interactions
+    weights : ndarray
+        Weights, if any
+    """
 
     def __init__(self, *, cat: DataFrame = None, cont: DataFrame = None,
                  interactions: List[Interaction] = None,
@@ -414,8 +435,9 @@ class AbsorbingRegressor():
                 hasher.update(ascontiguousarray(to_numpy(self._cont[col]).data))
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
-        for interact in self._interactions:
-            hashes.extend(interact.hash)
+        if self._interactions is not None:
+            for interact in self._interactions:
+                hashes.extend(interact.hash)
         # Add weight hash if provided
         if self._weights is not None:
             hasher = hash_func()
@@ -428,16 +450,16 @@ class AbsorbingRegressor():
         regressors = []
 
         if self._cat is not None and self._cat.shape[1] > 0:
-            regressors.append(dummy_matrix(self._cat)[0])
+            regressors.append(dummy_matrix(self._cat, precondition=False)[0])
         if self._cont is not None and self._cont.shape[1] > 0:
             regressors.append(csc_matrix(to_numpy(self._cont)))
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 
         if regressors:
-            regressor_mat = sp.hstack(regressors)
+            regressor_mat = sp.hstack(regressors, format='csc')
             if self._weights is not None:
-                return sp.diags(sqrt(self._weights.squeeze())).dot(regressor_mat)
+                return (sp.diags(sqrt(self._weights.squeeze())).dot(regressor_mat)).asformat('csc')
             return regressor_mat
         else:
             return csc_matrix(empty((0, 0)))
@@ -488,6 +510,8 @@ class AbsorbingLS(object):
         self._has_constant = self._check_constant()
         self._constant_absorbed = self._absorb_inter.cat.shape[1] > 0 and self._has_constant
         self._num_params = 0
+        self._regressors = None
+        self._regressors_hash = None
 
     def _drop_missing(self):
         pass
@@ -596,6 +620,46 @@ class AbsorbingLS(object):
                 else:
                     raise TypeError('interactions must contain DataFrames or Interactions')
 
+    def _first_time_fit(self, use_cache, lsmr_options):
+        weights = self.weights.ndarray if self._weighted else None
+
+        areg = AbsorbingRegressor(cat=self._absorb_inter.cat, cont=self._absorb_inter.cont,
+                                  interactions=self._interaction_list, weights=weights)
+        self._regressors = preconditioner(areg.regressors)[0]
+        self._regressors_hash = areg.hash
+
+        dep = self._dependent.ndarray
+        exog = self._exog.ndarray
+
+        root_w = sqrt(self._weight_data.ndarray)
+        dep = root_w * dep
+        exog = root_w * exog
+        denom = root_w.T @ root_w
+        mu_dep = (root_w.T @ dep) / denom
+        mu_exog = (root_w.T @ exog) / denom
+
+        lsmr_options = {} if lsmr_options is None else lsmr_options
+        if self._regressors.shape[1] > 0:
+            dep_resid = lsmr_annihilate(self._regressors, dep, use_cache, self._regressors_hash,
+                                        **lsmr_options)
+            if self._exog is not None:
+                exog_resid = lsmr_annihilate(self._regressors, exog, use_cache,
+                                             self._regressors_hash, **lsmr_options)
+            else:
+                exog_resid = empty((dep_resid.shape[0], 0))
+        else:
+            dep_resid = dep
+            exog_resid = exog
+
+        if self._constant_absorbed:
+            dep_resid += root_w * mu_dep
+            exog_resid += root_w * mu_exog
+
+        self._absorbed_dependent = DataFrame(dep_resid, index=self._dependent.pandas.index,
+                                             columns=self._dependent.pandas.columns)
+        self._absorbed_exog = DataFrame(exog_resid, index=self._exog.pandas.index,
+                                        columns=self._exog.pandas.columns)
+
     def fit(self, *, cov_type: str = 'robust', debiased: bool = False, lsmr_options: dict = None,
             use_cache: bool = True, **cov_config: Any):
         """
@@ -650,45 +714,16 @@ class AbsorbingLS(object):
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
-        weights = self.weights.ndarray if self._weighted else None
-        areg = AbsorbingRegressor(cat=self._absorb_inter.cat, cont=self._absorb_inter.cont,
-                                  interactions=self._interaction_list, weights=weights)
-        regressors = areg.regressors
 
-        dep = self._dependent.ndarray
-        exog = self._exog.ndarray
+        if self._absorbed_dependent is None:
+            self._first_time_fit(use_cache, lsmr_options)
 
-        root_w = sqrt(self._weight_data.ndarray)
-        dep = root_w * dep
-        exog = root_w * exog
-        denom = root_w.T @ root_w
-        mu_dep = (root_w.T @ dep) / denom
-        mu_exog = (root_w.T @ exog) / denom
-
-        lsmr_options = {} if lsmr_options is None else lsmr_options
-        if regressors.shape[1] > 0:
-            dep_resid = lsmr_annihilate(regressors, dep, use_cache, areg.hash, **lsmr_options)
-            if self._exog is not None:
-                exog_resid = lsmr_annihilate(regressors, exog, use_cache, areg.hash,
-                                             **lsmr_options)
-            else:
-                exog_resid = empty((dep_resid.shape[0], 0))
-        else:
-            dep_resid = dep
-            exog_resid = exog
-
-        if self._constant_absorbed:
-            dep_resid += root_w * mu_dep
-            exog_resid += root_w * mu_exog
-
-        self._absorbed_dependent = DataFrame(dep_resid, index=self._dependent.pandas.index,
-                                             columns=self._dependent.pandas.columns)
-        self._absorbed_exog = DataFrame(exog_resid, index=self._exog.pandas.index,
-                                        columns=self._exog.pandas.columns)
-        self._x = self._absorbed_exog
+        self._x = exog_resid = to_numpy(self.absorbed_exog)
+        dep_resid = to_numpy(self.absorbed_dependent)
         if self._exog is None:
             # TODO early return, only absorbed
             params = empty((0,))
+            return params
         else:
             if exog_resid.shape[1] and matrix_rank(exog_resid) < exog_resid.shape[1]:
                 # TODO: Refactor algo to find absorbed from panel
@@ -810,6 +845,10 @@ if __name__ == '__main__':
                     pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
     interact = Interaction.from_frame(ia)
     print(interact.hash)
-    mod = AbsorbingLS(y, x, cats, ia)
-    print(mod.fit(lsmr_options={'show': True}))
-    print(mod.fit(lsmr_options={'show': True}))
+    mod = AbsorbingLS(y, x, absorb=cats, interactions=ia)
+    import timer_cm
+
+    with timer_cm.Timer('First'):
+        print(mod.fit(lsmr_options={'show': True}))
+    with timer_cm.Timer('Second'):
+        print(mod.fit(lsmr_options={'show': True}))
