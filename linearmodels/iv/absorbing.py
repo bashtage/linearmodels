@@ -4,10 +4,9 @@ from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
 from collections import defaultdict
 from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Union
 
-from numpy import (any as npany, arange, asarray, ascontiguousarray, average,
+from numpy import (any as npany, arange, ascontiguousarray, average,
                    column_stack, dtype, empty, empty_like, int8, int16, int32,
                    int64, nanmean, ndarray, ones, ptp, sqrt, where, zeros)
-from numpy.linalg import matrix_rank
 from pandas import Categorical, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
@@ -16,9 +15,9 @@ from scipy.sparse.linalg import lsmr
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import COVARIANCE_ESTIMATORS
-from linearmodels.iv.results import OLSResults
-from linearmodels.panel.model import AbsorbingEffectError, absorbing_error_msg
-from linearmodels.panel.utility import dummy_matrix, preconditioner
+from linearmodels.iv.results import AbsorbingLSResults
+from linearmodels.panel.utility import (check_absorbed, dummy_matrix,
+                                        preconditioner)
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 
@@ -80,18 +79,8 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, x_hash=No
     where :math:`\hat{\beta}` is computed using lsmr.
     """
 
-    regressor_hash = ''
-
-    if use_cache:
-        if x_hash is None:
-            hasher = hash_func()
-            hasher.update(ascontiguousarray(x.data.data))
-            hasher.update(ascontiguousarray(x.indptr.data))
-            hasher.update(ascontiguousarray(x.indptr.data))
-            regressor_hash = hasher.hexdigest()
-        else:
-            regressor_hash = x_hash
-
+    use_cache = use_cache and x_hash is not None
+    regressor_hash = x_hash if x_hash is not None else ''
     default_opts = dict(atol=1e-8, btol=1e-8, show=False)
     default_opts.update(lsmr_options)
     resids = []
@@ -240,7 +229,7 @@ class Interaction(object):
     >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(5,size=n)))
     ...                  for _ in range(4)],1)
     >>> cats.describe()
-                     0       1       2       3
+                 0       1       2       3
     count   100000  100000  100000  100000
     unique       5       5       5       5
     top          3       3       0       4
@@ -379,6 +368,7 @@ class Interaction(object):
         >>> from linearmodels.iv.absorbing import Interaction
         >>> import pandas as pd
         >>> rs = np.random.RandomState(0)
+        >>> n = 100000
         >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(i+2,size=n)))
         ...                  for i in range(4)],1)
         >>> cats.columns = ['cat{0}'.format(i) for i in range(4)]
@@ -420,6 +410,18 @@ class AbsorbingRegressor(object):
         self._cont = cont
         self._interactions = interactions
         self._weights = weights
+        self._approx_rank = None
+
+    @property
+    def has_constant(self):
+        """Flag indicating whether the regressors have a constant equivalent"""
+        return self._cat is not None and self._cat.shape[1] > 0
+
+    @property
+    def approx_rank(self):
+        if self._approx_rank is None:
+            self._regressors()
+        return self._approx_rank
 
     @property
     def hash(self):
@@ -447,6 +449,9 @@ class AbsorbingRegressor(object):
 
     @property
     def regressors(self) -> csc_matrix:
+        return self._regressors()
+
+    def _regressors(self) -> csc_matrix:
         regressors = []
 
         if self._cat is not None and self._cat.shape[1] > 0:
@@ -458,17 +463,33 @@ class AbsorbingRegressor(object):
 
         if regressors:
             regressor_mat = sp.hstack(regressors, format='csc')
+            approx_rank = regressor_mat.shape[1]
+            self._approx_rank = approx_rank
             if self._weights is not None:
                 return (sp.diags(sqrt(self._weights.squeeze())).dot(regressor_mat)).asformat('csc')
             return regressor_mat
         else:
+            self._approx_rank = 0
             return csc_matrix(empty((0, 0)))
 
 
 class AbsorbingLS(object):
-    """
-    Stub for documentation of AbsorbingLS
+    r"""
+    Limited information ML and k-class estimation of IV models
 
+    Parameters
+    ----------
+    dependent : ArrayLike
+        Endogenous variables (nobs by 1)
+    exog : ArrayLike, optional
+        Exogenous regressors  (nobs by nexog)
+    absorb: {DataFrame, Interaction}
+    interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}, optional
+    weights : ArrayLike, optional
+        Observation weights used in estimation
+
+    Notes
+    -----
     TODO
     """
 
@@ -479,7 +500,7 @@ class AbsorbingLS(object):
 
         self._dependent = IVData(dependent, 'dependent')
         self._nobs = nobs = self._dependent.shape[0]
-        self._exog = IVData(exog, 'exog')
+        self._exog = IVData(exog, 'exog', nobs=self._nobs)
         self._absorb = absorb
         if isinstance(absorb, DataFrame):
             self._absorb_inter = Interaction.from_frame(absorb)
@@ -504,11 +525,12 @@ class AbsorbingLS(object):
         self._drop_missing()
         self._columns = self._exog.cols
         self._index = self._dependent.rows
-        self._method = 'OLS'
+        self._method = 'Absorbing LS'
 
         self._const_col = 0
-        self._has_constant = self._check_constant()
-        self._constant_absorbed = self._absorb_inter.cat.shape[1] > 0 and self._has_constant
+        self._has_constant = False
+        self._has_constant_exog = self._check_constant()
+        self._constant_absorbed = False
         self._num_params = 0
         self._regressors = None
         self._regressors_hash = None
@@ -536,8 +558,6 @@ class AbsorbingLS(object):
 
     def _check_shape(self):
         nobs = self._nobs
-        if self._exog.shape[0] != nobs:
-            raise ValueError('exog and dependent have different number of observations')
         if self._absorb is not None:
             if self._absorb_inter.nobs != nobs:
                 raise ValueError('absorb and dependent have different number of observations')
@@ -625,8 +645,14 @@ class AbsorbingLS(object):
 
         areg = AbsorbingRegressor(cat=self._absorb_inter.cat, cont=self._absorb_inter.cont,
                                   interactions=self._interaction_list, weights=weights)
+        areg_constant = areg.has_constant
         self._regressors = preconditioner(areg.regressors)[0]
+        self._num_params += areg.approx_rank
+        # Do not double count intercept-like terms
+        self._has_constant = self._has_constant_exog or areg_constant
+        self._num_params -= min(self._has_constant_exog, areg_constant)
         self._regressors_hash = areg.hash
+        self._constant_absorbed = self._has_constant_exog and areg_constant
 
         dep = self._dependent.ndarray
         exog = self._exog.ndarray
@@ -642,11 +668,8 @@ class AbsorbingLS(object):
         if self._regressors.shape[1] > 0:
             dep_resid = lsmr_annihilate(self._regressors, dep, use_cache, self._regressors_hash,
                                         **lsmr_options)
-            if self._exog is not None:
-                exog_resid = lsmr_annihilate(self._regressors, exog, use_cache,
-                                             self._regressors_hash, **lsmr_options)
-            else:
-                exog_resid = empty((dep_resid.shape[0], 0))
+            exog_resid = lsmr_annihilate(self._regressors, exog, use_cache,
+                                         self._regressors_hash, **lsmr_options)
         else:
             dep_resid = dep
             exog_resid = exog
@@ -697,7 +720,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        results : OLSResults
+        results : AbsorbingLSResults
             Results container
 
         Notes
@@ -720,18 +743,13 @@ class AbsorbingLS(object):
 
         self._x = exog_resid = to_numpy(self.absorbed_exog)
         dep_resid = to_numpy(self.absorbed_dependent)
-        if self._exog is None:
-            # TODO early return, only absorbed
-            params = empty((0,))
-            return params
+        if self._exog.shape[1] == 0:
+            params = empty((0, 1))
         else:
-            if exog_resid.shape[1] and matrix_rank(exog_resid) < exog_resid.shape[1]:
-                # TODO: Refactor algo to find absorbed from panel
-                # TODO: Move error to common location
-                msg = absorbing_error_msg.format(absorbed_variables='unknown')
-                raise AbsorbingEffectError(msg)
+            if exog_resid.shape[1]:
+                check_absorbed(exog_resid, self.exog.cols)
             params = lstsq(exog_resid, dep_resid)[0]
-            self._num_params += dep_resid.shape[1]
+            self._num_params += exog_resid.shape[1]
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
         cov_config['debiased'] = debiased
@@ -745,8 +763,9 @@ class AbsorbingLS(object):
                    'liml_kappa': 0.0}
         pe = self._post_estimation(params, cov_estimator, cov_type)
         results.update(pe)
+        results['df_model'] = self._num_params
 
-        return OLSResults(results, self)
+        return AbsorbingLSResults(results, self)
 
     def resids(self, params: ndarray):
         """
@@ -778,23 +797,33 @@ class AbsorbingLS(object):
         columns = self._columns
         index = self._index
         eps = self.resids(params)
-        y = self._absorbed_dependent
-        # TODO: save effects
-        # TODO: effects in fitted? self._effects
-        fitted = DataFrame(asarray(y) - eps, y.index, ['fitted_values'])
+        fitted = DataFrame(self._dependent.ndarray - eps, index=self._dependent.rows,
+                           columns=['fitted_values'])
+        absorbed_effects = DataFrame(to_numpy(self._absorbed_dependent) - to_numpy(fitted),
+                                     columns=['absorbed_effects'], index=self._dependent.rows)
+
         weps = self.wresids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
 
-        residual_ss = (weps.T @ weps)
+        residual_ss = (weps.T @ weps)[0, 0]
 
         w = self.weights.ndarray
-        e = self._dependent.ndarray * sqrt(w)
-        if True:  # self.has_constant: TODO: constant
-            e = e - sqrt(self.weights.ndarray) * average(self._dependent.ndarray, weights=w)
+        root_w = sqrt(w)
+        e = self._dependent.ndarray * root_w
+        if self.has_constant:
+            e = e - root_w * average(self._dependent.ndarray, weights=w)
 
         total_ss = float(e.T @ e)
         r2 = 1 - residual_ss / total_ss
+
+        e = to_numpy(self._absorbed_dependent)  # already scaled by root_w
+        if self.has_constant:
+            mu = (root_w.T @ e) / (root_w.T @ root_w)
+            e = e - root_w * mu
+
+        aborbed_total_ss = float(e.T @ e)
+        r2_absorbed = 1 - residual_ss / aborbed_total_ss
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {'params': Series(params.squeeze(), columns, name='parameter'),
@@ -814,41 +843,8 @@ class AbsorbingLS(object):
                'method': self._method,
                'cov_estimator': cov_estimator,
                'fitted': fitted,
-               'original_index': self._original_index}
+               'original_index': self._original_index,
+               'absorbed_effects': absorbed_effects,
+               'absorbed_r2': r2_absorbed}
 
         return out
-
-
-if __name__ == '__main__':
-    import numpy as np
-
-    rs = np.random.RandomState(0)
-    n = 100000
-    cats = rs.randint(2, size=n)  # binary dummy
-    cont = rs.standard_normal((n, 3))
-    interact = Interaction(cats, cont)
-    print(interact.sparse.shape)  # Get the shape of the dummy matrix
-
-    import numpy as np
-    import pandas as pd
-
-    n = 1000000
-    rs = np.random.RandomState(0)
-    cats = pd.concat([pd.Series(pd.Categorical(rs.randint(n // 7, size=n)))], 1)
-    effects = rs.standard_normal((n, 1))
-    x = pd.DataFrame(rs.standard_normal((n, 3)))
-    y = pd.DataFrame(
-        x.to_numpy().sum(1)[:, None] + rs.standard_normal((n, 1)) + effects[
-            cats.to_numpy().squeeze()])
-
-    ia = pd.concat([pd.Series(rs.standard_normal((n))),
-                    pd.Series(pd.Categorical(rs.randint(n // 10, size=n)))], 1)
-    interact = Interaction.from_frame(ia)
-    print(interact.hash)
-    mod = AbsorbingLS(y, x, absorb=cats, interactions=ia)
-    import timer_cm
-
-    with timer_cm.Timer('First'):
-        print(mod.fit(lsmr_options={'show': True}))
-    with timer_cm.Timer('Second'):
-        print(mod.fit(lsmr_options={'show': True}))

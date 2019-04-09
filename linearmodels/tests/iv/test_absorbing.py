@@ -17,10 +17,12 @@ from linearmodels.iv.absorbing import (_VARIABLE_CACHE, AbsorbingLS,
                                        category_interaction, category_product,
                                        clear_cache)
 from linearmodels.iv.model import _OLS
+from linearmodels.iv.results import AbsorbingLSResults, OLSResults
 from linearmodels.panel.utility import dummy_matrix
 from linearmodels.utility import AttrDict
 
 NOBS = 100
+pytestmark = pytest.mark.filterwarnings('ignore:the matrix subclass:PendingDeprecationWarning')
 
 
 class Hasher(object):
@@ -176,7 +178,7 @@ configs = product([0, 3],  # k
                   [0, 1]  # ncont
                   )
 
-configs = [c for c in configs if (c[2] or c[5] or c[9]) and (c[0] or c[1])]
+configs = [c for c in configs if (c[2] or c[5] or c[9])]
 id_str = 'k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, ' \
          'cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}'
 ids = [id_str.format(*config) for config in configs]
@@ -199,7 +201,7 @@ configs_ols = product([0, 3],  # k
                       [0, 1]  # ncont
                       )
 
-configs_ols = [c for c in configs_ols if (c[2] or c[5] or c[9]) and (c[0] or c[1])]
+configs_ols = [c for c in configs_ols if (c[0] or c[1])]
 id_str = 'k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, ' \
          'cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}'
 ids_ols = [id_str.format(*config) for config in configs_ols]
@@ -214,6 +216,29 @@ def test_smoke(data):
     mod = AbsorbingLS(data.y, data.x, absorb=data.absorb, interactions=data.interactions,
                       weights=data.weights)
     mod.fit()
+
+
+def test_absorbing_exceptions(rs):
+    with pytest.raises(TypeError):
+        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)),
+                    absorb=rs.standard_normal((NOBS, 2)))
+    with pytest.raises(ValueError):
+        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS - 1, 2)))
+    with pytest.raises(ValueError):
+        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)),
+                    absorb=pd.DataFrame(rs.standard_normal((NOBS - 1, 1))))
+    with pytest.raises(ValueError):
+        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)),
+                    interactions=random_cat(10, NOBS - 1, frame=True, rs=rs))
+    mod = AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)),
+                      interactions=random_cat(10, NOBS, frame=True, rs=rs))
+    with pytest.raises(RuntimeError):
+        mod.absorbed_dependent
+    with pytest.raises(RuntimeError):
+        mod.absorbed_exog
+    with pytest.raises(TypeError):
+        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)),
+                    interactions=rs.randint(0, 10, size=(NOBS, 2)))
 
 
 def test_clear_cache():
@@ -358,12 +383,20 @@ def test_interaction_cat_cont_convert(cat, cont):
 
 def test_absorbing_regressors(cat, cont, interact, weights):
     areg = AbsorbingRegressor(cat=cat, cont=cont, interactions=interact, weights=weights)
+    rank = areg.approx_rank
+    expected_rank = 0
+
     expected = []
+    for i, col in enumerate(cat):
+        expected_rank += pd.Series(get_codes(cat[col].cat)).nunique() - (i > 0)
     expected.append(dummy_matrix(cat, precondition=False)[0])
+    expected_rank += cont.shape[1]
     expected.append(csc_matrix(cont))
     if interact is not None:
         for inter in interact:
-            expected.append(inter.sparse)
+            interact_mat = inter.sparse
+            expected_rank += interact_mat.shape[1]
+            expected.append(interact_mat)
     expected = sp.hstack(expected, format='csc')
     if weights is not None:
         expected = (sp.diags(np.sqrt(weights)).dot(expected)).asformat('csc')
@@ -372,7 +405,11 @@ def test_absorbing_regressors(cat, cont, interact, weights):
     assert_array_equal(expected.indptr, actual.indptr)
     assert_array_equal(expected.indices, actual.indices)
     assert_allclose(expected.A, actual.A)
+    assert expected_rank == rank
 
+
+def test_absorbing_regressors_hash(cat, cont, interact, weights):
+    areg = AbsorbingRegressor(cat=cat, cont=cont, interactions=interact, weights=weights)
     # Build hash
     hashes = []
     for col in cat:
@@ -426,9 +463,7 @@ def test_against_ols(ols_data):
         _x = np.column_stack([_x, absorb])
     ols_mod = _OLS(ols_data.y, _x)
     ols_res = ols_mod.fit()
-    p_absorb = res.params
-    p1 = ols_res.params[:res.params.shape[0]]
-    assert_allclose(p_absorb, p1)
+    assert_results_equal(ols_res, res)
 
 
 def test_cache():
@@ -446,3 +481,45 @@ def test_cache():
     mod.fit()
     fourth = len(_VARIABLE_CACHE)
     assert fourth - third == 0
+
+
+def test_instrments():
+    gen = generate_data(2, True, 2, format='pandas', ncont=0, cont_interactions=1)
+    mod = AbsorbingLS(gen.y, gen.x, absorb=gen.absorb.iloc[:, :1], interactions=gen.interactions)
+    assert mod.instruments.shape[1] == 0
+
+
+def assert_results_equal(o_res: OLSResults, a_res: AbsorbingLSResults, k: int = None):
+    if k is None:
+        k = a_res.params.shape[0]
+    attrs = [v for v in dir(o_res) if not v.startswith('_')]
+    callables = ['conf_int']
+    skip = ['summary', 'test_linear_constraint', 'predict', 'model', 'f_statistic', 'wald_test',
+            'method']
+    for attr in attrs:
+        if attr in skip:
+            continue
+        left = getattr(o_res, attr)
+        right = getattr(a_res, attr)
+        if attr in callables:
+            left = left()
+            right = right()
+        if isinstance(left, np.ndarray):
+            raise NotImplementedError
+        elif isinstance(left, pd.DataFrame):
+            if attr == 'conf_int':
+                left = left.iloc[:k]
+            elif attr == 'cov':
+                left = left.iloc[:k, :k]
+            assert_allclose(left, right, rtol=2e-4)
+        elif isinstance(left, pd.Series):
+            assert_allclose(left.iloc[:k], right.iloc[:k], rtol=1e-5)
+        else:
+            if isinstance(left, float):
+                assert_allclose(left, right)
+            else:
+                try:
+                    assert left == right
+                except AssertionError:
+                    print(attr)
+                    assert left == right

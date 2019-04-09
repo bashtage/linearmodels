@@ -1,6 +1,7 @@
 from linearmodels.compat.numpy import isin
 
 from collections import defaultdict
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,22 @@ try:
     HAS_CYTHON = True
 except ImportError:
     HAS_CYTHON = False
+
+
+class AbsorbingEffectError(Exception):
+    pass
+
+
+absorbing_error_msg = """
+The model cannot be estimated. The included effects have fully absorbed
+one or more of the variables. This occurs when one or more of the dependent
+variable is perfectly explained using the effects included in the model.
+
+The following variables or variable combinations have been fully absorbed
+or have become perfectly collinear after effects are removed:
+
+{absorbed_variables}
+"""
 
 
 def preconditioner(d, *, copy=False):
@@ -337,3 +354,30 @@ def in_2core_graph_slow(cats):
     retain = np.zeros(nobs, dtype=np.bool)
     retain[retain_idx] = True
     return retain
+
+
+def check_absorbed(x: np.ndarray, variables: List[str]):
+    """
+    Check a regressor matrix for variables absorbed
+
+    Parameters
+    ----------
+    x : ndarray
+        Regressor matrix to check
+    variables : List[str]
+        List of variable names
+    """
+    if np.linalg.matrix_rank(x) < x.shape[1]:
+        xpx = x.T @ x
+        vals, vecs = np.linalg.eigh(xpx)
+        tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
+        absorbed = vals < tol
+        nabsorbed = absorbed.sum()
+        absorbed_vecs = vecs[:, absorbed]
+        rows = []
+        for i in range(nabsorbed):
+            vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
+            rows.append(' ' * 10 + ', '.join((variables[vi] for vi in vars_idx)))
+        absorbed_variables = '\n'.join(rows)
+        msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
+        raise AbsorbingEffectError(msg)

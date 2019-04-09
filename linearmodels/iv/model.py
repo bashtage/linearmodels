@@ -1175,7 +1175,7 @@ class IVGMMCUE(IVGMM):
 
 class _OLS(IVLIML):
     """
-    Computes OLS estimated when required
+    Computes OLS estimates when required
 
     Parameters
     ----------
