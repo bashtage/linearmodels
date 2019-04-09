@@ -20,6 +20,7 @@ from linearmodels.panel.utility import (check_absorbed, dummy_matrix,
                                         preconditioner)
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+from linearmodels.utility import missing_warning
 
 try:
     from xxhash import xxh64 as hash_func
@@ -288,6 +289,14 @@ class Interaction(object):
         return self._cont_data.pandas
 
     @property
+    def isnull(self) -> Series:
+        return self.cat.isnull().any(1) | self.cont.isnull().any(1)
+
+    def drop(self, locs) -> None:
+        self._cat_data.drop(locs)
+        self._cont_data.drop(locs)
+
+    @property
     def sparse(self) -> csc_matrix:
         r"""
         Construct a sparce interaction matrix
@@ -475,7 +484,7 @@ class AbsorbingRegressor(object):
 
 class AbsorbingLS(object):
     r"""
-    Limited information ML and k-class estimation of IV models
+    Linear regression with high-dimensaional effects
 
     Parameters
     ----------
@@ -484,13 +493,76 @@ class AbsorbingLS(object):
     exog : ArrayLike, optional
         Exogenous regressors  (nobs by nexog)
     absorb: {DataFrame, Interaction}
+        The effects or continuous variables to absorb. When using a DataFrame,
+        effects must be categorical variables. Other variable types are treated
+        as continuous variables that should be absorbed. When using an
+        Interaction, variables in the `cat` argument are treaded as effects
+        and variables in the `cont` argument are treated as continuous.
     interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}, optional
+        Interactions containing both categorical and continuous variables.  Each
+        interaction is constructed using the Cartesian product of the categorical
+        variables to produce the dummy, which are then separately interacted with
+        each continuous variable.
+
     weights : ArrayLike, optional
         Observation weights used in estimation
 
     Notes
     -----
-    TODO
+    Capable of estimating models with millions of effects.
+
+    Estimates models of the form
+
+    .. math::
+
+      y_i = x_i \beta + z_i \gamma + \epsilon_i
+
+    where :math:`\beta` are parameters of interest and :math:`\gamma`
+    are not. z may be high-dimensional, although must have fewer
+    variables than the number of observations in y.
+
+    The syntax simplifies specifying high-dimensional z when z consists
+    of categorical (factor) variables, also known as effects, or when
+    z contains interactions between continuous variables and categorical
+    variables, also known as fixed slopes.
+
+    The high-dimensional effects are fit using LSMR which avoids inverting
+    or even constructing the inner product of the regressors. This is
+    combined with Frish-Waugh-Lovell to orthogonzlize x and y from z.
+
+    z can contain factors that are perfectly linearly dependent. LSMR
+    estimates a particular restricted set of parameters that captures the
+    effect of non-redundant components in z.
+
+    See also
+    --------
+    Interaction
+    linearmodels.iv.model.IVLIML
+    linearmodels.iv.model.IV2SLS
+    scipy.sparse.linalg.lsmr
+
+    Examples
+    --------
+    Estimate a model by absorbing 2 cateogricals and 2 continuous variables
+
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> from lineamodels.iv import AbsorbingLS, Interaction
+    >>> dep = np.random.standard_normal((20000,1))
+    >>> exog = np.random.standard_normal((20000,2))
+    >>> cats = pd.DataFrame({i: pd.Categorical(np.random.randint(1000, size=20000))
+    ...                      for i in range(2)})
+    >>> cont = pd.DataFrame({i+2: np.random.standard_normal(20000) for i in range(2)})
+    >>> absorb = pd.concat([cats, cont], 1)
+    >>> mod = AbsorbingLS(dep, exog, absorb=absorb)
+    >>> res = mod.fit()
+
+    Add interactions between the cartesian product of the categorical and
+    each continuous variables
+
+    >>> iaction = Interaction(cat=cats, cont=cont)
+    >>> absorb = Interaction(cat=cats) # Other encoding of categoricals
+    >>> mod = AbsorbingLS(dep, exog, absorb=absorb, interactions=iaction)
     """
 
     def __init__(self, dependent: ArrayLike, exog: OptionalArrayLike = None, *,
@@ -511,6 +583,7 @@ class AbsorbingLS(object):
         else:
             raise TypeError('absorb must ba a DataFrame or an Interaction')
         self._weights = weights
+        self._is_weighted = False
         self._check_weights()
 
         self._interactions = interactions
@@ -522,7 +595,7 @@ class AbsorbingLS(object):
 
         self._check_shape()
         self._original_index = self._dependent.pandas.index
-        self._drop_missing()
+        self._drop_locs = self._drop_missing()
         self._columns = self._exog.cols
         self._index = self._dependent.rows
         self._method = 'Absorbing LS'
@@ -535,9 +608,21 @@ class AbsorbingLS(object):
         self._regressors = None
         self._regressors_hash = None
 
-    def _drop_missing(self):
-        pass
-        # TODO: implement
+    def _drop_missing(self) -> ndarray:
+        missing = to_numpy(self.dependent.isnull)
+        missing |= to_numpy(self.exog.isnull)
+        missing |= to_numpy(self._absorb_inter.cat.isnull().any(1))
+        missing |= to_numpy(self._absorb_inter.cont.isnull().any(1))
+        for interact in self._interaction_list:
+            missing |= to_numpy(interact.isnull)
+        if npany(missing):
+            self.dependent.drop(missing)
+            self.exog.drop(missing)
+            self._absorb_inter.drop(missing)
+            for interact in self._interaction_list:
+                interact.drop(missing)
+        missing_warning(missing)
+        return missing
 
     def _check_constant(self):
         col_delta = ptp(self.exog.ndarray, 0)
@@ -548,10 +633,10 @@ class AbsorbingLS(object):
     def _check_weights(self):
         if self._weights is None:
             nobs = self._dependent.shape[0]
-            self._weighted = False
+            self._is_weighted = False
             self._weight_data = IVData(ones(nobs), 'weights')
         else:
-            self._weighted = True
+            self._is_weighted = True
             weights = IVData(self._weights).ndarray
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name='weights', nobs=self._nobs)
@@ -641,7 +726,7 @@ class AbsorbingLS(object):
                     raise TypeError('interactions must contain DataFrames or Interactions')
 
     def _first_time_fit(self, use_cache, lsmr_options):
-        weights = self.weights.ndarray if self._weighted else None
+        weights = self.weights.ndarray if self._is_weighted else None
 
         areg = AbsorbingRegressor(cat=self._absorb_inter.cat, cont=self._absorb_inter.cont,
                                   interactions=self._interaction_list, weights=weights)
@@ -730,6 +815,12 @@ class AbsorbingLS(object):
         supported options. Defaults are used if no covariance configuration
         is provided.
 
+        If use_cache is True, then variables are hashed based on their
+        contents using either a 64 bit value (if xxhash is installed) or
+        a 256 bit value. This allows variables to be reused in different
+        models if the set of absorbing variables and interactions is held
+        constant.
+
         See also
         --------
         linearmodels.iv.covariance.HomoskedasticCovariance
@@ -781,11 +872,29 @@ class AbsorbingLS(object):
         resids : ndarray
             Model residuals
         """
-        return to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
+        resids = self.wresids(params)
+        return resids / sqrt(self.weights.ndarray)
 
     def wresids(self, params: ndarray):
-        # TODO: weights
-        return self.resids(params)
+        """
+        Compute weighted model residuals
+
+        Parameters
+        ----------
+        params : ndarray
+            Model parameters (nvar by 1)
+
+        Returns
+        -------
+        wresids : ndarray
+            Weighted model residuals
+
+        Notes
+        -----
+        Uses weighted versions of data instead of raw data.  Identical to
+        resids if all weights are unity.
+        """
+        return to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
 
     def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
         const_loc = find_constant(self._exog.ndarray)

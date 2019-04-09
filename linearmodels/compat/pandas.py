@@ -3,6 +3,8 @@ from distutils.version import LooseVersion
 import numpy as np
 import pandas as pd
 
+from linearmodels.typing import AnyPandas
+
 PD_LT_023 = LooseVersion(pd.__version__) < LooseVersion('0.23')
 
 
@@ -60,7 +62,7 @@ def get_codes(index):
         return index.labels
 
 
-def to_numpy(df: pd.DataFrame) -> np.ndarray:
+def to_numpy(df: AnyPandas) -> np.ndarray:
     try:
         return df.to_numpy()
     except AttributeError:

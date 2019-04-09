@@ -28,8 +28,8 @@ matrix:
   - python: 3.5
     env:
     - PYTHON=3.5
-    - NUMPY=1.12
-    - SCIPY=0.18
+    - NUMPY=1.13
+    - SCIPY=0.19
     - PANDAS=0.20
     - STATSMODELS=0.8
   - python: 3.6
