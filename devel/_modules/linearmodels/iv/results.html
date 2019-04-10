@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.results &#8212; linearmodels 4.12+8.g5e3183f documentation</title>
+    <title>linearmodels.iv.results &#8212; linearmodels 4.12+9.gba6c1c1 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.12 (+8, g5e3183f)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12 (+9, gba6c1c1)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -111,14 +111,15 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Results containers and post-estimation diagnostics for IV models</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
-
 <span class="kn">from</span> <span class="nn">linearmodels.compat.statsmodels</span> <span class="k">import</span> <span class="n">Summary</span>
 
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
 <span class="kn">from</span> <span class="nn">cached_property</span> <span class="k">import</span> <span class="n">cached_property</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">array</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">ndarray</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">diag</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">ones</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span>
+                   <span class="n">zeros</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span> <span class="n">pinv</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">to_numeric</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
@@ -155,7 +156,7 @@
 
 
 <div class="viewcode-block" id="OLSResults"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.OLSResults">[docs]</a><span class="k">class</span> <span class="nc">OLSResults</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">model</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;eps&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wresid</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;weps&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]</span>
@@ -176,6 +177,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimator</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;cov_estimator&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;original_index&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df_model</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;df_model&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cov_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -296,17 +298,17 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Number of observations&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">df_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Residual degree of freedom&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nobs</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_model</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">df_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Model degree of freedom&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df_model</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_constant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -437,6 +439,19 @@
         <span class="n">ci</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_errors</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">q</span>
         <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">])</span></div>
 
+    <span class="k">def</span> <span class="nf">_top_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">f_stat</span> <span class="o">=</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">stat</span><span class="p">):</span>
+            <span class="n">f_stat</span> <span class="o">=</span> <span class="s1">&#39;      N/A&#39;</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="s1">&#39;R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Adj. R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared_adj</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;F-statistic:&#39;</span><span class="p">,</span> <span class="n">f_stat</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;P-value (F-stat)&#39;</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">pval</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Distribution:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">dist_name</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Summary</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results</span>
@@ -455,13 +470,7 @@
                     <span class="p">(</span><span class="s1">&#39;Cov. Estimator:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov_type</span><span class="p">),</span>
                     <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
 
-        <span class="n">top_right</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)),</span>
-                     <span class="p">(</span><span class="s1">&#39;Adj. R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared_adj</span><span class="p">)),</span>
-                     <span class="p">(</span><span class="s1">&#39;F-statistic:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">stat</span><span class="p">)),</span>
-                     <span class="p">(</span><span class="s1">&#39;P-value (F-stat)&#39;</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">pval</span><span class="p">)),</span>
-                     <span class="p">(</span><span class="s1">&#39;Distribution:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">dist_name</span><span class="p">)),</span>
-                     <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-                     <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
+        <span class="n">top_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_right</span><span class="p">()</span>
 
         <span class="n">stubs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
@@ -502,23 +511,28 @@
             <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">txt_row</span><span class="p">)</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Parameter Estimates&#39;</span>
         <span class="n">table_stubs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Parameter&#39;</span><span class="p">,</span> <span class="s1">&#39;Std. Err.&#39;</span><span class="p">,</span> <span class="s1">&#39;T-stat&#39;</span><span class="p">,</span> <span class="s1">&#39;P-value&#39;</span><span class="p">,</span> <span class="s1">&#39;Lower CI&#39;</span><span class="p">,</span> <span class="s1">&#39;Upper CI&#39;</span><span class="p">]</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-                            <span class="n">stubs</span><span class="o">=</span><span class="n">table_stubs</span><span class="p">,</span>
-                            <span class="n">txt_fmt</span><span class="o">=</span><span class="n">fmt_params</span><span class="p">,</span>
-                            <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
-        <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="n">extra_text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">table_stubs</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Parameter&#39;</span><span class="p">,</span> <span class="s1">&#39;Std. Err.&#39;</span><span class="p">,</span> <span class="s1">&#39;T-stat&#39;</span><span class="p">,</span> <span class="s1">&#39;P-value&#39;</span><span class="p">,</span> <span class="s1">&#39;Lower CI&#39;</span><span class="p">,</span> <span class="s1">&#39;Upper CI&#39;</span><span class="p">]</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                                <span class="n">stubs</span><span class="o">=</span><span class="n">table_stubs</span><span class="p">,</span>
+                                <span class="n">txt_fmt</span><span class="o">=</span><span class="n">fmt_params</span><span class="p">,</span>
+                                <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+                                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">smry</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Model contains no parameters&#39;</span><span class="p">)</span>
 
         <span class="n">instruments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">instruments</span>
         <span class="k">if</span> <span class="n">instruments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">extra_text</span> <span class="o">=</span> <span class="p">[]</span>
+
             <span class="n">endog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span>
             <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Endogenous: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">endog</span><span class="o">.</span><span class="n">cols</span><span class="p">))</span>
             <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Instruments: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instruments</span><span class="o">.</span><span class="n">cols</span><span class="p">))</span>
             <span class="n">cov_descr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cov_estimator</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cov_descr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
                 <span class="n">extra_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">extra_text</span><span class="p">:</span>
             <span class="n">smry</span><span class="o">.</span><span class="n">add_extra_txt</span><span class="p">(</span><span class="n">extra_text</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">smry</span>
@@ -592,6 +606,42 @@
                       <span class="s1">&#39;instead. This method will be unavailable after June 2019.&#39;</span><span class="p">,</span>
                       <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wald_test</span><span class="p">(</span><span class="n">restriction</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">AbsorbingLSResults</span><span class="p">(</span><span class="n">OLSResults</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">model</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbsorbingLSResults</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_rsquared</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;absorbed_r2&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_effects</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;absorbed_effects&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_top_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">f_stat</span> <span class="o">=</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">stat</span><span class="p">):</span>
+            <span class="n">f_stat</span> <span class="o">=</span> <span class="s1">&#39;      N/A&#39;</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="s1">&#39;R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Adj. R-squared:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsquared_adj</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;F-statistic:&#39;</span><span class="p">,</span> <span class="n">f_stat</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;P-value (F-stat):&#39;</span><span class="p">,</span> <span class="n">pval_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">pval</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Distribution:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_statistic</span><span class="o">.</span><span class="n">dist_name</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;R-squared (No Effects):&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorbed_rsquared</span><span class="p">,</span> <span class="mi">5</span><span class="p">))),</span>
+                <span class="p">(</span><span class="s1">&#39;Varaibles Absorbed:&#39;</span><span class="p">,</span> <span class="n">_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_absorbed</span><span class="p">))</span>
+                <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">absorbed_rsquared</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Coefficient of determination (R**2), ignoring absorbed variables&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_rsquared</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">absorbed_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fitted values from only absorbed terms&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_absorbed_effects</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">df_absorbed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Number of variables absorbed&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_model</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="FirstStageResults"><a class="viewcode-back" href="../../../iv/results.html#linearmodels.iv.results.FirstStageResults">[docs]</a><span class="k">class</span> <span class="nc">FirstStageResults</span><span class="p">(</span><span class="n">_SummaryStr</span><span class="p">):</span>
@@ -1522,7 +1572,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

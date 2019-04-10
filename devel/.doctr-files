@@ -8,6 +8,7 @@ devel/_modules/index.html
 devel/_modules/linearmodels/asset_pricing/covariance.html
 devel/_modules/linearmodels/asset_pricing/model.html
 devel/_modules/linearmodels/asset_pricing/results.html
+devel/_modules/linearmodels/iv/absorbing.html
 devel/_modules/linearmodels/iv/covariance.html
 devel/_modules/linearmodels/iv/gmm.html
 devel/_modules/linearmodels/iv/model.html
@@ -33,7 +34,9 @@ devel/_sources/asset-pricing/results.rst.txt
 devel/_sources/changes.rst.txt
 devel/_sources/contributing.rst.txt
 devel/_sources/index.rst.txt
+devel/_sources/iv/absorbing.rst.txt
 devel/_sources/iv/covariance.rst.txt
+devel/_sources/iv/examples/absorbing-regression.ipynb.txt
 devel/_sources/iv/examples/advanced-examples.ipynb.txt
 devel/_sources/iv/examples/basic-examples.ipynb.txt
 devel/_sources/iv/examples/using-formulas.ipynb.txt
@@ -184,7 +187,9 @@ devel/changes.html
 devel/contributing.html
 devel/genindex.html
 devel/index.html
+devel/iv/absorbing.html
 devel/iv/covariance.html
+devel/iv/examples/absorbing-regression.html
 devel/iv/examples/advanced-examples.html
 devel/iv/examples/basic-examples.html
 devel/iv/examples/using-formulas.html

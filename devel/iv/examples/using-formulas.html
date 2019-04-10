@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.12+8.g5e3183f documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.12+9.gba6c1c1 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -26,7 +26,7 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Module Reference" href="../reference.html" />
+    <link rel="next" title="Absorbing Regression" href="absorbing-regression.html" />
     <link rel="prev" title="Further Examples" href="advanced-examples.html" />
   
   
@@ -45,12 +45,12 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../reference.html" title="Module Reference"
+          <a href="absorbing-regression.html" title="Absorbing Regression"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.12 (+8, g5e3183f)</a>
+    ../../index.html" class="text-logo">linearmodels 4.12 (+9, gba6c1c1)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -73,9 +73,11 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Instrumental Variable Estimation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../absorbing.html">Absorbing Least Squares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic-examples.html">Basic Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="advanced-examples.html">Further Examples</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="absorbing-regression.html">Absorbing Regression</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
 </ul>
@@ -450,8 +452,8 @@ vgh               vg or good health
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Thu, Apr 04 2019   P-value (F-stat)                0.0000
-Time:                        15:01:54   Distribution:                  chi2(6)
+Date:                Wed, Apr 10 2019   P-value (F-stat)                0.0000
+Time:                        17:01:56   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -514,8 +516,8 @@ Debiased: False
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Thu, Apr 04 2019   P-value (F-stat)                0.0000
-Time:                        15:01:54   Distribution:                  chi2(6)
+Date:                Wed, Apr 10 2019   P-value (F-stat)                0.0000
+Time:                        17:01:56   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -599,7 +601,7 @@ T-stats reported in parentheses
       </div>
     
       <div class="pull-right">
-        <a class="btn btn-default" href="../reference.html" title="next chapter (use the right arrow)">Module Reference</a>
+        <a class="btn btn-default" href="absorbing-regression.html" title="next chapter (use the right arrow)">Absorbing Regression</a>
       </div>
     </div>
     <div class="clearer"></div>
@@ -617,12 +619,12 @@ T-stats reported in parentheses
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../reference.html" title="Module Reference"
+          <a href="absorbing-regression.html" title="Absorbing Regression"
              >next</a> |</li>
         <li class="right" >
           <a href="advanced-examples.html" title="Further Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

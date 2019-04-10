@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.12+8.g5e3183f documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.12+9.gba6c1c1 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.12 (+8, g5e3183f)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12 (+9, gba6c1c1)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -128,7 +128,8 @@
 <span class="kn">from</span> <span class="nn">linearmodels.panel.data</span> <span class="k">import</span> <span class="n">PanelData</span>
 <span class="kn">from</span> <span class="nn">linearmodels.panel.results</span> <span class="k">import</span> <span class="p">(</span><span class="n">PanelEffectsResults</span><span class="p">,</span> <span class="n">PanelResults</span><span class="p">,</span>
                                         <span class="n">RandomEffectsResults</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">linearmodels.panel.utility</span> <span class="k">import</span> <span class="n">dummy_matrix</span><span class="p">,</span> <span class="n">in_2core_graph</span>
+<span class="kn">from</span> <span class="nn">linearmodels.panel.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">check_absorbed</span><span class="p">,</span> <span class="n">dummy_matrix</span><span class="p">,</span>
+                                        <span class="n">in_2core_graph</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
                                   <span class="n">InferenceUnavailableWarning</span><span class="p">,</span>
                                   <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">MemoryWarning</span><span class="p">,</span>
@@ -235,28 +236,12 @@
         <span class="k">return</span> <span class="n">out</span>
 
 
-<span class="k">class</span> <span class="nc">AbsorbingEffectError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
-
-
-<span class="n">absorbing_error_msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">The model cannot be estimated. The included effects have fully absorbed</span>
-<span class="s2">one or more of the variables. This occurs when one or more of the dependent</span>
-<span class="s2">variable is perfectly explained using the effects included in the model.</span>
-
-<span class="s2">The following variables or variable combinations have been fully absorbed</span>
-<span class="s2">or have become perfectly collinear after effects are removed:</span>
-
-<span class="si">{absorbed_variables}</span><span class="s2"></span>
-<span class="s2">&quot;&quot;&quot;</span>
-
-
 <span class="k">class</span> <span class="nc">AmbiguityError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PanelOLS&#39;</span><span class="p">,</span> <span class="s1">&#39;PooledOLS&#39;</span><span class="p">,</span> <span class="s1">&#39;RandomEffects&#39;</span><span class="p">,</span> <span class="s1">&#39;FirstDifferenceOLS&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;BetweenOLS&#39;</span><span class="p">,</span> <span class="s1">&#39;AbsorbingEffectError&#39;</span><span class="p">,</span> <span class="s1">&#39;AmbiguityError&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;BetweenOLS&#39;</span><span class="p">,</span> <span class="s1">&#39;AmbiguityError&#39;</span><span class="p">,</span>
            <span class="s1">&#39;FamaMacBeth&#39;</span><span class="p">]</span>
 
 
@@ -1312,8 +1297,7 @@
         <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Default case for 2-way -- not completely clear</span>
 
 <div class="viewcode-block" id="PanelOLS.fit"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">use_lsdv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_lsmr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;unadjusted&#39;</span><span class="p">,</span>
-            <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">auto_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">count_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
+            <span class="n">debiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">auto_df</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">count_effects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Estimate model parameters</span>
 
@@ -1415,21 +1399,7 @@
                 <span class="n">drop_first</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">xpx</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>
-                <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">xpx</span><span class="p">)</span>
-                <span class="n">tol</span> <span class="o">=</span> <span class="n">vals</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
-                <span class="n">absorbed</span> <span class="o">=</span> <span class="n">vals</span> <span class="o">&lt;</span> <span class="n">tol</span>
-                <span class="n">nabsorbed</span> <span class="o">=</span> <span class="n">absorbed</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-                <span class="n">absorbed_vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">absorbed</span><span class="p">]</span>
-                <span class="n">exog_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span>
-                <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nabsorbed</span><span class="p">):</span>
-                    <span class="n">vars_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">absorbed_vecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">exog_vars</span><span class="p">[</span><span class="n">vi</span><span class="p">]</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">vars_idx</span><span class="p">)))</span>
-                <span class="n">absorbed_variables</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="n">absorbing_error_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">absorbed_variables</span><span class="o">=</span><span class="n">absorbed_variables</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">AbsorbingEffectError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">check_absorbed</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2300,7 +2270,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+8.g5e3183f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+9.gba6c1c1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
