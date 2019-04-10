@@ -1,4 +1,5 @@
 from linearmodels.compat.pandas import get_codes, to_numpy
+from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
 

@@ -924,15 +924,18 @@ class AbsorbingLS(object):
             e = e - root_w * average(self._dependent.ndarray, weights=w)
 
         total_ss = float(e.T @ e)
-        r2 = 1 - residual_ss / total_ss
+        r2 = max(1 - residual_ss / total_ss, 0.0)
 
         e = to_numpy(self._absorbed_dependent)  # already scaled by root_w
-        if self.has_constant:
-            mu = (root_w.T @ e) / (root_w.T @ root_w)
-            e = e - root_w * mu
+        # If absorbing contains a constant, but exog does not, no need to demean
+        if self._const_col is not None:
+            col = self._const_col
+            x = to_numpy(self._absorbed_exog)[:, col:col + 1]
+            mu = (lstsq(x, to_numpy(e))[0]).squeeze()
+            e = e - x * mu
 
         aborbed_total_ss = float(e.T @ e)
-        r2_absorbed = 1 - residual_ss / aborbed_total_ss
+        r2_absorbed = max(1 - residual_ss / aborbed_total_ss, 0.0)
 
         fstat = self._f_statistic(params, cov, debiased)
         out = {'params': Series(params.squeeze(), columns, name='parameter'),

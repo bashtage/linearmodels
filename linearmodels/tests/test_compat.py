@@ -1,8 +1,6 @@
-from linearmodels.compat.numpy import isin
 from linearmodels.compat.pandas import concat
 
 import numpy as np
-from numpy.testing import assert_array_equal
 from pandas import DataFrame, Series, date_range
 import pytest
 
