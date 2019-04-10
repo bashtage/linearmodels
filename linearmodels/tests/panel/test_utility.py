@@ -1,5 +1,3 @@
-from linearmodels.compat.numpy import isin
-
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
@@ -94,7 +92,7 @@ def test_drop_singletons_single():
     assert vc[vc > 1].sum() == nonsingletons.shape[0]
     singletons = np.asarray(vc.index[vc == 1])
     assert nonsingletons.shape[0] == (40000 - singletons.shape[0])
-    assert not np.any(isin(nonsingletons, singletons))
+    assert not np.any(np.isin(nonsingletons, singletons))
 
 
 def test_drop_singletons_slow():
@@ -106,7 +104,7 @@ def test_drop_singletons_slow():
     nonsingletons = cats[retain]
     for col in (c1, c2):
         uniq, counts = np.unique(col, return_counts=True)
-        assert not np.any(isin(col[retain], uniq[counts == 1]))
+        assert not np.any(np.isin(col[retain], uniq[counts == 1]))
 
     idx = np.arange(40000)
 

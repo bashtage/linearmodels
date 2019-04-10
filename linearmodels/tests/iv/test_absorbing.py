@@ -527,6 +527,9 @@ def assert_results_equal(o_res: OLSResults, a_res: AbsorbingLSResults, k: int = 
                 except AssertionError:
                     print(attr)
                     assert left == right
+    assert isinstance(a_res.summary, Summary)
+    assert isinstance(a_res.absorbed_effects, pd.DataFrame)
+    assert a_res.absorbed_rsquared <= a_res.rsquared
 
 
 def test_center_cov_arg():

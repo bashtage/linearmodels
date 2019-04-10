@@ -1,5 +1,3 @@
-from linearmodels.compat.numpy import isin
-
 from collections import defaultdict
 from typing import List
 
@@ -265,7 +263,7 @@ def in_2core_graph(cats):
         # Fast, simple path
         ucats, counts = np.unique(cats, return_counts=True)
         retain = ucats[counts > 1]
-        return isin(cats, retain).ravel()
+        return np.isin(cats, retain).ravel()
 
     nobs, ncats = cats.shape
     zero_cats = []
@@ -346,7 +344,7 @@ def in_2core_graph_slow(cats):
         singleton = np.zeros(cats.shape[0], dtype=np.bool)
         for i in range(ncats):
             ucats, counts = np.unique(cats[:, i], return_counts=True)
-            singleton |= isin(cats[:, i], ucats[counts == 1])
+            singleton |= np.isin(cats[:, i], ucats[counts == 1])
         num_singleton = singleton.sum()
         if num_singleton:
             cats = cats[~singleton]

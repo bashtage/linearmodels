@@ -28,14 +28,3 @@ def test_concat_sort(data):
     assert list(b.columns) == ['A', 'B', 'C', 'D']
     assert list(c.columns) == ['A', 'B', 'C', 'D']
     assert list(d.columns) == ['B', 'C', 'A', 'D']
-
-
-def test_isin():
-    a = np.arange(5)
-    b = np.arange(3)
-    expected = np.array([1, 1, 1, 0, 0], dtype=np.bool)
-    assert_array_equal(isin(a, b), np.array([1, 1, 1, 0, 0], dtype=np.bool))
-
-    a = np.column_stack([a] * 3)
-    expected = np.column_stack([expected] * 3)
-    assert_array_equal(isin(a, b), expected)
