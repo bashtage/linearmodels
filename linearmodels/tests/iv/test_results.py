@@ -79,6 +79,14 @@ def test_fitted_predict(data, model):
     assert list(pred.columns) == ['fitted_values', 'residual']
 
 
+def test_fitted_predict_exception(data, model):
+    mod = model(data.dep, None, data.endog, data.instr)
+    res = mod.fit()
+    df = DataFrame([[1]])
+    with pytest.raises(ValueError):
+        res.predict(data=df)
+
+
 def test_predict_no_selection(data, model):
     mod = model(data.dep, None, data.endog, data.instr)
     res = mod.fit()

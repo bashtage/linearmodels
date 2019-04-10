@@ -59,13 +59,9 @@ def random_cat(ncat, size, frame=False, rs=None):
     return series
 
 
-def random_cont(size, frame=False, rs=None):
-    if rs is None:
-        rs = np.random.RandomState()
+def random_cont(size, rs=None):
     series = pd.Series(rs.standard_normal(size))
-    if frame:
-        return pd.DataFrame(series)
-    return series
+    return pd.DataFrame(series)
 
 
 @pytest.fixture(scope='module', params=[1, 2, 3])
@@ -98,7 +94,7 @@ def interact(request):
     interactions = []
     for i in range(request.param):
         cat = random_cat(4, 100, frame=True, rs=rs)
-        cont = random_cont(100, rs=rs, frame=True)
+        cont = random_cont(100, rs=rs)
         interactions.append(Interaction(cat, cont))
     return interactions
 
@@ -106,10 +102,7 @@ def interact(request):
 def generate_data(k=3, const=True, nfactors=1, factor_density=10, nobs=2000, cont_interactions=1,
                   format='interaction', singleton_interaction=False, weighted=False, ncont=0):
     rs = np.random.RandomState(1234567890)
-    if isinstance(factor_density, int):
-        density = [factor_density] * max(nfactors, cont_interactions)
-    else:
-        density = factor_density
+    density = [factor_density] * max(nfactors, cont_interactions)
     x = rs.standard_normal((nobs, k))
     if const:
         x = np.column_stack([np.ones(nobs), x])
@@ -216,7 +209,9 @@ def ols_data(request):
 def test_smoke(data):
     mod = AbsorbingLS(data.y, data.x, absorb=data.absorb, interactions=data.interactions,
                       weights=data.weights)
-    mod.fit()
+    res = mod.fit()
+    assert isinstance(res.summary, Summary)
+    assert isinstance(str(res.summary), str)
 
 
 def test_absorbing_exceptions(rs):
@@ -523,12 +518,9 @@ def assert_results_equal(o_res: OLSResults, a_res: AbsorbingLSResults, k: int = 
             if isinstance(left, float):
                 assert_allclose(left, right, atol=1e-10)
             else:
-                try:
-                    assert left == right
-                except AssertionError:
-                    print(attr)
-                    assert left == right
+                assert left == right
     assert isinstance(a_res.summary, Summary)
+    assert isinstance(str(a_res.summary), str)
     assert isinstance(a_res.absorbed_effects, pd.DataFrame)
     assert a_res.absorbed_rsquared <= a_res.rsquared
 

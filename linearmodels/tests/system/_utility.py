@@ -218,8 +218,6 @@ def simple_3sls(y, x, z):
 
 
 def convert_to_pandas(a, base):
-    if a.ndim == 1:
-        return pd.Series(a, name=base)
     k = a.shape[1]
     cols = [base + '_{0}'.format(i) for i in range(k)]
     return pd.DataFrame(a, columns=cols)
