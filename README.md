@@ -132,7 +132,7 @@ others are the version that are being used in the test environment.  It
 is possible that older versions work.
 
 * **Python 3.5+**: extensive use of `@` operator
-* NumPy (1.12+)
+* NumPy (1.13+)
 * SciPy (0.18+)
 * pandas (0.20+)
 * statsmodels (0.8+)

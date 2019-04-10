@@ -1,16 +1,26 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from typing import Tuple, List, Any, Dict
-
 from linearmodels.compat.pandas import (concat, is_categorical,
                                         is_categorical_dtype, is_numeric_dtype,
                                         is_string_dtype, is_string_like)
-from linearmodels.typing.data import ArrayLike
+
 import copy
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+
+from linearmodels.typing.data import OptionalArrayLike
+
+iv_data_types = (np.ndarray, pd.DataFrame, pd.Series)
+try:
+    import xarray as xr
+
+    HAS_XARRAY = True
+    iv_data_types = iv_data_types + (xr.DataArray,)
+except ImportError:
+    HAS_XARRAY = False
 
 dim_err = '{0} has too many dims.  Maximum is 2, actual is {1}'
 type_err = 'Only ndarrays, DataArrays and Series and DataFrames are supported'
@@ -35,10 +45,15 @@ class IVData(object):
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, DataArray}
+    x : {ndarray, Series, DataFrame, DataArray}, optional
+        Data to wrap and standardize.  If None, then nobs must be provided to
+        produce an IVData instance with shape (nobs, 0).
     var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
+    nobs : int, optiona
+        Number of observation, used when `x` is None. If `x` is array-like,
+        then nobs is used to check the number of observations in `x`.
     convert_dummies : bool, optional
         Flat indicating whether pandas categoricals or string input data
         should be converted to dummy variables
@@ -46,7 +61,7 @@ class IVData(object):
         Flag indicating to drop first dummy category
     """
 
-    def __init__(self, x: ArrayLike, var_name: str = 'x', nobs: int = None,
+    def __init__(self, x: OptionalArrayLike, var_name: str = 'x', nobs: int = None,
                  convert_dummies: bool = True, drop_first: bool = True):
 
         if isinstance(x, IVData):

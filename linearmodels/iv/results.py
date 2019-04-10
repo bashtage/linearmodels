@@ -1,14 +1,15 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
-from typing import Union, Dict, Any, List
-
 from linearmodels.compat.statsmodels import Summary
 
 from collections import OrderedDict
 import datetime as dt
+from typing import Any, Dict, List, Union
+
 from cached_property import cached_property
-from numpy import array, c_, diag, empty, log, ones, sqrt, zeros, ndarray
+from numpy import (array, c_, diag, empty, isnan, log, ndarray, ones, sqrt,
+                   zeros)
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
 import scipy.stats as stats
@@ -45,7 +46,7 @@ def table_concat(lists, sep='='):
 
 
 class OLSResults(_SummaryStr):
-    def __init__(self, results, model):
+    def __init__(self, results: Dict[str, Any], model):
         self._resid = results['eps']
         self._wresid = results['weps']
         self._params = results['params']
@@ -66,6 +67,7 @@ class OLSResults(_SummaryStr):
         self._cov_estimator = results['cov_estimator']
         self._original_index = results['original_index']
         self._fitted = results['fitted']
+        self._df_model = results.get('df_model', self._params.shape[0])
 
     @property
     def cov_config(self) -> Dict[str, Any]:
@@ -186,17 +188,17 @@ class OLSResults(_SummaryStr):
     @property
     def nobs(self) -> int:
         """Number of observations"""
-        return self.model.endog.shape[0]
+        return self.model.dependent.shape[0]
 
     @property
     def df_resid(self) -> int:
         """Residual degree of freedom"""
-        return self.nobs - self.model.exog.shape[1]
+        return self.nobs - self.df_model
 
     @property
     def df_model(self) -> int:
         """Model degree of freedom"""
-        return self.model._x.shape[1]
+        return int(self._df_model)
 
     @property
     def has_constant(self) -> bool:
@@ -327,6 +329,19 @@ class OLSResults(_SummaryStr):
         ci = self.params[:, None] + self.std_errors[:, None] * q
         return DataFrame(ci, index=self._vars, columns=['lower', 'upper'])
 
+    def _top_right(self):
+        f_stat = _str(self.f_statistic.stat)
+        if isnan(self.f_statistic.stat):
+            f_stat = '      N/A'
+
+        return [('R-squared:', _str(self.rsquared)),
+                ('Adj. R-squared:', _str(self.rsquared_adj)),
+                ('F-statistic:', f_stat),
+                ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
+                ('Distribution:', str(self.f_statistic.dist_name)),
+                ('', ''),
+                ('', '')]
+
     @property
     def summary(self) -> Summary:
         """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
@@ -345,13 +360,7 @@ class OLSResults(_SummaryStr):
                     ('Cov. Estimator:', self._cov_type),
                     ('', '')]
 
-        top_right = [('R-squared:', _str(self.rsquared)),
-                     ('Adj. R-squared:', _str(self.rsquared_adj)),
-                     ('F-statistic:', _str(self.f_statistic.stat)),
-                     ('P-value (F-stat)', pval_format(self.f_statistic.pval)),
-                     ('Distribution:', str(self.f_statistic.dist_name)),
-                     ('', ''),
-                     ('', '')]
+        top_right = self._top_right()
 
         stubs = []
         vals = []
@@ -392,23 +401,28 @@ class OLSResults(_SummaryStr):
             data.append(txt_row)
         title = 'Parameter Estimates'
         table_stubs = list(self.params.index)
-        header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
-        table = SimpleTable(data,
-                            stubs=table_stubs,
-                            txt_fmt=fmt_params,
-                            headers=header,
-                            title=title)
-        smry.tables.append(table)
+        extra_text = []
+        if table_stubs:
+            header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+            table = SimpleTable(data,
+                                stubs=table_stubs,
+                                txt_fmt=fmt_params,
+                                headers=header,
+                                title=title)
+            smry.tables.append(table)
+        else:
+            extra_text.append('Model contains no parameters')
 
         instruments = self.model.instruments
         if instruments.shape[1] > 0:
-            extra_text = []
+
             endog = self.model.endog
             extra_text.append('Endogenous: ' + ', '.join(endog.cols))
             extra_text.append('Instruments: ' + ', '.join(instruments.cols))
             cov_descr = str(self._cov_estimator)
             for line in cov_descr.split('\n'):
                 extra_text.append(line)
+        if extra_text:
             smry.add_extra_txt(extra_text)
 
         return smry
@@ -482,6 +496,42 @@ class OLSResults(_SummaryStr):
                       'instead. This method will be unavailable after June 2019.',
                       DeprecationWarning)
         return self.wald_test(restriction, value, formula=formula)
+
+
+class AbsorbingLSResults(OLSResults):
+    def __init__(self, results: Dict[str, Any], model):
+        super(AbsorbingLSResults, self).__init__(results, model)
+        self._absorbed_rsquared = results['absorbed_r2']
+        self._absorbed_effects = results['absorbed_effects']
+
+    def _top_right(self):
+        f_stat = _str(self.f_statistic.stat)
+        if isnan(self.f_statistic.stat):
+            f_stat = '      N/A'
+
+        return [('R-squared:', _str(self.rsquared)),
+                ('Adj. R-squared:', _str(self.rsquared_adj)),
+                ('F-statistic:', f_stat),
+                ('P-value (F-stat):', pval_format(self.f_statistic.pval)),
+                ('Distribution:', str(self.f_statistic.dist_name)),
+                ('R-squared (No Effects):', _str(round(self.absorbed_rsquared, 5))),
+                ('Varaibles Absorbed:', _str(self.df_absorbed))
+                ]
+
+    @property
+    def absorbed_rsquared(self) -> float:
+        """Coefficient of determination (R**2), ignoring absorbed variables"""
+        return self._absorbed_rsquared
+
+    @property
+    def absorbed_effects(self) -> DataFrame:
+        """Fitted values from only absorbed terms"""
+        return self._absorbed_effects
+
+    @property
+    def df_absorbed(self) -> DataFrame:
+        """Number of variables absorbed"""
+        return self.df_model - self.params.shape[0]
 
 
 class FirstStageResults(_SummaryStr):

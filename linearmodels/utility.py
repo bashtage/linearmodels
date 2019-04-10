@@ -358,6 +358,8 @@ def _str(v):
 
 def pval_format(v):
     """Preferred formatting for x in [0,1]"""
+    if np.isnan(v):
+        return '        '
     return '{0:4.4f}'.format(v)
 
 

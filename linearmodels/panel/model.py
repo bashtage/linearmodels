@@ -18,7 +18,8 @@ from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
-from linearmodels.panel.utility import dummy_matrix, in_2core_graph
+from linearmodels.panel.utility import (check_absorbed, dummy_matrix,
+                                        in_2core_graph)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InferenceUnavailableWarning,
                                   InvalidTestStatistic, MemoryWarning,
@@ -125,28 +126,12 @@ class PanelFormulaParser(object):
         return out
 
 
-class AbsorbingEffectError(Exception):
-    pass
-
-
-absorbing_error_msg = """
-The model cannot be estimated. The included effects have fully absorbed
-one or more of the variables. This occurs when one or more of the dependent
-variable is perfectly explained using the effects included in the model.
-
-The following variables or variable combinations have been fully absorbed
-or have become perfectly collinear after effects are removed:
-
-{absorbed_variables}
-"""
-
-
 class AmbiguityError(Exception):
     pass
 
 
 __all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS',
-           'BetweenOLS', 'AbsorbingEffectError', 'AmbiguityError',
+           'BetweenOLS', 'AmbiguityError',
            'FamaMacBeth']
 
 
@@ -1202,8 +1187,7 @@ class PanelOLS(PooledOLS):
         return True  # Default case for 2-way -- not completely clear
 
     def fit(self, *, use_lsdv=False, use_lsmr=False, low_memory=None, cov_type='unadjusted',
-            debiased=True,
-            auto_df=True, count_effects=True, **cov_config):
+            debiased=True, auto_df=True, count_effects=True, **cov_config):
         """
         Estimate model parameters
 
@@ -1305,21 +1289,7 @@ class PanelOLS(PooledOLS):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
-            if matrix_rank(x) < x.shape[1]:
-                xpx = x.T @ x
-                vals, vecs = np.linalg.eigh(xpx)
-                tol = vals.max() * self.exog.shape[1] * np.finfo(np.float64).eps
-                absorbed = vals < tol
-                nabsorbed = absorbed.sum()
-                absorbed_vecs = vecs[:, absorbed]
-                exog_vars = self.exog.vars
-                rows = []
-                for i in range(nabsorbed):
-                    vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
-                    rows.append(' ' * 10 + ', '.join((exog_vars[vi] for vi in vars_idx)))
-                absorbed_variables = '\n'.join(rows)
-                msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
-                raise AbsorbingEffectError(msg)
+            check_absorbed(x, self.exog.vars)
 
         params = lstsq(x, y)[0]
         nobs = self.dependent.dataframe.shape[0]
