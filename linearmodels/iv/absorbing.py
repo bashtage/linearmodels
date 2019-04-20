@@ -22,6 +22,11 @@ from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import missing_warning
 
+from patsy.highlevel import dmatrices
+from patsy.desc import ModelDesc
+from patsy.missing import NAAction
+from patsy.eval import EvalEnvironment
+
 try:
     from xxhash import xxh64 as hash_func
 except ImportError:
@@ -481,6 +486,66 @@ class AbsorbingRegressor(object):
             self._approx_rank = 0
             return csc_matrix(empty((0, 0)))
 
+class AbsorbingFormulaParser(object):
+    """
+
+    Examples
+    --------
+    >>> formula = 'y ~ 1 + x + z'
+    >>> formula = 'y ~ 1 + x + {z}'
+    >>> formula = 'y ~ 1 + x + {w*z + q}'
+    """
+    def __init__(self, formula: str, data: DataFrame, eval_env=0):
+        self._formula = formula
+        if not isinstance(formula, str):
+            raise TypeError('formula must be a string')
+        if not isinstance(data, DataFrame):
+            raise TypeError('data must be a DataFrame')
+        self._data = data
+        self._na_action = NAAction(on_NA='raise', NA_types=[])
+        self._eval_env = EvalEnvironment.capture(eval_env, reference=1)
+
+    def _parse_formula(self):
+        fmla = self._formula
+        absorb = ''
+        if '{' is self._formula:
+            main, absorb = self._formula.split('{')
+        else:
+            main = fmla
+        if absorb:
+            absorb = absorb.replace('}', '')
+            md = ModelDesc.from_formula(absorb)
+            for term in md.rhs_termlist:
+                factors = term.factors
+                if len(factors) == 1:
+                    # Either categorical or cont, must be absorb
+                    # TODO
+                    pass
+                else:  # interaction
+            # TODO: parse absorb
+        main = main.strip()
+        if main.endswith(('-','+')):
+            main = main[:-1]
+
+        main = main + ' + 0'
+        self._dep, self._exog = dmatrices(main, self._data, self._eval_env, NA_action=self._na_action)
+
+    @property
+    def interactions(self):
+        return self._interactions
+
+    @property
+    def absorb(self):
+        return self._absorb
+
+    @property
+    def dep(self):
+        return self._dep
+
+    @property
+    def exog(self):
+        return self._exog
+
 
 class AbsorbingLS(object):
     r"""
@@ -607,6 +672,59 @@ class AbsorbingLS(object):
         self._num_params = 0
         self._regressors = None
         self._regressors_hash = None
+        self.formula = None
+
+    @staticmethod
+    def from_formula(formula: str, data: DataFrame, *, weights: OptionalArrayLike = None,
+                     fuller: float = 0, kappa: OptionalNumeric = None):
+        """
+        Parameters
+        ----------
+        formula : str
+            Patsy formula modified for the IV syntax described in the notes
+            section
+        data : DataFrame
+            DataFrame containing the variables used in the formula
+        weights : array-like, optional
+            Observation weights used in estimation
+        fuller : float, optional
+            Fuller's alpha to modify LIML estimator. Default returns unmodified
+            LIML estimator.
+        kappa : float, optional
+            Parameter value for k-class estimation.  If not provided, computed to
+            produce LIML parameter estimate.
+
+        Returns
+        -------
+        model : IVLIML
+            Model instance
+
+        Notes
+        -----
+        The IV formula modifies the standard Patsy formula to include a
+        block of the form [endog ~ instruments] which is used to indicate
+        the list of endogenous variables and instruments.  The general
+        structure is `dependent ~ exog [endog ~ instruments]` and it must
+        be the case that the formula expressions constructed from blocks
+        `dependent ~ exog endog` and `dependent ~ exog instruments` are both
+        valid Patsy formulas.
+
+        A constant must be explicitly included using '1 +' if required.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from linearmodels.datasets import wage
+        >>> from linearmodels.iv import IVLIML
+        >>> data = wage.load()
+        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> mod = IVLIML.from_formula(formula, data)
+        """
+        parser = AbsorbingFormulaParser(formula, data)
+        mod = AbsorbingLS(parser.dep, exog=parser.exog, absorb=parser.absorb,
+                          interactions=parser.interactions, weights=weights)
+        mod.formula = formula
+        return mod
 
     def _drop_missing(self) -> ndarray:
         missing = to_numpy(self.dependent.isnull)
