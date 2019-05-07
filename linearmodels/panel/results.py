@@ -391,7 +391,7 @@ class PanelResults(_SummaryStr):
         interface.  `exog` can be used for both a model created using a formula
         or a model specified with dependent and exog arrays.
 
-        When sing `exog` to generate out-of-sample predictions, the variable
+        When using `exog` to generate out-of-sample predictions, the variable
         order must match the variables in the original model.
 
         Idiosyncratic errors and effects are not available for out-of-sample
