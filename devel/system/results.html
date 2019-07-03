@@ -132,7 +132,7 @@
 <h2>SUR and 3SLS<a class="headerlink" href="#sur-and-3sls" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.system.results.SystemResults">
-<em class="property">class </em><code class="descname">SystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">SystemResults</code><span class="sig-paren">(</span><em class="sig-param">results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results from Seemingly Unrelated Regression Estimators</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -141,7 +141,7 @@
 </dl>
 <dl class="method">
 <dt id="linearmodels.system.results.SystemResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.SystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.SystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -158,99 +158,99 @@
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.cov_config">
-<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_config</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configuration of covariance estimator used to compute covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.equation_labels">
-<code class="descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual equation labels</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.equations">
-<code class="descname">equations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equations" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">equations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.equations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual equation results</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.iterations">
-<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.iterations" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.method">
-<code class="descname">method</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation method</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.model">
-<code class="descname">model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model used in estimation</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.results.SystemResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>equations=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">equations=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em>, <em class="sig-param">dataframe=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#SystemResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.SystemResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -297,68 +297,68 @@ estimated model.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.system.results.SystemResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.sigma">
-<code class="descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.sigma" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.sigma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residual covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.SystemResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.SystemResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
 </dd></dl>
 
@@ -369,10 +369,10 @@ estimated model.</p>
 <h2>Generalized Method of Moments (GMM)<a class="headerlink" href="#generalized-method-of-moments-gmm" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.system.results.GMMSystemResults">
-<em class="property">class </em><code class="descname">GMMSystemResults</code><span class="sig-paren">(</span><em>results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#GMMSystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">GMMSystemResults</code><span class="sig-paren">(</span><em class="sig-param">results</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/results.html#GMMSystemResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -389,69 +389,69 @@ estimated model.</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.cov_config">
-<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_config</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configuration of covariance estimator used to compute covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.equation_labels">
-<code class="descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">equation_labels</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equation_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual equation labels</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.equations">
-<code class="descname">equations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equations" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">equations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.equations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual equation results</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.iterations">
-<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.iterations" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">iterations</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of iterations of the GLS executed</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.j_stat">
-<code class="descname">j_stat</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.j_stat" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">j_stat</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.j_stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>J-test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -473,39 +473,39 @@ statistic is defined as</p>
 <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.method">
-<code class="descname">method</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation method</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.model">
-<code class="descname">model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model used in estimation</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>equations=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em>, <em>dataframe=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">equations=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em>, <em class="sig-param">dataframe=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -552,86 +552,86 @@ estimated model.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.system.results.GMMSystemResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.sigma">
-<code class="descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.sigma" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sigma</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.sigma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residual covariance</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.w">
-<code class="descname">w</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.w" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">w</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.w" title="Permalink to this definition">¶</a></dt>
 <dd><p>GMM weight matrix used in estimation</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.weight_config">
-<code class="descname">weight_config</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">weight_config</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight configuration options used in GMM estimation</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.weight_type">
-<code class="descname">weight_type</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">weight_type</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.weight_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of weighting used in GMM estimation</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.results.GMMSystemResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.system.results.GMMSystemResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
 </dd></dl>
 

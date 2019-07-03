@@ -132,7 +132,7 @@
 <span id="gmm-weight-and-covariance-estimation"></span><h1>GMM Weight and Covariance Estimation<a class="headerlink" href="#module-linearmodels.iv.gmm" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance">
-<em class="property">class </em><code class="descname">IVGMMCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>w</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#IVGMMCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVGMMCovariance</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">params</em>, <em class="sig-param">w</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#IVGMMCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for GMM models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -176,15 +176,15 @@ provided, nobs - 2 is used.</p></li>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HomoskedasticCovariance" title="linearmodels.iv.covariance.HomoskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HomoskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance" title="linearmodels.iv.covariance.HeteroskedasticCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.HeteroskedasticCovariance</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.KernelCovariance" title="linearmodels.iv.covariance.KernelCovariance"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.KernelCovariance</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.OneWayClusteredCovariance</span></code></p>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance of estimated parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if covariance is debiased</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -193,9 +193,9 @@ provided, nobs - 2 is used.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance.s">
-<code class="descname">s</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.s" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score covariance estimate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -204,9 +204,9 @@ provided, nobs - 2 is used.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.IVGMMCovariance.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.gmm.IVGMMCovariance.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated variance of residuals. Small-sample adjusted if debiased.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -219,7 +219,7 @@ provided, nobs - 2 is used.</p></li>
 
 <dl class="class">
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix">
-<em class="property">class </em><code class="descname">HomoskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HomoskedasticWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Homoskedastic (unadjusted) weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -237,9 +237,9 @@ the mean before computing the weight matrix.</p></li>
 W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
 <p><code class="docutils literal notranslate"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -253,7 +253,7 @@ W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HomoskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HomoskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -275,7 +275,7 @@ W &amp; =n^{-1}s^{2}\sum_{i=1}^{n}z_i'z_i\end{split}\]</div>
 
 <dl class="class">
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix">
-<em class="property">class </em><code class="descname">HeteroskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HeteroskedasticWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -292,9 +292,9 @@ the mean before computing the weight matrix.</p></li>
 \[\begin{split}g_i &amp; =z_i\epsilon_i\\
 W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(z_i\)</span> contains both the exogenous regressors and instruments.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -308,7 +308,7 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#HeteroskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.HeteroskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -330,7 +330,7 @@ W &amp; =n^{-1}\sum_{i=1}^{n}g'_ig_i\end{split}\]</div>
 
 <dl class="class">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix">
-<em class="property">class </em><code class="descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>center=False</em>, <em>debiased=False</em>, <em>optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">kernel='bartlett'</em>, <em class="sig-param">bandwidth=None</em>, <em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity, autocorrelation robust weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -362,15 +362,15 @@ contains both the exogenous regressors and instruments..</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="covariance.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.bandwidth">
-<code class="descname">bandwidth</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.bandwidth" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">bandwidth</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.bandwidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actual bandwidth used in estimating the weight matrix</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -384,7 +384,7 @@ contains both the exogenous regressors and instruments..</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#KernelWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.KernelWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -406,7 +406,7 @@ contains both the exogenous regressors and instruments..</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix">
-<em class="property">class </em><code class="descname">OneWayClusteredWeightMatrix</code><span class="sig-paren">(</span><em>clusters</em>, <em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">OneWayClusteredWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">clusters</em>, <em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clustered (one-way) weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -418,9 +418,9 @@ the mean before computing the weight matrix.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -434,7 +434,7 @@ the mean before computing the weight matrix.</p></li>
 
 <dl class="method">
 <dt id="linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/gmm.html#OneWayClusteredWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.gmm.OneWayClusteredWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

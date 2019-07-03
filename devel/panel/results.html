@@ -134,11 +134,11 @@
 <h2>Fixed Effect Models<a class="headerlink" href="#fixed-effect-models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.panel.results.PanelEffectsResults">
-<em class="property">class </em><code class="descname">PanelEffectsResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PanelEffectsResults</code><span class="sig-paren">(</span><em class="sig-param">res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results container for panel data models that include effects</p>
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -157,43 +157,43 @@
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelEffectsResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nvar plus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.entity_info">
-<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per entity</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.estimated_effects">
-<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated effects</p>
 <p class="rubric">Notes</p>
 <p>NaN filled when models do not include effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.f_pooled">
-<code class="descname">f_pooled</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_pooled" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_pooled</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_pooled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test that included effects are jointly zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -218,9 +218,9 @@ has an <span class="math notranslate nohighlight">\(F_{k,df_{effect}}\)</span> d
 <span class="math notranslate nohighlight">\(k=df_{pool}-df_{effect}\)</span>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -243,9 +243,9 @@ in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is t
 unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.f_statistic_robust">
-<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -271,15 +271,15 @@ number of restrictions and inference is made using an <span class="math notransl
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -289,51 +289,51 @@ estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.included_effects">
-<code class="descname">included_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.included_effects" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">included_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.included_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of effects included in the model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.loglik">
-<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.name">
-<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model name</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations used to estimate the model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.other_info">
-<code class="descname">other_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.other_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">other_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.other_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per group for other effects</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">effects=False</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,19 +368,19 @@ predictions.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelEffectsResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
 <p class="rubric">Notes</p>
 <p>These residuals are from the estimated model. They will not have the
@@ -388,15 +388,15 @@ same shape as the original data whenever the model is estimated on
 transformed data which has a different shape.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model Coefficient of determination</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_between">
-<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
 <dd><p>Between Coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -411,15 +411,15 @@ transformed data which has a different shape.</p>
 variable on the time averaged dependent variables.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive">
-<code class="descname">rsquared_inclusive</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_inclusive</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_inclusive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model Coefficient of determination including fit of included effects</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_overall">
-<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overall coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -434,9 +434,9 @@ variable on the time averaged dependent variables.</p>
 variable on the dependent variables ignoring any included effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.rsquared_within">
-<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
 <dd><p>Within coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -451,58 +451,58 @@ variable on the dependent variables ignoring any included effects.</p>
 effects on the exogenous purged of entity effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.time_info">
-<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per time interval</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.variance_decomposition">
-<code class="descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decomposition of total variance into effects and residuals</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -569,9 +569,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelEffectsResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted model residuals</p>
 </dd></dl>
 
@@ -582,11 +582,11 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <h2>Random Effects Models<a class="headerlink" href="#random-effects-models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.panel.results.RandomEffectsResults">
-<em class="property">class </em><code class="descname">RandomEffectsResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#RandomEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">RandomEffectsResults</code><span class="sig-paren">(</span><em class="sig-param">res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#RandomEffectsResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results container for random effect panel data models</p>
 <dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -605,43 +605,43 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.RandomEffectsResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nvar plus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.entity_info">
-<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.entity_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per entity</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.estimated_effects">
-<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated effects</p>
 <p class="rubric">Notes</p>
 <p>NaN filled when models do not include effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -664,9 +664,9 @@ in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is t
 unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.f_statistic_robust">
-<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -692,15 +692,15 @@ number of restrictions and inference is made using an <span class="math notransl
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -710,39 +710,39 @@ estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.loglik">
-<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.loglik" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.name">
-<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model name</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations used to estimate the model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">effects=False</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -777,19 +777,19 @@ predictions.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.RandomEffectsResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
 <p class="rubric">Notes</p>
 <p>These residuals are from the estimated model. They will not have the
@@ -797,15 +797,15 @@ same shape as the original data whenever the model is estimated on
 transformed data which has a different shape.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model Coefficient of determination</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_between">
-<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
 <dd><p>Between Coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -820,9 +820,9 @@ transformed data which has a different shape.</p>
 variable on the time averaged dependent variables.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_overall">
-<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overall coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -837,9 +837,9 @@ variable on the time averaged dependent variables.</p>
 variable on the dependent variables ignoring any included effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.rsquared_within">
-<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
 <dd><p>Within coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -854,64 +854,64 @@ variable on the dependent variables ignoring any included effects.</p>
 effects on the exogenous purged of entity effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.theta">
-<code class="descname">theta</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.theta" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">theta</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Values used in generalized demeaning</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.time_info">
-<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.time_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per time interval</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.variance_decomposition">
-<code class="descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">variance_decomposition</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.variance_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decomposition of total variance into effects and residuals</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -978,9 +978,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.RandomEffectsResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.RandomEffectsResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted model residuals</p>
 </dd></dl>
 
@@ -991,11 +991,11 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <h2>All other Models<a class="headerlink" href="#all-other-models" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.panel.results.PanelResults">
-<em class="property">class </em><code class="descname">PanelResults</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PanelResults</code><span class="sig-paren">(</span><em class="sig-param">res</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results container for panel data models that do not include effects</p>
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1014,43 +1014,43 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.cov" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nvar plus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <p class="rubric">Notes</p>
 <p>Defined as nobs minus nvar minus the number of included effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.entity_info">
-<code class="descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.entity_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">entity_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.entity_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per entity</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.estimated_effects">
-<code class="descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">estimated_effects</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.estimated_effects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated effects</p>
 <p class="rubric">Notes</p>
 <p>NaN filled when models do not include effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1073,9 +1073,9 @@ in the model and <span class="math notranslate nohighlight">\(df_U\)</span> is t
 unrestricted model.  The test has an <span class="math notranslate nohighlight">\(F_{k,df_U}\)</span> distribution.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.f_statistic_robust">
-<code class="descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic_robust</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.f_statistic_robust" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joint test of significance for non-constant regressors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1101,15 +1101,15 @@ number of restrictions and inference is made using an <span class="math notransl
 distribution where df is the residual degree of freedom from the model.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -1119,39 +1119,39 @@ estimates only depend on the model estimated through the estimation
 of parameters and inclusion of effects, if any.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.loglik">
-<code class="descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.loglik" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">loglik</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.loglik" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log-likelihood of model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.name">
-<code class="descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.name" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model name</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations used to estimate the model</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>effects=False</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">effects=False</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1186,19 +1186,19 @@ predictions.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.panel.results.PanelResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model residuals</p>
 <p class="rubric">Notes</p>
 <p>These residuals are from the estimated model. They will not have the
@@ -1206,15 +1206,15 @@ same shape as the original data whenever the model is estimated on
 transformed data which has a different shape.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model Coefficient of determination</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.rsquared_between">
-<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_between" title="Permalink to this definition">¶</a></dt>
 <dd><p>Between Coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1229,9 +1229,9 @@ transformed data which has a different shape.</p>
 variable on the time averaged dependent variables.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.rsquared_overall">
-<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_overall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overall coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1246,9 +1246,9 @@ variable on the time averaged dependent variables.</p>
 variable on the dependent variables ignoring any included effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.rsquared_within">
-<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.rsquared_within" title="Permalink to this definition">¶</a></dt>
 <dd><p>Within coefficient of determination</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1263,52 +1263,52 @@ variable on the dependent variables ignoring any included effects.</p>
 effects on the exogenous purged of entity effects.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.time_info">
-<code class="descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.time_info" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">time_info</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.time_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Statistics on observations per time interval</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.wald_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelResults.wald_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1375,9 +1375,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.panel.results.PanelResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted model residuals</p>
 </dd></dl>
 
@@ -1388,7 +1388,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <h2>Comparing Multiple Models<a class="headerlink" href="#comparing-multiple-models" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="linearmodels.panel.results.compare">
-<code class="descname">compare</code><span class="sig-paren">(</span><em>results</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.compare" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare the results of multiple models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1410,7 +1410,7 @@ Default is ‘tstats’.</p></li>
 
 <dl class="class">
 <dt id="linearmodels.panel.results.PanelModelComparison">
-<em class="property">class </em><code class="descname">PanelModelComparison</code><span class="sig-paren">(</span><em>results</em>, <em>*</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PanelModelComparison</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">*</em>, <em class="sig-param">precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/results.html#PanelModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison of multiple models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1422,88 +1422,88 @@ Default is ‘tstats’.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator descriptions</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.estimator_method">
-<code class="descname">estimator_method</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">estimator_method</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation methods</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>F-statistics and P-values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficients of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.rsquared_between">
-<code class="descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_between" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_between</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_between" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficients of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.rsquared_overall">
-<code class="descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_overall" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_overall</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_overall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficients of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.rsquared_within">
-<code class="descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_within" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_within</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.rsquared_within" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficients of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-stats for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.results.PanelModelComparison.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.panel.results.PanelModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-stats for all models</p>
 </dd></dl>
 

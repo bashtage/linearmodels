@@ -132,7 +132,7 @@
 <span id="instrumental-variable-covariance-estimation"></span><h1>Instrumental Variable Covariance Estimation<a class="headerlink" href="#module-linearmodels.iv.covariance" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance">
-<em class="property">class </em><code class="descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HomoskedasticCovariance</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">params</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HomoskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for homoskedastic data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -158,9 +158,9 @@
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
 <p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
 <span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance of estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -169,9 +169,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if covariance is debiased</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -180,9 +180,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance.s">
-<code class="descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.s" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Score covariance estimate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -191,9 +191,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HomoskedasticCovariance.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.HomoskedasticCovariance.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated variance of residuals. Small-sample adjusted if debiased.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -206,7 +206,7 @@
 
 <dl class="class">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance">
-<em class="property">class </em><code class="descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HeteroskedasticCovariance</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">params</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#HeteroskedasticCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for heteroskedastic data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -234,9 +234,9 @@
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
 <p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
 <span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance of estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -245,9 +245,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if covariance is debiased</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -256,9 +256,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance.s">
-<code class="descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.s" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity-robust score covariance estimate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -267,9 +267,9 @@
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.HeteroskedasticCovariance.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.HeteroskedasticCovariance.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated variance of residuals. Small-sample adjusted if debiased.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -282,7 +282,7 @@
 
 <dl class="class">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance">
-<em class="property">class </em><code class="descname">ClusteredCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>clusters=None</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#ClusteredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ClusteredCovariance</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">params</em>, <em class="sig-param">clusters=None</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#ClusteredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimation for clustered data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -315,9 +315,9 @@ of groups..</p>
 \[V = n^{-1} X'Z(Z'Z)^{-1}Z'X\]</div>
 <p>where <span class="math notranslate nohighlight">\(X\)</span> is the matrix of variables included in the model and
 <span class="math notranslate nohighlight">\(Z\)</span> is the matrix of instruments, including exogenous regressors.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance of estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -326,9 +326,9 @@ of groups..</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if covariance is debiased</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -337,9 +337,9 @@ of groups..</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance.s">
-<code class="descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.s" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clustered estimator of score covariance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -348,9 +348,9 @@ of groups..</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.ClusteredCovariance.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.ClusteredCovariance.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated variance of residuals. Small-sample adjusted if debiased.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -363,7 +363,7 @@ of groups..</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.covariance.KernelCovariance">
-<em class="property">class </em><code class="descname">KernelCovariance</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>params</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>debiased=False</em>, <em>kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">KernelCovariance</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">params</em>, <em class="sig-param">kernel='bartlett'</em>, <em class="sig-param">bandwidth=None</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">kappa=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/covariance.html#KernelCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weighted (HAC) covariance estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -410,9 +410,9 @@ by n / (n-k).</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="linearmodels.iv.covariance.kernel_weight_bartlett"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_bartlett</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="linearmodels.iv.covariance.kernel_weight_parzen"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_parzen</span></code></a>, <a class="reference internal" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="linearmodels.iv.covariance.kernel_weight_quadratic_spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span></code></a></p>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.KernelCovariance.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance of estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -421,9 +421,9 @@ by n / (n-k).</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.KernelCovariance.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating if covariance is debiased</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -432,9 +432,9 @@ by n / (n-k).</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.KernelCovariance.s">
-<code class="descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.s" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.s" title="Permalink to this definition">¶</a></dt>
 <dd><p>HAC score covariance estimate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -443,9 +443,9 @@ by n / (n-k).</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.covariance.KernelCovariance.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.covariance.KernelCovariance.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated variance of residuals. Small-sample adjusted if debiased.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -460,7 +460,7 @@ by n / (n-k).</p>
 <h2>Kernel Weight Generators<a class="headerlink" href="#kernel-weight-generators" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
 <dt id="linearmodels.iv.covariance.kernel_weight_bartlett">
-<code class="descclassname">covariance.</code><code class="descname">kernel_weight_bartlett</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covariance.</code><code class="sig-name descname">kernel_weight_bartlett</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_bartlett" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a Bartlett kernel</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -480,7 +480,7 @@ by n / (n-k).</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.covariance.kernel_weight_parzen">
-<code class="descclassname">covariance.</code><code class="descname">kernel_weight_parzen</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covariance.</code><code class="sig-name descname">kernel_weight_parzen</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_parzen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a Parzen kernel</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -502,7 +502,7 @@ w_i &amp;  = 2(1-z_i)^3, z &gt; 0.5\end{split}\]</div>
 
 <dl class="method">
 <dt id="linearmodels.iv.covariance.kernel_weight_quadratic_spectral">
-<code class="descclassname">covariance.</code><code class="descname">kernel_weight_quadratic_spectral</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">covariance.</code><code class="sig-name descname">kernel_weight_quadratic_spectral</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.covariance.kernel_weight_quadratic_spectral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel weights from a quadratic-spectral kernel</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

@@ -132,7 +132,7 @@
 <h2>Absorbing OLS<a class="headerlink" href="#absorbing-ols" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS">
-<em class="property">class </em><code class="descname">AbsorbingLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog=None</em>, <em>*</em>, <em>absorb=None</em>, <em>interactions=None</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">AbsorbingLS</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">absorb=None</em>, <em class="sig-param">interactions=None</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear regression with high-dimensaional effects</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -196,9 +196,9 @@ each continuous variables</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mod</span> <span class="o">=</span> <span class="n">AbsorbingLS</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">absorb</span><span class="o">=</span><span class="n">absorb</span><span class="p">,</span> <span class="n">interactions</span><span class="o">=</span><span class="n">iaction</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS.absorbed_dependent">
-<code class="descname">absorbed_dependent</code><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.absorbed_dependent" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">absorbed_dependent</code><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.absorbed_dependent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dependent variable with effects absorbed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -213,9 +213,9 @@ each continuous variables</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS.absorbed_exog">
-<code class="descname">absorbed_exog</code><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.absorbed_exog" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">absorbed_exog</code><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.absorbed_exog" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exogenous variables with effects absorbed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -232,7 +232,7 @@ each continuous variables</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>lsmr_options=None</em>, <em>use_cache=True</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">lsmr_options=None</em>, <em class="sig-param">use_cache=True</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -287,7 +287,7 @@ constant.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.resids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -304,7 +304,7 @@ constant.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS.wresids">
-<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.wresids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.wresids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wresids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS.wresids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -329,7 +329,7 @@ resids if all weights are unity.</p>
 <h2>Interactions<a class="headerlink" href="#interactions" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="linearmodels.iv.absorbing.Interaction">
-<em class="property">class </em><code class="descname">Interaction</code><span class="sig-paren">(</span><em>cat=None</em>, <em>cont=None</em>, <em>nobs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#Interaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Interaction</code><span class="sig-paren">(</span><em class="sig-param">cat=None</em>, <em class="sig-param">cont=None</em>, <em class="sig-param">nobs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#Interaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that simplifies specifying interactions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -374,9 +374,9 @@ and the cartesian product of the categories.</p>
 <span class="go">(100000, 1875)</span>
 </pre></div>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.cat">
-<code class="descname">cat</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.cat" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cat</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.cat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Categorical Variables</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -385,9 +385,9 @@ and the cartesian product of the categories.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.cont">
-<code class="descname">cont</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.cont" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cont</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.cont" title="Permalink to this definition">¶</a></dt>
 <dd><p>Continusous Variables</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -396,9 +396,9 @@ and the cartesian product of the categories.</p>
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.from_frame">
-<em class="property">static </em><code class="descname">from_frame</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#Interaction.from_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.from_frame" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_frame</code><span class="sig-paren">(</span><em class="sig-param">frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#Interaction.from_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.from_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience function the simplifies using a DataFrame</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -432,16 +432,16 @@ variables are passed as <cite>cont</cite>.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.hash">
-<code class="descname">hash</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.hash" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">hash</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a hash that will be invariant for any permutation of
 inputs that produce the same fit when used as regressors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.sparse">
-<code class="descname">sparse</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.sparse" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sparse</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.sparse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a sparce interaction matrix</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>

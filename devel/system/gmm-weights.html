@@ -130,7 +130,7 @@
 <span id="gmm-moment-weighting"></span><h1>GMM Moment Weighting<a class="headerlink" href="#module-linearmodels.system.gmm" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.system.gmm.HomoskedasticWeightMatrix">
-<em class="property">class </em><code class="descname">HomoskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HomoskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HomoskedasticWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HomoskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Homoskedastic (unadjusted) weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -149,9 +149,9 @@ the mean before computing the weight matrix.</p></li>
 regressors and instruments and <span class="math notranslate nohighlight">\(\Sigma\)</span> is the covariance of the
 model residuals.</p>
 <p><code class="docutils literal notranslate"><span class="pre">center</span></code> has no effect on this estimator since it is always centered.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.gmm.HomoskedasticWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -165,7 +165,7 @@ model residuals.</p>
 
 <dl class="method">
 <dt id="linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HomoskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em>, <em class="sig-param">*</em>, <em class="sig-param">sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HomoskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HomoskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -188,7 +188,7 @@ model residuals.</p>
 
 <dl class="class">
 <dt id="linearmodels.system.gmm.HeteroskedasticWeightMatrix">
-<em class="property">class </em><code class="descname">HeteroskedasticWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HeteroskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">HeteroskedasticWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HeteroskedasticWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -209,9 +209,9 @@ observation i.  <span class="math notranslate nohighlight">\(z_{ji}\)</span> is 
 j and <span class="math notranslate nohighlight">\(\epsilon_{ji}\)</span> is the error for equation j for observation
 i.  This form allows for heteroskedasticity and arbitrary cross-sectional
 dependence between the moment conditions.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.gmm.HeteroskedasticWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -225,7 +225,7 @@ dependence between the moment conditions.</p>
 
 <dl class="method">
 <dt id="linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HeteroskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em>, <em class="sig-param">*</em>, <em class="sig-param">sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#HeteroskedasticWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.HeteroskedasticWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -247,7 +247,7 @@ dependence between the moment conditions.</p>
 
 <dl class="class">
 <dt id="linearmodels.system.gmm.KernelWeightMatrix">
-<em class="property">class </em><code class="descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em>center=False</em>, <em>debiased=False</em>, <em>kernel='bartlett'</em>, <em>bandwidth=None</em>, <em>optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">KernelWeightMatrix</code><span class="sig-paren">(</span><em class="sig-param">center=False</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">kernel='bartlett'</em>, <em class="sig-param">bandwidth=None</em>, <em class="sig-param">optimal_bw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#KernelWeightMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heteroskedasticity robust weight estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -283,15 +283,15 @@ selected kernel and bandwidth.  <span class="math notranslate nohighlight">\(z_{
 for equation j and <span class="math notranslate nohighlight">\(\epsilon_{ji}\)</span> is the error for equation j for
 observation i.  This form allows for heteroskedasticity and autocorrelation
 between the moment conditions.</p>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.gmm.KernelWeightMatrix.bandwidth">
-<code class="descname">bandwidth</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.bandwidth" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">bandwidth</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.bandwidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bandwidth used to estimate covariance of moment conditions</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.gmm.KernelWeightMatrix.config">
-<code class="descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight estimator configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -303,15 +303,15 @@ between the moment conditions.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.system.gmm.KernelWeightMatrix.kernel">
-<code class="descname">kernel</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.kernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">kernel</code><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.kernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel used in estimation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.system.gmm.KernelWeightMatrix.weight_matrix">
-<code class="descname">weight_matrix</code><span class="sig-paren">(</span><em>x</em>, <em>z</em>, <em>eps</em>, <em>*</em>, <em>sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#KernelWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">weight_matrix</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">z</em>, <em class="sig-param">eps</em>, <em class="sig-param">*</em>, <em class="sig-param">sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/system/gmm.html#KernelWeightMatrix.weight_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.system.gmm.KernelWeightMatrix.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

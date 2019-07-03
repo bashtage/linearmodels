@@ -132,7 +132,7 @@
 <span id="estimation-methods"></span><span id="iv-module-reference-models"></span><h1>Estimation Methods<a class="headerlink" href="#module-linearmodels.iv.model" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.iv.model.IV2SLS">
-<em class="property">class </em><code class="descname">IV2SLS</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IV2SLS</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog</em>, <em class="sig-param">endog</em>, <em class="sig-param">instruments</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using two-stage least squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -153,7 +153,7 @@
            \hat{X} &amp; =Z(Z'Z)^{-1}Z'X\end{split}\]</div>
 <p>The 2SLS estimator is a special case of a k-class estimator with
 <span class="math notranslate nohighlight">\(\kappa=1\)</span>,</p>
-<div class="admonition-todo admonition" id="index-0">
+<div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <ul class="simple">
 <li><p>VCV: bootstrap</p></li>
@@ -163,9 +163,9 @@
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">estimate_parameters</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">kappa</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -190,7 +190,7 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -232,9 +232,9 @@ is provided.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.formula">
-<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formula used to create the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -243,9 +243,9 @@ is provided.</p>
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_formula</code><span class="sig-paren">(</span><em class="sig-param">formula</em>, <em class="sig-param">data</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IV2SLS.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -282,27 +282,27 @@ valid Patsy formulas.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.isnull">
-<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.isnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.isnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations with missing values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.notnull">
-<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.notnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">*</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -337,7 +337,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.resids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -354,7 +354,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IV2SLS.wresids">
-<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.wresids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wresids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IV2SLS.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -376,7 +376,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVLIML">
-<em class="property">class </em><code class="descname">IVLIML</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVLIML</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog</em>, <em class="sig-param">endog</em>, <em class="sig-param">instruments</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">fuller=0</em>, <em class="sig-param">kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Limited information ML and k-class estimation of IV models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -409,7 +409,7 @@ P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
 <p>When using Fuller’s <span class="math notranslate nohighlight">\(\alpha\)</span>, the value used is modified to</p>
 <div class="math notranslate nohighlight">
 \[\kappa-\alpha/(n-n_{instr})\]</div>
-<div class="admonition-todo admonition" id="index-1">
+<div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Todo</p>
 <ul class="simple">
 <li><p>VCV: bootstrap</p></li>
@@ -419,9 +419,9 @@ P_{z} &amp; =Z(Z'Z)^{-1}Z'\end{split}\]</div>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">estimate_parameters</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">kappa</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter estimation without error checking</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -446,7 +446,7 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -488,9 +488,9 @@ is provided.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.formula">
-<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formula used to create the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -499,9 +499,9 @@ is provided.</p>
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>fuller=0</em>, <em>kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_formula</code><span class="sig-paren">(</span><em class="sig-param">formula</em>, <em class="sig-param">data</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">fuller=0</em>, <em class="sig-param">kappa=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -542,27 +542,27 @@ valid Patsy formulas.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.isnull">
-<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.isnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.isnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations with missing values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.notnull">
-<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.notnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVLIML.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">*</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">eval_env=4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -597,7 +597,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.resids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -614,7 +614,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVLIML.wresids">
-<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.wresids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.wresids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wresids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVLIML.wresids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVLIML.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -636,7 +636,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVGMM">
-<em class="property">class </em><code class="descname">IVGMM</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVGMM</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog</em>, <em class="sig-param">endog</em>, <em class="sig-param">instruments</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">weight_type='robust'</em>, <em class="sig-param">**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using the generalized method of moments (GMM)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -667,7 +667,7 @@ autocorrelation</p></li>
 \[\hat{\beta}_{gmm}=(X'ZW^{-1}Z'X)^{-1}X'ZW^{-1}Z'Y\]</div>
 <p>where <span class="math notranslate nohighlight">\(W\)</span> is a positive definite weight matrix and <span class="math notranslate nohighlight">\(Z\)</span>
 contains both the exogenous regressors and the instruments.</p>
-<div class="admonition-todo admonition" id="index-2">
+<div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Todo</p>
 <ul class="simple">
 <li><p>VCV: bootstrap</p></li>
@@ -677,9 +677,9 @@ contains both the exogenous regressors and the instruments.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>, <a class="reference internal" href="#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p>
 </div>
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.estimate_parameters">
-<em class="property">static </em><code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">estimate_parameters</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">w</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -703,7 +703,7 @@ e.g., bootstrapped samples.  Performs no error checking.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>iter_limit=2</em>, <em>tol=0.0001</em>, <em>initial_weight=None</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">iter_limit=2</em>, <em class="sig-param">tol=0.0001</em>, <em class="sig-param">initial_weight=None</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -751,9 +751,9 @@ configuration is provided.</p></li>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.formula">
-<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formula used to create the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -762,9 +762,9 @@ configuration is provided.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_formula</code><span class="sig-paren">(</span><em class="sig-param">formula</em>, <em class="sig-param">data</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">weight_type='robust'</em>, <em class="sig-param">**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMM.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMM.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -806,27 +806,27 @@ valid Patsy formulas.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.isnull">
-<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.isnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.isnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations with missing values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.notnull">
-<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.notnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMM.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">*</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -861,7 +861,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.resids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -878,7 +878,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMM.wresids">
-<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.wresids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wresids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMM.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -900,7 +900,7 @@ resids if all weights are unity.</p>
 
 <dl class="class">
 <dt id="linearmodels.iv.model.IVGMMCUE">
-<em class="property">class </em><code class="descname">IVGMMCUE</code><span class="sig-paren">(</span><em>dependent</em>, <em>exog</em>, <em>endog</em>, <em>instruments</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVGMMCUE</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog</em>, <em class="sig-param">endog</em>, <em class="sig-param">instruments</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">weight_type='robust'</em>, <em class="sig-param">**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation of IV models using continuously updating GMM</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -939,7 +939,7 @@ through <span class="math notranslate nohighlight">\(\epsilon_i = y_i - x_i\beta
 </div>
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.estimate_parameters">
-<code class="descname">estimate_parameters</code><span class="sig-paren">(</span><em>starting</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>display=False</em>, <em>opt_options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.estimate_parameters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_parameters</code><span class="sig-paren">(</span><em class="sig-param">starting</em>, <em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em>, <em class="sig-param">display=False</em>, <em class="sig-param">opt_options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.estimate_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.estimate_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -970,7 +970,7 @@ samples.  Performs no error checking.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>*</em>, <em>starting=None</em>, <em>display=False</em>, <em>cov_type='robust'</em>, <em>debiased=False</em>, <em>opt_options=None</em>, <em>**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">starting=None</em>, <em class="sig-param">display=False</em>, <em class="sig-param">cov_type='robust'</em>, <em class="sig-param">debiased=False</em>, <em class="sig-param">opt_options=None</em>, <em class="sig-param">**cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1006,9 +1006,9 @@ configuration is provided.</p></li>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.formula">
-<code class="descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">formula</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.formula" title="Permalink to this definition">¶</a></dt>
 <dd><p>Formula used to create the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1017,9 +1017,9 @@ configuration is provided.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.from_formula">
-<em class="property">static </em><code class="descname">from_formula</code><span class="sig-paren">(</span><em>formula</em>, <em>data</em>, <em>*</em>, <em>weights=None</em>, <em>weight_type='robust'</em>, <em>**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_formula</code><span class="sig-paren">(</span><em class="sig-param">formula</em>, <em class="sig-param">data</em>, <em class="sig-param">*</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">weight_type='robust'</em>, <em class="sig-param">**weight_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.from_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.from_formula" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1058,21 +1058,21 @@ valid Patsy formulas.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.isnull">
-<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.isnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">isnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.isnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations with missing values</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.j">
-<code class="descname">j</code><span class="sig-paren">(</span><em>params</em>, <em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.j"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.j" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">j</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/model.html#IVGMMCUE.j"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.j" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimization target</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1103,15 +1103,15 @@ with the moment conditions, and so has explicit dependence on
 <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.notnull">
-<code class="descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.notnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">notnull</code><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.notnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations of observations included in estimation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>params</em>, <em>*</em>, <em>exog=None</em>, <em>endog=None</em>, <em>data=None</em>, <em>eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">*</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">data=None</em>, <em class="sig-param">eval_env=4</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict values for additional data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1146,7 +1146,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.resids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">resids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1163,7 +1163,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.model.IVGMMCUE.wresids">
-<code class="descname">wresids</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.wresids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wresids</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.model.IVGMMCUE.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted model residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

@@ -132,11 +132,11 @@
 <span id="iv-module-reference-results"></span><h1>Estimation Results<a class="headerlink" href="#estimation-results" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.iv.results.IVResults">
-<em class="property">class </em><code class="descname">IVResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVResults</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results from IV estimation</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.anderson_rubin">
-<code class="descname">anderson_rubin</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.anderson_rubin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">anderson_rubin</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.anderson_rubin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Anderson-Rubin test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -157,7 +157,7 @@ indicate the model is not overidentified. The test statistic is</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.basmann">
-<code class="descname">basmann</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">basmann</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basmann’s test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -184,7 +184,7 @@ endogenous regressors.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.basmann_f">
-<code class="descname">basmann_f</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann_f" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">basmann_f</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.basmann_f" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basmann’s F test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -205,7 +205,7 @@ indicate the model is not overidentified. The test statistic is</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -222,9 +222,9 @@ indicate the model is not overidentified. The test statistic is</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -233,9 +233,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.cov_config">
-<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -244,9 +244,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -255,9 +255,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.cov_type">
-<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -266,9 +266,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -277,9 +277,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -288,9 +288,9 @@ indicate the model is not overidentified. The test statistic is</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -301,7 +301,7 @@ indicate the model is not overidentified. The test statistic is</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.durbin">
-<code class="descname">durbin</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.durbin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">durbin</code><span class="sig-paren">(</span><em class="sig-param">variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.durbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.durbin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Durbin’s test of exogeneity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -335,9 +335,9 @@ matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
 <p>where <span class="math notranslate nohighlight">\(q\)</span> is the number of variables tested.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -357,9 +357,9 @@ number of parameters tested and uses an F-distribution.</p>
 estimator and so is robust against the same specification issues.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.first_stage">
-<code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.first_stage" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.first_stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>First stage regression results</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -371,9 +371,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -382,9 +382,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -393,9 +393,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -410,9 +410,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.kappa">
-<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.kappa" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -421,9 +421,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.method">
-<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -432,9 +432,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -443,9 +443,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -454,9 +454,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -467,7 +467,7 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -504,13 +504,13 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -519,9 +519,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -530,9 +530,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -541,9 +541,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.rsquared_adj">
-<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -552,9 +552,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -565,7 +565,7 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.sargan">
-<code class="descname">sargan</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.sargan" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sargan</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.sargan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sargan test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -592,19 +592,19 @@ of instruments and the number of endogenous regressors.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
@@ -612,9 +612,9 @@ of instruments and the number of endogenous regressors.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -625,13 +625,13 @@ of instruments and the number of endogenous regressors.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.tstats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -694,7 +694,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.wooldridge_overid">
-<code class="descname">wooldridge_overid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_overid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wooldridge_overid</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_overid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s score test of overidentification</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -721,7 +721,7 @@ variables.  The test is computed as a regression</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.wooldridge_regression">
-<code class="descname">wooldridge_regression</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_regression" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wooldridge_regression</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_regression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s regression test of exogeneity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -748,7 +748,7 @@ identical to the covariance estimator used with <code class="docutils literal no
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVResults.wooldridge_score">
-<code class="descname">wooldridge_score</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_score" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wooldridge_score</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wooldridge_score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wooldridge’s score test of exogeneity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -773,9 +773,9 @@ variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogen
 <p>Implemented using the expression in Wooldridge (2002), Eq. 6.19</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -786,7 +786,7 @@ variable <span class="math notranslate nohighlight">\(x_j\)</span> on the exogen
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVResults.wu_hausman">
-<code class="descname">wu_hausman</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wu_hausman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wu_hausman" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wu_hausman</code><span class="sig-paren">(</span><em class="sig-param">variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVResults.wu_hausman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVResults.wu_hausman" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wu-Hausman test of exogeneity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -826,11 +826,11 @@ matrix onto the exogenous variables and instruments (<cite>z</cite>) as well as
 
 <dl class="class">
 <dt id="linearmodels.iv.results.IVGMMResults">
-<em class="property">class </em><code class="descname">IVGMMResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVGMMResults</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Results from GMM estimation of IV models</p>
 <dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.c_stat">
-<code class="descname">c_stat</code><span class="sig-paren">(</span><em>variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults.c_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.c_stat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">c_stat</code><span class="sig-paren">(</span><em class="sig-param">variables=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVGMMResults.c_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.c_stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>C-test of endogeneity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -871,7 +871,7 @@ tested.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -888,9 +888,9 @@ tested.</p>
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -899,9 +899,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_config">
-<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -910,9 +910,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -921,9 +921,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.cov_type">
-<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -932,9 +932,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -943,9 +943,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -954,9 +954,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -965,9 +965,9 @@ tested.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -987,9 +987,9 @@ number of parameters tested and uses an F-distribution.</p>
 estimator and so is robust against the same specification issues.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.first_stage">
-<code class="descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.first_stage" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">first_stage</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.first_stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>First stage regression results</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1001,9 +1001,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1012,9 +1012,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1023,9 +1023,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -1040,9 +1040,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.iterations">
-<code class="descname">iterations</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.iterations" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">iterations</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.iterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterations used in GMM estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1051,9 +1051,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.j_stat">
-<code class="descname">j_stat</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.j_stat" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">j_stat</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.j_stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>J-test of overidentifying restrictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1076,9 +1076,9 @@ estimator of the variance of <span class="math notranslate nohighlight">\(\sqrt{
 freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog}\)</span>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.kappa">
-<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.kappa" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1087,9 +1087,9 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.method">
-<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1098,9 +1098,9 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1109,9 +1109,9 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1120,9 +1120,9 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1133,7 +1133,7 @@ freedom is <span class="math notranslate nohighlight">\(q = n_{instr} - n_{endog
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1170,13 +1170,13 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1185,9 +1185,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1196,9 +1196,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1207,9 +1207,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.rsquared_adj">
-<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1218,9 +1218,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1231,19 +1231,19 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
@@ -1251,9 +1251,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1264,13 +1264,13 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.IVGMMResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.tstats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1331,9 +1331,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.weight_config">
-<code class="descname">weight_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">weight_config</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighting matrix configuration used in estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1342,9 +1342,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.weight_matrix">
-<code class="descname">weight_matrix</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_matrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">weight_matrix</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weight matrix used in the final-step GMM estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1353,9 +1353,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.weight_type">
-<code class="descname">weight_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">weight_type</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.weight_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighting matrix method used in estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1364,9 +1364,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVGMMResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.IVGMMResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1379,10 +1379,10 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="class">
 <dt id="linearmodels.iv.results.OLSResults">
-<em class="property">class </em><code class="descname">OLSResults</code><span class="sig-paren">(</span><em>results</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">OLSResults</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.conf_int">
-<code class="descname">conf_int</code><span class="sig-paren">(</span><em>level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.conf_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conf_int</code><span class="sig-paren">(</span><em class="sig-param">level=0.95</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.conf_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.conf_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confidence interval construction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1399,9 +1399,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 <p>Uses a t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.cov">
-<code class="descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated covariance of parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1410,9 +1410,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.cov_config">
-<code class="descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_config" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_config</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter values from covariance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1421,9 +1421,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type of covariance estimator used to compute covariance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1432,9 +1432,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.cov_type">
-<code class="descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_type</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.cov_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator used</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1443,9 +1443,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.debiased">
-<code class="descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.debiased" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">debiased</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.debiased" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating whether covariance uses a small-sample adjustment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1454,9 +1454,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.df_model">
-<code class="descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_model</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1465,9 +1465,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.df_resid">
-<code class="descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_resid" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">df_resid</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.df_resid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual degree of freedom</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1476,9 +1476,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Model F-statistic</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1498,9 +1498,9 @@ number of parameters tested and uses an F-distribution.</p>
 estimator and so is robust against the same specification issues.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.fitted_values">
-<code class="descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.fitted_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">fitted_values</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.fitted_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fitted values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1509,9 +1509,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.has_constant">
-<code class="descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.has_constant" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">has_constant</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.has_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag indicating the model includes a constant or equivalent</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1520,9 +1520,9 @@ estimator and so is robust against the same specification issues.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.idiosyncratic">
-<code class="descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">idiosyncratic</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.idiosyncratic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Idiosyncratic error</p>
 <p class="rubric">Notes</p>
 <p>Differs from resids since this is the estimated idiosyncratic shock
@@ -1537,9 +1537,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.kappa">
-<code class="descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.kappa" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">kappa</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.kappa" title="Permalink to this definition">¶</a></dt>
 <dd><p>k-class estimator value</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1548,9 +1548,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.method">
-<code class="descname">method</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">method</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method used to estimate model parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1559,9 +1559,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.model_ss">
-<code class="descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.model_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">model_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.model_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1570,9 +1570,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of observations</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1581,9 +1581,9 @@ of parameters and inclusion of effects, if any.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1594,7 +1594,7 @@ of parameters and inclusion of effects, if any.</p>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>exog=None</em>, <em>endog=None</em>, <em>*</em>, <em>data=None</em>, <em>fitted=True</em>, <em>idiosyncratic=False</em>, <em>missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">exog=None</em>, <em class="sig-param">endog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">data=None</em>, <em class="sig-param">fitted=True</em>, <em class="sig-param">idiosyncratic=False</em>, <em class="sig-param">missing=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>In- and out-of-sample predictions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1631,13 +1631,13 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.pvalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals. Uses t(df_resid) if <code class="docutils literal notranslate"><span class="pre">debiased</span></code> is True, else normal</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.resid_ss">
-<code class="descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resid_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resid_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resid_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1646,9 +1646,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.resids">
-<code class="descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">resids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.resids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1657,9 +1657,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1668,9 +1668,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.rsquared_adj">
-<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficient of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1679,9 +1679,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.s2">
-<code class="descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.s2" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">s2</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Residual variance estimator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1692,19 +1692,19 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.std_errors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimated parameter standard errors</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
@@ -1712,9 +1712,9 @@ values corresponding to the original model specification.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.total_ss">
-<code class="descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.total_ss" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">total_ss</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.total_ss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total sum of squares</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1725,13 +1725,13 @@ values corresponding to the original model specification.</p>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.OLSResults.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.tstats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-statistics</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.wald_test">
-<code class="descname">wald_test</code><span class="sig-paren">(</span><em>restriction=None</em>, <em>value=None</em>, <em>*</em>, <em>formula=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.wald_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wald_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wald_test</code><span class="sig-paren">(</span><em class="sig-param">restriction=None</em>, <em class="sig-param">value=None</em>, <em class="sig-param">*</em>, <em class="sig-param">formula=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#OLSResults.wald_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wald_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test linear equality constraints using a Wald test</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1792,9 +1792,9 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.OLSResults.wresids">
-<code class="descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wresids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">wresids</code><a class="headerlink" href="#linearmodels.iv.results.OLSResults.wresids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weighted estimated residuals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1807,7 +1807,7 @@ has a <span class="math notranslate nohighlight">\(\chi^2_q\)</span> distributio
 
 <dl class="function">
 <dt id="linearmodels.iv.results.compare">
-<code class="descname">compare</code><span class="sig-paren">(</span><em>results</em>, <em>*</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.compare" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">*</em>, <em class="sig-param">precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare the results of multiple models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1829,7 +1829,7 @@ Default is ‘tstats’.</p></li>
 
 <dl class="class">
 <dt id="linearmodels.iv.results.IVModelComparison">
-<em class="property">class </em><code class="descname">IVModelComparison</code><span class="sig-paren">(</span><em>results</em>, <em>*</em>, <em>precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">IVModelComparison</code><span class="sig-paren">(</span><em class="sig-param">results</em>, <em class="sig-param">*</em>, <em class="sig-param">precision='tstats'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#IVModelComparison"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison of multiple models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1841,9 +1841,9 @@ Default is ‘tstats’.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.cov_estimator">
-<code class="descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cov_estimator</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.cov_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Covariance estimator descriptions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1852,9 +1852,9 @@ Default is ‘tstats’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.estimator_method">
-<code class="descname">estimator_method</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">estimator_method</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.estimator_method" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimation methods</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1863,39 +1863,39 @@ Default is ‘tstats’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.f_statistic">
-<code class="descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">f_statistic</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.f_statistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>F-statistics and P-values</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.params">
-<code class="descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.params" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.pvalues">
-<code class="descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pvalues</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.pvalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter p-vals for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.rsquared">
-<code class="descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>Coefficients of determination (R**2)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.rsquared_adj">
-<code class="descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared_adj" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">rsquared_adj</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.rsquared_adj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sample-size adjusted coefficients of determination (R**2)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1904,21 +1904,21 @@ Default is ‘tstats’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.std_errors">
-<code class="descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.std_errors" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">std_errors</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.std_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-stats for all models</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>
@@ -1926,9 +1926,9 @@ Default is ‘tstats’.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.IVModelComparison.tstats">
-<code class="descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">tstats</code><a class="headerlink" href="#linearmodels.iv.results.IVModelComparison.tstats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameter t-stats for all models</p>
 </dd></dl>
 
@@ -1936,11 +1936,11 @@ Default is ‘tstats’.</p></li>
 
 <dl class="class">
 <dt id="linearmodels.iv.results.FirstStageResults">
-<em class="property">class </em><code class="descname">FirstStageResults</code><span class="sig-paren">(</span><em>dep</em>, <em>exog</em>, <em>endog</em>, <em>instr</em>, <em>weights</em>, <em>cov_type</em>, <em>cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#FirstStageResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">FirstStageResults</code><span class="sig-paren">(</span><em class="sig-param">dep</em>, <em class="sig-param">exog</em>, <em class="sig-param">endog</em>, <em class="sig-param">instr</em>, <em class="sig-param">weights</em>, <em class="sig-param">cov_type</em>, <em class="sig-param">cov_config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/results.html#FirstStageResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>First stage estimation results and diagnostics</p>
 <dl class="attribute">
 <dt id="linearmodels.iv.results.FirstStageResults.diagnostics">
-<code class="descname">diagnostics</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.diagnostics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnostics</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.diagnostics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post estimation diagnostics of first-stage fit</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1975,7 +1975,7 @@ is with respect to the other included variables in the model.</p></li>
 
 <dl class="attribute">
 <dt id="linearmodels.iv.results.FirstStageResults.individual">
-<code class="descname">individual</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.individual" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">individual</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.individual" title="Permalink to this definition">¶</a></dt>
 <dd><p>Individual model results from first-stage regressions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1988,15 +1988,15 @@ the variable names of the endogenous regressors.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.iv.results.FirstStageResults.summary">
-<code class="descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.summary" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">summary</code><a class="headerlink" href="#linearmodels.iv.results.FirstStageResults.summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summary table of model estimation results</p>
 <p>Supports export to csv, html and latex  using the methods <code class="docutils literal notranslate"><span class="pre">summary.as_csv()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">summary.as_html()</span></code> and <code class="docutils literal notranslate"><span class="pre">summary.as_latex()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0.dev0+1382.g116cdd8b9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://www.statsmodels.org/dev/generated/statsmodels.iolib.summary.Summary.html#statsmodels.iolib.summary.Summary" title="(in statsmodels vv0.10.0+15.g25fa5a685)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statsmodels.iolib.summary.Summary</span></code></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Summary</span></code></p>

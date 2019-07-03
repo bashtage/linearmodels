@@ -132,7 +132,7 @@
 <span id="panel-data-structures"></span><span id="panel-module-reference-data"></span><h1>Panel Data Structures<a class="headerlink" href="#module-linearmodels.panel.data" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.panel.data.PanelData">
-<em class="property">class </em><code class="descname">PanelData</code><span class="sig-paren">(</span><em>x</em>, <em>var_name='x'</em>, <em>convert_dummies=True</em>, <em>drop_first=True</em>, <em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PanelData</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">var_name='x'</em>, <em class="sig-param">convert_dummies=True</em>, <em class="sig-param">drop_first=True</em>, <em class="sig-param">copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstraction to handle alternative formats for panel data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -176,13 +176,13 @@ column MultiIndex DataFrames.</p>
 </dl>
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a deep copy</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.count">
-<code class="descname">count</code><span class="sig-paren">(</span><em>group='entity'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.count" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count</code><span class="sig-paren">(</span><em class="sig-param">group='entity'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count number of observations by entity or time</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -197,15 +197,15 @@ column MultiIndex DataFrames.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.dataframe">
-<code class="descname">dataframe</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.dataframe" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>pandas DataFrame view of data</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.demean">
-<code class="descname">demean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em>, <em>return_panel=True</em>, <em>low_memory=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.demean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">demean</code><span class="sig-paren">(</span><em class="sig-param">group='entity'</em>, <em class="sig-param">weights=None</em>, <em class="sig-param">return_panel=True</em>, <em class="sig-param">low_memory=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.demean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Demeans data by either entity or time group</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -234,7 +234,7 @@ estimation.</p>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.drop">
-<code class="descname">drop</code><span class="sig-paren">(</span><em>locs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.drop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">drop</code><span class="sig-paren">(</span><em class="sig-param">locs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.drop" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>locs</strong> (<em>ndarray</em>) – Boolean array indicating observations to drop with reference to
@@ -245,7 +245,7 @@ the dataframe view of the data</p>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.dummies">
-<code class="descname">dummies</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>drop_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.dummies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dummies</code><span class="sig-paren">(</span><em class="sig-param">group='entity'</em>, <em class="sig-param">drop_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.dummies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.dummies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate entity or time dummies</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -264,15 +264,15 @@ entity or time period should be dropped</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.entities">
-<code class="descname">entities</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entities" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">entities</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entities" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of entity index names</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.entity_ids">
-<code class="descname">entity_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entity_ids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">entity_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.entity_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get array containing entity group membership information</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -286,7 +286,7 @@ entity or time period should be dropped</p></li>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.first_difference">
-<code class="descname">first_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.first_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.first_difference" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">first_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.first_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.first_difference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute first differences of variables</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -300,7 +300,7 @@ entity or time period should be dropped</p></li>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.general_demean">
-<code class="descname">general_demean</code><span class="sig-paren">(</span><em>groups</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.general_demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.general_demean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">general_demean</code><span class="sig-paren">(</span><em class="sig-param">groups</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.general_demean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.general_demean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multi-way demeaning using only groupby</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -320,21 +320,21 @@ entity or time period should be dropped</p></li>
 <p>Iterates until convergence</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.index">
-<code class="descname">index</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.index" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">index</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the index of the multi-index dataframe view</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.isnull">
-<code class="descname">isnull</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.isnull" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">isnull</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.isnull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Locations with missing observations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.panel.data.PanelData.mean">
-<code class="descname">mean</code><span class="sig-paren">(</span><em>group='entity'</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param">group='entity'</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/panel/data.html#PanelData.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.panel.data.PanelData.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute data mean by either entity or time group</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -352,51 +352,51 @@ entity or time period should be dropped</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.ndim">
-<code class="descname">ndim</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.ndim" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">ndim</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.ndim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of dimensions of panel view of data</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.nentity">
-<code class="descname">nentity</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nentity" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nentity</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nentity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of entities</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.nobs">
-<code class="descname">nobs</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nobs" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nobs</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of time observations</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.nvar">
-<code class="descname">nvar</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nvar" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">nvar</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.nvar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of variables</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.panel">
-<code class="descname">panel</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.panel" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">panel</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.panel" title="Permalink to this definition">¶</a></dt>
 <dd><p>pandas Panel view of data</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.shape">
-<code class="descname">shape</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.shape" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">shape</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shape of panel view of data</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.time">
-<code class="descname">time</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">time</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of time index names</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.time_ids">
-<code class="descname">time_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time_ids" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">time_ids</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.time_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get array containing time membership information</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -408,21 +408,21 @@ entity or time period should be dropped</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.values2d">
-<code class="descname">values2d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">values2d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>NumPy ndarray view of dataframe</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.values3d">
-<code class="descname">values3d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">values3d</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.values3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>NumPy ndarray view of panel</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.panel.data.PanelData.vars">
-<code class="descname">vars</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.vars" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">vars</code><a class="headerlink" href="#linearmodels.panel.data.PanelData.vars" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of variable names</p>
 </dd></dl>
 
