@@ -1161,3 +1161,22 @@ def test_singleton_removal_mixed(singleton_data, other_effects):
     res = mod.fit(cov_type='clustered', clusters=singleton_data.vc2, use_lsmr=True)
     assert_allclose(res_keep.params, res.params)
     assert res.nobs <= res_keep.nobs
+
+
+def test_repeated_measures_weight():
+    # Issue reported by email
+    rs = np.random.RandomState(0)
+    w = rs.chisquare(5, 300) / 5
+    idx1 = ['a']*100 + ['b']*100 + ['c']*100
+    idx2 = np.arange(300) % 25
+    mi = pd.MultiIndex.from_arrays([idx1, idx2])
+    df = pd.DataFrame(rs.standard_normal((300, 2)),
+                      index=mi, columns=['y', 'x'])
+    w = pd.Series(w, index=mi, name='weight')
+    df['weight'] = w
+    mod = PanelOLS.from_formula('y ~ x + EntityEffects + TimeEffects', df,
+                                weights=df['weight'])
+    res = mod.fit()
+    mod = PanelOLS.from_formula('y ~ x + EntityEffects + TimeEffects', df)
+    res_un = mod.fit()
+    assert res.params[0] != res_un.params[0]
