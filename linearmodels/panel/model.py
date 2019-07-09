@@ -251,7 +251,11 @@ class PooledOLS(object):
         if weights.shape[0] == nobs and nobs == nentity:
             raise AmbiguityError('Unable to distinguish nobs form nentity since they are '
                                  'equal. You must use an 2-d array to avoid ambiguity.')
-        if weights.shape[0] == nobs:
+        if (isinstance(weights, (pd.Series, pd.DataFrame)) and
+                isinstance(weights.index, pd.MultiIndex) and
+                weights.shape[0] == self.dependent.dataframe.shape[0]):
+            frame = weights
+        elif weights.shape[0] == nobs:
             weights = np.asarray(weights)[:, None]
             weights = weights @ np.ones((1, nentity))
             frame.iloc[:, :] = weights
