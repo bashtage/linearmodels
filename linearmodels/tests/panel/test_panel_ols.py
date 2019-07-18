@@ -14,6 +14,7 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                assert_frame_similar,
                                                assert_results_equal, datatypes,
                                                generate_data)
+from linearmodels.panel.utility import AbsorbingEffectWarning
 from linearmodels.utility import AttrDict, MemoryWarning
 
 pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning',
@@ -29,6 +30,27 @@ ids = list(map(lambda s: '-'.join(map(str, s)), perms))
 def data(request):
     missing, datatype, const = request.param
     return generate_data(missing, datatype, const=const, ntk=(91, 15, 5), other_effects=2)
+
+
+@pytest.fixture(params=['numpy', 'pandas'])
+def absorbed_data(request):
+    datatype = request.param
+    rng = np.random.RandomState(12345)
+    data = generate_data(0, datatype, ntk=(131, 4, 3), rng=rng)
+    x = data.x
+    if isinstance(data.x, np.ndarray):
+        absorbed = np.arange(x.shape[2])
+        absorbed = np.tile(absorbed, (1, x.shape[1], 1))
+        data.x = np.concatenate([data.x, absorbed])
+    else:
+        try:
+            codes = data.x.index.codes
+        except AttributeError:
+            # pandas < 0.24
+            codes = data.x.index.labels
+        absorbed = np.array(codes[0]).astype(np.double)
+        data.x['x_absorbed'] = absorbed
+    return data
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -1180,3 +1202,21 @@ def test_repeated_measures_weight():
     mod = PanelOLS.from_formula('y ~ x + EntityEffects + TimeEffects', df)
     res_un = mod.fit()
     assert res.params[0] != res_un.params[0]
+
+
+def test_absorbed(absorbed_data):
+    mod = PanelOLS(absorbed_data.y, absorbed_data.x, drop_absorbed=True, entity_effects=True)
+    if isinstance(absorbed_data.y, pd.DataFrame):
+        match = 'x_absorbed'
+    else:
+        match = 'Exog.3'
+    with pytest.warns(AbsorbingEffectWarning, match=match):
+        res = mod.fit()
+    if isinstance(absorbed_data.x, np.ndarray):
+        x = absorbed_data.x[:-1]
+    else:
+        x = absorbed_data.x.iloc[:, :-1]
+    mod = PanelOLS(absorbed_data.y, x, drop_absorbed=False, entity_effects=True)
+    res_no = mod.fit()
+    assert_allclose(res.params, res_no.params)
+    assert_results_equal(res, res_no)
