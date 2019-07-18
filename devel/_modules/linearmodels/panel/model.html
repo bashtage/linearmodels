@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.model &#8212; linearmodels 4.12+14.g2c832ff documentation</title>
+    <title>linearmodels.panel.model &#8212; linearmodels 4.12+16.ga7b92c7 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+14.g2c832ff documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+16.ga7b92c7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.12 (+14, g2c832ff)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12 (+16, ga7b92c7)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -128,8 +128,8 @@
 <span class="kn">from</span> <span class="nn">linearmodels.panel.data</span> <span class="k">import</span> <span class="n">PanelData</span>
 <span class="kn">from</span> <span class="nn">linearmodels.panel.results</span> <span class="k">import</span> <span class="p">(</span><span class="n">PanelEffectsResults</span><span class="p">,</span> <span class="n">PanelResults</span><span class="p">,</span>
                                         <span class="n">RandomEffectsResults</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">linearmodels.panel.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">check_absorbed</span><span class="p">,</span> <span class="n">dummy_matrix</span><span class="p">,</span>
-                                        <span class="n">in_2core_graph</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">linearmodels.panel.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">check_absorbed</span><span class="p">,</span> <span class="n">dummy_matrix</span><span class="p">,</span> <span class="n">in_2core_graph</span><span class="p">,</span>
+                                        <span class="n">not_absorbed</span><span class="p">,</span> <span class="n">AbsorbingEffectWarning</span><span class="p">,</span> <span class="n">absorbing_warn_msg</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="p">(</span><span class="n">AttrDict</span><span class="p">,</span> <span class="n">InapplicableTestStatistic</span><span class="p">,</span>
                                   <span class="n">InferenceUnavailableWarning</span><span class="p">,</span>
                                   <span class="n">InvalidTestStatistic</span><span class="p">,</span> <span class="n">MemoryWarning</span><span class="p">,</span>
@@ -830,6 +830,8 @@
 <span class="sd">        effects. Each variable is treated as an effect.</span>
 <span class="sd">    singletons : bool, optional</span>
 <span class="sd">        Flag indicating whether to drop singleton observation</span>
+<span class="sd">    drop_absorbed : bool, optional</span>
+<span class="sd">        Flag indicating whether to drop absorbed variables</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -866,7 +868,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">time_effects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">other_effects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">singletons</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">other_effects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">singletons</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_absorbed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PanelOLS</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_entity_effects</span> <span class="o">=</span> <span class="n">entity_effects</span>
@@ -875,6 +877,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_singletons</span> <span class="o">=</span> <span class="n">singletons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_effects</span><span class="p">(</span><span class="n">other_effects</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_effect</span> <span class="o">=</span> <span class="n">entity_effects</span> <span class="ow">or</span> <span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span> <span class="o">=</span> <span class="n">drop_absorbed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_singleton_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drop_singletons</span><span class="p">()</span>
 
@@ -985,7 +988,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_effects</span>
 
 <div class="viewcode-block" id="PanelOLS.from_formula"><a class="viewcode-back" href="../../../panel/models.html#linearmodels.panel.model.PanelOLS.from_formula">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_formula</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_formula</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">singletons</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_absorbed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a model from a formula</span>
 
@@ -1007,6 +1011,11 @@
 <span class="sd">        other_effects : array-like, optional</span>
 <span class="sd">            Category codes to use for any effects that are not entity or time</span>
 <span class="sd">            effects. Each variable is treated as an effect.</span>
+<span class="sd">        singletons : bool, optional</span>
+<span class="sd">            Flag indicating whether to drop singleton observation</span>
+<span class="sd">        drop_absorbed : bool, optional</span>
+<span class="sd">            Flag indicating whether to drop absorbed variables</span>
+
 
 
 <span class="sd">        Returns</span>
@@ -1025,7 +1034,8 @@
         <span class="n">time_effect</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">time_effect</span>
         <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">entity_effects</span><span class="o">=</span><span class="n">entity_effect</span><span class="p">,</span> <span class="n">time_effects</span><span class="o">=</span><span class="n">time_effect</span><span class="p">,</span>
-                  <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="n">other_effects</span><span class="p">)</span>
+                  <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">other_effects</span><span class="o">=</span><span class="n">other_effects</span><span class="p">,</span> <span class="n">singletons</span><span class="o">=</span><span class="n">singletons</span><span class="p">,</span>
+                  <span class="n">drop_absorbed</span><span class="o">=</span><span class="n">drop_absorbed</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
 
@@ -1375,7 +1385,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">weighted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values2d</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">y_effects</span> <span class="o">=</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="n">use_lsmr</span><span class="p">:</span>
             <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lsmr_path</span><span class="p">()</span>
@@ -1385,6 +1394,8 @@
             <span class="n">low_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_choose_twoway_algo</span><span class="p">()</span> <span class="k">if</span> <span class="n">low_memory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">low_memory</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">weighted</span><span class="p">:</span>
                 <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
+                <span class="n">y_effects</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">x_effects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ybar</span><span class="p">,</span> <span class="n">y_effects</span><span class="p">,</span> <span class="n">x_effects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_fast_path</span><span class="p">(</span><span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">)</span>
 
@@ -1403,7 +1414,20 @@
                 <span class="n">drop_first</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_effects</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_effects</span><span class="p">:</span>
-            <span class="n">check_absorbed</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_absorbed</span><span class="p">:</span>
+                <span class="n">check_absorbed</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">retain</span> <span class="o">=</span> <span class="n">not_absorbed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">retain</span><span class="p">)</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">drop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">retain</span><span class="p">)</span>
+                    <span class="n">dropped</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">drop</span><span class="p">])</span>
+                    <span class="kn">import</span> <span class="nn">warnings</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">absorbing_warn_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">absorbed_variables</span><span class="o">=</span><span class="n">dropped</span><span class="p">),</span>
+                                  <span class="n">AbsorbingEffectWarning</span><span class="p">)</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">retain</span><span class="p">]</span>
+                    <span class="c1"># Adjust exog</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">exog</span> <span class="o">=</span> <span class="n">PanelData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exog</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">retain</span><span class="p">])</span>
+                    <span class="n">x_effects</span> <span class="o">=</span> <span class="n">x_effects</span><span class="p">[</span><span class="n">retain</span><span class="p">]</span>
 
         <span class="n">params</span> <span class="o">=</span> <span class="n">lstsq</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nobs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2274,7 +2298,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+14.g2c832ff documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+16.ga7b92c7 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
