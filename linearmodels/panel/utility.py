@@ -26,6 +26,19 @@ The following variables or variable combinations have been fully absorbed
 or have become perfectly collinear after effects are removed:
 
 {absorbed_variables}
+
+Set drop_absorbed=True to automatically drop absorbed variables.
+"""
+
+
+class AbsorbingEffectWarning(Warning):
+    pass
+
+
+absorbing_warn_msg = """
+Variables have been fully absorbed and have removed from the regression:
+
+{absorbed_variables}
 """
 
 
@@ -379,3 +392,32 @@ def check_absorbed(x: np.ndarray, variables: List[str]):
         absorbed_variables = '\n'.join(rows)
         msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
         raise AbsorbingEffectError(msg)
+
+
+def not_absorbed(x: np.ndarray):
+    """
+    Construct a list of the indices of regressors that are not absorbed
+
+    Parameters
+    ----------
+    x : ndarray
+        Regressor matrix to check
+
+    Returns
+    -------
+    retain : list[int]
+        List of columns to retain
+    """
+    if np.linalg.matrix_rank(x) < x.shape[1]:
+        xpx = x.T @ x
+        vals, vecs = np.linalg.eigh(xpx)
+        tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
+        absorbed = vals < tol
+        nabsorbed = absorbed.sum()
+        if nabsorbed == 0:
+            return []
+        q, r = np.linalg.qr(x)
+        threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
+        drop = np.where(np.abs(np.diag(r)) < threshold)[0]
+        retain = set(range(x.shape[1])).difference(drop)
+        return sorted(retain)

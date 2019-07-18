@@ -18,8 +18,8 @@ from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
-from linearmodels.panel.utility import (check_absorbed, dummy_matrix,
-                                        in_2core_graph)
+from linearmodels.panel.utility import (check_absorbed, dummy_matrix, in_2core_graph,
+                                        not_absorbed, AbsorbingEffectWarning, absorbing_warn_msg)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InferenceUnavailableWarning,
                                   InvalidTestStatistic, MemoryWarning,
@@ -720,6 +720,8 @@ class PanelOLS(PooledOLS):
         effects. Each variable is treated as an effect.
     singletons : bool, optional
         Flag indicating whether to drop singleton observation
+    drop_absorbed : bool, optional
+        Flag indicating whether to drop absorbed variables
 
     Notes
     -----
@@ -756,7 +758,7 @@ class PanelOLS(PooledOLS):
     """
 
     def __init__(self, dependent, exog, *, weights=None, entity_effects=False, time_effects=False,
-                 other_effects=None, singletons=True):
+                 other_effects=None, singletons=True, drop_absorbed=False):
         super(PanelOLS, self).__init__(dependent, exog, weights=weights)
 
         self._entity_effects = entity_effects
@@ -765,6 +767,7 @@ class PanelOLS(PooledOLS):
         self._singletons = singletons
         self._other_effects = self._validate_effects(other_effects)
         self._has_effect = entity_effects or time_effects or self.other_effects
+        self._drop_absorbed = drop_absorbed
         self._singleton_index = None
         self._drop_singletons()
 
@@ -875,7 +878,8 @@ class PanelOLS(PooledOLS):
         return self._other_effects
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None, other_effects=None):
+    def from_formula(cls, formula, data, *, weights=None, other_effects=None,
+                     singletons=True, drop_absorbed=False):
         """
         Create a model from a formula
 
@@ -897,6 +901,11 @@ class PanelOLS(PooledOLS):
         other_effects : array-like, optional
             Category codes to use for any effects that are not entity or time
             effects. Each variable is treated as an effect.
+        singletons : bool, optional
+            Flag indicating whether to drop singleton observation
+        drop_absorbed : bool, optional
+            Flag indicating whether to drop absorbed variables
+
 
 
         Returns
@@ -915,7 +924,8 @@ class PanelOLS(PooledOLS):
         time_effect = parser.time_effect
         dependent, exog = parser.data
         mod = cls(dependent, exog, entity_effects=entity_effect, time_effects=time_effect,
-                  weights=weights, other_effects=other_effects)
+                  weights=weights, other_effects=other_effects, singletons=singletons,
+                  drop_absorbed=drop_absorbed)
         mod.formula = formula
         return mod
 
@@ -1265,7 +1275,6 @@ class PanelOLS(PooledOLS):
         """
 
         weighted = np.any(self.weights.values2d != 1.0)
-        y_effects = x_effects = 0
 
         if use_lsmr:
             y, x, ybar, y_effects, x_effects = self._lsmr_path()
@@ -1275,6 +1284,8 @@ class PanelOLS(PooledOLS):
             low_memory = self._choose_twoway_algo() if low_memory is None else low_memory
             if not weighted:
                 y, x, ybar = self._fast_path(low_memory=low_memory)
+                y_effects = 0.0
+                x_effects = np.zeros(x.shape[1])
             else:
                 y, x, ybar, y_effects, x_effects = self._weighted_fast_path(low_memory=low_memory)
 
@@ -1293,7 +1304,20 @@ class PanelOLS(PooledOLS):
                 drop_first = True
 
         if self.entity_effects or self.time_effects or self.other_effects:
-            check_absorbed(x, self.exog.vars)
+            if not self._drop_absorbed:
+                check_absorbed(x, self.exog.vars)
+            else:
+                retain = not_absorbed(x)
+                if len(retain) != x.shape[1]:
+                    drop = set(range(x.shape[1])).difference(retain)
+                    dropped = ', '.join([self.exog.vars[i] for i in drop])
+                    import warnings
+                    warnings.warn(absorbing_warn_msg.format(absorbed_variables=dropped),
+                                  AbsorbingEffectWarning)
+                    x = x[:, retain]
+                    # Adjust exog
+                    self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
+                    x_effects = x_effects[retain]
 
         params = lstsq(x, y)[0]
         nobs = self.dependent.dataframe.shape[0]

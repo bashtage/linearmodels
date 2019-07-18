@@ -3,6 +3,9 @@ Change Log
 
 Since Version 4.12
 ==================
+* Added ``drop_absorbed`` option to :class:`~linearmodels.panel.model.PanelOLS`
+  which automatically drops variables that are absorbed by fixed effects.
+  (:issue:`206`)
 * Added optional Cythonized node selection for dropping singletons
 * Added preconditioning to the dummy variable matrix when ``use_lsmr=True``
   in :func:`~linearmodels.panel.model.PanelOLS.fit`. In models with many
