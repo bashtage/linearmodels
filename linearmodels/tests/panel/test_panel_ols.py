@@ -1220,3 +1220,11 @@ def test_absorbed(absorbed_data):
     res_no = mod.fit()
     assert_allclose(res.params, res_no.params)
     assert_results_equal(res, res_no)
+
+
+def test_absorbed_option(data):
+    mod = PanelOLS(data.y, data.x, entity_effects=True, drop_absorbed=True)
+    res = mod.fit(auto_df=False, count_effects=False, debiased=False)
+    mod = PanelOLS(data.y, data.x, entity_effects=True, drop_absorbed=False)
+    res_false = mod.fit(auto_df=False, count_effects=False, debiased=False)
+    assert_results_equal(res, res_false)

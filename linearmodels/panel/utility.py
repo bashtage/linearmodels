@@ -408,16 +408,15 @@ def not_absorbed(x: np.ndarray):
     retain : list[int]
         List of columns to retain
     """
-    if np.linalg.matrix_rank(x) < x.shape[1]:
-        xpx = x.T @ x
-        vals, vecs = np.linalg.eigh(xpx)
-        tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
-        absorbed = vals < tol
-        nabsorbed = absorbed.sum()
-        if nabsorbed == 0:
-            return []
-        q, r = np.linalg.qr(x)
-        threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
-        drop = np.where(np.abs(np.diag(r)) < threshold)[0]
-        retain = set(range(x.shape[1])).difference(drop)
-        return sorted(retain)
+    if np.linalg.matrix_rank(x) == x.shape[1]:
+        return list(range(x.shape[1]))
+    xpx = x.T @ x
+    vals, vecs = np.linalg.eigh(xpx)
+    tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
+    absorbed = vals < tol
+    nabsorbed = absorbed.sum()
+    q, r = np.linalg.qr(x)
+    threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
+    drop = np.where(np.abs(np.diag(r)) < threshold)[0]
+    retain = set(range(x.shape[1])).difference(drop)
+    return sorted(retain)
