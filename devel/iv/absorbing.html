@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Absorbing Least Squares &#8212; linearmodels 4.12+18.g7bd8a01 documentation</title>
+    <title>Absorbing Least Squares &#8212; linearmodels 4.12+19.gca3748c documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+19.gca3748c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.12 (+18, g7bd8a01)</a>
+    ../index.html" class="text-logo">linearmodels 4.12 (+19, gca3748c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -133,7 +133,7 @@
 <dl class="class">
 <dt id="linearmodels.iv.absorbing.AbsorbingLS">
 <em class="property">class </em><code class="sig-name descname">AbsorbingLS</code><span class="sig-paren">(</span><em class="sig-param">dependent</em>, <em class="sig-param">exog=None</em>, <em class="sig-param">*</em>, <em class="sig-param">absorb=None</em>, <em class="sig-param">interactions=None</em>, <em class="sig-param">weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linearmodels/iv/absorbing.html#AbsorbingLS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.iv.absorbing.AbsorbingLS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Linear regression with high-dimensaional effects</p>
+<dd><p>Linear regression with high-dimensional effects</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -142,7 +142,7 @@
 <li><p><strong>absorb</strong> (<em>{DataFrame</em><em>, </em><em>Interaction}</em>) – The effects or continuous variables to absorb. When using a DataFrame,
 effects must be categorical variables. Other variable types are treated
 as continuous variables that should be absorbed. When using an
-Interaction, variables in the <cite>cat</cite> argument are treaded as effects
+Interaction, variables in the <cite>cat</cite> argument are treated as effects
 and variables in the <cite>cont</cite> argument are treated as continuous.</p></li>
 <li><p><strong>interactions</strong> (<em>{DataFrame</em><em>, </em><a class="reference internal" href="#linearmodels.iv.absorbing.Interaction" title="linearmodels.iv.absorbing.Interaction"><em>Interaction</em></a><em>, </em><em>List</em><em>[</em><em>DataFrame</em><em>, </em><a class="reference internal" href="#linearmodels.iv.absorbing.Interaction" title="linearmodels.iv.absorbing.Interaction"><em>Interaction</em></a><em>]</em><em>}</em><em>, </em><em>optional</em>) – Interactions containing both categorical and continuous variables.  Each
 interaction is constructed using the Cartesian product of the categorical
@@ -166,7 +166,7 @@ z contains interactions between continuous variables and categorical
 variables, also known as fixed slopes.</p>
 <p>The high-dimensional effects are fit using LSMR which avoids inverting
 or even constructing the inner product of the regressors. This is
-combined with Frish-Waugh-Lovell to orthogonzlize x and y from z.</p>
+combined with Frish-Waugh-Lovell to orthogonalize x and y from z.</p>
 <p>z can contain factors that are perfectly linearly dependent. LSMR
 estimates a particular restricted set of parameters that captures the
 effect of non-redundant components in z.</p>
@@ -175,7 +175,7 @@ effect of non-redundant components in z.</p>
 <p><a class="reference internal" href="#linearmodels.iv.absorbing.Interaction" title="linearmodels.iv.absorbing.Interaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interaction</span></code></a>, <a class="reference internal" href="methods.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.model.IVLIML</span></code></a>, <a class="reference internal" href="methods.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">linearmodels.iv.model.IV2SLS</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.sparse.linalg.lsmr</span></code></p>
 </div>
 <p class="rubric">Examples</p>
-<p>Estimate a model by absorbing 2 cateogricals and 2 continuous variables</p>
+<p>Estimate a model by absorbing 2 categoricals and 2 continuous variables</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lineamodels.iv</span> <span class="k">import</span> <span class="n">AbsorbingLS</span><span class="p">,</span> <span class="n">Interaction</span>
@@ -388,7 +388,7 @@ and the cartesian product of the categories.</p>
 <dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.cont">
 <em class="property">property </em><code class="sig-name descname">cont</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.cont" title="Permalink to this definition">¶</a></dt>
-<dd><p>Continusous Variables</p>
+<dd><p>Continuous Variables</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
@@ -442,10 +442,10 @@ inputs that produce the same fit when used as regressors</p>
 <dl class="method">
 <dt id="linearmodels.iv.absorbing.Interaction.sparse">
 <em class="property">property </em><code class="sig-name descname">sparse</code><a class="headerlink" href="#linearmodels.iv.absorbing.Interaction.sparse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct a sparce interaction matrix</p>
+<dd><p>Construct a sparse interaction matrix</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>dummy_interact</strong> – Dummy interaction constructed from teh cartesian product of
+<dd class="field-odd"><p><strong>dummy_interact</strong> – Dummy interaction constructed from the cartesian product of
 the categories and each of the continuous variables.</p>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -497,7 +497,7 @@ the categories and each of the continuous variables.</p>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12+19.gca3748c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

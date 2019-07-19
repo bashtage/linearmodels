@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.iv.absorbing &#8212; linearmodels 4.12+18.g7bd8a01 documentation</title>
+    <title>linearmodels.iv.absorbing &#8212; linearmodels 4.12+19.gca3748c documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+19.gca3748c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.12 (+18, g7bd8a01)</a>
+    ../../../index.html" class="text-logo">linearmodels 4.12 (+19, gca3748c)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -395,7 +395,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cont</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Continusous Variables&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Continuous Variables&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cont_data</span><span class="o">.</span><span class="n">pandas</span>
 
     <span class="nd">@property</span>
@@ -409,12 +409,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csc_matrix</span><span class="p">:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Construct a sparce interaction matrix</span>
+<span class="sd">        Construct a sparse interaction matrix</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dummy_interact : csc_matrix</span>
-<span class="sd">            Dummy interaction constructed from teh cartesian product of</span>
+<span class="sd">            Dummy interaction constructed from the cartesian product of</span>
 <span class="sd">            the categories and each of the continuous variables.</span>
 
 <span class="sd">        Notes</span>
@@ -594,7 +594,7 @@
 
 <div class="viewcode-block" id="AbsorbingLS"><a class="viewcode-back" href="../../../iv/absorbing.html#linearmodels.iv.absorbing.AbsorbingLS">[docs]</a><span class="k">class</span> <span class="nc">AbsorbingLS</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Linear regression with high-dimensaional effects</span>
+<span class="sd">    Linear regression with high-dimensional effects</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -606,7 +606,7 @@
 <span class="sd">        The effects or continuous variables to absorb. When using a DataFrame,</span>
 <span class="sd">        effects must be categorical variables. Other variable types are treated</span>
 <span class="sd">        as continuous variables that should be absorbed. When using an</span>
-<span class="sd">        Interaction, variables in the `cat` argument are treaded as effects</span>
+<span class="sd">        Interaction, variables in the `cat` argument are treated as effects</span>
 <span class="sd">        and variables in the `cont` argument are treated as continuous.</span>
 <span class="sd">    interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}, optional</span>
 <span class="sd">        Interactions containing both categorical and continuous variables.  Each</span>
@@ -638,7 +638,7 @@
 
 <span class="sd">    The high-dimensional effects are fit using LSMR which avoids inverting</span>
 <span class="sd">    or even constructing the inner product of the regressors. This is</span>
-<span class="sd">    combined with Frish-Waugh-Lovell to orthogonzlize x and y from z.</span>
+<span class="sd">    combined with Frish-Waugh-Lovell to orthogonalize x and y from z.</span>
 
 <span class="sd">    z can contain factors that are perfectly linearly dependent. LSMR</span>
 <span class="sd">    estimates a particular restricted set of parameters that captures the</span>
@@ -653,7 +653,7 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Estimate a model by absorbing 2 cateogricals and 2 continuous variables</span>
+<span class="sd">    Estimate a model by absorbing 2 categoricals and 2 continuous variables</span>
 
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
@@ -1086,7 +1086,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.12+19.gca3748c documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

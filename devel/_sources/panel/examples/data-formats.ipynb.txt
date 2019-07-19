@@ -75,7 +75,7 @@
    "metadata": {},
    "source": [
     "## NumPy arrays\n",
-    "3D NumPy arrays can be used to hand panel data where the three axes are `0`, items, `1`, time and `2`, enitity. NumPy arrays aren't usually the best format for data since the results all use generic variable names. \n",
+    "3D NumPy arrays can be used to hand panel data where the three axes are `0`, items, `1`, time and `2`, entity. NumPy arrays are not usually the best format for data since the results all use generic variable names. \n",
     "\n",
     "Pandas dropped support for their Panel in 0.25."
    ]
