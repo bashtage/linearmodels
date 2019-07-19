@@ -133,7 +133,7 @@ is possible that older versions work.
 
 * **Python 3.5+**: extensive use of `@` operator
 * NumPy (1.13+)
-* SciPy (0.18+)
+* SciPy (0.19+)
 * pandas (0.20+)
 * statsmodels (0.8+)
 * xarray (0.9+, optional)
