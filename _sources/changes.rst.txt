@@ -1,6 +1,22 @@
 Change Log
 ----------
 
+Version 4.13
+============
+* Added :class:`~linearmodels.iv.absorbing.AbsorbingLS` which allows a large number
+  of variables to be absorbed. This model can handle very high-dimensional dummy
+  variables and has been tested using up to 1,000,000 categories in a data set
+  with 5,000,000 observations.
+* Fixed a bug when estimating weighted panel models that have repeated observations
+  (i.e., more than one observation per entity and time id).
+* Added ``drop_absorbed`` option to :class:`~linearmodels.panel.model.PanelOLS`
+  which automatically drops variables that are absorbed by fixed effects.
+  (:issue:`206`)
+* Added optional Cythonized node selection for dropping singletons
+* Added preconditioning to the dummy variable matrix when ``use_lsmr=True``
+  in :func:`~linearmodels.panel.model.PanelOLS.fit`. In models with many
+  effects, this can reduce run time by a factor of 4 or more.
+
 Version 4.12
 ============
 * Added an option to drop singleton observations in

@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.12 documentation</title>
+    <title>Three-stage Least Squares (3SLS) &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.12</a>
+    ../../index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -338,7 +336,7 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 <div class="section" id="Data">
 <h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
 <p>The data set is the MORZ data set from Wooldridge (2002).</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -347,6 +345,17 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 <span class="n">data</span> <span class="o">=</span> <span class="n">mroz</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
+/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+</pre></div></div>
 </div>
 <p>Here the relevant variables are selected and missing observations are dropped to avoid warnings.</p>
 <div class="nbinput nblast docutils container">
@@ -361,9 +370,9 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 </div>
 <p>The main models are imported:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - single equation 2-stage least squares</li>
-<li><code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> - system estimation using instrumental variables</li>
-<li><code class="docutils literal notranslate"><span class="pre">SUR</span></code> - system estimation without endogenous variables</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - single equation 2-stage least squares</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV3SLS</span></code> - system estimation using instrumental variables</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SUR</span></code> - system estimation without endogenous variables</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -401,8 +410,8 @@ hours &amp; = &amp; \beta_0 + \beta_1 \ln(wage) + \beta_2 educ + \beta_3 age + \
 Dep. Variable:                  hours   R-squared:                      0.1903
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.1807
 No. Observations:                 428   F-statistic:                    399.30
-Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
-Time:                        08:56:06   Distribution:                  chi2(5)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        12:42:34   Distribution:                  chi2(5)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -446,8 +455,8 @@ Debiased: False
 Dep. Variable:                  lwage   R-squared:                      0.7582
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.7559
 No. Observations:                 428   F-statistic:                    1362.4
-Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
-Time:                        08:56:06   Distribution:                  chi2(4)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        12:42:34   Distribution:                  chi2(4)
 Cov. Estimator:            unadjusted
 
                              Parameter Estimates
@@ -490,8 +499,8 @@ Debiased: False
 Estimator:                        OLS   Overall R-squared:              0.1903
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:06
+Date:                Fri, Jul 19 2019
+Time:                        12:42:35
 
 
                   Equation: hours, Dependent Variable: hours
@@ -550,8 +559,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: False)
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:06
+Date:                Fri, Jul 19 2019
+Time:                        12:42:35
 
 
                   Equation: hours, Dependent Variable: hours
@@ -592,10 +601,10 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 <h2>Direct Model Specification<a class="headerlink" href="#Direct-Model-Specification" title="Permalink to this headline">¶</a></h2>
 <p>The model can be directly specified using a dictionary of dictionaries where the inner dictionaries contain the 4 components of the model:</p>
 <ul class="simple">
-<li>dependent - The dependent variable</li>
-<li>exog - Exogenous regressors</li>
-<li>endog - Endogenous regressors</li>
-<li>instruments - Instrumental variables</li>
+<li><p>dependent - The dependent variable</p></li>
+<li><p>exog - Exogenous regressors</p></li>
+<li><p>endog - Endogenous regressors</p></li>
+<li><p>instruments - Instrumental variables</p></li>
 </ul>
 <p>The estimates are the same. This interface is more useful for programmatically generating and estimating models.</p>
 <div class="nbinput docutils container">
@@ -630,8 +639,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:              0.0120
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:07
+Date:                Fri, Jul 19 2019
+Time:                        12:42:35
 
 
                   Equation: hours, Dependent Variable: hours
@@ -698,8 +707,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:          2-Step System GMM   Overall R-squared:              0.0121
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 428   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:07
+Date:                Fri, Jul 19 2019
+Time:                        12:42:35
 
 
                   Equation: hours, Dependent Variable: hours
@@ -761,8 +770,8 @@ Number of iterations: 20
 Estimator:         Iterative System GMM   Overall R-squared:             -0.0345
 No. Equations.:                       2   Cov. Estimator:                 robust
 No. Observations:                   428   Num. Constraints:                 None
-Date:                  Wed, Mar 13 2019
-Time:                          08:56:07
+Date:                  Fri, Jul 19 2019
+Time:                          12:42:35
 
 
                   Equation: hours, Dependent Variable: hours
@@ -835,7 +844,7 @@ Heteroskedastic (Robust) Weighting (Debiased: False, Center: False)
         <li class="right" >
           <a href="formulas.html" title="Using formulas to specify models"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

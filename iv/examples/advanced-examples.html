@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Further Examples &#8212; linearmodels 4.12 documentation</title>
+    <title>Further Examples &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.12</a>
+    ../../index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -75,9 +73,11 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Instrumental Variable Estimation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../absorbing.html">Absorbing Least Squares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basic-examples.html">Basic Examples</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Further Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using-formulas.html">Using formulas to specify models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="absorbing-regression.html">Absorbing Regression</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference.html">Module Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mathematical-formula.html">Formulas and Mathematical Detail</a></li>
 </ul>
@@ -332,12 +332,12 @@ div.rendered_html tbody tr:hover {
 <p>These examples follow those in <strong>Chapter 6</strong> of <em>Microeconometrics Using Stata</em> by Cameron &amp; Trivedi.</p>
 <p>The first step is to import the main estimator for linear IV models:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - standard two-stage least squares</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class estimators</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</li>
-<li><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> - standard two-stage least squares</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVLIML</span></code> - Limited information maximum likelihood and k-class estimators</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</p></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -345,6 +345,17 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IVLIML</span><span class="p">,</span> <span class="n">IVGMM</span><span class="p">,</span> <span class="n">IVGMMCUE</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
+/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="Importing-data">
@@ -581,8 +592,8 @@ max        9.250620      1.000000      1.000000     50.000000
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
-Time:                        08:55:26   Distribution:                  chi2(6)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        12:41:55   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -624,8 +635,8 @@ blhisp         -0.1513     0.0341    -4.4353     0.0000     -0.2182     -0.0844
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Wed, Mar 13 2019   P-value (F-stat)                0.0000
-Time:                        08:55:26   Distribution:                  chi2(6)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        12:41:55   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -666,10 +677,10 @@ Debiased: False
 <h2>Alternative covariance estimators<a class="headerlink" href="#Alternative-covariance-estimators" title="Permalink to this headline">¶</a></h2>
 <p>All estimator allow for three types of parameter covariance estimator:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> is the classic homoskedastic estimator</li>
-<li><code class="docutils literal notranslate"><span class="pre">'robust'</span></code> is robust to heteroskedasticity</li>
-<li><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for additional sources of dependence between the model scores</li>
-<li><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust covariance estimator</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'unadjusted'</span></code> is the classic homoskedastic estimator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'robust'</span></code> is robust to heteroskedasticity</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'clustered'</span></code> allows one- or two-way clustering to account for additional sources of dependence between the model scores</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'kernel'</span></code> produces a heteroskedasticity-autocorrelation robust covariance estimator</p></li>
 </ul>
 <p>The default is <code class="docutils literal notranslate"><span class="pre">'robust'</span></code>.</p>
 <p>These are all passed using the keyword input <code class="docutils literal notranslate"><span class="pre">cov_type</span></code>. Using clustered requires also passing the clustering variable(s).</p>
@@ -826,7 +837,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f627ae4ee80
+WaldTestStatistic, id: 0x7f1a99749e80
 </pre></div>
 </div>
 </div>
@@ -850,7 +861,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7f627b7c56a0
+WaldTestStatistic, id: 0x7f1a99501be0
 </pre></div>
 </div>
 </div>
@@ -897,7 +908,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f627ae78908
+WaldTestStatistic, id: 0x7f1a9923c198
 </pre></div>
 </div>
 </div>
@@ -921,7 +932,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f627a9eb438
+WaldTestStatistic, id: 0x7f1a9923c630
 </pre></div>
 </div>
 </div>
@@ -946,7 +957,7 @@ WaldTestStatistic, id: 0x7f627a9eb438
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7f627b171358
+WaldTestStatistic, id: 0x7f1a99c16b38
 </pre></div>
 </div>
 </div>
@@ -971,7 +982,7 @@ WaldTestStatistic, id: 0x7f627b171358
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7f627a915518
+WaldTestStatistic, id: 0x7f1a990cde80
 </pre></div>
 </div>
 </div>
@@ -1277,7 +1288,7 @@ blhisp       -0.151307 -0.151307
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>

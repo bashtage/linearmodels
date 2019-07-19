@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../../_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.12 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.12</a>
+    ../../index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -329,11 +327,11 @@ div.rendered_html tbody tr:hover {
 <h1>Using formulas to specify models<a class="headerlink" href="#Using-formulas-to-specify-models" title="Permalink to this headline">¶</a></h1>
 <p>Formulas can be used to specify models using mostly standard <a class="reference external" href="https://patsy.readthedocs.io/">patsy</a> syntax. Since system estimation is more complicated than the specification of a single model, there are two methods available to specify a system:</p>
 <ul class="simple">
-<li>Dictionary of formulas</li>
-<li>Single formula separated using {}</li>
+<li><p>Dictionary of formulas</p></li>
+<li><p>Single formula separated using {}</p></li>
 </ul>
 <p>These examples use data on fringe benefits from F. Vella (1993), “A Simple Estimator for Simultaneous Models with Censored Endogenous Regressors” which appears in Wooldridge (2002). The model consists of two equations, one for hourly wage and the other for hourly benefits. The initial model uses the same regressors in both equations.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -344,6 +342,17 @@ div.rendered_html tbody tr:hover {
 <span class="n">data</span> <span class="o">=</span> <span class="n">fringe</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
+/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+</pre></div></div>
 </div>
 <div class="section" id="Dictionary">
 <h2>Dictionary<a class="headerlink" href="#Dictionary" title="Permalink to this headline">¶</a></h2>
@@ -381,8 +390,8 @@ div.rendered_html tbody tr:hover {
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:04
+Date:                Fri, Jul 19 2019
+Time:                        12:42:32
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -442,8 +451,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:04
+Date:                Fri, Jul 19 2019
+Time:                        12:42:32
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -540,35 +549,35 @@ Labeled
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.7176
+Estimator:                        GLS   Overall R-squared:              0.7119
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Wed, Mar 13 2019
-Time:                        08:56:04
+Date:                Fri, Jul 19 2019
+Time:                        12:42:32
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0320     0.0116     2.7583     0.0058      0.0092      0.0547
-exper          0.0402     0.0189     2.1292     0.0332      0.0032      0.0772
-expersq       -0.0008     0.0005    -1.6741     0.0941     -0.0017      0.0001
-union          0.3666     0.1053     3.4804     0.0005      0.1602      0.5731
-south         -0.1596     0.1295    -1.2321     0.2179     -0.4135      0.0943
-nrtheast      -0.1244     0.1470    -0.8461     0.3975     -0.4125      0.1637
-nrthcen       -0.1720     0.1310    -1.3125     0.1893     -0.4288      0.0848
-male           0.2904     0.1046     2.7768     0.0055      0.0854      0.4954
+educ           0.0339     0.0125     2.7205     0.0065      0.0095      0.0583
+exper          0.0384     0.0215     1.7861     0.0741     -0.0037      0.0805
+expersq       -0.0007     0.0005    -1.2258     0.2203     -0.0017      0.0004
+union          0.3728     0.1064     3.5024     0.0005      0.1642      0.5814
+south         -0.2490     0.1153    -2.1593     0.0308     -0.4750     -0.0230
+nrtheast      -0.1405     0.1460    -0.9624     0.3359     -0.4266      0.1456
+nrthcen       -0.1345     0.1290    -1.0432     0.2968     -0.3873      0.1182
+male           0.2236     0.0912     2.4513     0.0142      0.0448      0.4024
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.4030     0.0282     14.315     0.0000      0.3478      0.4581
-exper         -0.1680     0.0626    -2.6812     0.0073     -0.2907     -0.0452
-expersq        0.0061     0.0016     3.7109     0.0002      0.0029      0.0094
-nrtheast      -0.9080     0.1521    -5.9693     0.0000     -1.2061     -0.6098
-married        0.6888     0.2191     3.1434     0.0017      0.2593      1.1183
-male           1.8998     0.1201     15.812     0.0000      1.6643      2.1353
+educ           0.3638     0.0218     16.691     0.0000      0.3211      0.4066
+exper         -0.1021     0.0478    -2.1354     0.0327     -0.1959     -0.0084
+expersq        0.0046     0.0012     3.7379     0.0002      0.0022      0.0071
+nrtheast      -0.7027     0.1479    -4.7504     0.0000     -0.9926     -0.4128
+married        0.3422     0.2146     1.5948     0.1108     -0.0783      0.7627
+male           2.0728     0.1023     20.255     0.0000      1.8722      2.2733
 ==============================================================================
 
 Covariance Estimator:
@@ -616,7 +625,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

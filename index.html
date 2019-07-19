@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Linear Model Estimation &#8212; linearmodels 4.12 documentation</title>
+    <title>Linear Model Estimation &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -48,7 +46,7 @@
         <li class="right" >
           <a href="iv/index.html" title="Instrumental Variable Estimation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -58,7 +56,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    #" class="text-logo">linearmodels 4.12</a>
+    #" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -113,8 +111,8 @@
   <div class="section" id="linear-model-estimation">
 <h1>Linear Model Estimation<a class="headerlink" href="#linear-model-estimation" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><a class="reference external" href="https://bashtage.github.io/linearmodels/">Stable documentation</a> for the latest release
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://bashtage.github.io/linearmodels/">Stable documentation</a> for the latest release
 is located at <a class="reference external" href="https://bashtage.github.io/linearmodels/">doc</a>.
 Documentation for <a class="reference external" href="https://bashtage.github.io/linearmodels/devel/">recent developments</a>
 is located at <a class="reference external" href="https://bashtage.github.io/linearmodels/devel/">devel</a>.</p>
@@ -122,34 +120,34 @@ is located at <a class="reference external" href="https://bashtage.github.io/lin
 <p>Estimation and inference in some common linear models:</p>
 <p><strong>Panel Data Models</strong></p>
 <ul class="simple">
-<li>Fixed Effects (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>)</li>
-<li>Random Effects (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a>)</li>
-<li>First Difference (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>)</li>
-<li>Between Estimation (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>)</li>
-<li>Pooled OLS (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>)</li>
-<li>Fama-MacBeth Estimation (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>)</li>
+<li><p>Fixed Effects (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>)</p></li>
+<li><p>Random Effects (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a>)</p></li>
+<li><p>First Difference (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a>)</p></li>
+<li><p>Between Estimation (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a>)</p></li>
+<li><p>Pooled OLS (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a>)</p></li>
+<li><p>Fama-MacBeth Estimation (<a class="reference internal" href="panel/models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a>)</p></li>
 </ul>
 <p><strong>Single equation Instrumental Variables (IV) models</strong></p>
 <ul class="simple">
-<li>Two-stage least squares (2SLS, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>)</li>
-<li>Limited Information ML (LIML, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>)</li>
-<li>Generalized Method of Moments (GMM, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>)</li>
-<li>Continuously Updating GMM (CUE-GMM, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a>)</li>
+<li><p>Two-stage least squares (2SLS, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IV2SLS" title="linearmodels.iv.model.IV2SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV2SLS</span></code></a>)</p></li>
+<li><p>Limited Information ML (LIML, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVLIML" title="linearmodels.iv.model.IVLIML"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVLIML</span></code></a>)</p></li>
+<li><p>Generalized Method of Moments (GMM, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMM" title="linearmodels.iv.model.IVGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMM</span></code></a>)</p></li>
+<li><p>Continuously Updating GMM (CUE-GMM, <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a>)</p></li>
 </ul>
 <p><strong>System Regression Estimators</strong></p>
 <ul class="simple">
-<li>Seemingly Unrelated Regression (SUR, <a class="reference internal" href="system/models.html#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR"><code class="xref py py-class docutils literal notranslate"><span class="pre">SUR</span></code></a>)</li>
-<li>Three-stage Least Squares (3SLS, <a class="reference internal" href="system/models.html#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV3SLS</span></code></a>)</li>
-<li>Generalized Method of Moments System Estimator (GMM, <a class="reference internal" href="system/models.html#linearmodels.system.model.IVSystemGMM" title="linearmodels.system.model.IVSystemGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVSystemGMM</span></code></a>)</li>
+<li><p>Seemingly Unrelated Regression (SUR, <a class="reference internal" href="system/models.html#linearmodels.system.model.SUR" title="linearmodels.system.model.SUR"><code class="xref py py-class docutils literal notranslate"><span class="pre">SUR</span></code></a>)</p></li>
+<li><p>Three-stage Least Squares (3SLS, <a class="reference internal" href="system/models.html#linearmodels.system.model.IV3SLS" title="linearmodels.system.model.IV3SLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IV3SLS</span></code></a>)</p></li>
+<li><p>Generalized Method of Moments System Estimator (GMM, <a class="reference internal" href="system/models.html#linearmodels.system.model.IVSystemGMM" title="linearmodels.system.model.IVSystemGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVSystemGMM</span></code></a>)</p></li>
 </ul>
 <p><strong>Asset Pricing Model Estimation and Testing</strong></p>
 <ul class="simple">
-<li>Linear Factor Model (2-step, for traded or non-traded factors)
-(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a>)</li>
-<li>Linear Factor Model (GMM, for traded or non-traded factors)
-(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a>)</li>
-<li>Linear factor model (1-step SUR, only for traded factors)
-(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a>)</li>
+<li><p>Linear Factor Model (2-step, for traded or non-traded factors)
+(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModel" title="linearmodels.asset_pricing.model.LinearFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModel</span></code></a>)</p></li>
+<li><p>Linear Factor Model (GMM, for traded or non-traded factors)
+(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM" title="linearmodels.asset_pricing.model.LinearFactorModelGMM"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearFactorModelGMM</span></code></a>)</p></li>
+<li><p>Linear factor model (1-step SUR, only for traded factors)
+(<a class="reference internal" href="asset-pricing/models.html#linearmodels.asset_pricing.model.TradedFactorModel" title="linearmodels.asset_pricing.model.TradedFactorModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TradedFactorModel</span></code></a>)</p></li>
 </ul>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
@@ -169,9 +167,9 @@ is located at <a class="reference external" href="https://bashtage.github.io/lin
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 
@@ -201,7 +199,7 @@ is located at <a class="reference external" href="https://bashtage.github.io/lin
         <li class="right" >
           <a href="iv/index.html" title="Instrumental Variable Estimation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

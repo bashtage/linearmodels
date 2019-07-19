@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Utilities &#8212; linearmodels 4.12 documentation</title>
+    <title>Utilities &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="system/mathematical-formula.html" title="Formulas and Mathematical Detail"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -62,7 +60,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.12</a>
+    index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -118,49 +116,45 @@
 <span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-linearmodels.utility" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="linearmodels.utility.WaldTestStatistic">
-<em class="property">class </em><code class="descname">WaldTestStatistic</code><span class="sig-paren">(</span><em>stat</em>, <em>null</em>, <em>df</em>, <em>df_denom=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#WaldTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">WaldTestStatistic</code><span class="sig-paren">(</span><em class="sig-param">stat</em>, <em class="sig-param">null</em>, <em class="sig-param">df</em>, <em class="sig-param">df_denom=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#WaldTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test statistic holder for Wald-type tests</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The test statistic</li>
-<li><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A statement of the test’s null hypothesis</li>
-<li><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Degree of freedom.</li>
-<li><strong>df_denom</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Numerator degree of freedom.  If provided, uses an
-F(df, df_denom) distribution.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The test statistic</p></li>
+<li><p><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A statement of the test’s null hypothesis</p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Degree of freedom.</p></li>
+<li><p><strong>df_denom</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Numerator degree of freedom.  If provided, uses an
+F(df, df_denom) distribution.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.utility.InvalidTestStatistic" title="linearmodels.utility.InvalidTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#linearmodels.utility.InvalidTestStatistic" title="linearmodels.utility.InvalidTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></a></p>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.WaldTestStatistic.critical_values">
-<code class="descname">critical_values</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.critical_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">critical_values</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.critical_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Critical values test for common test sizes</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.WaldTestStatistic.null">
-<code class="descname">null</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.null" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">null</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.null" title="Permalink to this definition">¶</a></dt>
 <dd><p>Null hypothesis</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.WaldTestStatistic.pval">
-<code class="descname">pval</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.pval" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pval</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.pval" title="Permalink to this definition">¶</a></dt>
 <dd><p>P-value of test statistic</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.WaldTestStatistic.stat">
-<code class="descname">stat</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.stat" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">stat</code><a class="headerlink" href="#linearmodels.utility.WaldTestStatistic.stat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test statistic</p>
 </dd></dl>
 
@@ -168,33 +162,29 @@ F(df, df_denom) distribution.</li>
 
 <dl class="class">
 <dt id="linearmodels.utility.InvalidTestStatistic">
-<em class="property">class </em><code class="descname">InvalidTestStatistic</code><span class="sig-paren">(</span><em>reason</em>, <em>*</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#InvalidTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">InvalidTestStatistic</code><span class="sig-paren">(</span><em class="sig-param">reason</em>, <em class="sig-param">*</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#InvalidTestStatistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class returned if a requested test is not valid for a model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reason</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Explanation why test is invalid</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Explanation why test is invalid</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Name of test</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#linearmodels.utility.WaldTestStatistic" title="linearmodels.utility.WaldTestStatistic"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaldTestStatistic</span></code></a></p>
 </div>
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.InvalidTestStatistic.critical_values">
-<code class="descname">critical_values</code><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic.critical_values" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">critical_values</code><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic.critical_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Always returns None</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="linearmodels.utility.InvalidTestStatistic.pval">
-<code class="descname">pval</code><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic.pval" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pval</code><a class="headerlink" href="#linearmodels.utility.InvalidTestStatistic.pval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Always returns np.NaN</p>
 </dd></dl>
 
@@ -202,42 +192,42 @@ F(df, df_denom) distribution.</li>
 
 <dl class="class">
 <dt id="linearmodels.utility.AttrDict">
-<em class="property">class </em><code class="descname">AttrDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">AttrDict</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ordered dictionary-like object that exposes keys as attributes</p>
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.clear">
-<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.clear" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.clear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all items from AD.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a shallow copy of AD</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.items">
-<code class="descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.items" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an ordered list-like object providing a view on AD’s items</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.keys">
-<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.keys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an ordered list-like object providing a view on AD’s keys</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.pop">
-<code class="descname">pop</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.pop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pop</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove specified key and return the corresponding value.
 If key is not found, default is returned if given, otherwise KeyError is raised</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update AD from dictionary or iterable E and F.
 If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]
 If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v
@@ -246,7 +236,7 @@ In either case, this is followed by: for k in F:  AD[k] = F[k]</p>
 
 <dl class="method">
 <dt id="linearmodels.utility.AttrDict.values">
-<code class="descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.values" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/linearmodels/utility.html#AttrDict.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linearmodels.utility.AttrDict.values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an ordered list-like object object providing a view on AD’s values</p>
 </dd></dl>
 
@@ -287,7 +277,7 @@ In either case, this is followed by: for k in F:  AD[k] = F[k]</p>
         <li class="right" >
           <a href="system/mathematical-formula.html" title="Formulas and Mathematical Detail"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

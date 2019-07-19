@@ -8,6 +8,7 @@
 ./_modules/linearmodels/asset_pricing/covariance.html
 ./_modules/linearmodels/asset_pricing/model.html
 ./_modules/linearmodels/asset_pricing/results.html
+./_modules/linearmodels/iv/absorbing.html
 ./_modules/linearmodels/iv/covariance.html
 ./_modules/linearmodels/iv/gmm.html
 ./_modules/linearmodels/iv/model.html
@@ -33,7 +34,9 @@
 ./_sources/changes.rst.txt
 ./_sources/contributing.rst.txt
 ./_sources/index.rst.txt
+./_sources/iv/absorbing.rst.txt
 ./_sources/iv/covariance.rst.txt
+./_sources/iv/examples/absorbing-regression.ipynb.txt
 ./_sources/iv/examples/advanced-examples.ipynb.txt
 ./_sources/iv/examples/basic-examples.ipynb.txt
 ./_sources/iv/examples/using-formulas.ipynb.txt
@@ -70,18 +73,12 @@
 ./_sources/system/reference.rst.txt
 ./_sources/system/results.rst.txt
 ./_sources/utility.rst.txt
-./_static/ajax-loader.gif
 ./_static/basic.css
-./_static/comment-bright.png
-./_static/comment-close.png
-./_static/comment.png
 ./_static/css/bootstrap-theme.min.css
 ./_static/css/bootstrap.min.css
 ./_static/css/overrides.css
 ./_static/doctools.js
 ./_static/documentation_options.js
-./_static/down-pressed.png
-./_static/down.png
 ./_static/file.png
 ./_static/fonts/glyphicons-halflings-regular.eot
 ./_static/fonts/glyphicons-halflings-regular.svg
@@ -177,9 +174,6 @@
 ./_static/searchtools.js
 ./_static/underscore-1.3.1.js
 ./_static/underscore.js
-./_static/up-pressed.png
-./_static/up.png
-./_static/websupport.js
 ./asset-pricing/covariance.html
 ./asset-pricing/examples/examples.html
 ./asset-pricing/examples/formulas.html
@@ -193,7 +187,9 @@
 ./contributing.html
 ./genindex.html
 ./index.html
+./iv/absorbing.html
 ./iv/covariance.html
+./iv/examples/absorbing-regression.html
 ./iv/examples/advanced-examples.html
 ./iv/examples/basic-examples.html
 ./iv/examples/using-formulas.html

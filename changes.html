@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Change Log &#8212; linearmodels 4.12 documentation</title>
+    <title>Change Log &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -62,7 +60,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">linearmodels 4.12</a>
+    index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -80,6 +78,7 @@
 <li class="toctree-l1"><a class="reference internal" href="plan.html">Module Plans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-4-13">Version 4.13</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-12">Version 4.12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-11">Version 4.11</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-10">Version 4.10</a></li>
@@ -130,115 +129,134 @@
             
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-4-13">
+<h2>Version 4.13<a class="headerlink" href="#version-4-13" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="iv/absorbing.html#linearmodels.iv.absorbing.AbsorbingLS" title="linearmodels.iv.absorbing.AbsorbingLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbsorbingLS</span></code></a> which allows a large number
+of variables to be absorbed. This model can handle very high-dimensional dummy
+variables and has been tested using up to 1,000,000 categories in a data set
+with 5,000,000 observations.</p></li>
+<li><p>Fixed a bug when estimating weighted panel models that have repeated observations
+(i.e., more than one observation per entity and time id).</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">drop_absorbed</span></code> option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a>
+which automatically drops variables that are absorbed by fixed effects.
+(<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/206">GH206</a>)</p></li>
+<li><p>Added optional Cythonized node selection for dropping singletons</p></li>
+<li><p>Added preconditioning to the dummy variable matrix when <code class="docutils literal notranslate"><span class="pre">use_lsmr=True</span></code>
+in <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>. In models with many
+effects, this can reduce run time by a factor of 4 or more.</p></li>
+</ul>
+</div>
 <div class="section" id="version-4-12">
 <h2>Version 4.12<a class="headerlink" href="#version-4-12" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added an option to drop singleton observations in
+<li><p>Added an option to drop singleton observations in
 <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> by setting the keyword argument
 <code class="docutils literal notranslate"><span class="pre">singletons=False</span></code>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, singelton observations are dropped
 before the model is fit, so the the result is <em>as-if</em> the observations were
-never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</li>
-<li>Added a method to construct the 2-core graph for 2-way effects models, which
+never in <code class="docutils literal notranslate"><span class="pre">exog</span></code> or <code class="docutils literal notranslate"><span class="pre">dependent</span></code>.</p></li>
+<li><p>Added a method to construct the 2-core graph for 2-way effects models, which
 allows singleton observations with no effect on estimated slopes to be
-excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</li>
-<li>Added support for LSMR estimation of parameters in
+excluded. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/191">GH191</a>)</p></li>
+<li><p>Added support for LSMR estimation of parameters in
 <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a> through the keyword argument
 <code class="docutils literal notranslate"><span class="pre">use_lsmr</span></code>. LSMR is a sparse estimation method that can be used to extend
-<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</li>
-<li>Fixed a bug where IV models estimated with only exogenous regressors where
-not being correctly labeled as OLS models in output. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</li>
-<li>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></li>
-<li>Added a low-memory option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
+<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> to more than two effects.</p></li>
+<li><p>Fixed a bug where IV models estimated with only exogenous regressors where
+not being correctly labeled as OLS models in output. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/185">GH185</a>)</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">wald_test</span></code> to panel-model results.</p></li>
+<li><p>Renamed <code class="docutils literal notranslate"><span class="pre">test_linear_constraint</span></code> to <code class="docutils literal notranslate"><span class="pre">wald_test</span></code></p></li>
+<li><p>Added a low-memory option to <a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.fit" title="linearmodels.panel.model.PanelOLS.fit"><code class="xref py py-func docutils literal notranslate"><span class="pre">fit()</span></code></a>
 that avoids constructing dummy variables. Only used when both <code class="docutils literal notranslate"><span class="pre">entity_effects</span></code>
 and <code class="docutils literal notranslate"><span class="pre">time_effects</span></code> are <code class="docutils literal notranslate"><span class="pre">True</span></code>. By default, the low memory algorithm will be
 used whenever constructing the dummy variable array would require more than
-1 GiB. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</li>
-<li>Added an option in model comparison (<a class="reference internal" href="iv/results.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
+1 GiB. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/182">GH182</a>)</p></li>
+<li><p>Added an option in model comparison (<a class="reference internal" href="iv/results.html#linearmodels.iv.results.compare" title="linearmodels.iv.results.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a> and
 <a class="reference internal" href="panel/results.html#linearmodels.panel.results.compare" title="linearmodels.panel.results.compare"><code class="xref py py-func docutils literal notranslate"><span class="pre">compare()</span></code></a>) to report standard errors or pvalues
-instead of t-stats. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</li>
+instead of t-stats. (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/178">GH178</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-11">
 <h2>Version 4.11<a class="headerlink" href="#version-4-11" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Fixed a bug which did not correctly check the rank of the
-cross-section regression in <a class="reference internal" href="panel/models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</li>
-<li>Fixed a bug which failed to correctly check rank conditions when
-specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</li>
-<li>Switched to external package cached-property to manage caching instead of
-custom and less-well-tested solution (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/172">GH172</a>)</li>
+<li><p>Fixed a bug which did not correctly check the rank of the
+cross-section regression in <a class="reference internal" href="panel/models.html#linearmodels.panel.model.FamaMacBeth" title="linearmodels.panel.model.FamaMacBeth"><code class="xref py py-class docutils literal notranslate"><span class="pre">FamaMacBeth</span></code></a> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/176">GH176</a>)</p></li>
+<li><p>Fixed a bug which failed to correctly check rank conditions when
+specifying asset pricing models (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/173">GH173</a>)</p></li>
+<li><p>Switched to external package cached-property to manage caching instead of
+custom and less-well-tested solution (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/172">GH172</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-10">
 <h2>Version 4.10<a class="headerlink" href="#version-4-10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Fixed a bug where weights were incorrectly calculated for HAC covariances
-when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</li>
+<li><p>Fixed a bug where weights were incorrectly calculated for HAC covariances
+when the weight function was <code class="docutils literal notranslate"><span class="pre">'parzen'</span></code> or <code class="docutils literal notranslate"><span class="pre">'gallant'</span></code> (<a class="reference external" href="https://github.com/bashtage/linearmodels/issues/170">GH170</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-9">
 <h2>Version 4.9<a class="headerlink" href="#version-4-9" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Changed the return type of Wooldridge’s over identification test when
-invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></li>
-<li>Add typing information to IV models</li>
-<li>Allow optimization parameters to be passed to <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></li>
-<li>Removed internal use of pandas Panel</li>
-<li>Improved performance in panel models when using
-<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></li>
-<li>Switched to retaining index column names when original input index is named</li>
-<li>Modified tests that were not well conceived</li>
-<li>Added spell check to documentation build</li>
-<li>Improve docstring for <code class="docutils literal notranslate"><span class="pre">summary</span></code> properties</li>
+<li><p>Changed the return type of Wooldridge’s over identification test when
+invalid to <code class="docutils literal notranslate"><span class="pre">InvalidTestStatistic</span></code></p></li>
+<li><p>Add typing information to IV models</p></li>
+<li><p>Allow optimization parameters to be passed to <a class="reference internal" href="iv/methods.html#linearmodels.iv.model.IVGMMCUE" title="linearmodels.iv.model.IVGMMCUE"><code class="xref py py-class docutils literal notranslate"><span class="pre">IVGMMCUE</span></code></a></p></li>
+<li><p>Removed internal use of pandas Panel</p></li>
+<li><p>Improved performance in panel models when using
+<a class="reference internal" href="panel/models.html#linearmodels.panel.model.PanelOLS.from_formula" title="linearmodels.panel.model.PanelOLS.from_formula"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_formula()</span></code></a></p></li>
+<li><p>Switched to retaining index column names when original input index is named</p></li>
+<li><p>Modified tests that were not well conceived</p></li>
+<li><p>Added spell check to documentation build</p></li>
+<li><p>Improve docstring for <code class="docutils literal notranslate"><span class="pre">summary</span></code> properties</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-8">
 <h2>Version 4.8<a class="headerlink" href="#version-4-8" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Corrected bug that prevented single character names in IV formulas</li>
-<li>Corrected kappa estimation in LIML when there are no exogenous regressors</li>
+<li><p>Corrected bug that prevented single character names in IV formulas</p></li>
+<li><p>Corrected kappa estimation in LIML when there are no exogenous regressors</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-7">
 <h2>Version 4.7<a class="headerlink" href="#version-4-7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Improved performance of Panel estimators by optimizing data structure
-construction</li>
+<li><p>Improved performance of Panel estimators by optimizing data structure
+construction</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-6">
 <h2>Version 4.6<a class="headerlink" href="#version-4-6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added a license</li>
+<li><p>Added a license</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-5">
 <h2>Version 4.5<a class="headerlink" href="#version-4-5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added System GMM estimator</li>
-<li>Added automatic bandwidth for kernel-based GMM weighting estimators</li>
-<li>Cleaned up HAC estimation across models</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">predict</span></code> method to IV, Panel and System model to allow out-of-sample
-prediction and simplify retrieval of in-sample results</li>
-<li>Fixed small issues with Fama-MacBeth which previously ignored weights</li>
+<li><p>Added System GMM estimator</p></li>
+<li><p>Added automatic bandwidth for kernel-based GMM weighting estimators</p></li>
+<li><p>Cleaned up HAC estimation across models</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">predict</span></code> method to IV, Panel and System model to allow out-of-sample
+prediction and simplify retrieval of in-sample results</p></li>
+<li><p>Fixed small issues with Fama-MacBeth which previously ignored weights</p></li>
 </ul>
 </div>
 <div class="section" id="version-4-0">
 <h2>Version 4.0<a class="headerlink" href="#version-4-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added Seemingly Unrelated Regression (SUR) Estimator</li>
-<li>Added Three-stage Least Squares (3SLS) Estimator</li>
+<li><p>Added Seemingly Unrelated Regression (SUR) Estimator</p></li>
+<li><p>Added Three-stage Least Squares (3SLS) Estimator</p></li>
 </ul>
 </div>
 <div class="section" id="version-3-0">
 <h2>Version 3.0<a class="headerlink" href="#version-3-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added Fama-MacBeth estimator for panels</li>
-<li>Added linear factor models for asset pricing applications<ul>
-<li>Time-series estimation using traded factors</li>
-<li>2- and 3-step estimation using OLS</li>
-<li>GMM Estimation</li>
+<li><p>Added Fama-MacBeth estimator for panels</p></li>
+<li><p>Added linear factor models for asset pricing applications</p>
+<ul>
+<li><p>Time-series estimation using traded factors</p></li>
+<li><p>2- and 3-step estimation using OLS</p></li>
+<li><p>GMM Estimation</p></li>
 </ul>
 </li>
 </ul>
@@ -246,16 +264,16 @@ prediction and simplify retrieval of in-sample results</li>
 <div class="section" id="version-2-0">
 <h2>Version 2.0<a class="headerlink" href="#version-2-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added panel models – fixed effects, random effects, between,
-first difference and pooled OLS.</li>
-<li>Addition of two-way clustering to some of the IV models (2SLS, LIML)</li>
+<li><p>Added panel models – fixed effects, random effects, between,
+first difference and pooled OLS.</p></li>
+<li><p>Addition of two-way clustering to some of the IV models (2SLS, LIML)</p></li>
 </ul>
 </div>
 <div class="section" id="version-1-0">
 <h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added Instrumental Variable estimators – 2SLS, LIML and
-k-class, GMM and continuously updating GMM.</li>
+<li><p>Added Instrumental Variable estimators – 2SLS, LIML and
+k-class, GMM and continuously updating GMM.</p></li>
 </ul>
 </div>
 </div>
@@ -293,7 +311,7 @@ k-class, GMM and continuously updating GMM.</li>
         <li class="right" >
           <a href="contributing.html" title="Contributing"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">linearmodels 4.13 documentation</a> &#187;</li> 
       </ul>
     </div>
 <script type="text/javascript">

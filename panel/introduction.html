@@ -1,12 +1,10 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
@@ -16,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Introduction &#8212; linearmodels 4.12 documentation</title>
+    <title>Introduction &#8212; linearmodels 4.13 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -52,7 +50,7 @@
         <li class="right" >
           <a href="index.html" title="Panel Data Model Estimation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -63,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.12</a>
+    ../index.html" class="text-logo">linearmodels 4.13</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -146,28 +144,28 @@ consistently estimated and <span class="math notranslate nohighlight">\(\epsilon
 uncorrelated with <span class="math notranslate nohighlight">\(\alpha_i\)</span> and the covariates <span class="math notranslate nohighlight">\(x_{it}\)</span>.</p>
 <p>All models require two inputs</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate nohighlight">\(y_{it}\)</span> in the model</li>
-<li><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The regressors, <span class="math notranslate nohighlight">\(x_{it}\)</span> in the model.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dependent</span></code> - The variable to be modeled, <span class="math notranslate nohighlight">\(y_{it}\)</span> in the model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exog</span></code> - The regressors, <span class="math notranslate nohighlight">\(x_{it}\)</span> in the model.</p></li>
 </ul>
 <p>and use different techniques to address the presence of <span class="math notranslate nohighlight">\(\alpha_i\)</span>.</p>
 <p>In particular,</p>
 <ul class="simple">
-<li><a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> uses fixed effect
+<li><p><a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> uses fixed effect
 (i.e., entity effects) to eliminate the entity specific components.
 This is mathematically equivalent to including a dummy variable for
 each entity, although the implementation does not do this for
-performance reasons.</li>
-<li><a class="reference internal" href="models.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a> averages within an
-entity and then regresses the time-averaged values using OLS.</li>
-<li><a class="reference internal" href="models.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> takes the first
-difference to eliminate the entity specific effect.</li>
-<li><a class="reference internal" href="models.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> uses a quasi-difference
+performance reasons.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.panel.model.BetweenOLS" title="linearmodels.panel.model.BetweenOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">BetweenOLS</span></code></a> averages within an
+entity and then regresses the time-averaged values using OLS.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.panel.model.FirstDifferenceOLS" title="linearmodels.panel.model.FirstDifferenceOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstDifferenceOLS</span></code></a> takes the first
+difference to eliminate the entity specific effect.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.panel.model.RandomEffects" title="linearmodels.panel.model.RandomEffects"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomEffects</span></code></a> uses a quasi-difference
 to efficiently estimate <span class="math notranslate nohighlight">\(\beta\)</span> when the entity effect is
 independent from the regressors.  It is, however, not consistent when
-there is dependence between the entity effect and the regressors.</li>
-<li><a class="reference internal" href="models.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a> ignores the entity effect
+there is dependence between the entity effect and the regressors.</p></li>
+<li><p><a class="reference internal" href="models.html#linearmodels.panel.model.PooledOLS" title="linearmodels.panel.model.PooledOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PooledOLS</span></code></a> ignores the entity effect
 and is consistent but inefficient when the effect is independent of the
-regressors.</li>
+regressors.</p></li>
 </ul>
 <p><a class="reference internal" href="models.html#linearmodels.panel.model.PanelOLS" title="linearmodels.panel.model.PanelOLS"><code class="xref py py-class docutils literal notranslate"><span class="pre">PanelOLS</span></code></a> is somewhat more general than the
 other estimators and can be used to model 2 effects (e.g., entity and time
@@ -268,7 +266,7 @@ to include the fixed effects.</p>
         <li class="right" >
           <a href="index.html" title="Panel Data Model Estimation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

@@ -1,0 +1,135 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Absorbing Regression\n",
+    "\n",
+    "An absorbing regression is a model of the form \n",
+    "\n",
+    "$$ y_i = x_i \\beta + z_i \\gamma +\\epsilon_i $$\n",
+    "\n",
+    "where interest is on $\\beta$ and not $\\gamma$.  $z_i$ may be high-dimensional, and may grow with the sample size (i.e., a matrix of fixed effects).\n",
+    "\n",
+    "This notebook shows how this type of model can be fit in a simulate data set that mirrors some used in practice.  There are three effects, one for the state of the worker (small), one one for the workers firm (large)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "rs = np.random.RandomState(0)\n",
+    "nobs = 250000\n",
+    "state_id = rs.randint(50, size=nobs)\n",
+    "state_effects = rs.standard_normal(state_id.max()+1)\n",
+    "state_effects = state_effects[state_id]\n",
+    "# 5 workers/firm, on average\n",
+    "firm_id = rs.randint(nobs//5, size=nobs) \n",
+    "firm_effects = rs.standard_normal(firm_id.max()+1)\n",
+    "firm_effects = firm_effects[firm_id]\n",
+    "cats = pd.DataFrame({'state': pd.Categorical(state_id), 'firm': pd.Categorical(firm_id)})\n",
+    "eps = rs.standard_normal(nobs)\n",
+    "x = rs.standard_normal((nobs,2))\n",
+    "x = np.column_stack([np.ones(nobs), x])\n",
+    "y = x.sum(1) + firm_effects + state_effects + eps"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Including a constant\n",
+    "The estimator can estimate an intercept even when all dummies are included.  This is does using a mathematical trick and the intercept is not usually meaningful. This is done as-if the the dummies are orthogonalized to a constant. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.iv.absorbing import AbsorbingLS\n",
+    "\n",
+    "mod = AbsorbingLS(y, x, absorb=cats)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Excluding the constant\n",
+    "If the constant is dropped the other coefficient are identical since the dummies span the constant."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.iv.absorbing import AbsorbingLS\n",
+    "\n",
+    "mod = AbsorbingLS(y, x[:,1:], absorb=cats)\n",
+    "print(mod.fit())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Optimization Options\n",
+    "LSMR is iterative and does not have a closed form. The tolerance can be set using `lsmr_options` which is a dictionary.  See [scipy.sparse.linalg.lsmr](https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr) for details on the options.\n",
+    "\n",
+    "Below `use_cache` is set to ensure that LSMR is run.  By default, the exogenous variables with the effects purged are cached. LSMR is run once for the dependent and for each column in exog. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.iv.absorbing import AbsorbingLS\n",
+    "\n",
+    "mod = AbsorbingLS(y, x[:,1:], absorb=cats)\n",
+    "res = mod.fit(use_cache=False, lsmr_options={'show': True})"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  },
+  "pycharm": {
+   "stem_cell": {
+    "cell_type": "raw",
+    "source": [],
+    "metadata": {
+     "collapsed": false
+    }
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

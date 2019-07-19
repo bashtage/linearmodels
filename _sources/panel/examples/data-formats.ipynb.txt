@@ -74,64 +74,10 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## pandas Panels and DataFrames\n",
-    "An alternative formal is to use pandas Panels ad DataFrames.  Panels should be formatted with `items` containing distinct variables, `major_axis` holding the time dimension and `minor_axis` holding the entity index.  Here we transform the MultiIndex DataFrame to a panel to demonstrate this format.\n",
-    "\n",
-    "A single index DataFrame can also be used and is treated as being a single item slice of a Panel, and so the items should contain the time series dimension and the columns should contain entities. Note that using the `DataFrame` version loses information about variable names, which is not usually desirable."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "panel = mi_data[['lscrap','hrsemp']].to_panel().swapaxes(1,2)\n",
-    "lscrap = panel['lscrap']\n",
-    "hrsemp = panel['hrsemp']\n",
-    "panel"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "When using panels, it is best to input the panel which requires selecting using `[[`_var_`]]` so ensure that the variable(s) selected still has 3 dimensions.  This retains information about variable name."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "res = PanelOLS(panel[['lscrap']], panel[['hrsemp']], entity_effects=True).fit()\n",
-    "print(res)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "Using DataFrames removes this information and so the generic _Dep_ and _Exog_ are used."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "res = PanelOLS(lscrap, hrsemp, entity_effects=True).fit()\n",
-    "print(res)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
     "## NumPy arrays\n",
-    "NumPy arrays are treated identically to pandas Panel and single index DataFrames.  In particular, using `panel.values` and `df.values` will produce identical results.  The main difference between NumPy and pandas is that NumPy loses all label information."
+    "3D NumPy arrays can be used to hand panel data where the three axes are `0`, items, `1`, time and `2`, entity. NumPy arrays are not usually the best format for data since the results all use generic variable names. \n",
+    "\n",
+    "Pandas dropped support for their Panel in 0.25."
    ]
   },
   {
@@ -140,7 +86,25 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = PanelOLS(lscrap.values, hrsemp.values, entity_effects=True).fit()\n",
+    "import numpy as np\n",
+    "\n",
+    "np_data = np.asarray(mi_data)\n",
+    "np_lscrap = np_data[:, mi_data.columns.get_loc('lscrap')]\n",
+    "np_hrsemp = np_data[:, mi_data.columns.get_loc('hrsemp')]\n",
+    "nentity = mi_data.index.levels[0].shape[0]\n",
+    "ntime = mi_data.index.levels[1].shape[0]\n",
+    "np_lscrap = np_lscrap.reshape((nentity, ntime)).T\n",
+    "np_hrsemp = np_hrsemp.reshape((nentity, ntime)).T\n",
+    "np_hrsemp.shape = (1,ntime,nentity)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = PanelOLS(np_lscrap, np_hrsemp, entity_effects=True).fit()\n",
     "print(res)"
    ]
   },
@@ -159,8 +123,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "da = panel.to_xarray()\n",
-    "da"
+    "da = mi_data.to_xarray()\n",
+    "da.keys()"
    ]
   },
   {
@@ -169,7 +133,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = PanelOLS(da.loc[['lscrap']], da.loc[['hrsemp']], entity_effects=True).fit()\n",
+    "res = PanelOLS(da['lscrap'].T, da['hrsemp'].T, entity_effects=True).fit()\n",
     "print(res)"
    ]
   },
@@ -184,9 +148,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "import pandas as pd\n",
@@ -257,7 +219,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.7.2"
   }
  },
  "nbformat": 4,
