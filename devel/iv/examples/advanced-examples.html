@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Further Examples &#8212; linearmodels 4.12+17.gf028b04 documentation</title>
+    <title>Further Examples &#8212; linearmodels 4.12+18.g7bd8a01 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+17.gf028b04 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.12 (+17, gf028b04)</a>
+    ../../index.html" class="text-logo">linearmodels 4.12 (+18, g7bd8a01)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -337,7 +337,7 @@ div.rendered_html tbody tr:hover {
 <li><p><code class="docutils literal notranslate"><span class="pre">IVGMM</span></code> - Generalized method of moment estimation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">IVGMMCUE</span></code> - Generalized method of moment estimation using continuously updating</p></li>
 </ul>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -345,6 +345,17 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="kn">from</span> <span class="nn">linearmodels</span> <span class="kn">import</span> <span class="n">IV2SLS</span><span class="p">,</span> <span class="n">IVLIML</span><span class="p">,</span> <span class="n">IVGMM</span><span class="p">,</span> <span class="n">IVGMMCUE</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
+/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="Importing-data">
@@ -544,7 +555,7 @@ max        9.250620      1.000000      1.000000     50.000000
 </div></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">add_constant</span></code> from <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> is used to simplify the process of adding a constant column to the data.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
@@ -554,6 +565,15 @@ max        9.250620      1.000000      1.000000     50.000000
 <span class="n">controls</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;const&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">controls</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/statsmodels/compat/pandas.py:23: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  data_klasses = (pandas.Series, pandas.DataFrame, pandas.Panel)
+</pre></div></div>
 </div>
 </div>
 <div class="section" id="2SLS-as-OLS">
@@ -581,8 +601,8 @@ max        9.250620      1.000000      1.000000     50.000000
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Thu, Jul 18 2019   P-value (F-stat)                0.0000
-Time:                        21:54:16   Distribution:                  chi2(6)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        11:27:58   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -624,8 +644,8 @@ blhisp         -0.1513     0.0341    -4.4353     0.0000     -0.2182     -0.0844
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Thu, Jul 18 2019   P-value (F-stat)                0.0000
-Time:                        21:54:16   Distribution:                  chi2(6)
+Date:                Fri, Jul 19 2019   P-value (F-stat)                0.0000
+Time:                        11:27:58   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -826,7 +846,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7ff657bc05c0
+WaldTestStatistic, id: 0x7f5c7a0efba8
 </pre></div>
 </div>
 </div>
@@ -850,7 +870,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7ff6577007b8
+WaldTestStatistic, id: 0x7f5c81719320
 </pre></div>
 </div>
 </div>
@@ -897,7 +917,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7ff657723cf8
+WaldTestStatistic, id: 0x7f5c79aae588
 </pre></div>
 </div>
 </div>
@@ -921,7 +941,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7ff657292588
+WaldTestStatistic, id: 0x7f5c797c6128
 </pre></div>
 </div>
 </div>
@@ -946,7 +966,7 @@ WaldTestStatistic, id: 0x7ff657292588
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7ff657a22908
+WaldTestStatistic, id: 0x7f5c79f87240
 </pre></div>
 </div>
 </div>
@@ -971,7 +991,7 @@ WaldTestStatistic, id: 0x7ff657a22908
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7ff6571bc5c0
+WaldTestStatistic, id: 0x7f5c797212e8
 </pre></div>
 </div>
 </div>
@@ -1277,7 +1297,7 @@ blhisp       -0.151307 -0.151307
         <li class="right" >
           <a href="basic-examples.html" title="Basic Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+17.gf028b04 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.12+18.g7bd8a01 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Instrumental Variable Estimation</a> &#187;</li> 
       </ul>
     </div>
