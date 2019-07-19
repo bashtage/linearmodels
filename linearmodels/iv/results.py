@@ -1330,7 +1330,7 @@ class IVModelComparison(_ModelComparison):
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
-        Estimator precision estimator to include in the comparrison output.
+        Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
     """
     _supported = (IVResults, IVGMMResults, OLSResults)
@@ -1438,7 +1438,7 @@ def compare(results, *, precision='tstats') -> IVModelComparison:
         Set of results to compare.  If a dict, the keys will be used as model
         names.  An OrderedDict will preserve the model order the comparisons.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
-        Estimator precision estimator to include in the comparrison output.
+        Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
 
     Returns

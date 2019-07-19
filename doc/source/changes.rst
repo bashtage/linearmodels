@@ -5,7 +5,7 @@ Version 4.13
 ============
 * Added :class:`~linearmodels.iv.absorbing.AbsorbingLS` which allows a large number
   of variables to be absorbed. This model can handle very high-dimensional dummy
-  variables and has beeen tested using up to 1,000,000 categories in a data set
+  variables and has been tested using up to 1,000,000 categories in a data set
   with 5,000,000 observations.
 * Fixed a bug when estimating weighted panel models that have repeated observations
   (i.e., more than one observation per entity and time id).

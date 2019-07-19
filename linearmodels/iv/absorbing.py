@@ -285,7 +285,7 @@ class Interaction(object):
 
     @property
     def cont(self) -> DataFrame:
-        """Continusous Variables"""
+        """Continuous Variables"""
         return self._cont_data.pandas
 
     @property
@@ -299,12 +299,12 @@ class Interaction(object):
     @property
     def sparse(self) -> csc_matrix:
         r"""
-        Construct a sparce interaction matrix
+        Construct a sparse interaction matrix
 
         Returns
         -------
         dummy_interact : csc_matrix
-            Dummy interaction constructed from teh cartesian product of
+            Dummy interaction constructed from the cartesian product of
             the categories and each of the continuous variables.
 
         Notes
@@ -484,7 +484,7 @@ class AbsorbingRegressor(object):
 
 class AbsorbingLS(object):
     r"""
-    Linear regression with high-dimensaional effects
+    Linear regression with high-dimensional effects
 
     Parameters
     ----------
@@ -496,7 +496,7 @@ class AbsorbingLS(object):
         The effects or continuous variables to absorb. When using a DataFrame,
         effects must be categorical variables. Other variable types are treated
         as continuous variables that should be absorbed. When using an
-        Interaction, variables in the `cat` argument are treaded as effects
+        Interaction, variables in the `cat` argument are treated as effects
         and variables in the `cont` argument are treated as continuous.
     interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}, optional
         Interactions containing both categorical and continuous variables.  Each
@@ -528,7 +528,7 @@ class AbsorbingLS(object):
 
     The high-dimensional effects are fit using LSMR which avoids inverting
     or even constructing the inner product of the regressors. This is
-    combined with Frish-Waugh-Lovell to orthogonzlize x and y from z.
+    combined with Frish-Waugh-Lovell to orthogonalize x and y from z.
 
     z can contain factors that are perfectly linearly dependent. LSMR
     estimates a particular restricted set of parameters that captures the
@@ -543,7 +543,7 @@ class AbsorbingLS(object):
 
     Examples
     --------
-    Estimate a model by absorbing 2 cateogricals and 2 continuous variables
+    Estimate a model by absorbing 2 categoricals and 2 continuous variables
 
     >>> import numpy as np
     >>> import pandas as pd
