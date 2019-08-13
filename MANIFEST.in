@@ -2,7 +2,7 @@ global-include *.csv *.py *.dta *.ipynb *.png
 
 recursive-include doc/source *
 recursive-include linearmodels/tests *.txt *.csv *.dta
-recursive-include linearmodels/datasets *.csv.bz
+recursive-include linearmodels/datasets *
 recursive-include examples *
 include versioneer.py
 include linearmodels/_version.py
@@ -12,3 +12,4 @@ include requirements.txt
 include requirements-dev.txt
 include examples/*.ipynb
 include examples/*.png
+recursive-exclude * __pycache__

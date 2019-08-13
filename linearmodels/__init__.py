@@ -41,7 +41,6 @@ from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
                                       FirstDifferenceOLS, PanelOLS, PooledOLS,
                                       RandomEffects)
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
-
 from ._version import get_versions
 
 OLS = _OLS
@@ -57,6 +56,30 @@ __all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
            'SUR', 'IV3SLS', 'IVSystemGMM',
            'LinearFactorModel', 'LinearFactorModelGMM', 'TradedFactorModel',
            'WARN_ON_MISSING', 'DROP_MISSING']
+
+
+def test(extra_args=None, exit=True, append=True):
+    import sys
+    try:
+        import pytest
+    except ImportError:
+        raise ImportError("Need pytest to run tests")
+
+    cmd = ['--tb=short', '--disable-pytest-warnings']
+    if extra_args:
+        if not isinstance(extra_args, list):
+            extra_args = [extra_args]
+        if append:
+            cmd += extra_args[:]
+        else:
+            cmd = extra_args
+    pkg = os.path.dirname(__file__)
+    cmd = [pkg] + cmd
+    print("running: pytest {}".format(' '.join(cmd)))
+    status = pytest.main(cmd)
+    if exit:
+        sys.exit(status)
+
 
 __version__ = get_versions()['version']
 del get_versions
