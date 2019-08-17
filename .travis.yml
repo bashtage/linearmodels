@@ -20,6 +20,7 @@ env:
     - OPENBLAS_NUM_THREADS=1
     - OMP_NUM_THREADS=1
     - PIP_PACKAGES=
+    - TEST_INSTALL=false
     - secure: "aCm98s/mNxRSoTEhpIgfvRKzzJKdDkm/9TufIvgWvnkeiyDQqZwoqRVDIikZ+v6mkFeu7dr7BBojyPXnhkhji+SkNFz5ArtEqahJTvIZhP2nWgktlQSWkaC2Q5GyCWPhdQag/ImYbM4RK1WvtIVcSL7GPL0jLTgFDXY6/Hdl0eQY7kfWtojxIZUJShxn9IPfXE3gGQeWHEOL7SkZ3+8KxBJAUzrdd9J32PiHWZb5BcUupTQcW29ajoco4q1fdL/xPu3GZnys8EClorHxnPptQWfGGlnoJ79Q6H7Jhw6BGIj2fDCG9qX4boEH2zvH8ZKlbuTvMeVcBiLxPE8BpRmx2drX2kDyUo5ywVwA0W/7zsZ2YUYEyHEYL+cr4WVFdoDpwwPKaHOTp8F4Q+lQgkvxZbSlO6dUEMLNxnltgujAAdiaRJKLd2CwA85RjqYGLkMzTqBgYhH+p+7wB6jK8EJgoqxU3k98LfaeqyhsPrdWsxVLleLVAvzhXpNilQfX4NBPf+DYsn9NeyXYzp85H9p+J8DGJMJ42kBdP1r/cz1Y44SrGZhlk1MhLhb+uX7kV7nnmcW87NYoGSr52S5vNVL9iSU980SzJ08wOZwxwkKXOqgEJtMqdHsEuqY9jSQ2m/xAdarpxBsDD+Pw2gPfar+R8Lcptep50pMPFMgddDWV2f4="
 
 matrix:
@@ -65,6 +66,13 @@ matrix:
     - XARRAY=0.11
     - DOCBUILD=true
     - PIP_PACKAGES="xxhash"
+  - python: 3.7
+    env:
+    - PYTHON=3.7
+    - USE_PYPI=true
+    - XARRAY=0.11
+    - PIP_PACKAGES="xxhash"
+    - TEST_INSTALL=true
 
 before_install:
   - sudo apt-get install -y pandoc enchant
@@ -89,7 +97,14 @@ install:
   - python setup.py develop
 
 script:
-  - pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
+  - |
+    if [[ ${TEST_INSTALL} = true ]]; then
+      python setup.py install
+      mkdir empty && cd empty
+      python -c "import linearmodels;linearmodels.test('--skip-slow')"
+    else
+      pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
+    fi
   - flake8 linearmodels
   - set -e
   - |

@@ -7,7 +7,7 @@ from linearmodels.compat.pandas import (concat, get_codes, is_categorical,
 from itertools import product
 
 import numpy as np
-from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
+from pandas import (Categorical, DataFrame, Index, MultiIndex, Series,
                     get_dummies)
 
 from linearmodels.utility import ensure_unique_column, panel_to_frame
@@ -100,7 +100,7 @@ class PanelData(object):
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, Panel, DataArray}
+    x : {ndarray, Series, DataFrame, DataArray}
        Input data
     var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
@@ -128,11 +128,8 @@ class PanelData(object):
 
     If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
     input is treated differently.  Index level 0 is assumed ot be entity.
-    Index level 1 is time.  The columns are the variables.  This is the most
-    precise format to use since pandas Panels do not preserve all variable
-    type information across transformations between Panel and MultiIndex
-    DataFrame. MultiIndex Series are also accepted and treated as single
-    column MultiIndex DataFrames.
+    Index level 1 is time.  The columns are the variables.  MultiIndex Series
+    are also accepted and treated as single column MultiIndex DataFrames.
 
     Raises
     ------
@@ -154,7 +151,7 @@ class PanelData(object):
             x = x.dataframe
         self._original = x
 
-        if not isinstance(x, (Series, DataFrame, Panel, np.ndarray)):
+        if not isinstance(x, (Series, DataFrame, np.ndarray)):
             try:
                 from xarray import DataArray
                 if isinstance(x, DataArray):
@@ -176,7 +173,7 @@ class PanelData(object):
         elif isinstance(x, Series):
             raise ValueError('Series can only be used with a 2-level MultiIndex')
 
-        if isinstance(x, (Panel, DataFrame)):
+        if isinstance(x, DataFrame):
             if isinstance(x, DataFrame):
                 if isinstance(x.index, MultiIndex):
                     if len(x.index.levels) != 2:
@@ -210,8 +207,8 @@ class PanelData(object):
             self._fake_panel = panel
             self._frame = panel.to_frame()
         else:
-            raise TypeError('Only ndarrays, DataFrames, Panels or DataArrays '
-                            'are supported')
+            raise TypeError('Only ndarrays, DataFrames or DataArrays are '
+                            'supported')
         if convert_dummies:
             self._frame = expand_categoricals(self._frame, drop_first)
             self._frame = self._frame.astype(np.float64, copy=False)
