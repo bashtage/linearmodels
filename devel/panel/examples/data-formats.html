@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Data Formats for Panel Data Analysis &#8212; linearmodels 4.13 documentation</title>
+    <title>Data Formats for Panel Data Analysis &#8212; linearmodels 4.13+3.g57bc817 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.13</a>
+    ../../index.html" class="text-logo">linearmodels 4.13 (+3, g57bc817)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -383,8 +383,6 @@ div.rendered_html tbody tr:hover {
 <div class="highlight"><pre>
 /home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
   PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
-/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
 </pre></div></div>
 </div>
 <p>Here <code class="docutils literal notranslate"><span class="pre">set_index</span></code> is used to set the multi index using the firm code (entity) and year (time).</p>
@@ -452,8 +450,8 @@ fcode  year
 Dep. Variable:                 lscrap   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Aug 02 2019   R-squared (Overall):             -0.0288
-Time:                        20:39:17   Log-likelihood                   -90.459
+Date:                Sat, Aug 17 2019   R-squared (Overall):             -0.0288
+Time:                        02:46:29   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -533,8 +531,8 @@ Inputs contain missing values. Dropping rows with missing observations.
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Aug 02 2019   R-squared (Overall):             -0.0288
-Time:                        20:39:17   Log-likelihood                   -90.459
+Date:                Sat, Aug 17 2019   R-squared (Overall):             -0.0288
+Time:                        02:46:29   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -638,8 +636,8 @@ Data variables:
 Dep. Variable:                    Dep   R-squared:                        0.0528
 Estimator:                   PanelOLS   R-squared (Between):             -0.0379
 No. Observations:                 140   R-squared (Within):               0.0528
-Date:                Fri, Aug 02 2019   R-squared (Overall):             -0.0288
-Time:                        20:39:17   Log-likelihood                   -90.459
+Date:                Sat, Aug 17 2019   R-squared (Overall):             -0.0288
+Time:                        02:46:29   Log-likelihood                   -90.459
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      5.0751
 Entities:                          48   P-value                           0.0267
@@ -730,8 +728,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Aug 02 2019   R-squared (Overall):             -0.0934
-Time:                        20:39:17   Log-likelihood                   -78.765
+Date:                Sat, Aug 17 2019   R-squared (Overall):             -0.0934
+Time:                        02:46:29   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -796,8 +794,8 @@ dtype: object
 Dep. Variable:                 lscrap   R-squared:                        0.1985
 Estimator:                   PanelOLS   R-squared (Between):             -0.1240
 No. Observations:                 140   R-squared (Within):               0.1985
-Date:                Fri, Aug 02 2019   R-squared (Overall):             -0.0934
-Time:                        20:39:18   Log-likelihood                   -78.765
+Date:                Sat, Aug 17 2019   R-squared (Overall):             -0.0934
+Time:                        02:46:29   Log-likelihood                   -78.765
 Cov. Estimator:            Unadjusted
                                         F-statistic:                      7.3496
 Entities:                          48   P-value                           0.0002
@@ -862,7 +860,7 @@ Included effects: Entity
         <li class="right" >
           <a href="../introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Panel Data Model Estimation</a> &#187;</li> 
       </ul>
     </div>

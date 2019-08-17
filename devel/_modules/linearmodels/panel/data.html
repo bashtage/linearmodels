@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>linearmodels.panel.data &#8212; linearmodels 4.13 documentation</title>
+    <title>linearmodels.panel.data &#8212; linearmodels 4.13+3.g57bc817 documentation</title>
     <link rel="stylesheet" href="../../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -53,7 +53,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../../index.html" class="text-logo">linearmodels 4.13</a>
+    ../../../index.html" class="text-logo">linearmodels 4.13 (+3, g57bc817)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -117,7 +117,7 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">product</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="p">(</span><span class="n">Categorical</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="p">(</span><span class="n">Categorical</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span>
                     <span class="n">get_dummies</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">linearmodels.utility</span> <span class="k">import</span> <span class="n">ensure_unique_column</span><span class="p">,</span> <span class="n">panel_to_frame</span>
@@ -210,7 +210,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    x : {ndarray, Series, DataFrame, Panel, DataArray}</span>
+<span class="sd">    x : {ndarray, Series, DataFrame, DataArray}</span>
 <span class="sd">       Input data</span>
 <span class="sd">    var_name : str, optional</span>
 <span class="sd">        Variable name to use when naming variables in NumPy arrays or</span>
@@ -238,11 +238,8 @@
 
 <span class="sd">    If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the</span>
 <span class="sd">    input is treated differently.  Index level 0 is assumed ot be entity.</span>
-<span class="sd">    Index level 1 is time.  The columns are the variables.  This is the most</span>
-<span class="sd">    precise format to use since pandas Panels do not preserve all variable</span>
-<span class="sd">    type information across transformations between Panel and MultiIndex</span>
-<span class="sd">    DataFrame. MultiIndex Series are also accepted and treated as single</span>
-<span class="sd">    column MultiIndex DataFrames.</span>
+<span class="sd">    Index level 1 is time.  The columns are the variables.  MultiIndex Series</span>
+<span class="sd">    are also accepted and treated as single column MultiIndex DataFrames.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -264,7 +261,7 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original</span> <span class="o">=</span> <span class="n">x</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">xarray</span> <span class="k">import</span> <span class="n">DataArray</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
@@ -286,7 +283,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Series can only be used with a 2-level MultiIndex&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">Panel</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -320,8 +317,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_fake_panel</span> <span class="o">=</span> <span class="n">panel</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Only ndarrays, DataFrames, Panels or DataArrays &#39;</span>
-                            <span class="s1">&#39;are supported&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Only ndarrays, DataFrames or DataArrays are &#39;</span>
+                            <span class="s1">&#39;supported&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">convert_dummies</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="n">expand_categoricals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="p">,</span> <span class="n">drop_first</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -765,7 +762,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

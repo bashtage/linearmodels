@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Using formulas to specify models &#8212; linearmodels 4.13 documentation</title>
+    <title>Using formulas to specify models &#8212; linearmodels 4.13+3.g57bc817 documentation</title>
     <link rel="stylesheet" href="../../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="examples.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">System Regression Models</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../../index.html" class="text-logo">linearmodels 4.13</a>
+    ../../index.html" class="text-logo">linearmodels 4.13 (+3, g57bc817)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -350,8 +350,6 @@ div.rendered_html tbody tr:hover {
 <div class="highlight"><pre>
 /home/travis/miniconda3/envs/linearmodels-test/lib/python3.7/site-packages/xarray/core/merge.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
   PANDAS_TYPES = (pd.Series, pd.DataFrame, pd.Panel)
-/home/travis/build/bashtage/linearmodels/linearmodels/panel/data.py:10: FutureWarning: The Panel class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
-  from pandas import (Categorical, DataFrame, Index, MultiIndex, Panel, Series,
 </pre></div></div>
 </div>
 <div class="section" id="Dictionary">
@@ -390,8 +388,8 @@ div.rendered_html tbody tr:hover {
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Aug 02 2019
-Time:                        20:39:34
+Date:                Sat, Aug 17 2019
+Time:                        02:46:45
 
 
                 Equation: benefits, Dependent Variable: hrbens
@@ -451,8 +449,8 @@ Homoskedastic (Unadjusted) Covariance (Debiased: False, GLS: True)
 Estimator:                        GLS   Overall R-squared:              0.6951
 No. Equations.:                     2   Cov. Estimator:             unadjusted
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Aug 02 2019
-Time:                        20:39:34
+Date:                Sat, Aug 17 2019
+Time:                        02:46:45
 
 
                  Equation: hrbens, Dependent Variable: hrbens
@@ -549,35 +547,35 @@ Labeled
 <div class="highlight"><pre>
                         System GLS Estimation Summary
 ==============================================================================
-Estimator:                        GLS   Overall R-squared:              0.6767
+Estimator:                        GLS   Overall R-squared:              0.6946
 No. Equations.:                     2   Cov. Estimator:                 robust
 No. Observations:                 616   Num. Constraints:                 None
-Date:                Fri, Aug 02 2019
-Time:                        20:39:35
+Date:                Sat, Aug 17 2019
+Time:                        02:46:46
 
 
                 Equation: benefits, Dependent Variable: hrbens
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.0336     0.0117     2.8647     0.0042      0.0106      0.0566
-exper          0.0478     0.0220     2.1685     0.0301      0.0046      0.0910
-expersq       -0.0009     0.0006    -1.6435     0.1003     -0.0020      0.0002
-union          0.3098     0.1082     2.8619     0.0042      0.0976      0.5219
-south         -0.2185     0.1304    -1.6757     0.0938     -0.4740      0.0371
-nrtheast      -0.1655     0.1383    -1.1966     0.2315     -0.4367      0.1056
-nrthcen       -0.1980     0.1311    -1.5101     0.1310     -0.4549      0.0590
-male           0.2237     0.0994     2.2512     0.0244      0.0289      0.4185
+educ           0.0329     0.0107     3.0910     0.0020      0.0120      0.0538
+exper          0.0292     0.0168     1.7410     0.0817     -0.0037      0.0621
+expersq       -0.0004     0.0004    -1.0455     0.2958     -0.0013      0.0004
+union          0.3851     0.1056     3.6459     0.0003      0.1781      0.5921
+south         -0.1579     0.1214    -1.3013     0.1932     -0.3958      0.0799
+nrtheast      -0.0664     0.1423    -0.4665     0.6409     -0.3452      0.2125
+nrthcen       -0.1450     0.1309    -1.1083     0.2677     -0.4015      0.1114
+male           0.2698     0.0984     2.7424     0.0061      0.0770      0.4627
                 Equation: earnings, Dependent Variable: hrearn
 ==============================================================================
             Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
 ------------------------------------------------------------------------------
-educ           0.3205     0.0180     17.807     0.0000      0.2852      0.3558
-exper          0.0054     0.0363     0.1484     0.8820     -0.0657      0.0765
-expersq        0.0017     0.0009     1.8565     0.0634   -9.29e-05      0.0034
-nrtheast      -0.5713     0.1639    -3.4862     0.0005     -0.8924     -0.2501
-married        0.4119     0.2102     1.9596     0.0500  -7.727e-05      0.8239
-male           1.8589     0.1082     17.186     0.0000      1.6469      2.0709
+educ           0.3331     0.0247     13.511     0.0000      0.2848      0.3815
+exper         -0.0390     0.0545    -0.7154     0.4744     -0.1459      0.0679
+expersq        0.0028     0.0014     1.9952     0.0460    4.87e-05      0.0055
+nrtheast      -0.5374     0.1678    -3.2029     0.0014     -0.8663     -0.2086
+married        0.6475     0.2276     2.8446     0.0044      0.2013      1.0936
+male           1.8711     0.1334     14.028     0.0000      1.6097      2.1325
 ==============================================================================
 
 Covariance Estimator:
@@ -625,7 +623,7 @@ Heteroskedastic (Robust) Covariance (Debiased: False, GLS: True)
         <li class="right" >
           <a href="examples.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >System Regression Models</a> &#187;</li> 
       </ul>
     </div>

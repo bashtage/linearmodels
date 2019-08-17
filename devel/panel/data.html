@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Panel Data Structures &#8212; linearmodels 4.13 documentation</title>
+    <title>Panel Data Structures &#8212; linearmodels 4.13+3.g57bc817 documentation</title>
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -50,7 +50,7 @@
         <li class="right" >
           <a href="covariance.html" title="Panel Model Covariance Estimators"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" accesskey="U">Module Reference</a> &#187;</li> 
       </ul>
@@ -62,7 +62,7 @@
       </div>
   <div id="left-column">
     <div class="sphinxsidebar"><a href="
-    ../index.html" class="text-logo">linearmodels 4.13</a>
+    ../index.html" class="text-logo">linearmodels 4.13 (+3, g57bc817)</a>
 <div class="sidebar-block">
   <div class="sidebar-wrapper">
     <h2>Table Of Contents</h2>
@@ -137,7 +137,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>Panel</em><em>, </em><em>DataArray}</em>) – Input data</p></li>
+<li><p><strong>x</strong> (<em>{ndarray</em><em>, </em><em>Series</em><em>, </em><em>DataFrame</em><em>, </em><em>DataArray}</em>) – Input data</p></li>
 <li><p><strong>var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Variable name to use when naming variables in NumPy arrays or
 xarray DataArrays</p></li>
 <li><p><strong>convert_dummies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – Flat indicating whether pandas categoricals or string input data
@@ -160,11 +160,8 @@ exception, 2-d inputs are treated as (nobs, nentity) so that the input
 can be treated as-if being (1, nobs, nentity).</p>
 <p>If the 2-d input is a pandas DataFrame with a 2-level MultiIndex then the
 input is treated differently.  Index level 0 is assumed ot be entity.
-Index level 1 is time.  The columns are the variables.  This is the most
-precise format to use since pandas Panels do not preserve all variable
-type information across transformations between Panel and MultiIndex
-DataFrame. MultiIndex Series are also accepted and treated as single
-column MultiIndex DataFrames.</p>
+Index level 1 is time.  The columns are the variables.  MultiIndex Series
+are also accepted and treated as single column MultiIndex DataFrames.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
@@ -463,7 +460,7 @@ entity or time period should be dropped</p></li>
         <li class="right" >
           <a href="covariance.html" title="Panel Model Covariance Estimators"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">linearmodels 4.13+3.g57bc817 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Panel Data Model Estimation</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="reference.html" >Module Reference</a> &#187;</li> 
       </ul>
