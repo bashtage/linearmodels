@@ -162,7 +162,7 @@ devel/_static/fonts/source-serif-pro/WOFF/TTF/SourceSerifPro-Semibold.ttf.woff
 devel/_static/fonts/source-serif-pro/bower.json
 devel/_static/fonts/source-serif-pro/source-serif-pro.css
 devel/_static/guzzle.css
-devel/_static/jquery-3.2.1.js
+devel/_static/jquery-3.4.1.js
 devel/_static/jquery.js
 devel/_static/jquery.min.map
 devel/_static/js/bootstrap.js
