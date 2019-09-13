@@ -1,6 +1,10 @@
 Change Log
 ----------
 
+Since Version 4.13
+==================
+* Switched to property-cached to inherit cached property from property
+
 Version 4.13
 ============
 * Added :class:`~linearmodels.iv.absorbing.AbsorbingLS` which allows a large number

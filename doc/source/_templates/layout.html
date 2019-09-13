@@ -1,7 +1,20 @@
 {# Import the theme's layout. #}
 {% extends "!layout.html" %}
 
-{%- block extrahead %}
+{%- block htmltitle %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ pathto('_static/css/overrides.css', 1) }}" type="text/css" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{{  pathto('_static/icons/apple-touch-icon.png', 1) }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{  pathto('_static/icons/favicon-32x32.png', 1) }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{  pathto('_static/icons/favicon-16x16.png', 1) }}">
+  <link rel="manifest" href="{{  pathto('_static/icons/site.webmanifest', 1) }}">
+  <link rel="mask-icon" href="{{  pathto('_static/icons/safari-pinned-tab.svg', 1) }}" color="#2196f3">
+  <link rel="shortcut icon" href="{{ pathto('_static/icons/favicon.ico', 1) }}">
+  <meta name="msapplication-TileColor" content="#f8f8f8">
+  <meta name="msapplication-config" content="{{  pathto('_static/icons/browserconfig.xml', 1) }}">
+  <style>
+  .highlight {
+    background-color: hsla(0,0%,92.5%,.5) !important;
+  }
+  </style>
 {% endblock %}

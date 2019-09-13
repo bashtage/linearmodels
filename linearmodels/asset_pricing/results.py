@@ -5,7 +5,7 @@ from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
 
-from cached_property import cached_property
+from property_cached import cached_property
 import numpy as np
 import pandas as pd
 from scipy import stats

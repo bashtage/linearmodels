@@ -1,7 +1,7 @@
-numpy>=1.13
-pandas>=0.20
-scipy>=0.18
+numpy>=1.14
+pandas>=0.22
+scipy>=1
+statsmodels>=0.9
 patsy
-statsmodels>=0.8
-cached_property>=1.5.1
+property_cached>=1.6.3
 mypy_extensions>=0.4

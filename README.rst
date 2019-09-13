@@ -156,7 +156,7 @@ Documentation
 ~~~~~~~~~~~~~
 
 -  sphinx
--  guzzle_sphinx_theme
+-  sphinx-material
 -  nbsphinx
 -  nbconvert
 -  nbformat
