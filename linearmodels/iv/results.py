@@ -7,7 +7,7 @@ from collections import OrderedDict
 import datetime as dt
 from typing import Any, Dict, List, Union
 
-from cached_property import cached_property
+from property_cached import cached_property
 from numpy import (array, c_, diag, empty, isnan, log, ndarray, ones, sqrt,
                    zeros)
 from numpy.linalg import inv, pinv

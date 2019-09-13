@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from property_cached import cached_property
 import numpy as np
 from numpy.linalg import inv
 from pandas import DataFrame
