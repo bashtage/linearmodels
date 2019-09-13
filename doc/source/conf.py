@@ -23,9 +23,9 @@
 
 from distutils.version import LooseVersion
 
-import guzzle_sphinx_theme
-
 import linearmodels
+
+import sphinx_material
 
 # ...
 
@@ -54,7 +54,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
-              'nbsphinx'
+              'nbsphinx',
+              'sphinx_material'
               ]
 
 try:
@@ -99,10 +100,13 @@ if '+' in version.version:
     version = version.split('+')
     commits, tag = version[1].split('.')
     version = version[0]
+    short_tag = ' (+{0})'.format(commits)
     tag = ' (+' + commits + ', ' + tag + ')'
+    short_version = version + short_tag
     version = version + tag
 else:
-    version = linearmodels.__version__
+    short_version = version = linearmodels.__version__
+
 
 # The full version, including alpha/beta/rc tags.
 release = linearmodels.__version__
@@ -120,7 +124,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "colorful"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
@@ -131,19 +135,37 @@ todo_include_todos = True
 # a list of builtin themes.
 #
 
-html_theme_path = guzzle_sphinx_theme.html_theme_path()
-html_theme = 'guzzle_sphinx_theme'
-#
-#  Register the theme as an extension to generate a sitemap.xml
-extensions.append("guzzle_sphinx_theme")
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-# Guzzle theme options (see theme.conf for more information)
+html_theme_path = sphinx_material.html_theme_path()
+html_context = sphinx_material.get_html_context()
+html_theme = 'sphinx_material'
+# Adds an HTML table visitor to apply Bootstrap table classes
+
+# sphinx_material theme options (see theme.conf for more information)
 html_theme_options = {
+    'base_url': 'http://bashtage.github.io/linearmodels/',
+    'repo_url': 'https://github.com/bashtage/linearmodels/',
+    'repo_name': 'linearmodels',
     # Set the name of the project to appear in the sidebar
-    "project_nav_name": project + u" " + version,
+    "nav_title": project + " " + short_version,
+    'globaltoc_depth': 2,
+    'globaltoc_collapse': True,
+    'globaltoc_includehidden': True,
+    'theme_color': '#fb8c00',
+    'color_primary': 'blue',
+    'color_accent': 'orange',
+    'html_minify': True,
+    'css_minify': True,
+    'master_doc': False,
+    'heroes': {
+        'index': 'Models for panel data, system regression, instrumental \
+        variables and asset pricing.'
+    }
 }
+
+html_favicon = 'images/favicon.ico'
+html_logo = 'images/bw-logo.svg'
+
+#  Register the theme as an extension to generate a sitemap.xml
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -151,12 +173,9 @@ html_theme_options = {
 html_static_path = ['_static']
 
 html_sidebars = {
-    '**': ['logo-text.html', 'globaltoc.html', 'searchbox.html']
+    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
 }
 # -- Options for HTMLHelp output ------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'paneldoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 

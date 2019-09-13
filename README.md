@@ -132,10 +132,10 @@ others are the version that are being used in the test environment.  It
 is possible that older versions work.
 
 * **Python 3.5+**: extensive use of `@` operator
-* NumPy (1.13+)
-* SciPy (0.19+)
-* pandas (0.20+)
-* statsmodels (0.8+)
+* NumPy (1.14+)
+* SciPy (1+)
+* pandas (0.22+)
+* statsmodels (0.9+)
 * xarray (0.9+, optional)
 * cython (optional)
 
@@ -146,7 +146,7 @@ is possible that older versions work.
 ### Documentation
 
 * sphinx
-* guzzle_sphinx_theme
+* sphinx-material
 * nbsphinx
 * nbconvert
 * nbformat
