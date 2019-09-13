@@ -150,7 +150,7 @@ html_theme_options = {
     'globaltoc_depth': 2,
     'globaltoc_collapse': True,
     'globaltoc_includehidden': True,
-    'theme_color': '#fb8c00',
+    'theme_color': '#2196f3',
     'color_primary': 'blue',
     'color_accent': 'orange',
     'html_minify': True,

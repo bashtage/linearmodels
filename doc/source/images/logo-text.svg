@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="7631.5825"
-   height="1026.5842"
-   viewBox="0 0 2019.1895 271.61708"
+   width="7706.5249"
+   height="1023.9998"
+   viewBox="0 0 2039.018 270.93329"
    version="1.1"
    id="svg821"
    sodipodi:docname="logo-text.svg"
@@ -51,7 +51,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.125"
      inkscape:cx="2301.9341"
-     inkscape:cy="802.63081"
+     inkscape:cy="802.63066"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -74,7 +74,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -82,7 +82,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-5e-7,-25.382914)">
+     transform="translate(-5e-7,-26.066664)">
     <g
        id="g1669"
        clip-path="url(#clipPath1673)">
