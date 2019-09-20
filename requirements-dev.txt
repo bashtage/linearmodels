@@ -11,7 +11,7 @@ sphinx
 sphinx-material
 ipython
 nbsphinx
-nbconvert!=5.4
+nbconvert
 nbformat
 matplotlib
 seaborn

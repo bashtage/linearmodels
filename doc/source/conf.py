@@ -250,3 +250,10 @@ panel_data = pd.DataFrame(np.random.randn(1000,5), index=mi, columns=['y','x1','
 y = panel_data.y
 x = panel_data.x1
 """
+
+napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = True
+
+autosummary_generate = True
+autoclass_content = 'class'

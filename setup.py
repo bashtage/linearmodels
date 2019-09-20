@@ -97,8 +97,7 @@ def run_setup(binary=True):
     if binary:
         from Cython.Build import cythonize
         import numpy
-        macros = [('NPY_NO_DEPRECATED_API', '1'),
-                  ('NPY_1_7_API_VERSION', '1')]
+        macros = [('NPY_NO_DEPRECATED_API', '1')]
         # macros.append(('CYTHON_TRACE', '1'))
         directives = {}  # {'linetrace': True, 'binding':True}
         extension = Extension('linearmodels.panel._utility',
