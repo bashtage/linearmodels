@@ -18,7 +18,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Multi Index DataFrames\n",
+    "## MultiIndex DataFrames\n",
     "The most precise data format to use is a MultiIndex `DataFrame`.  This is the most precise since only single columns can preserve all types within a panel.  For example, it is not possible to span a single Categorical variable across multiple columns when using a pandas `Panel`. \n",
     "\n",
     "This example uses the job training data to construct a MultiIndex `DataFrame` using the `set_index` command. The entity index is `fcode` and the time index is `year`."
@@ -39,7 +39,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Here `set_index` is used to set the multi index using the firm code (entity) and year (time)."
+    "Here `set_index` is used to set the MultiIndex using the firm code (entity) and year (time)."
    ]
   },
   {

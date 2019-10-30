@@ -1,5 +1,7 @@
-Linear Model Estimation
-=======================
+.. image:: images/logo-text.svg
+   :width: 50%
+   :align: left
+   :alt: linearmodels logo
 
 .. note::
 
@@ -44,10 +46,11 @@ Estimation and inference in some common linear models:
 * Linear factor model (1-step SUR, only for traded factors)
   (:class:`~linearmodels.asset_pricing.model.TradedFactorModel`)
 
+linearmodels
+============
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
    :glob:
 
    iv/index
@@ -61,9 +64,8 @@ Estimation and inference in some common linear models:
    references
 
 
-Indices and tables
-==================
+Indices
+=======
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
