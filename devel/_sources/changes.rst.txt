@@ -1,9 +1,11 @@
 Change Log
 ----------
 
-Since Version 4.13
-==================
-* Switched to property-cached to inherit cached property from property
+Version 4.14
+============
+* Fixed issue where datasets were not installed with wheels :issue:`217`)
+* Switched to property-cached to inherit cached property from property (:issue:`211`).
+* Removed all use of :class:`pandas.Panel` (:issue:`211`).
 
 Version 4.13
 ============
