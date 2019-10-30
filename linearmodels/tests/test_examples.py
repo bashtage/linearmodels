@@ -15,10 +15,10 @@ try:
     import jupyter_client
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
+    kernels = jupyter_client.kernelspec.find_kernel_specs()
 except ImportError:  # pragma: no cover
     pytest.mark.skip(reason='Required packages not available')
 
-kernels = jupyter_client.kernelspec.find_kernel_specs()
 kernel_name = 'python%s' % sys.version_info.major
 
 head, _ = os.path.split(__file__)

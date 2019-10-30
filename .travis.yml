@@ -26,6 +26,21 @@ env:
 matrix:
   fast_finish: true
   include:
+  - python: 3.7
+    env:
+    - PYTHON=3.7
+    - USE_PYPI=true
+    - XARRAY=0.11
+    - NUMPY=1.16
+    - DOCBUILD=true
+    - PIP_PACKAGES="xxhash"
+  - python: 3.7
+    env:
+    - PYTHON=3.7
+    - USE_PYPI=true
+    - XARRAY=0.12
+    - PIP_PACKAGES="xxhash"
+    - TEST_INSTALL=true
   - python: 3.5
     env:
     - PYTHON=3.5
@@ -53,37 +68,26 @@ matrix:
   - python: 3.7
     env:
     - PYTHON=3.7
-    - NUMPY=1.15
-    - SCIPY=1.1
-    - PANDAS=0.23
-    - XARRAY=0.10
-    - STATSMODELS=0.9
+    - NUMPY=1.17
+    - SCIPY=1.3
+    - PANDAS=0.25
+    - XARRAY=0.13
+    - STATSMODELS=0.10
     - OPENBLAS=1
-  - python: 3.7
-    env:
-    - PYTHON=3.7
-    - USE_PYPI=true
-    - XARRAY=0.11
-    - NUMPY=1.16
-    - DOCBUILD=true
-    - PIP_PACKAGES="xxhash"
-  - python: 3.7
-    env:
-    - PYTHON=3.7
-    - USE_PYPI=true
-    - XARRAY=0.12
-    - PIP_PACKAGES="xxhash"
-    - TEST_INSTALL=true
+
 
 before_install:
   - sudo apt-get install -y pandoc enchant
   - git fetch --tags
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh -nv
-  - chmod +x miniconda3.sh
-  - ./miniconda3.sh -b
-  - export PATH=/home/travis/miniconda3/bin:$PATH
-  - conda config --set always_yes true
-  - conda update --all -q
+  - |
+    if [[ ${USE_PYPI} = false ]]; then
+      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh -nv
+      chmod +x miniconda3.sh
+      ./miniconda3.sh -b
+      export PATH=/home/travis/miniconda3/bin:$PATH
+      conda config --set always_yes true
+      conda update --all -q
+    fi;
   # Install packages
   - |
     if [[ ${USE_PYPI} = true ]]; then
@@ -100,9 +104,17 @@ install:
 script:
   - |
     if [[ ${TEST_INSTALL} = true ]]; then
-      python setup.py install
+      python setup.py bdist_wheel
+      cd dist
+      export WHEEL_FILE=$(ls -t -U | grep -m 1 "linearmodels")
+      echo $WHEEL_FILE
+      pip install $WHEEL_FILE
+      cd ..
+      cd linearmodels/tests
+      pytest test_examples.py
+      cd ../..
       mkdir empty && cd empty
-      python -c "import linearmodels;linearmodels.test('--skip-slow')"
+      python -c "import linearmodels;linearmodels.test()"
     else
       pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
     fi

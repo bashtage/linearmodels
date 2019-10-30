@@ -7,7 +7,7 @@ import pytest
 from linearmodels.utility import AttrDict
 
 
-@pytest.fixture('module')
+@pytest.fixture(scope='module')
 def data():
     idx = date_range('2000-01-01', periods=100)
     df1 = DataFrame(np.arange(100)[:, None], columns=['A'], index=idx)

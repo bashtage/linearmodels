@@ -148,7 +148,7 @@ def has_constant(x, x_rank=None):
         return True, int(loc)
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
-        loc = np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0))
+        loc = (np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)
         loc = np.argwhere(loc)
         return True, int(loc)
 

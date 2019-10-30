@@ -15,7 +15,7 @@ formats = {'csc': scipy.sparse.csc.csc_matrix, 'csr': scipy.sparse.csr.csr_matri
 pytestmark = pytest.mark.filterwarnings('ignore:the matrix subclass:PendingDeprecationWarning')
 
 
-@pytest.fixture('module', params=formats)
+@pytest.fixture(scope='module', params=formats)
 def format(request):
     return request.param, formats[request.param]
 
