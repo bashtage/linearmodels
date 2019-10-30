@@ -555,6 +555,8 @@ def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
         List like object with major_axis labels
     minor_axis : list-like
         List like object with minor_axis labels
+    swap : bool
+        Swap is major and minor axes
 
     Notes
     -----
