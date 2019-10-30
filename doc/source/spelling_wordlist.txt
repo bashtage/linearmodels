@@ -114,3 +114,5 @@ csc
 tstats
 np
 orthogonalize
+MultiIndex
+multiindex
