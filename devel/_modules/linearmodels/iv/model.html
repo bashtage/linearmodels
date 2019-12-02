@@ -2,29 +2,29 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Instrumental variable estimators</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >typing</span> <span class=k >import</span> <span class=n >Any</span><span class=p >,</span> <span class=n >Dict</span><span class=p >,</span> <span class=n >Type</span><span class=p >,</span> <span class=n >Union</span>
+<span class=kn >from</span> <span class=nn >typing</span> <span class=kn >import</span> <span class=n >Any</span><span class=p >,</span> <span class=n >Dict</span><span class=p >,</span> <span class=n >Type</span><span class=p >,</span> <span class=n >Union</span>
 
-<span class=kn >from</span> <span class=nn >numpy</span> <span class=k >import</span> <span class=p >(</span><span class=nb >all</span> <span class=k >as</span> <span class=n >npall</span><span class=p >,</span> <span class=nb >any</span><span class=p >,</span> <span class=n >array</span><span class=p >,</span> <span class=n >asarray</span><span class=p >,</span> <span class=n >atleast_2d</span><span class=p >,</span> <span class=n >average</span><span class=p >,</span> <span class=n >c_</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >numpy</span> <span class=kn >import</span> <span class=p >(</span><span class=nb >all</span> <span class=k >as</span> <span class=n >npall</span><span class=p >,</span> <span class=nb >any</span><span class=p >,</span> <span class=n >array</span><span class=p >,</span> <span class=n >asarray</span><span class=p >,</span> <span class=n >atleast_2d</span><span class=p >,</span> <span class=n >average</span><span class=p >,</span> <span class=n >c_</span><span class=p >,</span>
                    <span class=n >isscalar</span><span class=p >,</span> <span class=n >logical_not</span><span class=p >,</span> <span class=n >nanmean</span><span class=p >,</span> <span class=n >ndarray</span><span class=p >,</span> <span class=n >ones</span><span class=p >,</span> <span class=n >sqrt</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=k >import</span> <span class=n >eigvalsh</span><span class=p >,</span> <span class=n >inv</span><span class=p >,</span> <span class=n >matrix_rank</span><span class=p >,</span> <span class=n >pinv</span>
-<span class=kn >from</span> <span class=nn >pandas</span> <span class=k >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span>
-<span class=kn >from</span> <span class=nn >scipy.optimize</span> <span class=k >import</span> <span class=n >minimize</span>
+<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=kn >import</span> <span class=n >eigvalsh</span><span class=p >,</span> <span class=n >inv</span><span class=p >,</span> <span class=n >matrix_rank</span><span class=p >,</span> <span class=n >pinv</span>
+<span class=kn >from</span> <span class=nn >pandas</span> <span class=kn >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span>
+<span class=kn >from</span> <span class=nn >scipy.optimize</span> <span class=kn >import</span> <span class=n >minimize</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=k >import</span> <span class=n >IVFormulaParser</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.common</span> <span class=k >import</span> <span class=n >f_statistic</span><span class=p >,</span> <span class=n >find_constant</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=k >import</span> <span class=p >(</span><span class=n >ClusteredCovariance</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=kn >import</span> <span class=n >IVFormulaParser</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.common</span> <span class=kn >import</span> <span class=n >f_statistic</span><span class=p >,</span> <span class=n >find_constant</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=kn >import</span> <span class=p >(</span><span class=n >ClusteredCovariance</span><span class=p >,</span>
                                         <span class=n >HeteroskedasticCovariance</span><span class=p >,</span>
                                         <span class=n >HomoskedasticCovariance</span><span class=p >,</span>
                                         <span class=n >KernelCovariance</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=k >import</span> <span class=n >IVData</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.gmm</span> <span class=k >import</span> <span class=p >(</span><span class=n >HeteroskedasticWeightMatrix</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=kn >import</span> <span class=n >IVData</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.gmm</span> <span class=kn >import</span> <span class=p >(</span><span class=n >HeteroskedasticWeightMatrix</span><span class=p >,</span>
                                  <span class=n >HomoskedasticWeightMatrix</span><span class=p >,</span> <span class=n >IVGMMCovariance</span><span class=p >,</span>
                                  <span class=n >KernelWeightMatrix</span><span class=p >,</span>
                                  <span class=n >OneWayClusteredWeightMatrix</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.results</span> <span class=k >import</span> <span class=n >IVGMMResults</span><span class=p >,</span> <span class=n >IVResults</span><span class=p >,</span> <span class=n >OLSResults</span>
-<span class=kn >from</span> <span class=nn >linearmodels.typing</span> <span class=k >import</span> <span class=n >Numeric</span><span class=p >,</span> <span class=n >OptionalNumeric</span>
-<span class=kn >from</span> <span class=nn >linearmodels.typing.data</span> <span class=k >import</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >OptionalArrayLike</span>
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=p >(</span><span class=n >WaldTestStatistic</span><span class=p >,</span> <span class=n >has_constant</span><span class=p >,</span> <span class=n >inv_sqrth</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.results</span> <span class=kn >import</span> <span class=n >IVGMMResults</span><span class=p >,</span> <span class=n >IVResults</span><span class=p >,</span> <span class=n >OLSResults</span>
+<span class=kn >from</span> <span class=nn >linearmodels.typing</span> <span class=kn >import</span> <span class=n >Numeric</span><span class=p >,</span> <span class=n >OptionalNumeric</span>
+<span class=kn >from</span> <span class=nn >linearmodels.typing.data</span> <span class=kn >import</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >OptionalArrayLike</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=p >(</span><span class=n >WaldTestStatistic</span><span class=p >,</span> <span class=n >has_constant</span><span class=p >,</span> <span class=n >inv_sqrth</span><span class=p >,</span>
                                   <span class=n >missing_warning</span><span class=p >)</span>
 
 <span class=n >IVResultType</span> <span class=o >=</span> <span class=n >Type</span><span class=p >[</span><span class=n >Union</span><span class=p >[</span><span class=n >IVResults</span><span class=p >,</span> <span class=n >IVGMMResults</span><span class=p >,</span> <span class=n >OLSResults</span><span class=p >]]</span>
@@ -113,7 +113,7 @@
 <span class=sd >    IV2SLS, IVGMM, IVGMMCUE</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
                  <span class=n >endog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=n >instruments</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >weights</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span> <span class=n >fuller</span><span class=p >:</span> <span class=n >Numeric</span> <span class=o >=</span> <span class=mi >0</span><span class=p >,</span>
                  <span class=n >kappa</span><span class=p >:</span> <span class=n >OptionalNumeric</span> <span class=o >=</span> <span class=kc >None</span><span class=p >):</span>
@@ -599,7 +599,7 @@
 <span class=sd >    IVLIML, IVGMM, IVGMMCUE</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
                  <span class=n >endog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=n >instruments</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >weights</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_method</span> <span class=o >=</span> <span class=s1 >'IV-2SLS'</span>
@@ -703,7 +703,7 @@
 <span class=sd >    IV2SLS, IVLIML, IVGMMCUE</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
                  <span class=n >endog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=n >instruments</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >weights</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span>
                  <span class=n >weight_type</span><span class=p >:</span> <span class=nb >str</span> <span class=o >=</span> <span class=s1 >'robust'</span><span class=p >,</span> <span class=o >**</span><span class=n >weight_config</span><span class=p >):</span>
@@ -950,7 +950,7 @@
 <span class=sd >    IV2SLS, IVLIML, IVGMM</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span>
                  <span class=n >endog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=n >instruments</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >weights</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span>
                  <span class=n >weight_type</span><span class=p >:</span> <span class=nb >str</span> <span class=o >=</span> <span class=s1 >'robust'</span><span class=p >,</span> <span class=o >**</span><span class=n >weight_config</span><span class=p >):</span>
@@ -1198,8 +1198,8 @@
 <span class=sd >    statsmodels.regression.linear_model.GLS</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >weights</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >_OLS</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >dependent</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=kc >None</span><span class=p >,</span> <span class=kc >None</span><span class=p >,</span> <span class=n >weights</span><span class=o >=</span><span class=n >weights</span><span class=p >,</span> <span class=n >kappa</span><span class=o >=</span><span class=mf >0.0</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_result_container</span> <span class=o >=</span> <span class=n >OLSResults</span>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

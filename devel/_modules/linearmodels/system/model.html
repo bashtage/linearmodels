@@ -12,34 +12,34 @@
 <span class=sd >    Systems of Simultaneous Equations in R. Journal of Statistical Software,</span>
 <span class=sd >    23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >linearmodels.compat.numpy</span> <span class=k >import</span> <span class=n >lstsq</span>
+<span class=kn >from</span> <span class=nn >linearmodels.compat.numpy</span> <span class=kn >import</span> <span class=n >lstsq</span>
 
-<span class=kn >from</span> <span class=nn >collections</span> <span class=k >import</span> <span class=n >Mapping</span><span class=p >,</span> <span class=n >OrderedDict</span>
-<span class=kn >from</span> <span class=nn >functools</span> <span class=k >import</span> <span class=n >reduce</span>
+<span class=kn >from</span> <span class=nn >collections</span> <span class=kn >import</span> <span class=n >Mapping</span><span class=p >,</span> <span class=n >OrderedDict</span>
+<span class=kn >from</span> <span class=nn >functools</span> <span class=kn >import</span> <span class=n >reduce</span>
 <span class=kn >import</span> <span class=nn >textwrap</span>
 
 <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
-<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=k >import</span> <span class=n >inv</span><span class=p >,</span> <span class=n >matrix_rank</span><span class=p >,</span> <span class=n >solve</span>
-<span class=kn >from</span> <span class=nn >pandas</span> <span class=k >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span>
+<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=kn >import</span> <span class=n >inv</span><span class=p >,</span> <span class=n >matrix_rank</span><span class=p >,</span> <span class=n >solve</span>
+<span class=kn >from</span> <span class=nn >pandas</span> <span class=kn >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=k >import</span> <span class=n >IVFormulaParser</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=k >import</span> <span class=n >IVData</span>
-<span class=kn >from</span> <span class=nn >linearmodels.system._utility</span> <span class=k >import</span> <span class=p >(</span><span class=n >LinearConstraint</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=kn >import</span> <span class=n >IVFormulaParser</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=kn >import</span> <span class=n >IVData</span>
+<span class=kn >from</span> <span class=nn >linearmodels.system._utility</span> <span class=kn >import</span> <span class=p >(</span><span class=n >LinearConstraint</span><span class=p >,</span>
                                           <span class=n >blocked_column_product</span><span class=p >,</span>
                                           <span class=n >blocked_cross_prod</span><span class=p >,</span>
                                           <span class=n >blocked_diag_product</span><span class=p >,</span>
                                           <span class=n >blocked_inner_prod</span><span class=p >,</span> <span class=n >inv_matrix_sqrt</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.system.covariance</span> <span class=k >import</span> <span class=p >(</span><span class=n >GMMHeteroskedasticCovariance</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.system.covariance</span> <span class=kn >import</span> <span class=p >(</span><span class=n >GMMHeteroskedasticCovariance</span><span class=p >,</span>
                                             <span class=n >GMMHomoskedasticCovariance</span><span class=p >,</span>
                                             <span class=n >GMMKernelCovariance</span><span class=p >,</span>
                                             <span class=n >HeteroskedasticCovariance</span><span class=p >,</span>
                                             <span class=n >HomoskedasticCovariance</span><span class=p >,</span>
                                             <span class=n >KernelCovariance</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.system.gmm</span> <span class=k >import</span> <span class=p >(</span><span class=n >HeteroskedasticWeightMatrix</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.system.gmm</span> <span class=kn >import</span> <span class=p >(</span><span class=n >HeteroskedasticWeightMatrix</span><span class=p >,</span>
                                      <span class=n >HomoskedasticWeightMatrix</span><span class=p >,</span>
                                      <span class=n >KernelWeightMatrix</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.system.results</span> <span class=k >import</span> <span class=n >GMMSystemResults</span><span class=p >,</span> <span class=n >SystemResults</span>
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=p >(</span><span class=n >AttrDict</span><span class=p >,</span> <span class=n >InvalidTestStatistic</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.system.results</span> <span class=kn >import</span> <span class=n >GMMSystemResults</span><span class=p >,</span> <span class=n >SystemResults</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=p >(</span><span class=n >AttrDict</span><span class=p >,</span> <span class=n >InvalidTestStatistic</span><span class=p >,</span>
                                   <span class=n >WaldTestStatistic</span><span class=p >,</span> <span class=n >has_constant</span><span class=p >,</span>
                                   <span class=n >missing_warning</span><span class=p >)</span>
 
@@ -134,7 +134,7 @@
 
 
 <span class=k >class</span> <span class=nc >SystemFormulaParser</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >formula</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >weights</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >eval_env</span><span class=o >=</span><span class=mi >6</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >formula</span><span class=p >,</span> <span class=n >data</span><span class=p >,</span> <span class=n >weights</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >eval_env</span><span class=o >=</span><span class=mi >6</span><span class=p >):</span>
         <span class=k >if</span> <span class=ow >not</span> <span class=nb >isinstance</span><span class=p >(</span><span class=n >formula</span><span class=p >,</span> <span class=p >(</span><span class=n >Mapping</span><span class=p >,</span> <span class=nb >str</span><span class=p >)):</span>
             <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=s1 >'formula must be a string or dictionary-like'</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_formula</span> <span class=o >=</span> <span class=n >formula</span>
@@ -351,7 +351,7 @@
 <span class=sd >    where :math:`\Sigma` is the covariance matrix of the residuals.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
         <span class=k >if</span> <span class=ow >not</span> <span class=nb >isinstance</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >Mapping</span><span class=p >):</span>
             <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=s1 >'equations must be a dictionary-like'</span><span class=p >)</span>
         <span class=k >for</span> <span class=n >key</span> <span class=ow >in</span> <span class=n >equations</span><span class=p >:</span>
@@ -544,10 +544,10 @@
                 <span class=bp >self</span><span class=o >.</span><span class=n >_instr</span><span class=p >[</span><span class=n >i</span><span class=p >]</span><span class=o >.</span><span class=n >drop</span><span class=p >(</span><span class=n >missing</span><span class=p >)</span>
                 <span class=bp >self</span><span class=o >.</span><span class=n >_weights</span><span class=p >[</span><span class=n >i</span><span class=p >]</span><span class=o >.</span><span class=n >drop</span><span class=p >(</span><span class=n >missing</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=fm >__str__</span><span class=p >()</span> <span class=o >+</span> <span class=s1 >'</span><span class=se >\n</span><span class=s1 >id: </span><span class=si >{0}</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=nb >hex</span><span class=p >(</span><span class=nb >id</span><span class=p >(</span><span class=bp >self</span><span class=p >)))</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=n >out</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_model_name</span> <span class=o >+</span> <span class=s1 >', '</span>
         <span class=n >out</span> <span class=o >+=</span> <span class=s1 >'</span><span class=si >{0}</span><span class=s1 > Equations:</span><span class=se >\n</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=nb >len</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_y</span><span class=p >))</span>
         <span class=n >eqns</span> <span class=o >=</span> <span class=s1 >', '</span><span class=o >.</span><span class=n >join</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_equations</span><span class=o >.</span><span class=n >keys</span><span class=p >())</span>
@@ -1248,7 +1248,7 @@
 <span class=sd >    no instruments.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
         <span class=k >if</span> <span class=ow >not</span> <span class=nb >isinstance</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >Mapping</span><span class=p >):</span>
             <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=s1 >'equations must be a dictionary-like'</span><span class=p >)</span>
         <span class=k >for</span> <span class=n >key</span> <span class=ow >in</span> <span class=n >equations</span><span class=p >:</span>
@@ -1447,7 +1447,7 @@
 <span class=sd >    where :math:`W` is a positive definite weighting matrix.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >weight_type</span><span class=o >=</span><span class=s1 >'robust'</span><span class=p >,</span> <span class=o >**</span><span class=n >weight_config</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >equations</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >weight_type</span><span class=o >=</span><span class=s1 >'robust'</span><span class=p >,</span> <span class=o >**</span><span class=n >weight_config</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >()</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=n >sigma</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_weight_type</span> <span class=o >=</span> <span class=n >weight_type</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_weight_config</span> <span class=o >=</span> <span class=n >weight_config</span>
@@ -1734,4 +1734,4 @@
         <span class=n >ncons</span> <span class=o >=</span> <span class=mi >0</span> <span class=k >if</span> <span class=bp >self</span><span class=o >.</span><span class=n >constraints</span> <span class=ow >is</span> <span class=kc >None</span> <span class=k >else</span> <span class=bp >self</span><span class=o >.</span><span class=n >constraints</span><span class=o >.</span><span class=n >r</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >0</span><span class=p >]</span>
 
         <span class=k >return</span> <span class=n >WaldTestStatistic</span><span class=p >(</span><span class=n >stat</span><span class=p >,</span> <span class=n >null</span><span class=p >,</span> <span class=n >ninstr</span> <span class=o >-</span> <span class=p >(</span><span class=n >nvar</span> <span class=o >-</span> <span class=n >ncons</span><span class=p >))</span></div>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

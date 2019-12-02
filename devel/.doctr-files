@@ -79,7 +79,11 @@ devel/_static/doctools.js
 devel/_static/documentation_options.js
 devel/_static/favicon.ico
 devel/_static/file.png
+devel/_static/fonts/font-awesome.css
 devel/_static/fonts/material-icons.css
+devel/_static/fonts/specimen/FontAwesome.ttf
+devel/_static/fonts/specimen/FontAwesome.woff
+devel/_static/fonts/specimen/FontAwesome.woff2
 devel/_static/fonts/specimen/MaterialIcons-Regular.ttf
 devel/_static/fonts/specimen/MaterialIcons-Regular.woff
 devel/_static/fonts/specimen/MaterialIcons-Regular.woff2

@@ -2,21 +2,21 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Linear factor models for applications in asset pricing</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >linearmodels.compat.numpy</span> <span class=k >import</span> <span class=n >lstsq</span>
+<span class=kn >from</span> <span class=nn >linearmodels.compat.numpy</span> <span class=kn >import</span> <span class=n >lstsq</span>
 
 <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
-<span class=kn >from</span> <span class=nn >patsy.highlevel</span> <span class=k >import</span> <span class=n >dmatrix</span>
-<span class=kn >from</span> <span class=nn >patsy.missing</span> <span class=k >import</span> <span class=n >NAAction</span>
-<span class=kn >from</span> <span class=nn >scipy.optimize</span> <span class=k >import</span> <span class=n >minimize</span>
+<span class=kn >from</span> <span class=nn >patsy.highlevel</span> <span class=kn >import</span> <span class=n >dmatrix</span>
+<span class=kn >from</span> <span class=nn >patsy.missing</span> <span class=kn >import</span> <span class=n >NAAction</span>
+<span class=kn >from</span> <span class=nn >scipy.optimize</span> <span class=kn >import</span> <span class=n >minimize</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.covariance</span> <span class=k >import</span> <span class=p >(</span><span class=n >HeteroskedasticCovariance</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.covariance</span> <span class=kn >import</span> <span class=p >(</span><span class=n >HeteroskedasticCovariance</span><span class=p >,</span>
                                                    <span class=n >HeteroskedasticWeight</span><span class=p >,</span>
                                                    <span class=n >KernelCovariance</span><span class=p >,</span>
                                                    <span class=n >KernelWeight</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.results</span> <span class=k >import</span> <span class=p >(</span><span class=n >GMMFactorModelResults</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.results</span> <span class=kn >import</span> <span class=p >(</span><span class=n >GMMFactorModelResults</span><span class=p >,</span>
                                                 <span class=n >LinearFactorModelResults</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=k >import</span> <span class=n >IVData</span>
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=p >(</span><span class=n >AttrDict</span><span class=p >,</span> <span class=n >WaldTestStatistic</span><span class=p >,</span> <span class=n >has_constant</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.data</span> <span class=kn >import</span> <span class=n >IVData</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=p >(</span><span class=n >AttrDict</span><span class=p >,</span> <span class=n >WaldTestStatistic</span><span class=p >,</span> <span class=n >has_constant</span><span class=p >,</span>
                                   <span class=n >missing_warning</span><span class=p >)</span>
 
 
@@ -61,20 +61,20 @@
 <span class=sd >    which must be excess returns on traded portfolios.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=n >factors</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=n >factors</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >portfolios</span> <span class=o >=</span> <span class=n >IVData</span><span class=p >(</span><span class=n >portfolios</span><span class=p >,</span> <span class=n >var_name</span><span class=o >=</span><span class=s1 >'portfolio'</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >factors</span> <span class=o >=</span> <span class=n >IVData</span><span class=p >(</span><span class=n >factors</span><span class=p >,</span> <span class=n >var_name</span><span class=o >=</span><span class=s1 >'factor'</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_name</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=vm >__class__</span><span class=o >.</span><span class=vm >__name__</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_formula</span> <span class=o >=</span> <span class=kc >None</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_validate_data</span><span class=p >()</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=n >out</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=vm >__class__</span><span class=o >.</span><span class=vm >__name__</span>
         <span class=n >f</span><span class=p >,</span> <span class=n >p</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >factors</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >],</span> <span class=bp >self</span><span class=o >.</span><span class=n >portfolios</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >]</span>
         <span class=n >out</span> <span class=o >+=</span> <span class=s1 >' with </span><span class=si >{0}</span><span class=s1 > factors, </span><span class=si >{1}</span><span class=s1 > test portfolios'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=n >f</span><span class=p >,</span> <span class=n >p</span><span class=p >)</span>
         <span class=k >return</span> <span class=n >out</span>
 
-    <span class=k >def</span> <span class=nf >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=fm >__str__</span><span class=p >()</span> <span class=o >+</span> <span class=s1 >'</span><span class=se >\n</span><span class=s1 >id: </span><span class=si >{0}</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=nb >hex</span><span class=p >(</span><span class=nb >id</span><span class=p >(</span><span class=bp >self</span><span class=p >)))</span>
 
     <span class=k >def</span> <span class=nf >_drop_missing</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
@@ -331,7 +331,7 @@
 <span class=sd >    :math:`\hat{\alpha}_i=\hat{\eta}_i`.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=n >factors</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >risk_free</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=n >factors</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >risk_free</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_risk_free</span> <span class=o >=</span> <span class=nb >bool</span><span class=p >(</span><span class=n >risk_free</span><span class=p >)</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >LinearFactorModel</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >portfolios</span><span class=p >,</span> <span class=n >factors</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_validate_additional_data</span><span class=p >()</span>
@@ -343,7 +343,7 @@
             <span class=bp >self</span><span class=o >.</span><span class=n >_sigma_m12</span> <span class=o >=</span> <span class=n >vecs</span> <span class=o >@</span> <span class=n >np</span><span class=o >.</span><span class=n >diag</span><span class=p >(</span><span class=mf >1.0</span> <span class=o >/</span> <span class=n >np</span><span class=o >.</span><span class=n >sqrt</span><span class=p >(</span><span class=n >vals</span><span class=p >))</span> <span class=o >@</span> <span class=n >vecs</span><span class=o >.</span><span class=n >T</span>
             <span class=bp >self</span><span class=o >.</span><span class=n >_sigma_inv</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >linalg</span><span class=o >.</span><span class=n >inv</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_sigma</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=n >out</span> <span class=o >=</span> <span class=nb >super</span><span class=p >(</span><span class=n >LinearFactorModel</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__str__</span><span class=p >()</span>
         <span class=k >if</span> <span class=n >np</span><span class=o >.</span><span class=n >any</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_sigma</span> <span class=o >!=</span> <span class=n >np</span><span class=o >.</span><span class=n >eye</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >portfolios</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >])):</span>
             <span class=n >out</span> <span class=o >+=</span> <span class=s1 >' using GLS'</span>
@@ -614,7 +614,7 @@
 <span class=sd >    usual GMM J statistic.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >factors</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >risk_free</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >factors</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >risk_free</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >LinearFactorModelGMM</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >factors</span><span class=p >,</span> <span class=n >portfolios</span><span class=p >,</span> <span class=n >risk_free</span><span class=o >=</span><span class=n >risk_free</span><span class=p >)</span>
 
 <div class=viewcode-block  id=LinearFactorModelGMM.from_formula ><a class=viewcode-back  href="../../../asset-pricing/models.html#linearmodels.asset_pricing.model.LinearFactorModelGMM.from_formula">[docs]</a>    <span class=nd >@classmethod</span>
@@ -887,4 +887,4 @@
         <span class=n >jac</span><span class=p >[</span><span class=o >-</span><span class=n >k</span><span class=p >:,</span> <span class=o >-</span><span class=n >k</span><span class=p >:]</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >eye</span><span class=p >(</span><span class=n >k</span><span class=p >)</span>
 
         <span class=k >return</span> <span class=n >jac</span></div>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

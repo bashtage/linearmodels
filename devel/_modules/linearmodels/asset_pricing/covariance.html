@@ -2,15 +2,15 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Covariance estimators for linear factor models</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=k >import</span> <span class=n >inv</span>
+<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=kn >import</span> <span class=n >inv</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=k >import</span> <span class=p >(</span><span class=n >KERNEL_LOOKUP</span><span class=p >,</span> <span class=n >_cov_kernel</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=kn >import</span> <span class=p >(</span><span class=n >KERNEL_LOOKUP</span><span class=p >,</span> <span class=n >_cov_kernel</span><span class=p >,</span>
                                         <span class=n >kernel_optimal_bandwidth</span><span class=p >)</span>
 
 
 <span class=k >class</span> <span class=nc >_HACMixin</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_bandwidth</span> <span class=o >=</span> <span class=kc >None</span>  <span class=c1 ># pragma: no cover</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_moments</span> <span class=o >=</span> <span class=kc >None</span>  <span class=c1 ># pragma: no cover</span>
 
@@ -80,7 +80,7 @@
 <span class=sd >        Degree of freedom value ot use if debiasing</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >xe</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >inv_jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >xe</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >inv_jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
                  <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >df</span><span class=o >=</span><span class=mi >0</span><span class=p >):</span>
 
         <span class=bp >self</span><span class=o >.</span><span class=n >_moments</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_xe</span> <span class=o >=</span> <span class=n >xe</span>
@@ -97,10 +97,10 @@
         <span class=k >else</span><span class=p >:</span>
             <span class=bp >self</span><span class=o >.</span><span class=n >_square</span> <span class=o >=</span> <span class=n >inv_jacobian</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >0</span><span class=p >]</span> <span class=o >==</span> <span class=n >inv_jacobian</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >]</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=vm >__class__</span><span class=o >.</span><span class=vm >__name__</span>
 
-    <span class=k >def</span> <span class=nf >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=fm >__str__</span><span class=p >()</span> <span class=o >+</span> <span class=s1 >', id: </span><span class=si >{0}</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=nb >hex</span><span class=p >(</span><span class=nb >id</span><span class=p >(</span><span class=bp >self</span><span class=p >)))</span>
 
     <span class=nd >@property</span>
@@ -199,7 +199,7 @@
 <span class=sd >    linearmodels.iv.covariance.kernel_weight_quadratic_spectral</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >xe</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >inv_jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >xe</span><span class=p >,</span> <span class=o >*</span><span class=p >,</span> <span class=n >jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >inv_jacobian</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
                  <span class=n >kernel</span><span class=o >=</span><span class=s1 >'bartlett'</span><span class=p >,</span> <span class=n >bandwidth</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >,</span>
                  <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >df</span><span class=o >=</span><span class=mi >0</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >KernelCovariance</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >xe</span><span class=p >,</span> <span class=n >jacobian</span><span class=o >=</span><span class=n >jacobian</span><span class=p >,</span>
@@ -209,7 +209,7 @@
         <span class=bp >self</span><span class=o >.</span><span class=n >_check_kernel</span><span class=p >(</span><span class=n >kernel</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_check_bandwidth</span><span class=p >(</span><span class=n >bandwidth</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=n >descr</span> <span class=o >=</span> <span class=s1 >', Kernel: </span><span class=si >{0}</span><span class=s1 >, Bandwidth: </span><span class=si >{1}</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_kernel</span><span class=p >,</span>
                                                        <span class=bp >self</span><span class=o >.</span><span class=n >bandwidth</span><span class=p >)</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=vm >__class__</span><span class=o >.</span><span class=vm >__name__</span> <span class=o >+</span> <span class=n >descr</span>
@@ -249,7 +249,7 @@
 <span class=sd >        Flag indicating to center the moments when computing the weights</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >moments</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >moments</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_moments</span> <span class=o >=</span> <span class=n >moments</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_center</span> <span class=o >=</span> <span class=n >center</span>
 
@@ -291,7 +291,7 @@
 <span class=sd >        Non-negative integer bandwidth</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >moments</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >,</span> <span class=n >kernel</span><span class=o >=</span><span class=s1 >'bartlett'</span><span class=p >,</span> <span class=n >bandwidth</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >moments</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >True</span><span class=p >,</span> <span class=n >kernel</span><span class=o >=</span><span class=s1 >'bartlett'</span><span class=p >,</span> <span class=n >bandwidth</span><span class=o >=</span><span class=kc >None</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >KernelWeight</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >moments</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=n >center</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_check_kernel</span><span class=p >(</span><span class=n >kernel</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_check_bandwidth</span><span class=p >(</span><span class=n >bandwidth</span><span class=p >)</span>
@@ -315,4 +315,4 @@
         <span class=n >out</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_kernel_cov</span><span class=p >(</span><span class=n >moments</span><span class=p >)</span>
 
         <span class=k >return</span> <span class=n >inv</span><span class=p >(</span><span class=n >out</span><span class=p >)</span>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

@@ -2,12 +2,12 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Covariance and weight estimation for GMM IV estimators</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >numpy</span> <span class=k >import</span> <span class=n >array</span><span class=p >,</span> <span class=n >empty</span><span class=p >,</span> <span class=n >repeat</span><span class=p >,</span> <span class=n >sqrt</span>
+<span class=kn >from</span> <span class=nn >numpy</span> <span class=kn >import</span> <span class=n >array</span><span class=p >,</span> <span class=n >empty</span><span class=p >,</span> <span class=n >repeat</span><span class=p >,</span> <span class=n >sqrt</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.covariance</span> <span class=k >import</span> <span class=n >_HACMixin</span>
-<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=k >import</span> <span class=n >kernel_optimal_bandwidth</span>
-<span class=kn >from</span> <span class=nn >linearmodels.system._utility</span> <span class=k >import</span> <span class=n >blocked_inner_prod</span>
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=n >AttrDict</span>
+<span class=kn >from</span> <span class=nn >linearmodels.asset_pricing.covariance</span> <span class=kn >import</span> <span class=n >_HACMixin</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv.covariance</span> <span class=kn >import</span> <span class=n >kernel_optimal_bandwidth</span>
+<span class=kn >from</span> <span class=nn >linearmodels.system._utility</span> <span class=kn >import</span> <span class=n >blocked_inner_prod</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=n >AttrDict</span>
 
 
 <div class=viewcode-block  id=HomoskedasticWeightMatrix ><a class=viewcode-back  href="../../../system/gmm-weights.html#linearmodels.system.gmm.HomoskedasticWeightMatrix">[docs]</a><span class=k >class</span> <span class=nc >HomoskedasticWeightMatrix</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
@@ -37,14 +37,14 @@
 <span class=sd >    ``center`` has no effect on this estimator since it is always centered.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_center</span> <span class=o >=</span> <span class=n >center</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_debiased</span> <span class=o >=</span> <span class=n >debiased</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_bandwidth</span> <span class=o >=</span> <span class=mi >0</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_name</span> <span class=o >=</span> <span class=s1 >'Homoskedastic (Unadjusted) Weighting'</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_config</span> <span class=o >=</span> <span class=n >AttrDict</span><span class=p >(</span><span class=n >center</span><span class=o >=</span><span class=n >center</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=n >debiased</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__str__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=n >out</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_name</span>
         <span class=n >extra</span> <span class=o >=</span> <span class=p >[]</span>
         <span class=k >for</span> <span class=n >key</span> <span class=ow >in</span> <span class=bp >self</span><span class=o >.</span><span class=n >_str_extra</span><span class=p >:</span>
@@ -53,7 +53,7 @@
             <span class=n >out</span> <span class=o >+=</span> <span class=s1 >' ('</span> <span class=o >+</span> <span class=s1 >', '</span><span class=o >.</span><span class=n >join</span><span class=p >(</span><span class=n >extra</span><span class=p >)</span> <span class=o >+</span> <span class=s1 >')'</span>
         <span class=k >return</span> <span class=n >out</span>
 
-    <span class=k >def</span> <span class=nf >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__repr__</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=fm >__str__</span><span class=p >()</span> <span class=o >+</span> <span class=s1 >', id: </span><span class=si >{0}</span><span class=s1 >'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=nb >hex</span><span class=p >(</span><span class=nb >id</span><span class=p >(</span><span class=bp >self</span><span class=p >)))</span>
 
     <span class=nd >@property</span>
@@ -136,7 +136,7 @@
 <span class=sd >    dependence between the moment conditions.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >HeteroskedasticWeightMatrix</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >center</span><span class=p >,</span> <span class=n >debiased</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_name</span> <span class=o >=</span> <span class=s1 >'Heteroskedastic (Robust) Weighting'</span>
 
@@ -229,7 +229,7 @@
 <span class=sd >    between the moment conditions.</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >kernel</span><span class=o >=</span><span class=s1 >'bartlett'</span><span class=p >,</span> <span class=n >bandwidth</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >center</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >debiased</span><span class=o >=</span><span class=kc >False</span><span class=p >,</span> <span class=n >kernel</span><span class=o >=</span><span class=s1 >'bartlett'</span><span class=p >,</span> <span class=n >bandwidth</span><span class=o >=</span><span class=kc >None</span><span class=p >,</span>
                  <span class=n >optimal_bw</span><span class=o >=</span><span class=kc >False</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >KernelWeightMatrix</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >center</span><span class=p >,</span> <span class=n >debiased</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_name</span> <span class=o >=</span> <span class=s1 >'Kernel (HAC) Weighting'</span>
@@ -303,4 +303,4 @@
         <span class=n >out</span> <span class=o >=</span> <span class=n >AttrDict</span><span class=p >([(</span><span class=n >k</span><span class=p >,</span> <span class=n >v</span><span class=p >)</span> <span class=k >for</span> <span class=n >k</span><span class=p >,</span> <span class=n >v</span> <span class=ow >in</span> <span class=bp >self</span><span class=o >.</span><span class=n >_config</span><span class=o >.</span><span class=n >items</span><span class=p >()])</span>
         <span class=n >out</span><span class=p >[</span><span class=s1 >'bandwidth'</span><span class=p >]</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >bandwidth</span>
         <span class=k >return</span> <span class=n >out</span></div>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

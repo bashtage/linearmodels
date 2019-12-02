@@ -2,21 +2,21 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Results for linear factor models</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >linearmodels.compat.statsmodels</span> <span class=k >import</span> <span class=n >Summary</span>
+<span class=kn >from</span> <span class=nn >linearmodels.compat.statsmodels</span> <span class=kn >import</span> <span class=n >Summary</span>
 
 <span class=kn >import</span> <span class=nn >datetime</span> <span class=k >as</span> <span class=nn >dt</span>
 
-<span class=kn >from</span> <span class=nn >property_cached</span> <span class=k >import</span> <span class=n >cached_property</span>
+<span class=kn >from</span> <span class=nn >property_cached</span> <span class=kn >import</span> <span class=n >cached_property</span>
 <span class=kn >import</span> <span class=nn >numpy</span> <span class=k >as</span> <span class=nn >np</span>
 <span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
-<span class=kn >from</span> <span class=nn >scipy</span> <span class=k >import</span> <span class=n >stats</span>
-<span class=kn >from</span> <span class=nn >statsmodels.iolib.summary</span> <span class=k >import</span> <span class=n >SimpleTable</span><span class=p >,</span> <span class=n >fmt_2cols</span><span class=p >,</span> <span class=n >fmt_params</span>
+<span class=kn >from</span> <span class=nn >scipy</span> <span class=kn >import</span> <span class=n >stats</span>
+<span class=kn >from</span> <span class=nn >statsmodels.iolib.summary</span> <span class=kn >import</span> <span class=n >SimpleTable</span><span class=p >,</span> <span class=n >fmt_2cols</span><span class=p >,</span> <span class=n >fmt_params</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=n >_str</span><span class=p >,</span> <span class=n >_SummaryStr</span><span class=p >,</span> <span class=n >pval_format</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=n >_str</span><span class=p >,</span> <span class=n >_SummaryStr</span><span class=p >,</span> <span class=n >pval_format</span>
 
 
 <div class=viewcode-block  id=LinearFactorModelResults ><a class=viewcode-back  href="../../../asset-pricing/results.html#linearmodels.asset_pricing.results.LinearFactorModelResults">[docs]</a><span class=k >class</span> <span class=nc >LinearFactorModelResults</span><span class=p >(</span><span class=n >_SummaryStr</span><span class=p >):</span>
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >res</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >res</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_jstat</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >jstat</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_params</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >params</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_param_names</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >param_names</span>
@@ -271,7 +271,7 @@
 
 
 <span class=k >class</span> <span class=nc >GMMFactorModelResults</span><span class=p >(</span><span class=n >LinearFactorModelResults</span><span class=p >):</span>
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >res</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >res</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >GMMFactorModelResults</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_iter</span> <span class=o >=</span> <span class=n >res</span><span class=o >.</span><span class=n >iter</span>
 
@@ -289,4 +289,4 @@
     <span class=k >def</span> <span class=nf >iterations</span><span class=p >(</span><span class=bp >self</span><span class=p >):</span>
         <span class=sd >"""Number of steps in GMM estimation"""</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_iter</span>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

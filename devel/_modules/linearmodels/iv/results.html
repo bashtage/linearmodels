@@ -2,23 +2,23 @@
 <span></span><span class=sd >"""</span>
 <span class=sd >Results containers and post-estimation diagnostics for IV models</span>
 <span class=sd >"""</span>
-<span class=kn >from</span> <span class=nn >linearmodels.compat.statsmodels</span> <span class=k >import</span> <span class=n >Summary</span>
+<span class=kn >from</span> <span class=nn >linearmodels.compat.statsmodels</span> <span class=kn >import</span> <span class=n >Summary</span>
 
-<span class=kn >from</span> <span class=nn >collections</span> <span class=k >import</span> <span class=n >OrderedDict</span>
+<span class=kn >from</span> <span class=nn >collections</span> <span class=kn >import</span> <span class=n >OrderedDict</span>
 <span class=kn >import</span> <span class=nn >datetime</span> <span class=k >as</span> <span class=nn >dt</span>
-<span class=kn >from</span> <span class=nn >typing</span> <span class=k >import</span> <span class=n >Any</span><span class=p >,</span> <span class=n >Dict</span><span class=p >,</span> <span class=n >List</span><span class=p >,</span> <span class=n >Union</span>
+<span class=kn >from</span> <span class=nn >typing</span> <span class=kn >import</span> <span class=n >Any</span><span class=p >,</span> <span class=n >Dict</span><span class=p >,</span> <span class=n >List</span><span class=p >,</span> <span class=n >Union</span>
 
-<span class=kn >from</span> <span class=nn >property_cached</span> <span class=k >import</span> <span class=n >cached_property</span>
-<span class=kn >from</span> <span class=nn >numpy</span> <span class=k >import</span> <span class=p >(</span><span class=n >array</span><span class=p >,</span> <span class=n >c_</span><span class=p >,</span> <span class=n >diag</span><span class=p >,</span> <span class=n >empty</span><span class=p >,</span> <span class=n >isnan</span><span class=p >,</span> <span class=n >log</span><span class=p >,</span> <span class=n >ndarray</span><span class=p >,</span> <span class=n >ones</span><span class=p >,</span> <span class=n >sqrt</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >property_cached</span> <span class=kn >import</span> <span class=n >cached_property</span>
+<span class=kn >from</span> <span class=nn >numpy</span> <span class=kn >import</span> <span class=p >(</span><span class=n >array</span><span class=p >,</span> <span class=n >c_</span><span class=p >,</span> <span class=n >diag</span><span class=p >,</span> <span class=n >empty</span><span class=p >,</span> <span class=n >isnan</span><span class=p >,</span> <span class=n >log</span><span class=p >,</span> <span class=n >ndarray</span><span class=p >,</span> <span class=n >ones</span><span class=p >,</span> <span class=n >sqrt</span><span class=p >,</span>
                    <span class=n >zeros</span><span class=p >)</span>
-<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=k >import</span> <span class=n >inv</span><span class=p >,</span> <span class=n >pinv</span>
-<span class=kn >from</span> <span class=nn >pandas</span> <span class=k >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span><span class=p >,</span> <span class=n >to_numeric</span>
+<span class=kn >from</span> <span class=nn >numpy.linalg</span> <span class=kn >import</span> <span class=n >inv</span><span class=p >,</span> <span class=n >pinv</span>
+<span class=kn >from</span> <span class=nn >pandas</span> <span class=kn >import</span> <span class=n >DataFrame</span><span class=p >,</span> <span class=n >Series</span><span class=p >,</span> <span class=n >concat</span><span class=p >,</span> <span class=n >to_numeric</span>
 <span class=kn >import</span> <span class=nn >scipy.stats</span> <span class=k >as</span> <span class=nn >stats</span>
-<span class=kn >from</span> <span class=nn >statsmodels.iolib.summary</span> <span class=k >import</span> <span class=n >SimpleTable</span><span class=p >,</span> <span class=n >fmt_2cols</span><span class=p >,</span> <span class=n >fmt_params</span>
-<span class=kn >from</span> <span class=nn >statsmodels.iolib.table</span> <span class=k >import</span> <span class=n >default_txt_fmt</span>
+<span class=kn >from</span> <span class=nn >statsmodels.iolib.summary</span> <span class=kn >import</span> <span class=n >SimpleTable</span><span class=p >,</span> <span class=n >fmt_2cols</span><span class=p >,</span> <span class=n >fmt_params</span>
+<span class=kn >from</span> <span class=nn >statsmodels.iolib.table</span> <span class=kn >import</span> <span class=n >default_txt_fmt</span>
 
-<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=k >import</span> <span class=n >annihilate</span><span class=p >,</span> <span class=n >proj</span>
-<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=k >import</span> <span class=p >(</span><span class=n >InvalidTestStatistic</span><span class=p >,</span> <span class=n >WaldTestStatistic</span><span class=p >,</span>
+<span class=kn >from</span> <span class=nn >linearmodels.iv._utility</span> <span class=kn >import</span> <span class=n >annihilate</span><span class=p >,</span> <span class=n >proj</span>
+<span class=kn >from</span> <span class=nn >linearmodels.utility</span> <span class=kn >import</span> <span class=p >(</span><span class=n >InvalidTestStatistic</span><span class=p >,</span> <span class=n >WaldTestStatistic</span><span class=p >,</span>
                                   <span class=n >_ModelComparison</span><span class=p >,</span> <span class=n >_str</span><span class=p >,</span> <span class=n >_SummaryStr</span><span class=p >,</span>
                                   <span class=n >pval_format</span><span class=p >,</span> <span class=n >quadratic_form_test</span><span class=p >)</span>
 
@@ -47,7 +47,7 @@
 
 
 <div class=viewcode-block  id=OLSResults ><a class=viewcode-back  href="../../../iv/results.html#linearmodels.iv.results.OLSResults">[docs]</a><span class=k >class</span> <span class=nc >OLSResults</span><span class=p >(</span><span class=n >_SummaryStr</span><span class=p >):</span>
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_resid</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'eps'</span><span class=p >]</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_wresid</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'weps'</span><span class=p >]</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_params</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'params'</span><span class=p >]</span>
@@ -500,7 +500,7 @@
 
 
 <span class=k >class</span> <span class=nc >AbsorbingLSResults</span><span class=p >(</span><span class=n >OLSResults</span><span class=p >):</span>
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >AbsorbingLSResults</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_absorbed_rsquared</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'absorbed_r2'</span><span class=p >]</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_absorbed_effects</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'absorbed_effects'</span><span class=p >]</span>
@@ -540,7 +540,7 @@
 <span class=sd >    First stage estimation results and diagnostics</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dep</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=n >endog</span><span class=p >,</span> <span class=n >instr</span><span class=p >,</span> <span class=n >weights</span><span class=p >,</span> <span class=n >cov_type</span><span class=p >,</span> <span class=n >cov_config</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >dep</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=n >endog</span><span class=p >,</span> <span class=n >instr</span><span class=p >,</span> <span class=n >weights</span><span class=p >,</span> <span class=n >cov_type</span><span class=p >,</span> <span class=n >cov_config</span><span class=p >):</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >dep</span> <span class=o >=</span> <span class=n >dep</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >exog</span> <span class=o >=</span> <span class=n >exog</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >endog</span> <span class=o >=</span> <span class=n >endog</span>
@@ -581,7 +581,7 @@
 <span class=sd >              orthogonalized endogenous regressor where the orthogonalization</span>
 <span class=sd >              is with respect to the other included variables in the model.</span>
 <span class=sd >        """</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=k >import</span> <span class=n >_OLS</span><span class=p >,</span> <span class=n >IV2SLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=kn >import</span> <span class=n >_OLS</span><span class=p >,</span> <span class=n >IV2SLS</span>
         <span class=n >endog</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=n >instr</span><span class=p >,</span> <span class=n >weights</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >endog</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >exog</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >instr</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >weights</span>
         <span class=n >w</span> <span class=o >=</span> <span class=n >sqrt</span><span class=p >(</span><span class=n >weights</span><span class=o >.</span><span class=n >ndarray</span><span class=p >)</span>
         <span class=n >z</span> <span class=o >=</span> <span class=n >w</span> <span class=o >*</span> <span class=n >instr</span><span class=o >.</span><span class=n >ndarray</span>
@@ -637,7 +637,7 @@
 <span class=sd >            Dictionary containing first stage estimation results. Keys are</span>
 <span class=sd >            the variable names of the endogenous regressors.</span>
 <span class=sd >        """</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=k >import</span> <span class=n >_OLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=kn >import</span> <span class=n >_OLS</span>
         <span class=n >w</span> <span class=o >=</span> <span class=n >sqrt</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >weights</span><span class=o >.</span><span class=n >ndarray</span><span class=p >)</span>
         <span class=n >exog_instr</span> <span class=o >=</span> <span class=n >w</span> <span class=o >*</span> <span class=n >c_</span><span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >exog</span><span class=o >.</span><span class=n >ndarray</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >instr</span><span class=o >.</span><span class=n >ndarray</span><span class=p >]</span>
         <span class=n >exog_instr</span> <span class=o >=</span> <span class=n >DataFrame</span><span class=p >(</span><span class=n >exog_instr</span><span class=p >,</span> <span class=n >columns</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >exog</span><span class=o >.</span><span class=n >cols</span> <span class=o >+</span> <span class=bp >self</span><span class=o >.</span><span class=n >instr</span><span class=o >.</span><span class=n >cols</span><span class=p >)</span>
@@ -709,7 +709,7 @@
 <span class=sd >    Results from IV estimation</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >_CommonIVResults</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_liml_kappa</span> <span class=o >=</span> <span class=n >results</span><span class=o >.</span><span class=n >get</span><span class=p >(</span><span class=s1 >'liml_kappa'</span><span class=p >,</span> <span class=kc >None</span><span class=p >)</span>
 
@@ -734,7 +734,7 @@
 <span class=sd >    Results from IV estimation</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >],</span> <span class=n >model</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >IVResults</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_kappa</span> <span class=o >=</span> <span class=n >results</span><span class=o >.</span><span class=n >get</span><span class=p >(</span><span class=s1 >'kappa'</span><span class=p >,</span> <span class=mi >1</span><span class=p >)</span>
 
@@ -846,7 +846,7 @@
             <span class=n >aug_exog</span> <span class=o >=</span> <span class=n >c_</span><span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >exog</span><span class=o >.</span><span class=n >ndarray</span><span class=p >,</span> <span class=n >assumed_exog</span><span class=p >]</span>
         <span class=n >ntested</span> <span class=o >=</span> <span class=n >assumed_exog</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >]</span>
 
-        <span class=kn >from</span> <span class=nn >linearmodels.iv</span> <span class=k >import</span> <span class=n >IV2SLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv</span> <span class=kn >import</span> <span class=n >IV2SLS</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=n >IV2SLS</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >dependent</span><span class=p >,</span> <span class=n >aug_exog</span><span class=p >,</span> <span class=n >still_endog</span><span class=p >,</span>
                      <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >instruments</span><span class=p >)</span>
         <span class=n >e0</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >()</span><span class=o >.</span><span class=n >resids</span><span class=o >.</span><span class=n >values</span><span class=p >[:,</span> <span class=kc >None</span><span class=p >]</span>
@@ -1005,7 +1005,7 @@
 
 <span class=sd >        Implemented using the expression in Wooldridge (2002), Eq. 6.19</span>
 <span class=sd >        """</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=k >import</span> <span class=n >_OLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=kn >import</span> <span class=n >_OLS</span>
 
         <span class=n >e</span> <span class=o >=</span> <span class=n >annihilate</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >dependent</span><span class=o >.</span><span class=n >ndarray</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >_x</span><span class=p >)</span>
         <span class=n >r</span> <span class=o >=</span> <span class=n >annihilate</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >endog</span><span class=o >.</span><span class=n >ndarray</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >_z</span><span class=p >)</span>
@@ -1047,7 +1047,7 @@
 <span class=sd >        using a Wald test.  The covariance estimator used in the test is</span>
 <span class=sd >        identical to the covariance estimator used with ``fit``.</span>
 <span class=sd >        """</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=k >import</span> <span class=n >_OLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=kn >import</span> <span class=n >_OLS</span>
         <span class=n >r</span> <span class=o >=</span> <span class=n >annihilate</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >endog</span><span class=o >.</span><span class=n >ndarray</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >_z</span><span class=p >)</span>
         <span class=n >augx</span> <span class=o >=</span> <span class=n >c_</span><span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >_x</span><span class=p >,</span> <span class=n >r</span><span class=p >]</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=n >_OLS</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >dependent</span><span class=p >,</span> <span class=n >augx</span><span class=p >)</span>
@@ -1090,7 +1090,7 @@
 
 <span class=sd >        The order of the instruments does not affect this test.</span>
 <span class=sd >        """</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=k >import</span> <span class=n >_OLS</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv.model</span> <span class=kn >import</span> <span class=n >_OLS</span>
         <span class=n >exog</span><span class=p >,</span> <span class=n >endog</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >exog</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >endog</span>
         <span class=n >instruments</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >model</span><span class=o >.</span><span class=n >instruments</span>
         <span class=n >nobs</span><span class=p >,</span> <span class=n >nendog</span> <span class=o >=</span> <span class=n >endog</span><span class=o >.</span><span class=n >shape</span>
@@ -1184,7 +1184,7 @@
 <span class=sd >    Results from GMM estimation of IV models</span>
 <span class=sd >    """</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >):</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >IVGMMResults</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >model</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_weight_mat</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'weight_mat'</span><span class=p >]</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_weight_type</span> <span class=o >=</span> <span class=n >results</span><span class=p >[</span><span class=s1 >'weight_type'</span><span class=p >]</span>
@@ -1300,7 +1300,7 @@
             <span class=n >ex</span> <span class=o >=</span> <span class=p >[</span><span class=n >c</span> <span class=k >for</span> <span class=n >c</span> <span class=ow >in</span> <span class=n >endog</span><span class=o >.</span><span class=n >pandas</span> <span class=k >if</span> <span class=n >c</span> <span class=ow >not</span> <span class=ow >in</span> <span class=n >variables</span><span class=p >]</span>
             <span class=n >endog_e</span> <span class=o >=</span> <span class=n >endog</span><span class=o >.</span><span class=n >pandas</span><span class=p >[</span><span class=n >ex</span><span class=p >]</span><span class=o >.</span><span class=n >values</span>
             <span class=n >null</span> <span class=o >=</span> <span class=s1 >'Variables </span><span class=si >{0}</span><span class=s1 > are exogenous'</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=s1 >', '</span><span class=o >.</span><span class=n >join</span><span class=p >(</span><span class=n >variables</span><span class=p >))</span>
-        <span class=kn >from</span> <span class=nn >linearmodels.iv</span> <span class=k >import</span> <span class=n >IVGMM</span>
+        <span class=kn >from</span> <span class=nn >linearmodels.iv</span> <span class=kn >import</span> <span class=n >IVGMM</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=n >IVGMM</span><span class=p >(</span><span class=n >dependent</span><span class=p >,</span> <span class=n >exog_e</span><span class=p >,</span> <span class=n >endog_e</span><span class=p >,</span> <span class=n >instruments</span><span class=p >)</span>
         <span class=n >res_e</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >cov_type</span><span class=p >,</span> <span class=o >**</span><span class=bp >self</span><span class=o >.</span><span class=n >cov_config</span><span class=p >)</span>
         <span class=n >j_e</span> <span class=o >=</span> <span class=n >res_e</span><span class=o >.</span><span class=n >j_stat</span><span class=o >.</span><span class=n >stat</span>
@@ -1336,7 +1336,7 @@
 <span class=sd >    """</span>
     <span class=n >_supported</span> <span class=o >=</span> <span class=p >(</span><span class=n >IVResults</span><span class=p >,</span> <span class=n >IVGMMResults</span><span class=p >,</span> <span class=n >OLSResults</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Union</span><span class=p >[</span><span class=n >List</span><span class=p >[</span><span class=n >AnyResult</span><span class=p >],</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >AnyResult</span><span class=p >]],</span> <span class=o >*</span><span class=p >,</span>
+    <span class=k >def</span> <span class=fm >__init__</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >results</span><span class=p >:</span> <span class=n >Union</span><span class=p >[</span><span class=n >List</span><span class=p >[</span><span class=n >AnyResult</span><span class=p >],</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >AnyResult</span><span class=p >]],</span> <span class=o >*</span><span class=p >,</span>
                  <span class=n >precision</span><span class=p >:</span> <span class=nb >str</span> <span class=o >=</span> <span class=s1 >'tstats'</span><span class=p >):</span>
         <span class=nb >super</span><span class=p >(</span><span class=n >IVModelComparison</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >precision</span><span class=o >=</span><span class=n >precision</span><span class=p >)</span>
 
@@ -1447,4 +1447,4 @@
 <span class=sd >    comparison : IVModelComparison</span>
 <span class=sd >    """</span>
     <span class=k >return</span> <span class=n >IVModelComparison</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=n >precision</span><span class=o >=</span><span class=n >precision</span><span class=p >)</span></div>
-</pre></div> </article> </div> </div> </main> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a></div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script> </div>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
