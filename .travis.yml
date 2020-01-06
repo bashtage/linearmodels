@@ -30,27 +30,27 @@ matrix:
     env:
     - PYTHON=3.7
     - USE_PYPI=true
-    - XARRAY=0.11
+    - XARRAY=0.13
     - NUMPY=1.16
     - DOCBUILD=true
     - PIP_PACKAGES="xxhash"
-  - python: 3.7
+  - python: 3.8
     env:
-    - PYTHON=3.7
+    - PYTHON=3.8
     - USE_PYPI=true
-    - XARRAY=0.12
+    - XARRAY=0.14
     - PIP_PACKAGES="xxhash"
     - TEST_INSTALL=true
-  - python: 3.5
+  - python: 3.6
     env:
-    - PYTHON=3.5
+    - PYTHON=3.6
     - NUMPY=1.14
-    - SCIPY=1
+    - SCIPY=1.0
     - PANDAS=0.22
     - STATSMODELS=0.9
   - python: 3.6
     env:
-    - PYTHON=3.6.7
+    - PYTHON=3.6
     - NUMPY=1.15
     - SCIPY=1.0
     - PANDAS=0.23
@@ -58,7 +58,7 @@ matrix:
     - STATSMODELS=0.9
   - python: 3.6
     env:
-    - PYTHON=3.6.7
+    - PYTHON=3.6
     - NUMPY=1.16
     - SCIPY=1.3
     - PANDAS=0.24
@@ -71,7 +71,7 @@ matrix:
     - NUMPY=1.17
     - SCIPY=1.3
     - PANDAS=0.25
-    - XARRAY=0.13
+    - XARRAY=0.12
     - STATSMODELS=0.10
     - OPENBLAS=1
 
