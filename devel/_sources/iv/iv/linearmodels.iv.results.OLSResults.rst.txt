@@ -1,0 +1,58 @@
+linearmodels.iv.results.OLSResults
+==================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoclass:: OLSResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~OLSResults.conf_int
+      ~OLSResults.predict
+      ~OLSResults.test_linear_constraint
+      ~OLSResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~OLSResults.cov
+      ~OLSResults.cov_config
+      ~OLSResults.cov_estimator
+      ~OLSResults.cov_type
+      ~OLSResults.debiased
+      ~OLSResults.df_model
+      ~OLSResults.df_resid
+      ~OLSResults.f_statistic
+      ~OLSResults.fitted_values
+      ~OLSResults.has_constant
+      ~OLSResults.idiosyncratic
+      ~OLSResults.kappa
+      ~OLSResults.method
+      ~OLSResults.model_ss
+      ~OLSResults.nobs
+      ~OLSResults.params
+      ~OLSResults.pvalues
+      ~OLSResults.resid_ss
+      ~OLSResults.resids
+      ~OLSResults.rsquared
+      ~OLSResults.rsquared_adj
+      ~OLSResults.s2
+      ~OLSResults.std_errors
+      ~OLSResults.summary
+      ~OLSResults.total_ss
+      ~OLSResults.tstats
+      ~OLSResults.wresids
+   
+   
+   

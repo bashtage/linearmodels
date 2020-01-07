@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.FamaMacBeth.fit
+========================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: FamaMacBeth.fit

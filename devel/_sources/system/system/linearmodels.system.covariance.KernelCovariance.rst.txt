@@ -1,0 +1,32 @@
+linearmodels.system.covariance.KernelCovariance
+===============================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoclass:: KernelCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~KernelCovariance.bandwidth
+      ~KernelCovariance.cov
+      ~KernelCovariance.cov_config
+      ~KernelCovariance.kernel
+      ~KernelCovariance.sigma
+   
+   
+   

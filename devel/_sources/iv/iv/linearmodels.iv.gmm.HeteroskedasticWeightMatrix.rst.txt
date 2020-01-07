@@ -1,0 +1,29 @@
+linearmodels.iv.gmm.HeteroskedasticWeightMatrix
+===============================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoclass:: HeteroskedasticWeightMatrix
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~HeteroskedasticWeightMatrix.weight_matrix
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~HeteroskedasticWeightMatrix.config
+   
+   
+   

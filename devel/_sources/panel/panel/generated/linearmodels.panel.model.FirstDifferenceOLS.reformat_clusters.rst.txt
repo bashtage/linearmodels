@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.FirstDifferenceOLS.reformat\_clusters
+==============================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: FirstDifferenceOLS.reformat_clusters

@@ -1,0 +1,32 @@
+linearmodels.panel.covariance.HeteroskedasticCovariance
+=======================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoclass:: HeteroskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~HeteroskedasticCovariance.deferred_cov
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~HeteroskedasticCovariance.cov
+      ~HeteroskedasticCovariance.eps
+      ~HeteroskedasticCovariance.name
+      ~HeteroskedasticCovariance.s2
+   
+   
+   

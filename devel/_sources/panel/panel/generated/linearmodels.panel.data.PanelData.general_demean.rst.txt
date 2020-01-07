@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.PanelData.general\_demean
+=================================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: PanelData.general_demean

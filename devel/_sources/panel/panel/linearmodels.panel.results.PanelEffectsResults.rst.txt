@@ -1,0 +1,63 @@
+linearmodels.panel.results.PanelEffectsResults
+==============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoclass:: PanelEffectsResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~PanelEffectsResults.conf_int
+      ~PanelEffectsResults.predict
+      ~PanelEffectsResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~PanelEffectsResults.cov
+      ~PanelEffectsResults.df_model
+      ~PanelEffectsResults.df_resid
+      ~PanelEffectsResults.entity_info
+      ~PanelEffectsResults.estimated_effects
+      ~PanelEffectsResults.f_pooled
+      ~PanelEffectsResults.f_statistic
+      ~PanelEffectsResults.f_statistic_robust
+      ~PanelEffectsResults.fitted_values
+      ~PanelEffectsResults.idiosyncratic
+      ~PanelEffectsResults.included_effects
+      ~PanelEffectsResults.loglik
+      ~PanelEffectsResults.model_ss
+      ~PanelEffectsResults.name
+      ~PanelEffectsResults.nobs
+      ~PanelEffectsResults.other_info
+      ~PanelEffectsResults.params
+      ~PanelEffectsResults.pvalues
+      ~PanelEffectsResults.resid_ss
+      ~PanelEffectsResults.resids
+      ~PanelEffectsResults.rsquared
+      ~PanelEffectsResults.rsquared_between
+      ~PanelEffectsResults.rsquared_inclusive
+      ~PanelEffectsResults.rsquared_overall
+      ~PanelEffectsResults.rsquared_within
+      ~PanelEffectsResults.s2
+      ~PanelEffectsResults.std_errors
+      ~PanelEffectsResults.summary
+      ~PanelEffectsResults.time_info
+      ~PanelEffectsResults.total_ss
+      ~PanelEffectsResults.tstats
+      ~PanelEffectsResults.variance_decomposition
+      ~PanelEffectsResults.wresids
+   
+   
+   

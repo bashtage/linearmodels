@@ -1,0 +1,68 @@
+linearmodels.iv.results.IVResults
+=================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoclass:: IVResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~IVResults.conf_int
+      ~IVResults.durbin
+      ~IVResults.predict
+      ~IVResults.test_linear_constraint
+      ~IVResults.wald_test
+      ~IVResults.wu_hausman
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~IVResults.anderson_rubin
+      ~IVResults.basmann
+      ~IVResults.basmann_f
+      ~IVResults.cov
+      ~IVResults.cov_config
+      ~IVResults.cov_estimator
+      ~IVResults.cov_type
+      ~IVResults.debiased
+      ~IVResults.df_model
+      ~IVResults.df_resid
+      ~IVResults.f_statistic
+      ~IVResults.first_stage
+      ~IVResults.fitted_values
+      ~IVResults.has_constant
+      ~IVResults.idiosyncratic
+      ~IVResults.kappa
+      ~IVResults.method
+      ~IVResults.model_ss
+      ~IVResults.nobs
+      ~IVResults.params
+      ~IVResults.pvalues
+      ~IVResults.resid_ss
+      ~IVResults.resids
+      ~IVResults.rsquared
+      ~IVResults.rsquared_adj
+      ~IVResults.s2
+      ~IVResults.sargan
+      ~IVResults.std_errors
+      ~IVResults.summary
+      ~IVResults.total_ss
+      ~IVResults.tstats
+      ~IVResults.wooldridge_overid
+      ~IVResults.wooldridge_regression
+      ~IVResults.wooldridge_score
+      ~IVResults.wresids
+   
+   
+   

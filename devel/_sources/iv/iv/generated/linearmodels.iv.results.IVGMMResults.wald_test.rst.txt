@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVGMMResults.wald\_test
+===============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVGMMResults.wald_test

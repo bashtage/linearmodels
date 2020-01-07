@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.IV3SLS.add\_constraints
+=================================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: IV3SLS.add_constraints

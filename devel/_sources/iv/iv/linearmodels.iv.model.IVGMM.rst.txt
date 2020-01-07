@@ -1,0 +1,37 @@
+linearmodels.iv.model.IVGMM
+===========================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: IVGMM
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~IVGMM.estimate_parameters
+      ~IVGMM.fit
+      ~IVGMM.from_formula
+      ~IVGMM.predict
+      ~IVGMM.resids
+      ~IVGMM.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~IVGMM.formula
+      ~IVGMM.has_constant
+      ~IVGMM.isnull
+      ~IVGMM.notnull
+   
+   
+   

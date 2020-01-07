@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.FamaMacBethCovariance.deferred\_cov
+=================================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. automethod:: FamaMacBethCovariance.deferred_cov

@@ -1,0 +1,60 @@
+linearmodels.panel.results.RandomEffectsResults
+===============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoclass:: RandomEffectsResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~RandomEffectsResults.conf_int
+      ~RandomEffectsResults.predict
+      ~RandomEffectsResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~RandomEffectsResults.cov
+      ~RandomEffectsResults.df_model
+      ~RandomEffectsResults.df_resid
+      ~RandomEffectsResults.entity_info
+      ~RandomEffectsResults.estimated_effects
+      ~RandomEffectsResults.f_statistic
+      ~RandomEffectsResults.f_statistic_robust
+      ~RandomEffectsResults.fitted_values
+      ~RandomEffectsResults.idiosyncratic
+      ~RandomEffectsResults.loglik
+      ~RandomEffectsResults.model_ss
+      ~RandomEffectsResults.name
+      ~RandomEffectsResults.nobs
+      ~RandomEffectsResults.params
+      ~RandomEffectsResults.pvalues
+      ~RandomEffectsResults.resid_ss
+      ~RandomEffectsResults.resids
+      ~RandomEffectsResults.rsquared
+      ~RandomEffectsResults.rsquared_between
+      ~RandomEffectsResults.rsquared_overall
+      ~RandomEffectsResults.rsquared_within
+      ~RandomEffectsResults.s2
+      ~RandomEffectsResults.std_errors
+      ~RandomEffectsResults.summary
+      ~RandomEffectsResults.theta
+      ~RandomEffectsResults.time_info
+      ~RandomEffectsResults.total_ss
+      ~RandomEffectsResults.tstats
+      ~RandomEffectsResults.variance_decomposition
+      ~RandomEffectsResults.wresids
+   
+   
+   

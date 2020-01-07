@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.IVGMMCUE.wresids
+======================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: IVGMMCUE.wresids

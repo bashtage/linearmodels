@@ -1,0 +1,32 @@
+linearmodels.panel.covariance.FamaMacBethCovariance
+===================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoclass:: FamaMacBethCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~FamaMacBethCovariance.deferred_cov
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~FamaMacBethCovariance.cov
+      ~FamaMacBethCovariance.eps
+      ~FamaMacBethCovariance.name
+      ~FamaMacBethCovariance.s2
+   
+   
+   

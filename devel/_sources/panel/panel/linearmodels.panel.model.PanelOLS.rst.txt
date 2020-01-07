@@ -1,0 +1,37 @@
+linearmodels.panel.model.PanelOLS
+=================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoclass:: PanelOLS
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~PanelOLS.fit
+      ~PanelOLS.from_formula
+      ~PanelOLS.predict
+      ~PanelOLS.reformat_clusters
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~PanelOLS.entity_effects
+      ~PanelOLS.formula
+      ~PanelOLS.has_constant
+      ~PanelOLS.not_null
+      ~PanelOLS.other_effects
+      ~PanelOLS.time_effects
+   
+   
+   

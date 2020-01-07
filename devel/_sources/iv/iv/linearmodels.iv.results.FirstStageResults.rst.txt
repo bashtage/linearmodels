@@ -1,0 +1,30 @@
+linearmodels.iv.results.FirstStageResults
+=========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoclass:: FirstStageResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~FirstStageResults.diagnostics
+      ~FirstStageResults.individual
+      ~FirstStageResults.summary
+   
+   
+   

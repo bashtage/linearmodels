@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.PooledOLS.predict
+==========================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: PooledOLS.predict

@@ -1,0 +1,37 @@
+linearmodels.system.model.IVSystemGMM
+=====================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoclass:: IVSystemGMM
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~IVSystemGMM.add_constraints
+      ~IVSystemGMM.fit
+      ~IVSystemGMM.from_formula
+      ~IVSystemGMM.multivariate_ls
+      ~IVSystemGMM.predict
+      ~IVSystemGMM.reset_constraints
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~IVSystemGMM.constraints
+      ~IVSystemGMM.formula
+      ~IVSystemGMM.has_constant
+      ~IVSystemGMM.param_names
+   
+   
+   

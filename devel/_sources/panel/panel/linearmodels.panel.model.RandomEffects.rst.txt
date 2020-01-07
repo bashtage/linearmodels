@@ -1,0 +1,34 @@
+linearmodels.panel.model.RandomEffects
+======================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoclass:: RandomEffects
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~RandomEffects.fit
+      ~RandomEffects.from_formula
+      ~RandomEffects.predict
+      ~RandomEffects.reformat_clusters
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~RandomEffects.formula
+      ~RandomEffects.has_constant
+      ~RandomEffects.not_null
+   
+   
+   

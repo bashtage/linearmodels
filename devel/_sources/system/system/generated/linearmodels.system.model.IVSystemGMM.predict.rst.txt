@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.IVSystemGMM.predict
+=============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: IVSystemGMM.predict

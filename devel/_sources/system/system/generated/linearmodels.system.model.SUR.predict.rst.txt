@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.SUR.predict
+=====================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: SUR.predict

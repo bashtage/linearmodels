@@ -1,0 +1,30 @@
+linearmodels.iv.gmm.KernelWeightMatrix
+======================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoclass:: KernelWeightMatrix
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~KernelWeightMatrix.weight_matrix
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~KernelWeightMatrix.bandwidth
+      ~KernelWeightMatrix.config
+   
+   
+   

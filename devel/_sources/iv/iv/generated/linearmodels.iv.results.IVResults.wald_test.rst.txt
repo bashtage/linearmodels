@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVResults.wald\_test
+============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVResults.wald_test

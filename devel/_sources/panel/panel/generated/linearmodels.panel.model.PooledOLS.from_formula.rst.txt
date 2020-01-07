@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.PooledOLS.from\_formula
+================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: PooledOLS.from_formula

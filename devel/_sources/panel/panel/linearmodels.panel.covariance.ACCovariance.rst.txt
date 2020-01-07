@@ -1,0 +1,32 @@
+linearmodels.panel.covariance.ACCovariance
+==========================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoclass:: ACCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~ACCovariance.deferred_cov
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~ACCovariance.cov
+      ~ACCovariance.eps
+      ~ACCovariance.name
+      ~ACCovariance.s2
+   
+   
+   

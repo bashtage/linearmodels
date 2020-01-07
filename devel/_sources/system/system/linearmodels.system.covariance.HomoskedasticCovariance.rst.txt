@@ -1,0 +1,30 @@
+linearmodels.system.covariance.HomoskedasticCovariance
+======================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoclass:: HomoskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~HomoskedasticCovariance.cov
+      ~HomoskedasticCovariance.cov_config
+      ~HomoskedasticCovariance.sigma
+   
+   
+   

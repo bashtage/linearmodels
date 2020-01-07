@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.kernel\_weight\_parzen
+=================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autofunction:: kernel_weight_parzen

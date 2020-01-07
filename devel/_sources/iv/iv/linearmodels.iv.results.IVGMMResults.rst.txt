@@ -1,0 +1,65 @@
+linearmodels.iv.results.IVGMMResults
+====================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoclass:: IVGMMResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~IVGMMResults.c_stat
+      ~IVGMMResults.conf_int
+      ~IVGMMResults.predict
+      ~IVGMMResults.test_linear_constraint
+      ~IVGMMResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~IVGMMResults.cov
+      ~IVGMMResults.cov_config
+      ~IVGMMResults.cov_estimator
+      ~IVGMMResults.cov_type
+      ~IVGMMResults.debiased
+      ~IVGMMResults.df_model
+      ~IVGMMResults.df_resid
+      ~IVGMMResults.f_statistic
+      ~IVGMMResults.first_stage
+      ~IVGMMResults.fitted_values
+      ~IVGMMResults.has_constant
+      ~IVGMMResults.idiosyncratic
+      ~IVGMMResults.iterations
+      ~IVGMMResults.j_stat
+      ~IVGMMResults.kappa
+      ~IVGMMResults.method
+      ~IVGMMResults.model_ss
+      ~IVGMMResults.nobs
+      ~IVGMMResults.params
+      ~IVGMMResults.pvalues
+      ~IVGMMResults.resid_ss
+      ~IVGMMResults.resids
+      ~IVGMMResults.rsquared
+      ~IVGMMResults.rsquared_adj
+      ~IVGMMResults.s2
+      ~IVGMMResults.std_errors
+      ~IVGMMResults.summary
+      ~IVGMMResults.total_ss
+      ~IVGMMResults.tstats
+      ~IVGMMResults.weight_config
+      ~IVGMMResults.weight_matrix
+      ~IVGMMResults.weight_type
+      ~IVGMMResults.wresids
+   
+   
+   

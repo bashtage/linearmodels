@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVResults.conf\_int
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVResults.conf_int

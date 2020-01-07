@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.data.IVData.drop
+================================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. automethod:: IVData.drop

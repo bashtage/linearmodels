@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVResults.test\_linear\_constraint
+==========================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVResults.test_linear_constraint

@@ -1,0 +1,58 @@
+linearmodels.system.results.GMMSystemResults
+============================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoclass:: GMMSystemResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~GMMSystemResults.conf_int
+      ~GMMSystemResults.predict
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~GMMSystemResults.cov
+      ~GMMSystemResults.cov_config
+      ~GMMSystemResults.cov_estimator
+      ~GMMSystemResults.debiased
+      ~GMMSystemResults.df_model
+      ~GMMSystemResults.df_resid
+      ~GMMSystemResults.equation_labels
+      ~GMMSystemResults.equations
+      ~GMMSystemResults.fitted_values
+      ~GMMSystemResults.iterations
+      ~GMMSystemResults.j_stat
+      ~GMMSystemResults.method
+      ~GMMSystemResults.model
+      ~GMMSystemResults.model_ss
+      ~GMMSystemResults.nobs
+      ~GMMSystemResults.params
+      ~GMMSystemResults.pvalues
+      ~GMMSystemResults.resid_ss
+      ~GMMSystemResults.resids
+      ~GMMSystemResults.rsquared
+      ~GMMSystemResults.sigma
+      ~GMMSystemResults.std_errors
+      ~GMMSystemResults.summary
+      ~GMMSystemResults.total_ss
+      ~GMMSystemResults.tstats
+      ~GMMSystemResults.w
+      ~GMMSystemResults.weight_config
+      ~GMMSystemResults.weight_type
+      ~GMMSystemResults.wresids
+   
+   
+   

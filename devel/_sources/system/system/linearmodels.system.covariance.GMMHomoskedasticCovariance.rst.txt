@@ -1,0 +1,29 @@
+linearmodels.system.covariance.GMMHomoskedasticCovariance
+=========================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoclass:: GMMHomoskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~GMMHomoskedasticCovariance.cov
+      ~GMMHomoskedasticCovariance.cov_config
+   
+   
+   

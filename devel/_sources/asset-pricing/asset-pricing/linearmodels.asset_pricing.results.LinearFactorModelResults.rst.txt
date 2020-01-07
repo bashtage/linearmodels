@@ -1,0 +1,45 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults
+============================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoclass:: LinearFactorModelResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~LinearFactorModelResults.alphas
+      ~LinearFactorModelResults.betas
+      ~LinearFactorModelResults.cov
+      ~LinearFactorModelResults.cov_estimator
+      ~LinearFactorModelResults.full_summary
+      ~LinearFactorModelResults.j_statistic
+      ~LinearFactorModelResults.name
+      ~LinearFactorModelResults.nobs
+      ~LinearFactorModelResults.params
+      ~LinearFactorModelResults.residual_ss
+      ~LinearFactorModelResults.risk_premia
+      ~LinearFactorModelResults.risk_premia_se
+      ~LinearFactorModelResults.risk_premia_tstats
+      ~LinearFactorModelResults.rsquared
+      ~LinearFactorModelResults.std_errors
+      ~LinearFactorModelResults.summary
+      ~LinearFactorModelResults.total_ss
+      ~LinearFactorModelResults.tstats
+   
+   
+   

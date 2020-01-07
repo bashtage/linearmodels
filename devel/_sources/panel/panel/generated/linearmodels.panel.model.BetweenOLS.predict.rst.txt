@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.BetweenOLS.predict
+===========================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: BetweenOLS.predict

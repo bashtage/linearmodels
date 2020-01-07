@@ -1,0 +1,32 @@
+linearmodels.panel.covariance.DriscollKraay
+===========================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoclass:: DriscollKraay
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~DriscollKraay.deferred_cov
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~DriscollKraay.cov
+      ~DriscollKraay.eps
+      ~DriscollKraay.name
+      ~DriscollKraay.s2
+   
+   
+   

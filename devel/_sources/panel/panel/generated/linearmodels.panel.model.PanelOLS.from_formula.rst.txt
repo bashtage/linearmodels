@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.PanelOLS.from\_formula
+===============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: PanelOLS.from_formula

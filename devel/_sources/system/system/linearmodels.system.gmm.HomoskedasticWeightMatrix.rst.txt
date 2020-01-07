@@ -1,0 +1,30 @@
+linearmodels.system.gmm.HomoskedasticWeightMatrix
+=================================================
+
+.. currentmodule:: linearmodels.system.gmm
+
+.. autoclass:: HomoskedasticWeightMatrix
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~HomoskedasticWeightMatrix.sigma
+      ~HomoskedasticWeightMatrix.weight_matrix
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~HomoskedasticWeightMatrix.config
+   
+   
+   

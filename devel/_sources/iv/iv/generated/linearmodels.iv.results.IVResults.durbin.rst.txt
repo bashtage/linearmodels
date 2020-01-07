@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVResults.durbin
+========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVResults.durbin

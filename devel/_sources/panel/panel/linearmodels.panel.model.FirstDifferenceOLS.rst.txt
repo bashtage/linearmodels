@@ -1,0 +1,34 @@
+linearmodels.panel.model.FirstDifferenceOLS
+===========================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoclass:: FirstDifferenceOLS
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~FirstDifferenceOLS.fit
+      ~FirstDifferenceOLS.from_formula
+      ~FirstDifferenceOLS.predict
+      ~FirstDifferenceOLS.reformat_clusters
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~FirstDifferenceOLS.formula
+      ~FirstDifferenceOLS.has_constant
+      ~FirstDifferenceOLS.not_null
+   
+   
+   

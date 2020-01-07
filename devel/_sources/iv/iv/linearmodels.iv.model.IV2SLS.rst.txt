@@ -1,0 +1,37 @@
+linearmodels.iv.model.IV2SLS
+============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: IV2SLS
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree: generated/
+
+      ~IV2SLS.estimate_parameters
+      ~IV2SLS.fit
+      ~IV2SLS.from_formula
+      ~IV2SLS.predict
+      ~IV2SLS.resids
+      ~IV2SLS.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+
+      ~IV2SLS.formula
+      ~IV2SLS.has_constant
+      ~IV2SLS.isnull
+      ~IV2SLS.notnull
+   
+   
+   
