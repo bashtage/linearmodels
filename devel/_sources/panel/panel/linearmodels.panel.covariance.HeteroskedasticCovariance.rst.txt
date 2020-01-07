@@ -11,7 +11,7 @@ linearmodels.panel.covariance.HeteroskedasticCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~HeteroskedasticCovariance.deferred_cov
    
@@ -22,6 +22,7 @@ linearmodels.panel.covariance.HeteroskedasticCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~HeteroskedasticCovariance.cov
       ~HeteroskedasticCovariance.eps

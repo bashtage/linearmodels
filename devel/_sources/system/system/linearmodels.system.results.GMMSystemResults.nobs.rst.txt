@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.nobs
+=================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.nobs

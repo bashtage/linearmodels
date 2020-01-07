@@ -11,7 +11,7 @@ linearmodels.system.covariance.GMMHeteroskedasticCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.system.covariance.GMMHeteroskedasticCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~GMMHeteroskedasticCovariance.cov
       ~GMMHeteroskedasticCovariance.cov_config

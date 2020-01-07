@@ -11,7 +11,7 @@ linearmodels.panel.covariance.ClusteredCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~ClusteredCovariance.deferred_cov
    
@@ -22,6 +22,7 @@ linearmodels.panel.covariance.ClusteredCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~ClusteredCovariance.cov
       ~ClusteredCovariance.eps

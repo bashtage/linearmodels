@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.debiased
+=============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.debiased

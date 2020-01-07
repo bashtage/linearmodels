@@ -1,0 +1,6 @@
+linearmodels.iv.gmm.KernelWeightMatrix.bandwidth
+================================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoproperty:: KernelWeightMatrix.bandwidth

@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.nobs
+============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.nobs

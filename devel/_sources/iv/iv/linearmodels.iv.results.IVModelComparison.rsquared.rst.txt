@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.rsquared
+==================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.rsquared

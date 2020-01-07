@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.resids
+===================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.resids

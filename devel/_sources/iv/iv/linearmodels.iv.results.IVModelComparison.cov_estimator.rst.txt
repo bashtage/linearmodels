@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.cov\_estimator
+========================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.cov_estimator

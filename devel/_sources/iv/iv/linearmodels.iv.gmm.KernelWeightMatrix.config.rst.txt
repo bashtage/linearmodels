@@ -1,0 +1,6 @@
+linearmodels.iv.gmm.KernelWeightMatrix.config
+=============================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoproperty:: KernelWeightMatrix.config

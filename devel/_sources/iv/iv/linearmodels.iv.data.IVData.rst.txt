@@ -11,7 +11,7 @@ linearmodels.iv.data.IVData
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVData.drop
    
@@ -22,6 +22,7 @@ linearmodels.iv.data.IVData
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVData.cols
       ~IVData.isnull

@@ -11,7 +11,7 @@ linearmodels.system.model.SUR
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~SUR.add_constraints
       ~SUR.fit
@@ -27,6 +27,7 @@ linearmodels.system.model.SUR
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~SUR.constraints
       ~SUR.formula

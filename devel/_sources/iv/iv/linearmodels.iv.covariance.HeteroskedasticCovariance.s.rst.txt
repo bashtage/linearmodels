@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.HeteroskedasticCovariance.s
+======================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoproperty:: HeteroskedasticCovariance.s

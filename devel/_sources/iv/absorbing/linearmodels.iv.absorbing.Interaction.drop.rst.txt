@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.absorbing.Interaction.drop
+==========================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. automethod:: Interaction.drop

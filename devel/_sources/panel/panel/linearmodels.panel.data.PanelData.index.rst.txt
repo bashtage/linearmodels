@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.index
+=======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.index

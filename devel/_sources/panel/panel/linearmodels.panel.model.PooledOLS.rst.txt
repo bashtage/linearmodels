@@ -11,7 +11,7 @@ linearmodels.panel.model.PooledOLS
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~PooledOLS.fit
       ~PooledOLS.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.PooledOLS
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~PooledOLS.formula
       ~PooledOLS.has_constant

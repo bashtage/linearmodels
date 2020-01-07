@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.debiased
+=====================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.debiased

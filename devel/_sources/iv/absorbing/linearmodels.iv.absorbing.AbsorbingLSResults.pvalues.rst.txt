@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.pvalues
+====================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.pvalues

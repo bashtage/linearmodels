@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.std\_errors
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.std_errors

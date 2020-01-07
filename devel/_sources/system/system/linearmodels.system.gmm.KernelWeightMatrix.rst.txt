@@ -11,7 +11,7 @@ linearmodels.system.gmm.KernelWeightMatrix
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~KernelWeightMatrix.sigma
       ~KernelWeightMatrix.weight_matrix
@@ -23,6 +23,7 @@ linearmodels.system.gmm.KernelWeightMatrix
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~KernelWeightMatrix.bandwidth
       ~KernelWeightMatrix.config

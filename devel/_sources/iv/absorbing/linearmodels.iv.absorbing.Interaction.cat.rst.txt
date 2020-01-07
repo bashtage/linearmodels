@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.Interaction.cat
+=========================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: Interaction.cat

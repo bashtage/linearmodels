@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.KernelCovariance.s2
+==============================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoproperty:: KernelCovariance.s2

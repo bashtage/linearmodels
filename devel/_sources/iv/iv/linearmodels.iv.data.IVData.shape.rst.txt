@@ -1,0 +1,6 @@
+linearmodels.iv.data.IVData.shape
+=================================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. autoproperty:: IVData.shape

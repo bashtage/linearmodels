@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.cov
+================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.cov

@@ -11,7 +11,7 @@ linearmodels.panel.covariance.DriscollKraay
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~DriscollKraay.deferred_cov
    
@@ -22,6 +22,7 @@ linearmodels.panel.covariance.DriscollKraay
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~DriscollKraay.cov
       ~DriscollKraay.eps

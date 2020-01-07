@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.s2
+=====================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.s2

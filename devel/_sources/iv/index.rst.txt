@@ -22,7 +22,6 @@ tests.
    :glob:
 
    introduction
-   absorbing
    examples/basic-examples.ipynb
    examples/advanced-examples.ipynb
    examples/using-formulas.ipynb

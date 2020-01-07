@@ -1,0 +1,6 @@
+linearmodels.panel.model.BetweenOLS.not\_null
+=============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: BetweenOLS.not_null

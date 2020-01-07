@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.cov
+==================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.cov

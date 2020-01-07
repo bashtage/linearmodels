@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.resid\_ss
+======================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.resid_ss

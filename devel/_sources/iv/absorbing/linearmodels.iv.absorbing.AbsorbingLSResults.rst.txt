@@ -1,0 +1,61 @@
+linearmodels.iv.absorbing.AbsorbingLSResults
+============================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoclass:: AbsorbingLSResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~AbsorbingLSResults.conf_int
+      ~AbsorbingLSResults.predict
+      ~AbsorbingLSResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~AbsorbingLSResults.absorbed_effects
+      ~AbsorbingLSResults.absorbed_rsquared
+      ~AbsorbingLSResults.cov
+      ~AbsorbingLSResults.cov_config
+      ~AbsorbingLSResults.cov_estimator
+      ~AbsorbingLSResults.cov_type
+      ~AbsorbingLSResults.debiased
+      ~AbsorbingLSResults.df_absorbed
+      ~AbsorbingLSResults.df_model
+      ~AbsorbingLSResults.df_resid
+      ~AbsorbingLSResults.f_statistic
+      ~AbsorbingLSResults.fitted_values
+      ~AbsorbingLSResults.has_constant
+      ~AbsorbingLSResults.idiosyncratic
+      ~AbsorbingLSResults.kappa
+      ~AbsorbingLSResults.method
+      ~AbsorbingLSResults.model_ss
+      ~AbsorbingLSResults.nobs
+      ~AbsorbingLSResults.params
+      ~AbsorbingLSResults.pvalues
+      ~AbsorbingLSResults.resid_ss
+      ~AbsorbingLSResults.resids
+      ~AbsorbingLSResults.rsquared
+      ~AbsorbingLSResults.rsquared_adj
+      ~AbsorbingLSResults.s2
+      ~AbsorbingLSResults.std_errors
+      ~AbsorbingLSResults.summary
+      ~AbsorbingLSResults.total_ss
+      ~AbsorbingLSResults.tstats
+      ~AbsorbingLSResults.wresids
+   
+   
+   

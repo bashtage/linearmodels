@@ -11,7 +11,7 @@ linearmodels.iv.model.IVLIML
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVLIML.estimate_parameters
       ~IVLIML.fit
@@ -27,6 +27,7 @@ linearmodels.iv.model.IVLIML
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVLIML.formula
       ~IVLIML.has_constant

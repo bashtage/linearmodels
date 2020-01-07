@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.nobs
+=================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.nobs

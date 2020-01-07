@@ -11,7 +11,7 @@ linearmodels.system.results.SystemResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~SystemResults.conf_int
       ~SystemResults.predict
@@ -23,6 +23,7 @@ linearmodels.system.results.SystemResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~SystemResults.cov
       ~SystemResults.cov_config

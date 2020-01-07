@@ -11,7 +11,7 @@ linearmodels.iv.gmm.IVGMMCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.iv.gmm.IVGMMCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVGMMCovariance.config
       ~IVGMMCovariance.cov

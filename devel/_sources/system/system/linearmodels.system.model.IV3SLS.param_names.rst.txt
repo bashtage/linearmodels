@@ -1,0 +1,6 @@
+linearmodels.system.model.IV3SLS.param\_names
+=============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: IV3SLS.param_names

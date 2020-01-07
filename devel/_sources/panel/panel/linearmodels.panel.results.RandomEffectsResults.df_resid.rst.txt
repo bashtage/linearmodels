@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.df\_resid
+=========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.df_resid

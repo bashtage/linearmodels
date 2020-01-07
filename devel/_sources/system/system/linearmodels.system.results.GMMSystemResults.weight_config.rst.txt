@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.weight\_config
+===========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.weight_config

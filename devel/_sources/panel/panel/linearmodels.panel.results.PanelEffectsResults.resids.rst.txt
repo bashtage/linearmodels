@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.resids
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.resids

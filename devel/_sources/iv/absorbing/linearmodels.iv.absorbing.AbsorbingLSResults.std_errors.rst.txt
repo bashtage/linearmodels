@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.std\_errors
+========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.std_errors

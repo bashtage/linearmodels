@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.idiosyncratic
+================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.idiosyncratic

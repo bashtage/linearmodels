@@ -11,7 +11,7 @@ linearmodels.panel.model.RandomEffects
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~RandomEffects.fit
       ~RandomEffects.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.RandomEffects
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~RandomEffects.formula
       ~RandomEffects.has_constant

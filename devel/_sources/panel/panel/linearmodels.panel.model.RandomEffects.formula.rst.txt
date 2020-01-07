@@ -1,0 +1,6 @@
+linearmodels.panel.model.RandomEffects.formula
+==============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: RandomEffects.formula

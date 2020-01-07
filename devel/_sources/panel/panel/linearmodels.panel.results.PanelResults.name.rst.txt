@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.name
+============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.name

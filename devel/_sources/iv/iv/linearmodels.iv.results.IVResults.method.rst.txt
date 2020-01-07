@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.method
+========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.method

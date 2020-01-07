@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.cov
+========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.cov

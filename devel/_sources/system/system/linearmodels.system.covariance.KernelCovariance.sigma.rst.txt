@@ -1,0 +1,6 @@
+linearmodels.system.covariance.KernelCovariance.sigma
+=====================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: KernelCovariance.sigma

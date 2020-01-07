@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.covariance.HeteroskedasticCovariance.square
+=======================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.covariance
+
+.. autoproperty:: HeteroskedasticCovariance.square

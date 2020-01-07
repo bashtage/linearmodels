@@ -11,12 +11,11 @@ linearmodels.iv.results.IVResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVResults.conf_int
       ~IVResults.durbin
       ~IVResults.predict
-      ~IVResults.test_linear_constraint
       ~IVResults.wald_test
       ~IVResults.wu_hausman
    
@@ -27,6 +26,7 @@ linearmodels.iv.results.IVResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVResults.anderson_rubin
       ~IVResults.basmann

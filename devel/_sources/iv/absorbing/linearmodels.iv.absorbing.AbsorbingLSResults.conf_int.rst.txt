@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.absorbing.AbsorbingLSResults.conf\_int
+======================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. automethod:: AbsorbingLSResults.conf_int

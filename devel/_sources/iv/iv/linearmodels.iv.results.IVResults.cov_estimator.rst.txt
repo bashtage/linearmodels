@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.cov\_estimator
+================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.cov_estimator

@@ -1,0 +1,6 @@
+linearmodels.iv.model.IV2SLS.has\_constant
+==========================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IV2SLS.has_constant

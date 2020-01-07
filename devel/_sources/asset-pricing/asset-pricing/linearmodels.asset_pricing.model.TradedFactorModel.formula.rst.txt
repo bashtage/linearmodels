@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.model.TradedFactorModel.formula
+===========================================================
+
+.. currentmodule:: linearmodels.asset_pricing.model
+
+.. autoproperty:: TradedFactorModel.formula

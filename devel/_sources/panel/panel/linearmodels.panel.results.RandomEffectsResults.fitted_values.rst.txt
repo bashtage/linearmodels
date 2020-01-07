@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.fitted\_values
+==============================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.fitted_values

@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLS.absorbed\_dependent
+=========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLS.absorbed_dependent

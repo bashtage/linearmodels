@@ -11,7 +11,7 @@ linearmodels.system.covariance.GMMKernelCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.system.covariance.GMMKernelCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~GMMKernelCovariance.bandwidth
       ~GMMKernelCovariance.cov

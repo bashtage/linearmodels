@@ -11,7 +11,7 @@ linearmodels.panel.results.RandomEffectsResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~RandomEffectsResults.conf_int
       ~RandomEffectsResults.predict
@@ -24,6 +24,7 @@ linearmodels.panel.results.RandomEffectsResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~RandomEffectsResults.cov
       ~RandomEffectsResults.df_model

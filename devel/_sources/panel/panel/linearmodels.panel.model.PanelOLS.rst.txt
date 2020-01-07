@@ -11,7 +11,7 @@ linearmodels.panel.model.PanelOLS
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~PanelOLS.fit
       ~PanelOLS.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.PanelOLS
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~PanelOLS.entity_effects
       ~PanelOLS.formula

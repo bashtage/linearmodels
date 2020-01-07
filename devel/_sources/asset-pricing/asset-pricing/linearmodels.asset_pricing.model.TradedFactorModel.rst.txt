@@ -11,7 +11,7 @@ linearmodels.asset\_pricing.model.TradedFactorModel
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~TradedFactorModel.fit
       ~TradedFactorModel.from_formula
@@ -23,6 +23,7 @@ linearmodels.asset\_pricing.model.TradedFactorModel
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~TradedFactorModel.formula
    

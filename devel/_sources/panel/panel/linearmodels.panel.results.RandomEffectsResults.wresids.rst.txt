@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.wresids
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.wresids

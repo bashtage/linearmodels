@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.df\_absorbed
+=========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.df_absorbed

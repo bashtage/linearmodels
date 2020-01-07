@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.j\_stat
+====================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.j_stat

@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.equation\_labels
+=============================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.equation_labels

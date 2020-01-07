@@ -11,7 +11,7 @@ linearmodels.iv.gmm.OneWayClusteredWeightMatrix
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~OneWayClusteredWeightMatrix.weight_matrix
    
@@ -22,6 +22,7 @@ linearmodels.iv.gmm.OneWayClusteredWeightMatrix
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~OneWayClusteredWeightMatrix.config
    

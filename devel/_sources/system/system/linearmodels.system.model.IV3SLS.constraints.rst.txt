@@ -1,0 +1,6 @@
+linearmodels.system.model.IV3SLS.constraints
+============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: IV3SLS.constraints

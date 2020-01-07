@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.df\_model
+===================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.df_model

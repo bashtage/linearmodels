@@ -11,7 +11,7 @@ linearmodels.panel.model.FirstDifferenceOLS
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~FirstDifferenceOLS.fit
       ~FirstDifferenceOLS.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.FirstDifferenceOLS
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~FirstDifferenceOLS.formula
       ~FirstDifferenceOLS.has_constant

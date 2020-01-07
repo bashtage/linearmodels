@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.absorbing.AbsorbingLS.fit
+=========================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. automethod:: AbsorbingLS.fit

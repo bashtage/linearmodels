@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelModelComparison.pvalues
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelModelComparison.pvalues

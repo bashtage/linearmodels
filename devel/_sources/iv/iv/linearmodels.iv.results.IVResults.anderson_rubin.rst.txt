@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.anderson\_rubin
+=================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.anderson_rubin

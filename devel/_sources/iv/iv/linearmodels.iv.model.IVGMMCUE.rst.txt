@@ -11,7 +11,7 @@ linearmodels.iv.model.IVGMMCUE
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVGMMCUE.estimate_parameters
       ~IVGMMCUE.fit
@@ -28,6 +28,7 @@ linearmodels.iv.model.IVGMMCUE
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVGMMCUE.formula
       ~IVGMMCUE.has_constant

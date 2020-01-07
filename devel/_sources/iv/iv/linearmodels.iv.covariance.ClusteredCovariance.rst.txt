@@ -11,7 +11,7 @@ linearmodels.iv.covariance.ClusteredCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.iv.covariance.ClusteredCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~ClusteredCovariance.config
       ~ClusteredCovariance.cov

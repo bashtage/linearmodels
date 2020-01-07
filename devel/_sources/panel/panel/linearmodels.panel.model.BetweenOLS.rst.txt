@@ -11,7 +11,7 @@ linearmodels.panel.model.BetweenOLS
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~BetweenOLS.fit
       ~BetweenOLS.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.BetweenOLS
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~BetweenOLS.formula
       ~BetweenOLS.has_constant

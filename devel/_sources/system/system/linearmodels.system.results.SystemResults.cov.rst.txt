@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.cov
+=============================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.cov

@@ -1,0 +1,6 @@
+linearmodels.system.covariance.HeteroskedasticCovariance.sigma
+==============================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: HeteroskedasticCovariance.sigma

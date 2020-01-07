@@ -1,0 +1,6 @@
+linearmodels.iv.data.IVData.isnull
+==================================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. autoproperty:: IVData.isnull

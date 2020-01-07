@@ -1,0 +1,6 @@
+linearmodels.panel.model.RandomEffects.not\_null
+================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: RandomEffects.not_null

@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.first\_stage
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.first_stage

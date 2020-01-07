@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelModelComparison.f\_statistic
+============================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelModelComparison.f_statistic

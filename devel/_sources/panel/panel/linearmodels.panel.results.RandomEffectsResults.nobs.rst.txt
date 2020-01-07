@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.nobs
+====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.nobs

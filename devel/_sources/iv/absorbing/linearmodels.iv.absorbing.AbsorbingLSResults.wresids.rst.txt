@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.wresids
+====================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.wresids

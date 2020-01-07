@@ -11,12 +11,11 @@ linearmodels.iv.results.IVGMMResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVGMMResults.c_stat
       ~IVGMMResults.conf_int
       ~IVGMMResults.predict
-      ~IVGMMResults.test_linear_constraint
       ~IVGMMResults.wald_test
    
    
@@ -26,6 +25,7 @@ linearmodels.iv.results.IVGMMResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVGMMResults.cov
       ~IVGMMResults.cov_config

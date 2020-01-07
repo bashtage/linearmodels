@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLS.weights
+=============================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLS.weights

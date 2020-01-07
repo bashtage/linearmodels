@@ -1,0 +1,6 @@
+linearmodels.system.model.IVSystemGMM.param\_names
+==================================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: IVSystemGMM.param_names

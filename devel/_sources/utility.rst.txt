@@ -4,11 +4,12 @@ Utilities
 .. module:: linearmodels.utility
    :synopsis: Utilities used across all model types
 
-.. autoclass:: WaldTestStatistic
-   :members:
+.. currentmodule:: linearmodels.utility
 
-.. autoclass:: InvalidTestStatistic
-   :members:
 
-.. autoclass:: AttrDict
-   :members:
+.. autosummary::
+   :toctree: utility/
+
+   AttrDict
+   WaldTestStatistic
+   InvalidTestStatistic

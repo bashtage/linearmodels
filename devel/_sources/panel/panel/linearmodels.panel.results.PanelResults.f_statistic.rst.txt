@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.f\_statistic
+====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.f_statistic

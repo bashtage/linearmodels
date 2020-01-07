@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.time\_info
+==================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.time_info

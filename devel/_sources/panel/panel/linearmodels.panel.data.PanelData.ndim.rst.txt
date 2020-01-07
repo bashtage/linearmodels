@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.ndim
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.ndim

@@ -11,7 +11,7 @@ linearmodels.panel.covariance.FamaMacBethKernelCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~FamaMacBethKernelCovariance.deferred_cov
    
@@ -22,6 +22,7 @@ linearmodels.panel.covariance.FamaMacBethKernelCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~FamaMacBethKernelCovariance.bandwidth
       ~FamaMacBethKernelCovariance.cov

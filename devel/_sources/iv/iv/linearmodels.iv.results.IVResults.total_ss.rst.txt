@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.total\_ss
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.total_ss

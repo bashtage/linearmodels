@@ -11,7 +11,7 @@ linearmodels.iv.results.FirstStageResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.iv.results.FirstStageResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~FirstStageResults.diagnostics
       ~FirstStageResults.individual

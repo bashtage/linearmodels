@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.params
+================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.params

@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.total\_ss
+======================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.total_ss

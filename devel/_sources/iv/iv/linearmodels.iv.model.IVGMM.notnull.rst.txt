@@ -1,0 +1,6 @@
+linearmodels.iv.model.IVGMM.notnull
+===================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IVGMM.notnull

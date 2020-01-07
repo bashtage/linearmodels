@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.f\_statistic
+===============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.f_statistic

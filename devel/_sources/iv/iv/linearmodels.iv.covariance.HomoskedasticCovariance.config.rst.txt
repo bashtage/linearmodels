@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.HomoskedasticCovariance.config
+=========================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoproperty:: HomoskedasticCovariance.config

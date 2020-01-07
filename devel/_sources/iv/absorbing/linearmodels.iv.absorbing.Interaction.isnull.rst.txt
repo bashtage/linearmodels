@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.Interaction.isnull
+============================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: Interaction.isnull

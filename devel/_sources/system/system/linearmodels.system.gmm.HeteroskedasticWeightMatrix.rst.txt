@@ -11,7 +11,7 @@ linearmodels.system.gmm.HeteroskedasticWeightMatrix
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~HeteroskedasticWeightMatrix.sigma
       ~HeteroskedasticWeightMatrix.weight_matrix
@@ -23,6 +23,7 @@ linearmodels.system.gmm.HeteroskedasticWeightMatrix
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~HeteroskedasticWeightMatrix.config
    

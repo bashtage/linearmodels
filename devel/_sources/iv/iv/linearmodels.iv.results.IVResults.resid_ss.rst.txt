@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.resid\_ss
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.resid_ss

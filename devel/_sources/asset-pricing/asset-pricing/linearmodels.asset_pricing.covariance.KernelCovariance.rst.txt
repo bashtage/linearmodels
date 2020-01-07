@@ -11,7 +11,7 @@ linearmodels.asset\_pricing.covariance.KernelCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.asset\_pricing.covariance.KernelCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~KernelCovariance.bandwidth
       ~KernelCovariance.config

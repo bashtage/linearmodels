@@ -11,11 +11,10 @@ linearmodels.iv.results.OLSResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~OLSResults.conf_int
       ~OLSResults.predict
-      ~OLSResults.test_linear_constraint
       ~OLSResults.wald_test
    
    
@@ -25,6 +24,7 @@ linearmodels.iv.results.OLSResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~OLSResults.cov
       ~OLSResults.cov_config

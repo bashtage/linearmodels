@@ -1,0 +1,6 @@
+linearmodels.panel.model.BetweenOLS.has\_constant
+=================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: BetweenOLS.has_constant

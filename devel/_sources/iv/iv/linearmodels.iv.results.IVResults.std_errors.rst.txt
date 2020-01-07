@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.std\_errors
+=============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.std_errors

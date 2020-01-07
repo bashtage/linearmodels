@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.f\_statistic\_robust
+====================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.f_statistic_robust

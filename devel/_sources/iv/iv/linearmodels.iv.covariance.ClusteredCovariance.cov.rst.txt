@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.ClusteredCovariance.cov
+==================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoproperty:: ClusteredCovariance.cov

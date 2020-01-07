@@ -11,7 +11,7 @@ linearmodels.panel.data.PanelData
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~PanelData.copy
       ~PanelData.count
@@ -29,6 +29,7 @@ linearmodels.panel.data.PanelData
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~PanelData.dataframe
       ~PanelData.entities

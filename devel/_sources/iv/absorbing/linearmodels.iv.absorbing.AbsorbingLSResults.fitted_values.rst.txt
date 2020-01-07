@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.fitted\_values
+===========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.fitted_values

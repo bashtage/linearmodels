@@ -11,7 +11,7 @@ linearmodels.asset\_pricing.results.LinearFactorModelResults
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.asset\_pricing.results.LinearFactorModelResults
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~LinearFactorModelResults.alphas
       ~LinearFactorModelResults.betas

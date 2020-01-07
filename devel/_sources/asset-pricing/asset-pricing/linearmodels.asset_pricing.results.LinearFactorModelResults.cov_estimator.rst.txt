@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults.cov\_estimator
+===========================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: LinearFactorModelResults.cov_estimator

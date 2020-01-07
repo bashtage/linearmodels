@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.total\_ss
+======================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.total_ss

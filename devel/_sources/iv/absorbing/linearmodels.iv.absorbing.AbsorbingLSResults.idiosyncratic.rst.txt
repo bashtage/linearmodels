@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.idiosyncratic
+==========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.idiosyncratic

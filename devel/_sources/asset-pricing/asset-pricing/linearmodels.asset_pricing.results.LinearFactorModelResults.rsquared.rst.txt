@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults.rsquared
+=====================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: LinearFactorModelResults.rsquared

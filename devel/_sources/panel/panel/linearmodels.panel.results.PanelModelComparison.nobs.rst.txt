@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelModelComparison.nobs
+====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelModelComparison.nobs

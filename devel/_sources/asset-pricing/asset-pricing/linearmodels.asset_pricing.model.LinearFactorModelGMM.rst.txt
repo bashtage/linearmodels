@@ -11,7 +11,7 @@ linearmodels.asset\_pricing.model.LinearFactorModelGMM
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~LinearFactorModelGMM.fit
       ~LinearFactorModelGMM.from_formula
@@ -23,6 +23,7 @@ linearmodels.asset\_pricing.model.LinearFactorModelGMM
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~LinearFactorModelGMM.formula
    

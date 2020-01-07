@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.df\_resid
+============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.df_resid

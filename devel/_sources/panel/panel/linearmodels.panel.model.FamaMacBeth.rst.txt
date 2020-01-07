@@ -11,7 +11,7 @@ linearmodels.panel.model.FamaMacBeth
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~FamaMacBeth.fit
       ~FamaMacBeth.from_formula
@@ -25,6 +25,7 @@ linearmodels.panel.model.FamaMacBeth
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~FamaMacBeth.formula
       ~FamaMacBeth.has_constant

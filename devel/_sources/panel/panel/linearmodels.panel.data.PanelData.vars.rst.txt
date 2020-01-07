@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.vars
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.vars

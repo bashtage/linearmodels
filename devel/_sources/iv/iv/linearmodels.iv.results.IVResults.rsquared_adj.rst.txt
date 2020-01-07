@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.rsquared\_adj
+===============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.rsquared_adj

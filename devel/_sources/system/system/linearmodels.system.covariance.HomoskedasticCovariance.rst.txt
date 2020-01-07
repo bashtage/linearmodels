@@ -11,7 +11,7 @@ linearmodels.system.covariance.HomoskedasticCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.system.covariance.HomoskedasticCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~HomoskedasticCovariance.cov
       ~HomoskedasticCovariance.cov_config

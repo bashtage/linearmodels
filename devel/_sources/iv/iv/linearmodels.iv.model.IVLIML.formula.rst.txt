@@ -1,0 +1,6 @@
+linearmodels.iv.model.IVLIML.formula
+====================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IVLIML.formula

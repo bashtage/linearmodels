@@ -11,7 +11,7 @@ linearmodels.system.covariance.HeteroskedasticCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
    
    
@@ -21,6 +21,7 @@ linearmodels.system.covariance.HeteroskedasticCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~HeteroskedasticCovariance.cov
       ~HeteroskedasticCovariance.cov_config

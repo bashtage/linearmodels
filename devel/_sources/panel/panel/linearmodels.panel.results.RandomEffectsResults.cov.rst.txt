@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.cov
+===================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.cov

@@ -1,0 +1,6 @@
+linearmodels.iv.gmm.OneWayClusteredWeightMatrix.config
+======================================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoproperty:: OneWayClusteredWeightMatrix.config

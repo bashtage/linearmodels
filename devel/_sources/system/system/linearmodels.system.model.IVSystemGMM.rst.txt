@@ -11,7 +11,7 @@ linearmodels.system.model.IVSystemGMM
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IVSystemGMM.add_constraints
       ~IVSystemGMM.fit
@@ -27,6 +27,7 @@ linearmodels.system.model.IVSystemGMM
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IVSystemGMM.constraints
       ~IVSystemGMM.formula

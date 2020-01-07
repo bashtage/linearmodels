@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.rsquared
+=====================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.rsquared

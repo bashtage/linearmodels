@@ -11,7 +11,7 @@ linearmodels.panel.covariance.FamaMacBethCovariance
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~FamaMacBethCovariance.deferred_cov
    
@@ -22,6 +22,7 @@ linearmodels.panel.covariance.FamaMacBethCovariance
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~FamaMacBethCovariance.cov
       ~FamaMacBethCovariance.eps

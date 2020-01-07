@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.covariance.HeteroskedasticCovariance.inv\_jacobian
+==============================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.covariance
+
+.. autoproperty:: HeteroskedasticCovariance.inv_jacobian

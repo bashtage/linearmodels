@@ -11,7 +11,7 @@ linearmodels.system.model.IV3SLS
    .. rubric:: Methods
 
    .. autosummary::
-      :toctree: generated/
+      :toctree:
 
       ~IV3SLS.add_constraints
       ~IV3SLS.fit
@@ -27,6 +27,7 @@ linearmodels.system.model.IV3SLS
    .. rubric:: Properties
 
    .. autosummary::
+      :toctree:
 
       ~IV3SLS.constraints
       ~IV3SLS.formula
