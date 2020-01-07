@@ -7,6 +7,15 @@ from linearmodels.typing import AnyPandas
 
 PD_LT_023 = LooseVersion(pd.__version__) < LooseVersion('0.23')
 
+__all__ = ['is_string_dtype', 'is_numeric_dtype', 'is_categorical',
+           'is_string_like', 'is_categorical_dtype', 'is_datetime64_any_dtype',
+           'concat', 'get_codes', 'to_numpy', 'assert_series_equal']
+
+try:
+    from pandas.testing import assert_series_equal
+except ImportError:
+    from pandas.util.testing import assert_series_equal
+
 
 def concat(*args, **kwargs):
     """
@@ -67,8 +76,3 @@ def to_numpy(df: AnyPandas) -> np.ndarray:
         return df.to_numpy()
     except AttributeError:
         return np.asarray(df)
-
-
-__all__ = ['is_string_dtype', 'is_numeric_dtype', 'is_categorical',
-           'is_string_like', 'is_categorical_dtype', 'is_datetime64_any_dtype',
-           'concat', 'get_codes', 'to_numpy']

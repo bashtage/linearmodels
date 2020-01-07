@@ -60,6 +60,21 @@ class HomoskedasticWeightMatrix(object):
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
     def sigma(self, eps, x):
+        """
+        Estimate residual covariance.
+
+        Parameters
+        ----------
+        eps : ndarray
+            The residuals from the system of equations.
+        x : list[ndarray]
+            A list of the regressor matrices for each equation in the system.
+
+        Returns
+        -------
+        ndarray
+            The estimated covariance matrix of the residuals.
+        """
         nobs = eps.shape[0]
         eps = eps - eps.mean(0)
         sigma = eps.T @ eps / nobs
@@ -74,6 +89,8 @@ class HomoskedasticWeightMatrix(object):
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
+        Construct a GMM weight matrix for a model.
+
         Parameters
         ----------
         x : ndarray
@@ -141,6 +158,8 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
+        Construct a GMM weight matrix for a model.
+
         Parameters
         ----------
         x : ndarray
@@ -239,6 +258,8 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
+        Construct a GMM weight matrix for a model.
+
         Parameters
         ----------
         x : ndarray

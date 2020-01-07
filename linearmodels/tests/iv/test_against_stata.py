@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
-import statsmodels.api as sm
+from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM, IVLIML
 from linearmodels.tests.iv.results.read_stata_results import process_results
@@ -41,7 +41,7 @@ def housing(request):
 
     data = HOUSING_DATA
     endog = data.rent
-    exog = sm.add_constant(data.pcturban)
+    exog = add_constant(data.pcturban)
     instd = data.hsngval
     instr = data[['faminc', 'region']]
     cov_opts = deepcopy(COV_OPTIONS[keys[1]])
@@ -117,9 +117,9 @@ def construct_model(key):
     dep = deps[var]
     if 'noconstant' not in other:
         if exog is not None:
-            exog = sm.add_constant(exog)
+            exog = add_constant(exog)
         else:
-            exog = sm.add_constant(pd.DataFrame(np.empty((dep.shape[0], 0))))
+            exog = add_constant(pd.DataFrame(np.empty((dep.shape[0], 0))))
 
     cov_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
     cov_opts['debiased'] = 'small' in other

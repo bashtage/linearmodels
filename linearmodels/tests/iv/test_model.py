@@ -1,3 +1,5 @@
+from linearmodels.compat.pandas import assert_series_equal
+
 from collections import OrderedDict
 import warnings
 
@@ -5,9 +7,8 @@ import numpy as np
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
 import pandas as pd
-from pandas.util.testing import assert_series_equal
 import pytest
-from statsmodels.api import add_constant
+from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS

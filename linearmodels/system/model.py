@@ -1133,6 +1133,8 @@ class IV3SLS(object):
 
     def add_constraints(self, r, q=None):
         r"""
+        Add parameter constraints to a model.
+
         Parameters
         ----------
         r : DataFrame

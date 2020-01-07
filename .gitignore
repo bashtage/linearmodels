@@ -13,6 +13,8 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+.pytest_cache/
+linearmodels.egg-info/
 env/
 build/
 develop-eggs/
@@ -31,6 +33,13 @@ wheels/
 *.egg
 *.do
 *.lyx~
+
+# Generated documentation
+doc/build/
+doc/source/asset-pricing/asset-pricing/
+doc/source/iv/iv/
+doc/source/panel/panel/
+doc/source/system/system/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
