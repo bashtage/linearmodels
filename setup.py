@@ -21,9 +21,6 @@ of models.
 ******************************************************************************
 """
 
-if sys.version_info < (3, 5):
-    sys.exit('Requires Python 3.5 or later due to use of @ operator.')
-
 try:
     markdown = os.stat('README.md').st_mtime
     if os.path.exists('README.rst'):
@@ -131,9 +128,9 @@ def run_setup(binary=True):
               'Intended Audience :: End Users/Desktop',
               'Intended Audience :: Financial and Insurance Industry',
               'Intended Audience :: Science/Research',
-              'Programming Language :: Python :: 3.5',
               'Programming Language :: Python :: 3.6',
               'Programming Language :: Python :: 3.7',
+              'Programming Language :: Python :: 3.8',
               'License :: OSI Approved',
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: Microsoft :: Windows',
@@ -141,7 +138,8 @@ def run_setup(binary=True):
               'Programming Language :: Python',
               'Topic :: Scientific/Engineering',
           ],
-          ext_modules=extensions
+          ext_modules=extensions,
+          python_requires='>=3.6',
           )
 
 

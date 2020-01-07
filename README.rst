@@ -133,22 +133,22 @@ Requirements
 Running
 ~~~~~~~
 
-With the exception of Python 3.5+, which is a hard requirement, the
+With the exception of Python 3.6, which is a hard requirement, the
 others are the version that are being used in the test environment. It
 is possible that older versions work.
 
--  **Python 3.5+**: extensive use of ``@`` operator
--  NumPy (1.13+)
--  SciPy (0.19+)
--  pandas (0.20+)
--  statsmodels (0.8+)
--  xarray (0.9+, optional)
+-  Python 3.6+
+-  NumPy (1.14+)
+-  SciPy (1.0+)
+-  pandas (0.22+)
+-  statsmodels (0.9+)
+-  xarray (0.10+, optional)
 -  cython (optional)
 
 Testing
 ~~~~~~~
 
--  py.test
+-  pytest
 
 .. _documentation-1:
 

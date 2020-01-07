@@ -127,11 +127,11 @@ regression. Currently only the single variable IV estimators are polished.
 
 ### Running
 
-With the exception of Python 3.5+, which is a hard requirement, the
+With the exception of Python 3.6+, which is a hard requirement, the
 others are the version that are being used in the test environment.  It
 is possible that older versions work.
 
-* **Python 3.5+**: extensive use of `@` operator
+* Python 3.6+
 * NumPy (1.14+)
 * SciPy (1+)
 * pandas (0.22+)
