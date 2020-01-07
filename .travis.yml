@@ -1,7 +1,6 @@
 language: python
 
-dist: xenial
-sudo: required
+dist: bionic
 
 git:
   depth: 1000
@@ -21,6 +20,7 @@ env:
     - OMP_NUM_THREADS=1
     - PIP_PACKAGES=
     - TEST_INSTALL=false
+    - PIP_PRE=false
     - secure: "aCm98s/mNxRSoTEhpIgfvRKzzJKdDkm/9TufIvgWvnkeiyDQqZwoqRVDIikZ+v6mkFeu7dr7BBojyPXnhkhji+SkNFz5ArtEqahJTvIZhP2nWgktlQSWkaC2Q5GyCWPhdQag/ImYbM4RK1WvtIVcSL7GPL0jLTgFDXY6/Hdl0eQY7kfWtojxIZUJShxn9IPfXE3gGQeWHEOL7SkZ3+8KxBJAUzrdd9J32PiHWZb5BcUupTQcW29ajoco4q1fdL/xPu3GZnys8EClorHxnPptQWfGGlnoJ79Q6H7Jhw6BGIj2fDCG9qX4boEH2zvH8ZKlbuTvMeVcBiLxPE8BpRmx2drX2kDyUo5ywVwA0W/7zsZ2YUYEyHEYL+cr4WVFdoDpwwPKaHOTp8F4Q+lQgkvxZbSlO6dUEMLNxnltgujAAdiaRJKLd2CwA85RjqYGLkMzTqBgYhH+p+7wB6jK8EJgoqxU3k98LfaeqyhsPrdWsxVLleLVAvzhXpNilQfX4NBPf+DYsn9NeyXYzp85H9p+J8DGJMJ42kBdP1r/cz1Y44SrGZhlk1MhLhb+uX7kV7nnmcW87NYoGSr52S5vNVL9iSU980SzJ08wOZwxwkKXOqgEJtMqdHsEuqY9jSQ2m/xAdarpxBsDD+Pw2gPfar+R8Lcptep50pMPFMgddDWV2f4="
 
 matrix:
@@ -47,6 +47,7 @@ matrix:
     - NUMPY=1.14
     - SCIPY=1.0
     - PANDAS=0.22
+    - XARRAY=0.9
     - STATSMODELS=0.9
   - python: 3.6
     env:
@@ -54,8 +55,8 @@ matrix:
     - NUMPY=1.15
     - SCIPY=1.0
     - PANDAS=0.23
-    - XARRAY=0.9
     - STATSMODELS=0.9
+    - SKIPSLOW="--skip-slow"
   - python: 3.6
     env:
     - PYTHON=3.6
@@ -65,6 +66,7 @@ matrix:
     - XARRAY=0.10
     - STATSMODELS=0.10
     - PIP_PACKAGES="xxhash"
+    - SKIPSLOW="--skip-slow"
   - python: 3.7
     env:
     - PYTHON=3.7
@@ -74,6 +76,16 @@ matrix:
     - XARRAY=0.12
     - STATSMODELS=0.10
     - OPENBLAS=1
+  - python: 3.8
+    env:
+    - PIP_PRE=true
+    - SKIPSLOW=--skip-slow
+
+  allow_failures:
+  - python: 3.8
+    env:
+    - PIP_PRE=true
+    - SKIPSLOW=--skip-slow
 
 
 before_install:
@@ -96,6 +108,7 @@ before_install:
       source ci/install-from-conda.sh
     fi;
   - source ci/install-common.sh
+  - if [[ ${PIP_PRE} = true ]]; then source ci/install-prerelease.sh; fi
   - pip list
 
 install:

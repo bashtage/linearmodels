@@ -2,12 +2,12 @@ from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes, is_string_dtype
 
 from itertools import product
+from datetime import datetime
 
 import numpy as np
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas import (Categorical, DataFrame, Series, date_range, datetime,
-                    get_dummies)
+from pandas import (Categorical, DataFrame, Series, date_range, get_dummies)
 from pandas.testing import assert_frame_equal, assert_index_equal
 import pytest
 
@@ -62,8 +62,7 @@ def test_numpy_3d():
     var_names = ['x.{0}'.format(i) for i in range(k)]
     expected_frame = panel_to_frame(np.reshape(x, (k, t, n)), items=var_names,
                                     major_axis=obs, minor_axis=items, swap=True)
-    expected_frame.index.levels[0].name = 'entity'
-    expected_frame.index.levels[1].name = 'time'
+    expected_frame.index.set_names(['entity', 'time'], inplace=True)
     assert_frame_equal(dh.dataframe, expected_frame)
 
 
@@ -827,8 +826,7 @@ def test_named_index(data):
         assert pdata.dataframe.index.levels[0].name == data.x.index.levels[0].name
         assert pdata.dataframe.index.levels[1].name == data.x.index.levels[1].name
 
-        data.x.index.levels[0].name = None
-        data.x.index.levels[1].name = None
+        data.x.index.set_names([None, None], inplace=True)
         pdata = PanelData(data.x)
 
     assert pdata.dataframe.index.levels[0].name == 'entity'

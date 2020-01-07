@@ -46,6 +46,17 @@ def table_concat(lists, sep='='):
 
 
 class OLSResults(_SummaryStr):
+    """
+    Results from OLS model estimation
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    model : _OLS
+        The model used to estimate parameters.
+    """
+
     def __init__(self, results: Dict[str, Any], model):
         self._resid = results['eps']
         self._wresid = results['weps']
@@ -489,14 +500,6 @@ class OLSResults(_SummaryStr):
         return quadratic_form_test(self._params, self.cov, restriction=restriction,
                                    value=value, formula=formula)
 
-    def test_linear_constraint(self, restriction=None, value=None, *,
-                               formula=None) -> WaldTestStatistic:
-        import warnings
-        warnings.warn('test_linear_constraint is deprecated.  Use wald_test '
-                      'instead. This method will be unavailable after June 2019.',
-                      DeprecationWarning)
-        return self.wald_test(restriction, value, formula=formula)
-
 
 class AbsorbingLSResults(OLSResults):
     def __init__(self, results: Dict[str, Any], model):
@@ -731,6 +734,13 @@ class _CommonIVResults(OLSResults):
 class IVResults(_CommonIVResults):
     """
     Results from IV estimation
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    model : {IV2SLS, IVLIML}
+        The model used to estimate parameters.
     """
 
     def __init__(self, results: Dict[str, Any], model):
@@ -1181,6 +1191,13 @@ class IVResults(_CommonIVResults):
 class IVGMMResults(_CommonIVResults):
     """
     Results from GMM estimation of IV models
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    model : {IVGMM, IVGMMCUE}
+        The model used to estimate parameters.
     """
 
     def __init__(self, results, model):

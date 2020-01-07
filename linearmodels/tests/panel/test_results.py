@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 from pandas.testing import assert_series_equal
 import pytest
-import statsmodels.api as sm
+from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
@@ -35,7 +35,7 @@ def generated_data(request):
 @pytest.mark.parametrize('precision', ('tstats', 'std_errors', 'pvalues'))
 def test_single(data, precision):
     dependent = data.set_index(['nr', 'year']).lwage
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog, entity_effects=True).fit()
     comp = compare([res])
     assert len(comp.rsquared) == 1
@@ -49,11 +49,11 @@ def test_single(data, precision):
 @pytest.mark.parametrize('precision', ('tstats', 'std_errors', 'pvalues'))
 def test_multiple(data, precision):
     dependent = data.set_index(['nr', 'year']).lwage
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
     res2 = PanelOLS(dependent, exog, entity_effects=True).fit(cov_type='clustered',
                                                               cluster_entity=True)
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['married', 'union']])
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(['nr', 'year'])[['exper']]
     res4 = RandomEffects(dependent, exog).fit()
@@ -70,9 +70,9 @@ def test_multiple(data, precision):
 
 def test_multiple_no_effects(data):
     dependent = data.set_index(['nr', 'year']).lwage
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog).fit()
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['married', 'union']])
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(['nr', 'year'])[['exper']]
     res4 = RandomEffects(dependent, exog).fit()
@@ -88,7 +88,7 @@ def test_multiple_no_effects(data):
 
 def test_incorrect_type(data):
     dependent = data.set_index(['nr', 'year']).lwage
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     mod = PanelOLS(dependent, exog)
     res = mod.fit()
     mod2 = IV2SLS(mod.dependent.dataframe, mod.exog.dataframe, None, None)
@@ -143,7 +143,7 @@ def test_predict_no_selection(generated_data):
 
 def test_wald_test(data):
     dependent = data.set_index(['nr', 'year']).lwage
-    exog = sm.add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
+    exog = add_constant(data.set_index(['nr', 'year'])[['expersq', 'married', 'union']])
     res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
 
     restriction = np.zeros((2, 4))

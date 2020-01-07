@@ -1,5 +1,6 @@
+from linearmodels.compat.pandas import assert_series_equal
+
 import numpy as np
-from pandas.util.testing import assert_series_equal
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML

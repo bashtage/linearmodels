@@ -22,6 +22,26 @@ Instrumental Variable Estimation
    IVGMM
    IVGMMCUE
 
+Absorbing Least Squares
+-----------------------
+OLS and WLS with high-dimensional effects.
+
+.. _absorbing-module-reference-models:
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. module:: linearmodels.iv.absorbing
+   :synopsis: Regression with high-dimensional effects
+
+
+.. autosummary::
+   :toctree: absorbing/
+
+   AbsorbingLS
+   AbsorbingLSResults
+   Interaction
+
+
 .. _iv-module-reference-results:
 
 Estimation Results

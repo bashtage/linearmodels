@@ -220,9 +220,7 @@ class PanelData(object):
                              'numeric or date-like')
         # self._k, self._t, self._n = self.panel.shape
         self._k, self._t, self._n = self.shape
-        levels = self._frame.index.levels
-        for i in range(2):
-            levels[i].name = index_names[i]
+        self._frame.index.set_names(index_names, inplace=True)
 
     @property
     def panel(self):
@@ -248,6 +246,8 @@ class PanelData(object):
 
     def drop(self, locs):
         """
+        Drop observations from the panel.
+
         Parameters
         ----------
         locs : ndarray

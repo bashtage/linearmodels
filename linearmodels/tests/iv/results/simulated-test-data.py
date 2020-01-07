@@ -15,7 +15,7 @@ Will also test other configurations - small, covariance-estimators, constant
 import numpy as np
 from numpy.random import multivariate_normal, seed
 import pandas as pd
-import statsmodels.api as sm
+from statsmodels.tools.tools import add_constant
 
 seed(12345)
 
@@ -32,7 +32,7 @@ w = multivariate_normal(np.zeros(k + p + 1), r, n)
 x = w[:, :k]
 z = w[:, k:k + p]
 e = w[:, -1]
-x = sm.add_constant(x)
+x = add_constant(x)
 beta = np.arange(k + 1) / k
 beta[0] = 1
 e_homo = e

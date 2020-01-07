@@ -4,7 +4,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
-from statsmodels.api import add_constant
+from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM
 from linearmodels.utility import AttrDict
@@ -121,6 +121,3 @@ def test_linear_restriction(data):
     formula = ' = '.join(res.params.index) + ' = 0'
     ts2 = res.wald_test(formula=formula)
     assert_allclose(ts.stat, ts2.stat)
-
-    with pytest.deprecated_call():
-        res.test_linear_constraint(q, np.zeros(nvar))

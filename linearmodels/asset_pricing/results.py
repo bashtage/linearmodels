@@ -15,27 +15,35 @@ from linearmodels.utility import _str, _SummaryStr, pval_format
 
 
 class LinearFactorModelResults(_SummaryStr):
-    def __init__(self, res):
-        self._jstat = res.jstat
-        self._params = res.params
-        self._param_names = res.param_names
-        self._factor_names = res.factor_names
-        self._portfolio_names = res.portfolio_names
-        self._rp = res.rp
-        self._cov = res.cov
-        self._rp_cov = res.rp_cov
-        self._rsquared = res.rsquared
-        self._total_ss = res.total_ss
-        self._residual_ss = res.residual_ss
-        self._name = res.name
-        self._cov_type = res.cov_type
-        self.model = res.model
-        self._nobs = res.nobs
+    """
+    Model results from a Linear Factor Model.
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    """
+    def __init__(self, results):
+        self._jstat = results.jstat
+        self._params = results.params
+        self._param_names = results.param_names
+        self._factor_names = results.factor_names
+        self._portfolio_names = results.portfolio_names
+        self._rp = results.rp
+        self._cov = results.cov
+        self._rp_cov = results.rp_cov
+        self._rsquared = results.rsquared
+        self._total_ss = results.total_ss
+        self._residual_ss = results.residual_ss
+        self._name = results.name
+        self._cov_type = results.cov_type
+        self.model = results.model
+        self._nobs = results.nobs
         self._datetime = dt.datetime.now()
         self._cols = ['alpha'] + ['{0}'.format(f) for f in self._factor_names]
-        self._rp_names = res.rp_names
-        self._alpha_vcv = res.alpha_vcv
-        self._cov_est = res.cov_est
+        self._rp_names = results.rp_names
+        self._alpha_vcv = results.alpha_vcv
+        self._cov_est = results.cov_est
 
     @property
     def summary(self):
@@ -270,9 +278,9 @@ class LinearFactorModelResults(_SummaryStr):
 
 
 class GMMFactorModelResults(LinearFactorModelResults):
-    def __init__(self, res):
-        super(GMMFactorModelResults, self).__init__(res)
-        self._iter = res.iter
+    def __init__(self, results):
+        super(GMMFactorModelResults, self).__init__(results)
+        self._iter = results.iter
 
     @property
     def std_errors(self):

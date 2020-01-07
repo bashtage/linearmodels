@@ -542,7 +542,8 @@ def test_drop_missing():
     gen = generate_data(2, True, 2, format='pandas', ncont=0, cont_interactions=1)
     for col in gen.absorb:
         gen.absorb[col] = gen.absorb[col].astype('int64').astype('object')
-        gen.absorb[col].iloc[::91] = np.nan
+        col_iloc = gen.absorb.columns.get_loc(col)
+        gen.absorb.iloc[::91, col_iloc] = np.nan
         gen.absorb[col] = pd.Categorical(to_numpy(gen.absorb[col]))
     with pytest.warns(MissingValueWarning):
         AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)

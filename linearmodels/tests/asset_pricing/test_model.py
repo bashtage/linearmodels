@@ -3,7 +3,7 @@ from numpy.testing import assert_allclose, assert_equal
 import pandas as pd
 import pytest
 from scipy import stats
-import statsmodels.api as sm
+from statsmodels.tools.tools import add_constant
 
 from linearmodels.asset_pricing.model import (LinearFactorModel,
                                               LinearFactorModelGMM,
@@ -67,7 +67,7 @@ def test_linear_model_time_series(data):
     nf = data.factors.shape[1]
     e = np.zeros((nobs, (nport * (nf + 1))))
     x = np.zeros((nobs, (nport * (nf + 1))))
-    factors = sm.add_constant(data.factors)
+    factors = add_constant(data.factors)
     loc = 0
     for i in range(data.portfolios.shape[1]):
         if isinstance(data.portfolios, pd.DataFrame):
