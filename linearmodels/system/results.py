@@ -537,6 +537,15 @@ class SystemEquationResult(_CommonResults):
 
 
 class GMMSystemResults(SystemResults):
+    """
+    Results from GMM System Estimators
+
+    Parameters
+    ----------
+    results : AttrDict
+        Dictionary of model estimation results
+    """
+
     def __init__(self, results):
         super(GMMSystemResults, self).__init__(results)
         self._wmat = results.wmat
