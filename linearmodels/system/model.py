@@ -690,8 +690,12 @@ class IV3SLS(object):
         nobs = eps.shape[0]
         debiased = cov_config.get('debiased', False)
         full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
-        if (self._common_exog and method is None and self._constraints is None) or method == 'ols':
-            return self._multivariate_ls_finalize(beta, eps, sigma, cov_type, **cov_config)
+        if method is None:
+            method = 'ols' if (self._common_exog and self._constraints is None) else 'gls'
+
+        if method == 'ols':
+            return self._multivariate_ls_finalize(beta, eps, sigma, col_idx, total_cols,
+                                                  cov_type, **cov_config)
 
         beta_hist = [beta]
         nobs = eps.shape[0]
@@ -714,8 +718,8 @@ class IV3SLS(object):
         x = blocked_diag_product(self._x, np.eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, full_sigma, gls_eps,
-                                  eps, cov_type, iter_count, **cov_config)
+        return self._gls_finalize(beta, sigma, full_sigma, gls_eps, eps, full_cov, total_cols,
+                                  col_idx, cov_type, iter_count, **cov_config)
 
     def _multivariate_ls_fit(self):
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
@@ -790,7 +794,8 @@ class IV3SLS(object):
 
         return beta, eps, sigma
 
-    def _multivariate_ls_finalize(self, beta, eps, sigma, cov_type, **cov_config):
+    def _multivariate_ls_finalize(self, beta, eps, sigma, col_idx, total_cols, cov_type,
+                                  **cov_config):
         k = len(self._wx)
 
         # Covariance estimation
@@ -820,6 +825,9 @@ class IV3SLS(object):
         results['wresid'] = results.resid
         results['cov_estimator'] = cov_est
         results['cov_config'] = cov_est.cov_config
+        individual = results["individual"]
+        r2s = [individual[eq].r2 for eq in individual]
+        results['system_r2'] = self._system_r2(eps, sigma, 'ols', False, debiased, r2s)
 
         return SystemResults(results)
 
@@ -1025,7 +1033,8 @@ class IV3SLS(object):
         results['cov_type'] = cov_type
         results['index'] = self._dependent[0].rows
         results['original_index'] = self._original_index
-        results['sigma'] = sigma
+        names = list(individual.keys())
+        results['sigma'] = DataFrame(sigma, columns=names, index=names)
         results['individual'] = individual
         results['params'] = beta
         results['df_model'] = beta.shape[0]
@@ -1063,7 +1072,47 @@ class IV3SLS(object):
 
         return results
 
-    def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps,
+    def _system_r2(self, eps, sigma, method, full_cov, debiased, r2s):
+        sigma_resid = sigma
+        sigma_m12 = inv_matrix_sqrt(sigma)
+
+        std_eps = eps @ sigma_m12
+        numerator = (std_eps ** 2).sum()
+
+        # System regression on a constant using weights if provided
+        wy, w = self._wy, self._w
+        wi = [np.sqrt(weights) for weights in w]
+        if method == 'ols':
+            est_sigma = np.eye(len(wy))
+        else:  # gls
+            est_sigma = sigma
+            if not full_cov:
+                est_sigma = np.diag(np.diag(est_sigma))
+        est_sigma_inv = inv(est_sigma)
+        nobs = wy[0].shape[0]
+        k = len(wy)
+        xpx = blocked_inner_prod(wi, est_sigma_inv)
+        xpy = np.zeros((k, 1))
+        for i in range(k):
+            sy = np.zeros((nobs, 1))
+            for j in range(k):
+                sy += est_sigma_inv[i, j] * wy[j]
+            xpy[i:(i + 1)] = wi[i].T @ sy
+
+        mu = _parameters_from_xprod(xpx, xpy)
+        eps_const = np.hstack([wy[j] - wi[i] * mu[j] for j in range(k)])
+        std_eps_const = eps_const @ sigma_m12
+        denom = (std_eps_const ** 2).sum()
+        mcelroy = 1.0 - numerator / denom
+        sigma_y = (eps_const.T @ eps_const / nobs) * self._sigma_scale(debiased)
+        berndt = 1 - np.linalg.det(sigma_resid) / np.linalg.det(sigma_y)
+        judge = 1 - (eps ** 2).sum() / (eps_const ** 2).sum()
+        tot_eps_const_sq = (eps_const ** 2).sum(0)
+        r2s = np.asarray(r2s)
+        dhrymes = (r2s * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
+        return Series(AttrDict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes))
+
+    def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps, full_cov, total_cols, col_idx,
                       cov_type, iter_count, **cov_config):
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
@@ -1108,6 +1157,9 @@ class IV3SLS(object):
         results['wresid'] = wresid
         results['cov_estimator'] = cov_est
         results['cov_config'] = cov_est.cov_config
+        individual = results["individual"]
+        r2s = [individual[eq].r2 for eq in individual]
+        results['system_r2'] = self._system_r2(eps, sigma, 'gls', full_cov, debiased, r2s)
 
         return SystemResults(results)
 
@@ -1621,6 +1673,8 @@ class IVSystemGMM(IV3SLS):
         results['cov_config'] = cov_est.cov_config
         results['weight_estimator'] = self._weight_est
         results['j_stat'] = self._j_statistic(beta, wmat)
+        r2s = [individual[eq].r2 for eq in individual]
+        results['system_r2'] = self._system_r2(eps, sigma, 'gls', False, debiased, r2s)
 
         return GMMSystemResults(results)
 

@@ -99,7 +99,29 @@ class _CommonResults(_SummaryStr):
 
     @property
     def rsquared(self):
-        """Coefficient of determination (R**2)"""
+        r"""
+        Coefficient of determination (R2)
+
+        Returns
+        -------
+        float
+            The coefficient of determinations.
+
+        Notes
+        -----
+        The overall R2 is similar to Judge's system R2 since no weighting is
+        used. These two only differ if one or more equations do not include
+        constants. It is defined as
+
+        .. math::
+
+           1 - \frac{\sum_i \sum_j \hat{\epsilon}_{ij}^2}{\sum_i \sum_j \hat{\eta}_{ij}^2}
+
+        where :math:`\eta` is the residual from a regression on only a
+        constant. Note that if a constant is not present in an equation
+        then the term in the denominator is **not** demeaned so that
+        :math:`\hat{\eta}_{ij}=y_{ij}`.
+        """
         return self._r2
 
     @property
@@ -175,6 +197,7 @@ class SystemResults(_CommonResults):
         self._individual = AttrDict()
         for key in results.individual:
             self._individual[key] = SystemEquationResult(results.individual[key])
+        self._system_r2 = results.system_r2
         self._sigma = results.sigma
         self._model = results.model
         self._constraints = results.constraints
@@ -315,6 +338,73 @@ class SystemResults(_CommonResults):
         return self._sigma
 
     @property
+    def system_rsquared(self):
+        r"""
+        Alternative measure of system fit
+
+        Returns
+        -------
+        Series
+            The measures of overall system fit.
+
+        Notes
+        -----
+        McElroy's R2 is defined as
+
+        .. math::
+
+           1 - \frac{SSR_{\Omega}}{TSS_{\Omega}}
+
+        where
+
+        .. math::
+
+           SSR_{\Omega} = \hat{\epsilon}^\prime\hat{\Omega}^{-1}\hat{\epsilon}
+
+        and
+
+        .. math::
+
+           TSS_{\Omega} = \hat{\eta}^\prime\hat{\Omega}^{-1}\hat{\eta}
+
+        where :math:`\eta` is the residual from a regression on only a constant.
+
+        Judge's system R2 is defined as
+
+        .. math::
+
+           1 - \frac{\sum_i \sum_j \hat{\epsilon}_ij^2}{\sum_i \sum_j \hat{\eta}_ij^2}
+
+        where :math:`\eta` is the residual from a regression on only a constant.
+
+        Berndt's system R2 is defined as
+
+        .. math::
+
+           1 - \frac{|\hat{\Sigma}_\epsilon|}{|\hat{\Sigma}_\eta|}
+
+        where :math:`\hat{\Sigma}_\epsilon` and :math:`\hat{\Sigma}_\eta` are the
+        estimated covariances :math:`\epsilon` and :math:`\eta`, respectively.
+
+        Dhrymes's system R2 is defined as a weighted average of the R2 of each
+        equation
+
+        .. math::
+
+            \sum__i w_i R^2_i
+
+        where the weight is
+
+        .. math::
+
+           w_i = \frac{\hat{\Sigma}_{\eta}^{[ii]}}{\tr{\hat{\Sigma}_{\eta}}}
+
+        the ratio of the variance the dependent in an equation to the total
+        variance of all dependent variables.
+        """
+        return self._system_r2
+
+    @property
     def summary(self):
         """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
 
@@ -333,12 +423,12 @@ class SystemResults(_CommonResults):
                     ('', '')]
 
         top_right = [('Overall R-squared:', _str(self.rsquared)),
+                     ('McElroy\'s R-squared:', _str(self.system_rsquared.mcelroy)),
+                     ('Judge\'s (OLS) R-squared:', _str(self.system_rsquared.judge)),
+                     ('Berndt\'s R-squared:', _str(self.system_rsquared.berndt)),
+                     ('Dhrymes\'s R-squared:', _str(self.system_rsquared.dhrymes)),
                      ('Cov. Estimator:', self._cov_type),
-                     ('Num. Constraints: ', self._num_constraints),
-                     ('', ''),
-                     ('', ''),
-                     ('', ''),
-                     ('', '')]
+                     ('Num. Constraints: ', self._num_constraints)]
 
         stubs = []
         vals = []

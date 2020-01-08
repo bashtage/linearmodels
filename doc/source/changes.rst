@@ -3,11 +3,12 @@ Change Log
 
 Since 4.14
 ==========
-* Removed support for Python 3.5 inline with NEP-29 (:issue:`222`)
+* Added McElroy's and Berndt's measures of system fit (:issue:`215`).
+* Removed support for Python 3.5 inline with NEP-29 (:issue:`222`).
 
 Version 4.14
 ============
-* Fixed issue where datasets were not installed with wheels (:issue:`217`)
+* Fixed issue where datasets were not installed with wheels (:issue:`217`).
 * Switched to property-cached to inherit cached property from property (:issue:`211`).
 * Removed all use of :class:`pandas.Panel` (:issue:`211`).
 
