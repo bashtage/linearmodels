@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.weight\_type
+=========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.weight_type

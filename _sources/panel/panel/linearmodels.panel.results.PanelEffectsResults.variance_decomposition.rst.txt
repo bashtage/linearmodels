@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.variance\_decomposition
+======================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.variance_decomposition

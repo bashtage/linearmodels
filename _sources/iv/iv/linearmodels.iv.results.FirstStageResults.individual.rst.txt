@@ -1,0 +1,6 @@
+linearmodels.iv.results.FirstStageResults.individual
+====================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: FirstStageResults.individual

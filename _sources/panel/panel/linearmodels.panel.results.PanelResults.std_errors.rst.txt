@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.std\_errors
+===================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.std_errors

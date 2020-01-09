@@ -1,0 +1,38 @@
+linearmodels.iv.absorbing.AbsorbingLS
+=====================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoclass:: AbsorbingLS
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~AbsorbingLS.fit
+      ~AbsorbingLS.resids
+      ~AbsorbingLS.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~AbsorbingLS.absorbed_dependent
+      ~AbsorbingLS.absorbed_exog
+      ~AbsorbingLS.dependent
+      ~AbsorbingLS.exog
+      ~AbsorbingLS.has_constant
+      ~AbsorbingLS.instruments
+      ~AbsorbingLS.weights
+   
+   
+   

@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.rsquared
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.rsquared

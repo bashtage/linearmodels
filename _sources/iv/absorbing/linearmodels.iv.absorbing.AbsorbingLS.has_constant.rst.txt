@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLS.has\_constant
+===================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLS.has_constant

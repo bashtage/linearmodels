@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.f\_statistic
+=================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.f_statistic

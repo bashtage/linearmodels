@@ -22,6 +22,11 @@ Estimation and inference in some common linear models:
 * Fama-MacBeth Estimation (:class:`~linearmodels.panel.model.FamaMacBeth`)
 
 
+**High-dimensional Regression**
+
+* Absorbing Least Squares (:class:`~linearmodels.iv.absorbing.AbsorbingLS`)
+
+
 **Single equation Instrumental Variables (IV) models**
 
 * Two-stage least squares (2SLS, :class:`~linearmodels.iv.model.IV2SLS`)

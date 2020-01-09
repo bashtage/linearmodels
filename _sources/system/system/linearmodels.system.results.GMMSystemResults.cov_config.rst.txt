@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.cov\_config
+========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.cov_config

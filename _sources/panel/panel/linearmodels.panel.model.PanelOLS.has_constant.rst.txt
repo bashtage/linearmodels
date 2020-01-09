@@ -1,0 +1,6 @@
+linearmodels.panel.model.PanelOLS.has\_constant
+===============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: PanelOLS.has_constant

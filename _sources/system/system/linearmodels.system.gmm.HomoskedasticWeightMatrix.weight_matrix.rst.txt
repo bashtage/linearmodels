@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.gmm.HomoskedasticWeightMatrix.weight\_matrix
+================================================================
+
+.. currentmodule:: linearmodels.system.gmm
+
+.. automethod:: HomoskedasticWeightMatrix.weight_matrix

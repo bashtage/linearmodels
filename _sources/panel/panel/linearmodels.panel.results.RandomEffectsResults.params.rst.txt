@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.params
+======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.params

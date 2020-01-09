@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.fitted\_values
+=================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.fitted_values

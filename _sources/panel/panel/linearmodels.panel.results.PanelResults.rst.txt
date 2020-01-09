@@ -1,0 +1,59 @@
+linearmodels.panel.results.PanelResults
+=======================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoclass:: PanelResults
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~PanelResults.conf_int
+      ~PanelResults.predict
+      ~PanelResults.wald_test
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~PanelResults.cov
+      ~PanelResults.df_model
+      ~PanelResults.df_resid
+      ~PanelResults.entity_info
+      ~PanelResults.estimated_effects
+      ~PanelResults.f_statistic
+      ~PanelResults.f_statistic_robust
+      ~PanelResults.fitted_values
+      ~PanelResults.idiosyncratic
+      ~PanelResults.loglik
+      ~PanelResults.model_ss
+      ~PanelResults.name
+      ~PanelResults.nobs
+      ~PanelResults.params
+      ~PanelResults.pvalues
+      ~PanelResults.resid_ss
+      ~PanelResults.resids
+      ~PanelResults.rsquared
+      ~PanelResults.rsquared_between
+      ~PanelResults.rsquared_overall
+      ~PanelResults.rsquared_within
+      ~PanelResults.s2
+      ~PanelResults.std_errors
+      ~PanelResults.summary
+      ~PanelResults.time_info
+      ~PanelResults.total_ss
+      ~PanelResults.tstats
+      ~PanelResults.wresids
+   
+   
+   

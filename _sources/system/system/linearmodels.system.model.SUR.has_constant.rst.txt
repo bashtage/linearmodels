@@ -1,0 +1,6 @@
+linearmodels.system.model.SUR.has\_constant
+===========================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: SUR.has_constant

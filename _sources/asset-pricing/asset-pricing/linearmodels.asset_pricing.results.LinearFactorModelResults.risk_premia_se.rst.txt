@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults.risk\_premia\_se
+=============================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: LinearFactorModelResults.risk_premia_se

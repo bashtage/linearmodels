@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.rsquared
+==================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.rsquared

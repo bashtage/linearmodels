@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.Interaction.sparse
+============================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: Interaction.sparse

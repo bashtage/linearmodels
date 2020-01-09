@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.f\_statistic
+======================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.f_statistic

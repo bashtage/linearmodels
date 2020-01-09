@@ -1,0 +1,6 @@
+linearmodels.system.covariance.GMMHeteroskedasticCovariance.cov\_config
+=======================================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: GMMHeteroskedasticCovariance.cov_config

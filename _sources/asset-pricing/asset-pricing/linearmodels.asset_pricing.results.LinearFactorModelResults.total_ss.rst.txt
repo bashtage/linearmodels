@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults.total\_ss
+======================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: LinearFactorModelResults.total_ss

@@ -1,0 +1,6 @@
+linearmodels.iv.results.compare
+===============================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autofunction:: compare

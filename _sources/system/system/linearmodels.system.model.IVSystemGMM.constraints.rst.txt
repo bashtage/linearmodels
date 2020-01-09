@@ -1,0 +1,6 @@
+linearmodels.system.model.IVSystemGMM.constraints
+=================================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: IVSystemGMM.constraints

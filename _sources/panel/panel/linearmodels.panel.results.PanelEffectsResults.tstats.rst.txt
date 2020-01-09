@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.tstats
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.tstats

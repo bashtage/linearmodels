@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.cov\_type
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.cov_type

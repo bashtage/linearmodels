@@ -1,0 +1,6 @@
+linearmodels.panel.model.FamaMacBeth.not\_null
+==============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: FamaMacBeth.not_null

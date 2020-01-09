@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.SUR.multivariate\_ls
+==============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: SUR.multivariate_ls

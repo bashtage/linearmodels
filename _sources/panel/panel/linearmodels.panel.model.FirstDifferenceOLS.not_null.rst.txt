@@ -1,0 +1,6 @@
+linearmodels.panel.model.FirstDifferenceOLS.not\_null
+=====================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: FirstDifferenceOLS.not_null

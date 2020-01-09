@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.PanelData.dummies
+=========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: PanelData.dummies

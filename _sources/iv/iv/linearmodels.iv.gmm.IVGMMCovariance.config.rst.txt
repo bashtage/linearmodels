@@ -1,0 +1,6 @@
+linearmodels.iv.gmm.IVGMMCovariance.config
+==========================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoproperty:: IVGMMCovariance.config

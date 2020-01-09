@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.rsquared\_overall
+=================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.rsquared_overall

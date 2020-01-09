@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.rsquared\_adj
+==========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.rsquared_adj

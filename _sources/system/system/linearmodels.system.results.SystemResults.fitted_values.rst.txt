@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.fitted\_values
+========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.fitted_values

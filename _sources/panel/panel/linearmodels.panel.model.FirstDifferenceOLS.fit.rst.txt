@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.FirstDifferenceOLS.fit
+===============================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: FirstDifferenceOLS.fit

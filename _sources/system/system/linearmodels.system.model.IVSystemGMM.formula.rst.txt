@@ -1,0 +1,6 @@
+linearmodels.system.model.IVSystemGMM.formula
+=============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: IVSystemGMM.formula

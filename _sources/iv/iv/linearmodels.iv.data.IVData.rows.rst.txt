@@ -1,0 +1,6 @@
+linearmodels.iv.data.IVData.rows
+================================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. autoproperty:: IVData.rows

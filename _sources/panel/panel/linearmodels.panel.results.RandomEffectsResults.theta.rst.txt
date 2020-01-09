@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.theta
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.theta

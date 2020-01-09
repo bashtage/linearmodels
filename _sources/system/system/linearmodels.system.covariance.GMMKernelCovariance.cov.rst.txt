@@ -1,0 +1,6 @@
+linearmodels.system.covariance.GMMKernelCovariance.cov
+======================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: GMMKernelCovariance.cov

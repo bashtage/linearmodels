@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.entity\_ids
+=============================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.entity_ids

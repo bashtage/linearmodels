@@ -1,0 +1,35 @@
+linearmodels.panel.model.PooledOLS
+==================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoclass:: PooledOLS
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~PooledOLS.fit
+      ~PooledOLS.from_formula
+      ~PooledOLS.predict
+      ~PooledOLS.reformat_clusters
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~PooledOLS.formula
+      ~PooledOLS.has_constant
+      ~PooledOLS.not_null
+   
+   
+   

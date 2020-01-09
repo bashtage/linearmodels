@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.cov\_estimator
+===========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.cov_estimator

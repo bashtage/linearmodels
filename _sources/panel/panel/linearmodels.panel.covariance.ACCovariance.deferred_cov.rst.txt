@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.ACCovariance.deferred\_cov
+========================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. automethod:: ACCovariance.deferred_cov

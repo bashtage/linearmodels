@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.wresids
+=========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.wresids

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.results.SystemResults.conf\_int
+===================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. automethod:: SystemResults.conf_int

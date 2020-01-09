@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.w
+==============================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.w

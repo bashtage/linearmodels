@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.PanelResults.conf\_int
+=================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: PanelResults.conf_int

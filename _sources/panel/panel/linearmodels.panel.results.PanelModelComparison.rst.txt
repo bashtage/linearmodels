@@ -1,0 +1,41 @@
+linearmodels.panel.results.PanelModelComparison
+===============================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoclass:: PanelModelComparison
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~PanelModelComparison.cov_estimator
+      ~PanelModelComparison.estimator_method
+      ~PanelModelComparison.f_statistic
+      ~PanelModelComparison.nobs
+      ~PanelModelComparison.params
+      ~PanelModelComparison.pvalues
+      ~PanelModelComparison.rsquared
+      ~PanelModelComparison.rsquared_between
+      ~PanelModelComparison.rsquared_overall
+      ~PanelModelComparison.rsquared_within
+      ~PanelModelComparison.std_errors
+      ~PanelModelComparison.summary
+      ~PanelModelComparison.tstats
+   
+   
+   

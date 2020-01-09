@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.PanelData.copy
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: PanelData.copy

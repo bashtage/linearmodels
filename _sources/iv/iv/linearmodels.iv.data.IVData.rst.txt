@@ -1,0 +1,37 @@
+linearmodels.iv.data.IVData
+===========================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. autoclass:: IVData
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~IVData.drop
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVData.cols
+      ~IVData.isnull
+      ~IVData.labels
+      ~IVData.ndarray
+      ~IVData.ndim
+      ~IVData.pandas
+      ~IVData.rows
+      ~IVData.shape
+   
+   
+   

@@ -1,0 +1,34 @@
+linearmodels.asset\_pricing.covariance.HeteroskedasticCovariance
+================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.covariance
+
+.. autoclass:: HeteroskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~HeteroskedasticCovariance.config
+      ~HeteroskedasticCovariance.cov
+      ~HeteroskedasticCovariance.inv_jacobian
+      ~HeteroskedasticCovariance.jacobian
+      ~HeteroskedasticCovariance.s
+      ~HeteroskedasticCovariance.square
+   
+   
+   

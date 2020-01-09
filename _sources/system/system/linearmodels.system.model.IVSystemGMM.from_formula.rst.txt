@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.IVSystemGMM.from\_formula
+===================================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: IVSystemGMM.from_formula

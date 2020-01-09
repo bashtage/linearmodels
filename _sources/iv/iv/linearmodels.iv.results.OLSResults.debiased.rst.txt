@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.debiased
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.debiased

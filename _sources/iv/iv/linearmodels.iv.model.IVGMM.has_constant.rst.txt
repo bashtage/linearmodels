@@ -1,0 +1,6 @@
+linearmodels.iv.model.IVGMM.has\_constant
+=========================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IVGMM.has_constant

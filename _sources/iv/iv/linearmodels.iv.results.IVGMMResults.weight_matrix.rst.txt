@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.weight\_matrix
+===================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.weight_matrix

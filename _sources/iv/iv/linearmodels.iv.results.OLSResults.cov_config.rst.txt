@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.cov\_config
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.cov_config

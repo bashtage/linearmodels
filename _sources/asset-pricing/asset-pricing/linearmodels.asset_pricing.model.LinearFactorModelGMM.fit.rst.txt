@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.asset\_pricing.model.LinearFactorModelGMM.fit
+==========================================================
+
+.. currentmodule:: linearmodels.asset_pricing.model
+
+.. automethod:: LinearFactorModelGMM.fit

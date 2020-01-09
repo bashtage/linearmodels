@@ -1,0 +1,6 @@
+linearmodels.iv.data.IVData.pandas
+==================================
+
+.. currentmodule:: linearmodels.iv.data
+
+.. autoproperty:: IVData.pandas

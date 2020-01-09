@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVResults.predict
+=========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVResults.predict

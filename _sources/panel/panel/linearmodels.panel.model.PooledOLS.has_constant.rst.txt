@@ -1,0 +1,6 @@
+linearmodels.panel.model.PooledOLS.has\_constant
+================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: PooledOLS.has_constant

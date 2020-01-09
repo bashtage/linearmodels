@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.IVGMM.fit
+===============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: IVGMM.fit

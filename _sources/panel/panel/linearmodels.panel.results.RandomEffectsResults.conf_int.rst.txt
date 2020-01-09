@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.RandomEffectsResults.conf\_int
+=========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: RandomEffectsResults.conf_int

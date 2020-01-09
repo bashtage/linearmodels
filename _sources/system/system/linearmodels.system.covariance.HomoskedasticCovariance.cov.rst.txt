@@ -1,0 +1,6 @@
+linearmodels.system.covariance.HomoskedasticCovariance.cov
+==========================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: HomoskedasticCovariance.cov

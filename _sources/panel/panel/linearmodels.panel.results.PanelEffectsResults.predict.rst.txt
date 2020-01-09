@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.PanelEffectsResults.predict
+======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: PanelEffectsResults.predict

@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.nentity
+=========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.nentity

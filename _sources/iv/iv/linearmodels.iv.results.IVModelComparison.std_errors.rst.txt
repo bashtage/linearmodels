@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.std\_errors
+=====================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.std_errors

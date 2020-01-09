@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.ClusteredCovariance.deferred\_cov
+===============================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. automethod:: ClusteredCovariance.deferred_cov

@@ -1,0 +1,6 @@
+linearmodels.panel.covariance.ACCovariance.name
+===============================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoproperty:: ACCovariance.name

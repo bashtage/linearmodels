@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVGMMResults.c\_stat
+============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVGMMResults.c_stat

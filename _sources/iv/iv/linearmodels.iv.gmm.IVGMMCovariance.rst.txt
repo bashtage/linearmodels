@@ -1,0 +1,33 @@
+linearmodels.iv.gmm.IVGMMCovariance
+===================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoclass:: IVGMMCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVGMMCovariance.config
+      ~IVGMMCovariance.cov
+      ~IVGMMCovariance.debiased
+      ~IVGMMCovariance.s
+      ~IVGMMCovariance.s2
+   
+   
+   

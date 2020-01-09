@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.model\_ss
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.model_ss

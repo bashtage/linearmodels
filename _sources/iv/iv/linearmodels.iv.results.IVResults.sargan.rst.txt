@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.sargan
+========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.sargan

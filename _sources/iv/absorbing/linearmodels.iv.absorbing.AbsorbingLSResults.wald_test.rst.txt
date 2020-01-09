@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.absorbing.AbsorbingLSResults.wald\_test
+=======================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. automethod:: AbsorbingLSResults.wald_test

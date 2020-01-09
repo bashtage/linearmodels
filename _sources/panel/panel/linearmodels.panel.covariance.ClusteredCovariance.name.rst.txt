@@ -1,0 +1,6 @@
+linearmodels.panel.covariance.ClusteredCovariance.name
+======================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoproperty:: ClusteredCovariance.name

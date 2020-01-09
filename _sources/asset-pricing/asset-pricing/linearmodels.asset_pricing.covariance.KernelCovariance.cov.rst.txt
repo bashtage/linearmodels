@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.covariance.KernelCovariance.cov
+===========================================================
+
+.. currentmodule:: linearmodels.asset_pricing.covariance
+
+.. autoproperty:: KernelCovariance.cov

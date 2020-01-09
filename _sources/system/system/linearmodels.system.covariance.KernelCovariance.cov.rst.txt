@@ -1,0 +1,6 @@
+linearmodels.system.covariance.KernelCovariance.cov
+===================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: KernelCovariance.cov

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.results.SystemResults.predict
+=================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. automethod:: SystemResults.predict

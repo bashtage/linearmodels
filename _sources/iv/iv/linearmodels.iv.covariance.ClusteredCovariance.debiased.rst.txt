@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.ClusteredCovariance.debiased
+=======================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoproperty:: ClusteredCovariance.debiased

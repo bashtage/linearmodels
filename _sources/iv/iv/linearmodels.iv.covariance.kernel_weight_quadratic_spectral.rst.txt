@@ -1,0 +1,6 @@
+linearmodels.iv.covariance.kernel\_weight\_quadratic\_spectral
+==============================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autofunction:: kernel_weight_quadratic_spectral

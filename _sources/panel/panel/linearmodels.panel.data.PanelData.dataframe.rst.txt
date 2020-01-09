@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.dataframe
+===========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.dataframe

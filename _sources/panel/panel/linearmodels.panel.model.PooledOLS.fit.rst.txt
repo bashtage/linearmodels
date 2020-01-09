@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.PooledOLS.fit
+======================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: PooledOLS.fit

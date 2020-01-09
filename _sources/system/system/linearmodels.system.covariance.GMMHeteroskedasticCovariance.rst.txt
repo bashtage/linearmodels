@@ -1,0 +1,30 @@
+linearmodels.system.covariance.GMMHeteroskedasticCovariance
+===========================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoclass:: GMMHeteroskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~GMMHeteroskedasticCovariance.cov
+      ~GMMHeteroskedasticCovariance.cov_config
+   
+   
+   

@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.resids
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.resids

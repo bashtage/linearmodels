@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.IVGMMCUE.from\_formula
+============================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: IVGMMCUE.from_formula

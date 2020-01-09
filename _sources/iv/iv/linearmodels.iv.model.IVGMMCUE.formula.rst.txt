@@ -1,0 +1,6 @@
+linearmodels.iv.model.IVGMMCUE.formula
+======================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: IVGMMCUE.formula

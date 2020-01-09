@@ -1,0 +1,30 @@
+linearmodels.iv.gmm.OneWayClusteredWeightMatrix
+===============================================
+
+.. currentmodule:: linearmodels.iv.gmm
+
+.. autoclass:: OneWayClusteredWeightMatrix
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~OneWayClusteredWeightMatrix.weight_matrix
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~OneWayClusteredWeightMatrix.config
+   
+   
+   

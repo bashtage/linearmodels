@@ -1,0 +1,33 @@
+linearmodels.iv.covariance.HeteroskedasticCovariance
+====================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autoclass:: HeteroskedasticCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~HeteroskedasticCovariance.config
+      ~HeteroskedasticCovariance.cov
+      ~HeteroskedasticCovariance.debiased
+      ~HeteroskedasticCovariance.s
+      ~HeteroskedasticCovariance.s2
+   
+   
+   

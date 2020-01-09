@@ -1,0 +1,38 @@
+linearmodels.iv.model.IVLIML
+============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: IVLIML
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~IVLIML.estimate_parameters
+      ~IVLIML.fit
+      ~IVLIML.from_formula
+      ~IVLIML.predict
+      ~IVLIML.resids
+      ~IVLIML.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVLIML.formula
+      ~IVLIML.has_constant
+      ~IVLIML.isnull
+      ~IVLIML.notnull
+   
+   
+   

@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLSResults.resids
+===================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLSResults.resids

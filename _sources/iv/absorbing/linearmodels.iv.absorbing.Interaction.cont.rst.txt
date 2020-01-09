@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.Interaction.cont
+==========================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: Interaction.cont

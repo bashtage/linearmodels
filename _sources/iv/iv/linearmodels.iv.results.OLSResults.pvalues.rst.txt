@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.pvalues
+==========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.pvalues

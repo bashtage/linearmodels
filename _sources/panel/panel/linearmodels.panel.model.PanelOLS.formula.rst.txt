@@ -1,0 +1,6 @@
+linearmodels.panel.model.PanelOLS.formula
+=========================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. autoproperty:: PanelOLS.formula

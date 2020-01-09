@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.std\_errors
+===========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.std_errors

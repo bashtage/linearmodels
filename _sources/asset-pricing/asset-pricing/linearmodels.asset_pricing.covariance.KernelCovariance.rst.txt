@@ -1,0 +1,36 @@
+linearmodels.asset\_pricing.covariance.KernelCovariance
+=======================================================
+
+.. currentmodule:: linearmodels.asset_pricing.covariance
+
+.. autoclass:: KernelCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~KernelCovariance.bandwidth
+      ~KernelCovariance.config
+      ~KernelCovariance.cov
+      ~KernelCovariance.inv_jacobian
+      ~KernelCovariance.jacobian
+      ~KernelCovariance.kernel
+      ~KernelCovariance.s
+      ~KernelCovariance.square
+   
+   
+   

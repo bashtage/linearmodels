@@ -1,0 +1,39 @@
+linearmodels.iv.model.IVGMMCUE
+==============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: IVGMMCUE
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~IVGMMCUE.estimate_parameters
+      ~IVGMMCUE.fit
+      ~IVGMMCUE.from_formula
+      ~IVGMMCUE.j
+      ~IVGMMCUE.predict
+      ~IVGMMCUE.resids
+      ~IVGMMCUE.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVGMMCUE.formula
+      ~IVGMMCUE.has_constant
+      ~IVGMMCUE.isnull
+      ~IVGMMCUE.notnull
+   
+   
+   

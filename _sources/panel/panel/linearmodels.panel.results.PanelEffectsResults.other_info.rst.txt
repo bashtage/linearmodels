@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.other\_info
+==========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.other_info

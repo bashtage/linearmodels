@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.total\_ss
+===================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.total_ss

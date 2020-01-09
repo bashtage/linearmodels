@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.has\_constant
+================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.has_constant

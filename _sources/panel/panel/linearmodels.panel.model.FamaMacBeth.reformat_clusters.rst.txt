@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.model.FamaMacBeth.reformat\_clusters
+=======================================================
+
+.. currentmodule:: linearmodels.panel.model
+
+.. automethod:: FamaMacBeth.reformat_clusters

@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingLS.exog
+==========================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingLS.exog

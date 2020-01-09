@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.df\_resid
+========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.df_resid

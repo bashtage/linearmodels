@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.rsquared\_between
+=========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.rsquared_between

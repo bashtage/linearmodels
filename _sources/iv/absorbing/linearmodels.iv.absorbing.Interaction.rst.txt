@@ -1,0 +1,36 @@
+linearmodels.iv.absorbing.Interaction
+=====================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoclass:: Interaction
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~Interaction.drop
+      ~Interaction.from_frame
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~Interaction.cat
+      ~Interaction.cont
+      ~Interaction.hash
+      ~Interaction.isnull
+      ~Interaction.nobs
+      ~Interaction.sparse
+   
+   
+   

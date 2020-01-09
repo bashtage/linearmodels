@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.cov\_estimator
+========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.cov_estimator

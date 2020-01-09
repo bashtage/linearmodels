@@ -1,0 +1,6 @@
+linearmodels.system.results.GMMSystemResults.df\_resid
+======================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: GMMSystemResults.df_resid

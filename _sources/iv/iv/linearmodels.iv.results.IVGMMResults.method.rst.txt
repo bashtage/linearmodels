@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.method
+===========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.method

@@ -1,0 +1,6 @@
+linearmodels.system.model.SUR.formula
+=====================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: SUR.formula

@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.rsquared\_within
+========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.rsquared_within

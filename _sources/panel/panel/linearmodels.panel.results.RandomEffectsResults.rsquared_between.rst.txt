@@ -1,0 +1,6 @@
+linearmodels.panel.results.RandomEffectsResults.rsquared\_between
+=================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: RandomEffectsResults.rsquared_between

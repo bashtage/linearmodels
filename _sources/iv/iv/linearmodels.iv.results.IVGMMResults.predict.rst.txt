@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.results.IVGMMResults.predict
+============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. automethod:: IVGMMResults.predict

@@ -1,0 +1,6 @@
+linearmodels.system.gmm.HeteroskedasticWeightMatrix.config
+==========================================================
+
+.. currentmodule:: linearmodels.system.gmm
+
+.. autoproperty:: HeteroskedasticWeightMatrix.config

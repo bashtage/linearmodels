@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.PanelData.drop
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: PanelData.drop

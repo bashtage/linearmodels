@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.kappa
+==========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.kappa

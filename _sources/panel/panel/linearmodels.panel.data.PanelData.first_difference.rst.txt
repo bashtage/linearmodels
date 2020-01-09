@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.PanelData.first\_difference
+===================================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: PanelData.first_difference

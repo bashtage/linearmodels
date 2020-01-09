@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.model.SUR.fit
+=================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. automethod:: SUR.fit

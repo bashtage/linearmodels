@@ -1,0 +1,6 @@
+linearmodels.system.results.SystemResults.resid\_ss
+===================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. autoproperty:: SystemResults.resid_ss

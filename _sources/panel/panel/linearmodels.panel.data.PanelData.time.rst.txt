@@ -1,0 +1,6 @@
+linearmodels.panel.data.PanelData.time
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: PanelData.time

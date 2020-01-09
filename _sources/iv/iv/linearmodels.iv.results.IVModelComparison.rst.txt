@@ -1,0 +1,39 @@
+linearmodels.iv.results.IVModelComparison
+=========================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoclass:: IVModelComparison
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~IVModelComparison.cov_estimator
+      ~IVModelComparison.estimator_method
+      ~IVModelComparison.f_statistic
+      ~IVModelComparison.nobs
+      ~IVModelComparison.params
+      ~IVModelComparison.pvalues
+      ~IVModelComparison.rsquared
+      ~IVModelComparison.rsquared_adj
+      ~IVModelComparison.std_errors
+      ~IVModelComparison.summary
+      ~IVModelComparison.tstats
+   
+   
+   

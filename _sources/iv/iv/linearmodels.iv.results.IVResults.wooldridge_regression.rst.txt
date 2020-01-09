@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVResults.wooldridge\_regression
+========================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVResults.wooldridge_regression

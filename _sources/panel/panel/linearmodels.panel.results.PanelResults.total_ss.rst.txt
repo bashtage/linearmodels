@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelResults.total\_ss
+=================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelResults.total_ss

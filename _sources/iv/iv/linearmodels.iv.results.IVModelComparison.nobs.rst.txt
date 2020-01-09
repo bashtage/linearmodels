@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVModelComparison.nobs
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVModelComparison.nobs

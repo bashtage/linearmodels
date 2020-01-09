@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.weight\_type
+=================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.weight_type

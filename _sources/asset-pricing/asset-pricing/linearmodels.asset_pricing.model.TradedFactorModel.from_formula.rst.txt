@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.asset\_pricing.model.TradedFactorModel.from\_formula
+=================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.model
+
+.. automethod:: TradedFactorModel.from_formula

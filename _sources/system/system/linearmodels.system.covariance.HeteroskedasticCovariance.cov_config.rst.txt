@@ -1,0 +1,6 @@
+linearmodels.system.covariance.HeteroskedasticCovariance.cov\_config
+====================================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: HeteroskedasticCovariance.cov_config
