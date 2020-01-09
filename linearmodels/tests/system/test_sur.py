@@ -682,3 +682,27 @@ def test_predict_error(missing_data):
     res = mod.fit()
     with pytest.raises(ValueError):
         res.predict(fitted=False, idiosyncratic=False)
+
+
+def test_system_r2_direct():
+    eqns = generate_data(k=3)
+    mod = SUR(eqns)
+    res = mod.fit(method='ols', cov_type='unadjusted')
+    u = res.resids.to_numpy().ravel()
+    nobs = res.resids.shape[0]
+    omega_inv = np.kron(np.linalg.inv(res.sigma), np.eye(nobs))
+    numerator = u[None,:] @ omega_inv @ u[:,None]
+
+    const = eqns.copy()
+    for eq in const:
+        const[eq]['exog'] = np.ones((nobs,1))
+    mod = SUR(const)
+    res_const = mod.fit(method='ols', cov_type='unadjusted')
+    uc = res_const.resids.to_numpy().ravel()
+    denom = uc[None, :] @ omega_inv @ uc[:, None]
+    mcelroy = 1 - np.squeeze(numerator / denom)
+    iota = np.ones((nobs, 1))
+    middle = np.kron(np.linalg.inv(res.sigma), np.eye(nobs) - iota @ iota.T / nobs)
+    y = np.vstack([const[eq]['dependent'] for eq in const])
+    denom2 = y.T @ middle @ y
+    1 - np.squeeze(numerator / denom2)

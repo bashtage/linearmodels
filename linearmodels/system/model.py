@@ -677,6 +677,9 @@ class IV3SLS(object):
         linearmodels.system.covariance.HeteroskedasticCovariance
         linearmodels.system.covariance.KernelCovariance
         """
+        if method is None:
+            method = 'ols' if (self._common_exog and self._constraints is None) else 'gls'
+
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
             raise ValueError('Unknown cov_type: {0}'.format(cov_type))
@@ -690,8 +693,6 @@ class IV3SLS(object):
         nobs = eps.shape[0]
         debiased = cov_config.get('debiased', False)
         full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
-        if method is None:
-            method = 'ols' if (self._common_exog and self._constraints is None) else 'gls'
 
         if method == 'ols':
             return self._multivariate_ls_finalize(beta, eps, sigma, col_idx, total_cols,
@@ -1110,7 +1111,7 @@ class IV3SLS(object):
         tot_eps_const_sq = (eps_const ** 2).sum(0)
         r2s = np.asarray(r2s)
         dhrymes = (r2s * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
-        return Series(AttrDict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes))
+        return Series(dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes))
 
     def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps, full_cov, total_cols, col_idx,
                       cov_type, iter_count, **cov_config):
