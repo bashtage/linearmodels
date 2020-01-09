@@ -47,6 +47,7 @@ linearmodels.system.results.SystemResults
       ~SystemResults.sigma
       ~SystemResults.std_errors
       ~SystemResults.summary
+      ~SystemResults.system_rsquared
       ~SystemResults.total_ss
       ~SystemResults.tstats
       ~SystemResults.wresids

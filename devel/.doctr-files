@@ -721,6 +721,7 @@ devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.rst.tx
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.sigma.rst.txt
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.std_errors.rst.txt
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.summary.rst.txt
+devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.system_rsquared.rst.txt
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.total_ss.rst.txt
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.tstats.rst.txt
 devel/_sources/system/system/linearmodels.system.results.GMMSystemResults.w.rst.txt
@@ -752,6 +753,7 @@ devel/_sources/system/system/linearmodels.system.results.SystemResults.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.sigma.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.std_errors.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.summary.rst.txt
+devel/_sources/system/system/linearmodels.system.results.SystemResults.system_rsquared.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.total_ss.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.tstats.rst.txt
 devel/_sources/system/system/linearmodels.system.results.SystemResults.wresids.rst.txt
@@ -1555,6 +1557,7 @@ devel/system/system/linearmodels.system.results.GMMSystemResults.rsquared.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.sigma.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.std_errors.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.summary.html
+devel/system/system/linearmodels.system.results.GMMSystemResults.system_rsquared.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.total_ss.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.tstats.html
 devel/system/system/linearmodels.system.results.GMMSystemResults.w.html
@@ -1586,6 +1589,7 @@ devel/system/system/linearmodels.system.results.SystemResults.rsquared.html
 devel/system/system/linearmodels.system.results.SystemResults.sigma.html
 devel/system/system/linearmodels.system.results.SystemResults.std_errors.html
 devel/system/system/linearmodels.system.results.SystemResults.summary.html
+devel/system/system/linearmodels.system.results.SystemResults.system_rsquared.html
 devel/system/system/linearmodels.system.results.SystemResults.total_ss.html
 devel/system/system/linearmodels.system.results.SystemResults.tstats.html
 devel/system/system/linearmodels.system.results.SystemResults.wresids.html

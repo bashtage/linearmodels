@@ -48,6 +48,7 @@ linearmodels.system.results.GMMSystemResults
       ~GMMSystemResults.sigma
       ~GMMSystemResults.std_errors
       ~GMMSystemResults.summary
+      ~GMMSystemResults.system_rsquared
       ~GMMSystemResults.total_ss
       ~GMMSystemResults.tstats
       ~GMMSystemResults.w
