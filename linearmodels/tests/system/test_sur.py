@@ -27,12 +27,12 @@ params = list(product(p, const, rho, common_exog, included_weights, output_dict)
 
 
 def gen_id(param):
-    idstr = 'homo' if isinstance(param[0], list) else 'hetero'
-    idstr += '-const' if param[1] else ''
-    idstr += '-correl' if param[2] != 0 else ''
-    idstr += '-common' if param[3] else ''
-    idstr += '-weights' if param[4] else ''
-    idstr += '-dist' if param[4] else '-tuple'
+    idstr = "homo" if isinstance(param[0], list) else "hetero"
+    idstr += "-const" if param[1] else ""
+    idstr += "-correl" if param[2] != 0 else ""
+    idstr += "-common" if param[3] else ""
+    idstr += "-weights" if param[4] else ""
+    idstr += "-dist" if param[4] else "-tuple"
     return idstr
 
 
@@ -48,9 +48,9 @@ def check_results(res1, res2):
     assert_allclose(res1.wresids, res2.wresids)
     assert_allclose(res1.tstats, res2.tstats)
     assert_allclose(res1.std_errors, res2.std_errors)
-    if hasattr(res1, 'rsquared_adj'):
+    if hasattr(res1, "rsquared_adj"):
         assert_allclose(res1.rsquared_adj, res2.rsquared_adj)
-    if hasattr(res1, 'f_statistic'):
+    if hasattr(res1, "f_statistic"):
         assert_allclose(res1.f_statistic.stat, res2.f_statistic.stat)
         if res2.f_statistic.df_denom is None:
             # Do not test case of F dist due to DOF differences
@@ -58,7 +58,7 @@ def check_results(res1, res2):
 
 
 def get_res(res):
-    d = filter(lambda s: not s.startswith('_'), dir(res))
+    d = filter(lambda s: not s.startswith("_"), dir(res))
     for attr in d:
         value = getattr(res, attr)
         if isinstance(value, Mapping):
@@ -71,19 +71,24 @@ def data(request):
     p, const, rho, common_exog, included_weights, output_dict = request.param
     if common_exog and isinstance(p, list):
         p = 3
-    return generate_data(p=p, const=const, rho=rho,
-                         common_exog=common_exog, included_weights=included_weights,
-                         output_dict=output_dict)
+    return generate_data(
+        p=p,
+        const=const,
+        rho=rho,
+        common_exog=common_exog,
+        included_weights=included_weights,
+        output_dict=output_dict,
+    )
 
 
-@pytest.fixture(scope='module', params=[0, 0.1])
+@pytest.fixture(scope="module", params=[0, 0.1])
 def missing_data(request):
     eqns = generate_data()
     np.random.seed(12345)
     missing = np.random.random_sample(500)
     missing = missing < request.param
     for key in eqns:
-        eqns[key]['dependent'][missing] = np.nan
+        eqns[key]["dependent"][missing] = np.nan
     return eqns
 
 
@@ -91,46 +96,51 @@ params = list(product(const, rho, included_weights))
 
 
 def gen_id(param):
-    idstr = 'const' if param[0] else ''
-    idstr += '-correl' if param[1] != 0 else ''
-    idstr += '-weights' if param[2] else ''
+    idstr = "const" if param[0] else ""
+    idstr += "-correl" if param[1] != 0 else ""
+    idstr += "-weights" if param[2] else ""
     return idstr
 
 
 ids = list(map(gen_id, params))
 
 
-@pytest.fixture(scope='module', params=params, ids=ids)
+@pytest.fixture(scope="module", params=params, ids=ids)
 def mvreg_data(request):
     const, rho, included_weights = request.param
-    values = generate_data(const=const, rho=rho,
-                           common_exog=True, included_weights=included_weights)
+    values = generate_data(
+        const=const, rho=rho, common_exog=True, included_weights=included_weights
+    )
     dep = []
     for key in values:
-        exog = values[key]['exog']
-        dep.append(values[key]['dependent'])
+        exog = values[key]["exog"]
+        dep.append(values[key]["dependent"])
     return np.hstack(dep), exog
 
 
-kernels = ['bartlett', 'newey-west', 'parzen', 'gallant', 'qs', 'andrews']
+kernels = ["bartlett", "newey-west", "parzen", "gallant", "qs", "andrews"]
 bandwidths = [None, 0, 10]
 debiased = [True, False]
 params = list(product(kernels, bandwidths, debiased))
-ids = list(map(lambda p: p[0] + ', BW: ' + str(p[1]) + ', Debiased: ' + str(p[2]), params))
+ids = list(
+    map(lambda p: p[0] + ", BW: " + str(p[1]) + ", Debiased: " + str(p[2]), params)
+)
 
 
 @pytest.fixture(params=params, ids=ids)
 def kernel_options(request):
-    return {'kernel': request.param[0],
-            'bandwidth': request.param[1],
-            'debiased': request.param[2]}
+    return {
+        "kernel": request.param[0],
+        "bandwidth": request.param[1],
+        "debiased": request.param[2],
+    }
 
 
 def test_smoke(data):
     mod = SUR(data)
     mod.fit()
-    mod.fit(cov_type='unadjusted')
-    mod.fit(cov_type='unadjusted', method='ols')
+    mod.fit(cov_type="unadjusted")
+    mod.fit(cov_type="unadjusted", method="ols")
     res = mod.fit(full_cov=False)
 
     get_res(res)
@@ -140,28 +150,39 @@ def test_errors():
     with pytest.raises(TypeError):
         SUR([])
     with pytest.raises(TypeError):
-        SUR({'a': 'absde', 'b': 12345})
+        SUR({"a": "absde", "b": 12345})
 
-    moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
-                     'exog': np.random.standard_normal((100, 5))}}
+    moddata = {
+        "a": {
+            "dependent": np.random.standard_normal((100, 1)),
+            "exog": np.random.standard_normal((100, 5)),
+        }
+    }
     with pytest.raises(ValueError):
         mod = SUR(moddata)
-        mod.fit(cov_type='unknown')
+        mod.fit(cov_type="unknown")
 
-    moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
-                     'exog': np.random.standard_normal((101, 5))}}
+    moddata = {
+        "a": {
+            "dependent": np.random.standard_normal((100, 1)),
+            "exog": np.random.standard_normal((101, 5)),
+        }
+    }
     with pytest.raises(ValueError):
         SUR(moddata)
 
-    moddata = {'a': {'dependent': np.random.standard_normal((10, 1)),
-                     'exog': np.random.standard_normal((10, 20))}}
+    moddata = {
+        "a": {
+            "dependent": np.random.standard_normal((10, 1)),
+            "exog": np.random.standard_normal((10, 20)),
+        }
+    }
     with pytest.raises(ValueError):
         SUR(moddata)
 
     x = np.random.standard_normal((100, 2))
     x = np.c_[x, x]
-    moddata = {'a': {'dependent': np.random.standard_normal((100, 1)),
-                     'exog': x}}
+    moddata = {"a": {"dependent": np.random.standard_normal((100, 1)), "exog": x}}
     with pytest.raises(ValueError):
         SUR(moddata)
 
@@ -170,70 +191,72 @@ def test_mv_reg_smoke(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
     mod.fit()
-    mod.fit(cov_type='unadjusted')
-    res = mod.fit(cov_type='unadjusted', method='ols')
-    assert res.method == 'OLS'
+    mod.fit(cov_type="unadjusted")
+    res = mod.fit(cov_type="unadjusted", method="ols")
+    assert res.method == "OLS"
     res = mod.fit(full_cov=False)
 
     get_res(res)
 
 
 def test_formula():
-    data = DataFrame(np.random.standard_normal((500, 4)),
-                     columns=['y1', 'y2', 'x1', 'x2'])
-    formula = {'eq1': 'y1 ~ 1 + x1', 'eq2': 'y2 ~ 1 + x2'}
+    data = DataFrame(
+        np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
+    )
+    formula = {"eq1": "y1 ~ 1 + x1", "eq2": "y2 ~ 1 + x2"}
     mod = SUR.from_formula(formula, data)
     mod.fit()
 
-    formula = '{y1 ~ 1 + x1} {y2 ~ 1 + x2}'
+    formula = "{y1 ~ 1 + x1} {y2 ~ 1 + x2}"
     mod = SUR.from_formula(formula, data)
-    mod.fit(cov_type='heteroskedastic')
+    mod.fit(cov_type="heteroskedastic")
 
-    formula = '''
+    formula = """
     {y1 ~ 1 + x1}
     {y2 ~ 1 + x2}
-    '''
+    """
     mod = SUR.from_formula(formula, data)
-    mod.fit(cov_type='heteroskedastic')
+    mod.fit(cov_type="heteroskedastic")
 
-    formula = '''
+    formula = """
     {eq.a:y1 ~ 1 + x1}
     {second: y2 ~ 1 + x2}
-    '''
+    """
     mod = SUR.from_formula(formula, data)
-    res = mod.fit(cov_type='heteroskedastic')
-    assert 'eq.a' in res.equation_labels
-    assert 'second' in res.equation_labels
+    res = mod.fit(cov_type="heteroskedastic")
+    assert "eq.a" in res.equation_labels
+    assert "second" in res.equation_labels
 
 
 # TODO: Implement weights
 # TODO: 1. MV OLS and OLS (weighted) homo and hetero
 # TODO: Implement observation dropping and check
 
+
 def test_mv_ols_equivalence(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
-    res = mod.fit(cov_type='unadjusted')
+    res = mod.fit(cov_type="unadjusted")
     keys = res.equation_labels
-    assert res.method == 'OLS'
+    assert res.method == "OLS"
 
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
-        ols_res = ols_mod.fit(cov_type='unadjusted', debiased=False)
+        ols_res = ols_mod.fit(cov_type="unadjusted", debiased=False)
         mv_res = res.equations[keys[i]]
-        assert mv_res.method == 'OLS'
+        assert mv_res.method == "OLS"
         check_results(mv_res, ols_res)
 
 
 def test_mv_ols_equivalence_robust(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
-    res = mod.fit(cov_type='robust')
+    res = mod.fit(cov_type="robust")
     keys = res.equation_labels
 
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
-        ols_res = ols_mod.fit(cov_type='robust', debiased=False)
+        ols_res = ols_mod.fit(cov_type="robust", debiased=False)
         mv_res = res.equations[keys[i]]
         check_results(mv_res, ols_res)
 
@@ -241,12 +264,12 @@ def test_mv_ols_equivalence_robust(mvreg_data):
 def test_mv_ols_equivalence_debiased(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
-    res = mod.fit(cov_type='unadjusted', debiased=True)
+    res = mod.fit(cov_type="unadjusted", debiased=True)
     keys = res.equation_labels
 
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
-        ols_res = ols_mod.fit(cov_type='unadjusted', debiased=True)
+        ols_res = ols_mod.fit(cov_type="unadjusted", debiased=True)
         mv_res = res.equations[keys[i]]
         check_results(mv_res, ols_res)
 
@@ -254,12 +277,12 @@ def test_mv_ols_equivalence_debiased(mvreg_data):
 def test_mv_ols_equivalence_hetero_debiased(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
-    res = mod.fit(cov_type='robust', debiased=True)
+    res = mod.fit(cov_type="robust", debiased=True)
     keys = res.equation_labels
 
     for i in range(dependent.shape[1]):
         ols_mod = OLS(dependent[:, i], exog)
-        ols_res = ols_mod.fit(cov_type='robust', debiased=True)
+        ols_res = ols_mod.fit(cov_type="robust", debiased=True)
         mv_res = res.equations[keys[i]]
         check_results(mv_res, ols_res)
 
@@ -272,12 +295,11 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
 
     ad = AttrDict()
     for i in range(dependent.shape[1]):
-        key = 'dependent.{0}'.format(i)
+        key = "dependent.{0}".format(i)
         df = DataFrame(dependent[:, [i]], columns=[key])
-        ad[key] = {'dependent': df,
-                   'exog': exog.copy()}
+        ad[key] = {"dependent": df, "exog": exog.copy()}
     gls_mod = SUR(ad, sigma=np.eye(len(ad)))
-    gls_res = gls_mod.fit(method='gls')
+    gls_res = gls_mod.fit(method="gls")
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -285,8 +307,8 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
 
-    mv_res = mv_mod.fit(cov_type='robust')
-    gls_res = gls_mod.fit(cov_type='robust', method='gls')
+    mv_res = mv_mod.fit(cov_type="robust")
+    gls_res = gls_mod.fit(cov_type="robust", method="gls")
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -294,8 +316,8 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
 
-    mv_res = mv_mod.fit(cov_type='robust', debiased=True)
-    gls_res = gls_mod.fit(cov_type='robust', method='gls', debiased=True)
+    mv_res = mv_mod.fit(cov_type="robust", debiased=True)
+    gls_res = gls_mod.fit(cov_type="robust", method="gls", debiased=True)
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -312,12 +334,11 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 
     ad = AttrDict()
     for i in range(dependent.shape[1]):
-        key = 'dependent.{0}'.format(i)
+        key = "dependent.{0}".format(i)
         df = DataFrame(dependent[:, [i]], columns=[key])
-        ad[key] = {'dependent': df,
-                   'exog': exog.copy()}
+        ad[key] = {"dependent": df, "exog": exog.copy()}
     gls_mod = SUR(ad)
-    gls_res = gls_mod.fit(method='ols')
+    gls_res = gls_mod.fit(method="ols")
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -325,8 +346,8 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
 
-    mv_res = mv_mod.fit(cov_type='robust')
-    gls_res = gls_mod.fit(cov_type='robust', method='ols')
+    mv_res = mv_mod.fit(cov_type="robust")
+    gls_res = gls_mod.fit(cov_type="robust", method="ols")
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -334,8 +355,8 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
         gls_res_eq = gls_res.equations[keys[i]]
         check_results(mv_res_eq, gls_res_eq)
 
-    mv_res = mv_mod.fit(cov_type='robust', debiased=True)
-    gls_res = gls_mod.fit(cov_type='robust', method='ols', debiased=True)
+    mv_res = mv_mod.fit(cov_type="robust", debiased=True)
+    gls_res = gls_mod.fit(cov_type="robust", method="ols", debiased=True)
     check_results(mv_res, gls_res)
 
     for i in range(dependent.shape[1]):
@@ -346,18 +367,18 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 
 def test_ols_against_gls(data):
     mod = SUR(data)
-    res = mod.fit(method='gls')
+    res = mod.fit(method="gls")
     sigma = res.sigma
     sigma_m12 = inv_matrix_sqrt(sigma)
     key = list(data.keys())[0]
 
     if isinstance(data[key], Mapping):
-        y = [data[key]['dependent'] for key in data]
-        x = [data[key]['exog'] for key in data]
+        y = [data[key]["dependent"] for key in data]
+        x = [data[key]["exog"] for key in data]
         try:
-            w = [data[key]['weights'] for key in data]
+            w = [data[key]["weights"] for key in data]
         except KeyError:
-            w = [np.ones_like(data[key]['dependent']) for key in data]
+            w = [np.ones_like(data[key]["dependent"]) for key in data]
     else:
         y = [data[key][0] for key in data]
         x = [data[key][1] for key in data]
@@ -388,17 +409,17 @@ def test_constraint_setting(data):
     q = Series([0, 1], index=r.index)
 
     mod.add_constraints(r)
-    mod.fit(method='ols')
-    res = mod.fit(method='ols', cov_type='unadjusted')
+    mod.fit(method="ols")
+    res = mod.fit(method="ols", cov_type="unadjusted")
     assert_allclose(r.values @ res.params.values[:, None], np.zeros((2, 1)), atol=1e-8)
-    mod.fit(method='gls')
-    res = mod.fit(method='gls', cov_type='unadjusted')
+    mod.fit(method="gls")
+    res = mod.fit(method="gls", cov_type="unadjusted")
     assert_allclose(r.values @ res.params.values[:, None], np.zeros((2, 1)), atol=1e-8)
 
     mod.add_constraints(r, q)
-    res = mod.fit(method='ols')
+    res = mod.fit(method="ols")
     assert_allclose(r.values @ res.params.values[:, None], q.values[:, None], atol=1e-8)
-    res = mod.fit(method='gls')
+    res = mod.fit(method="gls")
     assert_allclose(r.values @ res.params.values[:, None], q.values[:, None], atol=1e-8)
 
 
@@ -457,44 +478,47 @@ def test_missing(data):
     primes = [11, 13, 17, 19, 23]
     for i, key in enumerate(data):
         if isinstance(data[key], Mapping):
-            data[key]['dependent'][::primes[i % 5]] = np.nan
+            data[key]["dependent"][:: primes[i % 5]] = np.nan
         else:
-            data[key][0][::primes[i % 5]] = np.nan
+            data[key][0][:: primes[i % 5]] = np.nan
 
     with warnings.catch_warnings(record=True) as w:
         SUR(data)
         assert len(w) == 1
-        assert 'missing' in w[0].message.args[0]
+        assert "missing" in w[0].message.args[0]
 
 
 def test_formula_errors():
-    data = DataFrame(np.random.standard_normal((500, 4)),
-                     columns=['y1', 'y2', 'x1', 'x2'])
+    data = DataFrame(
+        np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
+    )
     with pytest.raises(TypeError):
         SUR.from_formula(np.ones(10), data)
 
 
 def test_formula_repeated_key():
-    data = DataFrame(np.random.standard_normal((500, 4)),
-                     columns=['y1', 'y2', 'x1', 'x2'])
+    data = DataFrame(
+        np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
+    )
 
-    formula = '''
+    formula = """
     {first:y1 ~ 1 + x1}
     {first: y2 ~ 1 + x2}
-    '''
+    """
     mod = SUR.from_formula(formula, data)
     res = mod.fit()
-    assert 'first' in res.equation_labels
-    assert 'first.0' in res.equation_labels
+    assert "first" in res.equation_labels
+    assert "first.0" in res.equation_labels
 
 
 def test_formula_weights():
-    data = DataFrame(np.random.standard_normal((500, 4)),
-                     columns=['y1', 'y2', 'x1', 'x2'])
-    weights = DataFrame(np.random.chisquare(5, (500, 2)), columns=['eq1', 'eq2'])
+    data = DataFrame(
+        np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
+    )
+    weights = DataFrame(np.random.chisquare(5, (500, 2)), columns=["eq1", "eq2"])
     formula = OrderedDict()
-    formula['eq1'] = 'y1 ~ 1 + x1'
-    formula['eq2'] = 'y2 ~ 1 + x1'
+    formula["eq1"] = "y1 ~ 1 + x1"
+    formula["eq2"] = "y2 ~ 1 + x1"
     mod = SUR.from_formula(formula, data, weights=weights)
     mod.fit()
     expected = weights.values[:, [0]]
@@ -502,8 +526,8 @@ def test_formula_weights():
     expected = weights.values[:, [1]]
     assert_allclose(mod._w[1], expected / expected.mean())
 
-    formula = '{y1 ~ 1 + x1} {y2 ~ 1 + x2}'
-    weights = DataFrame(np.random.chisquare(5, (500, 2)), columns=['y1', 'y2'])
+    formula = "{y1 ~ 1 + x1} {y2 ~ 1 + x2}"
+    weights = DataFrame(np.random.chisquare(5, (500, 2)), columns=["y1", "y2"])
     mod = SUR.from_formula(formula, data, weights=weights)
     mod.fit()
     expected = weights.values[:, [0]]
@@ -513,31 +537,32 @@ def test_formula_weights():
 
 
 def test_formula_partial_weights():
-    data = DataFrame(np.random.standard_normal((500, 4)),
-                     columns=['y1', 'y2', 'x1', 'x2'])
-    weights = DataFrame(np.random.chisquare(5, (500, 1)), columns=['eq2'])
+    data = DataFrame(
+        np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
+    )
+    weights = DataFrame(np.random.chisquare(5, (500, 1)), columns=["eq2"])
     formula = OrderedDict()
-    formula['eq1'] = 'y1 ~ 1 + x1'
-    formula['eq2'] = 'y2 ~ 1 + x1'
+    formula["eq1"] = "y1 ~ 1 + x1"
+    formula["eq2"] = "y2 ~ 1 + x1"
     with warnings.catch_warnings(record=True) as w:
         mod = SUR.from_formula(formula, data, weights=weights)
         assert len(w) == 1
-        assert 'Weights' in w[0].message.args[0]
-        assert 'eq1' in w[0].message.args[0]
-        assert 'eq2' not in w[0].message.args[0]
+        assert "Weights" in w[0].message.args[0]
+        assert "eq1" in w[0].message.args[0]
+        assert "eq2" not in w[0].message.args[0]
     mod.fit()
     expected = np.ones((500, 1))
     assert_allclose(mod._w[0], expected / expected.mean())
     expected = weights.values[:, [0]]
     assert_allclose(mod._w[1], expected / expected.mean())
 
-    formula = '{y1 ~ 1 + x1} {y2 ~ 1 + x2}'
-    weights = DataFrame(np.random.chisquare(5, (500, 1)), columns=['y2'])
+    formula = "{y1 ~ 1 + x1} {y2 ~ 1 + x2}"
+    weights = DataFrame(np.random.chisquare(5, (500, 1)), columns=["y2"])
     with warnings.catch_warnings(record=True) as w:
         mod = SUR.from_formula(formula, data, weights=weights)
         assert len(w) == 1
-        assert 'y1' in w[0].message.args[0]
-        assert 'y2' not in w[0].message.args[0]
+        assert "y1" in w[0].message.args[0]
+        assert "y2" not in w[0].message.args[0]
 
     expected = np.ones((500, 1))
     assert_allclose(mod._w[0], expected / expected.mean())
@@ -555,22 +580,22 @@ def test_against_direct_model(data):
     keys = list(data.keys())
     if not isinstance(data[keys[0]], Mapping):
         return
-    if 'weights' in data[keys[0]]:
+    if "weights" in data[keys[0]]:
         return
     y = []
     x = []
     data_copy = OrderedDict()
     for i in range(min(3, len(data))):
         data_copy[keys[i]] = data[keys[i]]
-        y.append(data[keys[i]]['dependent'])
-        x.append(data[keys[i]]['exog'])
+        y.append(data[keys[i]]["dependent"])
+        x.append(data[keys[i]]["exog"])
 
     direct = simple_sur(y, x)
     mod = SUR(data_copy)
-    res = mod.fit(method='ols')
+    res = mod.fit(method="ols")
     assert_allclose(res.params.values[:, None], direct.beta0)
 
-    res = mod.fit(method='gls')
+    res = mod.fit(method="gls")
     assert_allclose(res.params.values[:, None], direct.beta1)
 
 
@@ -590,33 +615,45 @@ def test_model_repr(data):
     repr = mod.__repr__()
     assert str(len(data)) in repr
     assert str(hex(id(mod))) in repr
-    assert 'Seemingly Unrelated Regression (SUR)' in repr
+    assert "Seemingly Unrelated Regression (SUR)" in repr
 
 
 def test_mv_ols_hac_smoke(kernel_options):
-    data = generate_data(p=3, const=True, rho=0.8, common_exog=False,
-                         included_weights=False, output_dict=True)
+    data = generate_data(
+        p=3,
+        const=True,
+        rho=0.8,
+        common_exog=False,
+        included_weights=False,
+        output_dict=True,
+    )
     mod = SUR(data)
-    res = mod.fit(cov_type='kernel', **kernel_options)
-    assert 'Kernel (HAC) ' in str(res)
-    assert 'Kernel: {0}'.format(kernel_options['kernel']) in str(res)
-    if kernel_options['bandwidth'] == 0:
-        res_base = mod.fit(cov_type='robust', debiased=kernel_options['debiased'])
+    res = mod.fit(cov_type="kernel", **kernel_options)
+    assert "Kernel (HAC) " in str(res)
+    assert "Kernel: {0}".format(kernel_options["kernel"]) in str(res)
+    if kernel_options["bandwidth"] == 0:
+        res_base = mod.fit(cov_type="robust", debiased=kernel_options["debiased"])
         assert_allclose(res.tstats, res_base.tstats)
 
 
 def test_invalid_kernel_options(kernel_options):
-    data = generate_data(p=3, const=True, rho=0.8, common_exog=False,
-                         included_weights=False, output_dict=True)
+    data = generate_data(
+        p=3,
+        const=True,
+        rho=0.8,
+        common_exog=False,
+        included_weights=False,
+        output_dict=True,
+    )
     mod = SUR(data)
     with pytest.raises(TypeError):
         ko = {k: v for k, v in kernel_options.items()}
-        ko['bandwidth'] = 'None'
-        mod.fit(cov_type='kernel', **ko)
+        ko["bandwidth"] = "None"
+        mod.fit(cov_type="kernel", **ko)
     with pytest.raises(TypeError):
         ko = {k: v for k, v in kernel_options.items()}
-        ko['kernel'] = 1
-        mod.fit(cov_type='kernel', **ko)
+        ko["kernel"] = 1
+        mod.fit(cov_type="kernel", **ko)
 
 
 def test_fitted(data):
@@ -626,29 +663,35 @@ def test_fitted(data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         fv = res.fitted_values[key].copy()
-        fv.name = 'fitted_values'
+        fv.name = "fitted_values"
         assert_series_equal(eq.fitted_values, fv)
         b = eq.params.values
         direct = mod._x[i] @ b
         expected.append(direct[:, None])
         assert_allclose(eq.fitted_values, direct, atol=1e-8)
     expected = np.concatenate(expected, 1)
-    expected = DataFrame(expected, index=mod._dependent[i].pandas.index,
-                         columns=[key for key in res.equations])
+    expected = DataFrame(
+        expected,
+        index=mod._dependent[i].pandas.index,
+        columns=[key for key in res.equations],
+    )
     assert_frame_equal(expected, res.fitted_values)
 
 
-@pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
 def test_predict(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
     pred = res.predict()
     for key in pred:
-        assert_series_equal(pred[key].iloc[:, 0], res.equations[key].fitted_values,
-                            check_names=False)
+        assert_series_equal(
+            pred[key].iloc[:, 0], res.equations[key].fitted_values, check_names=False
+        )
     pred = res.predict(fitted=False, idiosyncratic=True)
     for key in pred:
-        assert_series_equal(pred[key].iloc[:, 0], res.equations[key].resids, check_names=False)
+        assert_series_equal(
+            pred[key].iloc[:, 0], res.equations[key].resids, check_names=False
+        )
     pred = res.predict(fitted=True, idiosyncratic=True)
     assert isinstance(pred, dict)
     for key in res.equations:
@@ -662,12 +705,12 @@ def test_predict(missing_data):
     assert_frame_equal(pred, res.resids)
     pred = res.predict(fitted=True, idiosyncratic=True, dataframe=True)
     assert isinstance(pred, dict)
-    assert 'fitted_values' in pred
-    assert_frame_equal(pred['fitted_values'], res.fitted_values)
-    assert 'idiosyncratic' in pred
-    assert_frame_equal(pred['idiosyncratic'], res.resids)
+    assert "fitted_values" in pred
+    assert_frame_equal(pred["fitted_values"], res.fitted_values)
+    assert "idiosyncratic" in pred
+    assert_frame_equal(pred["idiosyncratic"], res.resids)
 
-    nobs = missing_data[list(missing_data.keys())[0]]['dependent'].shape[0]
+    nobs = missing_data[list(missing_data.keys())[0]]["dependent"].shape[0]
     pred = res.predict(fitted=True, idiosyncratic=False, dataframe=True, missing=True)
     assert pred.shape[0] == nobs
 
@@ -676,7 +719,7 @@ def test_predict(missing_data):
         assert pred[key].shape[0] == nobs
 
 
-@pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
 def test_predict_error(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
@@ -715,15 +758,15 @@ def reference_berndt(u, y):
 def test_system_r2_direct():
     eqns = generate_data(k=3)
     mod = SUR(eqns)
-    res = mod.fit(method='ols', cov_type='unadjusted')
-    y = np.hstack([eqns[eq]['dependent'] for eq in eqns])
+    res = mod.fit(method="ols", cov_type="unadjusted")
+    y = np.hstack([eqns[eq]["dependent"] for eq in eqns])
     ref = reference_mcelroy(res.resids, y, res.sigma)
     assert_allclose(ref, res.system_rsquared.mcelroy)
     ref = reference_berndt(res.resids, y)
     assert_allclose(ref, res.system_rsquared.berndt)
 
-    res = mod.fit(method='gls', cov_type='unadjusted', iter_limit=100)
-    y = np.hstack([eqns[eq]['dependent'] for eq in eqns])
+    res = mod.fit(method="gls", cov_type="unadjusted", iter_limit=100)
+    y = np.hstack([eqns[eq]["dependent"] for eq in eqns])
     ref = reference_mcelroy(res.resids, y, res.sigma)
     assert_allclose(ref, res.system_rsquared.mcelroy)
     ref = reference_berndt(res.resids, y)

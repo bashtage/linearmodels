@@ -12,11 +12,13 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                assert_results_equal, datatypes,
                                                generate_data)
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 missing = [0.0, 0.20]
 perms = list(product(missing, datatypes))
-ids = list(map(lambda s: '-'.join(map(str, s)), perms))
+ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -32,16 +34,22 @@ def test_firstdifference_ols(data):
     y = mod.dependent.values3d
     x = mod.exog.values3d
     dy = np.array(y[0, 1:] - y[0, :-1])
-    dy = pd.DataFrame(dy, index=mod.dependent.panel.major_axis[1:],
-                      columns=mod.dependent.panel.minor_axis)
+    dy = pd.DataFrame(
+        dy,
+        index=mod.dependent.panel.major_axis[1:],
+        columns=mod.dependent.panel.minor_axis,
+    )
     dy = dy.T.stack()
     dy = dy.reindex(mod.dependent.index)
 
     dx = x[:, 1:] - x[:, :-1]
     _dx = {}
     for i, dxi in enumerate(dx):
-        temp = pd.DataFrame(dxi, index=mod.dependent.panel.major_axis[1:],
-                            columns=mod.dependent.panel.minor_axis)
+        temp = pd.DataFrame(
+            dxi,
+            index=mod.dependent.panel.major_axis[1:],
+            columns=mod.dependent.panel.minor_axis,
+        )
         temp = temp.T.stack()
         temp = temp.reindex(mod.dependent.index)
         _dx[mod.exog.vars[i]] = temp
@@ -54,30 +62,32 @@ def test_firstdifference_ols(data):
     dx = dx.loc[~drop]
 
     ols_mod = IV2SLS(dy, dx, None, None)
-    ols_res = ols_mod.fit(cov_type='unadjusted')
+    ols_res = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols_mod.fit(cov_type='robust')
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols_mod.fit(cov_type="robust")
     assert_results_equal(res, ols_res)
 
     clusters = data.vc1
     ols_clusters = mod.reformat_clusters(data.vc1)
     fd = mod.dependent.first_difference()
     ols_clusters = ols_clusters.dataframe.loc[fd.index]
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols_mod.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='clustered', cluster_entity=True, debiased=False)
+    res = mod.fit(cov_type="clustered", cluster_entity=True, debiased=False)
     entity_clusters = mod.dependent.first_difference().entity_ids
-    ols_res = ols_mod.fit(cov_type='clustered', clusters=entity_clusters)
+    ols_res = ols_mod.fit(cov_type="clustered", clusters=entity_clusters)
     assert_results_equal(res, ols_res)
 
-    ols_clusters['entity.clusters'] = entity_clusters
+    ols_clusters["entity.clusters"] = entity_clusters
     ols_clusters = ols_clusters.astype(np.int32)
-    res = mod.fit(cov_type='clustered', cluster_entity=True, clusters=data.vc1, debiased=False)
-    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(
+        cov_type="clustered", cluster_entity=True, clusters=data.vc1, debiased=False
+    )
+    ols_res = ols_mod.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -88,16 +98,22 @@ def test_firstdifference_ols_weighted(data):
     y = mod.dependent.values3d
     x = mod.exog.values3d
     dy = np.array(y[0, 1:] - y[0, :-1])
-    dy = pd.DataFrame(dy, index=mod.dependent.panel.major_axis[1:],
-                      columns=mod.dependent.panel.minor_axis)
+    dy = pd.DataFrame(
+        dy,
+        index=mod.dependent.panel.major_axis[1:],
+        columns=mod.dependent.panel.minor_axis,
+    )
     dy = dy.T.stack()
     dy = dy.reindex(mod.dependent.index)
 
     dx = x[:, 1:] - x[:, :-1]
     _dx = {}
     for i, dxi in enumerate(dx):
-        temp = pd.DataFrame(dxi, index=mod.dependent.panel.major_axis[1:],
-                            columns=mod.dependent.panel.minor_axis)
+        temp = pd.DataFrame(
+            dxi,
+            index=mod.dependent.panel.major_axis[1:],
+            columns=mod.dependent.panel.minor_axis,
+        )
         temp = temp.T.stack()
         temp = temp.reindex(mod.dependent.index)
         _dx[mod.exog.vars[i]] = temp
@@ -109,8 +125,11 @@ def test_firstdifference_ols_weighted(data):
     w = mod.weights.values3d
     w = 1.0 / w
     sw = w[0, 1:] + w[0, :-1]
-    sw = pd.DataFrame(sw, index=mod.dependent.panel.major_axis[1:],
-                      columns=mod.dependent.panel.minor_axis)
+    sw = pd.DataFrame(
+        sw,
+        index=mod.dependent.panel.major_axis[1:],
+        columns=mod.dependent.panel.minor_axis,
+    )
     sw = sw.T.stack()
     sw = sw.reindex(mod.dependent.index)
     sw = 1.0 / sw
@@ -122,11 +141,11 @@ def test_firstdifference_ols_weighted(data):
     sw = sw.loc[~drop]
 
     ols_mod = IV2SLS(dy, dx, None, None, weights=sw)
-    ols_res = ols_mod.fit(cov_type='unadjusted')
+    ols_res = ols_mod.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols_mod.fit(cov_type='robust')
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols_mod.fit(cov_type="robust")
     assert_results_equal(res, ols_res)
 
     clusters = data.vc1
@@ -134,8 +153,8 @@ def test_firstdifference_ols_weighted(data):
     fd = mod.dependent.first_difference()
     ols_clusters = ols_clusters.dataframe.loc[fd.index]
 
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols_mod.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols_mod.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -153,7 +172,7 @@ def test_first_difference_errors(data):
     if not isinstance(data.x, pd.DataFrame):
         return
     x = data.x.copy()
-    x['Intercept'] = 1.0
+    x["Intercept"] = 1.0
     with pytest.raises(ValueError):
         FirstDifferenceOLS(data.y, x)
 
@@ -173,7 +192,7 @@ def test_firstdifference_error(data):
     clusters.iloc[::3, :] = clusters.iloc[::3, :] + 1
 
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', clusters=clusters)
+        mod.fit(cov_type="clustered", clusters=clusters)
 
 
 def test_fitted_effects_residuals(data):
@@ -181,16 +200,16 @@ def test_fitted_effects_residuals(data):
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
-    expected = pd.DataFrame(expected, index=mod.exog.index, columns=['fitted_values'])
+    expected = pd.DataFrame(expected, index=mod.exog.index, columns=["fitted_values"])
     assert_allclose(res.fitted_values, expected)
     assert_frame_similar(res.fitted_values, expected)
 
     expected.iloc[:, 0] = mod.dependent.values2d - expected.values
-    expected.columns = ['idiosyncratic']
+    expected.columns = ["idiosyncratic"]
     assert_allclose(res.idiosyncratic, expected)
     assert_frame_similar(res.idiosyncratic, expected)
 
     expected.iloc[:, 0] = np.nan
-    expected.columns = ['estimated_effects']
+    expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)

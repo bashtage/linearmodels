@@ -47,4 +47,5 @@ vserat                   (vacdays+sicklve)/annearn
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'fringe.csv.bz2')
+
+    return datasets.load(__file__, "fringe.csv.bz2")

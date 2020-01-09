@@ -21,7 +21,7 @@ class TestDataHandler(object):
         x = np.empty((10, 2))
         xdh = IVData(x)
         assert xdh.ndim == x.ndim
-        assert xdh.cols == ['x.0', 'x.1']
+        assert xdh.cols == ["x.0", "x.1"]
         assert xdh.rows == list(np.arange(10))
         assert_equal(xdh.ndarray, x)
         df = pd.DataFrame(x, columns=xdh.cols, index=xdh.rows)
@@ -33,7 +33,7 @@ class TestDataHandler(object):
         x = np.empty(10)
         xdh = IVData(x)
         assert xdh.ndim == 2
-        assert xdh.cols == ['x']
+        assert xdh.cols == ["x"]
         assert xdh.rows == list(np.arange(10))
         assert_equal(xdh.ndarray, x[:, None])
         df = pd.DataFrame(x[:, None], columns=xdh.cols, index=xdh.rows)
@@ -42,8 +42,8 @@ class TestDataHandler(object):
 
     def test_pandas_df_numeric(self):
         x = np.empty((10, 2))
-        index = pd.date_range('2017-01-01', periods=10)
-        xdf = pd.DataFrame(x, columns=['a', 'b'], index=index)
+        index = pd.date_range("2017-01-01", periods=10)
+        xdf = pd.DataFrame(x, columns=["a", "b"], index=index)
         xdh = IVData(xdf)
         assert xdh.ndim == 2
         assert xdh.cols == list(xdf.columns)
@@ -55,8 +55,8 @@ class TestDataHandler(object):
 
     def test_pandas_series_numeric(self):
         x = np.empty(10)
-        index = pd.date_range('2017-01-01', periods=10)
-        xs = pd.Series(x, name='charlie', index=index)
+        index = pd.date_range("2017-01-01", periods=10)
+        xs = pd.Series(x, name="charlie", index=index)
         xdh = IVData(xs)
         assert xdh.ndim == 2
         assert xdh.cols == [xs.name]
@@ -66,46 +66,43 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 1)
 
-    @pytest.mark.skipif(MISSING_XARRAY, reason='xarray not installed')
+    @pytest.mark.skipif(MISSING_XARRAY, reason="xarray not installed")
     def test_xarray_1d(self):
         x_np = np.random.randn(10)
         x = xr.DataArray(x_np)
-        dh = IVData(x, 'some_variable')
+        dh = IVData(x, "some_variable")
         assert_equal(dh.ndarray, x_np[:, None])
         assert dh.rows == list(np.arange(10))
-        assert dh.cols == ['some_variable.0']
+        assert dh.cols == ["some_variable.0"]
         expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
-        index = pd.date_range('2017-01-01', periods=10)
-        x = xr.DataArray(x_np,
-                         [('time', index)])
-        dh = IVData(x, 'some_variable')
+        index = pd.date_range("2017-01-01", periods=10)
+        x = xr.DataArray(x_np, [("time", index)])
+        dh = IVData(x, "some_variable")
         assert_equal(dh.ndarray, x_np[:, None])
         assert_series_equal(pd.Series(dh.rows), pd.Series(list(index)))
-        assert dh.cols == ['some_variable.0']
+        assert dh.cols == ["some_variable.0"]
         expected = pd.DataFrame(x_np[:, None], columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
-    @pytest.mark.skipif(MISSING_XARRAY, reason='xarray not installed')
+    @pytest.mark.skipif(MISSING_XARRAY, reason="xarray not installed")
     def test_xarray_2d(self):
         x_np = np.random.randn(10, 2)
         x = xr.DataArray(x_np)
         dh = IVData(x)
         assert_equal(dh.ndarray, x_np)
         assert dh.rows == list(np.arange(10))
-        assert dh.cols == ['x.0', 'x.1']
+        assert dh.cols == ["x.0", "x.1"]
         expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
-        index = pd.date_range('2017-01-01', periods=10)
-        x = xr.DataArray(x_np,
-                         [('time', index),
-                          ('variables', ['apple', 'banana'])])
+        index = pd.date_range("2017-01-01", periods=10)
+        x = xr.DataArray(x_np, [("time", index), ("variables", ["apple", "banana"])])
         dh = IVData(x)
         assert_equal(dh.ndarray, x_np)
         assert_series_equal(pd.Series(dh.rows), pd.Series(list(index)))
-        assert dh.cols == ['apple', 'banana']
+        assert dh.cols == ["apple", "banana"]
         expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
@@ -115,6 +112,7 @@ class TestDataHandler(object):
         with pytest.raises(ValueError):
             IVData(np.empty((10, 2, 2)))
         with pytest.raises(TypeError):
+
             class AnotherClass(object):
                 @property
                 def ndim(self):
@@ -123,21 +121,22 @@ class TestDataHandler(object):
             IVData(AnotherClass())
 
     def test_string_cat_equiv(self):
-        s1 = pd.Series(['a', 'b', 'a', 'b', 'c', 'd', 'a', 'b'])
+        s1 = pd.Series(["a", "b", "a", "b", "c", "d", "a", "b"])
         s2 = pd.Series(np.arange(8.0))
-        s3 = pd.Series(['apple', 'banana', 'apple', 'banana',
-                        'cherry', 'date', 'apple', 'banana'])
-        df = pd.DataFrame({'string': s1, 'number': s2, 'other_string': s3})
+        s3 = pd.Series(
+            ["apple", "banana", "apple", "banana", "cherry", "date", "apple", "banana"]
+        )
+        df = pd.DataFrame({"string": s1, "number": s2, "other_string": s3})
         dh = IVData(df)
         df_cat = df.copy()
-        df_cat['string'] = df_cat['string'].astype('category')
+        df_cat["string"] = df_cat["string"].astype("category")
         dh_cat = IVData(df_cat)
         assert_frame_equal(dh.pandas, dh_cat.pandas)
 
     def test_existing_datahandler(self):
         x = np.empty((10, 2))
-        index = pd.date_range('2017-01-01', periods=10)
-        xdf = pd.DataFrame(x, columns=['a', 'b'], index=index)
+        index = pd.date_range("2017-01-01", periods=10)
+        xdf = pd.DataFrame(x, columns=["a", "b"], index=index)
         xdh = IVData(xdf)
         xdh2 = IVData(xdh)
         assert xdh is not xdh2
@@ -148,57 +147,57 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, xdh2.pandas)
 
     def test_categorical(self):
-        index = pd.date_range('2017-01-01', periods=10)
-        cat = pd.Categorical(['a', 'b', 'a', 'b', 'a', 'a', 'b', 'c', 'c', 'a'])
+        index = pd.date_range("2017-01-01", periods=10)
+        cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
         df = pd.DataFrame(OrderedDict(cat=cat, num=num), index=index)
         dh = IVData(df)
         assert dh.ndim == 2
         assert dh.shape == (10, 3)
-        assert sorted(dh.cols) == sorted(['cat.b', 'cat.c', 'num'])
+        assert sorted(dh.cols) == sorted(["cat.b", "cat.c", "num"])
         assert dh.rows == list(index)
-        assert_equal(dh.pandas['num'].values, num)
-        assert_equal(dh.pandas['cat.b'].values, (cat == 'b').astype(np.float))
-        assert_equal(dh.pandas['cat.c'].values, (cat == 'c').astype(np.float))
+        assert_equal(dh.pandas["num"].values, num)
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
     def test_categorical_series(self):
-        index = pd.date_range('2017-01-01', periods=10)
-        cat = pd.Categorical(['a', 'b', 'a', 'b', 'a', 'a', 'b', 'c', 'c', 'a'])
-        s = pd.Series(cat, name='cat', index=index)
+        index = pd.date_range("2017-01-01", periods=10)
+        cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
+        s = pd.Series(cat, name="cat", index=index)
         dh = IVData(s)
         assert dh.ndim == 2
         assert dh.shape == (10, 2)
-        assert sorted(dh.cols) == sorted(['cat.b', 'cat.c'])
+        assert sorted(dh.cols) == sorted(["cat.b", "cat.c"])
         assert dh.rows == list(index)
-        assert_equal(dh.pandas['cat.b'].values, (cat == 'b').astype(np.float))
-        assert_equal(dh.pandas['cat.c'].values, (cat == 'c').astype(np.float))
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
     def test_categorical_no_conversion(self):
-        index = pd.date_range('2017-01-01', periods=10)
-        cat = pd.Categorical(['a', 'b', 'a', 'b', 'a', 'a', 'b', 'c', 'c', 'a'])
-        s = pd.Series(cat, index=index, name='cat')
+        index = pd.date_range("2017-01-01", periods=10)
+        cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
+        s = pd.Series(cat, index=index, name="cat")
         dh = IVData(s, convert_dummies=False)
         assert dh.ndim == 2
         assert dh.shape == (10, 1)
-        assert dh.cols == ['cat']
+        assert dh.cols == ["cat"]
         assert dh.rows == list(index)
         df = pd.DataFrame(s)
         assert_frame_equal(dh.pandas, df)
 
     def test_categorical_keep_first(self):
-        index = pd.date_range('2017-01-01', periods=10)
-        cat = pd.Categorical(['a', 'b', 'a', 'b', 'a', 'a', 'b', 'c', 'c', 'a'])
+        index = pd.date_range("2017-01-01", periods=10)
+        cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
         df = pd.DataFrame(OrderedDict(cat=cat, num=num), index=index)
         dh = IVData(df, drop_first=False)
         assert dh.ndim == 2
         assert dh.shape == (10, 4)
-        assert sorted(dh.cols) == sorted(['cat.a', 'cat.b', 'cat.c', 'num'])
+        assert sorted(dh.cols) == sorted(["cat.a", "cat.b", "cat.c", "num"])
         assert dh.rows == list(index)
-        assert_equal(dh.pandas['num'].values, num)
-        assert_equal(dh.pandas['cat.a'].values, (cat == 'a').astype(np.float))
-        assert_equal(dh.pandas['cat.b'].values, (cat == 'b').astype(np.float))
-        assert_equal(dh.pandas['cat.c'].values, (cat == 'c').astype(np.float))
+        assert_equal(dh.pandas["num"].values, num)
+        assert_equal(dh.pandas["cat.a"].values, (cat == "a").astype(np.float))
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
     def test_nobs_missing_error(self):
         with pytest.raises(ValueError):
@@ -210,12 +209,12 @@ class TestDataHandler(object):
             IVData(x, nobs=100)
 
     def test_mixed_data(self):
-        s = pd.Series([1, 2, 'a', -3.0])
+        s = pd.Series([1, 2, "a", -3.0])
         with pytest.raises(ValueError):
             IVData(s)
 
 
 def test_duplicate_column_names():
-    x = pd.DataFrame(np.ones((3, 2)), columns=['x', 'x'])
+    x = pd.DataFrame(np.ones((3, 2)), columns=["x", "x"])
     with pytest.raises(ValueError):
         IVData(x)

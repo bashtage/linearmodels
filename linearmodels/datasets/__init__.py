@@ -8,4 +8,4 @@ def get_path(f):
 
 
 def load(module, file_name):
-    return pd.read_csv(join(get_path(module), file_name), compression='bz2')
+    return pd.read_csv(join(get_path(module), file_name), compression="bz2")

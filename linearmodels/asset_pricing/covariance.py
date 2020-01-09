@@ -8,7 +8,6 @@ from linearmodels.iv.covariance import (KERNEL_LOOKUP, _cov_kernel,
 
 
 class _HACMixin(object):
-
     def __init__(self):
         self._bandwidth = None  # pragma: no cover
         self._moments = None  # pragma: no cover
@@ -32,10 +31,10 @@ class _HACMixin(object):
 
     def _check_kernel(self, kernel):
         if not isinstance(kernel, str):
-            raise TypeError('kernel must be the name of a kernel')
+            raise TypeError("kernel must be the name of a kernel")
         self._kernel = kernel.lower()
         if self._kernel not in KERNEL_LOOKUP:
-            raise ValueError('Unknown kernel')
+            raise ValueError("Unknown kernel")
 
     def _check_bandwidth(self, bandwidth):
         self._bandwidth = bandwidth
@@ -43,9 +42,9 @@ class _HACMixin(object):
             try:
                 bandwidth = float(bandwidth)
             except (TypeError, ValueError):
-                raise TypeError('bandwidth must be either None or a float')
+                raise TypeError("bandwidth must be either None or a float")
             if bandwidth < 0:
-                raise ValueError('bandwidth must be non-negative.')
+                raise ValueError("bandwidth must be non-negative.")
 
     def _kernel_cov(self, z):
         nobs = z.shape[0]
@@ -79,16 +78,20 @@ class HeteroskedasticCovariance(object):
         Degree of freedom value ot use if debiasing
     """
 
-    def __init__(self, xe, *, jacobian=None, inv_jacobian=None,
-                 center=True, debiased=False, df=0):
+    def __init__(
+        self, xe, *, jacobian=None, inv_jacobian=None, center=True, debiased=False, df=0
+    ):
 
         self._moments = self._xe = xe
         self._jac = jacobian
         self._inv_jac = inv_jacobian
         self._center = center
-        if (jacobian is None and inv_jacobian is None) \
-                or (jacobian is not None and inv_jacobian is not None):
-            raise ValueError('One and only one of jacobian or inv_jacobian must be provided.')
+        if (jacobian is None and inv_jacobian is None) or (
+            jacobian is not None and inv_jacobian is not None
+        ):
+            raise ValueError(
+                "One and only one of jacobian or inv_jacobian must be provided."
+            )
         self._debiased = debiased
         self._df = df
         if jacobian is not None:
@@ -100,11 +103,11 @@ class HeteroskedasticCovariance(object):
         return self.__class__.__name__
 
     def __repr__(self):
-        return self.__str__() + ', id: {0}'.format(hex(id(self)))
+        return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
     def config(self):
-        return {'type': self.__class__.__name__}
+        return {"type": self.__class__.__name__}
 
     @property
     def s(self):
@@ -198,26 +201,38 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
-    def __init__(self, xe, *, jacobian=None, inv_jacobian=None,
-                 kernel='bartlett', bandwidth=None, center=True,
-                 debiased=False, df=0):
-        super(KernelCovariance, self).__init__(xe, jacobian=jacobian,
-                                               inv_jacobian=inv_jacobian,
-                                               center=center,
-                                               debiased=debiased, df=df)
+    def __init__(
+        self,
+        xe,
+        *,
+        jacobian=None,
+        inv_jacobian=None,
+        kernel="bartlett",
+        bandwidth=None,
+        center=True,
+        debiased=False,
+        df=0
+    ):
+        super(KernelCovariance, self).__init__(
+            xe,
+            jacobian=jacobian,
+            inv_jacobian=inv_jacobian,
+            center=center,
+            debiased=debiased,
+            df=df,
+        )
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
     def __str__(self):
-        descr = ', Kernel: {0}, Bandwidth: {1}'.format(self._kernel,
-                                                       self.bandwidth)
+        descr = ", Kernel: {0}, Bandwidth: {1}".format(self._kernel, self.bandwidth)
         return self.__class__.__name__ + descr
 
     @property
     def config(self):
         out = super(KernelCovariance, self).config
-        out['kernel'] = self._kernel
-        out['bandwidth'] = self.bandwidth
+        out["kernel"] = self._kernel
+        out["bandwidth"] = self.bandwidth
         return out
 
     @property
@@ -290,7 +305,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         Non-negative integer bandwidth
     """
 
-    def __init__(self, moments, center=True, kernel='bartlett', bandwidth=None):
+    def __init__(self, moments, center=True, kernel="bartlett", bandwidth=None):
         super(KernelWeight, self).__init__(moments, center=center)
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)

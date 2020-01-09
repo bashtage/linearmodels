@@ -23,8 +23,9 @@ def find_constant(x):
         return None
 
 
-def f_statistic(params: ndarray, cov: ndarray, debiased: bool, resid_df: int,
-                const_loc: int = None):
+def f_statistic(
+    params: ndarray, cov: ndarray, debiased: bool, resid_df: int, const_loc: int = None
+):
     """
     Parameters
     ----------
@@ -45,15 +46,17 @@ def f_statistic(params: ndarray, cov: ndarray, debiased: bool, resid_df: int,
     WaldTestStatistic
         WaldTestStatistic instance
     """
-    null = 'All parameters ex. constant are zero'
-    name = 'Model F-statistic'
+    null = "All parameters ex. constant are zero"
+    name = "Model F-statistic"
 
     nvar = params.shape[0]
     non_const = list(range(nvar))
     if const_loc is not None:
         non_const.pop(const_loc)
     if not non_const:
-        return InvalidTestStatistic('Model contains no non-constant exogenous terms', name=name)
+        return InvalidTestStatistic(
+            "Model contains no non-constant exogenous terms", name=name
+        )
     test_params = params[non_const]
     test_cov = cov[ix_(non_const, non_const)]
     test_stat = test_params.T @ inv(test_cov) @ test_params

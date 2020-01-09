@@ -81,13 +81,13 @@ class AttrDict(MutableMapping):
 
     def __repr__(self):
         out = self.__ordered_dict__.__str__()
-        return 'Attr' + out[7:]
+        return "Attr" + out[7:]
 
     def __str__(self):
         return self.__repr__()
 
     def __init__(self, *args, **kwargs):
-        self.__dict__['__ordered_dict__'] = OrderedDict(*args, **kwargs)
+        self.__dict__["__ordered_dict__"] = OrderedDict(*args, **kwargs)
 
     def __contains__(self, item):
         return self.__ordered_dict__.__contains__(item)
@@ -96,8 +96,8 @@ class AttrDict(MutableMapping):
         return self.__ordered_dict__[item]
 
     def __setitem__(self, key, value):
-        if key == '__ordered_dict__':
-            raise KeyError(key + ' is reserved and cannot be set.')
+        if key == "__ordered_dict__":
+            raise KeyError(key + " is reserved and cannot be set.")
         self.__ordered_dict__[key] = value
 
     def __delitem__(self, key):
@@ -109,8 +109,8 @@ class AttrDict(MutableMapping):
         return self.__ordered_dict__[item]
 
     def __setattr__(self, key, value):
-        if key == '__ordered_dict__':
-            raise AttributeError(key + ' is invalid')
+        if key == "__ordered_dict__":
+            raise AttributeError(key + " is invalid")
         self.__ordered_dict__[key] = value
 
     def __delattr__(self, name):
@@ -215,10 +215,10 @@ class WaldTestStatistic(object):
         self._name = name
         if df_denom is None:
             self.dist = chi2(df)
-            self.dist_name = 'chi2({0})'.format(df)
+            self.dist_name = "chi2({0})".format(df)
         else:
             self.dist = f(df, df_denom)
-            self.dist_name = 'F({0},{1})'.format(df, df_denom)
+            self.dist_name = "F({0},{1})".format(df, df_denom)
 
     @property
     def stat(self):
@@ -233,8 +233,7 @@ class WaldTestStatistic(object):
     @property
     def critical_values(self):
         """Critical values test for common test sizes"""
-        return OrderedDict(zip(['10%', '5%', '1%'],
-                               self.dist.ppf([.9, .95, .99])))
+        return OrderedDict(zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99])))
 
     @property
     def null(self):
@@ -242,16 +241,26 @@ class WaldTestStatistic(object):
         return self._null
 
     def __str__(self):
-        name = '' if not self._name else self._name + '\n'
-        msg = '{name}H0: {null}\nStatistic: {stat:0.4f}\n' \
-              'P-value: {pval:0.4f}\nDistributed: {dist}'
-        return msg.format(name=name, null=self.null, stat=self.stat,
-                          pval=self.pval, dist=self.dist_name)
+        name = "" if not self._name else self._name + "\n"
+        msg = (
+            "{name}H0: {null}\nStatistic: {stat:0.4f}\n"
+            "P-value: {pval:0.4f}\nDistributed: {dist}"
+        )
+        return msg.format(
+            name=name,
+            null=self.null,
+            stat=self.stat,
+            pval=self.pval,
+            dist=self.dist_name,
+        )
 
     def __repr__(self):
-        return self.__str__() + '\n' + \
-               self.__class__.__name__ + \
-               ', id: {0}'.format(hex(id(self)))
+        return (
+            self.__str__()
+            + "\n"
+            + self.__class__.__name__
+            + ", id: {0}".format(hex(id(self)))
+        )
 
 
 class InvalidTestWarning(UserWarning):
@@ -276,8 +285,10 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __init__(self, reason, *, name=None):
         self._reason = reason
-        super(InvalidTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1, name=name)
-        self.dist_name = 'None'
+        super(InvalidTestStatistic, self).__init__(
+            np.NaN, np.NaN, df=1, df_denom=1, name=name
+        )
+        self.dist_name = "None"
 
     @property
     def pval(self):
@@ -291,7 +302,7 @@ class InvalidTestStatistic(WaldTestStatistic):
 
     def __str__(self):
         msg = "Invalid test statistic\n{reason}\n{name}"
-        name = '' if self._name is None else self._name
+        name = "" if self._name is None else self._name
         return msg.format(name=name, reason=self._reason)
 
 
@@ -314,11 +325,12 @@ class InapplicableTestStatistic(WaldTestStatistic):
     def __init__(self, *, reason=None, name=None):
         self._reason = reason
         if reason is None:
-            self._reason = 'Test is not applicable to model specification'
+            self._reason = "Test is not applicable to model specification"
 
-        super(InapplicableTestStatistic, self).__init__(np.NaN, np.NaN, df=1, df_denom=1,
-                                                        name=name)
-        self.dist_name = 'None'
+        super(InapplicableTestStatistic, self).__init__(
+            np.NaN, np.NaN, df=1, df_denom=1, name=name
+        )
+        self.dist_name = "None"
 
     @property
     def pval(self):
@@ -332,35 +344,35 @@ class InapplicableTestStatistic(WaldTestStatistic):
 
     def __str__(self):
         msg = "Irrelevant test statistic\n{reason}\n{name}"
-        name = '' if self._name is None else self._name
+        name = "" if self._name is None else self._name
         return msg.format(name=name, reason=self._reason)
 
 
 def _str(v):
     """Preferred basic formatter"""
     if np.isnan(v):
-        return '        '
+        return "        "
     av = abs(v)
     digits = 0
     if av != 0:
         digits = np.ceil(np.log10(av))
     if digits > 4 or digits <= -4:
-        return '{0:8.4g}'.format(v)
+        return "{0:8.4g}".format(v)
 
     if digits > 0:
         d = int(5 - digits)
     else:
         d = int(4)
 
-    format_str = '{0:' + '0.{0}f'.format(d) + '}'
+    format_str = "{0:" + "0.{0}f".format(d) + "}"
     return format_str.format(v)
 
 
 def pval_format(v):
     """Preferred formatting for x in [0,1]"""
     if np.isnan(v):
-        return '        '
-    return '{0:4.4f}'.format(v)
+        return "        "
+    return "{0:4.4f}".format(v)
 
 
 class _SummaryStr(object):
@@ -368,15 +380,18 @@ class _SummaryStr(object):
         return self.summary.as_text()
 
     def __repr__(self):
-        return self.__str__() + '\n' + \
-               self.__class__.__name__ + \
-               ', id: {0}'.format(hex(id(self)))
+        return (
+            self.__str__()
+            + "\n"
+            + self.__class__.__name__
+            + ", id: {0}".format(hex(id(self)))
+        )
 
     def _repr_html_(self):
-        return self.summary.as_html() + '<br/>id: {0}'.format(hex(id(self)))
+        return self.summary.as_html() + "<br/>id: {0}".format(hex(id(self)))
 
 
-def ensure_unique_column(col_name, df, addition='_'):
+def ensure_unique_column(col_name, df, addition="_"):
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name
@@ -386,16 +401,19 @@ class _ModelComparison(_SummaryStr):
     """
     Base class for model comparisons
     """
-    _supported = tuple()
-    _PRECISION_TYPES = {'tstats': 'T-stats',
-                        'pvalues': 'P-values',
-                        'std_errors': 'Std. Errors'}
 
-    def __init__(self, results, *, precision='tstats'):
+    _supported = tuple()
+    _PRECISION_TYPES = {
+        "tstats": "T-stats",
+        "pvalues": "P-values",
+        "std_errors": "Std. Errors",
+    }
+
+    def __init__(self, results, *, precision="tstats"):
         if not isinstance(results, (dict, OrderedDict)):
             _results = OrderedDict()
             for i, res in enumerate(results):
-                _results['Model ' + str(i)] = res
+                _results["Model " + str(i)] = res
             results = _results
         elif not isinstance(results, OrderedDict):
             _results = OrderedDict()
@@ -406,15 +424,17 @@ class _ModelComparison(_SummaryStr):
 
         for key in self._results:
             if not isinstance(self._results[key], self._supported):
-                raise TypeError('Results from unknown model')
-        precision = precision.lower().replace('-', '_')
-        if precision not in ('tstats', 'pvalues', 'std_errors'):
-            raise ValueError('Unknown precision value. Must be one of \'tstats\', \'std_errors\' '
-                             'or \'pvalues\'.')
+                raise TypeError("Results from unknown model")
+        precision = precision.lower().replace("-", "_")
+        if precision not in ("tstats", "pvalues", "std_errors"):
+            raise ValueError(
+                "Unknown precision value. Must be one of 'tstats', 'std_errors' "
+                "or 'pvalues'."
+            )
         self._precision = precision
 
     def _get_series_property(self, name):
-        out = ([(k, getattr(v, name)) for k, v in self._results.items()])
+        out = [(k, getattr(v, name)) for k, v in self._results.items()]
         cols = [v[0] for v in out]
         values = concat([v[1] for v in out], 1)
         values.columns = cols
@@ -431,38 +451,40 @@ class _ModelComparison(_SummaryStr):
     @property
     def nobs(self):
         """Parameters for all models"""
-        return self._get_property('nobs')
+        return self._get_property("nobs")
 
     @property
     def params(self):
         """Parameters for all models"""
-        return self._get_series_property('params')
+        return self._get_series_property("params")
 
     @property
     def tstats(self):
         """Parameter t-stats for all models"""
-        return self._get_series_property('tstats')
+        return self._get_series_property("tstats")
 
     @property
     def std_errors(self):
         """Parameter t-stats for all models"""
-        return self._get_series_property('std_errors')
+        return self._get_series_property("std_errors")
 
     @property
     def pvalues(self):
         """Parameter p-vals for all models"""
-        return self._get_series_property('pvalues')
+        return self._get_series_property("pvalues")
 
     @property
     def rsquared(self):
         """Coefficients of determination (R**2)"""
-        return self._get_property('rsquared')
+        return self._get_property("rsquared")
 
     @property
     def f_statistic(self):
         """F-statistics and P-values"""
-        out = self._get_property('f_statistic')
-        out_df = DataFrame(np.empty((len(out), 2)), columns=['F stat', 'P-value'], index=out.index)
+        out = self._get_property("f_statistic")
+        out_df = DataFrame(
+            np.empty((len(out), 2)), columns=["F stat", "P-value"], index=out.index
+        )
         for loc in out.index:
             out_df.loc[loc] = out[loc].stat, out[loc].pval
         return out_df
@@ -473,18 +495,22 @@ def missing_warning(missing):
     if not np.any(missing):
         return
     import linearmodels
+
     if linearmodels.WARN_ON_MISSING:
         import warnings
+
         warnings.warn(missing_value_warning_msg, MissingValueWarning)
 
 
 def param_table(results, title, pad_bottom=False):
     """Formatted standard parameter table"""
-    param_data = np.c_[np.asarray(results.params)[:, None],
-                       np.asarray(results.std_errors)[:, None],
-                       np.asarray(results.tstats)[:, None],
-                       np.asarray(results.pvalues)[:, None],
-                       results.conf_int()]
+    param_data = np.c_[
+        np.asarray(results.params)[:, None],
+        np.asarray(results.std_errors)[:, None],
+        np.asarray(results.tstats)[:, None],
+        np.asarray(results.pvalues)[:, None],
+        results.conf_int(),
+    ]
     data = []
     for row in param_data:
         txt_row = []
@@ -494,15 +520,16 @@ def param_table(results, title, pad_bottom=False):
                 f = pval_format
             txt_row.append(f(v))
         data.append(txt_row)
-    header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+    header = ["Parameter", "Std. Err.", "T-stat", "P-value", "Lower CI", "Upper CI"]
     table_stubs = list(results.params.index)
     if pad_bottom:
         # Append blank row for spacing
-        data.append([''] * 6)
-        table_stubs += ['']
+        data.append([""] * 6)
+        table_stubs += [""]
 
-    return SimpleTable(data, stubs=table_stubs, txt_fmt=fmt_params,
-                       headers=header, title=title)
+    return SimpleTable(
+        data, stubs=table_stubs, txt_fmt=fmt_params, headers=header, title=title
+    )
 
 
 def format_wide(s, cols):
@@ -522,21 +549,21 @@ def format_wide(s, cols):
         The joined list.
     """
     lines = []
-    line = ''
+    line = ""
     for i, val in enumerate(s):
-        if line == '':
+        if line == "":
             line = val
             if i + 1 != len(s):
-                line += ', '
+                line += ", "
         else:
             temp = line + val
             if i + 1 != len(s):
-                temp += ', '
+                temp += ", "
             if len(temp) > cols:
                 lines.append([line])
                 line = val
                 if i + 1 != len(s):
-                    line += ', '
+                    line += ", "
             else:
                 line = temp
     lines.append([line])
@@ -583,14 +610,13 @@ def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
     df.index.set_levels(final_levels, [0, 1], inplace=True)
-    df.index.names = ['major', 'minor']
+    df.index.names = ["major", "minor"]
     return df
 
 
 def quadratic_form_test(params, cov, restriction=None, value=None, formula=None):
     if formula is not None and restriction is not None:
-        raise ValueError('restriction and formula cannot be used'
-                         'simultaneously.')
+        raise ValueError("restriction and formula cannot be used" "simultaneously.")
     if formula is not None:
         di = DesignInfo(list(params.index))
         lc = di.linear_constraint(formula)
@@ -603,7 +629,7 @@ def quadratic_form_test(params, cov, restriction=None, value=None, formula=None)
     rcov = restriction @ cov @ restriction.T
     stat = float(diff.T @ np.linalg.inv(rcov) @ diff)
     df = restriction.shape[0]
-    null = 'Linear equality constraint is valid'
-    name = 'Linear Equality Hypothesis Test'
+    null = "Linear equality constraint is valid"
+    name = "Linear Equality Hypothesis Test"
 
     return WaldTestStatistic(stat, null, df, name=name)

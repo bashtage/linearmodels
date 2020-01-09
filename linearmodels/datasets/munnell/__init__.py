@@ -18,4 +18,5 @@ UNEMP   Unemployment rate
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'munnell.csv.bz2')
+
+    return datasets.load(__file__, "munnell.csv.bz2")

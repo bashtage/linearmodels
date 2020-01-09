@@ -10,15 +10,23 @@ from linearmodels.panel.model import AmbiguityError, PanelOLS
 from linearmodels.panel.utility import AbsorbingEffectError
 from linearmodels.tests.panel._utility import datatypes, generate_data, lsdv
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]
 TYPES = datatypes
 
 
-@pytest.fixture(params=list(product(PERC_MISSING, TYPES)),
-                ids=list(map(lambda x: str(int(100 * x[0])) + '-' + str(x[1]),
-                             product(PERC_MISSING, TYPES))))
+@pytest.fixture(
+    params=list(product(PERC_MISSING, TYPES)),
+    ids=list(
+        map(
+            lambda x: str(int(100 * x[0])) + "-" + str(x[1]),
+            product(PERC_MISSING, TYPES),
+        )
+    ),
+)
 def data(request):
     missing, datatype = request.param
     rng = np.random.RandomState(12345)
@@ -155,7 +163,7 @@ def test_incorrect_weight_shape(data):
     w = data.w
     if isinstance(w, pd.DataFrame):
         entities = w.index.levels[0][:4]
-        w = w.loc[pd.IndexSlice[entities[0]:entities[-1]], :]
+        w = w.loc[pd.IndexSlice[entities[0] : entities[-1]], :]
     elif isinstance(w, np.ndarray):
         w = w[:3]
         w = w[None, :, :]
@@ -170,7 +178,7 @@ def test_weight_ambiguity(data):
     if isinstance(data.x, pd.DataFrame):
         t = len(data.y.index.levels[1])
         entities = data.x.index.levels[0]
-        slice = pd.IndexSlice[entities[0]:entities[t - 1]]
+        slice = pd.IndexSlice[entities[0] : entities[t - 1]]
         x = data.x.loc[slice, :]
     else:
         t = data.x.shape[1]
@@ -181,7 +189,7 @@ def test_weight_ambiguity(data):
         PanelOLS(y, x, weights=weights)
 
 
-@pytest.mark.parametrize('intercept', [True, False])
+@pytest.mark.parametrize("intercept", [True, False])
 def test_absorbing_effect(data, intercept):
     x = data.x.copy()
     if isinstance(data.x, pd.DataFrame):
@@ -189,15 +197,15 @@ def test_absorbing_effect(data, intercept):
         ntime = len(x.index.levels[1])
         temp = data.x.iloc[:, 0].copy()
         temp.values[:] = 1.0
-        temp.values[:(ntime * (nentity // 2))] = 0
+        temp.values[: (ntime * (nentity // 2))] = 0
 
         if intercept:
-            x['Intercept'] = 1.0
-        x['absorbed'] = temp
+            x["Intercept"] = 1.0
+        x["absorbed"] = temp
     else:
         intercept_vals = np.ones((1, x.shape[1], x.shape[2]))
         absorbed = np.ones((1, x.shape[1], x.shape[2]))
-        absorbed[:, :, :x.shape[2] // 2] = 0
+        absorbed[:, :, : x.shape[2] // 2] = 0
         if intercept:
             extra = [x, intercept_vals, absorbed]
         else:
@@ -209,10 +217,10 @@ def test_absorbing_effect(data, intercept):
         mod.fit()
     var_names = mod.exog.vars
     assert var_names[3] in str(exc_info.value)
-    assert (' ' * (2 - intercept) + var_names[-1]) in str(exc_info.value)
+    assert (" " * (2 - intercept) + var_names[-1]) in str(exc_info.value)
 
 
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_all_missing(data):
     y = PanelData(data.y)
     x = PanelData(data.x)
@@ -220,6 +228,7 @@ def test_all_missing(data):
     y.drop(missing)
     x.drop(missing)
     import warnings
+
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()
     assert len(w) == 0

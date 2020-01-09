@@ -9,13 +9,19 @@ import scipy.sparse.csr
 from linearmodels.panel.utility import (dummy_matrix, in_2core_graph,
                                         in_2core_graph_slow, preconditioner)
 
-formats = {'csc': scipy.sparse.csc.csc_matrix, 'csr': scipy.sparse.csr.csr_matrix,
-           'coo': scipy.sparse.coo.coo_matrix, 'array': np.ndarray}
+formats = {
+    "csc": scipy.sparse.csc.csc_matrix,
+    "csr": scipy.sparse.csr.csr_matrix,
+    "coo": scipy.sparse.coo.coo_matrix,
+    "array": np.ndarray,
+}
 
-pytestmark = pytest.mark.filterwarnings('ignore:the matrix subclass:PendingDeprecationWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:the matrix subclass:PendingDeprecationWarning"
+)
 
 
-@pytest.fixture(scope='module', params=formats)
+@pytest.fixture(scope="module", params=formats)
 def format(request):
     return request.param, formats[request.param]
 
@@ -40,7 +46,7 @@ def test_dummy_last():
     cats[10:, 0] = 2
     cats[:, 1] = np.arange(15) % 5
     cats[-1, 1] = 0
-    out, _ = dummy_matrix(cats, drop='last', precondition=False)
+    out, _ = dummy_matrix(cats, drop="last", precondition=False)
     assert isinstance(out, scipy.sparse.csc.csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 4, 3, 3, 3], dtype=np.int32)
@@ -52,14 +58,14 @@ def test_invalid_format():
     cats = np.zeros([10, 1], dtype=np.int8)
     cats[5:, 0] = 1
     with pytest.raises(ValueError):
-        dummy_matrix(cats, format='unknown', precondition=False)
+        dummy_matrix(cats, format="unknown", precondition=False)
 
 
 def test_dummy_pandas():
-    c1 = pd.Series(pd.Categorical(['a'] * 5 + ['b'] * 5 + ['c'] * 5))
-    c2 = pd.Series(pd.Categorical(['A', 'B', 'C', 'D', 'E'] * 3))
+    c1 = pd.Series(pd.Categorical(["a"] * 5 + ["b"] * 5 + ["c"] * 5))
+    c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
     cats = pd.concat([c1, c2], 1)
-    out, _ = dummy_matrix(cats, drop='last', precondition=False)
+    out, _ = dummy_matrix(cats, drop="last", precondition=False)
     assert isinstance(out, scipy.sparse.csc.csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 3, 3, 3, 3], dtype=np.int32)
@@ -67,12 +73,14 @@ def test_dummy_pandas():
 
 
 def test_dummy_precondition():
-    c1 = pd.Series(pd.Categorical(['a'] * 5 + ['b'] * 5 + ['c'] * 5))
-    c2 = pd.Series(pd.Categorical(['A', 'B', 'C', 'D', 'E'] * 3))
+    c1 = pd.Series(pd.Categorical(["a"] * 5 + ["b"] * 5 + ["c"] * 5))
+    c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
     cats = pd.concat([c1, c2], 1)
-    out_arr, cond_arr = dummy_matrix(cats, format='array', drop='last', precondition=True)
-    out_csc, cond_csc = dummy_matrix(cats, format='csc', drop='last', precondition=True)
-    out_csr, cond_csr = dummy_matrix(cats, format='csr', drop='last', precondition=True)
+    out_arr, cond_arr = dummy_matrix(
+        cats, format="array", drop="last", precondition=True
+    )
+    out_csc, cond_csc = dummy_matrix(cats, format="csc", drop="last", precondition=True)
+    out_csr, cond_csr = dummy_matrix(cats, format="csr", drop="last", precondition=True)
     assert_allclose((out_arr ** 2).sum(0), np.ones(out_arr.shape[1]))
     assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_arr.shape[1]))
     assert_allclose(cond_arr, cond_csc)
@@ -108,23 +116,23 @@ def test_drop_singletons_slow():
 
     idx = np.arange(40000)
 
-    cols = {'c1': c1.copy(), 'c2': c2.copy()}
+    cols = {"c1": c1.copy(), "c2": c2.copy()}
     for i in range(40000):
-        last = cols['c1'].shape[0]
+        last = cols["c1"].shape[0]
         for col in cols:
             keep = in_2core_graph_slow(cols[col])
             for col2 in cols:
                 cols[col2] = cols[col2][keep]
             idx = idx[keep]
-        if cols['c1'].shape[0] == last:
+        if cols["c1"].shape[0] == last:
             break
 
     expected = np.concatenate([c1[idx], c2[idx]], 1)
     assert_array_equal(nonsingletons, expected)
-    expected = np.concatenate([cols['c1'], cols['c2']], 1)
+    expected = np.concatenate([cols["c1"], cols["c2"]], 1)
     assert_array_equal(nonsingletons, expected)
 
-    dummies, _ = dummy_matrix(cats, format='csr', precondition=False)
+    dummies, _ = dummy_matrix(cats, format="csr", precondition=False)
     to_drop = dummies[~retain]
     assert to_drop.sum() == 2 * (~retain).sum()
 
@@ -154,10 +162,12 @@ def test_drop_singletons_pandas():
     rs = np.random.RandomState(0)
     c1 = rs.randint(0, 10000, (40000, 1))
     c2 = rs.randint(0, 20000, (40000, 1))
-    df = [pd.Series(['{0}{1}'.format(let, c) for c in cat.ravel()], dtype='category')
-          for let, cat in zip('AB', (c1, c2))]
+    df = [
+        pd.Series(["{0}{1}".format(let, c) for c in cat.ravel()], dtype="category")
+        for let, cat in zip("AB", (c1, c2))
+    ]
     df = pd.concat(df, 1)
-    df.columns = ['cat1', 'cat2']
+    df.columns = ["cat1", "cat2"]
     cats = df
     remain = in_2core_graph(cats)
     expected = in_2core_graph_slow(cats)

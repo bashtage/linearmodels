@@ -44,7 +44,9 @@ class HomoskedasticCovariance(object):
         (X'X)^{-1}(X'\Omega X)(X'X)^{-1}
     """
 
-    def __init__(self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None):
+    def __init__(
+        self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None
+    ):
         self._eps = eps
         self._x = x
         self._nobs = eps.shape[0]
@@ -54,7 +56,7 @@ class HomoskedasticCovariance(object):
         self._gls = gls
         self._debiased = debiased
         self._constraints = constraints
-        self._name = 'Homoskedastic (Unadjusted) Covariance'
+        self._name = "Homoskedastic (Unadjusted) Covariance"
         self._str_extra = AttrDict(Debiased=self._debiased, GLS=self._gls)
         self._cov_config = AttrDict(debiased=self._debiased)
 
@@ -62,14 +64,14 @@ class HomoskedasticCovariance(object):
         out = self._name
         extra = []
         for key in self._str_extra:
-            extra.append(': '.join([key, str(self._str_extra[key])]))
+            extra.append(": ".join([key, str(self._str_extra[key])]))
         if extra:
-            out += ' (' + ', '.join(extra) + ')'
+            out += " (" + ", ".join(extra) + ")"
         return out
 
     def __repr__(self):
         out = self.__str__()
-        return out + ', id: {0}'.format(hex(id(self)))
+        return out + ", id: {0}".format(hex(id(self)))
 
     @property
     def sigma(self):
@@ -174,12 +176,19 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     where :math:`\hat{S}` is a estimator of the covariance of the model scores.
     """
 
-    def __init__(self, x, eps, sigma, full_sigma, gls=False, debiased=False, constraints=None):
-        super(HeteroskedasticCovariance, self).__init__(x, eps, sigma, full_sigma,
-                                                        gls=gls,
-                                                        debiased=debiased,
-                                                        constraints=constraints)
-        self._name = 'Heteroskedastic (Robust) Covariance'
+    def __init__(
+        self, x, eps, sigma, full_sigma, gls=False, debiased=False, constraints=None
+    ):
+        super(HeteroskedasticCovariance, self).__init__(
+            x,
+            eps,
+            sigma,
+            full_sigma,
+            gls=gls,
+            debiased=debiased,
+            constraints=constraints,
+        )
+        self._name = "Heteroskedastic (Robust) Covariance"
 
         k = len(x)
         nobs = eps.shape[0]
@@ -200,7 +209,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             loc = 0
             for i in range(k):
                 offset = x[i].shape[1]
-                xe[:, loc:loc+offset] = x[i] * eps[:, i:i+1]
+                xe[:, loc : loc + offset] = x[i] * eps[:, i : i + 1]
                 loc += offset
 
         self._moments = xe
@@ -305,17 +314,34 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
     """
 
-    def __init__(self, x, eps, sigma, full_sigma, *, gls=False, debiased=False, constraints=None,
-                 kernel='bartlett', bandwidth=None):
-        super(KernelCovariance, self).__init__(x, eps, sigma, full_sigma, gls=gls,
-                                               debiased=debiased,
-                                               constraints=constraints)
+    def __init__(
+        self,
+        x,
+        eps,
+        sigma,
+        full_sigma,
+        *,
+        gls=False,
+        debiased=False,
+        constraints=None,
+        kernel="bartlett",
+        bandwidth=None
+    ):
+        super(KernelCovariance, self).__init__(
+            x,
+            eps,
+            sigma,
+            full_sigma,
+            gls=gls,
+            debiased=debiased,
+            constraints=constraints,
+        )
 
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
-        self._name = 'Kernel (HAC) Covariance'
-        self._str_extra['Kernel'] = kernel
-        self._cov_config['kernel'] = kernel
+        self._name = "Kernel (HAC) Covariance"
+        self._str_extra["Kernel"] = kernel
+        self._cov_config["kernel"] = kernel
 
     def _xeex(self):
         return self._kernel_cov(self._moments)
@@ -324,7 +350,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     def cov_config(self):
         """Optional configuration information used in covariance"""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
-        out['bandwidth'] = self.bandwidth
+        out["bandwidth"] = self.bandwidth
         return out
 
 
@@ -368,7 +394,7 @@ class GMMHomoskedasticCovariance(object):
         self._w = w
         self._debiased = debiased
         self._constraints = constraints
-        self._name = 'GMM Homoskedastic (Unadjusted) Covariance'
+        self._name = "GMM Homoskedastic (Unadjusted) Covariance"
         self._cov_config = AttrDict(debiased=self._debiased)
 
     def __str__(self):
@@ -377,7 +403,7 @@ class GMMHomoskedasticCovariance(object):
 
     def __repr__(self):
         out = self.__str__()
-        return out + ', id: {0}'.format(hex(id(self)))
+        return out + ", id: {0}".format(hex(id(self)))
 
     @property
     def cov(self):
@@ -401,7 +427,14 @@ class GMMHomoskedasticCovariance(object):
             xpz_wi_zpx = cons.t.T @ xpz_wi_zpx @ cons.t
             xpz_wi_zpxi = inv(xpz_wi_zpx)
             xpz_wi_omega_wi_zpx = cons.t.T @ xpz_wi_omega_wi_zpx @ cons.t
-            cov = cons.t @ xpz_wi_zpxi @ xpz_wi_omega_wi_zpx @ xpz_wi_zpxi @ cons.t.T / nobs
+            cov = (
+                cons.t
+                @ xpz_wi_zpxi
+                @ xpz_wi_omega_wi_zpx
+                @ xpz_wi_zpxi
+                @ cons.t.T
+                / nobs
+            )
 
         cov = (cov + cov.T) / 2
         return adj * cov
@@ -465,8 +498,10 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
     """
 
     def __init__(self, x, z, eps, w, *, sigma=None, debiased=False, constraints=None):
-        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints)
-        self._name = 'GMM Heteroskedastic (Robust) Covariance'
+        super().__init__(
+            x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints
+        )
+        self._name = "GMM Heteroskedastic (Robust) Covariance"
 
         k = len(z)
         k_total = sum(map(lambda a: a.shape[1], z))
@@ -475,7 +510,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         ze = empty((nobs, k_total))
         for i in range(k):
             kz = z[i].shape[1]
-            ze[:, loc:loc + kz] = z[i] * eps[:, [i]]
+            ze[:, loc : loc + kz] = z[i] * eps[:, [i]]
             loc += kz
         self._moments = ze
 
@@ -528,13 +563,26 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     where :math:`\Omega` is the covariance of the moment conditions.
     """
 
-    def __init__(self, x, z, eps, w, *, sigma=None, debiased=False, constraints=None,
-                 kernel='bartlett', bandwidth=None):
-        super().__init__(x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints)
-        self._name = 'GMM Kernel (HAC) Covariance'
+    def __init__(
+        self,
+        x,
+        z,
+        eps,
+        w,
+        *,
+        sigma=None,
+        debiased=False,
+        constraints=None,
+        kernel="bartlett",
+        bandwidth=None
+    ):
+        super().__init__(
+            x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints
+        )
+        self._name = "GMM Kernel (HAC) Covariance"
         self._check_bandwidth(bandwidth)
         self._check_kernel(kernel)
-        self._cov_config['kernel'] = kernel
+        self._cov_config["kernel"] = kernel
 
     def _omega(self):
         return self._kernel_cov(self._moments)
@@ -543,5 +591,5 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
     def cov_config(self):
         """Optional configuration information used in covariance"""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
-        out['bandwidth'] = self.bandwidth
+        out["bandwidth"] = self.bandwidth
         return out

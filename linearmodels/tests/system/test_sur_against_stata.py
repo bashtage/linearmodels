@@ -12,42 +12,44 @@ from linearmodels.tests.system.results.generate_data import (basic_data,
 from linearmodels.tests.system.results.parse_stata_results import stata_results
 from linearmodels.utility import AttrDict
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 
-@pytest.fixture(scope='module', params=list(stata_results.keys()))
+@pytest.fixture(scope="module", params=list(stata_results.keys()))
 def model_data(request):
     key = request.param
-    dgp, model_type = key.split('-')
-    if dgp == 'basic':
+    dgp, model_type = key.split("-")
+    if dgp == "basic":
         data = basic_data
-    elif dgp == 'common':
+    elif dgp == "common":
         data = common_data
         for i, data_key in enumerate(data):
             if i == 0:
-                exog = data[data_key]['exog']
+                exog = data[data_key]["exog"]
             else:
-                data[data_key]['exog'] = exog
+                data[data_key]["exog"] = exog
     else:  # dgp == 'missing'
         data = missing_data
-    cov_kwds = {'cov_type': 'unadjusted'}
-    if model_type == 'ss':
-        cov_kwds['debiased'] = True
+    cov_kwds = {"cov_type": "unadjusted"}
+    if model_type == "ss":
+        cov_kwds["debiased"] = True
     stata_result = stata_results[key]
     rekeyed_data = OrderedDict()
     for data_key in data:
         temp = data[data_key]
-        new_key = temp['dependent'].columns[0]
+        new_key = temp["dependent"].columns[0]
         rekeyed_data[new_key] = temp
     constraint = None
-    if model_type == 'constrained':
+    if model_type == "constrained":
         cols = []
         widths = []
         for new_key in rekeyed_data:
-            exog = rekeyed_data[new_key]['exog']
-            cols.extend([new_key + '_' + col for col in exog.columns])
+            exog = rekeyed_data[new_key]["exog"]
+            cols.extend([new_key + "_" + col for col in exog.columns])
             widths.append(exog.shape[1])
-        r = pd.DataFrame(columns=cols, index=['r0', 'r1'], dtype=np.float64)
+        r = pd.DataFrame(columns=cols, index=["r0", "r1"], dtype=np.float64)
         r.iloc[:, :] = 0.0
         r.iloc[:, 0] = -1.0
         r.iloc[0, widths[0]] = 1.0
@@ -59,9 +61,16 @@ def model_data(request):
         mod.add_constraints(constraint)
     res = mod.fit(**cov_kwds)
 
-    return AttrDict(data=rekeyed_data, cov_kwds=cov_kwds, model_type=model_type,
-                    stata_result=stata_result, key=key, constraint=constraint,
-                    mod=mod, res=res)
+    return AttrDict(
+        data=rekeyed_data,
+        cov_kwds=cov_kwds,
+        model_type=model_type,
+        stata_result=stata_result,
+        key=key,
+        constraint=constraint,
+        mod=mod,
+        res=res,
+    )
 
 
 def test_params(model_data):
@@ -105,12 +114,12 @@ def test_f_stat(model_data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.f_statistic.stat
-        stata_stat = stata_stats.loc['F_{0}'.format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc["F_{0}".format(i + 1)].squeeze()
         if np.isnan(stata_stat):
-            stata_stat = stata_stats.loc['chi2_{0}'.format(i + 1)].squeeze()
+            stata_stat = stata_stats.loc["chi2_{0}".format(i + 1)].squeeze()
         assert_allclose(stat, stata_stat)
         pval = eq.f_statistic.pval
-        stata_pval = stata_stats.loc['p_{0}'.format(i + 1)]
+        stata_pval = stata_stats.loc["p_{0}".format(i + 1)]
         assert_allclose(pval, stata_pval, atol=1e-6)
 
 
@@ -120,7 +129,7 @@ def test_r2(model_data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.rsquared
-        stata_stat = stata_stats.loc['r2_{0}'.format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc["r2_{0}".format(i + 1)].squeeze()
         assert_allclose(stat, stata_stat)
 
 
@@ -130,9 +139,9 @@ def test_sum_of_squares(model_data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.resid_ss
-        stata_stat = stata_stats.loc['rss_{0}'.format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc["rss_{0}".format(i + 1)].squeeze()
         assert_allclose(stat, stata_stat)
-        stata_stat = stata_stats.loc['mss_{0}'.format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc["mss_{0}".format(i + 1)].squeeze()
         stat = eq.model_ss
         assert_allclose(stat, stata_stat)
 
@@ -143,5 +152,5 @@ def test_df_model(model_data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.df_model
-        stata_stat = stata_stats.loc['df_m{0}'.format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc["df_m{0}".format(i + 1)].squeeze()
         assert_allclose(stat, stata_stat + 1)

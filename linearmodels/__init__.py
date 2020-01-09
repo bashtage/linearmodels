@@ -45,28 +45,43 @@ from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 from ._version import get_versions
 
 OLS = _OLS
-WARN_ON_MISSING = os.environ.get('LINEARMODELS_WARN_ON_MISSING', True)
-WARN_ON_MISSING = False if WARN_ON_MISSING in ('0', 'False') else True
-DROP_MISSING = os.environ.get('LINEARMODELS_DROP_MISSING', True)
-DROP_MISSING = False if DROP_MISSING in ('0', 'False') else True
+WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", True)
+WARN_ON_MISSING = False if WARN_ON_MISSING in ("0", "False") else True
+DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", True)
+DROP_MISSING = False if DROP_MISSING in ("0", "False") else True
 
-__all__ = ['PooledOLS', 'PanelOLS', 'FirstDifferenceOLS', 'BetweenOLS',
-           'RandomEffects',
-           'FamaMacBeth',
-           'IVLIML', 'IVGMM', 'IVGMMCUE', 'IV2SLS', 'OLS',
-           'SUR', 'IV3SLS', 'IVSystemGMM',
-           'LinearFactorModel', 'LinearFactorModelGMM', 'TradedFactorModel',
-           'WARN_ON_MISSING', 'DROP_MISSING']
+__all__ = [
+    "PooledOLS",
+    "PanelOLS",
+    "FirstDifferenceOLS",
+    "BetweenOLS",
+    "RandomEffects",
+    "FamaMacBeth",
+    "IVLIML",
+    "IVGMM",
+    "IVGMMCUE",
+    "IV2SLS",
+    "OLS",
+    "SUR",
+    "IV3SLS",
+    "IVSystemGMM",
+    "LinearFactorModel",
+    "LinearFactorModelGMM",
+    "TradedFactorModel",
+    "WARN_ON_MISSING",
+    "DROP_MISSING",
+]
 
 
 def test(extra_args=None, exit=True, append=True):
     import sys
+
     try:
         import pytest
     except ImportError:
         raise ImportError("Need pytest to run tests")
 
-    cmd = ['--tb=short', '--disable-pytest-warnings']
+    cmd = ["--tb=short", "--disable-pytest-warnings"]
     if extra_args:
         if not isinstance(extra_args, list):
             extra_args = [extra_args]
@@ -76,11 +91,11 @@ def test(extra_args=None, exit=True, append=True):
             cmd = extra_args
     pkg = os.path.dirname(__file__)
     cmd = [pkg] + cmd
-    print("running: pytest {}".format(' '.join(cmd)))
+    print("running: pytest {}".format(" ".join(cmd)))
     status = pytest.main(cmd)
     if exit:
         sys.exit(status)
 
 
-__version__ = get_versions()['version']
+__version__ = get_versions()["version"]
 del get_versions

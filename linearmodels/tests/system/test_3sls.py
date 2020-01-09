@@ -20,29 +20,35 @@ rho = [0.8, 0.0]
 common_exog = [True, False]
 included_weights = [True, False]
 output_dict = [True, False]
-params = list(product(nexog, nendog, ninstr, const, rho, common_exog,
-                      included_weights, output_dict))
+params = list(
+    product(
+        nexog, nendog, ninstr, const, rho, common_exog, included_weights, output_dict
+    )
+)
 
 nexog = [[0, 1, 2]]
 nendog = [[1, 0, 1]]
 ninstr = [[2, 0, 1]]
 
 # Explicitly test variables that have no columns
-add_params = list(product(nexog, nendog, ninstr, const, rho, common_exog,
-                          included_weights, output_dict))
+add_params = list(
+    product(
+        nexog, nendog, ninstr, const, rho, common_exog, included_weights, output_dict
+    )
+)
 
 params += add_params
 
 
 def gen_id(param):
-    idstr = 'homo' if isinstance(param[0], list) else 'hetero'
-    idstr += '-homo_endog' if isinstance(param[1], list) else '-hetero_endog'
-    idstr += '-homo_instr' if isinstance(param[2], list) else '-hetero_instr'
-    idstr += '-const' if param[3] else ''
-    idstr += '-correl' if param[4] != 0 else ''
-    idstr += '-common' if param[5] else ''
-    idstr += '-weights' if param[6] else ''
-    idstr += '-dict' if param[7] else '-tuple'
+    idstr = "homo" if isinstance(param[0], list) else "hetero"
+    idstr += "-homo_endog" if isinstance(param[1], list) else "-hetero_endog"
+    idstr += "-homo_instr" if isinstance(param[2], list) else "-hetero_instr"
+    idstr += "-const" if param[3] else ""
+    idstr += "-correl" if param[4] != 0 else ""
+    idstr += "-common" if param[5] else ""
+    idstr += "-weights" if param[6] else ""
+    idstr += "-dict" if param[7] else "-tuple"
     return idstr
 
 
@@ -59,6 +65,7 @@ def data(request):
         en = 2
         instr = 3
     elif list_like:
+
         def safe_len(a):
             a = np.array(a)
             if a.ndim == 0:
@@ -67,14 +74,23 @@ def data(request):
 
         k = max(map(safe_len, [p, en, instr]))
 
-    return generate_3sls_data(n=250, k=k, p=p, en=en, instr=instr, const=const, rho=rho,
-                              common_exog=common_exog, included_weights=included_weights,
-                              output_dict=output_dict)
+    return generate_3sls_data(
+        n=250,
+        k=k,
+        p=p,
+        en=en,
+        instr=instr,
+        const=const,
+        rho=rho,
+        common_exog=common_exog,
+        included_weights=included_weights,
+        output_dict=output_dict,
+    )
 
 
 def test_direct_simple(data):
     mod = IV3SLS(data)
-    res = mod.fit(cov_type='unadjusted')
+    res = mod.fit(cov_type="unadjusted")
 
     y = []
     x = []
@@ -92,14 +108,18 @@ def test_direct_simple(data):
             if len(val) == 5:
                 return  # weighted
         else:
-            y.append(val['dependent'])
-            nobs = val['dependent'].shape[0]
-            vexog = val['exog'] if val['exog'] is not None else np.empty((nobs, 0))
-            vendog = val['endog'] if val['endog'] is not None else np.empty((nobs, 0))
-            vinstr = val['instruments'] if val['instruments'] is not None else np.empty((nobs, 0))
+            y.append(val["dependent"])
+            nobs = val["dependent"].shape[0]
+            vexog = val["exog"] if val["exog"] is not None else np.empty((nobs, 0))
+            vendog = val["endog"] if val["endog"] is not None else np.empty((nobs, 0))
+            vinstr = (
+                val["instruments"]
+                if val["instruments"] is not None
+                else np.empty((nobs, 0))
+            )
             x.append(np.concatenate([vexog, vendog], 1))
             z.append(np.concatenate([vexog, vinstr], 1))
-            if 'weights' in val:
+            if "weights" in val:
                 return  # weighted
     out = simple_3sls(y, x, z)
     assert_allclose(res.params.values, out.beta1.squeeze())
@@ -113,7 +133,7 @@ def test_single_equation(data):
     data = {key: data[key]}
 
     mod = IV3SLS(data)
-    res = mod.fit(cov_type='unadjusted')
+    res = mod.fit(cov_type="unadjusted")
 
     y = []
     x = []
@@ -127,10 +147,10 @@ def test_single_equation(data):
             if len(val) == 5:
                 return  # weighted
         else:
-            y.append(val['dependent'])
-            x.append(np.concatenate([val['exog'], val['endog']], 1))
-            z.append(np.concatenate([val['exog'], val['instruments']], 1))
-            if 'weights' in val:
+            y.append(val["dependent"])
+            x.append(np.concatenate([val["exog"], val["endog"]], 1))
+            z.append(np.concatenate([val["exog"], val["instruments"]], 1))
+            if "weights" in val:
                 return  # weighted
     out = simple_3sls(y, x, z)
     assert_allclose(res.params.values, out.beta1.squeeze())
@@ -147,7 +167,7 @@ def test_too_few_instruments():
     instr = np.random.standard_normal((n, 1))
     eqns = {}
     for i in range(2):
-        eqns['eqn.{0}'.format(i)] = (dep[:, i], exog, endog, instr)
+        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -161,7 +181,7 @@ def test_redundant_instruments():
     instr = np.concatenate([exog, instr], 1)
     eqns = {}
     for i in range(2):
-        eqns['eqn.{0}'.format(i)] = (dep[:, i], exog, endog, instr)
+        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -174,7 +194,7 @@ def test_too_many_instruments():
     instr = np.random.standard_normal((n, n + 1))
     eqns = {}
     for i in range(2):
-        eqns['eqn.{0}'.format(i)] = (dep[:, i], exog, endog, instr)
+        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -203,14 +223,14 @@ def test_multivariate_iv():
     n = 250
     dep = np.random.standard_normal((n, 2))
     exog = np.random.standard_normal((n, 3))
-    exog = DataFrame(exog, columns=['exog.{0}'.format(i) for i in range(3)])
+    exog = DataFrame(exog, columns=["exog.{0}".format(i) for i in range(3)])
     endog = np.random.standard_normal((n, 2))
-    endog = DataFrame(endog, columns=['endog.{0}'.format(i) for i in range(2)])
+    endog = DataFrame(endog, columns=["endog.{0}".format(i) for i in range(2)])
     instr = np.random.standard_normal((n, 3))
-    instr = DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=["instr.{0}".format(i) for i in range(3)])
     eqns = {}
     for i in range(2):
-        eqns['dependent.{0}'.format(i)] = (dep[:, i], exog, endog, instr)
+        eqns["dependent.{0}".format(i)] = (dep[:, i], exog, endog, instr)
     mod = IV3SLS(eqns)
     res = mod.fit()
 
@@ -224,7 +244,7 @@ def test_multivariate_iv_bad_data():
     n = 250
     dep = np.random.standard_normal((n, 2))
     instr = np.random.standard_normal((n, 3))
-    instr = DataFrame(instr, columns=['instr.{0}'.format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=["instr.{0}".format(i) for i in range(3)])
 
     with pytest.raises(ValueError):
         IV3SLS.multivariate_ls(dep, None, None, instr)
@@ -237,15 +257,18 @@ def test_fitted(data):
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         fv = res.fitted_values[key].copy()
-        fv.name = 'fitted_values'
+        fv.name = "fitted_values"
         assert_series_equal(eq.fitted_values, fv)
         b = eq.params.values
         direct = mod._x[i] @ b
         expected.append(direct[:, None])
         assert_allclose(eq.fitted_values, direct, atol=1e-8)
     expected = np.concatenate(expected, 1)
-    expected = DataFrame(expected, index=mod._dependent[i].pandas.index,
-                         columns=[key for key in res.equations])
+    expected = DataFrame(
+        expected,
+        index=mod._dependent[i].pandas.index,
+        columns=[key for key in res.equations],
+    )
     assert_frame_equal(expected, res.fitted_values)
 
 
@@ -254,11 +277,11 @@ def test_no_exog():
     mod = IV3SLS(data)
     res = mod.fit()
 
-    data = generate_3sls_data_v2(nexog=0, const=False, omitted='drop')
+    data = generate_3sls_data_v2(nexog=0, const=False, omitted="drop")
     mod = IV3SLS(data)
     res2 = mod.fit()
 
-    data = generate_3sls_data_v2(nexog=0, const=False, omitted='empty')
+    data = generate_3sls_data_v2(nexog=0, const=False, omitted="empty")
     mod = IV3SLS(data)
     res3 = mod.fit()
 
@@ -266,7 +289,9 @@ def test_no_exog():
     mod = IV3SLS(data)
     res4 = mod.fit()
 
-    data = generate_3sls_data_v2(nexog=0, const=False, output_dict=False, omitted='empty')
+    data = generate_3sls_data_v2(
+        nexog=0, const=False, output_dict=False, omitted="empty"
+    )
     mod = IV3SLS(data)
     res5 = mod.fit()
     assert_series_equal(res.params, res2.params)
@@ -280,11 +305,11 @@ def test_no_endog():
     mod = IV3SLS(data)
     res = mod.fit()
 
-    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted='drop')
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted="drop")
     mod = IV3SLS(data)
     res2 = mod.fit()
 
-    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted='empty')
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, omitted="empty")
     mod = IV3SLS(data)
     res3 = mod.fit()
 
@@ -292,7 +317,7 @@ def test_no_endog():
     mod = IV3SLS(data)
     res4 = mod.fit()
 
-    data = generate_3sls_data_v2(nendog=0, ninstr=0, output_dict=False, omitted='empty')
+    data = generate_3sls_data_v2(nendog=0, ninstr=0, output_dict=False, omitted="empty")
     mod = IV3SLS(data)
     res5 = mod.fit()
     assert_series_equal(res.params, res2.params)
@@ -304,6 +329,6 @@ def test_no_endog():
 def test_uneven_shapes():
     data = generate_3sls_data_v2()
     eq = data[list(data.keys())[0]]
-    eq['weights'] = np.ones(eq.dependent.shape[0] // 2)
+    eq["weights"] = np.ones(eq.dependent.shape[0] // 2)
     with pytest.raises(ValueError):
         IV3SLS(data)

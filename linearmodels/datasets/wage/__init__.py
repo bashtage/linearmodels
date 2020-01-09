@@ -24,4 +24,5 @@ lwage                    natural log of wage
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'wage.csv.bz2')
+
+    return datasets.load(__file__, "wage.csv.bz2")

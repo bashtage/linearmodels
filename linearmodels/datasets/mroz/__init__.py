@@ -30,4 +30,5 @@ expersq    exper^2
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'mroz.csv.bz2')
+
+    return datasets.load(__file__, "mroz.csv.bz2")

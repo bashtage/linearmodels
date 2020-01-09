@@ -6,15 +6,17 @@ import pytest
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.utility import AttrDict
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 
-@pytest.fixture(scope='module', params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
+@pytest.fixture(scope="module", params=[IV2SLS, IVLIML, IVGMM, IVGMMCUE])
 def model(request):
     return request.param
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def data():
     n, q, k, p = 1000, 2, 5, 3
     np.random.seed(12345)
@@ -29,7 +31,7 @@ def data():
     v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
     v.flat[::93] = np.nan
     x = v[:, :k]
-    z = v[:, k:k + p]
+    z = v[:, k : k + p]
     e = v[:, [-1]]
     params = np.arange(1, k + 1) / k
     params = params[:, None]
@@ -49,25 +51,32 @@ def data():
     endog_clean = x_clean[:, :q]
     instr_clean = z_clean
     clusters_clean = clusters[not_missing]
-    return AttrDict(dep=dep, exog=exog, endog=endog, instr=instr,
-                    dep_clean=dep_clean, exog_clean=exog_clean,
-                    endog_clean=endog_clean, instr_clean=instr_clean,
-                    clusters=clusters, clusters_clean=clusters_clean)
+    return AttrDict(
+        dep=dep,
+        exog=exog,
+        endog=endog,
+        instr=instr,
+        dep_clean=dep_clean,
+        exog_clean=exog_clean,
+        endog_clean=endog_clean,
+        instr_clean=instr_clean,
+        clusters=clusters,
+        clusters_clean=clusters_clean,
+    )
 
 
 def get_all(v):
-    attr = [d for d in dir(v) if not d.startswith('_')]
+    attr = [d for d in dir(v) if not d.startswith("_")]
     for a in attr:
         val = getattr(v, a)
-        if a in ('conf_int', 'durbin', 'wu_hausman', 'c_stat'):
+        if a in ("conf_int", "durbin", "wu_hausman", "c_stat"):
             val()
 
 
 def test_missing(data, model):
     mod = model(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    mod = model(data.dep_clean, data.exog_clean,
-                data.endog_clean, data.instr_clean)
+    mod = model(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)
     res2 = mod.fit()
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
@@ -77,11 +86,10 @@ def test_missing(data, model):
 def test_missing_clustered(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', clusters=data.clusters)
-    res = mod.fit(cov_type='clustered', clusters=data.clusters_clean)
-    mod = IV2SLS(data.dep_clean, data.exog_clean,
-                 data.endog_clean, data.instr_clean)
-    res2 = mod.fit(cov_type='clustered', clusters=data.clusters_clean)
+        mod.fit(cov_type="clustered", clusters=data.clusters)
+    res = mod.fit(cov_type="clustered", clusters=data.clusters_clean)
+    mod = IV2SLS(data.dep_clean, data.exog_clean, data.endog_clean, data.instr_clean)
+    res2 = mod.fit(cov_type="clustered", clusters=data.clusters_clean)
     assert res.nobs == res2.nobs
     assert_series_equal(res.params, res2.params)
     get_all(res)

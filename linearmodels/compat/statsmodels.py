@@ -11,7 +11,7 @@ class Summary(summary.Summary):
         str
             concatenated summary tables in HTML format
         """
-        html = summary.summary_return(self.tables, return_fmt='html')
+        html = summary.summary_return(self.tables, return_fmt="html")
         if self.extra_txt is not None:
-            html = html + '<br/><br/>' + self.extra_txt.replace('\n', '<br/>')
+            html = html + "<br/><br/>" + self.extra_txt.replace("\n", "<br/>")
         return html

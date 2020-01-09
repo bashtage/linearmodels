@@ -16,7 +16,7 @@ from linearmodels.iv.results import compare
 from linearmodels.utility import AttrDict
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def data():
     n, q, k, p = 1000, 2, 5, 3
     np.random.seed(12345)
@@ -30,7 +30,7 @@ def data():
     r += np.eye(9) * 0.5
     v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
     x = v[:, :k]
-    z = v[:, k:k + p]
+    z = v[:, k : k + p]
     e = v[:, [-1]]
     params = np.arange(1, k + 1) / k
     params = params[:, None]
@@ -43,18 +43,34 @@ def data():
     vinv = np.linalg.inv(v)
     kappa = 0.99
     vk = (x.T @ x * (1 - kappa) + kappa * xhat.T @ xhat) / nobs
-    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, xhat=xhat,
-                    params=params, s2=s2, s2_debiased=s2_debiased,
-                    clusters=clusters, nvar=nvar, v=v, vinv=vinv, vk=vk,
-                    kappa=kappa, dep=y, exog=x[:, q:], endog=x[:, :q],
-                    instr=z)
+    return AttrDict(
+        nobs=nobs,
+        e=e,
+        x=x,
+        y=y,
+        z=z,
+        xhat=xhat,
+        params=params,
+        s2=s2,
+        s2_debiased=s2_debiased,
+        clusters=clusters,
+        nvar=nvar,
+        v=v,
+        vinv=vinv,
+        vk=vk,
+        kappa=kappa,
+        dep=y,
+        exog=x[:, q:],
+        endog=x[:, :q],
+        instr=z,
+    )
 
 
 def get_all(v):
-    attr = [d for d in dir(v) if not d.startswith('_')]
+    attr = [d for d in dir(v) if not d.startswith("_")]
     for a in attr:
         val = getattr(v, a)
-        if a in ('conf_int', 'durbin', 'wu_hausman', 'c_stat'):
+        if a in ("conf_int", "durbin", "wu_hausman", "c_stat"):
             val()
 
 
@@ -102,12 +118,14 @@ class TestErrors(object):
     def test_string_cat(self, data):
         instr = data.instr.copy()
         n = data.instr.shape[0]
-        cat = pd.Series(['a'] * (n // 2) + ['b'] * (n // 2))
+        cat = pd.Series(["a"] * (n // 2) + ["b"] * (n // 2))
         instr = pd.DataFrame(instr)
-        instr['cat'] = cat
-        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type='unadjusted')
-        instr['cat'] = cat.astype('category')
-        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type='unadjusted')
+        instr["cat"] = cat
+        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type="unadjusted")
+        instr["cat"] = cat.astype("category")
+        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit(
+            cov_type="unadjusted"
+        )
         assert_series_equal(res.params, res_cat.params)
 
     def test_no_regressors(self, data):
@@ -260,6 +278,7 @@ def test_model_summary_smoke(data):
 
 def test_model_missing(data):
     import copy
+
     data2 = AttrDict()
     for key in data:
         data2[key] = copy.deepcopy(data[key])
@@ -290,24 +309,20 @@ def test_compare(data):
     c = compare([res1, res2, res3, res4])
     assert len(c.rsquared) == 4
     c.summary
-    c = compare({'Model A': res1,
-                 'Model B': res2,
-                 'Model C': res3,
-                 'Model D': res4})
+    c = compare({"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4})
     c.summary
     res = OrderedDict()
-    res['Model A'] = res1
-    res['Model B'] = res2
-    res['Model C'] = res3
-    res['Model D'] = res4
+    res["Model A"] = res1
+    res["Model B"] = res2
+    res["Model C"] = res3
+    res["Model D"] = res4
     c = compare(res)
     c.summary
     c.pvalues
 
     res1 = IV2SLS(data.dep, data.exog[:, :1], None, None).fit()
     res2 = IV2SLS(data.dep, data.exog[:, :2], None, None).fit()
-    c = compare({'Model A': res1,
-                 'Model B': res2})
+    c = compare({"Model A": res1, "Model B": res2})
     c.summary
 
 
@@ -316,10 +331,10 @@ def test_compare_single(data):
     c = compare([res1])
     assert len(c.rsquared) == 1
     c.summary
-    c = compare({'Model A': res1})
+    c = compare({"Model A": res1})
     c.summary
     res = OrderedDict()
-    res['Model A'] = res1
+    res["Model A"] = res1
     c = compare(res)
     c.summary
     c.pvalues
@@ -339,18 +354,18 @@ def test_first_stage_summary(data):
 
 def test_gmm_str(data):
     mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
-    str(mod.fit(cov_type='unadjusted'))
-    str(mod.fit(cov_type='robust'))
-    str(mod.fit(cov_type='clustered', clusters=data.clusters))
-    str(mod.fit(cov_type='kernel'))
+    str(mod.fit(cov_type="unadjusted"))
+    str(mod.fit(cov_type="robust"))
+    str(mod.fit(cov_type="clustered", clusters=data.clusters))
+    str(mod.fit(cov_type="kernel"))
 
 
 def test_gmm_cue_optimization_options(data):
     mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
     res_none = mod.fit(display=False)
-    opt_options = dict(method='BFGS', options={'disp': False})
+    opt_options = dict(method="BFGS", options={"disp": False})
     res_bfgs = mod.fit(display=False, opt_options=opt_options)
-    opt_options = dict(method='L-BFGS-B', options={'disp': False})
+    opt_options = dict(method="L-BFGS-B", options={"disp": False})
     res_lbfgsb = mod.fit(display=False, opt_options=opt_options)
     assert res_none.iterations > 2
     assert res_bfgs.iterations > 2

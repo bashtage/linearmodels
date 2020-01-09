@@ -42,7 +42,7 @@ from linearmodels.utility import (AttrDict, InvalidTestStatistic,
                                   WaldTestStatistic, has_constant,
                                   missing_warning)
 
-__all__ = ['SUR', 'IV3SLS', 'IVSystemGMM']
+__all__ = ["SUR", "IV3SLS", "IVSystemGMM"]
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys 'dependent'
@@ -50,24 +50,32 @@ and 'exog' or a 2-element tuple of he form (dependent, exog).
 equations[{key}] was {type}
 """
 
-COV_TYPES = {'unadjusted': 'unadjusted',
-             'homoskedastic': 'unadjusted',
-             'robust': 'robust',
-             'heteroskedastic': 'robust',
-             'kernel': 'kernel',
-             'hac': 'kernel'}
+COV_TYPES = {
+    "unadjusted": "unadjusted",
+    "homoskedastic": "unadjusted",
+    "robust": "robust",
+    "heteroskedastic": "robust",
+    "kernel": "kernel",
+    "hac": "kernel",
+}
 
-COV_EST = {'unadjusted': HomoskedasticCovariance,
-           'robust': HeteroskedasticCovariance,
-           'kernel': KernelCovariance}
+COV_EST = {
+    "unadjusted": HomoskedasticCovariance,
+    "robust": HeteroskedasticCovariance,
+    "kernel": KernelCovariance,
+}
 
-GMM_W_EST = {'unadjusted': HomoskedasticWeightMatrix,
-             'robust': HeteroskedasticWeightMatrix,
-             'kernel': KernelWeightMatrix}
+GMM_W_EST = {
+    "unadjusted": HomoskedasticWeightMatrix,
+    "robust": HeteroskedasticWeightMatrix,
+    "kernel": KernelWeightMatrix,
+}
 
-GMM_COV_EST = {'unadjusted': GMMHomoskedasticCovariance,
-               'robust': GMMHeteroskedasticCovariance,
-               'kernel': GMMKernelCovariance}
+GMM_COV_EST = {
+    "unadjusted": GMMHomoskedasticCovariance,
+    "robust": GMMHeteroskedasticCovariance,
+    "kernel": GMMKernelCovariance,
+}
 
 
 def _to_ordered_dict(equations):
@@ -86,7 +94,8 @@ def _missing_weights(weights):
     missing = [key for key in weights if weights[key] is None]
     if missing:
         import warnings
-        msg = 'Weights not found for equation labels:\n{0}'.format(', '.join(missing))
+
+        msg = "Weights not found for equation labels:\n{0}".format(", ".join(missing))
         warnings.warn(msg, UserWarning)
     return None
 
@@ -135,7 +144,7 @@ def _parameters_from_xprod(xpx, xpy, constraints=None):
 class SystemFormulaParser(object):
     def __init__(self, formula, data, weights=None, eval_env=6):
         if not isinstance(formula, (Mapping, str)):
-            raise TypeError('formula must be a string or dictionary-like')
+            raise TypeError("formula must be a string or dictionary-like")
         self._formula = formula
         self._data = data
         self._weights = weights
@@ -147,8 +156,8 @@ class SystemFormulaParser(object):
 
     @staticmethod
     def _prevent_autoconst(formula):
-        if not (' 0+' in formula or ' 0 +' in formula):
-            formula = '~ 0 +'.join(formula.split('~'))
+        if not (" 0+" in formula or " 0 +" in formula):
+            formula = "~ 0 +".join(formula.split("~"))
         return formula
 
     def _parse(self):
@@ -172,24 +181,24 @@ class SystemFormulaParser(object):
                         weight_dict[key] = None
                 cln_formula[key] = f
         else:
-            formula = formula.replace('\n', ' ').strip()
-            parts = formula.split('}')
+            formula = formula.replace("\n", " ").strip()
+            parts = formula.split("}")
             for part in parts:
                 key = base_key = None
                 part = part.strip()
-                if part == '':
+                if part == "":
                     continue
-                part = part.replace('{', '')
-                if ':' in part.split('~')[0]:
-                    base_key, part = part.split(':')
+                part = part.replace("{", "")
+                if ":" in part.split("~")[0]:
+                    base_key, part = part.split(":")
                     key = base_key = base_key.strip()
                     part = part.strip()
                 f = self._prevent_autoconst(part)
                 if base_key is None:
-                    base_key = key = f.split('~')[0].strip()
+                    base_key = key = f.split("~")[0].strip()
                 count = 0
                 while key in parsers:
-                    key = base_key + '.{0}'.format(count)
+                    key = base_key + ".{0}".format(count)
                     count += 1
                 parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
                 cln_formula[key] = f
@@ -202,7 +211,9 @@ class SystemFormulaParser(object):
         self._weight_dict = weight_dict
 
     def _get_variable(self, variable):
-        return OrderedDict([(key, getattr(self._parsers[key], variable)) for key in self._parsers])
+        return OrderedDict(
+            [(key, getattr(self._parsers[key], variable)) for key in self._parsers]
+        )
 
     @property
     def formula(self):
@@ -222,7 +233,9 @@ class SystemFormulaParser(object):
         new_parsers = OrderedDict()
         for key in parsers:
             parser = parsers[key]
-            new_parsers[key] = IVFormulaParser(parser._formula, parser._data, self._eval_env)
+            new_parsers[key] = IVFormulaParser(
+                parser._formula, parser._data, self._eval_env
+            )
         self._parsers = new_parsers
 
     @property
@@ -234,36 +247,36 @@ class SystemFormulaParser(object):
         out = OrderedDict()
         dep = self.dependent
         for key in dep:
-            out[key] = {'dependent': dep[key]}
+            out[key] = {"dependent": dep[key]}
         exog = self.exog
         for key in exog:
-            out[key]['exog'] = exog[key]
+            out[key]["exog"] = exog[key]
         endog = self.endog
         for key in endog:
-            out[key]['endog'] = endog[key]
+            out[key]["endog"] = endog[key]
         instr = self.instruments
         for key in instr:
-            out[key]['instruments'] = instr[key]
+            out[key]["instruments"] = instr[key]
         for key in self._weight_dict:
             if self._weight_dict[key] is not None:
-                out[key]['weights'] = self._weight_dict[key]
+                out[key]["weights"] = self._weight_dict[key]
         return out
 
     @property
     def dependent(self):
-        return self._get_variable('dependent')
+        return self._get_variable("dependent")
 
     @property
     def exog(self):
-        return self._get_variable('exog')
+        return self._get_variable("exog")
 
     @property
     def endog(self):
-        return self._get_variable('endog')
+        return self._get_variable("endog")
 
     @property
     def instruments(self):
-        return self._get_variable('instruments')
+        return self._get_variable("instruments")
 
 
 class IV3SLS(object):
@@ -352,10 +365,10 @@ class IV3SLS(object):
 
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
-            raise TypeError('equations must be a dictionary-like')
+            raise TypeError("equations must be a dictionary-like")
         for key in equations:
             if not isinstance(key, str):
-                raise ValueError('Equation labels (keys) must be strings')
+                raise ValueError("Equation labels (keys) must be strings")
 
         # Ensure nearly deterministic equation ordering
         equations = _to_ordered_dict(equations)
@@ -366,8 +379,10 @@ class IV3SLS(object):
             self._sigma = np.asarray(sigma)
             k = len(self._equations)
             if self._sigma.shape != (k, k):
-                raise ValueError('sigma must be a square matrix with dimensions '
-                                 'equal to the number of equations')
+                raise ValueError(
+                    "sigma must be a square matrix with dimensions "
+                    "equal to the number of equations"
+                )
         self._param_names = []
         self._eq_labels = []
         self._dependent = []
@@ -390,7 +405,7 @@ class IV3SLS(object):
         self._has_constant = None
         self._common_exog = False
         self._original_index = None
-        self._model_name = 'Three Stage Least Squares (3SLS)'
+        self._model_name = "Three Stage Least Squares (3SLS)"
 
         self._validate_data()
 
@@ -408,22 +423,26 @@ class IV3SLS(object):
         for i, key in enumerate(self._equations):
             self._eq_labels.append(key)
             eq_data = self._equations[key]
-            dep_name = 'dependent_' + str(i)
-            exog_name = 'exog_' + str(i)
-            endog_name = 'endog_' + str(i)
-            instr_name = 'instr_' + str(i)
+            dep_name = "dependent_" + str(i)
+            exog_name = "exog_" + str(i)
+            endog_name = "endog_" + str(i)
+            instr_name = "instr_" + str(i)
             if isinstance(eq_data, (tuple, list)):
                 dep = IVData(eq_data[0], var_name=dep_name)
                 self._dependent.append(dep)
                 current_id = id(eq_data[1])
-                self._exog.append(IVData(eq_data[1], var_name=exog_name, nobs=dep.shape[0]))
+                self._exog.append(
+                    IVData(eq_data[1], var_name=exog_name, nobs=dep.shape[0])
+                )
                 endog = IVData(eq_data[2], var_name=endog_name, nobs=dep.shape[0])
                 if endog.shape[1] > 0:
                     current_id = (current_id, id(eq_data[2]))
                 ids.append(current_id)
                 self._endog.append(endog)
 
-                self._instr.append(IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0]))
+                self._instr.append(
+                    IVData(eq_data[3], var_name=instr_name, nobs=dep.shape[0])
+                )
                 if len(eq_data) == 5:
                     self._weights.append(IVData(eq_data[4]))
                 else:
@@ -431,26 +450,26 @@ class IV3SLS(object):
                     self._weights.append(IVData(np.ones_like(dep)))
 
             elif isinstance(eq_data, (dict, Mapping)):
-                dep = IVData(eq_data['dependent'], var_name=dep_name)
+                dep = IVData(eq_data["dependent"], var_name=dep_name)
                 self._dependent.append(dep)
 
-                exog = eq_data.get('exog', None)
+                exog = eq_data.get("exog", None)
                 self._exog.append(IVData(exog, var_name=exog_name, nobs=dep.shape[0]))
                 current_id = id(exog)
 
-                endog = eq_data.get('endog', None)
+                endog = eq_data.get("endog", None)
                 endog = IVData(endog, var_name=endog_name, nobs=dep.shape[0])
                 self._endog.append(endog)
-                if 'endog' in eq_data:
-                    current_id = (current_id, id(eq_data['endog']))
+                if "endog" in eq_data:
+                    current_id = (current_id, id(eq_data["endog"]))
                 ids.append(current_id)
 
-                instr = eq_data.get('instruments', None)
+                instr = eq_data.get("instruments", None)
                 instr = IVData(instr, var_name=instr_name, nobs=dep.shape[0])
                 self._instr.append(instr)
 
-                if 'weights' in eq_data:
-                    self._weights.append(IVData(eq_data['weights']))
+                if "weights" in eq_data:
+                    self._weights.append(IVData(eq_data["weights"]))
                 else:
                     self._weights.append(IVData(np.ones(dep.shape)))
             else:
@@ -460,14 +479,17 @@ class IV3SLS(object):
         for instr in self._instr:
             self._has_instruments = self._has_instruments or (instr.shape[1] > 1)
 
-        for i, comps in enumerate(zip(self._dependent, self._exog, self._endog, self._instr,
-                                      self._weights)):
+        for i, comps in enumerate(
+            zip(self._dependent, self._exog, self._endog, self._instr, self._weights)
+        ):
             shapes = list(map(lambda a: a.shape[0], comps))
             if min(shapes) != max(shapes):
-                raise ValueError('Dependent, exogenous, endogenous and '
-                                 'instruments, and weights, if provided, do '
-                                 'not have the same number of observations in '
-                                 '{eq}'.format(eq=self._eq_labels[i]))
+                raise ValueError(
+                    "Dependent, exogenous, endogenous and "
+                    "instruments, and weights, if provided, do "
+                    "not have the same number of observations in "
+                    "{eq}".format(eq=self._eq_labels[i])
+                )
 
         self._drop_missing()
         self._common_exog = len(set(ids)) == 1
@@ -479,9 +501,14 @@ class IV3SLS(object):
         constant = []
         constant_loc = []
 
-        for dep, exog, endog, instr, w, label in zip(self._dependent, self._exog, self._endog,
-                                                     self._instr, self._weights,
-                                                     self._eq_labels):
+        for dep, exog, endog, instr, w, label in zip(
+            self._dependent,
+            self._exog,
+            self._endog,
+            self._instr,
+            self._weights,
+            self._eq_labels,
+        ):
             y = dep.ndarray
             x = np.concatenate([exog.ndarray, endog.ndarray], 1)
             z = np.concatenate([exog.ndarray, instr.ndarray], 1)
@@ -496,29 +523,38 @@ class IV3SLS(object):
             self._wx.append(x * w_sqrt)
             self._wz.append(z * w_sqrt)
             cols = list(exog.cols) + list(endog.cols)
-            self._param_names.extend([label + '_' + col for col in cols])
+            self._param_names.extend([label + "_" + col for col in cols])
             if y.shape[0] <= x.shape[1]:
-                raise ValueError('Fewer observations than variables in '
-                                 'equation {eq}'.format(eq=label))
+                raise ValueError(
+                    "Fewer observations than variables in "
+                    "equation {eq}".format(eq=label)
+                )
             if matrix_rank(x) < x.shape[1]:
-                raise ValueError('Equation {eq} regressor array is not full '
-                                 'rank'.format(eq=label))
+                raise ValueError(
+                    "Equation {eq} regressor array is not full " "rank".format(eq=label)
+                )
             if x.shape[1] > z.shape[1]:
-                raise ValueError('Equation {eq} has fewer instruments than '
-                                 'endogenous variables.'.format(eq=label))
+                raise ValueError(
+                    "Equation {eq} has fewer instruments than "
+                    "endogenous variables.".format(eq=label)
+                )
             if z.shape[1] > z.shape[0]:
-                raise ValueError('Fewer observations than instruments in '
-                                 'equation {eq}'.format(eq=label))
+                raise ValueError(
+                    "Fewer observations than instruments in "
+                    "equation {eq}".format(eq=label)
+                )
             if matrix_rank(z) < z.shape[1]:
-                raise ValueError('Equation {eq} instrument array is full '
-                                 'rank'.format(eq=label))
+                raise ValueError(
+                    "Equation {eq} instrument array is full " "rank".format(eq=label)
+                )
 
         for rhs in self._x:
             const, const_loc = has_constant(rhs)
             constant.append(const)
             constant_loc.append(const_loc)
-        self._has_constant = Series(constant,
-                                    index=[d.cols[0] for d in self._dependent])
+        self._has_constant = Series(
+            constant, index=[d.cols[0] for d in self._dependent]
+        )
         self._constant_loc = constant_loc
 
     def _drop_missing(self):
@@ -544,15 +580,15 @@ class IV3SLS(object):
                 self._weights[i].drop(missing)
 
     def __repr__(self):
-        return self.__str__() + '\nid: {0}'.format(hex(id(self)))
+        return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
     def __str__(self):
-        out = self._model_name + ', '
-        out += '{0} Equations:\n'.format(len(self._y))
-        eqns = ', '.join(self._equations.keys())
-        out += '\n'.join(textwrap.wrap(eqns, 70))
+        out = self._model_name + ", "
+        out += "{0} Equations:\n".format(len(self._y))
+        eqns = ", ".join(self._equations.keys())
+        out += "\n".join(textwrap.wrap(eqns, 70))
         if self._common_exog:
-            out += '\nCommon Exogenous Variables'
+            out += "\nCommon Exogenous Variables"
         return out
 
     def predict(self, params, *, equations=None, data=None, eval_env=8):
@@ -608,10 +644,10 @@ class IV3SLS(object):
         for i, label in enumerate(self._eq_labels):
             kx = self._x[i].shape[1]
             if label in equations:
-                b = params[loc:loc + kx]
+                b = params[loc : loc + kx]
                 eqn = equations[label]  # type: dict
-                exog = eqn.get('exog', None)
-                endog = eqn.get('endog', None)
+                exog = eqn.get("exog", None)
+                endog = eqn.get("endog", None)
                 if exog is None and endog is None:
                     loc += kx
                     continue
@@ -628,13 +664,25 @@ class IV3SLS(object):
                 fitted = DataFrame(fitted, index=exog_endog.index, columns=[label])
                 out[label] = fitted
             loc += kx
-        out = reduce(lambda left, right: left.merge(right, how='outer',
-                                                    left_index=True, right_index=True),
-                     [out[key] for key in out])
+        out = reduce(
+            lambda left, right: left.merge(
+                right, how="outer", left_index=True, right_index=True
+            ),
+            [out[key] for key in out],
+        )
         return out
 
-    def fit(self, *, method=None, full_cov=True, iterate=False, iter_limit=100, tol=1e-6,
-            cov_type='robust', **cov_config):
+    def fit(
+        self,
+        *,
+        method=None,
+        full_cov=True,
+        iterate=False,
+        iter_limit=100,
+        tol=1e-6,
+        cov_type="robust",
+        **cov_config
+    ):
         """
         Estimate model parameters
 
@@ -678,11 +726,13 @@ class IV3SLS(object):
         linearmodels.system.covariance.KernelCovariance
         """
         if method is None:
-            method = 'ols' if (self._common_exog and self._constraints is None) else 'gls'
+            method = (
+                "ols" if (self._common_exog and self._constraints is None) else "gls"
+            )
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
-            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+            raise ValueError("Unknown cov_type: {0}".format(cov_type))
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
         col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
@@ -691,20 +741,24 @@ class IV3SLS(object):
         self._construct_xhat()
         beta, eps = self._multivariate_ls_fit()
         nobs = eps.shape[0]
-        debiased = cov_config.get('debiased', False)
+        debiased = cov_config.get("debiased", False)
         full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
 
-        if method == 'ols':
-            return self._multivariate_ls_finalize(beta, eps, sigma, col_idx, total_cols,
-                                                  cov_type, **cov_config)
+        if method == "ols":
+            return self._multivariate_ls_finalize(
+                beta, eps, sigma, col_idx, total_cols, cov_type, **cov_config
+            )
 
         beta_hist = [beta]
         nobs = eps.shape[0]
         iter_count = 0
         delta = np.inf
-        while ((iter_count < iter_limit and iterate) or iter_count == 0) and delta >= tol:
-            beta, eps, sigma, est_sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
-                                                             full_cov, debiased)
+        while (
+            (iter_count < iter_limit and iterate) or iter_count == 0
+        ) and delta >= tol:
+            beta, eps, sigma, est_sigma = self._gls_estimate(
+                eps, nobs, total_cols, col_idx, full_cov, debiased
+            )
             beta_hist.append(beta)
             delta = beta_hist[-1] - beta_hist[-2]
             delta = np.sqrt(np.mean(delta ** 2))
@@ -719,8 +773,18 @@ class IV3SLS(object):
         x = blocked_diag_product(self._x, np.eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, full_sigma, est_sigma, gls_eps, eps, full_cov,
-                                  cov_type, iter_count, **cov_config)
+        return self._gls_finalize(
+            beta,
+            sigma,
+            full_sigma,
+            est_sigma,
+            gls_eps,
+            eps,
+            full_cov,
+            cov_type,
+            iter_count,
+            **cov_config
+        )
 
     def _multivariate_ls_fit(self):
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
@@ -737,7 +801,7 @@ class IV3SLS(object):
         eps = []
         for i in range(k):
             nb = wx[i].shape[1]
-            b = beta[loc:loc + nb]
+            b = beta[loc : loc + nb]
             eps.append(wy[i] - wx[i] @ b)
             loc += nb
         eps = np.hstack(eps)
@@ -782,7 +846,7 @@ class IV3SLS(object):
             sy = np.zeros((nobs, 1))
             for j in range(k):
                 sy += sigma_inv[i, j] * wy[j]
-            xpy[ci[i]:ci[i + 1]] = wxhat[i].T @ sy
+            xpy[ci[i] : ci[i + 1]] = wxhat[i].T @ sy
 
         beta = _parameters_from_xprod(xpx, xpy, constraints=self.constraints)
 
@@ -791,23 +855,31 @@ class IV3SLS(object):
             _wx = wx[j]
             _wy = wy[j]
             kx = _wx.shape[1]
-            eps[:, [j]] = _wy - _wx @ beta[loc:loc + kx]
+            eps[:, [j]] = _wy - _wx @ beta[loc : loc + kx]
             loc += kx
 
         return beta, eps, sigma, est_sigma
 
-    def _multivariate_ls_finalize(self, beta, eps, sigma, col_idx, total_cols, cov_type,
-                                  **cov_config):
+    def _multivariate_ls_finalize(
+        self, beta, eps, sigma, col_idx, total_cols, cov_type, **cov_config
+    ):
         k = len(self._wx)
 
         # Covariance estimation
         cov_est = COV_EST[cov_type]
-        cov_est = cov_est(self._wxhat, eps, sigma, sigma, gls=False,
-                          constraints=self._constraints, **cov_config)
+        cov_est = cov_est(
+            self._wxhat,
+            eps,
+            sigma,
+            sigma,
+            gls=False,
+            constraints=self._constraints,
+            **cov_config
+        )
         cov = cov_est.cov
 
         individual = AttrDict()
-        debiased = cov_config.get('debiased', False)
+        debiased = cov_config.get("debiased", False)
         for i in range(k):
             wy = wye = self._wy[i]
             w = self._w[i]
@@ -816,20 +888,33 @@ class IV3SLS(object):
                 wc = np.ones_like(wy) * np.sqrt(w)
                 wye = wy - wc @ lstsq(wc, wy)[0]
             total_ss = float(wye.T @ wye)
-            stats = self._common_indiv_results(i, beta, cov, eps, eps, 'OLS',
-                                               cov_type, cov_est, 0, debiased, cons, total_ss)
+            stats = self._common_indiv_results(
+                i,
+                beta,
+                cov,
+                eps,
+                eps,
+                "OLS",
+                cov_type,
+                cov_est,
+                0,
+                debiased,
+                cons,
+                total_ss,
+            )
             key = self._eq_labels[i]
             individual[key] = stats
 
         nobs = eps.size
-        results = self._common_results(beta, cov, 'OLS', 0, nobs, cov_type,
-                                       sigma, individual, debiased)
-        results['wresid'] = results.resid
-        results['cov_estimator'] = cov_est
-        results['cov_config'] = cov_est.cov_config
+        results = self._common_results(
+            beta, cov, "OLS", 0, nobs, cov_type, sigma, individual, debiased
+        )
+        results["wresid"] = results.resid
+        results["cov_estimator"] = cov_est
+        results["cov_config"] = cov_est.cov_config
         individual = results["individual"]
         r2s = [individual[eq].r2 for eq in individual]
-        results['system_r2'] = self._system_r2(eps, sigma, 'ols', False, debiased, r2s)
+        results["system_r2"] = self._system_r2(eps, sigma, "ols", False, debiased, r2s)
 
         return SystemResults(results)
 
@@ -869,14 +954,19 @@ class IV3SLS(object):
         exogenous, endogenous and instrumental variables.
         """
         equations = OrderedDict()
-        dependent = IVData(dependent, var_name='dependent')
+        dependent = IVData(dependent, var_name="dependent")
         if exog is None and endog is None:
-            raise ValueError('At least one of exog or endog must be provided')
-        exog = IVData(exog, var_name='exog')
-        endog = IVData(endog, var_name='endog', nobs=dependent.shape[0])
-        instr = IVData(instruments, var_name='instruments', nobs=dependent.shape[0])
+            raise ValueError("At least one of exog or endog must be provided")
+        exog = IVData(exog, var_name="exog")
+        endog = IVData(endog, var_name="endog", nobs=dependent.shape[0])
+        instr = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
         for col in dependent.pandas:
-            equations[col] = (dependent.pandas[[col]], exog.pandas, endog.pandas, instr.pandas)
+            equations[col] = (
+                dependent.pandas[[col]],
+                exog.pandas,
+                endog.pandas,
+                instr.pandas,
+            )
         return cls(equations)
 
     @classmethod
@@ -952,97 +1042,114 @@ class IV3SLS(object):
         params = stats.params[sel]
         df = params.shape[0]
         nobs = stats.nobs
-        null = 'All parameters ex. constant are zero'
-        name = 'Equation F-statistic'
+        null = "All parameters ex. constant are zero"
+        name = "Equation F-statistic"
         try:
             stat = float(params.T @ inv(cov) @ params)
 
         except np.linalg.LinAlgError:
-            return InvalidTestStatistic('Covariance is singular, possibly due '
-                                        'to constraints.', name=name)
+            return InvalidTestStatistic(
+                "Covariance is singular, possibly due " "to constraints.", name=name
+            )
 
         if debiased:
             total_reg = np.sum(list(map(lambda s: s.shape[1], self._wx)))
             df_denom = len(self._wx) * nobs - total_reg
-            wald = WaldTestStatistic(stat / df, null, df, df_denom=df_denom,
-                                     name=name)
+            wald = WaldTestStatistic(stat / df, null, df, df_denom=df_denom, name=name)
         else:
             return WaldTestStatistic(stat, null=null, df=df, name=name)
 
         return wald
 
-    def _common_indiv_results(self, index, beta, cov, wresid, resid, method,
-                              cov_type, cov_est, iter_count, debiased, constant, total_ss,
-                              *, weight_est=None):
+    def _common_indiv_results(
+        self,
+        index,
+        beta,
+        cov,
+        wresid,
+        resid,
+        method,
+        cov_type,
+        cov_est,
+        iter_count,
+        debiased,
+        constant,
+        total_ss,
+        *,
+        weight_est=None
+    ):
         loc = 0
         for i in range(index):
             loc += self._wx[i].shape[1]
         i = index
         stats = AttrDict()
         # Static properties
-        stats['eq_label'] = self._eq_labels[i]
-        stats['dependent'] = self._dependent[i].cols[0]
-        stats['instruments'] = self._instr[i].cols if self._instr[i].shape[1] > 0 else None
-        stats['endog'] = self._endog[i].cols if self._endog[i].shape[1] > 0 else None
-        stats['method'] = method
-        stats['cov_type'] = cov_type
-        stats['cov_estimator'] = cov_est
-        stats['cov_config'] = cov_est.cov_config
-        stats['weight_estimator'] = weight_est
-        stats['index'] = self._dependent[i].rows
-        stats['original_index'] = self._original_index
-        stats['iter'] = iter_count
-        stats['debiased'] = debiased
-        stats['has_constant'] = bool(constant)
-        stats['constant_loc'] = self._constant_loc[i]
+        stats["eq_label"] = self._eq_labels[i]
+        stats["dependent"] = self._dependent[i].cols[0]
+        stats["instruments"] = (
+            self._instr[i].cols if self._instr[i].shape[1] > 0 else None
+        )
+        stats["endog"] = self._endog[i].cols if self._endog[i].shape[1] > 0 else None
+        stats["method"] = method
+        stats["cov_type"] = cov_type
+        stats["cov_estimator"] = cov_est
+        stats["cov_config"] = cov_est.cov_config
+        stats["weight_estimator"] = weight_est
+        stats["index"] = self._dependent[i].rows
+        stats["original_index"] = self._original_index
+        stats["iter"] = iter_count
+        stats["debiased"] = debiased
+        stats["has_constant"] = bool(constant)
+        stats["constant_loc"] = self._constant_loc[i]
 
         # Parameters, errors and measures of fit
         wxi = self._wx[i]
         nobs, df = wxi.shape
-        b = beta[loc:loc + df]
+        b = beta[loc : loc + df]
         e = wresid[:, [i]]
         nobs = e.shape[0]
-        df_c = (nobs - constant)
-        df_r = (nobs - df)
+        df_c = nobs - constant
+        df_r = nobs - df
 
-        stats['params'] = b
-        stats['cov'] = cov[loc:loc + df, loc:loc + df]
-        stats['wresid'] = e
-        stats['nobs'] = nobs
-        stats['df_model'] = df
-        stats['resid'] = resid[:, [i]]
-        stats['fitted'] = self._x[i] @ b
-        stats['resid_ss'] = float(resid[:, [i]].T @ resid[:, [i]])
-        stats['total_ss'] = total_ss
-        stats['r2'] = 1.0 - stats.resid_ss / stats.total_ss
-        stats['r2a'] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
+        stats["params"] = b
+        stats["cov"] = cov[loc : loc + df, loc : loc + df]
+        stats["wresid"] = e
+        stats["nobs"] = nobs
+        stats["df_model"] = df
+        stats["resid"] = resid[:, [i]]
+        stats["fitted"] = self._x[i] @ b
+        stats["resid_ss"] = float(resid[:, [i]].T @ resid[:, [i]])
+        stats["total_ss"] = total_ss
+        stats["r2"] = 1.0 - stats.resid_ss / stats.total_ss
+        stats["r2a"] = 1.0 - (stats.resid_ss / df_r) / (stats.total_ss / df_c)
 
-        names = self._param_names[loc:loc + df]
+        names = self._param_names[loc : loc + df]
         offset = len(stats.eq_label) + 1
-        stats['param_names'] = [n[offset:] for n in names]
+        stats["param_names"] = [n[offset:] for n in names]
 
         # F-statistic
-        stats['f_stat'] = self._f_stat(stats, debiased)
+        stats["f_stat"] = self._f_stat(stats, debiased)
 
         return stats
 
-    def _common_results(self, beta, cov, method, iter_count, nobs, cov_type,
-                        sigma, individual, debiased):
+    def _common_results(
+        self, beta, cov, method, iter_count, nobs, cov_type, sigma, individual, debiased
+    ):
         results = AttrDict()
-        results['method'] = method
-        results['iter'] = iter_count
-        results['nobs'] = nobs
-        results['cov_type'] = cov_type
-        results['index'] = self._dependent[0].rows
-        results['original_index'] = self._original_index
+        results["method"] = method
+        results["iter"] = iter_count
+        results["nobs"] = nobs
+        results["cov_type"] = cov_type
+        results["index"] = self._dependent[0].rows
+        results["original_index"] = self._original_index
         names = list(individual.keys())
-        results['sigma'] = DataFrame(sigma, columns=names, index=names)
-        results['individual'] = individual
-        results['params'] = beta
-        results['df_model'] = beta.shape[0]
-        results['param_names'] = self._param_names
-        results['cov'] = cov
-        results['debiased'] = debiased
+        results["sigma"] = DataFrame(sigma, columns=names, index=names)
+        results["individual"] = individual
+        results["params"] = beta
+        results["df_model"] = beta.shape[0]
+        results["param_names"] = self._param_names
+        results["cov"] = cov
+        results["debiased"] = debiased
 
         total_ss = resid_ss = 0.0
         resid = []
@@ -1052,12 +1159,12 @@ class IV3SLS(object):
             resid.append(individual[key].resid)
         resid = np.hstack(resid)
 
-        results['resid_ss'] = resid_ss
-        results['total_ss'] = total_ss
-        results['r2'] = 1.0 - results.resid_ss / results.total_ss
-        results['resid'] = resid
-        results['constraints'] = self._constraints
-        results['model'] = self
+        results["resid_ss"] = resid_ss
+        results["total_ss"] = total_ss
+        results["r2"] = 1.0 - results.resid_ss / results.total_ss
+        results["resid"] = resid
+        results["constraints"] = self._constraints
+        results["model"] = self
 
         x = self._x
         k = len(x)
@@ -1065,26 +1172,22 @@ class IV3SLS(object):
         fitted = []
         for i in range(k):
             nb = x[i].shape[1]
-            b = beta[loc:loc + nb]
+            b = beta[loc : loc + nb]
             fitted.append(x[i] @ b)
             loc += nb
         fitted = np.hstack(fitted)
 
-        results['fitted'] = fitted
+        results["fitted"] = fitted
 
         return results
 
     def _system_r2(self, eps, sigma, method, full_cov, debiased, r2s):
         sigma_resid = sigma
-        sigma_m12 = inv_matrix_sqrt(sigma)
-
-        std_eps = eps @ sigma_m12
-        numerator = (std_eps ** 2).sum()
 
         # System regression on a constant using weights if provided
         wy, w = self._wy, self._w
         wi = [np.sqrt(weights) for weights in w]
-        if method == 'ols':
+        if method == "ols":
             est_sigma = np.eye(len(wy))
         else:  # gls
             est_sigma = sigma
@@ -1099,23 +1202,50 @@ class IV3SLS(object):
             sy = np.zeros((nobs, 1))
             for j in range(k):
                 sy += est_sigma_inv[i, j] * wy[j]
-            xpy[i:(i + 1)] = wi[i].T @ sy
+            xpy[i : (i + 1)] = wi[i].T @ sy
 
         mu = _parameters_from_xprod(xpx, xpy)
         eps_const = np.hstack([self._y[j] - mu[j] for j in range(k)])
-        std_eps_const = eps_const @ sigma_m12
-        denom = (std_eps_const ** 2).sum()
-        mcelroy = 1.0 - numerator / denom
-        sigma_y = (eps_const.T @ eps_const / nobs) * self._sigma_scale(debiased)
-        berndt = 1 - np.linalg.det(sigma_resid) / np.linalg.det(sigma_y)
+        # Judge
         judge = 1 - (eps ** 2).sum() / (eps_const ** 2).sum()
+        # Dhrymes
         tot_eps_const_sq = (eps_const ** 2).sum(0)
         r2s = np.asarray(r2s)
         dhrymes = (r2s * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
-        return Series(dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes))
 
-    def _gls_finalize(self, beta, sigma, full_sigma, est_sigma, gls_eps, eps, full_cov,
-                      cov_type, iter_count, **cov_config):
+        # Berndt
+        sigma_y = (eps_const.T @ eps_const / nobs) * self._sigma_scale(debiased)
+        berndt = np.nan
+        # Avoid division by 0
+        if np.linalg.det(sigma_y) > 0:
+            berndt = 1 - np.linalg.det(sigma_resid) / np.linalg.det(sigma_y)
+
+        mcelroy = np.nan
+        # Check that the matrix is invertible
+        if np.linalg.matrix_rank(sigma) == sigma.shape[0]:
+            # McElroy
+            sigma_m12 = inv_matrix_sqrt(sigma)
+            std_eps = eps @ sigma_m12
+            numerator = (std_eps ** 2).sum()
+            std_eps_const = eps_const @ sigma_m12
+            denom = (std_eps_const ** 2).sum()
+            mcelroy = 1.0 - numerator / denom
+        r2 = dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes)
+        return Series(r2)
+
+    def _gls_finalize(
+        self,
+        beta,
+        sigma,
+        full_sigma,
+        est_sigma,
+        gls_eps,
+        eps,
+        full_cov,
+        cov_type,
+        iter_count,
+        **cov_config
+    ):
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
 
@@ -1123,14 +1253,21 @@ class IV3SLS(object):
         cov_est = COV_EST[cov_type]
         gls_eps = np.reshape(gls_eps, (k, gls_eps.shape[0] // k)).T
         eps = np.reshape(eps, (k, eps.shape[0] // k)).T
-        cov_est = cov_est(self._wxhat, gls_eps, sigma, full_sigma, gls=True,
-                          constraints=self._constraints, **cov_config)
+        cov_est = cov_est(
+            self._wxhat,
+            gls_eps,
+            sigma,
+            full_sigma,
+            gls=True,
+            constraints=self._constraints,
+            **cov_config
+        )
         cov = cov_est.cov
 
         # Repackage results for individual equations
         individual = AttrDict()
-        debiased = cov_config.get('debiased', False)
-        method = 'Iterative GLS' if iter_count > 1 else 'GLS'
+        debiased = cov_config.get("debiased", False)
+        method = "Iterative GLS" if iter_count > 1 else "GLS"
         for i in range(k):
             cons = int(self.has_constant.iloc[i])
 
@@ -1140,28 +1277,50 @@ class IV3SLS(object):
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
-            stats = self._common_indiv_results(i, beta, cov, gls_eps, eps,
-                                               method, cov_type, cov_est, iter_count,
-                                               debiased, cons, total_ss)
+            stats = self._common_indiv_results(
+                i,
+                beta,
+                cov,
+                gls_eps,
+                eps,
+                method,
+                cov_type,
+                cov_est,
+                iter_count,
+                debiased,
+                cons,
+                total_ss,
+            )
             key = self._eq_labels[i]
             individual[key] = stats
 
         # Populate results dictionary
         nobs = eps.size
-        results = self._common_results(beta, cov, method, iter_count, nobs,
-                                       cov_type, est_sigma, individual, debiased)
+        results = self._common_results(
+            beta,
+            cov,
+            method,
+            iter_count,
+            nobs,
+            cov_type,
+            est_sigma,
+            individual,
+            debiased,
+        )
 
         # wresid is different between GLS and OLS
         wresid = []
         for key in individual:
             wresid.append(individual[key].wresid)
         wresid = np.hstack(wresid)
-        results['wresid'] = wresid
-        results['cov_estimator'] = cov_est
-        results['cov_config'] = cov_est.cov_config
+        results["wresid"] = wresid
+        results["cov_estimator"] = cov_est
+        results["cov_config"] = cov_est.cov_config
         individual = results["individual"]
         r2s = [individual[eq].r2 for eq in individual]
-        results['system_r2'] = self._system_r2(eps, sigma, 'gls', full_cov, debiased, r2s)
+        results["system_r2"] = self._system_r2(
+            eps, sigma, "gls", full_cov, debiased, r2s
+        )
 
         return SystemResults(results)
 
@@ -1207,8 +1366,9 @@ class IV3SLS(object):
         The property `param_names` can be used to determine the order of
         parameters.
         """
-        self._constraints = LinearConstraint(r, q=q, num_params=len(self._param_names),
-                                             require_pandas=True)
+        self._constraints = LinearConstraint(
+            r, q=q, num_params=len(self._param_names), require_pandas=True
+        )
 
     def reset_constraints(self):
         """Remove all model constraints"""
@@ -1305,10 +1465,10 @@ class SUR(IV3SLS):
 
     def __init__(self, equations, *, sigma=None):
         if not isinstance(equations, Mapping):
-            raise TypeError('equations must be a dictionary-like')
+            raise TypeError("equations must be a dictionary-like")
         for key in equations:
             if not isinstance(key, str):
-                raise ValueError('Equation labels (keys) must be strings')
+                raise ValueError("Equation labels (keys) must be strings")
         reformatted = equations.__class__()
         for key in equations:
             eqn = equations[key]
@@ -1321,7 +1481,7 @@ class SUR(IV3SLS):
                     eqn = eqn + (None, None)
             reformatted[key] = eqn
         super(SUR, self).__init__(reformatted, sigma=sigma)
-        self._model_name = 'Seemingly Unrelated Regression (SUR)'
+        self._model_name = "Seemingly Unrelated Regression (SUR)"
 
     @classmethod
     def multivariate_ls(cls, dependent, exog):
@@ -1360,8 +1520,8 @@ class SUR(IV3SLS):
         >>> mod = SUR.multivariate_ls(portfolios, factors)
         """
         equations = OrderedDict()
-        dependent = IVData(dependent, var_name='dependent')
-        exog = IVData(exog, var_name='exog')
+        dependent = IVData(dependent, var_name="dependent")
+        exog = IVData(exog, var_name="exog")
         for col in dependent.pandas:
             equations[col] = (dependent.pandas[[col]], exog.pandas)
         return cls(equations)
@@ -1502,24 +1662,35 @@ class IVSystemGMM(IV3SLS):
     where :math:`W` is a positive definite weighting matrix.
     """
 
-    def __init__(self, equations, *, sigma=None, weight_type='robust', **weight_config):
+    def __init__(self, equations, *, sigma=None, weight_type="robust", **weight_config):
         super().__init__(equations, sigma=sigma)
         self._weight_type = weight_type
         self._weight_config = weight_config
 
         if weight_type not in COV_TYPES:
-            raise ValueError('Unknown estimator for weight_type')
+            raise ValueError("Unknown estimator for weight_type")
 
-        if weight_type not in ('unadjusted', 'homoskedastic') and sigma is not None:
+        if weight_type not in ("unadjusted", "homoskedastic") and sigma is not None:
             import warnings
-            warnings.warn('sigma has been provided but the estimated weight '
-                          'matrix not unadjusted (homoskedastic).  sigma will '
-                          'be ignored.', UserWarning)
+
+            warnings.warn(
+                "sigma has been provided but the estimated weight "
+                "matrix not unadjusted (homoskedastic).  sigma will "
+                "be ignored.",
+                UserWarning,
+            )
         weight_type = COV_TYPES[weight_type]
         self._weight_est = GMM_W_EST[weight_type](**weight_config)
 
-    def fit(self, *, iter_limit=2, tol=1e-6, initial_weight=None,
-            cov_type='robust', **cov_config):
+    def fit(
+        self,
+        *,
+        iter_limit=2,
+        tol=1e-6,
+        initial_weight=None,
+        cov_type="robust",
+        **cov_config
+    ):
         """
         Estimate model parameters
 
@@ -1550,7 +1721,7 @@ class IVSystemGMM(IV3SLS):
             Estimation results
         """
         if cov_type not in COV_TYPES:
-            raise ValueError('Unknown cov_type: {0}'.format(cov_type))
+            raise ValueError("Unknown cov_type: {0}".format(cov_type))
         # Parameter estimation
         wx, wy, wz = self._wx, self._wy, self._wz
         k = len(wx)
@@ -1560,12 +1731,14 @@ class IVSystemGMM(IV3SLS):
             w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
         else:
             w = initial_weight
-        beta_last = beta = self._blocked_gmm(wx, wy, wz, w=w, constraints=self.constraints)
+        beta_last = beta = self._blocked_gmm(
+            wx, wy, wz, w=w, constraints=self.constraints
+        )
         eps = []
         loc = 0
         for i in range(k):
             nb = wx[i].shape[1]
-            b = beta[loc:loc + nb]
+            b = beta[loc : loc + nb]
             eps.append(wy[i] - wx[i] @ b)
             loc += nb
         eps = np.hstack(eps)
@@ -1574,7 +1747,9 @@ class IVSystemGMM(IV3SLS):
         iters = 1
         norm = 10 * tol + 1
         while iters < iter_limit and norm > tol:
-            sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
+            sigma = (
+                self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
+            )
             w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
             beta = self._blocked_gmm(wx, wy, wz, w=w, constraints=self.constraints)
             delta = beta_last - beta
@@ -1591,7 +1766,7 @@ class IVSystemGMM(IV3SLS):
             loc = 0
             for i in range(k):
                 nb = wx[i].shape[1]
-                b = beta[loc:loc + nb]
+                b = beta[loc : loc + nb]
                 eps.append(wy[i] - wx[i] @ b)
                 loc += nb
             eps = np.hstack(eps)
@@ -1599,7 +1774,9 @@ class IVSystemGMM(IV3SLS):
 
         cov_type = COV_TYPES[cov_type]
         cov_est = GMM_COV_EST[cov_type]
-        cov = cov_est(wx, wz, eps, w, sigma=sigma, constraints=self._constraints, **cov_config)
+        cov = cov_est(
+            wx, wz, eps, w, sigma=sigma, constraints=self._constraints, **cov_config
+        )
 
         weps = eps
         eps = []
@@ -1607,13 +1784,14 @@ class IVSystemGMM(IV3SLS):
         x, y = self._x, self._y
         for i in range(k):
             nb = x[i].shape[1]
-            b = beta[loc:loc + nb]
+            b = beta[loc : loc + nb]
             eps.append(y[i] - x[i] @ b)
             loc += nb
         eps = np.hstack(eps)
         iters += 1
-        return self._finalize_results(beta, cov.cov, weps, eps, w, sigma,
-                                      iters - 1, cov_type, cov_config, cov)
+        return self._finalize_results(
+            beta, cov.cov, weps, eps, w, sigma, iters - 1, cov_type, cov_config, cov
+        )
 
     @staticmethod
     def _blocked_gmm(x, y, z, *, w=None, constraints=None):
@@ -1630,16 +1808,27 @@ class IVSystemGMM(IV3SLS):
 
         return params
 
-    def _finalize_results(self, beta, cov, weps, eps, wmat, sigma,
-                          iter_count, cov_type, cov_config, cov_est):
+    def _finalize_results(
+        self,
+        beta,
+        cov,
+        weps,
+        eps,
+        wmat,
+        sigma,
+        iter_count,
+        cov_type,
+        cov_config,
+        cov_est,
+    ):
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
         # Repackage results for individual equations
         individual = AttrDict()
-        debiased = cov_config.get('debiased', False)
-        method = '{0}-Step System GMM'.format(iter_count)
+        debiased = cov_config.get("debiased", False)
+        method = "{0}-Step System GMM".format(iter_count)
         if iter_count > 2:
-            method = 'Iterative System GMM'
+            method = "Iterative System GMM"
         for i in range(k):
             cons = int(self.has_constant.iloc[i])
 
@@ -1649,39 +1838,53 @@ class IVSystemGMM(IV3SLS):
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
-            stats = self._common_indiv_results(i, beta, cov, weps, eps,
-                                               method, cov_type, cov_est,
-                                               iter_count, debiased, cons, total_ss,
-                                               weight_est=self._weight_est)
+            stats = self._common_indiv_results(
+                i,
+                beta,
+                cov,
+                weps,
+                eps,
+                method,
+                cov_type,
+                cov_est,
+                iter_count,
+                debiased,
+                cons,
+                total_ss,
+                weight_est=self._weight_est,
+            )
 
             key = self._eq_labels[i]
             individual[key] = stats
 
         # Populate results dictionary
         nobs = eps.size
-        results = self._common_results(beta, cov, method, iter_count, nobs,
-                                       cov_type, sigma, individual, debiased)
+        results = self._common_results(
+            beta, cov, method, iter_count, nobs, cov_type, sigma, individual, debiased
+        )
 
         # wresid is different between GLS and OLS
         wresid = []
         for key in individual:
             wresid.append(individual[key].wresid)
         wresid = np.hstack(wresid)
-        results['wresid'] = wresid
-        results['wmat'] = wmat
-        results['weight_type'] = self._weight_type
-        results['weight_config'] = self._weight_est.config
-        results['cov_estimator'] = cov_est
-        results['cov_config'] = cov_est.cov_config
-        results['weight_estimator'] = self._weight_est
-        results['j_stat'] = self._j_statistic(beta, wmat)
+        results["wresid"] = wresid
+        results["wmat"] = wmat
+        results["weight_type"] = self._weight_type
+        results["weight_config"] = self._weight_est.config
+        results["cov_estimator"] = cov_est
+        results["cov_config"] = cov_est.cov_config
+        results["weight_estimator"] = self._weight_est
+        results["j_stat"] = self._j_statistic(beta, wmat)
         r2s = [individual[eq].r2 for eq in individual]
-        results['system_r2'] = self._system_r2(eps, sigma, 'gls', False, debiased, r2s)
+        results["system_r2"] = self._system_r2(eps, sigma, "gls", False, debiased, r2s)
 
         return GMMSystemResults(results)
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None, weight_type='robust', **weight_config):
+    def from_formula(
+        cls, formula, data, *, weights=None, weight_type="robust", **weight_config
+    ):
         """
         Specify a 3SLS using the formula interface
 
@@ -1777,7 +1980,7 @@ class IVSystemGMM(IV3SLS):
         idx = 0
         for i in range(k):
             kx = x[i].shape[1]
-            beta = params[idx:idx + kx]
+            beta = params[idx : idx + kx]
             eps = y[i] - x[i] @ beta
             ze.append(z[i] * eps)
             idx += kx
@@ -1785,7 +1988,7 @@ class IVSystemGMM(IV3SLS):
         g_bar = ze.mean(0)
         nobs = x[0].shape[0]
         stat = float(nobs * g_bar.T @ np.linalg.inv(weight_mat) @ g_bar.T)
-        null = 'Expected moment conditions are equal to 0'
+        null = "Expected moment conditions are equal to 0"
         ninstr = sum(map(lambda a: a.shape[1], z))
         nvar = sum(map(lambda a: a.shape[1], x))
         ncons = 0 if self.constraints is None else self.constraints.r.shape[0]

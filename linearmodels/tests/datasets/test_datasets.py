@@ -5,9 +5,20 @@ from linearmodels.datasets import (birthweight, card, fertility, french,
                                    fringe, jobtraining, meps, mroz, munnell,
                                    wage, wage_panel)
 
-DATASETS = [birthweight, card, fertility, french, fringe,
-            jobtraining, meps, mroz, munnell, wage, wage_panel]
-ids = list(map(lambda x: x.__name__.split('.')[-1], DATASETS))
+DATASETS = [
+    birthweight,
+    card,
+    fertility,
+    french,
+    fringe,
+    jobtraining,
+    meps,
+    mroz,
+    munnell,
+    wage,
+    wage_panel,
+]
+ids = list(map(lambda x: x.__name__.split(".")[-1], DATASETS))
 
 
 @pytest.fixture(params=DATASETS, ids=ids)
