@@ -287,7 +287,7 @@ class IV3SLS(object):
         equation contains no exogenous regressors. Similarly 'endog' and
         'instruments' can either be omitted or may contain an empty array (or
         `None`) if all variables in an equation are exogenous.
-    sigma : array-like
+    sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
 
@@ -561,7 +561,7 @@ class IV3SLS(object):
 
         Parameters
         ----------
-        params : array-like
+        params : array_like
             Model parameters (nvar by 1)
         equations : dict
             Dictionary-like structure containing exogenous and endogenous
@@ -703,8 +703,8 @@ class IV3SLS(object):
         iter_count = 0
         delta = np.inf
         while ((iter_count < iter_limit and iterate) or iter_count == 0) and delta >= tol:
-            beta, eps, sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
-                                                  full_cov, debiased)
+            beta, eps, sigma, est_sigma = self._gls_estimate(eps, nobs, total_cols, col_idx,
+                                                             full_cov, debiased)
             beta_hist.append(beta)
             delta = beta_hist[-1] - beta_hist[-2]
             delta = np.sqrt(np.mean(delta ** 2))
@@ -719,8 +719,8 @@ class IV3SLS(object):
         x = blocked_diag_product(self._x, np.eye(k))
         eps = y - x @ beta
 
-        return self._gls_finalize(beta, sigma, full_sigma, gls_eps, eps, full_cov, total_cols,
-                                  col_idx, cov_type, iter_count, **cov_config)
+        return self._gls_finalize(beta, sigma, full_sigma, est_sigma, gls_eps, eps, full_cov,
+                                  cov_type, iter_count, **cov_config)
 
     def _multivariate_ls_fit(self):
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
@@ -768,6 +768,7 @@ class IV3SLS(object):
         if sigma is None:
             sigma = eps.T @ eps / nobs
             sigma *= self._sigma_scale(debiased)
+        est_sigma = sigma
 
         if not full_cov:
             sigma = np.diag(np.diag(sigma))
@@ -793,7 +794,7 @@ class IV3SLS(object):
             eps[:, [j]] = _wy - _wx @ beta[loc:loc + kx]
             loc += kx
 
-        return beta, eps, sigma
+        return beta, eps, sigma, est_sigma
 
     def _multivariate_ls_finalize(self, beta, eps, sigma, col_idx, total_cols, cov_type,
                                   **cov_config):
@@ -844,13 +845,13 @@ class IV3SLS(object):
 
         Parameters
         ----------
-        dependent : array-like
+        dependent : array_like
             nobs by ndep array of dependent variables
-        exog : array-like, optional
+        exog : array_like, optional
             nobs by nexog array of exogenous regressors common to all models
-        endog : array-like, optional
+        endog : array_like, optional
             nobs by nendog array of endogenous regressors common to all models
-        instruments : array-like, optional
+        instruments : array_like, optional
             nobs by ninstr array of instruments to use in all equations
 
         Returns
@@ -891,7 +892,7 @@ class IV3SLS(object):
             description of the accepted syntax
         data : DataFrame
             Frame containing named variables
-        sigma : array-like
+        sigma : array_like
             Prespecified residual covariance to use in GLS estimation. If
             not provided, FGLS is implemented based on an estimate of sigma.
         weights : dict-like
@@ -1101,7 +1102,7 @@ class IV3SLS(object):
             xpy[i:(i + 1)] = wi[i].T @ sy
 
         mu = _parameters_from_xprod(xpx, xpy)
-        eps_const = np.hstack([wy[j] - wi[i] * mu[j] for j in range(k)])
+        eps_const = np.hstack([self._y[j] - mu[j] for j in range(k)])
         std_eps_const = eps_const @ sigma_m12
         denom = (std_eps_const ** 2).sum()
         mcelroy = 1.0 - numerator / denom
@@ -1113,7 +1114,7 @@ class IV3SLS(object):
         dhrymes = (r2s * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
         return Series(dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes))
 
-    def _gls_finalize(self, beta, sigma, full_sigma, gls_eps, eps, full_cov, total_cols, col_idx,
+    def _gls_finalize(self, beta, sigma, full_sigma, est_sigma, gls_eps, eps, full_cov,
                       cov_type, iter_count, **cov_config):
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
@@ -1148,7 +1149,7 @@ class IV3SLS(object):
         # Populate results dictionary
         nobs = eps.size
         results = self._common_results(beta, cov, method, iter_count, nobs,
-                                       cov_type, sigma, individual, debiased)
+                                       cov_type, est_sigma, individual, debiased)
 
         # wresid is different between GLS and OLS
         wresid = []
@@ -1238,7 +1239,7 @@ class SUR(IV3SLS):
         value must be either a tuple of the form (dependent,
         exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
         the optional key 'weights'.
-    sigma : array-like
+    sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
 
@@ -1329,9 +1330,9 @@ class SUR(IV3SLS):
 
         Parameters
         ----------
-        dependent : array-like
+        dependent : array_like
             nobs by ndep array of dependent variables
-        exog : array-like
+        exog : array_like
             nobs by nvar array of exogenous regressors common to all models
 
         Returns
@@ -1378,7 +1379,7 @@ class SUR(IV3SLS):
             description of the accepted syntax
         data : DataFrame
             Frame containing named variables
-        sigma : array-like
+        sigma : array_like
             Prespecified residual covariance to use in GLS estimation. If
             not provided, FGLS is implemented based on an estimate of sigma.
         weights : dict-like
@@ -1441,7 +1442,7 @@ class IVSystemGMM(IV3SLS):
         'exog'.  The dictionary may contain optional keys for 'endog',
         'instruments', and 'weights'. Endogenous and/or Instrument can be empty
         if all variables in an equation are exogenous.
-    sigma : array-like
+    sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma. Only used
         if weight_type is 'unadjusted'

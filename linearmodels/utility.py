@@ -177,7 +177,7 @@ def inv_sqrth(x):
 
     Returns
     -------
-    invsqrt : ndarray
+    ndarray
         Input to the power -1/2
     """
     vals, vecs = np.linalg.eigh(x)
@@ -507,6 +507,8 @@ def param_table(results, title, pad_bottom=False):
 
 def format_wide(s, cols):
     """
+    Format a list of strings.
+
     Parameters
     ----------
     s : List[str]
@@ -516,8 +518,8 @@ def format_wide(s, cols):
 
     Returns
     -------
-    formatted : List[List[str]]
-        Joined list:
+    List[List[str]]
+        The joined list.
     """
     lines = []
     line = ''

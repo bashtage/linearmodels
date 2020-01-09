@@ -8,7 +8,7 @@ class Summary(summary.Summary):
 
         Returns
         -------
-        html : string
+        str
             concatenated summary tables in HTML format
         """
         html = summary.summary_return(self.tables, return_fmt='html')

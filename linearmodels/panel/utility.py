@@ -46,7 +46,7 @@ def preconditioner(d, *, copy=False):
     """
     Parameters
     ----------
-    d : array-like
+    d : array_like
         Array to precondition
     copy : bool
         Flag indicating whether the operation should be in-place, if possible.
@@ -54,12 +54,12 @@ def preconditioner(d, *, copy=False):
 
     Returns
     -------
-        d : array-like
-            Array with same type as input array. If copy is False, and d is
-            an ndarray or a csc_matrix, then the operation is inplace
-        cond : ndarray
-            Array of conditioning numbers defined as the square root of the column
-            2-norms (nvar,)
+    d : array_like
+        Array with same type as input array. If copy is False, and d is
+        an ndarray or a csc_matrix, then the operation is inplace
+    cond : ndarray
+        Array of conditioning numbers defined as the square root of the column
+        2-norms (nvar,)
     """
     # Dense path
     if not sp.issparse(d):
@@ -119,7 +119,7 @@ def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, preconditi
 
     Returns
     -------
-    dummies : array-like
+    dummies : array_like
         Array, either sparse or dense, of size nobs x ncats containing the
         dummy variable values
     cond : ndarray

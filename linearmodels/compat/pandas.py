@@ -50,7 +50,7 @@ try:
 
         Returns
         -------
-        is_str_like : bool
+        bool
             Whether `obj` is a string or not.
         """
         return isinstance(obj, str)

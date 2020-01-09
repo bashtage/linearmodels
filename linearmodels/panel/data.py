@@ -320,7 +320,7 @@ class PanelData(object):
 
         Returns
         -------
-        id : ndarray
+        ndarray
             2d array containing entity ids corresponding dataframe view
         """
         return np.asarray(get_codes(self._frame.index)[0])[:, None]
@@ -332,7 +332,7 @@ class PanelData(object):
 
         Returns
         -------
-        id : ndarray
+        ndarray
             2d array containing time ids corresponding dataframe view
         """
         return np.asarray(get_codes(self._frame.index)[1])[:, None]
@@ -384,7 +384,7 @@ class PanelData(object):
 
         Returns
         -------
-        demeaned : PanelData
+        PanelData
             Weighted, demeaned data according to groups
 
         Notes
@@ -472,7 +472,7 @@ class PanelData(object):
 
         Returns
         -------
-        demeaned : PanelData
+        PanelData
             Demeaned data according to type
 
         Notes
@@ -529,7 +529,7 @@ class PanelData(object):
 
         Returns
         -------
-        count : DataFrame
+        DataFrame
             Counts according to type. Either (entity by var) or (time by var)
         """
         level = 0 if group == 'entity' else 1
@@ -561,7 +561,7 @@ class PanelData(object):
 
         Returns
         -------
-        mean : DataFrame
+        DataFrame
             Data mean according to type. Either (entity by var) or (time by var)
         """
         level = 0 if group == 'entity' else 1
@@ -587,7 +587,7 @@ class PanelData(object):
 
         Returns
         -------
-        diffs : PanelData
+        PanelData
             Differenced values
         """
         diffs = self.panel.values
@@ -624,7 +624,7 @@ class PanelData(object):
 
         Returns
         -------
-        dummies : DataFrame
+        DataFrame
             Dummy variables
         """
         if group not in ('entity', 'time'):

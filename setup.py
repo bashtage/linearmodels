@@ -50,31 +50,6 @@ except (ImportError, OSError):
     warnings.warn("Unable to convert README.md to README.rst", UserWarning)
     description = open('README.md').read()
 
-# Copy over notebooks from examples to docs for build
-notebooks = glob.glob('examples/*.ipynb')
-for nb in notebooks:
-    fname = os.path.split(nb)[-1]
-    folder, nbname = fname.split('_')
-    outdir = os.path.join('doc', 'source', folder, 'examples')
-    if not os.path.exists(outdir):
-        os.makedirs(outdir, exist_ok=True)
-    outfile = os.path.join(outdir, nbname)
-    with open(outfile, 'w') as nbout:
-        with open(nb, 'r') as nbin:
-            nbout.write(nbin.read())
-
-images = glob.glob('examples/*.png')
-for image in images:
-    fname = os.path.split(image)[-1]
-    folder, _ = fname.split('_')
-    outdir = os.path.join('doc', 'source', folder, 'examples')
-    if not os.path.exists(outdir):
-        os.makedirs(outdir, exist_ok=True)
-    outfile = os.path.join(outdir, fname)
-    with open(outfile, 'wb') as imageout:
-        with open(image, 'rb') as imagein:
-            imageout.write(imagein.read())
-
 additional_files = []
 for filename in glob.iglob('./linearmodels/datasets/**', recursive=True):
     if '.csv.bz' in filename:

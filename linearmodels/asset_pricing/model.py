@@ -37,9 +37,9 @@ class TradedFactorModel(object):
 
     Parameters
     ----------
-    portfolios : array-like
+    portfolios : array_like
         Test portfolio returns (nobs by nportfolio)
-    factors : array-like
+    factors : array_like
         Priced factor returns (nobs by nfactor)
 
     Notes
@@ -143,12 +143,12 @@ class TradedFactorModel(object):
             Patsy formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array-like, optional
+        portfolios : array_like, optional
             Portfolios to be used in the model
 
         Returns
         -------
-        model : TradedFactorModel
+        TradedFactorModel
             Model instance
 
         Notes
@@ -193,7 +193,7 @@ class TradedFactorModel(object):
 
         Returns
         -------
-        results : LinearFactorModelResults
+        LinearFactorModelResults
             Results class with parameter estimates, covariance and test statistics
 
         Notes
@@ -286,15 +286,15 @@ class LinearFactorModel(TradedFactorModel):
 
     Parameters
     ----------
-    portfolios : array-like
+    portfolios : array_like
         Test portfolio returns (nobs by nportfolio)
-    factors : array-like
+    factors : array_like
         Priced factor returns (nobs by nfactor)
     risk_free : bool, optional
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
         assumed to be excess returns using the correct risk-free rate.
-    sigma : array-like, optional
+    sigma : array_like, optional
         Positive definite residual covariance (nportfolio by nportfolio)
 
     Notes
@@ -369,19 +369,19 @@ class LinearFactorModel(TradedFactorModel):
             Patsy formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array-like, optional
+        portfolios : array_like, optional
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
         risk_free : bool, optional
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
-        sigma : array-like, optional
+        sigma : array_like, optional
             Positive definite residual covariance (nportfolio by nportfolio)
 
         Returns
         -------
-        model : LinearFactorModel
+        LinearFactorModel
             Model instance
 
         Notes
@@ -426,7 +426,7 @@ class LinearFactorModel(TradedFactorModel):
 
         Returns
         -------
-        results : LinearFactorModelResults
+        LinearFactorModelResults
             Results class with parameter estimates, covariance and test statistics
 
         Notes
@@ -575,9 +575,9 @@ class LinearFactorModelGMM(LinearFactorModel):
 
     Parameters
     ----------
-    portfolios : array-like
+    portfolios : array_like
         Test portfolio returns (nobs by nportfolio)
-    factors : array-like
+    factors : array_like
         Priced factors values (nobs by nfactor)
     risk_free : bool, optional
         Flag indicating whether the risk-free rate should be estimated
@@ -625,7 +625,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             Patsy formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array-like, optional
+        portfolios : array_like, optional
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
         risk_free : bool, optional
@@ -635,7 +635,7 @@ class LinearFactorModelGMM(LinearFactorModel):
 
         Returns
         -------
-        model : LinearFactorModelGMM
+        LinearFactorModelGMM
             Model instance
 
         Notes
@@ -695,7 +695,7 @@ class LinearFactorModelGMM(LinearFactorModel):
 
         Returns
         -------
-        results : GMMFactorModelResults
+        GMMFactorModelResults
             Results class with parameter estimates, covariance and test statistics
 
         Notes

@@ -1,8 +1,9 @@
 Change Log
 ----------
 
-Since 4.14
-==========
+Version 4.15
+============
+* Blackened the code.
 * Added McElroy's and Berndt's measures of system fit (:issue:`215`).
 * Removed support for Python 3.5 inline with NEP-29 (:issue:`222`).
 

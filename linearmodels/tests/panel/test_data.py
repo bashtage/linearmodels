@@ -1,13 +1,13 @@
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes, is_string_dtype
 
-from itertools import product
 from datetime import datetime
+from itertools import product
 
 import numpy as np
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
-from pandas import (Categorical, DataFrame, Series, date_range, get_dummies)
+from pandas import Categorical, DataFrame, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_index_equal
 import pytest
 

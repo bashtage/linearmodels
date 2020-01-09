@@ -61,15 +61,15 @@ class IVLIML(object):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array-like
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
-    endog : array-like
+    endog : array_like
         Endogenous regressors (nobs by nendog)
-    instruments : array-like
+    instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array-like, optional
+    weights : array_like, optional
         Observation weights used in estimation
     fuller : float, optional
         Fuller's alpha to modify LIML estimator. Default returns unmodified
@@ -190,7 +190,7 @@ class IVLIML(object):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array-like, optional
+        weights : array_like, optional
             Observation weights used in estimation
         fuller : float, optional
             Fuller's alpha to modify LIML estimator. Default returns unmodified
@@ -201,7 +201,7 @@ class IVLIML(object):
 
         Returns
         -------
-        model : IVLIML
+        IVLIML
             Model instance
 
         Notes
@@ -240,11 +240,11 @@ class IVLIML(object):
 
         Parameters
         ----------
-        params : array-like
+        params : array_like
             Model parameters (nvar by 1)
-        exog : array-like
+        exog : array_like
             Exogenous regressors (nobs by nexog)
-        endog : array-like
+        endog : array_like
             Endogenous regressors (nobs by nendog)
         data : DataFrame
             Values to use when making predictions from a model constructed
@@ -254,7 +254,7 @@ class IVLIML(object):
 
         Returns
         -------
-        predictions : DataFrame
+        DataFrame
             Fitted values from supplied data and parameters
 
         Notes
@@ -355,7 +355,7 @@ class IVLIML(object):
 
         Returns
         -------
-        params : ndarray
+        ndarray
             Estimated parameters (nvar by 1)
 
         Notes
@@ -413,7 +413,7 @@ class IVLIML(object):
 
         Returns
         -------
-        results : IVResults
+        IVResults
             Results container
 
         Notes
@@ -470,7 +470,7 @@ class IVLIML(object):
 
         Returns
         -------
-        wresids : ndarray
+        ndarray
             Weighted model residuals
 
         Notes
@@ -491,7 +491,7 @@ class IVLIML(object):
 
         Returns
         -------
-        resids : ndarray
+        ndarray
             Model residuals
         """
         return self._y - self._x @ params
@@ -565,15 +565,15 @@ class IV2SLS(IVLIML):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array-like
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
-    endog : array-like
+    endog : array_like
         Endogenous regressors (nobs by nendog)
-    instruments : array-like
+    instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array-like, optional
+    weights : array_like, optional
         Observation weights used in estimation
 
     Notes
@@ -615,12 +615,12 @@ class IV2SLS(IVLIML):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array-like, optional
+        weights : array_like, optional
             Observation weights used in estimation
 
         Returns
         -------
-        model : IV2SLS
+        IV2SLS
             Model instance
 
         Notes
@@ -657,15 +657,15 @@ class IVGMM(IVLIML):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array-like
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
-    endog : array-like
+    endog : array_like
         Endogenous regressors (nobs by nendog)
-    instruments : array-like
+    instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array-like, optional
+    weights : array_like, optional
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
@@ -725,7 +725,7 @@ class IVGMM(IVLIML):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array-like, optional
+        weights : array_like, optional
             Observation weights used in estimation
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
@@ -747,7 +747,7 @@ class IVGMM(IVLIML):
 
         Returns
         -------
-        model : IVGMM
+        IVGMM
             Model instance
 
         Examples
@@ -782,7 +782,7 @@ class IVGMM(IVLIML):
 
         Returns
         -------
-        params : ndarray
+        ndarray
             Estimated parameters (nvar by 1)
 
         Notes
@@ -837,7 +837,7 @@ class IVGMM(IVLIML):
 
         Returns
         -------
-        results : IVGMMResults
+        IVGMMResults
             Results container
 
         See also
@@ -906,15 +906,15 @@ class IVGMMCUE(IVGMM):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array-like
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
-    endog : array-like
+    endog : array_like
         Endogenous regressors (nobs by nendog)
-    instruments : array-like
+    instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array-like, optional
+    weights : array_like, optional
         Observation weights used in estimation
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
@@ -970,7 +970,7 @@ class IVGMMCUE(IVGMM):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array-like, optional
+        weights : array_like, optional
             Observation weights used in estimation
         weight_type : str
             Name of moment condition weight function to use in the GMM estimation
@@ -980,7 +980,7 @@ class IVGMMCUE(IVGMM):
 
         Returns
         -------
-        model : IVGMMCUE
+        IVGMMCUE
             Model instance
 
         Notes
@@ -1027,7 +1027,7 @@ class IVGMMCUE(IVGMM):
 
         Returns
         -------
-        j : float
+        float
             GMM objective function, also known as the J statistic
 
         Notes
@@ -1076,7 +1076,7 @@ class IVGMMCUE(IVGMM):
 
         Returns
         -------
-        params : ndarray
+        ndarray
             Estimated parameters (nvar by 1)
 
         Notes
@@ -1130,7 +1130,7 @@ class IVGMMCUE(IVGMM):
 
         Returns
         -------
-        results : IVGMMResults
+        IVGMMResults
             Results container
 
         Notes
@@ -1179,11 +1179,11 @@ class _OLS(IVLIML):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : array-like
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
-    weights : array-like, optional
+    weights : array_like, optional
         Observation weights used in estimation
 
     Notes

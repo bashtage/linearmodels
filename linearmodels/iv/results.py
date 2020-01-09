@@ -7,11 +7,11 @@ from collections import OrderedDict
 import datetime as dt
 from typing import Any, Dict, List, Union
 
-from property_cached import cached_property
 from numpy import (array, c_, diag, empty, isnan, log, ndarray, ones, sqrt,
                    zeros)
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
+from property_cached import cached_property
 import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
@@ -142,9 +142,9 @@ class OLSResults(_SummaryStr):
 
         Parameters
         ----------
-        exog : array-like
+        exog : array_like
             Exogenous values to use in out-of-sample prediction (nobs by nexog)
-        endog : array-like
+        endog : array_like
             Endogenous values to use in out-of-sample prediction (nobs by nendog)
         data : DataFrame, optional
             DataFrame to use for out-of-sample predictions when model was
@@ -161,7 +161,7 @@ class OLSResults(_SummaryStr):
 
         Returns
         -------
-        predictions : DataFrame
+        DataFrame
             DataFrame containing columns for all selected outputs
 
         Notes
@@ -292,7 +292,7 @@ class OLSResults(_SummaryStr):
 
         Returns
         -------
-        f : WaldTestStatistic
+        WaldTestStatistic
             Test statistic for null all coefficients excluding constant terms
             are zero.
 
@@ -324,7 +324,7 @@ class OLSResults(_SummaryStr):
 
         Returns
         -------
-        ci : DataFrame
+        DataFrame
             Confidence interval of the form [lower, upper] for each parameters
 
         Notes
@@ -463,7 +463,7 @@ class OLSResults(_SummaryStr):
 
         Returns
         -------
-        t: WaldTestStatistic
+        WaldTestStatistic
             Test statistic for null that restrictions are valid.
 
         Notes
@@ -561,7 +561,7 @@ class FirstStageResults(_SummaryStr):
 
         Returns
         -------
-        res : DataFrame
+        DataFrame
             DataFrame where each endogenous variable appears as a row and
             the columns contain alternative measures.  The columns are:
 
@@ -635,7 +635,7 @@ class FirstStageResults(_SummaryStr):
 
         Returns
         -------
-        res : dict
+        dict
             Dictionary containing first stage estimation results. Keys are
             the variable names of the endogenous regressors.
         """
@@ -722,7 +722,7 @@ class _CommonIVResults(OLSResults):
 
         Returns
         -------
-        first : FirstStageResults
+        FirstStageResults
             Object containing results for diagnosing instrument relevance issues.
         """
         return FirstStageResults(self.model.dependent, self.model.exog,
@@ -754,7 +754,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -800,7 +800,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -879,7 +879,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -934,7 +934,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -990,7 +990,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1034,7 +1034,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1077,7 +1077,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1127,7 +1127,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1160,7 +1160,7 @@ class IVResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1235,7 +1235,7 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        j : WaldTestStatistic
+        WaldTestStatistic
             J statistic  test of overidentifying restrictions
 
         Notes
@@ -1268,7 +1268,7 @@ class IVGMMResults(_CommonIVResults):
 
         Returns
         -------
-        t : WaldTestStatistic
+        WaldTestStatistic
             Object containing test statistic, p-value, distribution and null
 
         Notes
@@ -1460,6 +1460,7 @@ def compare(results, *, precision='tstats') -> IVModelComparison:
 
     Returns
     -------
-    comparison : IVModelComparison
+    IVModelComparison
+        The model comparison object.
     """
     return IVModelComparison(results, precision=precision)

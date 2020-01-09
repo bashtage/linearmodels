@@ -1068,5 +1068,244 @@ ic weighting formula immediately above.
 
 \end_layout
 
+\begin_layout Subsection*
+System Measures of Fit (
+\begin_inset Formula $R^{2}$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+Most measures of fit for systems of equations assume that all equations
+ contains a constant (or equivalent).
+ Caution is needed when interpreting if equations exclude constant terms.
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Overall 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The overall 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is defined as 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{\sum_{i=1}^{K}SSR_{i}}{\sum_{i=1}^{K}TSS_{i}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $TSS_{i}$
+\end_inset
+
+ is centered if equation 
+\begin_inset Formula $i$
+\end_inset
+
+ contains a constant and uncentered if it does not.
+ When all equations contain constants, it is identical to Judge's measure.
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+McElroy
+\end_layout
+
+\begin_layout Standard
+\noindent
+McElroy's (1977) measure is defined as 
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{\epsilon^{\prime}\Omega^{-1}\epsilon}{Y^{\prime}\left(\Sigma^{-1}\otimes\left(I_{N}-\frac{\iota\iota^{\prime}}{N}\right)\right)Y}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\iota$
+\end_inset
+
+ is a 
+\begin_inset Formula $N$
+\end_inset
+
+ by 1 vector of 1s.
+ This is implemented as 
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{\xi}_{ij}^{2}}{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{\eta}_{ij}^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where
+\begin_inset Formula 
+\begin{align*}
+\hat{\xi} & =\hat{E}\hat{\Sigma}^{-\frac{1}{2}}\\
+\hat{E} & =\left[\begin{array}{cccc}
+\hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\begin{align*}
+\hat{\eta} & =\tilde{Y}\hat{\Sigma}^{-\frac{1}{2}}\\
+\tilde{Y} & =\left[\begin{array}{cccc}
+Y_{1}-\hat{\mu}_{1} & Y_{2}-\hat{\mu}_{2} & \ldots & Y_{N}-\hat{\mu}_{N}\end{array}\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where the vector of mean parameters is estimated by fitting a SURE to the
+ data (using user specified weights, if provided) where 
+\begin_inset Formula $X_{i}=\iota$
+\end_inset
+
+ contains only a constant.
+ Greene provides an alternative formulation of this measure as 
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{K}{\mathrm{tr}\left(\hat{\Sigma}^{-1}\hat{\Psi}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\hat{\Psi}=N^{-1}\tilde{Y}^{\prime}\tilde{Y}$
+\end_inset
+
+ is the covariance of the demeaned data.
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Berndt
+\end_layout
+
+\begin_layout Standard
+\noindent
+Berndt's measure is defined as 
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{\left|\hat{\Sigma}\right|}{\left|\hat{\Psi}\right|}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Judge
+\end_layout
+
+\begin_layout Standard
+\noindent
+Judge's measure is the naive OLS 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ for the system,
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+R^{2}=1-\frac{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{E}_{ij}^{2}}{\sum_{i=1}^{N}\sum_{j=1}^{K}\tilde{Y}_{ij}^{2}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+\noindent
+Dhrymes
+\end_layout
+
+\begin_layout Standard
+\noindent
+Dhrymes' measure of fit is a weighted average of the 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ of each equation,
+\begin_inset Formula 
+\[
+R^{2}=\sum_{i=1}^{K}R_{i}^{2}\frac{\hat{\Psi}_{ii}}{\mathrm{tr}\left(\hat{\Psi}\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $R_{i}^{2}$
+\end_inset
+
+ is the coefficient of determination from equation 
+\begin_inset Formula $i$
+\end_inset
+
+.
+\end_layout
+
 \end_body
 \end_document

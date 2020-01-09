@@ -104,7 +104,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
@@ -118,7 +118,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        config : AttrDict
+        AttrDict
             Dictionary containing weight estimator configuration information
         """
         return self._config
@@ -171,7 +171,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = x[0].shape[0]
@@ -271,7 +271,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = x[0].shape[0]
@@ -317,7 +317,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         Returns
         -------
-        config : AttrDict
+        AttrDict
             Dictionary containing weight estimator configuration information
         """
         out = AttrDict([(k, v) for k, v in self._config.items()])

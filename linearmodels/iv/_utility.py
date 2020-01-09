@@ -34,7 +34,7 @@ def proj(y: ndarray, x: ndarray) -> ndarray:
 
     Returns
     -------
-    yhat : ndarray
+    ndarray
         Projected values of y (nobs by nseries)
     """
     return x @ (np.linalg.pinv(x) @ y)
@@ -53,7 +53,7 @@ def annihilate(y: ndarray, x: ndarray) -> ndarray:
 
     Returns
     -------
-    eps : ndarray
+    ndarray
         Residuals values of y minus y projected on x (nobs by nseries)
     """
     return y - proj(y, x)

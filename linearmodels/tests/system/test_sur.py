@@ -684,25 +684,47 @@ def test_predict_error(missing_data):
         res.predict(fitted=False, idiosyncratic=False)
 
 
+def reference_mcelroy(u, y, sigma):
+    u = np.asarray(u)
+    nobs = u.shape[0]
+    sigma = np.asarray(sigma)
+    y = np.asarray(y)
+    u = u.T.ravel()
+    y = y.T.ravel()
+    sigma_inv = np.linalg.inv(sigma)
+    omega_inv = np.kron(sigma_inv, np.eye(nobs))
+    num = u @ omega_inv @ u
+    iota = np.ones((nobs, 1))
+    core = np.kron(sigma_inv, np.eye(nobs) - iota @ iota.T / nobs)
+    denom = y @ core @ y
+
+    return 1 - num / denom
+
+
+def reference_berndt(u, y):
+    u = np.asarray(u)
+    nobs = u.shape[0]
+    num = np.linalg.det(u.T @ u / nobs)
+    y = np.asarray(y)
+    mu = y.mean(0)
+    y = y - mu
+    denom = np.linalg.det(y.T @ y / nobs)
+    return 1 - num / denom
+
+
 def test_system_r2_direct():
     eqns = generate_data(k=3)
     mod = SUR(eqns)
     res = mod.fit(method='ols', cov_type='unadjusted')
-    u = res.resids.to_numpy().ravel()
-    nobs = res.resids.shape[0]
-    omega_inv = np.kron(np.linalg.inv(res.sigma), np.eye(nobs))
-    numerator = u[None,:] @ omega_inv @ u[:,None]
+    y = np.hstack([eqns[eq]['dependent'] for eq in eqns])
+    ref = reference_mcelroy(res.resids, y, res.sigma)
+    assert_allclose(ref, res.system_rsquared.mcelroy)
+    ref = reference_berndt(res.resids, y)
+    assert_allclose(ref, res.system_rsquared.berndt)
 
-    const = eqns.copy()
-    for eq in const:
-        const[eq]['exog'] = np.ones((nobs,1))
-    mod = SUR(const)
-    res_const = mod.fit(method='ols', cov_type='unadjusted')
-    uc = res_const.resids.to_numpy().ravel()
-    denom = uc[None, :] @ omega_inv @ uc[:, None]
-    mcelroy = 1 - np.squeeze(numerator / denom)
-    iota = np.ones((nobs, 1))
-    middle = np.kron(np.linalg.inv(res.sigma), np.eye(nobs) - iota @ iota.T / nobs)
-    y = np.vstack([const[eq]['dependent'] for eq in const])
-    denom2 = y.T @ middle @ y
-    1 - np.squeeze(numerator / denom2)
+    res = mod.fit(method='gls', cov_type='unadjusted', iter_limit=100)
+    y = np.hstack([eqns[eq]['dependent'] for eq in eqns])
+    ref = reference_mcelroy(res.resids, y, res.sigma)
+    assert_allclose(ref, res.system_rsquared.mcelroy)
+    ref = reference_berndt(res.resids, y)
+    assert_allclose(ref, res.system_rsquared.berndt, atol=1e-3, rtol=1e-3)

@@ -14,7 +14,7 @@ def blocked_column_product(x, s):
 
     Returns
     -------
-    bp : ndarray
+    ndarray
         Blocked product.  k x nobs rows and the number of columns is the same
         the number of columns as any member of x.
     """
@@ -39,7 +39,7 @@ def blocked_diag_product(x, s):
 
     Returns
     -------
-    bp : ndarray
+    ndarray
         Blocked product.  k x nobs rows and the number of columns is the same
         as the total number of columns in x.
     """
@@ -67,7 +67,7 @@ def blocked_inner_prod(x, s):
 
     Returns
     -------
-    ip : ndarray
+    ndarray
         Weighted inner product constructed from x and s
 
     Notes
@@ -135,7 +135,7 @@ def blocked_cross_prod(x, z, s):
 
     Returns
     -------
-    xp : ndarray
+    ndarray
         Weighted cross product constructed from x and s
 
     Notes
@@ -291,7 +291,7 @@ class LinearConstraint(object):
 
         Returns
         -------
-        t : ndarray
+        ndarray
             Constraint transformation matrix
 
         Notes
@@ -309,7 +309,7 @@ class LinearConstraint(object):
 
         Returns
         -------
-        a : ndarray
+        ndarray
             Transformed target
 
         Notes

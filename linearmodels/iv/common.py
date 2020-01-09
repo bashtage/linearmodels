@@ -42,7 +42,7 @@ def f_statistic(params: ndarray, cov: ndarray, debiased: bool, resid_df: int,
 
     Returns
     -------
-    f_stat : WaldTestStatistic
+    WaldTestStatistic
         WaldTestStatistic instance
     """
     null = 'All parameters ex. constant are zero'

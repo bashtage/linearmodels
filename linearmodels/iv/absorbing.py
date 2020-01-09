@@ -66,7 +66,7 @@ def lsmr_annihilate(x: csc_matrix, y: ndarray, use_cache: bool = True, x_hash=No
 
     Returns
     -------
-    resids : ndarray
+    ndarray
         Returns the residuals from regressing y on x, (nobs, nvar)
 
     Notes
@@ -119,7 +119,7 @@ def category_product(cats: AnyPandas) -> Series:
 
     Returns
     -------
-    cp : Series
+    Series
         Categorical series containing the cartesian product of the categories
         in cats
     """
@@ -162,7 +162,7 @@ def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
 
     Returns
     -------
-    dummies : csc_matrix
+    csc_matrix
         Sparse matrix of dummies with unit column norm
     """
     codes = get_codes(category_product(cat).cat)
@@ -183,7 +183,7 @@ def category_continuous_interaction(cat: AnyPandas, cont: AnyPandas,
 
     Returns
     -------
-    interact : csc_matrix
+    csc_matrix
         Sparse matrix of dummy interactions with unit column norm
     """
     codes = get_codes(category_product(cat).cat)
@@ -303,7 +303,7 @@ class Interaction(object):
 
         Returns
         -------
-        dummy_interact : csc_matrix
+        csc_matrix
             Dummy interaction constructed from the cartesian product of
             the categories and each of the continuous variables.
 
@@ -368,7 +368,7 @@ class Interaction(object):
 
         Returns
         -------
-        interaction : Interaction
+        Interaction
             Instance using the columns of frame
 
         Examples
@@ -658,7 +658,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        dependent : DataFrame
+        DataFrame
             Dependent after effects have been absorbed
 
         Raises
@@ -677,7 +677,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        exogenous : DataFrame
+        DataFrame
             Exogenous after effects have been absorbed
 
         Raises
@@ -805,7 +805,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        results : AbsorbingLSResults
+        AbsorbingLSResults
             Results container
 
         Notes
@@ -869,7 +869,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        resids : ndarray
+        ndarray
             Model residuals
         """
         resids = self.wresids(params)
@@ -886,7 +886,7 @@ class AbsorbingLS(object):
 
         Returns
         -------
-        wresids : ndarray
+        ndarray
             Weighted model residuals
 
         Notes

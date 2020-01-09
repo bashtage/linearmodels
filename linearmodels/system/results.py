@@ -2,9 +2,9 @@ from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
 
-from property_cached import cached_property
 import numpy as np
 from pandas import DataFrame, Series, concat
+from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
@@ -165,7 +165,7 @@ class _CommonResults(_SummaryStr):
 
         Returns
         -------
-        ci : DataFrame
+        DataFrame
             Confidence interval of the form [lower, upper] for each parameters
 
         Notes
@@ -277,7 +277,7 @@ class SystemResults(_CommonResults):
 
         Returns
         -------
-        predictions : DataFrame, dict
+        predictions : {DataFrame, dict}
             DataFrame or dictionary containing selected outputs
 
         Notes
@@ -589,7 +589,7 @@ class SystemEquationResult(_CommonResults):
 
         Returns
         -------
-        f : WaldTestStatistic
+        WaldTestStatistic
             Test statistic for null all coefficients excluding constant terms
             are zero.
 
@@ -665,7 +665,7 @@ class GMMSystemResults(SystemResults):
 
         Returns
         -------
-        j : WaldTestStatistic
+        WaldTestStatistic
             J statistic  test of overidentifying restrictions
 
         Notes

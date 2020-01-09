@@ -41,6 +41,7 @@ from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
                                       FirstDifferenceOLS, PanelOLS, PooledOLS,
                                       RandomEffects)
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
+
 from ._version import get_versions
 
 OLS = _OLS

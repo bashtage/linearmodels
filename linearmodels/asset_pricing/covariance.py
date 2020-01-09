@@ -113,7 +113,7 @@ class HeteroskedasticCovariance(object):
 
         Returns
         -------
-        s : ndarray
+        ndarray
             Covariance of the scores or moment conditions
         """
         xe = self._xe
@@ -150,7 +150,7 @@ class HeteroskedasticCovariance(object):
 
         Returns
         -------
-        c : ndarray
+        ndarray
             Parameter covariance
         """
         s = self.s
@@ -227,7 +227,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
         Returns
         -------
-        s : ndarray
+        ndarray
             Covariance of the scores or moment conditions
         """
         xe = self._xe
@@ -263,7 +263,7 @@ class HeteroskedasticWeight(object):
 
         Returns
         -------
-        w : ndarray
+        ndarray
             Weighting matrix computed from moment conditions
         """
         if self._center:
@@ -306,7 +306,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
 
         Returns
         -------
-        w : ndarray
+        ndarray
             Weighting matrix computed from moment conditions
         """
         if self._center:

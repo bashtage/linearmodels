@@ -18,8 +18,10 @@ from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
                                         RandomEffectsResults)
-from linearmodels.panel.utility import (check_absorbed, dummy_matrix, in_2core_graph,
-                                        not_absorbed, AbsorbingEffectWarning, absorbing_warn_msg)
+from linearmodels.panel.utility import (AbsorbingEffectWarning,
+                                        absorbing_warn_msg, check_absorbed,
+                                        dummy_matrix, in_2core_graph,
+                                        not_absorbed)
 from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   InferenceUnavailableWarning,
                                   InvalidTestStatistic, MemoryWarning,
@@ -150,11 +152,11 @@ class PooledOLS(object):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity)
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -200,12 +202,12 @@ class PooledOLS(object):
 
         Parameters
         ----------
-        clusters : array-like
+        clusters : array_like
             Values to use for variance clustering
 
         Returns
         -------
-        reformatted : PanelData
+        PanelData
             Original data with matching axis and observation dropped where
             missing in the model data.
 
@@ -484,18 +486,18 @@ class PooledOLS(object):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like, optional
+        weights: array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
 
         Returns
         -------
-        model : PooledOLS
+        PooledOLS
             Model specified using the formula
 
         Notes
@@ -577,7 +579,7 @@ class PooledOLS(object):
 
         Returns
         -------
-        results :  PanelResults
+        PanelResults
             Estimation results
 
         Examples
@@ -653,9 +655,9 @@ class PooledOLS(object):
 
         Parameters
         ----------
-        params : array-like
+        params : array_like
             Model parameters (nvar by 1)
-        exog : array-like
+        exog : array_like
             Exogenous regressors (nobs by nvar)
         data : DataFrame
             Values to use when making predictions from a model constructed
@@ -665,7 +667,7 @@ class PooledOLS(object):
 
         Returns
         -------
-        predictions : DataFrame
+        DataFrame
             Fitted values from supplied data and parameters
 
         Notes
@@ -703,11 +705,11 @@ class PanelOLS(PooledOLS):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity).
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -715,7 +717,7 @@ class PanelOLS(PooledOLS):
         Flag whether to include entity (fixed) effects in the model
     time_effects : bool, optional
         Flag whether to include time effects in the model
-    other_effects : array-like, optional
+    other_effects : array_like, optional
         Category codes to use for any effects that are not entity or time
         effects. Each variable is treated as an effect.
     singletons : bool, optional
@@ -890,15 +892,15 @@ class PanelOLS(PooledOLS):
             with two special variable names, EntityEffects and TimeEffects
             which can be used to specify that the model should contain an
             entity effect or a time effect, respectively. See Examples.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
-        other_effects : array-like, optional
+        other_effects : array_like, optional
             Category codes to use for any effects that are not entity or time
             effects. Each variable is treated as an effect.
         singletons : bool, optional
@@ -910,7 +912,7 @@ class PanelOLS(PooledOLS):
 
         Returns
         -------
-        model : PanelOLS
+        PanelOLS
             Model specified using the formula
 
         Examples
@@ -1240,7 +1242,7 @@ class PanelOLS(PooledOLS):
 
         Returns
         -------
-        results :  PanelEffectsResults
+        PanelEffectsResults
             Estimation results
 
         Examples
@@ -1411,11 +1413,11 @@ class BetweenOLS(PooledOLS):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity)
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -1479,7 +1481,7 @@ class BetweenOLS(PooledOLS):
 
         Returns
         -------
-        results :  PanelResults
+        PanelResults
             Estimation results
 
         Examples
@@ -1559,18 +1561,18 @@ class BetweenOLS(PooledOLS):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like, optional
+        weights: array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
 
         Returns
         -------
-        model : BetweenOLS
+        BetweenOLS
             Model specified using the formula
 
         Notes
@@ -1597,11 +1599,11 @@ class FirstDifferenceOLS(PooledOLS):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity)
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -1678,7 +1680,7 @@ class FirstDifferenceOLS(PooledOLS):
 
         Returns
         -------
-        results : PanelResults
+        PanelResults
             Estimation results
 
         Examples
@@ -1774,18 +1776,18 @@ class FirstDifferenceOLS(PooledOLS):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like, optional
+        weights: array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
 
         Returns
         -------
-        model : FirstDifferenceOLS
+        FirstDifferenceOLS
             Model specified using the formula
 
         Notes
@@ -1812,11 +1814,11 @@ class RandomEffects(PooledOLS):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity)
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -1842,18 +1844,18 @@ class RandomEffects(PooledOLS):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like, optional
+        weights: array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
 
         Returns
         -------
-        model : RandomEffects
+        RandomEffects
             Model specified using the formula
 
         Notes
@@ -1961,11 +1963,11 @@ class FamaMacBeth(PooledOLS):
 
     Parameters
     ----------
-    dependent : array-like
+    dependent : array_like
         Dependent (left-hand-side) variable (time by entity)
-    exog : array-like
+    exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array-like, optional
+    weights : array_like, optional
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -2045,7 +2047,7 @@ class FamaMacBeth(PooledOLS):
 
         Returns
         -------
-        results :  PanelResults
+        PanelResults
             Estimation results
 
         Examples
@@ -2142,18 +2144,18 @@ class FamaMacBeth(PooledOLS):
         ----------
         formula : str
             Formula to transform into model. Conforms to patsy formula rules.
-        data : array-like
+        data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array-like, optional
+        weights: array_like, optional
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
 
         Returns
         -------
-        model : FamaMacBeth
+        FamaMacBeth
             Model specified using the formula
 
         Notes

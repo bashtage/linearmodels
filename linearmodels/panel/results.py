@@ -2,9 +2,9 @@ from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
 
-from property_cached import cached_property
 import numpy as np
 from pandas import DataFrame, Series, concat
+from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
@@ -145,7 +145,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        rsquared : float
+        float
             Between coefficient of determination
 
         Notes
@@ -161,7 +161,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        rsquared : float
+        float
             Within coefficient of determination
 
         Notes
@@ -177,7 +177,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        rsquared : float
+        float
             Between coefficient of determination
 
         Notes
@@ -214,7 +214,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        ci : DataFrame
+        DataFrame
             Confidence interval of the form [lower, upper] for each parameters
 
         Notes
@@ -364,7 +364,7 @@ class PanelResults(_SummaryStr):
 
         Parameters
         ----------
-        exog : array-like
+        exog : array_like
             Exogenous values to use in out-of-sample prediction (nobs by nexog)
         data : DataFrame, optional
             DataFrame to use for out-of-sample predictions when model was
@@ -382,7 +382,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        predictions : DataFrame
+        DataFrame
             DataFrame containing columns for all selected output
 
         Notes
@@ -457,7 +457,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        f_stat : WaldTestStatistic
+        WaldTestStatistic
             Statistic value, distribution and p-value
 
         Notes
@@ -489,7 +489,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        f_stat : WaldTestStatistic
+        WaldTestStatistic
             Statistic value, distribution and p-value
 
         Notes
@@ -540,7 +540,7 @@ class PanelResults(_SummaryStr):
 
         Returns
         -------
-        t: WaldTestStatistic
+        WaldTestStatistic
             Test statistic for null that restrictions are valid.
 
         Notes
@@ -608,7 +608,7 @@ class PanelEffectsResults(PanelResults):
 
         Returns
         -------
-        f_pooled : WaldTestStatistic
+        WaldTestStatistic
             Statistic value, distribution and p-value
 
         Notes
@@ -751,7 +751,8 @@ def compare(results, precision='tstats'):
 
     Returns
     -------
-    comparison : PanelModelComparison
+    PanelModelComparison
+        The model comparison object.
     """
     return PanelModelComparison(results, precision=precision)
 

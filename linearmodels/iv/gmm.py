@@ -53,7 +53,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs, nvar = x.shape
@@ -70,7 +70,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        config : dict
+        dict
             Dictionary containing weight estimator configuration information
         """
         return {'center': self._center,
@@ -117,7 +117,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs, nvar = x.shape
@@ -195,7 +195,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs, nvar = x.shape
@@ -224,7 +224,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        config : dict
+        dict
             Dictionary containing weight estimator configuration information
         """
         return {'center': self._center,
@@ -270,7 +270,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs, nvar = x.shape
@@ -301,7 +301,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        config : dict
+        dict
             Dictionary containing weight estimator configuration information
         """
         return {'center': self._center,

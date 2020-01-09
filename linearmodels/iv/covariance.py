@@ -36,7 +36,7 @@ def _cov_cluster(z: ndarray, clusters: ndarray) -> ndarray:
 
     Returns
     -------
-    c : ndarray
+    ndarray
        k by k cluster asymptotic covariance
     """
 
@@ -71,7 +71,7 @@ def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
 
     Returns
     -------
-    c : ndarray
+    ndarray
        k by k kernel asymptotic covariance
     """
     k = len(w)
@@ -99,7 +99,7 @@ def kernel_weight_bartlett(bw: int, *args) -> ndarray:
 
     Returns
     -------
-    weights : ndarray
+    ndarray
         Weight array  ordered by lag position (maxlag + 1)
 
     Notes
@@ -124,7 +124,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
 
     Returns
     -------
-    weights : ndarray
+    ndarray
         Weight array  ordered by lag position (maxlag + 1)
 
     Notes
@@ -165,7 +165,7 @@ def kernel_weight_parzen(bw: int, *args) -> ndarray:
 
     Returns
     -------
-    weights : ndarray
+    ndarray
         Weight array  ordered by lag position (maxlag + 1)
 
     Notes
@@ -196,7 +196,7 @@ def kernel_optimal_bandwidth(x: ndarray, kernel: str = 'bartlett') -> int:
 
     Returns
     -------
-    m : int
+    int
         Optimal bandwidth. Set to nobs - 1 if computed bandwidth is larger.
 
     Notes
