@@ -17,6 +17,10 @@ estimating asset prices:
    -  Pooled regression for panel data
    -  Fama-MacBeth estimation of panel models
 
+-  **High-dimensional Regresssion**:
+
+   -  Absorbing Least Squares
+
 -  **Instrumental Variable estimators**
 
    -  Two-stage Least Squares
@@ -133,22 +137,22 @@ Requirements
 Running
 ~~~~~~~
 
-With the exception of Python 3.6, which is a hard requirement, the
+With the exception of Python 3.6+, which is a hard requirement, the
 others are the version that are being used in the test environment. It
 is possible that older versions work.
 
 -  Python 3.6+
 -  NumPy (1.14+)
--  SciPy (1.0+)
+-  SciPy (1+)
 -  pandas (0.22+)
 -  statsmodels (0.9+)
--  xarray (0.10+, optional)
+-  xarray (0.9+, optional)
 -  cython (optional)
 
 Testing
 ~~~~~~~
 
--  pytest
+-  py.test
 
 .. _documentation-1:
 

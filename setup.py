@@ -4,6 +4,7 @@ import sys
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from setuptools import Extension, find_packages, setup
+from setuptools.dist import Distribution
 
 import versioneer
 
@@ -62,6 +63,11 @@ for filename in glob.iglob("./linearmodels/tests/**", recursive=True):
 for filename in glob.iglob("./examples/**", recursive=True):
     if ".png" in filename:
         additional_files.append(filename)
+
+
+class BinaryDistribution(Distribution):
+    def is_pure(self):
+        return False
 
 
 def run_setup(binary=True):
@@ -130,6 +136,7 @@ def run_setup(binary=True):
         ],
         ext_modules=extensions,
         python_requires=">=3.6",
+        distclass=BinaryDistribution,
     )
 
 
