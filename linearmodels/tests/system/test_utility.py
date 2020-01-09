@@ -13,7 +13,7 @@ from linearmodels.system._utility import (LinearConstraint,
                                           blocked_inner_prod, inv_matrix_sqrt)
 
 
-@pytest.fixture(params=(3, np.arange(1, 6)), ids=['common-size', 'different-size'])
+@pytest.fixture(params=(3, np.arange(1, 6)), ids=["common-size", "different-size"])
 def data(request):
     k = 5
     t = 200
@@ -151,7 +151,7 @@ def test_linear_constraint_repr():
     r = np.eye(10)
     lc = LinearConstraint(r, require_pandas=False)
     assert hex(id(lc)) in lc.__repr__()
-    assert '10 constraints' in lc.__repr__()
+    assert "10 constraints" in lc.__repr__()
     assert isinstance(lc.q, pd.Series)
     assert np.all(lc.q == 0)
     assert lc.q.shape == (10,)
@@ -197,5 +197,6 @@ def test_blocked_outer_product():
     _z = np.concatenate(_z, 0)
     desired = _x.T @ np.kron(s, np.eye(nobs)) @ _z
     assert_allclose(actual, desired)
+
 
 # TODO: One complex constrain test of equivalence

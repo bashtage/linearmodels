@@ -17,11 +17,11 @@ def generate_data(nkp=(1000, 5, 3)):
     v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
 
     x = v[:, :k]
-    z = v[:, 2:k + p]
+    z = v[:, 2 : k + p]
     e = v[:, [-1]]
     endog = x[:, :2]
     exog = x[:, 2:]
-    instr = z[:, k - 2:]
+    instr = z[:, k - 2 :]
     params = np.arange(1, k + 1) / k
     params = params[:, None]
     y = x @ params + e
@@ -37,9 +37,27 @@ def generate_data(nkp=(1000, 5, 3)):
     xzizx = x.T @ z @ z.T @ x / nobs
     xzizx_inv = np.linalg.inv(xzizx)
 
-    return AttrDict(nobs=nobs, e=e, x=x, y=y, z=z, xhat=xhat,
-                    params=params, s2=s2, s2_debiased=s2_debiased,
-                    clusters=clusters, nvar=nvar, v=v, vinv=vinv, vk=vk,
-                    i=np.eye(k + p - 2), kappa=kappa,
-                    xzizx=xzizx, xzizx_inv=xzizx_inv,
-                    dep=dep, exog=exog, endog=endog, instr=instr)
+    return AttrDict(
+        nobs=nobs,
+        e=e,
+        x=x,
+        y=y,
+        z=z,
+        xhat=xhat,
+        params=params,
+        s2=s2,
+        s2_debiased=s2_debiased,
+        clusters=clusters,
+        nvar=nvar,
+        v=v,
+        vinv=vinv,
+        vk=vk,
+        i=np.eye(k + p - 2),
+        kappa=kappa,
+        xzizx=xzizx,
+        xzizx_inv=xzizx_inv,
+        dep=dep,
+        exog=exog,
+        endog=endog,
+        instr=instr,
+    )

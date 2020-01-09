@@ -1,5 +1,8 @@
 xarray>=0.9
-pytest>=5
+pytest>=5.0
+black==19.10b0
+flake8
+flake8-black
 sphinx
 sphinx-material
 ipython
@@ -9,4 +12,3 @@ nbconvert
 nbformat
 matplotlib
 seaborn
-Cython

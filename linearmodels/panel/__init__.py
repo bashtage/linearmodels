@@ -3,5 +3,12 @@ from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
                                       RandomEffects)
 from linearmodels.panel.results import compare
 
-__all__ = ['PanelOLS', 'PooledOLS', 'RandomEffects', 'FirstDifferenceOLS', 'BetweenOLS',
-           'FamaMacBeth', 'compare']
+__all__ = [
+    "PanelOLS",
+    "PooledOLS",
+    "RandomEffects",
+    "FirstDifferenceOLS",
+    "BetweenOLS",
+    "FamaMacBeth",
+    "compare",
+]

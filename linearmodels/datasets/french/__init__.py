@@ -45,6 +45,7 @@ S5M5     Large firms, winners
 
 def load():
     from linearmodels import datasets
-    data = datasets.load(__file__, 'french.csv.bz2')
-    data['dates'] = pd.to_datetime(data.dates)
+
+    data = datasets.load(__file__, "french.csv.bz2")
+    data["dates"] = pd.to_datetime(data.dates)
     return data

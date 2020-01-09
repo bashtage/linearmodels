@@ -2,7 +2,7 @@ import os
 from os.path import join
 import subprocess
 
-STATA_PATH = join('C:\\', 'Program Files (x86)', 'Stata13', 'StataMP-64.exe')
+STATA_PATH = join("C:\\", "Program Files (x86)", "Stata13", "StataMP-64.exe")
 
 start = """
 use http://www.stata-press.com/data/r13/hsng, clear \n
@@ -33,36 +33,40 @@ file write myfile  _n _n "########## !{method}-{desc}-{small}! ##########" _n
 file close myfile
 """
 
-methods = ['2sls', 'liml', 'gmm']
-outfile = os.path.join(os.getcwd(), 'stata-iv-housing-results.txt')
+methods = ["2sls", "liml", "gmm"]
+outfile = os.path.join(os.getcwd(), "stata-iv-housing-results.txt")
 if os.path.exists(outfile):
     os.unlink(outfile)
-variance_options = [', vce(unadjusted)', ', vce(robust)', ', vce(cluster division)']
-descr = ['unadjusted', 'robust', 'cluster']
+variance_options = [", vce(unadjusted)", ", vce(robust)", ", vce(cluster division)"]
+descr = ["unadjusted", "robust", "cluster"]
 
-with open('temp.do', 'w') as stata:
+with open("temp.do", "w") as stata:
     stata.write(start)
     for small in (True, False):
         for method in methods:
             for vo, desc in zip(variance_options, descr):
-                small_text = 'small' if small else 'asymptotic'
-                stata.write(section_header.format(outfile=outfile, method=method, desc=desc,
-                                                  small=small_text))
-                desc += '-small' if small else ''
-                vo += ' small' if small else ''
+                small_text = "small" if small else "asymptotic"
+                stata.write(
+                    section_header.format(
+                        outfile=outfile, method=method, desc=desc, small=small_text
+                    )
+                )
+                desc += "-small" if small else ""
+                vo += " small" if small else ""
                 of = outfile.format(method=method, descr=desc)
-                extra = ' J ' if method == 'gmm' else ' kappa '
-                extra += ' F p ' if small else ' chi2 p '
-                cmd = iv_tempplate.format(outfile=of, variance_option=vo, method=method,
-                                          extra=extra)
-                if 'gmm' in method:
-                    cmd = cmd.replace('vce', 'wmatrix')
+                extra = " J " if method == "gmm" else " kappa "
+                extra += " F p " if small else " chi2 p "
+                cmd = iv_tempplate.format(
+                    outfile=of, variance_option=vo, method=method, extra=extra
+                )
+                if "gmm" in method:
+                    cmd = cmd.replace("vce", "wmatrix")
                 stata.write(cmd)
-                if 'gmm' in method:
+                if "gmm" in method:
                     stata.write(gmm_extra.format(outfile=of))
-                stata.write('\n')
+                stata.write("\n")
 
-do_file = join(os.getcwd(), 'temp.do')
-stata_cmd = [STATA_PATH, '/e', 'do', do_file]
-print(' '.join(stata_cmd))
+do_file = join(os.getcwd(), "temp.do")
+stata_cmd = [STATA_PATH, "/e", "do", do_file]
+print(" ".join(stata_cmd))
 subprocess.call(stata_cmd)

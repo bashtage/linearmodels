@@ -1,7 +1,3 @@
-
-Formulas and Mathematical Detail
-================================
-
 Seemingly Unrelated Regression (SUR/SURE)
 -----------------------------------------
 
@@ -217,6 +213,8 @@ hypothesis testing of parameters. It can also lead to more precise
 parameter estimates if some residuals are conditionally homoskedastic
 and regressors differ across equations.
 
+.. _basic-notation-1:
+
 Basic Notation
 ~~~~~~~~~~~~~~
 
@@ -372,3 +370,86 @@ cases these should be the same, and so the covariance of the estimated
 parameters will simplify to
 
 .. math:: \widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.
+
+System Measures of Fit (:math:`R^{2}`)
+--------------------------------------
+
+Most measures of fit for systems of equations assume that all equations
+contains a constant (or equivalent). Caution is needed when interpreting
+if equations exclude constant terms.
+
+Overall :math:`R^{2}`
+~~~~~~~~~~~~~~~~~~~~~
+
+The overall :math:`R^{2}` is defined as
+
+.. math:: R^{2}=1-\frac{\sum_{i=1}^{K}SSR_{i}}{\sum_{i=1}^{K}TSS_{i}}
+
+where :math:`TSS_{i}` is centered if equation :math:`i` contains a
+constant and uncentered if it does not. When all equations contain
+constants, it is identical to Judge’s measure.
+
+McElroy
+~~~~~~~
+
+McElroy’s (1977) measure is defined as
+
+.. math:: R^{2}=1-\frac{\epsilon^{\prime}\Omega^{-1}\epsilon}{Y^{\prime}\left(\Sigma^{-1}\otimes\left(I_{N}-\frac{\iota\iota^{\prime}}{N}\right)\right)Y}
+
+where :math:`\iota` is a :math:`N` by 1 vector of 1s. This is
+implemented as
+
+.. math:: R^{2}=1-\frac{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{\xi}_{ij}^{2}}{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{\eta}_{ij}^{2}}
+
+where
+
+.. math::
+
+   \begin{aligned}
+   \hat{\xi} & =\hat{E}\hat{\Sigma}^{-\frac{1}{2}}\\
+   \hat{E} & =\left[\begin{array}{cccc}
+   \hat{\epsilon}_{1} & \hat{\epsilon}_{2} & \ldots & \hat{\epsilon}_{N}\end{array}\right]\end{aligned}
+
+and
+
+.. math::
+
+   \begin{aligned}
+   \hat{\eta} & =\tilde{Y}\hat{\Sigma}^{-\frac{1}{2}}\\
+   \tilde{Y} & =\left[\begin{array}{cccc}
+   Y_{1}-\hat{\mu}_{1} & Y_{2}-\hat{\mu}_{2} & \ldots & Y_{N}-\hat{\mu}_{N}\end{array}\right].\end{aligned}
+
+where the vector of mean parameters is estimated by fitting a SURE to
+the data (using user specified weights, if provided) where
+:math:`X_{i}=\iota` contains only a constant. Greene provides an
+alternative formulation of this measure as
+
+.. math:: R^{2}=1-\frac{K}{\mathrm{tr}\left(\hat{\Sigma}^{-1}\hat{\Psi}\right)}
+
+where :math:`\hat{\Psi}=N^{-1}\tilde{Y}^{\prime}\tilde{Y}` is the
+covariance of the demeaned data.
+
+Berndt
+~~~~~~
+
+Berndt’s measure is defined as
+
+.. math:: R^{2}=1-\frac{\left|\hat{\Sigma}\right|}{\left|\hat{\Psi}\right|}.
+
+Judge
+~~~~~
+
+Judge’s measure is the naive OLS :math:`R^{2}` for the system,
+
+.. math:: R^{2}=1-\frac{\sum_{i=1}^{N}\sum_{j=1}^{K}\hat{E}_{ij}^{2}}{\sum_{i=1}^{N}\sum_{j=1}^{K}\tilde{Y}_{ij}^{2}}.
+
+Dhrymes
+~~~~~~~
+
+Dhrymes’ measure of fit is a weighted average of the :math:`R^{2}` of
+each equation,
+
+.. math:: R^{2}=\sum_{i=1}^{K}R_{i}^{2}\frac{\hat{\Psi}_{ii}}{\mathrm{tr}\left(\hat{\Psi}\right)}
+
+where :math:`R_{i}^{2}` is the coefficient of determination from
+equation :math:`i`.

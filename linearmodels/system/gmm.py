@@ -40,20 +40,20 @@ class HomoskedasticWeightMatrix(object):
         self._center = center
         self._debiased = debiased
         self._bandwidth = 0
-        self._name = 'Homoskedastic (Unadjusted) Weighting'
+        self._name = "Homoskedastic (Unadjusted) Weighting"
         self._config = AttrDict(center=center, debiased=debiased)
 
     def __str__(self):
         out = self._name
         extra = []
         for key in self._str_extra:
-            extra.append(': '.join([key, str(self._str_extra[key])]))
+            extra.append(": ".join([key, str(self._str_extra[key])]))
         if extra:
-            out += ' (' + ', '.join(extra) + ')'
+            out += " (" + ", ".join(extra) + ")"
         return out
 
     def __repr__(self):
-        return self.__str__() + ', id: {0}'.format(hex(id(self)))
+        return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
     def _str_extra(self):
@@ -104,7 +104,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
@@ -118,7 +118,7 @@ class HomoskedasticWeightMatrix(object):
 
         Returns
         -------
-        config : AttrDict
+        AttrDict
             Dictionary containing weight estimator configuration information
         """
         return self._config
@@ -154,7 +154,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def __init__(self, center=False, debiased=False):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
-        self._name = 'Heteroskedastic (Robust) Weighting'
+        self._name = "Heteroskedastic (Robust) Weighting"
 
     def weight_matrix(self, x, z, eps, *, sigma=None):
         """
@@ -171,7 +171,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = x[0].shape[0]
@@ -182,7 +182,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         for i in range(k):
             e = eps[:, [i]]
             zk = z[i].shape[1]
-            ze[:, loc:loc + zk] = z[i] * e
+            ze[:, loc : loc + zk] = z[i] * e
             loc += zk
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
@@ -247,10 +247,16 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     between the moment conditions.
     """
 
-    def __init__(self, center=False, debiased=False, kernel='bartlett', bandwidth=None,
-                 optimal_bw=False):
+    def __init__(
+        self,
+        center=False,
+        debiased=False,
+        kernel="bartlett",
+        bandwidth=None,
+        optimal_bw=False,
+    ):
         super(KernelWeightMatrix, self).__init__(center, debiased)
-        self._name = 'Kernel (HAC) Weighting'
+        self._name = "Kernel (HAC) Weighting"
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
         self._predefined_bw = self._bandwidth
@@ -271,7 +277,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         Returns
         -------
-        weight : ndarray
+        ndarray
             Covariance of GMM moment conditions.
         """
         nobs = x[0].shape[0]
@@ -282,7 +288,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         for i in range(k):
             e = eps[:, [i]]
             zk = z[i].shape[1]
-            ze[:, loc:loc + zk] = z[i] * e
+            ze[:, loc : loc + zk] = z[i] * e
             loc += zk
         mu = ze.mean(axis=0) if self._center else 0
         ze -= mu
@@ -317,9 +323,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         Returns
         -------
-        config : AttrDict
+        AttrDict
             Dictionary containing weight estimator configuration information
         """
         out = AttrDict([(k, v) for k, v in self._config.items()])
-        out['bandwidth'] = self.bandwidth
+        out["bandwidth"] = self.bandwidth
         return out

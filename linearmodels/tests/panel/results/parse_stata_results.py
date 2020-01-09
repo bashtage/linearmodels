@@ -5,22 +5,22 @@ import pandas as pd
 
 from linearmodels.utility import AttrDict
 
-filename = 'stata-panel-simulated-results.txt'
+filename = "stata-panel-simulated-results.txt"
 
 cwd = os.path.split(os.path.abspath(__file__))[0]
 blocks = {}
 block = []
-key = ''
+key = ""
 with open(os.path.join(cwd, filename)) as results:
     for line in results.readlines():
         line = line.strip()
         if not line:
             continue
-        if '###!' in line:
+        if "###!" in line:
             if key:
                 blocks[key] = block
             block = []
-            key = line.split('!')[1]
+            key = line.split("!")[1]
         block.append(line)
     if block:
         blocks[key] = block
@@ -30,30 +30,29 @@ def parse_block(block):
     params = {}
     stats = {}
     for i, line in enumerate(block):
-        if 'b/t' in line:
+        if "b/t" in line:
             params_start = i + 1
-        if 'rss' in line:
+        if "rss" in line:
             stats_start = i
-        if '** Variance **' in line:
+        if "** Variance **" in line:
             variance_start = i + 1
 
     for i in range(params_start, stats_start, 3):
-        name, value = block[i].split('\t')
+        name, value = block[i].split("\t")
         value = float(value)
         tstat = float(block[i + 1])
         pvalue = float(block[i + 1])
-        params[name] = pd.Series(
-            {'param': value, 'tstat': tstat, 'pvalue': pvalue})
+        params[name] = pd.Series({"param": value, "tstat": tstat, "pvalue": pvalue})
     params = pd.DataFrame(params).sort_index()
     for i in range(stats_start, variance_start - 1):
-        if '\t' in block[i]:
-            name, value = block[i].split('\t')
+        if "\t" in block[i]:
+            name, value = block[i].split("\t")
             stats[name] = float(value)
         else:
             stats[block[i]] = None
     stats = pd.Series(stats)
-    var = '\n'.join(block[variance_start + 1:])
-    variance = pd.read_csv(StringIO(',' + var.replace('\t', ',')))
+    var = "\n".join(block[variance_start + 1 :])
+    variance = pd.read_csv(StringIO("," + var.replace("\t", ",")))
     index = variance.pop(variance.columns[0])
     index.name = None
     variance.index = index
@@ -70,5 +69,5 @@ def data():
     return blocks
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(data())

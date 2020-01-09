@@ -15,7 +15,9 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                assert_results_equal, datatypes,
                                                generate_data)
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 
 def data_gen(missing, datatype):
@@ -58,17 +60,16 @@ def test_single_entity(data):
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols.fit(cov_type='robust')
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols.fit(cov_type="robust")
     assert_results_equal(res, ols_res)
 
-    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape),
-                            index=dep.index)
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols.fit(cov_type='clustered', clusters=clusters)
+    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape), index=dep.index)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols.fit(cov_type="clustered", clusters=clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -97,17 +98,16 @@ def test_single_entity_weights(data):
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None, weights=mod.weights.values2d)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols.fit(cov_type='robust', debiased=False)
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols.fit(cov_type="robust", debiased=False)
     assert_results_equal(res, ols_res)
 
-    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape),
-                            index=dep.index)
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols.fit(cov_type='clustered', clusters=clusters, debiased=False)
+    clusters = pd.DataFrame(np.random.randint(0, 9, dep.shape), index=dep.index)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols.fit(cov_type="clustered", clusters=clusters, debiased=False)
     assert_results_equal(res, ols_res)
 
 
@@ -116,14 +116,13 @@ def test_multiple_obs_per_entity(data):
     res = mod.fit(reweight=True, debiased=False)
 
     dep = mod.dependent.values3d.mean(1).T
-    exog = pd.DataFrame(mod.exog.values3d.mean(1).T,
-                        columns=mod.exog.vars)
+    exog = pd.DataFrame(mod.exog.values3d.mean(1).T, columns=mod.exog.vars)
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols.fit(cov_type='robust', debiased=False)
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols.fit(cov_type="robust", debiased=False)
     assert_results_equal(res, ols_res)
 
     clusters = mod.dependent.dataframe.copy()
@@ -133,8 +132,8 @@ def test_multiple_obs_per_entity(data):
         clusters.loc[entity] = np.random.randint(9)
 
     ols_clusters = PanelData(clusters).values3d.mean(1).T.astype(np.int32)
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -152,11 +151,11 @@ def test_multiple_obs_per_entity_weighted(data):
     exog = pd.DataFrame(wexog, columns=mod.exog.vars)
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(cov_type='robust', debiased=False)
-    ols_res = ols.fit(cov_type='robust')
+    res = mod.fit(cov_type="robust", debiased=False)
+    ols_res = ols.fit(cov_type="robust")
     assert_results_equal(res, ols_res)
 
     clusters = mod.dependent.dataframe.copy()
@@ -166,8 +165,8 @@ def test_multiple_obs_per_entity_weighted(data):
         clusters.loc[entity] = np.random.randint(9)
 
     ols_clusters = PanelData(clusters).values3d.mean(1).T.astype(np.int32)
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
-    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
+    ols_res = ols.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -184,20 +183,21 @@ def test_missing(missing_data):
     weights = weights.reindex(mod.dependent.entities)
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
-    res = mod.fit(reweight=True, cov_type='robust', debiased=False)
-    ols_res = ols.fit(cov_type='robust')
+    res = mod.fit(reweight=True, cov_type="robust", debiased=False)
+    ols_res = ols.fit(cov_type="robust")
     assert_results_equal(res, ols_res)
 
     vc1 = PanelData(missing_data.vc1)
     ols_clusters = vc1.dataframe.groupby(level=0).mean().astype(np.int32)
     ols_clusters = ols_clusters.reindex(mod.dependent.entities)
 
-    res = mod.fit(reweight=True, cov_type='clustered',
-                  clusters=missing_data.vc1, debiased=False)
-    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    res = mod.fit(
+        reweight=True, cov_type="clustered", clusters=missing_data.vc1, debiased=False
+    )
+    ols_res = ols.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -219,14 +219,14 @@ def test_missing_weighted(missing_data):
     exog = (1.0 / weights.values) * exog
 
     ols = IV2SLS(dep, exog, None, None, weights=weights)
-    ols_res = ols.fit(cov_type='unadjusted')
+    ols_res = ols.fit(cov_type="unadjusted")
     assert_results_equal(res, ols_res)
 
 
 def test_unknown_covariance(data):
     mod = BetweenOLS(data.y, data.x)
     with pytest.raises(KeyError):
-        mod.fit(cov_type='unknown')
+        mod.fit(cov_type="unknown")
 
 
 def test_results_access(data):
@@ -266,14 +266,14 @@ def test_2way_cluster(data):
     exog = mod.exog.dataframe.groupby(level=0).mean()
 
     clusters = mod.dependent.dataframe.copy()
-    clusters.columns = ['cluster.0']
-    clusters['cluster.1'] = mod.dependent.dataframe.copy()
+    clusters.columns = ["cluster.0"]
+    clusters["cluster.1"] = mod.dependent.dataframe.copy()
     clusters.loc[:, :] = 0
     clusters = clusters.astype(np.int32)
     for entity in mod.dependent.entities:
         clusters.loc[entity, :] = np.random.randint(33, size=(1, 2))
 
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
     dep = dep.reindex(list(res.resids.index))
     exog = exog.reindex(list(res.resids.index))
@@ -282,7 +282,7 @@ def test_2way_cluster(data):
     ols_clusters = clusters.groupby(level=0).max()
     ols_clusters = ols_clusters.reindex(list(res.resids.index))
 
-    ols_res = ols.fit(cov_type='clustered', clusters=ols_clusters)
+    ols_res = ols.fit(cov_type="clustered", clusters=ols_clusters)
     assert_results_equal(res, ols_res)
 
 
@@ -296,7 +296,7 @@ def test_cluster_error(data):
     clusters.iloc[::7, :] = 0
 
     with pytest.raises(ValueError):
-        mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
+        mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
 
 def test_default_clusters(data):
@@ -314,20 +314,23 @@ def test_default_clusters(data):
         x = x[:, [0]]
         y = y[:, [0]]
     mod = BetweenOLS(y, x)
-    res = mod.fit(reweight=True, cov_type='clustered', debiased=False)
+    res = mod.fit(reweight=True, cov_type="clustered", debiased=False)
 
     dep = mod.dependent.dataframe
     exog = mod.exog.dataframe
     ols = IV2SLS(dep, exog, None, None)
-    ols_res = ols.fit(cov_type='clustered')
+    ols_res = ols.fit(cov_type="clustered")
     assert_results_equal(res, ols_res)
 
 
 def test_fitted_effects_residuals(both_data_types):
     mod = BetweenOLS(both_data_types.y, both_data_types.x)
     res = mod.fit(reweight=True, debiased=False)
-    expected = pd.DataFrame(mod.exog.values2d @ res.params.values, mod.dependent.index,
-                            columns=['fitted_values'])
+    expected = pd.DataFrame(
+        mod.exog.values2d @ res.params.values,
+        mod.dependent.index,
+        columns=["fitted_values"],
+    )
     assert_allclose(expected, res.fitted_values)
     assert_frame_similar(res.fitted_values, expected)
 
@@ -337,12 +340,12 @@ def test_fitted_effects_residuals(both_data_types):
     resids = resids.reindex(reindex)
     resids.index = index
     expected = pd.DataFrame(resids)
-    expected.columns = ['estimated_effects']
+    expected.columns = ["estimated_effects"]
     assert_allclose(expected, res.estimated_effects)
     assert_frame_similar(res.estimated_effects, expected)
 
     fitted_effects = res.fitted_values.values + res.estimated_effects.values
     expected.iloc[:, 0] = mod.dependent.values2d - fitted_effects
-    expected.columns = ['idiosyncratic']
+    expected.columns = ["idiosyncratic"]
     assert_allclose(expected, res.idiosyncratic, atol=1e-8)
     assert_frame_similar(res.idiosyncratic, expected)

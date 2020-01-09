@@ -34,7 +34,7 @@ def proj(y: ndarray, x: ndarray) -> ndarray:
 
     Returns
     -------
-    yhat : ndarray
+    ndarray
         Projected values of y (nobs by nseries)
     """
     return x @ (np.linalg.pinv(x) @ y)
@@ -53,7 +53,7 @@ def annihilate(y: ndarray, x: ndarray) -> ndarray:
 
     Returns
     -------
-    eps : ndarray
+    ndarray
         Residuals values of y minus y projected on x (nobs by nseries)
     """
     return y - proj(y, x)
@@ -80,44 +80,52 @@ class IVFormulaParser(object):
     def __init__(self, formula: str, data: DataFrame, eval_env: int = 2):
         self._formula = formula
         self._data = data
-        self._na_action = NAAction(on_NA='raise', NA_types=[])
+        self._na_action = NAAction(on_NA="raise", NA_types=[])
         self._eval_env = eval_env
         self._components = {}  # type: Dict[str, str]
         self._parse()
 
     def _parse(self):
-        blocks = self._formula.strip().split('~')
+        blocks = self._formula.strip().split("~")
         if len(blocks) == 2:
             dep = blocks[0].strip()
             exog = blocks[1].strip()
-            endog = '0'
-            instr = '0'
+            endog = "0"
+            instr = "0"
         elif len(blocks) == 3:
             blocks = [bl.strip() for bl in blocks]
-            if '[' not in blocks[1] or ']' not in blocks[2]:
-                raise ValueError('formula not understood. Endogenous variables and '
-                                 'instruments must be segregated in a block that '
-                                 'starts with [ and ends with ].')
+            if "[" not in blocks[1] or "]" not in blocks[2]:
+                raise ValueError(
+                    "formula not understood. Endogenous variables and "
+                    "instruments must be segregated in a block that "
+                    "starts with [ and ends with ]."
+                )
             dep = blocks[0].strip()
-            exog, endog = [bl.strip() for bl in blocks[1].split('[')]
-            instr, exog2 = [bl.strip() for bl in blocks[2].split(']')]
-            if endog[0] == '+' or endog[-1] == '+':
-                raise ValueError('endogenous block must not start or end with +. This block '
-                                 'was: {0}'.format(endog))
-            if instr[0] == '+' or instr[-1] == '+':
-                raise ValueError('instrument block must not start or end with +. This '
-                                 'block was: {0}'.format(instr))
+            exog, endog = [bl.strip() for bl in blocks[1].split("[")]
+            instr, exog2 = [bl.strip() for bl in blocks[2].split("]")]
+            if endog[0] == "+" or endog[-1] == "+":
+                raise ValueError(
+                    "endogenous block must not start or end with +. This block "
+                    "was: {0}".format(endog)
+                )
+            if instr[0] == "+" or instr[-1] == "+":
+                raise ValueError(
+                    "instrument block must not start or end with +. This "
+                    "block was: {0}".format(instr)
+                )
             if exog2:
                 exog += exog2
             if exog:
-                exog = exog[:-1].strip() if exog[-1] == '+' else exog
-            exog = '0' if not exog else '0 + ' + exog
+                exog = exog[:-1].strip() if exog[-1] == "+" else exog
+            exog = "0" if not exog else "0 + " + exog
         else:
-            raise ValueError('formula contains more then 2 separators (~)')
-        comp = {'dependent': '0 + ' + dep,
-                'exog': exog,
-                'endog': endog,
-                'instruments': instr}
+            raise ValueError("formula contains more then 2 separators (~)")
+        comp = {
+            "dependent": "0 + " + dep,
+            "exog": exog,
+            "endog": endog,
+            "instruments": instr,
+        }
         self._components = comp
 
     @property
@@ -140,33 +148,53 @@ class IVFormulaParser(object):
     @property
     def dependent(self) -> DataFrame:
         """Dependent variable"""
-        dep = self.components['dependent']
-        dep = dmatrix('0 + ' + dep, self._data, eval_env=self._eval_env,
-                      return_type='dataframe', NA_action=self._na_action)
+        dep = self.components["dependent"]
+        dep = dmatrix(
+            "0 + " + dep,
+            self._data,
+            eval_env=self._eval_env,
+            return_type="dataframe",
+            NA_action=self._na_action,
+        )
         return dep
 
     @property
     def exog(self) -> OptionalDataFrame:
         """Exogenous variables"""
-        exog = self.components['exog']
-        exog = dmatrix(exog, self._data, eval_env=self._eval_env,
-                       return_type='dataframe', NA_action=self._na_action)
+        exog = self.components["exog"]
+        exog = dmatrix(
+            exog,
+            self._data,
+            eval_env=self._eval_env,
+            return_type="dataframe",
+            NA_action=self._na_action,
+        )
         return self._empty_check(exog)
 
     @property
     def endog(self) -> OptionalDataFrame:
         """Endogenous variables"""
-        endog = self.components['endog']
-        endog = dmatrix('0 + ' + endog, self._data, eval_env=self._eval_env,
-                        return_type='dataframe', NA_action=self._na_action)
+        endog = self.components["endog"]
+        endog = dmatrix(
+            "0 + " + endog,
+            self._data,
+            eval_env=self._eval_env,
+            return_type="dataframe",
+            NA_action=self._na_action,
+        )
         return self._empty_check(endog)
 
     @property
     def instruments(self) -> OptionalDataFrame:
         """Instruments"""
-        instr = self.components['instruments']
-        instr = dmatrix('0 + ' + instr, self._data, eval_env=self._eval_env,
-                        return_type='dataframe', NA_action=self._na_action)
+        instr = self.components["instruments"]
+        instr = dmatrix(
+            "0 + " + instr,
+            self._data,
+            eval_env=self._eval_env,
+            return_type="dataframe",
+            NA_action=self._na_action,
+        )
 
         return self._empty_check(instr)
 

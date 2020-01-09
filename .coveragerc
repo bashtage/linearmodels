@@ -5,6 +5,7 @@ branch = True
 omit =
     */results/*
     */_version.py
+    */conftest.py
 
 [report]
 # Regexes for lines to exclude from consideration

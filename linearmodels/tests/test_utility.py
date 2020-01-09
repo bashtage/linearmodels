@@ -15,7 +15,7 @@ from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
                                   has_constant, inv_sqrth, missing_warning,
                                   panel_to_frame)
 
-MISSING_PANEL = 'Panel' not in dir(pd)
+MISSING_PANEL = "Panel" not in dir(pd)
 
 
 def test_missing_warning():
@@ -60,38 +60,38 @@ def test_hasconstant():
 def test_wald_statistic():
     ts = WaldTestStatistic(1.0, "_NULL_", 1, name="_NAME_")
     assert str(hex(id(ts))) in ts.__repr__()
-    assert '_NULL_' in str(ts)
+    assert "_NULL_" in str(ts)
     assert ts.stat == 1.0
     assert ts.df == 1
     assert ts.df_denom is None
-    assert ts.dist_name == 'chi2(1)'
+    assert ts.dist_name == "chi2(1)"
     assert isinstance(ts.critical_values, dict)
     assert_allclose(1 - stats.chi2.cdf(1.0, 1), ts.pval)
 
     ts = WaldTestStatistic(1.0, "_NULL_", 1, 1000, name="_NAME_")
     assert ts.df == 1
     assert ts.df_denom == 1000
-    assert ts.dist_name == 'F(1,1000)'
+    assert ts.dist_name == "F(1,1000)"
     assert_allclose(1 - stats.f.cdf(1.0, 1, 1000), ts.pval)
 
 
 def test_invalid_test_statistic():
-    ts = InvalidTestStatistic('_REASON_', name='_NAME_')
+    ts = InvalidTestStatistic("_REASON_", name="_NAME_")
     assert str(hex(id(ts))) in ts.__repr__()
-    assert '_REASON_' in str(ts)
+    assert "_REASON_" in str(ts)
     assert np.isnan(ts.pval)
     assert ts.critical_values is None
 
 
 def test_inapplicable_test_statistic():
-    ts = InapplicableTestStatistic(reason='_REASON_', name='_NAME_')
+    ts = InapplicableTestStatistic(reason="_REASON_", name="_NAME_")
     assert str(hex(id(ts))) in ts.__repr__()
-    assert '_REASON_' in str(ts)
+    assert "_REASON_" in str(ts)
     assert np.isnan(ts.pval)
     assert ts.critical_values is None
 
     ts = InapplicableTestStatistic()
-    assert 'not applicable' in str(ts)
+    assert "not applicable" in str(ts)
 
 
 def test_inv_sqrth():
@@ -103,52 +103,52 @@ def test_inv_sqrth():
 
 
 def test_ensure_unique_column():
-    df = pd.DataFrame({'a': [0, 1, 0], 'b': [1.0, 0.0, 1.0]})
-    out = ensure_unique_column('a', df)
-    assert out == '_a_'
-    out = ensure_unique_column('c', df)
-    assert out == 'c'
-    out = ensure_unique_column('a', df, '=')
-    assert out == '=a='
-    df['_a_'] = -1
-    out = ensure_unique_column('a', df)
-    assert out == '__a__'
+    df = pd.DataFrame({"a": [0, 1, 0], "b": [1.0, 0.0, 1.0]})
+    out = ensure_unique_column("a", df)
+    assert out == "_a_"
+    out = ensure_unique_column("c", df)
+    assert out == "c"
+    out = ensure_unique_column("a", df, "=")
+    assert out == "=a="
+    df["_a_"] = -1
+    out = ensure_unique_column("a", df)
+    assert out == "__a__"
 
 
 def test_attr_dict():
     ad = AttrDict()
-    ad['one'] = 'one'
+    ad["one"] = "one"
     ad[1] = 1
-    ad[('a', 2)] = ('a', 2)
-    assert list(ad.keys()) == ['one', 1, ('a', 2)]
+    ad[("a", 2)] = ("a", 2)
+    assert list(ad.keys()) == ["one", 1, ("a", 2)]
     assert len(ad) == 3
 
     ad2 = ad.copy()
     assert list(ad2.keys()) == list(ad.keys())
-    assert ad.get('one', None) == 'one'
-    assert ad.get('two', False) is False
+    assert ad.get("one", None) == "one"
+    assert ad.get("two", False) is False
 
     k, v = ad.popitem()
-    assert k == 'one'
-    assert v == 'one'
+    assert k == "one"
+    assert v == "one"
 
     items = ad.items()
     assert (1, 1) in items
-    assert (('a', 2), ('a', 2)) in items
+    assert (("a", 2), ("a", 2)) in items
     assert len(items) == 2
 
     values = ad.values()
     assert 1 in values
-    assert ('a', 2) in values
+    assert ("a", 2) in values
     assert len(values) == 2
 
     ad2 = AttrDict()
     ad2[1] = 3
-    ad2['one'] = 'one'
-    ad2['a'] = 'a'
+    ad2["one"] = "one"
+    ad2["a"] = "a"
     ad.update(ad2)
     assert ad[1] == 3
-    assert 'a' in ad
+    assert "a" in ad
 
     ad.__str__()
     with pytest.raises(AttributeError):
@@ -156,23 +156,23 @@ def test_attr_dict():
     with pytest.raises(AttributeError):
         ad.some_other_key
     with pytest.raises(KeyError):
-        ad['__ordered_dict__'] = None
+        ad["__ordered_dict__"] = None
 
     del ad[1]
     assert 1 not in ad.keys()
-    ad.new_value = 'new_value'
-    assert 'new_value' in ad.keys()
-    assert ad.new_value == ad['new_value']
+    ad.new_value = "new_value"
+    assert "new_value" in ad.keys()
+    assert ad.new_value == ad["new_value"]
 
     for key in ad.keys():
         if isinstance(key, str):
             assert key in dir(ad)
 
-    new_value = ad.pop('new_value')
-    assert new_value == 'new_value'
+    new_value = ad.pop("new_value")
+    assert new_value == "new_value"
 
     del ad.one
-    assert 'one' not in ad.keys()
+    assert "one" not in ad.keys()
 
     ad.clear()
     assert list(ad.keys()) == []
@@ -202,15 +202,22 @@ def test_panel_to_midf():
     df2 = panel_to_frame(x, list(range(3)), list(range(7)), list(range(100)), True)
     pd.testing.assert_frame_equal(df2, expected2)
 
-    entities = list(map(''.join, [[random.choice(string.ascii_lowercase) for __ in range(10)]
-                                  for _ in range(100)]))
-    times = pd.date_range('1999-12-31', freq='A-DEC', periods=7)
-    var_names = ['x.{0}'.format(i) for i in range(1, 4)]
+    entities = list(
+        map(
+            "".join,
+            [
+                [random.choice(string.ascii_lowercase) for __ in range(10)]
+                for _ in range(100)
+            ],
+        )
+    )
+    times = pd.date_range("1999-12-31", freq="A-DEC", periods=7)
+    var_names = ["x.{0}".format(i) for i in range(1, 4)]
     df3 = panel_to_frame(x, var_names, times, entities, True)
     mi = pd.MultiIndex.from_product([times, entities])
     expected3 = pd.DataFrame(index=mi, columns=var_names)
     for i in range(1, 4):
-        expected3['x.{0}'.format(i)] = x[i-1].ravel()
+        expected3["x.{0}".format(i)] = x[i - 1].ravel()
     expected3.index = expected3.index.swaplevel(0, 1)
     mi = pd.MultiIndex.from_product([entities, times])
     expected3 = expected3.loc[mi]

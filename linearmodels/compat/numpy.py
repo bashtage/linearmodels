@@ -2,7 +2,7 @@ from distutils.version import LooseVersion
 
 import numpy as np
 
-NP_LT_114 = LooseVersion(np.__version__) < LooseVersion('1.14')
+NP_LT_114 = LooseVersion(np.__version__) < LooseVersion("1.14")
 
 
 def lstsq(a, b, rcond=None):
@@ -14,4 +14,4 @@ def lstsq(a, b, rcond=None):
     return np.linalg.lstsq(a, b, rcond=rcond)
 
 
-__all__ = ['lstsq']
+__all__ = ["lstsq"]

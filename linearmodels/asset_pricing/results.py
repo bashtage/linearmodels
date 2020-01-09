@@ -5,9 +5,9 @@ from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
 
-from property_cached import cached_property
 import numpy as np
 import pandas as pd
+from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
@@ -23,6 +23,7 @@ class LinearFactorModelResults(_SummaryStr):
     results : dict[str, any]
         A dictionary of results from the model estimation.
     """
+
     def __init__(self, results):
         self._jstat = results.jstat
         self._params = results.params
@@ -40,7 +41,7 @@ class LinearFactorModelResults(_SummaryStr):
         self.model = results.model
         self._nobs = results.nobs
         self._datetime = dt.datetime.now()
-        self._cols = ['alpha'] + ['{0}'.format(f) for f in self._factor_names]
+        self._cols = ["alpha"] + ["{0}".format(f) for f in self._factor_names]
         self._rp_names = results.rp_names
         self._alpha_vcv = results.alpha_vcv
         self._cov_est = results.cov_est
@@ -53,27 +54,31 @@ class LinearFactorModelResults(_SummaryStr):
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
 
-        title = self.name + ' Estimation Summary'
+        title = self.name + " Estimation Summary"
 
-        top_left = [('No. Test Portfolios:', len(self._portfolio_names)),
-                    ('No. Factors:', len(self._factor_names)),
-                    ('No. Observations:', self.nobs),
-                    ('Date:', self._datetime.strftime('%a, %b %d %Y')),
-                    ('Time:', self._datetime.strftime('%H:%M:%S')),
-                    ('Cov. Estimator:', self._cov_type),
-                    ('', '')]
+        top_left = [
+            ("No. Test Portfolios:", len(self._portfolio_names)),
+            ("No. Factors:", len(self._factor_names)),
+            ("No. Observations:", self.nobs),
+            ("Date:", self._datetime.strftime("%a, %b %d %Y")),
+            ("Time:", self._datetime.strftime("%H:%M:%S")),
+            ("Cov. Estimator:", self._cov_type),
+            ("", ""),
+        ]
 
         j_stat = _str(self.j_statistic.stat)
         j_pval = pval_format(self.j_statistic.pval)
         j_dist = self.j_statistic.dist_name
 
-        top_right = [('R-squared:', _str(self.rsquared)),
-                     ('J-statistic:', j_stat),
-                     ('P-value', j_pval),
-                     ('Distribution:', j_dist),
-                     ('', ''),
-                     ('', ''),
-                     ('', '')]
+        top_right = [
+            ("R-squared:", _str(self.rsquared)),
+            ("J-statistic:", j_stat),
+            ("P-value", j_pval),
+            ("Distribution:", j_dist),
+            ("", ""),
+            ("", ""),
+            ("", ""),
+        ]
 
         stubs = []
         vals = []
@@ -87,9 +92,9 @@ class LinearFactorModelResults(_SummaryStr):
         # Top Table
         # Parameter table
         fmt = fmt_2cols
-        fmt['data_fmts'][1] = '%18s'
+        fmt["data_fmts"][1] = "%18s"
 
-        top_right = [('%-21s' % ('  ' + k), v) for k, v in top_right]
+        top_right = [("%-21s" % ("  " + k), v) for k, v in top_right]
         stubs = []
         vals = []
         for stub, val in top_right:
@@ -103,11 +108,7 @@ class LinearFactorModelResults(_SummaryStr):
         tstats = np.asarray(self.risk_premia / self.risk_premia_se)
         pvalues = 2 - 2 * stats.norm.cdf(np.abs(tstats))
         ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
-        param_data = np.c_[rp,
-                           se,
-                           tstats[:, None],
-                           pvalues[:, None],
-                           ci]
+        param_data = np.c_[rp, se, tstats[:, None], pvalues[:, None], ci]
         data = []
         for row in param_data:
             txt_row = []
@@ -117,24 +118,26 @@ class LinearFactorModelResults(_SummaryStr):
                     f = pval_format
                 txt_row.append(f(v))
             data.append(txt_row)
-        title = 'Risk Premia Estimates'
+        title = "Risk Premia Estimates"
         table_stubs = list(self.risk_premia.index)
-        header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
-        table = SimpleTable(data,
-                            stubs=table_stubs,
-                            txt_fmt=fmt_params,
-                            headers=header,
-                            title=title)
+        header = ["Parameter", "Std. Err.", "T-stat", "P-value", "Lower CI", "Upper CI"]
+        table = SimpleTable(
+            data, stubs=table_stubs, txt_fmt=fmt_params, headers=header, title=title
+        )
         smry.tables.append(table)
-        smry.add_extra_txt(['Covariance estimator:',
-                            str(self._cov_est),
-                            'See full_summary for complete results'])
+        smry.add_extra_txt(
+            [
+                "Covariance estimator:",
+                str(self._cov_est),
+                "See full_summary for complete results",
+            ]
+        )
 
         return smry
 
     @staticmethod
     def _single_table(params, se, name, param_names, first=False):
-        tstats = (params / se)
+        tstats = params / se
         pvalues = 2 - 2 * stats.norm.cdf(tstats)
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[params, se, tstats, pvalues, ci]
@@ -148,14 +151,22 @@ class LinearFactorModelResults(_SummaryStr):
                     f = pval_format
                 txt_row.append(f(v))
             data.append(txt_row)
-        title = '{0} Coefficients'.format(name)
+        title = "{0} Coefficients".format(name)
         table_stubs = param_names
         if first:
-            header = ['Parameter', 'Std. Err.', 'T-stat', 'P-value', 'Lower CI', 'Upper CI']
+            header = [
+                "Parameter",
+                "Std. Err.",
+                "T-stat",
+                "P-value",
+                "Lower CI",
+                "Upper CI",
+            ]
         else:
             header = None
-        table = SimpleTable(data, stubs=table_stubs, txt_fmt=fmt_params, headers=header,
-                            title=title)
+        table = SimpleTable(
+            data, stubs=table_stubs, txt_fmt=fmt_params, headers=header, title=title
+        )
 
         return table
 
@@ -168,10 +179,16 @@ class LinearFactorModelResults(_SummaryStr):
         param_names = list(params.columns)
         first = True
         for row in params.index:
-            smry.tables.append(SimpleTable(['']))
-            smry.tables.append(self._single_table(np.asarray(params.loc[row])[:, None],
-                                                  np.asarray(se.loc[row])[:, None],
-                                                  row, param_names, first))
+            smry.tables.append(SimpleTable([""]))
+            smry.tables.append(
+                self._single_table(
+                    np.asarray(params.loc[row])[:, None],
+                    np.asarray(se.loc[row])[:, None],
+                    row,
+                    param_names,
+                    first,
+                )
+            )
             first = False
 
         return smry
@@ -199,7 +216,9 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def params(self):
         """Estimated parameters"""
-        return pd.DataFrame(self._params, columns=self._cols, index=self._portfolio_names)
+        return pd.DataFrame(
+            self._params, columns=self._cols, index=self._portfolio_names
+        )
 
     @property
     def std_errors(self):
@@ -224,7 +243,9 @@ class LinearFactorModelResults(_SummaryStr):
     @property
     def cov(self):
         """Estimated covariance of parameters"""
-        return pd.DataFrame(self._cov, columns=self._param_names, index=self._param_names)
+        return pd.DataFrame(
+            self._cov, columns=self._param_names, index=self._param_names
+        )
 
     @property
     def j_statistic(self):
@@ -233,7 +254,7 @@ class LinearFactorModelResults(_SummaryStr):
 
         Returns
         -------
-        j : WaldTestStatistic
+        WaldTestStatistic
             Test statistic for null that model prices test portfolios
 
         Notes

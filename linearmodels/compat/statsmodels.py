@@ -8,10 +8,10 @@ class Summary(summary.Summary):
 
         Returns
         -------
-        html : string
+        str
             concatenated summary tables in HTML format
         """
-        html = summary.summary_return(self.tables, return_fmt='html')
+        html = summary.summary_return(self.tables, return_fmt="html")
         if self.extra_txt is not None:
-            html = html + '<br/><br/>' + self.extra_txt.replace('\n', '<br/>')
+            html = html + "<br/><br/>" + self.extra_txt.replace("\n", "<br/>")
         return html

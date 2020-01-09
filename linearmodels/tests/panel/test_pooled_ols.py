@@ -13,12 +13,14 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                assert_results_equal, datatypes,
                                                generate_data)
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 missing = [0.0, 0.20]
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))
-ids = list(map(lambda s: '-'.join(map(str, s)), perms))
+ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -36,10 +38,10 @@ def test_pooled_ols(data):
     y.index = np.arange(len(y))
     x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None).fit(cov_type='unadjusted')
+    res2 = IV2SLS(y, x, None, None).fit(cov_type="unadjusted")
     assert_results_equal(res, res2)
 
-    res3 = mod.fit(cov_type='homoskedastic', debiased=False)
+    res3 = mod.fit(cov_type="homoskedastic", debiased=False)
     assert_results_equal(res, res3)
 
 
@@ -53,14 +55,14 @@ def test_pooled_ols_weighted(data):
     y.index = np.arange(len(y))
     w.index = x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type='unadjusted')
+    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type="unadjusted")
     assert_results_equal(res, res2)
 
 
 def test_diff_data_size(data):
     if isinstance(data.x, pd.DataFrame):
         entities = data.x.index.levels[0]
-        x = data.x.loc[pd.IndexSlice[entities[0]:entities[-2]]]
+        x = data.x.loc[pd.IndexSlice[entities[0] : entities[-2]]]
         y = data.y
     elif isinstance(data.x, np.ndarray):
         x = data.x
@@ -115,62 +117,63 @@ def test_alt_rsquared_weighted(data):
 
 def test_cov_equiv(data):
     mod = PooledOLS(data.y, data.x)
-    res = mod.fit(cov_type='robust', debiased=False)
+    res = mod.fit(cov_type="robust", debiased=False)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
-    res2 = IV2SLS(y, x, None, None).fit(cov_type='robust')
+    res2 = IV2SLS(y, x, None, None).fit(cov_type="robust")
     assert_results_equal(res, res2)
 
-    res3 = mod.fit(cov_type='heteroskedastic', debiased=False)
+    res3 = mod.fit(cov_type="heteroskedastic", debiased=False)
     assert_results_equal(res, res3)
 
 
 def test_cov_equiv_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
-    res = mod.fit(cov_type='robust', debiased=False)
+    res = mod.fit(cov_type="robust", debiased=False)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     w = mod.weights.dataframe.copy()
     y.index = np.arange(len(y))
     w.index = x.index = y.index
 
-    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type='robust')
+    res2 = IV2SLS(y, x, None, None, weights=w).fit(cov_type="robust")
     assert_results_equal(res, res2)
 
-    res3 = mod.fit(cov_type='heteroskedastic', debiased=False)
+    res3 = mod.fit(cov_type="heteroskedastic", debiased=False)
     assert_results_equal(res, res3)
 
 
 def test_cov_equiv_cluster(data):
     mod = PooledOLS(data.y, data.x)
-    res = mod.fit(cov_type='clustered', cluster_entity=True, debiased=False)
+    res = mod.fit(cov_type="clustered", cluster_entity=True, debiased=False)
     y = PanelData(data.y)
     clusters = pd.DataFrame(y.entity_ids, index=y.index)
-    res2 = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
+    res2 = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
     assert_results_equal(res, res2)
 
-    res = mod.fit(cov_type='clustered', cluster_time=True, debiased=False)
+    res = mod.fit(cov_type="clustered", cluster_time=True, debiased=False)
     clusters = pd.DataFrame(y.time_ids, index=y.index)
-    res2 = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
+    res2 = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
     assert_results_equal(res, res2)
 
-    res = mod.fit(cov_type='clustered', clusters=data.vc1, debiased=False)
+    res = mod.fit(cov_type="clustered", clusters=data.vc1, debiased=False)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
     y.index = np.arange(len(y))
     x.index = y.index
     clusters = mod.reformat_clusters(data.vc1)
     ols_mod = IV2SLS(y, x, None, None)
-    res2 = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe,
-                       debiased=False)
+    res2 = ols_mod.fit(
+        cov_type="clustered", clusters=clusters.dataframe, debiased=False
+    )
     assert_results_equal(res, res2)
 
 
 def test_cov_equiv_cluster_weighted(data):
     mod = PooledOLS(data.y, data.x, weights=data.w)
-    res = mod.fit(cov_type='clustered', clusters=data.vc1, debiased=False)
+    res = mod.fit(cov_type="clustered", clusters=data.vc1, debiased=False)
 
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
@@ -179,7 +182,7 @@ def test_cov_equiv_cluster_weighted(data):
     w.index = x.index = y.index
     clusters = mod.reformat_clusters(data.vc1)
     ols_mod = IV2SLS(y, x, None, None, weights=w)
-    res2 = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe)
+    res2 = ols_mod.fit(cov_type="clustered", clusters=clusters.dataframe)
     assert_results_equal(res, res2)
 
 
@@ -190,9 +193,9 @@ def test_two_way_clustering(data):
     entity_clusters = pd.DataFrame(y.entity_ids, index=y.index)
     vc1 = PanelData(data.vc1)
     clusters = vc1.copy()
-    clusters.dataframe['var.cluster.entity'] = entity_clusters
+    clusters.dataframe["var.cluster.entity"] = entity_clusters
     clusters._frame = clusters._frame.astype(np.int64)
-    res = mod.fit(cov_type='clustered', clusters=clusters, debiased=False)
+    res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
 
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()
@@ -201,7 +204,7 @@ def test_two_way_clustering(data):
     clusters = mod.reformat_clusters(clusters)
 
     ols_mod = IV2SLS(y, x, None, None)
-    ols_res = ols_mod.fit(cov_type='clustered', clusters=clusters.dataframe)
+    ols_res = ols_mod.fit(cov_type="clustered", clusters=clusters.dataframe)
     assert_results_equal(res, ols_res)
 
 
@@ -209,16 +212,16 @@ def test_fitted_effects_residuals(data):
     mod = PooledOLS(data.y, data.x)
     res = mod.fit()
     expected = pd.DataFrame(res.resids.copy())
-    expected.columns = ['idiosyncratic']
+    expected.columns = ["idiosyncratic"]
     assert_allclose(res.idiosyncratic, expected)
     assert_frame_similar(res.idiosyncratic, expected)
 
     expected = mod.dependent.values2d - res.resids.values[:, None]
-    expected = pd.DataFrame(expected, index=res.resids.index, columns=['fitted_values'])
+    expected = pd.DataFrame(expected, index=res.resids.index, columns=["fitted_values"])
     assert_allclose(res.fitted_values, expected)
     assert_frame_similar(res.fitted_values, expected)
 
     expected.iloc[:, 0] = np.nan
-    expected.columns = ['estimated_effects']
+    expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)

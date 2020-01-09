@@ -34,4 +34,5 @@ y84educ
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'fertility.csv.bz2')
+
+    return datasets.load(__file__, "fertility.csv.bz2")

@@ -38,4 +38,5 @@ lhrsemp                 lhrsemp - lhrsemp[t-1]
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'jobtraining.csv.bz2')
+
+    return datasets.load(__file__, "jobtraining.csv.bz2")

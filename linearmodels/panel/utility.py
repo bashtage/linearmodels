@@ -46,7 +46,7 @@ def preconditioner(d, *, copy=False):
     """
     Parameters
     ----------
-    d : array-like
+    d : array_like
         Array to precondition
     copy : bool
         Flag indicating whether the operation should be in-place, if possible.
@@ -54,12 +54,12 @@ def preconditioner(d, *, copy=False):
 
     Returns
     -------
-        d : array-like
-            Array with same type as input array. If copy is False, and d is
-            an ndarray or a csc_matrix, then the operation is inplace
-        cond : ndarray
-            Array of conditioning numbers defined as the square root of the column
-            2-norms (nvar,)
+    d : array_like
+        Array with same type as input array. If copy is False, and d is
+        an ndarray or a csc_matrix, then the operation is inplace
+    cond : ndarray
+        Array of conditioning numbers defined as the square root of the column
+        2-norms (nvar,)
     """
     # Dense path
     if not sp.issparse(d):
@@ -92,7 +92,9 @@ def preconditioner(d, *, copy=False):
     return d, cond
 
 
-def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, precondition=True):
+def dummy_matrix(
+    cats, *, format="csc", drop="first", drop_all=False, precondition=True
+):
     """
     Parameters
     ----------
@@ -119,7 +121,7 @@ def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, preconditi
 
     Returns
     -------
-    dummies : array-like
+    dummies : array_like
         Array, either sparse or dense, of size nobs x ncats containing the
         dummy variable values
     cond : ndarray
@@ -137,37 +139,43 @@ def dummy_matrix(cats, *, format='csc', drop='first', drop_all=False, preconditi
         rows = np.arange(nobs)
         ucats, inverse = np.unique(codes[:, i], return_inverse=True)
         ncategories = len(ucats)
-        bits = min([i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories + total_dummies)])
-        replacements = np.arange(ncategories, dtype='int{:d}'.format(bits))
+        bits = min(
+            [i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories + total_dummies)]
+        )
+        replacements = np.arange(ncategories, dtype="int{:d}".format(bits))
         cols = replacements[inverse]
         if i == 0 and not drop_all:
             retain = np.arange(nobs)
-        elif drop == 'first':
+        elif drop == "first":
             # remove first
             retain = cols != 0
         else:  # drop == 'last'
             # remove last
             retain = cols != (ncategories - 1)
         rows = rows[retain]
-        col_adj = -1 if (drop == 'first' and i > 0) else 0
+        col_adj = -1 if (drop == "first" and i > 0) else 0
         cols = cols[retain] + total_dummies + col_adj
         values = np.ones(rows.shape)
-        data['values'].append(values)
-        data['rows'].append(rows)
-        data['cols'].append(cols)
+        data["values"].append(values)
+        data["rows"].append(rows)
+        data["cols"].append(cols)
         total_dummies += ncategories - (i > 0)
 
-    if format in ('csc', 'array'):
+    if format in ("csc", "array"):
         fmt = sp.csc_matrix
-    elif format == 'csr':
+    elif format == "csr":
         fmt = sp.csr_matrix
-    elif format == 'coo':
+    elif format == "coo":
         fmt = sp.coo_matrix
     else:
-        raise ValueError('Unknown format: {0}'.format(format))
-    out = fmt((np.concatenate(data['values']),
-               (np.concatenate(data['rows']), np.concatenate(data['cols']))))
-    if format == 'array':
+        raise ValueError("Unknown format: {0}".format(format))
+    out = fmt(
+        (
+            np.concatenate(data["values"]),
+            (np.concatenate(data["rows"]), np.concatenate(data["cols"])),
+        )
+    )
+    if format == "array":
         out = out.toarray()
 
     if precondition:
@@ -310,10 +318,12 @@ def in_2core_graph(cats):
 
     def min_dtype(*args):
         bits = max([np.log2(max(arg.max(), 1)) for arg in args])
-        return 'int{0}'.format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
+        return "int{0}".format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
 
     dtype = min_dtype(offset, node_id, count, orig_dest)
-    meta = np.column_stack([node_id.astype(dtype), count.astype(dtype), offset.astype(dtype)])
+    meta = np.column_stack(
+        [node_id.astype(dtype), count.astype(dtype), offset.astype(dtype)]
+    )
     orig_dest = orig_dest.astype(dtype)
 
     singletons = np.any(meta[:, 1] == 1)
@@ -388,8 +398,8 @@ def check_absorbed(x: np.ndarray, variables: List[str]):
         rows = []
         for i in range(nabsorbed):
             vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
-            rows.append(' ' * 10 + ', '.join((variables[vi] for vi in vars_idx)))
-        absorbed_variables = '\n'.join(rows)
+            rows.append(" " * 10 + ", ".join((variables[vi] for vi in vars_idx)))
+        absorbed_variables = "\n".join(rows)
         msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
         raise AbsorbingEffectError(msg)
 

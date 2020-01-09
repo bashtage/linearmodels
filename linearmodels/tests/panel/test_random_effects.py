@@ -10,12 +10,14 @@ from linearmodels.tests.panel._utility import (access_attributes,
                                                assert_frame_similar, datatypes,
                                                generate_data)
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 missing = [0.0, 0.20]
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))
-ids = list(map(lambda s: '-'.join(map(str, s)), perms))
+ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -30,17 +32,17 @@ def test_random_effects_small_sample(data):
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
-        assert (ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects)
+        assert ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects
     else:
-        assert (ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects)
+        assert ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects
 
     mod = RandomEffects(data.y, data.x, weights=data.w)
     no_ss = mod.fit()
     ss = mod.fit(small_sample=True)
     if y.dataframe.shape[0] == mod.dependent.dataframe.shape[0]:
-        assert (ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects)
+        assert ss.variance_decomposition.Effects == no_ss.variance_decomposition.Effects
     else:
-        assert (ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects)
+        assert ss.variance_decomposition.Effects != no_ss.variance_decomposition.Effects
 
 
 def test_results_access(data):
@@ -54,17 +56,17 @@ def test_fitted_effects_residuals(data):
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
-    expected = pd.DataFrame(expected, index=mod.exog.index, columns=['fitted_values'])
+    expected = pd.DataFrame(expected, index=mod.exog.index, columns=["fitted_values"])
     assert_allclose(res.fitted_values, expected)
     assert_frame_similar(res.fitted_values, expected)
 
     expected.iloc[:, 0] = res.resids
-    expected.columns = ['idiosyncratic']
+    expected.columns = ["idiosyncratic"]
     assert_allclose(res.idiosyncratic, expected)
     assert_frame_similar(res.idiosyncratic, expected)
 
     fitted_error = res.fitted_values + res.idiosyncratic.values
     expected.iloc[:, 0] = mod.dependent.values2d - fitted_error
-    expected.columns = ['estimated_effects']
+    expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)

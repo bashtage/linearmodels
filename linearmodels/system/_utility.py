@@ -14,7 +14,7 @@ def blocked_column_product(x, s):
 
     Returns
     -------
-    bp : ndarray
+    ndarray
         Blocked product.  k x nobs rows and the number of columns is the same
         the number of columns as any member of x.
     """
@@ -39,7 +39,7 @@ def blocked_diag_product(x, s):
 
     Returns
     -------
-    bp : ndarray
+    ndarray
         Blocked product.  k x nobs rows and the number of columns is the same
         as the total number of columns in x.
     """
@@ -67,7 +67,7 @@ def blocked_inner_prod(x, s):
 
     Returns
     -------
-    ip : ndarray
+    ndarray
         Weighted inner product constructed from x and s
 
     Notes
@@ -135,7 +135,7 @@ def blocked_cross_prod(x, z, s):
 
     Returns
     -------
-    xp : ndarray
+    ndarray
         Weighted cross product constructed from x and s
 
     Notes
@@ -182,8 +182,8 @@ def blocked_full_inner_product(x, s):
     for i in range(k):
         v = s[i, 0] * x[0:t]
         for j in range(1, k):
-            v += s[i, j] * x[j * t:(j + 1) * t]
-        sx[i * t:(i + 1) * t] = v
+            v += s[i, j] * x[j * t : (j + 1) * t]
+        sx[i * t : (i + 1) * t] = v
     return x.T @ sx
 
 
@@ -220,20 +220,20 @@ class LinearConstraint(object):
 
     def __init__(self, r, q=None, num_params=None, require_pandas=True):
         if not isinstance(r, (pd.DataFrame, np.ndarray)):
-            raise TypeError('r must be an array or DataFrame')
+            raise TypeError("r must be an array or DataFrame")
         elif require_pandas and not isinstance(r, pd.DataFrame):
-            raise TypeError('r must be a DataFrame')
+            raise TypeError("r must be a DataFrame")
         if r.ndim != 2:
-            raise ValueError('r must be 2-dimensional')
+            raise ValueError("r must be 2-dimensional")
         r_pd = pd.DataFrame(r)
         ra = np.asarray(r, dtype=np.float64)
         self._r_pd = r_pd
         self._ra = ra
         if q is not None:
             if require_pandas and not isinstance(q, pd.Series):
-                raise TypeError('q must be a Series')
+                raise TypeError("q must be a Series")
             elif not isinstance(q, (pd.Series, np.ndarray)):
-                raise TypeError('q must be a Series')
+                raise TypeError("q must be a Series")
             q_pd = pd.Series(q, index=r_pd.index)
         else:
             q_pd = pd.Series(np.zeros(r_pd.shape[0]), index=r_pd.index)
@@ -244,26 +244,27 @@ class LinearConstraint(object):
         self._verify_constraints()
 
     def __repr__(self):
-        return self.__str__() + '\nid: ' + str(hex(id(self)))
+        return self.__str__() + "\nid: " + str(hex(id(self)))
 
     def __str__(self):
-        return 'Linear Constraint with {0} constraints'.format(self._ra.shape[0])
+        return "Linear Constraint with {0} constraints".format(self._ra.shape[0])
 
     def _verify_constraints(self):
         r = self._ra
         q = self._qa
         if r.shape[0] != q.shape[0]:
-            raise ValueError('Constraint inputs are not shape compatible')
+            raise ValueError("Constraint inputs are not shape compatible")
         if self._num_params is not None:
             if r.shape[1] != self._num_params:
-                raise ValueError('r is incompatible with the number of model '
-                                 'parameters')
+                raise ValueError(
+                    "r is incompatible with the number of model " "parameters"
+                )
         rq = np.c_[r, q[:, None]]
         if not np.all(np.isfinite(rq)) or matrix_rank(rq) < rq.shape[0]:
-            raise ValueError('Constraints must be non-redundant')
+            raise ValueError("Constraints must be non-redundant")
         qr = np.linalg.qr(rq)
         if matrix_rank(qr[1][:, :-1]) != matrix_rank(qr[1]):
-            raise ValueError('One or more constraints are infeasible')
+            raise ValueError("One or more constraints are infeasible")
 
     def _compute_transform(self):
         r = self._ra
@@ -274,7 +275,7 @@ class LinearConstraint(object):
         vecs = np.real(vecs)
         idx = np.argsort(vals)[::-1]
         vecs = vecs[:, idx]
-        t, left = vecs[:, :k - c], vecs[:, k - c:]
+        t, left = vecs[:, : k - c], vecs[:, k - c :]
         q = self._qa[:, None]
         a = q.T @ inv(left.T @ r.T) @ left.T
         self._t, self._l, self._a = t, left, a
@@ -291,7 +292,7 @@ class LinearConstraint(object):
 
         Returns
         -------
-        t : ndarray
+        ndarray
             Constraint transformation matrix
 
         Notes
@@ -309,7 +310,7 @@ class LinearConstraint(object):
 
         Returns
         -------
-        a : ndarray
+        ndarray
             Transformed target
 
         Notes

@@ -24,13 +24,13 @@ seed(12345)
 k, p, n = 5, 2, 600
 r = np.empty((k + p + 1, k + p + 1))
 r[:, :] = 0.5
-r[p:k + p, -1] = r[-1, p:k + 1 + p] = 0
+r[p : k + p, -1] = r[-1, p : k + 1 + p] = 0
 r[-1, -1] = 0.5
 r += 0.5 * np.eye(k + p + 1)
 
 w = multivariate_normal(np.zeros(k + p + 1), r, n)
 x = w[:, :k]
-z = w[:, k:k + p]
+z = w[:, k : k + p]
 e = w[:, -1]
 x = add_constant(x)
 beta = np.arange(k + 1) / k
@@ -52,7 +52,7 @@ r = 0.5 * np.ones((cluster_size, cluster_size))
 r += 0.5 * np.eye(cluster_size)
 rsqrt = np.linalg.cholesky(r)
 for i in range(0, len(r), 5):
-    e[i:i + 5] = (rsqrt @ e[i:i + 5][:, None]).squeeze()
+    e[i : i + 5] = (rsqrt @ e[i : i + 5][:, None]).squeeze()
 e_cluster = e
 clusters = np.tile(np.arange(n // 5)[None, :], (5, 1)).T.ravel()
 
@@ -70,10 +70,43 @@ weights = np.random.chisquare(10, size=y_kernel.shape) / 10
 weights = weights / weights.mean()
 
 time = np.arange(n)
-data = np.c_[time, y_unadjusted, y_robust, y_clustered, y_kernel, x, z, e_homo, e_hetero,
-             e_cluster, e_autoc, clusters, weights]
-data = pd.DataFrame(data, columns=['time', 'y_unadjusted', 'y_robust', 'y_clustered',
-                                   'y_kernel', '_cons', 'x1', 'x2', 'x3',
-                                   'x4', 'x5', 'z1', 'z2', 'e_homo', 'e_hetero', 'e_cluster',
-                                   'e_autoc', 'cluster_id', 'weights'])
-data.to_stata('simulated-data.dta')
+data = np.c_[
+    time,
+    y_unadjusted,
+    y_robust,
+    y_clustered,
+    y_kernel,
+    x,
+    z,
+    e_homo,
+    e_hetero,
+    e_cluster,
+    e_autoc,
+    clusters,
+    weights,
+]
+data = pd.DataFrame(
+    data,
+    columns=[
+        "time",
+        "y_unadjusted",
+        "y_robust",
+        "y_clustered",
+        "y_kernel",
+        "_cons",
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "z1",
+        "z2",
+        "e_homo",
+        "e_hetero",
+        "e_cluster",
+        "e_autoc",
+        "cluster_id",
+        "weights",
+    ],
+)
+data.to_stata("simulated-data.dta")

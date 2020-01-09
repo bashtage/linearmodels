@@ -33,4 +33,5 @@ vgh               vg or good health
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'meps.csv.bz2')
+
+    return datasets.load(__file__, "meps.csv.bz2")

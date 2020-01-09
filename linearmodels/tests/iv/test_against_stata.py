@@ -10,46 +10,50 @@ from statsmodels.tools.tools import add_constant
 from linearmodels.iv import IV2SLS, IVGMM, IVLIML
 from linearmodels.tests.iv.results.read_stata_results import process_results
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 
-HOUSING_DATA = pd.read_csv(os.path.join(CWD, 'results', 'housing.csv'), index_col=0)
-HOUSING_DATA.region = HOUSING_DATA.region.astype('category')
-HOUSING_DATA.state = HOUSING_DATA.state.astype('category')
-HOUSING_DATA.division = HOUSING_DATA.division.astype('category')
+HOUSING_DATA = pd.read_csv(os.path.join(CWD, "results", "housing.csv"), index_col=0)
+HOUSING_DATA.region = HOUSING_DATA.region.astype("category")
+HOUSING_DATA.state = HOUSING_DATA.state.astype("category")
+HOUSING_DATA.division = HOUSING_DATA.division.astype("category")
 
-SIMULATED_DATA = pd.read_stata(os.path.join(CWD, 'results', 'simulated-data.dta'))
+SIMULATED_DATA = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
 
-filepath = os.path.join(CWD, 'results', 'stata-iv-housing-results.txt')
+filepath = os.path.join(CWD, "results", "stata-iv-housing-results.txt")
 HOUSING_RESULTS = process_results(filepath)
-filepath = os.path.join(CWD, 'results', 'stata-iv-simulated-results.txt')
+filepath = os.path.join(CWD, "results", "stata-iv-simulated-results.txt")
 SIMULATED_RESULTS = process_results(filepath)
 
-MODELS = {'2sls': IV2SLS, 'gmm': IVGMM, 'liml': IVLIML}
-COV_OPTIONS = {'cluster': {'cov_type': 'clustered', 'clusters': HOUSING_DATA.division},
-               'robust': {'cov_type': 'robust'},
-               'unadjusted': {'cov_type': 'unadjusted'},
-               'bartlett_12': {'cov_type': 'kernel', 'kernel': 'bartlett', 'bandwidth': 12}}
+MODELS = {"2sls": IV2SLS, "gmm": IVGMM, "liml": IVLIML}
+COV_OPTIONS = {
+    "cluster": {"cov_type": "clustered", "clusters": HOUSING_DATA.division},
+    "robust": {"cov_type": "robust"},
+    "unadjusted": {"cov_type": "unadjusted"},
+    "bartlett_12": {"cov_type": "kernel", "kernel": "bartlett", "bandwidth": 12},
+}
 
 
-@pytest.fixture(params=list(HOUSING_RESULTS.keys()), scope='module')
+@pytest.fixture(params=list(HOUSING_RESULTS.keys()), scope="module")
 def housing(request):
     result = HOUSING_RESULTS[request.param]
-    keys = request.param.split('-')
+    keys = request.param.split("-")
     mod = MODELS[keys[0]]
 
     data = HOUSING_DATA
     endog = data.rent
     exog = add_constant(data.pcturban)
     instd = data.hsngval
-    instr = data[['faminc', 'region']]
+    instr = data[["faminc", "region"]]
     cov_opts = deepcopy(COV_OPTIONS[keys[1]])
-    cov_opts['debiased'] = keys[2] == 'small'
-    if keys[0] == 'gmm':
+    cov_opts["debiased"] = keys[2] == "small"
+    if keys[0] == "gmm":
         weight_opts = deepcopy(COV_OPTIONS[keys[1]])
-        weight_opts['weight_type'] = weight_opts['cov_type']
-        del weight_opts['cov_type']
+        weight_opts["weight_type"] = weight_opts["cov_type"]
+        del weight_opts["cov_type"]
     else:
         weight_opts = {}
 
@@ -96,50 +100,59 @@ class TestHousingResults(object):
 
 
 SIMULATED_COV_OPTIONS = {
-    'vce(cluster cluster_id)': {'cov_type': 'clustered', 'clusters': SIMULATED_DATA.cluster_id},
-    'vce(robust)': {'cov_type': 'robust'},
-    'vce(unadjusted)': {'cov_type': 'unadjusted'},
-    'vce(hac bartlett 12)': {'cov_type': 'kernel', 'kernel': 'bartlett', 'bandwidth': 12}}
+    "vce(cluster cluster_id)": {
+        "cov_type": "clustered",
+        "clusters": SIMULATED_DATA.cluster_id,
+    },
+    "vce(robust)": {"cov_type": "robust"},
+    "vce(unadjusted)": {"cov_type": "unadjusted"},
+    "vce(hac bartlett 12)": {
+        "cov_type": "kernel",
+        "kernel": "bartlett",
+        "bandwidth": 12,
+    },
+}
 
 
 def construct_model(key):
-    model, nendog, nexog, ninstr, weighted, var, other = key.split('-')
-    var = var.replace('wmatrix', 'vce')
+    model, nendog, nexog, ninstr, weighted, var, other = key.split("-")
+    var = var.replace("wmatrix", "vce")
     mod = MODELS[model]
     data = SIMULATED_DATA
-    endog = data[['x1', 'x2']] if '2' in nendog else data.x1
-    exog = data[['x3', 'x4', 'x5']] if '3' in nexog else None
-    instr = data[['z1', 'z2']] if '2' in ninstr else data.z1
-    deps = {'vce(unadjusted)': data.y_unadjusted,
-            'vce(robust)': data.y_robust,
-            'vce(cluster cluster_id)': data.y_clustered,
-            'vce(hac bartlett 12)': data.y_kernel}
+    endog = data[["x1", "x2"]] if "2" in nendog else data.x1
+    exog = data[["x3", "x4", "x5"]] if "3" in nexog else None
+    instr = data[["z1", "z2"]] if "2" in ninstr else data.z1
+    deps = {
+        "vce(unadjusted)": data.y_unadjusted,
+        "vce(robust)": data.y_robust,
+        "vce(cluster cluster_id)": data.y_clustered,
+        "vce(hac bartlett 12)": data.y_kernel,
+    }
     dep = deps[var]
-    if 'noconstant' not in other:
+    if "noconstant" not in other:
         if exog is not None:
             exog = add_constant(exog)
         else:
             exog = add_constant(pd.DataFrame(np.empty((dep.shape[0], 0))))
 
     cov_opts = deepcopy(SIMULATED_COV_OPTIONS[var])
-    cov_opts['debiased'] = 'small' in other
+    cov_opts["debiased"] = "small" in other
     mod_options = {}
-    if 'True' in weighted:
-        mod_options['weights'] = data.weights
-    if model == 'gmm':
+    if "True" in weighted:
+        mod_options["weights"] = data.weights
+    if model == "gmm":
         mod_options.update(deepcopy(SIMULATED_COV_OPTIONS[var]))
-        mod_options['weight_type'] = mod_options['cov_type']
-        del mod_options['cov_type']
-        mod_options['center'] = 'center' in other
+        mod_options["weight_type"] = mod_options["cov_type"]
+        del mod_options["cov_type"]
+        mod_options["center"] = "center" in other
 
     model_result = mod(dep, exog, endog, instr, **mod_options).fit(**cov_opts)
-    if model == 'gmm' and 'True' in weighted:
-        pytest.skip('Weighted GMM differs slightly')
+    if model == "gmm" and "True" in weighted:
+        pytest.skip("Weighted GMM differs slightly")
     return model_result
 
 
-@pytest.fixture(params=list(SIMULATED_RESULTS.keys()),
-                scope='module')
+@pytest.fixture(params=list(SIMULATED_RESULTS.keys()), scope="module")
 def simulated(request):
     result = SIMULATED_RESULTS[request.param]
     model_result = construct_model(request.param)
@@ -170,7 +183,7 @@ class TestSimulatedResults(object):
     def test_fstat(self, simulated):
         res, stata = simulated
         if stata.f_statistic is None:
-            pytest.skip('Comparison result not available')
+            pytest.skip("Comparison result not available")
         assert_allclose(res.f_statistic.stat, stata.f_statistic)
 
     def test_params(self, simulated):
@@ -191,7 +204,9 @@ class TestSimulatedResults(object):
 
     def test_weight_mat(self, simulated):
         res, stata = simulated
-        if not hasattr(stata, 'weight_mat') or not isinstance(stata.weight_mat, pd.DataFrame):
+        if not hasattr(stata, "weight_mat") or not isinstance(
+            stata.weight_mat, pd.DataFrame
+        ):
             return
         stata_weight_mat = stata.weight_mat.reindex_like(res.weight_matrix)
         stata_weight_mat = stata_weight_mat[res.weight_matrix.columns]
@@ -199,12 +214,12 @@ class TestSimulatedResults(object):
 
     def test_j_stat(self, simulated):
         res, stata = simulated
-        if not hasattr(stata, 'J') or stata.J is None:
+        if not hasattr(stata, "J") or stata.J is None:
             return
         assert_allclose(res.j_stat.stat, stata.J, atol=1e-6, rtol=1e-4)
 
     def test_kappa(self, simulated):
         res, stata = simulated
-        if not hasattr(stata, 'kappa') or stata.kappa is None:
+        if not hasattr(stata, "kappa") or stata.kappa is None:
             return
         assert_allclose(res.kappa, stata.kappa, rtol=1e-4)

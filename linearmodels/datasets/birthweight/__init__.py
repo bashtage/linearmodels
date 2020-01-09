@@ -22,4 +22,5 @@ faminc                   log(faminc)
 
 def load():
     from linearmodels import datasets
-    return datasets.load(__file__, 'birthweight.csv.bz2')
+
+    return datasets.load(__file__, "birthweight.csv.bz2")

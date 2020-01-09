@@ -15,18 +15,22 @@ from linearmodels.tests.panel._utility import (access_attributes,
 from linearmodels.utility import (InferenceUnavailableWarning,
                                   MissingValueWarning)
 
-pytestmark = pytest.mark.filterwarnings('ignore::linearmodels.utility.MissingValueWarning')
+pytestmark = pytest.mark.filterwarnings(
+    "ignore::linearmodels.utility.MissingValueWarning"
+)
 
 missing = [0.0, 0.20]
 has_const = [True, False]
 perms = list(product(missing, datatypes, has_const))
-ids = list(map(lambda s: '-'.join(map(str, s)), perms))
+ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
 @pytest.fixture(params=perms, ids=ids)
 def data(request):
     missing, datatype, const = request.param
-    return generate_data(missing, datatype, const=const, other_effects=1, ntk=(25, 200, 5))
+    return generate_data(
+        missing, datatype, const=const, other_effects=1, ntk=(25, 200, 5)
+    )
 
 
 def test_fama_macbeth(data):
@@ -60,17 +64,17 @@ def test_fama_macbeth(data):
 
 def test_unknown_cov_type(data):
     with pytest.raises(ValueError):
-        FamaMacBeth(data.y, data.x).fit(cov_type='unknown')
+        FamaMacBeth(data.y, data.x).fit(cov_type="unknown")
 
 
 def test_fama_macbeth_kernel_smoke(data):
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel')
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='bartlett')
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='newey-west')
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='parzen')
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='qs')
-    FamaMacBeth(data.y, data.x).fit(cov_type='kernel', bandwidth=3)
-    res = FamaMacBeth(data.y, data.x).fit(cov_type='kernel', kernel='andrews')
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel")
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="bartlett")
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="newey-west")
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="parzen")
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="qs")
+    FamaMacBeth(data.y, data.x).fit(cov_type="kernel", bandwidth=3)
+    res = FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="andrews")
     access_attributes(res)
 
 
@@ -79,30 +83,32 @@ def test_fitted_effects_residuals(data):
     res = mod.fit()
 
     expected = mod.exog.values2d @ res.params.values
-    expected = pd.DataFrame(expected, index=mod.exog.index, columns=['fitted_values'])
+    expected = pd.DataFrame(expected, index=mod.exog.index, columns=["fitted_values"])
     assert_allclose(res.fitted_values, expected)
     assert_frame_similar(res.fitted_values, expected)
 
     expected.iloc[:, 0] = mod.dependent.values2d - expected.values
-    expected.columns = ['idiosyncratic']
+    expected.columns = ["idiosyncratic"]
     assert_allclose(res.idiosyncratic, expected)
     assert_frame_similar(res.idiosyncratic, expected)
 
     expected.iloc[:, 0] = np.nan
-    expected.columns = ['estimated_effects']
+    expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)
 
 
-@pytest.mark.filterwarnings('always::linearmodels.utility.MissingValueWarning')
+@pytest.mark.filterwarnings("always::linearmodels.utility.MissingValueWarning")
 def test_block_size_warnings():
     y = np.arange(12.0)[:, None]
     x = np.ones((12, 3))
     x[:, 1] = np.arange(12.0)
     x[:, 2] = np.arange(12.0) ** 2
-    idx = pd.MultiIndex.from_product([['a', 'b', 'c'], pd.date_range('2000-1-1', periods=4)])
-    y = pd.DataFrame(y, index=idx, columns=['y'])
-    x = pd.DataFrame(x, index=idx, columns=['x1', 'x2', 'x3'])
+    idx = pd.MultiIndex.from_product(
+        [["a", "b", "c"], pd.date_range("2000-1-1", periods=4)]
+    )
+    y = pd.DataFrame(y, index=idx, columns=["y"])
+    x = pd.DataFrame(x, index=idx, columns=["x1", "x2", "x3"])
     with pytest.warns(MissingValueWarning):
         FamaMacBeth(y.iloc[:11], x.iloc[:11])
     with pytest.warns(InferenceUnavailableWarning):
@@ -114,8 +120,10 @@ def test_block_size_error():
     x = np.ones((12, 2))
     x[1::4, 1] = 2
     x[2::4, 1] = 3
-    idx = pd.MultiIndex.from_product([['a', 'b', 'c'], pd.date_range('2000-1-1', periods=4)])
-    y = pd.DataFrame(y, index=idx, columns=['y'])
-    x = pd.DataFrame(x, index=idx, columns=['x1', 'x2'])
+    idx = pd.MultiIndex.from_product(
+        [["a", "b", "c"], pd.date_range("2000-1-1", periods=4)]
+    )
+    y = pd.DataFrame(y, index=idx, columns=["y"])
+    x = pd.DataFrame(x, index=idx, columns=["x1", "x2"])
     with pytest.raises(ValueError):
         FamaMacBeth(y, x)
