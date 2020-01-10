@@ -216,6 +216,8 @@ def test_absorbing_effect(data, intercept):
         mod = PanelOLS(data.y, x, entity_effects=True)
         mod.fit()
     var_names = mod.exog.vars
+    print([var_names[i] in str(exc_info.value) for i in range(len(var_names))])
+    print(str(exc_info.value))
     assert var_names[3] in str(exc_info.value)
     assert (" " * (2 - intercept) + var_names[-1]) in str(exc_info.value)
 
