@@ -24,6 +24,7 @@ class TestCovariance(object):
         cls.cluster4 = np.random.randint(0, 10, (cls.n * cls.t, 2))
         cls.cluster5 = np.random.randint(0, 10, (cls.n * cls.t, 3))
 
+    @pytest.mark.smoke
     def test_heteroskedastic_smoke(self):
         cov = HeteroskedasticCovariance(
             self.y, self.x, self.params, self.entity_ids, self.time_ids, extra_df=0
@@ -34,6 +35,7 @@ class TestCovariance(object):
         ).cov
         assert cov.shape == (self.k, self.k)
 
+    @pytest.mark.smoke
     def test_homoskedastic_smoke(self):
         cov = HomoskedasticCovariance(
             self.y, self.x, self.params, self.entity_ids, self.time_ids, extra_df=0
@@ -44,6 +46,7 @@ class TestCovariance(object):
         ).cov
         assert cov.shape == (self.k, self.k)
 
+    @pytest.mark.smoke
     def test_clustered_covariance_smoke(self):
         cov = ClusteredCovariance(
             self.y, self.x, self.params, self.entity_ids, self.time_ids, extra_df=0
@@ -141,6 +144,7 @@ class TestCovariance(object):
                 clusters=self.cluster4[::2],
             )
 
+    @pytest.mark.smoke
     def test_driscoll_kraay_smoke(self):
         cov = DriscollKraay(
             self.y, self.x, self.params, self.entity_ids, self.time_ids
@@ -155,6 +159,7 @@ class TestCovariance(object):
         ).cov
         assert cov.shape == (self.k, self.k)
 
+    @pytest.mark.smoke
     def test_ac_covariance_smoke(self):
         cov = ACCovariance(
             self.y, self.x, self.params, self.entity_ids, self.time_ids

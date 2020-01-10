@@ -309,6 +309,7 @@ class TestKernelCovariance(object):
 
 
 class TestAutomaticBandwidth(object):
+    @pytest.mark.smoke
     def test_smoke(self, data, kernel):
         # TODO: This should be improved from a smoke test
         u = data.e.copy()

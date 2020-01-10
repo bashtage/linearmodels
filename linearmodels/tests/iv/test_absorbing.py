@@ -238,6 +238,7 @@ def ols_data(request):
     return generate_data(*request.param)
 
 
+@pytest.mark.smoke
 def test_smoke(data):
     mod = AbsorbingLS(
         data.y,

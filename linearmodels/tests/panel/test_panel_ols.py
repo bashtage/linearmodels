@@ -1082,6 +1082,7 @@ def test_cov_equiv_cluster(data):
     assert_results_equal(res, res2)
 
 
+@pytest.mark.smoke
 def test_cluster_smoke(data):
     mod = PanelOLS(data.y, data.x, entity_effects=True)
     mod.fit(cov_type="clustered", cluster_time=True, debiased=False)
@@ -1180,6 +1181,7 @@ def test_entity_other(data):
     assert_results_equal(res, res2)
 
 
+@pytest.mark.smoke
 def test_other_weighted_smoke(data):
     mod = PanelOLS(data.y, data.x, weights=data.w, other_effects=data.c)
     mod.fit(debiased=False)

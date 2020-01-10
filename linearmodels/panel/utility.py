@@ -388,15 +388,18 @@ def check_absorbed(x: np.ndarray, variables: List[str]):
     variables : List[str]
         List of variable names
     """
-    if np.linalg.matrix_rank(x) < x.shape[1]:
+    rank = np.linalg.matrix_rank(x)
+    if rank < x.shape[1]:
         xpx = x.T @ x
         vals, vecs = np.linalg.eigh(xpx)
-        tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
-        absorbed = vals < tol
-        nabsorbed = absorbed.sum()
+        nabsorbed = x.shape[1] - rank
+        tol = np.sort(vals)[nabsorbed - 1]
+        absorbed = vals <= tol
         absorbed_vecs = vecs[:, absorbed]
         rows = []
         for i in range(nabsorbed):
+            abs_vec = np.abs(absorbed_vecs[:, i])
+            tol = abs_vec.max() * np.finfo(np.float64).eps * abs_vec.shape[0]
             vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
             rows.append(" " * 10 + ", ".join((variables[vi] for vi in vars_idx)))
         absorbed_variables = "\n".join(rows)

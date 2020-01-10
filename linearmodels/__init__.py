@@ -81,7 +81,7 @@ def test(extra_args=None, exit=True, append=True):
     except ImportError:
         raise ImportError("Need pytest to run tests")
 
-    cmd = ["--tb=short", "--disable-pytest-warnings"]
+    cmd = ["--tb=auto"]
     if extra_args:
         if not isinstance(extra_args, list):
             extra_args = [extra_args]

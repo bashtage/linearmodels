@@ -136,6 +136,7 @@ def kernel_options(request):
     }
 
 
+@pytest.mark.smoke
 def test_smoke(data):
     mod = SUR(data)
     mod.fit()
@@ -187,6 +188,7 @@ def test_errors():
         SUR(moddata)
 
 
+@pytest.mark.smoke
 def test_mv_reg_smoke(mvreg_data):
     dependent, exog = mvreg_data
     mod = SUR.multivariate_ls(dependent, exog)
@@ -618,6 +620,7 @@ def test_model_repr(data):
     assert "Seemingly Unrelated Regression (SUR)" in repr
 
 
+@pytest.mark.smoke
 def test_mv_ols_hac_smoke(kernel_options):
     data = generate_data(
         p=3,
