@@ -9,7 +9,7 @@ env:
   global:
     - PANDAS=pandas
     - COVERAGE=true
-    - SKIPSLOW=""
+    - SKIP=""
     - DOCTR_PUSH_TYPE=""
     - XARRAY=
     - OPENBLAS=0
@@ -56,7 +56,7 @@ matrix:
     - SCIPY=1.0
     - PANDAS=0.23
     - STATSMODELS=0.9
-    - SKIPSLOW="--skip-slow"
+    - SKIP="--skip-slow --skip-smoke"
   - python: 3.6
     env:
     - PYTHON=3.6
@@ -66,7 +66,7 @@ matrix:
     - XARRAY=0.10
     - STATSMODELS=0.10
     - PIP_PACKAGES="xxhash"
-    - SKIPSLOW="--skip-slow"
+    - SKIP="--skip-slow --skip-smoke"
   - python: 3.7
     env:
     - PYTHON=3.7
@@ -79,13 +79,13 @@ matrix:
   - python: 3.8
     env:
     - PIP_PRE=true
-    - SKIPSLOW=--skip-slow
+    - SKIP="--skip-slow --skip-smoke"
 
   allow_failures:
   - python: 3.8
     env:
     - PIP_PRE=true
-    - SKIPSLOW=--skip-slow
+    - SKIP="--skip-slow --skip-smoke"
 
 
 before_install:
@@ -129,7 +129,7 @@ script:
       mkdir empty && cd empty
       python -c "import linearmodels;linearmodels.test()"
     else
-      pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIPSLOW}
+      pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIP}
     fi
   - flake8 linearmodels
   - set -e

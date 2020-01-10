@@ -67,6 +67,7 @@ def test_unknown_cov_type(data):
         FamaMacBeth(data.y, data.x).fit(cov_type="unknown")
 
 
+@pytest.mark.smoke
 def test_fama_macbeth_kernel_smoke(data):
     FamaMacBeth(data.y, data.x).fit(cov_type="kernel")
     FamaMacBeth(data.y, data.x).fit(cov_type="kernel", kernel="bartlett")

@@ -22,36 +22,42 @@ def data(request):
     return generate_data(nportfolio=10, output=request.param)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type="robust", disp=5)
     get_all(res)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_smoke_iterate(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type="robust", disp=5, steps=20)
     get_all(res)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_smoke_risk_free(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors, risk_free=True)
     res = mod.fit(cov_type="robust", disp=10)
     get_all(res)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_kernel_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type="kernel", disp=10)
     get_all(res)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_kernel_bandwidth_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors)
     res = mod.fit(cov_type="kernel", bandwidth=10, disp=10)
     get_all(res)
 
 
+@pytest.mark.smoke
 def test_linear_model_gmm_cue_smoke(data):
     mod = LinearFactorModelGMM(data.portfolios, data.factors, risk_free=True)
     res = mod.fit(cov_type="robust", disp=10, use_cue=True)
@@ -112,6 +118,7 @@ def test_linear_model_time_series(data):
     assert_allclose(1.0 - stats.chi2.cdf(stat_direct, nport), res.j_statistic.pval)
 
 
+@pytest.mark.smoke
 def test_linear_model_time_series_kernel_smoke(data):
     mod = TradedFactorModel(data.portfolios, data.factors)
     mod.fit(cov_type="kernel")

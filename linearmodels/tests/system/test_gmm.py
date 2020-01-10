@@ -207,6 +207,7 @@ def test_weight_options(data):
     res = mod.fit(cov_type="robust")
 
 
+@pytest.mark.smoke
 def test_no_constant_smoke():
     eqns = generate_3sls_data_v2(k=3, const=False)
     mod = IVSystemGMM(eqns)

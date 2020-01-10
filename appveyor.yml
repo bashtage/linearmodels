@@ -1,0 +1,53 @@
+skip_tags: true
+clone_depth: 50
+
+matrix:
+    fast_finish: false
+
+environment:
+  global:
+    OMP_NUM_THREADS: 1
+    MKL_NUM_THREADS: 1
+    VML_NUM_THREADS: 1
+    PYTHONHASHSEED: 31211999
+
+  matrix:
+    - PYTHON: C:\Python38-x64
+      PYTHON_VERSION: 3.8
+      PYTHON_ARCH: 64
+
+    - PYTHON: C:\Python38
+      PYTHON_VERSION: 3.8
+      PYTHON_ARCH: 32
+
+
+# We always use a 64-bit machine, but can build x86 distributions
+# with the TARGET_ARCH variable.
+platform:
+    - x64
+
+install:
+    - git submodule update --init --recursive
+    - git fetch --all --tags
+
+    # Set path
+    - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+
+    # Check that we have the expected version and architecture for Python
+    - python --version
+    - python -m pip install --upgrade pip wheel
+
+build_script:
+    # Install build requirements
+    - pip install cython numpy scipy statsmodels pandas xarray property_cached mypy-extensions pytest pytest-xdist
+    - python setup.py bdist_wheel
+    - ls dist/*
+
+test_script:
+    # install from wheel
+    - pip install --no-index --find-links dist/ linearmodels
+
+    # run tests from install wheel
+    - mkdir _for_testing
+    - cd _for_testing
+    - python -c "import linearmodels; linearmodels.test(['-n 2','--skip-slow','--skip-smoke','--durations=25'])"

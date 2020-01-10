@@ -241,6 +241,7 @@ def test_2sls_just_identified(data):
     get_all(fs)
 
 
+@pytest.mark.smoke
 def test_durbin_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
@@ -248,6 +249,7 @@ def test_durbin_smoke(data):
     res.durbin([mod.endog.cols[1]])
 
 
+@pytest.mark.smoke
 def test_wu_hausman_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
@@ -255,6 +257,7 @@ def test_wu_hausman_smoke(data):
     res.wu_hausman([mod.endog.cols[1]])
 
 
+@pytest.mark.smoke
 def test_wooldridge_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
@@ -262,6 +265,7 @@ def test_wooldridge_smoke(data):
     res.wooldridge_score
 
 
+@pytest.mark.smoke
 def test_model_summary_smoke(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
     res.__repr__()
