@@ -62,7 +62,7 @@ class HomoskedasticCovariance(object):
         self._str_extra = AttrDict(Debiased=self._debiased, GLS=self._gls)
         self._cov_config = AttrDict(debiased=self._debiased)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = self._name
         extra = []
         for key in self._str_extra:
@@ -71,7 +71,7 @@ class HomoskedasticCovariance(object):
             out += " (" + ", ".join(extra) + ")"
         return out
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         out = self.__str__()
         return out + ", id: {0}".format(hex(id(self)))
 
@@ -399,11 +399,11 @@ class GMMHomoskedasticCovariance(object):
         self._name = "GMM Homoskedastic (Unadjusted) Covariance"
         self._cov_config = AttrDict(debiased=self._debiased)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = self._name
         return out
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         out = self.__str__()
         return out + ", id: {0}".format(hex(id(self)))
 

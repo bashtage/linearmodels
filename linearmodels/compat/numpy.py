@@ -1,11 +1,14 @@
 from distutils.version import LooseVersion
+from typing import Optional, Tuple
 
 import numpy as np
 
 NP_LT_114 = LooseVersion(np.__version__) < LooseVersion("1.14")
 
 
-def lstsq(a, b, rcond=None):
+def lstsq(
+    a: np.ndarray, b: np.ndarray, rcond: Optional[int] = None
+) -> Tuple[np.ndarray, np.ndarray, int, np.ndarray]:
     """
     Wrapper that allows rcond to be automatically set to avoid FutureWarning
     """

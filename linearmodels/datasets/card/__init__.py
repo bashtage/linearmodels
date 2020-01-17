@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 DESCR = """
 D. Card (1995), "Using Geographic Variation in College Proximity to Estimate
 the Return to Schooling," in Aspects of Labour Market Behavior:  Essays in
@@ -41,7 +43,7 @@ xpersq                   exper**2
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "card.csv.bz2")

@@ -1,9 +1,9 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import Any
+from typing import Any, Dict, Mapping, Optional, Union
 
-from numpy import asarray, unique
+from numpy import asarray, ndarray, unique
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -41,12 +41,12 @@ class HomoskedasticWeightMatrix(object):
     ``center`` has no effect on this estimator since it is always centered.
     """
 
-    def __init__(self, center=False, debiased=False):
+    def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
         self._bandwidth = 0
 
-    def weight_matrix(self, x, z, eps):
+    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
         """
         Parameters
         ----------
@@ -70,7 +70,7 @@ class HomoskedasticWeightMatrix(object):
         return w
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
         """
         Weight estimator configuration
 
@@ -106,10 +106,10 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     where :math:`z_i` contains both the exogenous regressors and instruments.
     """
 
-    def __init__(self, center=False, debiased=False):
+    def __init__(self, center: bool = False, debiased: bool = False) -> None:
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
-    def weight_matrix(self, x, z, eps):
+    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
         """
         Parameters
         ----------
@@ -180,12 +180,12 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     def __init__(
         self,
-        kernel="bartlett",
-        bandwidth=None,
-        center=False,
-        debiased=False,
-        optimal_bw=False,
-    ):
+        kernel: str = "bartlett",
+        bandwidth: Optional[int] = None,
+        center: bool = False,
+        debiased: bool = False,
+        optimal_bw: bool = False,
+    ) -> None:
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
         self._orig_bandwidth = bandwidth
@@ -193,7 +193,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._kernels = KERNEL_LOOKUP
         self._optimal_bw = optimal_bw
 
-    def weight_matrix(self, x, z, eps):
+    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
         """
         Parameters
         ----------
@@ -229,7 +229,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
         """
         Weight estimator configuration
 
@@ -246,7 +246,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         }
 
     @property
-    def bandwidth(self):
+    def bandwidth(self) -> float:
         """Actual bandwidth used in estimating the weight matrix"""
         return self._bandwidth
 
@@ -266,11 +266,13 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         Flag indicating whether to use small-sample adjustments
     """
 
-    def __init__(self, clusters, center=False, debiased=False):
+    def __init__(
+        self, clusters: ndarray, center: bool = False, debiased: bool = False
+    ) -> None:
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
-    def weight_matrix(self, x, z, eps):
+    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
         """
         Parameters
         ----------
@@ -310,7 +312,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
         """
         Weight estimator configuration
 
@@ -384,8 +386,16 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     # TODO: 2-way clustering
     def __init__(
-        self, x, y, z, params, w, cov_type="robust", debiased=False, **cov_config
-    ):
+        self,
+        x: ndarray,
+        y: ndarray,
+        z: ndarray,
+        params: ndarray,
+        w: ndarray,
+        cov_type: str = "robust",
+        debiased: bool = False,
+        **cov_config: Dict[str, Union[str, bool]]
+    ) -> None:
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type
         self._cov_config = cov_config
@@ -405,7 +415,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
             raise ValueError("Unknown cov_type")
         self._score_cov_estimator = score_cov_estimator
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = super(IVGMMCovariance, self).__str__()
         cov_type = self._cov_type
         if cov_type in ("robust", "heteroskedastic"):
@@ -427,7 +437,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def cov(self):
+    def cov(self) -> ndarray:
         x, z, eps, w = self.x, self.z, self.eps, self.w
         nobs = x.shape[0]
         xpz = x.T @ z / nobs
@@ -444,7 +454,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return (c + c.T) / 2
 
     @property
-    def config(self):
-        conf = {"debiased": self.debiased}
+    def config(self) -> Mapping[str, Union[str, bool]]:
+        conf: Dict[str, Union[str, bool]] = {"debiased": self.debiased}
         conf.update(self._cov_config)
         return conf

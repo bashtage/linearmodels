@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 DESCR = """
 J. Mullahy (1997), "Instrumental-Variable Estimation of Count Data Models:
 Applications to Models of Cigarette Smoking Behavior," Review of Economics
@@ -20,7 +22,7 @@ faminc                   log(faminc)
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "birthweight.csv.bz2")

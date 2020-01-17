@@ -85,7 +85,7 @@ def test(
     extra_args: Optional[Union[str, List[str]]] = None,
     exit: bool = True,
     append: bool = True,
-):
+) -> None:
     import sys
 
     try:

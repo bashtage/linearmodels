@@ -99,13 +99,13 @@ class HomoskedasticCovariance(object):
         return self._scale * float(eps.T @ eps) / self._nobs
 
     @cached_property
-    def cov(self):
+    def cov(self) -> np.ndarray:
         """Estimated covariance"""
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
 
-    def deferred_cov(self):
+    def deferred_cov(self) -> np.ndarray:
         """Covariance calculation deferred until executed"""
         return self.cov
 

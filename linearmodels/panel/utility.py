@@ -324,7 +324,7 @@ def in_2core_graph(cats: ArrayLike) -> np.ndarray:
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
 
-    def min_dtype(*args):
+    def min_dtype(*args: np.ndarray) -> str:
         bits = max([np.log2(max(arg.max(), 1)) for arg in args])
         return "int{0}".format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
 

@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 # noinspection SpellCheckingInspection,SpellCheckingInspection
 DESCR = """
 F. Vella (1993), "A Simple Estimator for Simultaneous Models with Censored
@@ -45,7 +47,7 @@ vserat                   (vacdays+sicklve)/annearn
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "fringe.csv.bz2")

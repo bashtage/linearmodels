@@ -102,10 +102,10 @@ class HeteroskedasticCovariance(object):
         else:
             self._square = inv_jacobian.shape[0] == inv_jacobian.shape[1]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
@@ -227,7 +227,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
-    def __str__(self):
+    def __str__(self) -> str:
         descr = ", Kernel: {0}, Bandwidth: {1}".format(self._kernel, self.bandwidth)
         return self.__class__.__name__ + descr
 

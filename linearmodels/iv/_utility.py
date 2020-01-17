@@ -85,7 +85,7 @@ class IVFormulaParser(object):
         self._components: Dict[str, str] = {}
         self._parse()
 
-    def _parse(self):
+    def _parse(self) -> None:
         blocks = self._formula.strip().split("~")
         if len(blocks) == 2:
             dep = blocks[0].strip()
@@ -134,7 +134,7 @@ class IVFormulaParser(object):
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value: int):
+    def eval_env(self, value: int) -> None:
         self._eval_env = value
 
     @property

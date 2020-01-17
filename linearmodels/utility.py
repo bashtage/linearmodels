@@ -412,6 +412,7 @@ class _SummaryStr(object):
     """
     Mixin class for results classes to automatically show the summary.
     """
+
     @property
     def summary(self) -> Summary:
         return Summary()

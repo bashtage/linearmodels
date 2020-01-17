@@ -1,9 +1,13 @@
+from typing import Optional, Sequence, Union
+
 import numpy as np
 from numpy.linalg import inv, matrix_rank
 import pandas as pd
 
+ArraySequence = Sequence[np.ndarray]
 
-def blocked_column_product(x, s):
+
+def blocked_column_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     """
     Parameters
     ----------
@@ -28,7 +32,7 @@ def blocked_column_product(x, s):
     return np.vstack(out)
 
 
-def blocked_diag_product(x, s):
+def blocked_diag_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     """
     Parameters
     ----------
@@ -56,7 +60,7 @@ def blocked_diag_product(x, s):
     return out
 
 
-def blocked_inner_prod(x, s):
+def blocked_inner_prod(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -89,8 +93,8 @@ def blocked_inner_prod(x, s):
     if homogeneous and not s_is_diag:
         # Fast path when all x have same number of columns
         # Slower than diag case when k is large since many 0s
-        x = np.hstack(x)
-        return x.T @ x * np.kron(s, np.ones((w0, w0)))
+        xa = np.hstack(x)
+        return xa.T @ xa * np.kron(s, np.ones((w0, w0)))
 
     cum_width = np.cumsum([0] + widths)
     total = sum(widths)
@@ -122,7 +126,7 @@ def blocked_inner_prod(x, s):
     return out
 
 
-def blocked_cross_prod(x, z, s):
+def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: np.ndarray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -159,7 +163,7 @@ def blocked_cross_prod(x, z, s):
     return np.concatenate(xp, 0)
 
 
-def blocked_full_inner_product(x, s):
+def blocked_full_inner_product(x: np.ndarray, s: np.ndarray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -187,7 +191,7 @@ def blocked_full_inner_product(x, s):
     return x.T @ sx
 
 
-def inv_matrix_sqrt(s):
+def inv_matrix_sqrt(s: np.ndarray) -> np.ndarray:
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
     out = vals @ np.diag(vecs) @ vals.T
@@ -218,7 +222,13 @@ class LinearConstraint(object):
         r \beta = q
     """
 
-    def __init__(self, r, q=None, num_params=None, require_pandas=True):
+    def __init__(
+        self,
+        r: Union[pd.DataFrame, np.ndarray],
+        q: Optional[Union[pd.Series, np.ndarray]] = None,
+        num_params: Optional[int] = None,
+        require_pandas: bool = True,
+    ) -> None:
         if not isinstance(r, (pd.DataFrame, np.ndarray)):
             raise TypeError("r must be an array or DataFrame")
         elif require_pandas and not isinstance(r, pd.DataFrame):
@@ -243,13 +253,13 @@ class LinearConstraint(object):
         self._num_params = num_params
         self._verify_constraints()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Linear Constraint with {0} constraints".format(self._ra.shape[0])
 
-    def _verify_constraints(self):
+    def _verify_constraints(self) -> None:
         r = self._ra
         q = self._qa
         if r.shape[0] != q.shape[0]:
@@ -266,7 +276,7 @@ class LinearConstraint(object):
         if matrix_rank(qr[1][:, :-1]) != matrix_rank(qr[1]):
             raise ValueError("One or more constraints are infeasible")
 
-    def _compute_transform(self):
+    def _compute_transform(self) -> None:
         r = self._ra
         c, k = r.shape
         m = np.eye(k) - r.T @ inv(r @ r.T) @ r
@@ -281,12 +291,12 @@ class LinearConstraint(object):
         self._t, self._l, self._a = t, left, a
 
     @property
-    def r(self):
+    def r(self) -> np.ndarray:
         """Constrain loading matrix"""
         return self._r_pd
 
     @property
-    def t(self):
+    def t(self) -> np.ndarray:
         """
         Constraint transformation matrix
 
@@ -304,7 +314,7 @@ class LinearConstraint(object):
         return self._t
 
     @property
-    def a(self):
+    def a(self) -> np.ndarray:
         r"""
         Transformed constraint target
 
@@ -334,6 +344,6 @@ class LinearConstraint(object):
         return self._a
 
     @property
-    def q(self):
+    def q(self) -> Union[pd.Series, np.ndarray]:
         """Constrain target values"""
         return self._q_pd

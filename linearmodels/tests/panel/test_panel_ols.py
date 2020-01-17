@@ -85,11 +85,11 @@ def singleton_data(request):
     )
 
 
-perms = list(product(missing, datatypes))
-ids = list(map(lambda s: "-".join(map(str, s)), perms))
+const_perms = list(product(missing, datatypes))
+const_ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
-@pytest.fixture(params=perms, ids=ids)
+@pytest.fixture(params=const_perms, ids=const_ids)
 def const_data(request):
     missing, datatype = request.param
     data = generate_data(missing, datatype, ntk=(91, 7, 1))
@@ -110,21 +110,21 @@ def time_eff(request):
     return request.param
 
 
-perms = [
+lsdv_perms = [
     p
     for p in product([True, False], [True, False], [True, False], [0, 1, 2])
     if sum(p[1:]) <= 2
 ]
-ids = []
-for p in perms:
+lsdv_ids = []
+for p in lsdv_perms:
     str_id = "weighted" if p[0] else "unweighted"
     str_id += "-entity_effects" if p[1] else ""
     str_id += "-time_effects" if p[2] else ""
     str_id += "-{0}_other_effects".format(p[3]) if p[3] else ""
-    ids.append(str_id)
+    lsdv_ids.append(str_id)
 
 
-@pytest.fixture(params=perms, ids=ids)
+@pytest.fixture(params=lsdv_perms, ids=lsdv_ids)
 def lsdv_config(request):
     weights, entity_effects, time_effects, other_effects = request.param
     return AttrDict(

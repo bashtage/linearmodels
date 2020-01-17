@@ -1,5 +1,6 @@
 from io import StringIO
 import os
+from typing import List
 
 import pandas as pd
 
@@ -13,7 +14,7 @@ with open(os.path.join(cwd, filename), "r") as results_file:
     results = results_file.readlines()
 
 blocks = {}
-block = []
+block: List[str] = []
 key = ""
 for line in results:
     if "###!" in line:

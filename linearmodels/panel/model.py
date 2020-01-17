@@ -82,7 +82,7 @@ class PanelFormulaParser(object):
         self._dependent = self._exog = None
         self._parse()
 
-    def _parse(self):
+    def _parse(self) -> None:
         parts = self._formula.split("~")
         parts[1] = " 0 + " + parts[1]
         cln_formula = "~".join(parts)
@@ -226,7 +226,7 @@ class PooledOLS(object):
         self._validate_data()
         self._singleton_index = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
         return out.format(
             name=self.__class__.__name__,
@@ -234,7 +234,7 @@ class PooledOLS(object):
             has_constant=self.has_constant,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
     def reformat_clusters(self, clusters):
@@ -409,7 +409,7 @@ class PooledOLS(object):
         sel = np.ones(params.shape[0], dtype=np.bool)
         name = "Model F-statistic (robust)"
 
-        def invalid_f():
+        def invalid_f() -> InvalidTestStatistic:
             return InvalidTestStatistic("Model contains only a constant", name=name)
 
         if self.has_constant:
@@ -417,7 +417,7 @@ class PooledOLS(object):
                 return invalid_f
             sel[self._constant_index] = False
 
-        def deferred_f():
+        def deferred_f() -> WaldTestStatistic:
             test_params = params[sel]
             test_cov = cov_est.cov[sel][:, sel]
             test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
@@ -917,7 +917,7 @@ class PanelOLS(PooledOLS):
         # Reverify exog matrix
         self._check_exog_rank()
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = super(PanelOLS, self).__str__()
         additional = (
             "\nEntity Effects: {ee}, Time Effects: {te}, Num Other Effects: {oe}"

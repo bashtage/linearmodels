@@ -1,7 +1,9 @@
 from distutils.version import LooseVersion
+from typing import Any
 
 import numpy as np
 import pandas as pd
+from pandas.core.arrays.categorical import CategoricalAccessor
 
 from linearmodels.typing import AnyPandas
 
@@ -26,7 +28,7 @@ except ImportError:
     from pandas.util.testing import assert_series_equal
 
 
-def concat(*args, **kwargs):
+def concat(*args: AnyPandas, **kwargs: Any) -> AnyPandas:
     """
     Shim around pandas concat that passes sort if allowed
 
@@ -53,7 +55,7 @@ try:
     )
 
     # From pandas 0.20.1
-    def is_string_like(obj):
+    def is_string_like(obj: object) -> bool:
         """
         Check if the object is a string.
 
@@ -80,7 +82,7 @@ except ImportError:  # pragma: no cover
     )
 
 
-def get_codes(index):
+def get_codes(index: CategoricalAccessor) -> pd.Series:
     """
     Tries .codes before falling back to .labels
     """

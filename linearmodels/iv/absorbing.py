@@ -58,7 +58,7 @@ def _reset(hasher):
         return hash_func()
 
 
-def clear_cache():
+def clear_cache() -> None:
     """Clear the absorbed variable cache"""
     _VARIABLE_CACHE.clear()
 
@@ -272,7 +272,7 @@ class Interaction(object):
         cat: OptionalArrayLike = None,
         cont: OptionalArrayLike = None,
         nobs: Optional[int] = None,
-    ):
+    ) -> None:
         self._cat = cat
         self._cont = cont
         self._cat_data = self._iv_data
@@ -281,10 +281,10 @@ class Interaction(object):
         self._check_data()
 
     @property
-    def nobs(self):
+    def nobs(self) -> int:
         return self._nobs
 
-    def _check_data(self):
+    def _check_data(self) -> None:
         cat, cont = self._cat, self._cont
         cat_nobs = getattr(cat, "shape", (0,))[0]
         cont_nobs = getattr(cont, "shape", (0,))[0]
@@ -765,7 +765,7 @@ class AbsorbingLS(object):
     def instruments(self):
         return IVData(None, "instrument", nobs=self._dependent.shape[0])
 
-    def _prepare_interactions(self):
+    def _prepare_interactions(self) -> None:
         if self._interactions is None:
             return
         elif isinstance(self._interactions, DataFrame):

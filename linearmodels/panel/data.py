@@ -434,10 +434,9 @@ class PanelData(object):
 
         weight_sum: Dict[int, Series] = {}
 
-        # TODO
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: np.ndarray, level: int
-        ):
+        ) -> np.ndarray:
             num = (root_w * df).groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
@@ -446,8 +445,9 @@ class PanelData(object):
                 weight_sum[level] = denom
             return np.asarray(num) / np.asarray(denom)
 
-        # TODO
-        def demean_pass(frame: DataFrame, weights: DataFrame, root_w: np.ndarray):
+        def demean_pass(
+            frame: DataFrame, weights: DataFrame, root_w: np.ndarray
+        ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):
                 mu = weighted_group_mean(frame, weights, root_w, level)

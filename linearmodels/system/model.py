@@ -590,10 +590,10 @@ class IV3SLS(object):
                 self._instr[i].drop(missing)
                 self._weights[i].drop(missing)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = self._model_name + ", "
         out += "{0} Equations:\n".format(len(self._y))
         eqns = ", ".join(self._equations.keys())

@@ -75,13 +75,13 @@ class TradedFactorModel(object):
         self._formula = None
         self._validate_data()
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = self.__class__.__name__
         f, p = self.factors.shape[1], self.portfolios.shape[1]
         out += " with {0} factors, {1} test portfolios".format(f, p)
         return out
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
     def _drop_missing(self):
@@ -409,7 +409,7 @@ class LinearFactorModel(TradedFactorModel):
             self._sigma_m12 = vecs @ np.diag(1.0 / np.sqrt(vals)) @ vecs.T
             self._sigma_inv = np.linalg.inv(self._sigma)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = super(LinearFactorModel, self).__str__()
         if np.any(self._sigma != np.eye(self.portfolios.shape[1])):
             out += " using GLS"

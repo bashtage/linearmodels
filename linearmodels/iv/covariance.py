@@ -108,7 +108,7 @@ def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
     return s
 
 
-def kernel_weight_bartlett(bw: int, *args) -> ndarray:
+def kernel_weight_bartlett(bw: Numeric, *args: int) -> ndarray:
     r"""
     Kernel weights from a Bartlett kernel
 
@@ -128,7 +128,7 @@ def kernel_weight_bartlett(bw: int, *args) -> ndarray:
 
        w_i = 1 - i / (m + 1), \, i < m
     """
-    return 1 - arange(bw + 1) / (bw + 1)
+    return 1 - arange(int(bw) + 1) / (int(bw) + 1)
 
 
 def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
@@ -174,7 +174,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
     return w
 
 
-def kernel_weight_parzen(bw: int, *args) -> ndarray:
+def kernel_weight_parzen(bw: Numeric, *args: int) -> ndarray:
     r"""
     Kernel weights from a Parzen kernel
 
@@ -196,7 +196,7 @@ def kernel_weight_parzen(bw: int, *args) -> ndarray:
        w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5 \\
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
-    z = arange(bw + 1) / (bw + 1)
+    z = arange(int(bw) + 1) / (int(bw) + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w

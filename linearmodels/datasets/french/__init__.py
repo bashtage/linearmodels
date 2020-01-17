@@ -1,4 +1,4 @@
-import pandas as pd
+from pandas import DataFrame, to_datetime
 
 DESCR = """
 Data from Ken French's data library
@@ -43,9 +43,9 @@ S5M5     Large firms, winners
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     data = datasets.load(__file__, "french.csv.bz2")
-    data["dates"] = pd.to_datetime(data.dates)
+    data["dates"] = to_datetime(data.dates)
     return data
