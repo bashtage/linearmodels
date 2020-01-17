@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from itertools import product
 
 import numpy as np
@@ -86,7 +85,7 @@ def test_multiple_no_effects(data):
         if value.startswith("_"):
             continue
         getattr(comp, value)
-    compare(OrderedDict(a=res, model2=res3, model3=res4))
+    compare(dict(a=res, model2=res3, model3=res4))
 
 
 def test_incorrect_type(data):

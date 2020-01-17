@@ -1,14 +1,31 @@
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import concat
+from linearmodels.compat.statsmodels import Summary
 
-from collections import OrderedDict
 from collections.abc import MutableMapping
+from typing import (
+    AbstractSet,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+    ValuesView,
+)
 
 import numpy as np
 from pandas import DataFrame, MultiIndex, Series
 from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
+
+from linearmodels.typing import ArrayLike, Label, OptionalArrayLike
 
 
 class MissingValueWarning(Warning):
@@ -36,96 +53,102 @@ class AttrDict(MutableMapping):
     Ordered dictionary-like object that exposes keys as attributes
     """
 
-    def update(self, *args, **kwargs):
+    def update(
+        self, *args: Union[Mapping[Any, Any], Iterable[Tuple[Any, Any]]], **kwargs: Any
+    ) -> None:
         """
         Update AD from dictionary or iterable E and F.
         If E is present and has a .keys() method, then does:  for k in E: AD[k] = E[k]
         If E is present and lacks a .keys() method, then does:  for k, v in E: AD[k] = v
         In either case, this is followed by: for k in F:  AD[k] = F[k]
         """
-        self.__ordered_dict__.update(*args, **kwargs)
+        self.__private_dict__.update(*args, **kwargs)
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all items from AD. """
-        self.__ordered_dict__.clear()
+        self.__private_dict__.clear()
 
-    def copy(self):
+    def copy(self) -> "AttrDict":
         """Create a shallow copy of AD """
         ad = AttrDict()
-        for key in self.__ordered_dict__.keys():
-            ad[key] = self.__ordered_dict__[key]
+        for key in self.__private_dict__.keys():
+            ad[key] = self.__private_dict__[key]
         return ad
 
-    def keys(self):
+    def keys(self) -> AbstractSet[Any]:
         """Return an ordered list-like object providing a view on AD's keys """
-        return self.__ordered_dict__.keys()
+        return self.__private_dict__.keys()
 
-    def items(self):
+    def items(self) -> AbstractSet[Tuple[Any, Any]]:
         """Return an ordered list-like object providing a view on AD's items """
-        return self.__ordered_dict__.items()
+        return self.__private_dict__.items()
 
-    def values(self):
+    def values(self) -> ValuesView[Any]:
         """Return an ordered list-like object object providing a view on AD's values """
-        return self.__ordered_dict__.values()
+        return self.__private_dict__.values()
 
-    def pop(self, key, default=None):
+    def pop(self, key: Label, default: Any = None) -> Any:
         """
         Remove specified key and return the corresponding value.
         If key is not found, default is returned if given, otherwise KeyError is raised
         """
 
-        return self.__ordered_dict__.pop(key, default)
+        return self.__private_dict__.pop(key, default)
 
-    def __len__(self):
-        return self.__ordered_dict__.__len__()
+    def __len__(self) -> int:
+        return self.__private_dict__.__len__()
 
-    def __repr__(self):
-        out = self.__ordered_dict__.__str__()
+    def __repr__(self) -> str:
+        out = self.__private_dict__.__str__()
         return "Attr" + out[7:]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def __init__(self, *args, **kwargs):
-        self.__dict__["__ordered_dict__"] = OrderedDict(*args, **kwargs)
+    def __init__(
+        self, *args: Union[Mapping[Any, Any], Sequence[Tuple[Any, Any]]], **kwargs: Any
+    ) -> None:
+        self.__dict__["__private_dict__"] = dict(*args, **kwargs)
 
-    def __contains__(self, item):
-        return self.__ordered_dict__.__contains__(item)
+    def __contains__(self, item: Label) -> bool:
+        return self.__private_dict__.__contains__(item)
 
-    def __getitem__(self, item):
-        return self.__ordered_dict__[item]
+    def __getitem__(self, item: Label) -> Any:
+        return self.__private_dict__[item]
 
-    def __setitem__(self, key, value):
-        if key == "__ordered_dict__":
-            raise KeyError(key + " is reserved and cannot be set.")
-        self.__ordered_dict__[key] = value
+    def __setitem__(self, key: Label, value: Any) -> None:
+        if key == "__private_dict__":
+            raise KeyError("__private_dict__ is reserved and cannot be set.")
+        self.__private_dict__[key] = value
 
-    def __delitem__(self, key):
-        del self.__ordered_dict__[key]
+    def __delitem__(self, key: Label) -> None:
+        del self.__private_dict__[key]
 
-    def __getattr__(self, item):
-        if item not in self.__ordered_dict__:
+    def __getattr__(self, key: Label) -> Any:
+        if key not in self.__private_dict__:
             raise AttributeError
-        return self.__ordered_dict__[item]
+        return self.__private_dict__[key]
 
-    def __setattr__(self, key, value):
-        if key == "__ordered_dict__":
-            raise AttributeError(key + " is invalid")
-        self.__ordered_dict__[key] = value
+    def __setattr__(self, key: Label, value: Any) -> None:
+        if key == "__private_dict__":
+            raise AttributeError("__private_dict__ is invalid")
+        self.__private_dict__[key] = value
 
-    def __delattr__(self, name):
-        del self.__ordered_dict__[name]
+    def __delattr__(self, key: Label) -> None:
+        del self.__private_dict__[key]
 
-    def __dir__(self):
-        out = super(AttrDict, self).__dir__() + list(self.__ordered_dict__.keys())
-        out = filter(lambda s: isinstance(s, str) and s.isidentifier(), out)
-        return sorted(set(out))
+    def __dir__(self) -> Iterable[str]:
+        out = list(super(AttrDict, self).__dir__()) + list(self.__private_dict__.keys())
+        filtered = filter(lambda s: isinstance(s, str) and s.isidentifier(), out)
+        return sorted(set(filtered))
 
-    def __iter__(self):
-        return self.__ordered_dict__.__iter__()
+    def __iter__(self) -> Iterator[Label]:
+        return self.__private_dict__.__iter__()
 
 
-def has_constant(x, x_rank=None):
+def has_constant(
+    x: np.ndarray, x_rank: Optional[int] = None
+) -> Tuple[bool, Optional[int]]:
     """
     Parameters
     ----------
@@ -166,7 +189,7 @@ def has_constant(x, x_rank=None):
     return bool(has_const), loc
 
 
-def inv_sqrth(x):
+def inv_sqrth(x: np.ndarray) -> np.ndarray:
     """
     Matrix inverse square root
 
@@ -207,7 +230,14 @@ class WaldTestStatistic(object):
     InvalidTestStatistic
     """
 
-    def __init__(self, stat, null, df, df_denom=None, name=None):
+    def __init__(
+        self,
+        stat: float,
+        null: str,
+        df: int,
+        df_denom: Optional[int] = None,
+        name: Optional[str] = None,
+    ) -> None:
         self._stat = stat
         self._null = null
         self.df = df
@@ -221,27 +251,29 @@ class WaldTestStatistic(object):
             self.dist_name = "F({0},{1})".format(df, df_denom)
 
     @property
-    def stat(self):
+    def stat(self) -> float:
         """Test statistic"""
         return self._stat
 
     @property
-    def pval(self):
+    def pval(self) -> float:
         """P-value of test statistic"""
         return 1 - self.dist.cdf(self.stat)
 
     @property
-    def critical_values(self):
+    def critical_values(self) -> Optional[Dict[str, float]]:
         """Critical values test for common test sizes"""
-        return OrderedDict(zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99])))
+        return dict(zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99])))
 
     @property
-    def null(self):
+    def null(self) -> str:
         """Null hypothesis"""
         return self._null
 
-    def __str__(self):
-        name = "" if not self._name else self._name + "\n"
+    def __str__(self) -> str:
+        name = ""
+        if self._name is not None:
+            name = self._name + "\n"
         msg = (
             "{name}H0: {null}\nStatistic: {stat:0.4f}\n"
             "P-value: {pval:0.4f}\nDistributed: {dist}"
@@ -254,7 +286,7 @@ class WaldTestStatistic(object):
             dist=self.dist_name,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             self.__str__()
             + "\n"
@@ -283,7 +315,7 @@ class InvalidTestStatistic(WaldTestStatistic):
     WaldTestStatistic
     """
 
-    def __init__(self, reason, *, name=None):
+    def __init__(self, reason: str, *, name: Optional[str] = None) -> None:
         self._reason = reason
         super(InvalidTestStatistic, self).__init__(
             np.NaN, np.NaN, df=1, df_denom=1, name=name
@@ -291,18 +323,19 @@ class InvalidTestStatistic(WaldTestStatistic):
         self.dist_name = "None"
 
     @property
-    def pval(self):
+    def pval(self) -> float:
         """Always returns np.NaN"""
         return np.NaN
 
     @property
-    def critical_values(self):
+    def critical_values(self) -> None:
         """Always returns None"""
         return None
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = "Invalid test statistic\n{reason}\n{name}"
         name = "" if self._name is None else self._name
+        assert name is not None
         return msg.format(name=name, reason=self._reason)
 
 
@@ -322,7 +355,7 @@ class InapplicableTestStatistic(WaldTestStatistic):
     WaldTestStatistic
     """
 
-    def __init__(self, *, reason=None, name=None):
+    def __init__(self, *, reason: Optional[str] = None, name: Optional[str] = None):
         self._reason = reason
         if reason is None:
             self._reason = "Test is not applicable to model specification"
@@ -333,22 +366,22 @@ class InapplicableTestStatistic(WaldTestStatistic):
         self.dist_name = "None"
 
     @property
-    def pval(self):
+    def pval(self) -> float:
         """Always returns np.NaN"""
         return np.NaN
 
     @property
-    def critical_values(self):
+    def critical_values(self) -> None:
         """Always returns None"""
         return None
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = "Irrelevant test statistic\n{reason}\n{name}"
         name = "" if self._name is None else self._name
         return msg.format(name=name, reason=self._reason)
 
 
-def _str(v):
+def _str(v: float) -> str:
     """Preferred basic formatter"""
     if np.isnan(v):
         return "        "
@@ -368,7 +401,7 @@ def _str(v):
     return format_str.format(v)
 
 
-def pval_format(v):
+def pval_format(v: float) -> str:
     """Preferred formatting for x in [0,1]"""
     if np.isnan(v):
         return "        "
@@ -376,10 +409,17 @@ def pval_format(v):
 
 
 class _SummaryStr(object):
-    def __str__(self):
+    """
+    Mixin class for results classes to automatically show the summary.
+    """
+    @property
+    def summary(self) -> Summary:
+        return Summary()
+
+    def __str__(self) -> str:
         return self.summary.as_text()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             self.__str__()
             + "\n"
@@ -387,11 +427,11 @@ class _SummaryStr(object):
             + ", id: {0}".format(hex(id(self)))
         )
 
-    def _repr_html_(self):
+    def _repr_html_(self) -> str:
         return self.summary.as_html() + "<br/>id: {0}".format(hex(id(self)))
 
 
-def ensure_unique_column(col_name, df, addition="_"):
+def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> str:
     while col_name in df:
         col_name = addition + col_name + addition
     return col_name
@@ -402,25 +442,28 @@ class _ModelComparison(_SummaryStr):
     Base class for model comparisons
     """
 
-    _supported = tuple()
+    _supported: Tuple[Type, ...] = tuple()
     _PRECISION_TYPES = {
         "tstats": "T-stats",
         "pvalues": "P-values",
         "std_errors": "Std. Errors",
     }
 
-    def __init__(self, results, *, precision="tstats"):
-        if not isinstance(results, (dict, OrderedDict)):
-            _results = OrderedDict()
+    # TODO: Replace Any with better list of types
+    def __init__(
+        self,
+        results: Union[Dict[str, Any], Sequence[Any]],
+        *,
+        precision: str = "tstats"
+    ) -> None:
+        if not isinstance(results, dict):
+            _results: Dict[str, Any] = {}
             for i, res in enumerate(results):
                 _results["Model " + str(i)] = res
-            results = _results
-        elif not isinstance(results, OrderedDict):
-            _results = OrderedDict()
-            for key in sorted(results.keys()):
-                _results[key] = results[key]
-            results = _results
-        self._results = results
+        else:
+            _results = {}
+            _results.update(results)
+        self._results = _results
 
         for key in self._results:
             if not isinstance(self._results[key], self._supported):
@@ -433,15 +476,15 @@ class _ModelComparison(_SummaryStr):
             )
         self._precision = precision
 
-    def _get_series_property(self, name):
+    def _get_series_property(self, name: str) -> DataFrame:
         out = [(k, getattr(v, name)) for k, v in self._results.items()]
         cols = [v[0] for v in out]
         values = concat([v[1] for v in out], 1)
         values.columns = cols
         return values
 
-    def _get_property(self, name):
-        out = OrderedDict()
+    def _get_property(self, name: str) -> Series:
+        out = {}
         items = []
         for k, v in self._results.items():
             items.append(k)
@@ -449,37 +492,37 @@ class _ModelComparison(_SummaryStr):
         return Series(out, name=name).loc[items]
 
     @property
-    def nobs(self):
+    def nobs(self) -> Series:
         """Parameters for all models"""
         return self._get_property("nobs")
 
     @property
-    def params(self):
+    def params(self) -> DataFrame:
         """Parameters for all models"""
         return self._get_series_property("params")
 
     @property
-    def tstats(self):
+    def tstats(self) -> DataFrame:
         """Parameter t-stats for all models"""
         return self._get_series_property("tstats")
 
     @property
-    def std_errors(self):
-        """Parameter t-stats for all models"""
+    def std_errors(self) -> DataFrame:
+        """Parameter standard errors for all models"""
         return self._get_series_property("std_errors")
 
     @property
-    def pvalues(self):
+    def pvalues(self) -> DataFrame:
         """Parameter p-vals for all models"""
         return self._get_series_property("pvalues")
 
     @property
-    def rsquared(self):
+    def rsquared(self) -> Series:
         """Coefficients of determination (R**2)"""
         return self._get_property("rsquared")
 
     @property
-    def f_statistic(self):
+    def f_statistic(self) -> DataFrame:
         """F-statistics and P-values"""
         out = self._get_property("f_statistic")
         out_df = DataFrame(
@@ -490,7 +533,7 @@ class _ModelComparison(_SummaryStr):
         return out_df
 
 
-def missing_warning(missing):
+def missing_warning(missing: ArrayLike) -> None:
     """Utility function to perform missing value check and warning"""
     if not np.any(missing):
         return
@@ -502,7 +545,8 @@ def missing_warning(missing):
         warnings.warn(missing_value_warning_msg, MissingValueWarning)
 
 
-def param_table(results, title, pad_bottom=False):
+# TODO: typing for Any
+def param_table(results: Any, title: str, pad_bottom: bool = False) -> SimpleTable:
     """Formatted standard parameter table"""
     param_data = np.c_[
         np.asarray(results.params)[:, None],
@@ -515,10 +559,10 @@ def param_table(results, title, pad_bottom=False):
     for row in param_data:
         txt_row = []
         for i, v in enumerate(row):
-            f = _str
+            func = _str
             if i == 3:
-                f = pval_format
-            txt_row.append(f(v))
+                func = pval_format
+            txt_row.append(func(v))
         data.append(txt_row)
     header = ["Parameter", "Std. Err.", "T-stat", "P-value", "Lower CI", "Upper CI"]
     table_stubs = list(results.params.index)
@@ -532,7 +576,7 @@ def param_table(results, title, pad_bottom=False):
     )
 
 
-def format_wide(s, cols):
+def format_wide(s: List[str], cols: int) -> List[List[str]]:
     """
     Format a list of strings.
 
@@ -570,7 +614,13 @@ def format_wide(s, cols):
     return lines
 
 
-def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
+def panel_to_frame(
+    x: np.ndarray,
+    items: Sequence[Label],
+    major_axis: Sequence[Label],
+    minor_axis: Sequence[Label],
+    swap: bool = False,
+) -> DataFrame:
     """
     Construct a multiindex DataFrame using Panel-like arguments
 
@@ -614,7 +664,13 @@ def panel_to_frame(x, items, major_axis, minor_axis, swap=False):
     return df
 
 
-def quadratic_form_test(params, cov, restriction=None, value=None, formula=None):
+def quadratic_form_test(
+    params: ArrayLike,
+    cov: ArrayLike,
+    restriction: OptionalArrayLike = None,
+    value: OptionalArrayLike = None,
+    formula: Optional[str] = None,
+) -> WaldTestStatistic:
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used" "simultaneously.")
     if formula is not None:
@@ -625,7 +681,7 @@ def quadratic_form_test(params, cov, restriction=None, value=None, formula=None)
     if value is None:
         value = np.zeros(restriction.shape[0])
     value = np.asarray(value).ravel()[:, None]
-    diff = restriction @ params.values[:, None] - value
+    diff = restriction @ np.asarray(params)[:, None] - value
     rcov = restriction @ cov @ restriction.T
     stat = float(diff.T @ np.linalg.inv(rcov) @ diff)
     df = restriction.shape[0]

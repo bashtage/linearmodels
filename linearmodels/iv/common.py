@@ -1,3 +1,5 @@
+from typing import Optional
+
 from numpy import ix_, ndarray, ptp, where
 from numpy.linalg import inv
 
@@ -24,7 +26,11 @@ def find_constant(x):
 
 
 def f_statistic(
-    params: ndarray, cov: ndarray, debiased: bool, resid_df: int, const_loc: int = None
+    params: ndarray,
+    cov: ndarray,
+    debiased: bool,
+    resid_df: int,
+    const_loc: Optional[int] = None,
 ):
     """
     Parameters

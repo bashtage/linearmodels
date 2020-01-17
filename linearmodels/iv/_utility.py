@@ -82,7 +82,7 @@ class IVFormulaParser(object):
         self._data = data
         self._na_action = NAAction(on_NA="raise", NA_types=[])
         self._eval_env = eval_env
-        self._components = {}  # type: Dict[str, str]
+        self._components: Dict[str, str] = {}
         self._parse()
 
     def _parse(self):

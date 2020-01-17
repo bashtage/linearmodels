@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -12,5 +12,5 @@ try:
 except ImportError:
     ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]  # type: ignore
 
-OptionalArrayLike = Union[ArrayLike, None]
-OptionalDataFrame = Union[pd.DataFrame, None]
+OptionalArrayLike = Optional[ArrayLike]
+OptionalDataFrame = Optional[pd.DataFrame]

@@ -8,8 +8,14 @@ from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
-from linearmodels.utility import (AttrDict, _str, _SummaryStr, format_wide,
-                                  param_table, pval_format)
+from linearmodels.utility import (
+    AttrDict,
+    _str,
+    _SummaryStr,
+    format_wide,
+    param_table,
+    pval_format,
+)
 
 __all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
@@ -177,7 +183,8 @@ class _CommonResults(_SummaryStr):
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
-        ci = self.params[:, None] + self.std_errors[:, None] * q
+        params = np.asarray(self.params)[:, None]
+        ci = params + np.asarray(self.std_errors)[:, None] * q
         return DataFrame(ci, index=self._param_names, columns=["lower", "upper"])
 
 
@@ -236,9 +243,9 @@ class SystemResults(_CommonResults):
                 "Predictions can only be constructed using one "
                 "of eqns or data, but not both."
             )
-        pred = self.model.predict(
+        pred: DataFrame = self.model.predict(
             self.params, equations=equations, data=data
-        )  # type: DataFrame
+        )
         if not dataframe:
             pred = {col: pred[[col]] for col in pred}
             if not missing:

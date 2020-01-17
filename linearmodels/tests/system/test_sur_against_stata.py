@@ -1,14 +1,14 @@
-from collections import OrderedDict
-
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
 from linearmodels.system import SUR
-from linearmodels.tests.system.results.generate_data import (basic_data,
-                                                             common_data,
-                                                             missing_data)
+from linearmodels.tests.system.results.generate_data import (
+    basic_data,
+    common_data,
+    missing_data,
+)
 from linearmodels.tests.system.results.parse_stata_results import stata_results
 from linearmodels.utility import AttrDict
 
@@ -36,7 +36,7 @@ def model_data(request):
     if model_type == "ss":
         cov_kwds["debiased"] = True
     stata_result = stata_results[key]
-    rekeyed_data = OrderedDict()
+    rekeyed_data = {}
     for data_key in data:
         temp = data[data_key]
         new_key = temp["dependent"].columns[0]

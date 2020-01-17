@@ -5,12 +5,23 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 import pytest
 
-from linearmodels.formula import (between_ols, fama_macbeth,
-                                  first_difference_ols, panel_ols, pooled_ols,
-                                  random_effects)
-from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
-                                      FirstDifferenceOLS, PanelFormulaParser,
-                                      PanelOLS, PooledOLS, RandomEffects)
+from linearmodels.formula import (
+    between_ols,
+    fama_macbeth,
+    first_difference_ols,
+    panel_ols,
+    pooled_ols,
+    random_effects,
+)
+from linearmodels.panel.model import (
+    BetweenOLS,
+    FamaMacBeth,
+    FirstDifferenceOLS,
+    PanelFormulaParser,
+    PanelOLS,
+    PooledOLS,
+    RandomEffects,
+)
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 pytestmark = pytest.mark.filterwarnings(

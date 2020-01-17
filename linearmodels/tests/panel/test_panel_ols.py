@@ -11,10 +11,13 @@ from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
 from linearmodels.panel.utility import AbsorbingEffectWarning
-from linearmodels.tests.panel._utility import (access_attributes,
-                                               assert_frame_similar,
-                                               assert_results_equal, datatypes,
-                                               generate_data)
+from linearmodels.tests.panel._utility import (
+    access_attributes,
+    assert_frame_similar,
+    assert_results_equal,
+    datatypes,
+    generate_data,
+)
 from linearmodels.utility import AttrDict, MemoryWarning
 
 pytestmark = pytest.mark.filterwarnings(

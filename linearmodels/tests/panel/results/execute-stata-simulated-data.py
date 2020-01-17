@@ -1,7 +1,7 @@
-from collections import OrderedDict
 import os
 from os.path import join
 import subprocess
+from typing import Dict
 
 STATA_PATH = join("C:\\", "Program Files (x86)", "Stata13", "StataMP-64.exe")
 
@@ -32,7 +32,7 @@ configs = {
     "regress {vars} [aweight=w], vce(cluster firm_id)": "pooled-cluster-weighted",
 }
 
-od = OrderedDict()  # type: OrderedDict
+od: Dict[str, str] = {}
 for key in sorted(configs.keys()):
     od[key] = configs[key]
 

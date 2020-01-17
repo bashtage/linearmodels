@@ -9,8 +9,13 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.utility import (_ModelComparison, _str, _SummaryStr,
-                                  pval_format, quadratic_form_test)
+from linearmodels.utility import (
+    _ModelComparison,
+    _str,
+    _SummaryStr,
+    pval_format,
+    quadratic_form_test,
+)
 
 __all__ = ["PanelResults", "PanelEffectsResults", "RandomEffectsResults"]
 
@@ -227,7 +232,8 @@ class PanelResults(_SummaryStr):
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
-        ci = self.params[:, None] + self.std_errors[:, None] * q
+        params = np.asarray(self.params)[:, None]
+        ci = params + np.asarray(self.std_errors)[:, None] * q
         return DataFrame(ci, index=self._var_names, columns=["lower", "upper"])
 
     @property
@@ -373,7 +379,7 @@ class PanelResults(_SummaryStr):
         effects=False,
         idiosyncratic=False,
         missing=False
-    ):
+    ) -> DataFrame:
         """
         In- and out-of-sample predictions
 
@@ -423,11 +429,11 @@ class PanelResults(_SummaryStr):
             out.append(self.idiosyncratic)
         if len(out) == 0:
             raise ValueError("At least one output must be selected")
-        out = concat(out, 1)  # type: DataFrame
+        out_df: DataFrame = concat(out, 1)
         if missing:
             index = self._original_index
-            out = out.reindex(index)
-        return out
+            out_df = out_df.reindex(index)
+        return out_df
 
     @property
     def fitted_values(self):
@@ -764,9 +770,9 @@ def compare(results, precision="tstats"):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
@@ -785,9 +791,9 @@ class PanelModelComparison(_ModelComparison):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.

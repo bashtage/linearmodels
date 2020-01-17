@@ -1,6 +1,5 @@
 from linearmodels.compat.pandas import concat
 
-from collections import OrderedDict
 from itertools import product
 
 import numpy as np
@@ -11,11 +10,12 @@ import pytest
 
 from linearmodels.iv.covariance import kernel_weight_parzen
 from linearmodels.system import IV3SLS, IVSystemGMM
-from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
-                                     HomoskedasticWeightMatrix,
-                                     KernelWeightMatrix)
-from linearmodels.tests.system._utility import (generate_3sls_data_v2,
-                                                simple_gmm)
+from linearmodels.system.gmm import (
+    HeteroskedasticWeightMatrix,
+    HomoskedasticWeightMatrix,
+    KernelWeightMatrix,
+)
+from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
 from linearmodels.utility import AttrDict
 
 params = list(product([1, 2], [True, False]))
@@ -127,9 +127,8 @@ def test_formula_equivalence(data):
         fmla += " + ".join(instr.columns) + " ] "
         formula.append(fmla)
         df.extend([dep, ex, en, instr])
-    from collections import OrderedDict
 
-    formulas = OrderedDict()
+    formulas = {}
     for i, f in enumerate(formula):
         formulas["eq{0}".format(i)] = f
     df = concat(df, 1)
@@ -152,7 +151,7 @@ def test_formula_equivalence_weights(data):
 
     mod = IVSystemGMM(eqn_copy, weight_type="unadjusted")
     df = []
-    formulas = OrderedDict()
+    formulas = {}
     for i, key in enumerate(data.eqns):
         eqn = data.eqns[key]
         dep = eqn.dependent

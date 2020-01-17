@@ -1,9 +1,11 @@
 from collections import defaultdict
-from typing import List
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
+
+from linearmodels.typing.data import ArrayLike
 
 try:
     from linearmodels.panel._utility import _drop_singletons
@@ -42,7 +44,7 @@ Variables have been fully absorbed and have removed from the regression:
 """
 
 
-def preconditioner(d, *, copy=False):
+def preconditioner(d: ArrayLike, *, copy: bool = False) -> Tuple[ArrayLike, np.ndarray]:
     """
     Parameters
     ----------
@@ -93,8 +95,13 @@ def preconditioner(d, *, copy=False):
 
 
 def dummy_matrix(
-    cats, *, format="csc", drop="first", drop_all=False, precondition=True
-):
+    cats: ArrayLike,
+    *,
+    format: str = "csc",
+    drop: str = "first",
+    drop_all: bool = False,
+    precondition: bool = True
+) -> Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, np.array]:
     """
     Parameters
     ----------
@@ -132,7 +139,7 @@ def dummy_matrix(
     else:
         codes = cats
 
-    data = defaultdict(list)
+    data: Dict[str, List[np.ndarray]] = defaultdict(list)
     total_dummies = 0
     nobs, ncats = codes.shape
     for i in range(ncats):
@@ -186,7 +193,7 @@ def dummy_matrix(
     return out, cond
 
 
-def _remove_node(node, meta, orig_dest):
+def _remove_node(node: int, meta: np.ndarray, orig_dest: np.ndarray) -> Tuple[int, int]:
     """
     Parameters
     ----------
@@ -204,6 +211,7 @@ def _remove_node(node, meta, orig_dest):
         ID of the next node in the branch
     next_count : int
         Count of the next node in the branch
+
     Notes
     -----
     Node has 1 link, so:
@@ -240,7 +248,7 @@ def _remove_node(node, meta, orig_dest):
     return next_node, next_count
 
 
-def _py_drop_singletons(meta, orig_dest):
+def _py_drop_singletons(meta: np.ndarray, orig_dest: np.ndarray) -> None:
     """
     Loop through the nodes and recursively drop singleton chains
 
@@ -265,7 +273,7 @@ if not HAS_CYTHON:
     _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
-def in_2core_graph(cats):
+def in_2core_graph(cats: ArrayLike) -> np.ndarray:
     """
     Parameters
     ----------
@@ -287,30 +295,30 @@ def in_2core_graph(cats):
         return np.isin(cats, retain).ravel()
 
     nobs, ncats = cats.shape
-    zero_cats = []
+    zero_cats_lst = []
     # Switch to 0 based indexing
     for col in range(ncats):
         u, inv = np.unique(cats[:, col], return_inverse=True)
-        zero_cats.append(np.arange(u.shape[0])[inv])
-    zero_cats = np.column_stack(zero_cats)
+        zero_cats_lst.append(np.arange(u.shape[0])[inv])
+    zero_cats = np.column_stack(zero_cats_lst)
     # 2 tables
     # a.
     #    origin_id, dest_id
     max_cat = zero_cats.max(0)
     shift = np.r_[0, max_cat[:-1] + 1]
     zero_cats += shift
-    orig_dest = []
+    orig_dest_lst = []
     for i in range(ncats):
         col_order = list(range(ncats))
         col_order.remove(i)
         col_order = [i] + col_order
         temp = zero_cats[:, col_order]
         idx = np.argsort(temp[:, 0])
-        orig_dest.append(temp[idx])
+        orig_dest_lst.append(temp[idx])
         if i == 0:
             inverter = np.empty_like(zero_cats[:, 0])
             inverter[idx] = np.arange(nobs)
-    orig_dest = np.concatenate(orig_dest, 0)
+    orig_dest = np.concatenate(orig_dest_lst, 0)
     # b.
     #    node_id, count, offset
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
@@ -338,7 +346,7 @@ def in_2core_graph(cats):
     return retain
 
 
-def in_2core_graph_slow(cats):
+def in_2core_graph_slow(cats: ArrayLike) -> np.ndarray:
     """
     Parameters
     ----------
@@ -377,7 +385,7 @@ def in_2core_graph_slow(cats):
     return retain
 
 
-def check_absorbed(x: np.ndarray, variables: List[str]):
+def check_absorbed(x: np.ndarray, variables: List[str]) -> None:
     """
     Check a regressor matrix for variables absorbed
 
@@ -407,7 +415,7 @@ def check_absorbed(x: np.ndarray, variables: List[str]):
         raise AbsorbingEffectError(msg)
 
 
-def not_absorbed(x: np.ndarray):
+def not_absorbed(x: np.ndarray) -> List[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
 

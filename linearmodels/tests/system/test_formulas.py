@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from itertools import product
 
 import numpy as np
@@ -137,7 +136,7 @@ def test_parser(config):
     fmla, model, interface = config
     parser = SystemFormulaParser(fmla, joined, eval_env=5)
     orig_data = parser.data
-    assert isinstance(orig_data, OrderedDict)
+    assert isinstance(orig_data, dict)
     assert parser.eval_env == 5
 
     parser.eval_env = 4

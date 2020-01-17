@@ -1,30 +1,52 @@
 """
 Instrumental variable estimators
 """
-from typing import Any, Dict, Type, Union
+from typing import Any, Dict, Optional, Type, Union
 
-from numpy import (all as npall, any, array, asarray, atleast_2d, average, c_,
-                   isscalar, logical_not, nanmean, ndarray, ones, sqrt)
+from numpy import (
+    all as npall,
+    any,
+    array,
+    asarray,
+    atleast_2d,
+    average,
+    c_,
+    isscalar,
+    logical_not,
+    nanmean,
+    ndarray,
+    ones,
+    sqrt,
+)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.common import f_statistic, find_constant
-from linearmodels.iv.covariance import (ClusteredCovariance,
-                                        HeteroskedasticCovariance,
-                                        HomoskedasticCovariance,
-                                        KernelCovariance)
+from linearmodels.iv.covariance import (
+    ClusteredCovariance,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+    KernelCovariance,
+)
 from linearmodels.iv.data import IVData
-from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
-                                 HomoskedasticWeightMatrix, IVGMMCovariance,
-                                 KernelWeightMatrix,
-                                 OneWayClusteredWeightMatrix)
+from linearmodels.iv.gmm import (
+    HeteroskedasticWeightMatrix,
+    HomoskedasticWeightMatrix,
+    IVGMMCovariance,
+    KernelWeightMatrix,
+    OneWayClusteredWeightMatrix,
+)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.typing import Numeric, OptionalNumeric
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
-from linearmodels.utility import (WaldTestStatistic, has_constant, inv_sqrth,
-                                  missing_warning)
+from linearmodels.utility import (
+    WaldTestStatistic,
+    has_constant,
+    inv_sqrth,
+    missing_warning,
+)
 
 IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
 
@@ -135,7 +157,7 @@ class IVLIML(object):
     ):
 
         self.dependent = IVData(dependent, var_name="dependent")
-        nobs = self.dependent.shape[0]  # type: int
+        nobs: int = self.dependent.shape[0]
         self.exog = IVData(exog, var_name="exog", nobs=nobs)
         self.endog = IVData(endog, var_name="endog", nobs=nobs)
         self.instruments = IVData(instruments, var_name="instruments", nobs=nobs)
@@ -179,7 +201,7 @@ class IVLIML(object):
             if additional:
                 self._method += "(" + ", ".join(additional) + ")"
         if not hasattr(self, "_result_container"):
-            self._result_container = IVResults  # type: IVResultType
+            self._result_container: IVResultType = IVResults
 
         self._kappa = kappa
         self._fuller = fuller
@@ -362,7 +384,7 @@ class IVLIML(object):
 
     def _drop_missing(self) -> ndarray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing = any(c_[[dh.isnull for dh in data]], 0)  # type: ndarray
+        missing: ndarray = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
             if npall(missing):
                 raise ValueError(
@@ -1181,7 +1203,7 @@ class IVGMMCUE(IVGMM):
         y: ndarray,
         z: ndarray,
         display: bool = False,
-        opt_options: Dict[str, Any] = None,
+        opt_options: Optional[Dict[str, Any]] = None,
     ):
         r"""
         Parameters
@@ -1215,7 +1237,9 @@ class IVGMMCUE(IVGMM):
         scipy.optimize.minimize
         """
         args = (x, y, z)
-        opt_options = {} if opt_options is None else opt_options
+        if opt_options is None:
+            opt_options = {}
+        assert opt_options is not None
         options = {"disp": display}
         if "options" in opt_options:
             opt_options = opt_options.copy()
@@ -1232,7 +1256,7 @@ class IVGMMCUE(IVGMM):
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
-        opt_options: Dict[str, Any] = None,
+        opt_options: Optional[Dict[str, Any]] = None,
         **cov_config: Any
     ):
         r"""

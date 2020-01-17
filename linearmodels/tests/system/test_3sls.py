@@ -7,9 +7,11 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
 from linearmodels.system.model import IV3SLS
-from linearmodels.tests.system._utility import (generate_3sls_data,
-                                                generate_3sls_data_v2,
-                                                simple_3sls)
+from linearmodels.tests.system._utility import (
+    generate_3sls_data,
+    generate_3sls_data_v2,
+    simple_3sls,
+)
 
 nexog = [3, [1, 2, 3, 4, 5]]
 nendog = [2, [1, 2, 1, 2, 1]]

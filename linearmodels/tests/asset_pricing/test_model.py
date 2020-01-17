@@ -5,9 +5,11 @@ import pytest
 from scipy import stats
 from statsmodels.tools.tools import add_constant
 
-from linearmodels.asset_pricing.model import (LinearFactorModel,
-                                              LinearFactorModelGMM,
-                                              TradedFactorModel)
+from linearmodels.asset_pricing.model import (
+    LinearFactorModel,
+    LinearFactorModelGMM,
+    TradedFactorModel,
+)
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import _OLS
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all

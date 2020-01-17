@@ -4,8 +4,24 @@ Covariance estimation for 2SLS and LIML IV estimators
 from typing import Any, Callable, Dict, Union
 
 from mypy_extensions import VarArg
-from numpy import (arange, argsort, asarray, ceil, cos, empty, int64, ndarray,
-                   ones, pi, r_, sin, sum as npsum, unique, where, zeros)
+from numpy import (
+    arange,
+    argsort,
+    asarray,
+    ceil,
+    cos,
+    empty,
+    int64,
+    ndarray,
+    ones,
+    pi,
+    r_,
+    sin,
+    sum as npsum,
+    unique,
+    where,
+    zeros,
+)
 from numpy.linalg import inv, pinv
 
 from linearmodels.typing import Numeric, OptionalNumeric
@@ -242,7 +258,7 @@ def kernel_optimal_bandwidth(x: ndarray, kernel: str = "bartlett") -> int:
     return min(int(ceil(m)), t - 1)
 
 
-KERNEL_LOOKUP = {
+KERNEL_LOOKUP: Dict[str, KernelWeight] = {
     "bartlett": kernel_weight_bartlett,
     "newey-west": kernel_weight_bartlett,
     "quadratic-spectral": kernel_weight_quadratic_spectral,
@@ -250,7 +266,7 @@ KERNEL_LOOKUP = {
     "andrews": kernel_weight_quadratic_spectral,
     "gallant": kernel_weight_parzen,
     "parzen": kernel_weight_parzen,
-}  # type: Dict[str, KernelWeight]
+}
 
 
 class HomoskedasticCovariance(object):

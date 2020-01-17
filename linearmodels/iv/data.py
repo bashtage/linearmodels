@@ -1,19 +1,24 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from linearmodels.compat.pandas import (concat, is_categorical,
-                                        is_categorical_dtype, is_numeric_dtype,
-                                        is_string_dtype, is_string_like)
+from linearmodels.compat.pandas import (
+    concat,
+    is_categorical,
+    is_categorical_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
+    is_string_like,
+)
 
 import copy
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 import numpy as np
 import pandas as pd
 
 from linearmodels.typing.data import OptionalArrayLike
 
-iv_data_types = (np.ndarray, pd.DataFrame, pd.Series)
+iv_data_types: Tuple[Type, ...] = (np.ndarray, pd.DataFrame, pd.Series)
 try:
     import xarray as xr
 
@@ -65,7 +70,7 @@ class IVData(object):
         self,
         x: OptionalArrayLike,
         var_name: str = "x",
-        nobs: int = None,
+        nobs: Optional[int] = None,
         convert_dummies: bool = True,
         drop_first: bool = True,
     ):
@@ -79,6 +84,7 @@ class IVData(object):
             raise ValueError("nobs required when x is None")
 
         self.original = x
+        assert x is not None
         xndim = x.ndim
         if xndim > 2:
             raise ValueError(dim_err.format(var_name, xndim))
@@ -86,7 +92,7 @@ class IVData(object):
         if isinstance(x, np.ndarray):
             x = x.astype(dtype=np.float64)
             if xndim == 1:
-                x.shape = (x.shape[0], -1)
+                x = x.reshape((x.shape[0], -1))
 
             self._ndarray = x.astype(np.float64)
             index = list(range(x.shape[0]))

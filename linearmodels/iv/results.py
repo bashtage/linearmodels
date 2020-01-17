@@ -3,12 +3,22 @@ Results containers and post-estimation diagnostics for IV models
 """
 from linearmodels.compat.statsmodels import Summary
 
-from collections import OrderedDict
 import datetime as dt
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Sequence, Union
 
-from numpy import (array, c_, diag, empty, isnan, log, ndarray, ones, sqrt,
-                   zeros)
+from numpy import (
+    array,
+    asarray,
+    c_,
+    diag,
+    empty,
+    isnan,
+    log,
+    ndarray,
+    ones,
+    sqrt,
+    zeros,
+)
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
 from property_cached import cached_property
@@ -17,28 +27,34 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
 from linearmodels.iv._utility import annihilate, proj
-from linearmodels.utility import (InvalidTestStatistic, WaldTestStatistic,
-                                  _ModelComparison, _str, _SummaryStr,
-                                  pval_format, quadratic_form_test)
+from linearmodels.utility import (
+    InvalidTestStatistic,
+    WaldTestStatistic,
+    _ModelComparison,
+    _str,
+    _SummaryStr,
+    pval_format,
+    quadratic_form_test,
+)
 
 
-def stub_concat(lists, sep="="):
+def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
     col_size = max([max(map(len, l)) for l in lists])
-    out = []
+    out: List[str] = []
     for l in lists:
         out.extend(l)
         out.append(sep * (col_size + 2))
     return out[:-1]
 
 
-def table_concat(lists, sep="="):
+def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[str]]:
     col_sizes = []
     for l in lists:
         size = list(map(lambda r: list(map(len, r)), l))
         col_sizes.append(list(array(size).max(0)))
     col_size = array(col_sizes).max(axis=0)
-    sep_cols = [sep * (cs + 2) for cs in col_size]
-    out = []
+    sep_cols: List[str] = [sep * (cs + 2) for cs in col_size]
+    out: List[List[str]] = []
     for l in lists:
         out.extend(l)
         out.append(sep_cols)
@@ -146,7 +162,7 @@ class OLSResults(_SummaryStr):
         fitted=True,
         idiosyncratic=False,
         missing=False
-    ):
+    ) -> DataFrame:
         """
         In- and out-of-sample predictions
 
@@ -195,11 +211,11 @@ class OLSResults(_SummaryStr):
             out.append(self.idiosyncratic)
         if len(out) == 0:
             raise ValueError("At least one output must be selected")
-        out = concat(out, 1)  # type: DataFrame
+        out_df: DataFrame = concat(out, 1)
         if missing:
             index = self._original_index
-            out = out.reindex(index)
-        return out
+            out_df = out_df.reindex(index)
+        return out_df
 
     @property
     def wresids(self) -> Series:
@@ -323,7 +339,7 @@ class OLSResults(_SummaryStr):
         """Method used to estimate model parameters"""
         return self._method
 
-    def conf_int(self, level=0.95) -> DataFrame:
+    def conf_int(self, level: float = 0.95) -> DataFrame:
         """
         Confidence interval construction
 
@@ -347,7 +363,7 @@ class OLSResults(_SummaryStr):
         else:
             q = stats.norm.ppf(ci_quantiles)
         q = q[None, :]
-        ci = self.params[:, None] + self.std_errors[:, None] * q
+        ci = asarray(self.params)[:, None] + asarray(self.std_errors)[:, None] * q
         return DataFrame(ci, index=self._vars, columns=["lower", "upper"])
 
     def _top_right(self):
@@ -625,7 +641,7 @@ class FirstStageResults(_SummaryStr):
         else:
             px = x @ pinv(x)
         ez = z - px @ z
-        out = OrderedDict()  # type: Dict[str, Series]
+        out: Dict[str, Series] = {}
         individual_results = self.individual
         for col in endog.pandas:
             y = w * endog.pandas[[col]].values
@@ -685,7 +701,7 @@ class FirstStageResults(_SummaryStr):
         w = sqrt(self.weights.ndarray)
         exog_instr = w * c_[self.exog.ndarray, self.instr.ndarray]
         exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
-        res = OrderedDict()  # type: Dict[str, OLSResults]
+        res: Dict[str, OLSResults] = {}
         for col in self.endog.pandas:
             dep = w.squeeze() * self.endog.pandas[col]
             mod = _OLS(dep, exog_instr)
@@ -1411,9 +1427,9 @@ class IVModelComparison(_ModelComparison):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
@@ -1464,9 +1480,7 @@ class IVModelComparison(_ModelComparison):
             "F-statistic",
             "P-value (F-stat)",
         ]
-        dep_name = (
-            OrderedDict()
-        )  # type: Dict[str, Union[IVResults, IVGMMResults, OLSResults]]
+        dep_name: Dict[str, Union[IVResults, IVGMMResults, OLSResults]] = {}
         for key in self._results:
             dep_name[key] = self._results[key].model.dependent.cols[0]
         dep_name = Series(dep_name)
@@ -1546,9 +1560,9 @@ def compare(results, *, precision="tstats") -> IVModelComparison:
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.

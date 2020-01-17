@@ -13,8 +13,7 @@ import pytest
 
 from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS
-from linearmodels.tests.panel._utility import (MISSING_XARRAY, datatypes,
-                                               generate_data)
+from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
 from linearmodels.utility import panel_to_frame
 
 try:

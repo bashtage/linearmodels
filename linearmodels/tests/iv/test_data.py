@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import numpy as np
 from numpy.testing import assert_equal
 import pandas as pd
@@ -150,7 +148,7 @@ class TestDataHandler(object):
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
-        df = pd.DataFrame(OrderedDict(cat=cat, num=num), index=index)
+        df = pd.DataFrame(dict(cat=cat, num=num), index=index)
         dh = IVData(df)
         assert dh.ndim == 2
         assert dh.shape == (10, 3)
@@ -188,7 +186,7 @@ class TestDataHandler(object):
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
-        df = pd.DataFrame(OrderedDict(cat=cat, num=num), index=index)
+        df = pd.DataFrame(dict(cat=cat, num=num), index=index)
         dh = IVData(df, drop_first=False)
         assert dh.ndim == 2
         assert dh.shape == (10, 4)

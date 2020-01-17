@@ -13,11 +13,16 @@ import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 
 from linearmodels.iv._utility import annihilate
-from linearmodels.iv.absorbing import (_VARIABLE_CACHE, AbsorbingLS,
-                                       AbsorbingRegressor, Interaction,
-                                       category_continuous_interaction,
-                                       category_interaction, category_product,
-                                       clear_cache)
+from linearmodels.iv.absorbing import (
+    _VARIABLE_CACHE,
+    AbsorbingLS,
+    AbsorbingRegressor,
+    Interaction,
+    category_continuous_interaction,
+    category_interaction,
+    category_product,
+    clear_cache,
+)
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import AbsorbingLSResults, OLSResults
 from linearmodels.panel.utility import dummy_matrix
