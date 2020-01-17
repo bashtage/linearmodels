@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -38,7 +36,7 @@ def model_data(request):
     if model_type == "ss":
         cov_kwds["debiased"] = True
     stata_result = stata_results[key]
-    rekeyed_data = OrderedDict()
+    rekeyed_data = {}
     for data_key in data:
         temp = data[data_key]
         new_key = temp["dependent"].columns[0]

@@ -258,7 +258,7 @@ def kernel_optimal_bandwidth(x: ndarray, kernel: str = "bartlett") -> int:
     return min(int(ceil(m)), t - 1)
 
 
-KERNEL_LOOKUP = {
+KERNEL_LOOKUP: Dict[str, KernelWeight] = {
     "bartlett": kernel_weight_bartlett,
     "newey-west": kernel_weight_bartlett,
     "quadratic-spectral": kernel_weight_quadratic_spectral,
@@ -266,7 +266,7 @@ KERNEL_LOOKUP = {
     "andrews": kernel_weight_quadratic_spectral,
     "gallant": kernel_weight_parzen,
     "parzen": kernel_weight_parzen,
-}  # type: Dict[str, KernelWeight]
+}
 
 
 class HomoskedasticCovariance(object):

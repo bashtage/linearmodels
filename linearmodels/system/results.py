@@ -243,9 +243,9 @@ class SystemResults(_CommonResults):
                 "Predictions can only be constructed using one "
                 "of eqns or data, but not both."
             )
-        pred = self.model.predict(
+        pred: DataFrame = self.model.predict(
             self.params, equations=equations, data=data
-        )  # type: DataFrame
+        )
         if not dataframe:
             pred = {col: pred[[col]] for col in pred}
             if not missing:

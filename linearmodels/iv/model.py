@@ -157,7 +157,7 @@ class IVLIML(object):
     ):
 
         self.dependent = IVData(dependent, var_name="dependent")
-        nobs = self.dependent.shape[0]  # type: int
+        nobs: int = self.dependent.shape[0]
         self.exog = IVData(exog, var_name="exog", nobs=nobs)
         self.endog = IVData(endog, var_name="endog", nobs=nobs)
         self.instruments = IVData(instruments, var_name="instruments", nobs=nobs)
@@ -201,7 +201,7 @@ class IVLIML(object):
             if additional:
                 self._method += "(" + ", ".join(additional) + ")"
         if not hasattr(self, "_result_container"):
-            self._result_container = IVResults  # type: IVResultType
+            self._result_container: IVResultType = IVResults
 
         self._kappa = kappa
         self._fuller = fuller
@@ -384,7 +384,7 @@ class IVLIML(object):
 
     def _drop_missing(self) -> ndarray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing = any(c_[[dh.isnull for dh in data]], 0)  # type: ndarray
+        missing: ndarray = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
             if npall(missing):
                 raise ValueError(

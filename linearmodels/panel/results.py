@@ -770,9 +770,9 @@ def compare(results, precision="tstats"):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
@@ -791,9 +791,9 @@ class PanelModelComparison(_ModelComparison):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.

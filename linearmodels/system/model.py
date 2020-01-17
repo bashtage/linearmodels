@@ -13,7 +13,7 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 """
 from linearmodels.compat.numpy import lstsq
 
-from collections import Mapping, OrderedDict
+from collections import Mapping
 from functools import reduce
 import textwrap
 
@@ -90,10 +90,10 @@ GMM_COV_EST = {
 
 
 def _to_ordered_dict(equations):
-    if not isinstance(equations, OrderedDict):
+    if not isinstance(equations, dict):
         keys = [key for key in equations]
         keys = sorted(keys)
-        ordered_eqn = OrderedDict()
+        ordered_eqn = {}
         for key in keys:
             ordered_eqn[key] = equations[key]
         equations = ordered_eqn
@@ -159,10 +159,10 @@ class SystemFormulaParser(object):
         self._formula = formula
         self._data = data
         self._weights = weights
-        self._parsers = OrderedDict()
-        self._weight_dict = OrderedDict()
+        self._parsers = {}
+        self._weight_dict = {}
         self._eval_env = eval_env
-        self._clean_formula = OrderedDict()
+        self._clean_formula = {}
         self._parse()
 
     @staticmethod
@@ -222,7 +222,7 @@ class SystemFormulaParser(object):
         self._weight_dict = weight_dict
 
     def _get_variable(self, variable):
-        return OrderedDict(
+        return dict(
             [(key, getattr(self._parsers[key], variable)) for key in self._parsers]
         )
 
@@ -241,7 +241,7 @@ class SystemFormulaParser(object):
         self._eval_env = value
         # Update parsers for new level
         parsers = self._parsers
-        new_parsers = OrderedDict()
+        new_parsers = {}
         for key in parsers:
             parser = parsers[key]
             new_parsers[key] = IVFormulaParser(
@@ -255,7 +255,7 @@ class SystemFormulaParser(object):
 
     @property
     def data(self):
-        out = OrderedDict()
+        out = {}
         dep = self.dependent
         for key in dep:
             out[key] = {"dependent": dep[key]}
@@ -656,7 +656,7 @@ class IV3SLS(object):
             kx = self._x[i].shape[1]
             if label in equations:
                 b = params[loc : loc + kx]
-                eqn = equations[label]  # type: dict
+                eqn: dict = equations[label]
                 exog = eqn.get("exog", None)
                 endog = eqn.get("endog", None)
                 if exog is None and endog is None:
@@ -964,7 +964,7 @@ class IV3SLS(object):
         the dictionary of equations from the variables using the common
         exogenous, endogenous and instrumental variables.
         """
-        equations = OrderedDict()
+        equations = {}
         dependent = IVData(dependent, var_name="dependent")
         if exog is None and endog is None:
             raise ValueError("At least one of exog or endog must be provided")
@@ -1530,7 +1530,7 @@ class SUR(IV3SLS):
         >>> factors['alpha'] = 1
         >>> mod = SUR.multivariate_ls(portfolios, factors)
         """
-        equations = OrderedDict()
+        equations = {}
         dependent = IVData(dependent, var_name="dependent")
         exog = IVData(exog, var_name="exog")
         for col in dependent.pandas:

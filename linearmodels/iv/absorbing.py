@@ -47,7 +47,7 @@ except ImportError:
 
 SCALAR_DTYPES = {"int8": int8, "int16": int16, "int32": int32, "int64": int64}
 
-_VARIABLE_CACHE = defaultdict(dict)  # type: DefaultDict[Hashable, Dict[str, ndarray]]
+_VARIABLE_CACHE: DefaultDict[Hashable, Dict[str, ndarray]] = defaultdict(dict)
 
 
 def _reset(hasher):
@@ -637,7 +637,7 @@ class AbsorbingLS(object):
         self._check_weights()
 
         self._interactions = interactions
-        self._interaction_list = []  # type: List[Interaction]
+        self._interaction_list: List[Interaction] = []
         self._prepare_interactions()
         self._absorbed_dependent = None
         self._absorbed_exog = None

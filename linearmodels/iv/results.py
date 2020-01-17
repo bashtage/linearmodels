@@ -3,7 +3,6 @@ Results containers and post-estimation diagnostics for IV models
 """
 from linearmodels.compat.statsmodels import Summary
 
-from collections import OrderedDict
 import datetime as dt
 from typing import Any, Dict, List, Sequence, Union
 
@@ -642,7 +641,7 @@ class FirstStageResults(_SummaryStr):
         else:
             px = x @ pinv(x)
         ez = z - px @ z
-        out = OrderedDict()  # type: Dict[str, Series]
+        out: Dict[str, Series] = {}
         individual_results = self.individual
         for col in endog.pandas:
             y = w * endog.pandas[[col]].values
@@ -702,7 +701,7 @@ class FirstStageResults(_SummaryStr):
         w = sqrt(self.weights.ndarray)
         exog_instr = w * c_[self.exog.ndarray, self.instr.ndarray]
         exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
-        res = OrderedDict()  # type: Dict[str, OLSResults]
+        res: Dict[str, OLSResults] = {}
         for col in self.endog.pandas:
             dep = w.squeeze() * self.endog.pandas[col]
             mod = _OLS(dep, exog_instr)
@@ -1428,9 +1427,9 @@ class IVModelComparison(_ModelComparison):
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
@@ -1481,9 +1480,7 @@ class IVModelComparison(_ModelComparison):
             "F-statistic",
             "P-value (F-stat)",
         ]
-        dep_name = (
-            OrderedDict()
-        )  # type: Dict[str, Union[IVResults, IVGMMResults, OLSResults]]
+        dep_name: Dict[str, Union[IVResults, IVGMMResults, OLSResults]] = {}
         for key in self._results:
             dep_name[key] = self._results[key].model.dependent.cols[0]
         dep_name = Series(dep_name)
@@ -1563,9 +1560,9 @@ def compare(results, *, precision="tstats") -> IVModelComparison:
 
     Parameters
     ----------
-    results : {list, dict, OrderedDict}
+    results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
-        names.  An OrderedDict will preserve the model order the comparisons.
+        names.
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.

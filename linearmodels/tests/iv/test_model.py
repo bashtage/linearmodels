@@ -1,6 +1,5 @@
 from linearmodels.compat.pandas import assert_series_equal
 
-from collections import OrderedDict
 import warnings
 
 import numpy as np
@@ -315,11 +314,7 @@ def test_compare(data):
     c.summary
     c = compare({"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4})
     c.summary
-    res = OrderedDict()
-    res["Model A"] = res1
-    res["Model B"] = res2
-    res["Model C"] = res3
-    res["Model D"] = res4
+    res = {"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4}
     c = compare(res)
     c.summary
     c.pvalues
@@ -337,8 +332,7 @@ def test_compare_single(data):
     c.summary
     c = compare({"Model A": res1})
     c.summary
-    res = OrderedDict()
-    res["Model A"] = res1
+    res = {"Model A": res1}
     c = compare(res)
     c.summary
     c.pvalues

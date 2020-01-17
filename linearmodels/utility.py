@@ -2,7 +2,6 @@ from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import concat
 from linearmodels.compat.statsmodels import Summary
 
-from collections import OrderedDict
 from collections.abc import MutableMapping
 from typing import (
     AbstractSet,
@@ -410,12 +409,12 @@ def pval_format(v: float) -> str:
 
 
 class _SummaryStr(object):
-    def __init__(self) -> None:
-        self._summary = Summary()
-
+    """
+    Mixin class for results classes to automatically show the summary.
+    """
     @property
     def summary(self) -> Summary:
-        return self._summary
+        return Summary()
 
     def __str__(self) -> str:
         return self.summary.as_text()
@@ -449,24 +448,22 @@ class _ModelComparison(_SummaryStr):
         "pvalues": "P-values",
         "std_errors": "Std. Errors",
     }
+
     # TODO: Replace Any with better list of types
     def __init__(
         self,
-        results: Union[OrderedDict[str, Any], Dict[str, Any], Sequence[Any]],
+        results: Union[Dict[str, Any], Sequence[Any]],
         *,
         precision: str = "tstats"
     ) -> None:
-        if not isinstance(results, (dict, OrderedDict)):
-            _results: OrderedDict[str, Any] = OrderedDict()
+        if not isinstance(results, dict):
+            _results: Dict[str, Any] = {}
             for i, res in enumerate(results):
                 _results["Model " + str(i)] = res
-            results = _results
-        elif not isinstance(results, OrderedDict):
-            _results = OrderedDict()
-            for key in sorted(results.keys()):
-                _results[key] = results[key]
-            results = _results
-        self._results = results
+        else:
+            _results = {}
+            _results.update(results)
+        self._results = _results
 
         for key in self._results:
             if not isinstance(self._results[key], self._supported):
@@ -487,7 +484,7 @@ class _ModelComparison(_SummaryStr):
         return values
 
     def _get_property(self, name: str) -> Series:
-        out = OrderedDict()
+        out = {}
         items = []
         for k, v in self._results.items():
             items.append(k)

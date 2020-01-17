@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from collections.abc import Mapping
 from itertools import product
 import warnings
@@ -520,9 +519,7 @@ def test_formula_weights():
         np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
     )
     weights = DataFrame(np.random.chisquare(5, (500, 2)), columns=["eq1", "eq2"])
-    formula = OrderedDict()
-    formula["eq1"] = "y1 ~ 1 + x1"
-    formula["eq2"] = "y2 ~ 1 + x1"
+    formula = {"eq1": "y1 ~ 1 + x1", "eq2": "y2 ~ 1 + x1"}
     mod = SUR.from_formula(formula, data, weights=weights)
     mod.fit()
     expected = weights.values[:, [0]]
@@ -545,9 +542,7 @@ def test_formula_partial_weights():
         np.random.standard_normal((500, 4)), columns=["y1", "y2", "x1", "x2"]
     )
     weights = DataFrame(np.random.chisquare(5, (500, 1)), columns=["eq2"])
-    formula = OrderedDict()
-    formula["eq1"] = "y1 ~ 1 + x1"
-    formula["eq2"] = "y2 ~ 1 + x1"
+    formula = {"eq1": "y1 ~ 1 + x1", "eq2": "y2 ~ 1 + x1"}
     with warnings.catch_warnings(record=True) as w:
         mod = SUR.from_formula(formula, data, weights=weights)
         assert len(w) == 1
@@ -588,7 +583,7 @@ def test_against_direct_model(data):
         return
     y = []
     x = []
-    data_copy = OrderedDict()
+    data_copy = {}
     for i in range(min(3, len(data))):
         data_copy[keys[i]] = data[keys[i]]
         y.append(data[keys[i]]["dependent"])
