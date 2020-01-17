@@ -3,8 +3,11 @@ Covariance estimators for linear factor models
 """
 from numpy.linalg import inv
 
-from linearmodels.iv.covariance import (KERNEL_LOOKUP, _cov_kernel,
-                                        kernel_optimal_bandwidth)
+from linearmodels.iv.covariance import (
+    KERNEL_LOOKUP,
+    _cov_kernel,
+    kernel_optimal_bandwidth,
+)
 
 
 class _HACMixin(object):

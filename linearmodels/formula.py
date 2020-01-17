@@ -1,6 +1,12 @@
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
-from linearmodels.panel import (BetweenOLS, FamaMacBeth, FirstDifferenceOLS,
-                                PanelOLS, PooledOLS, RandomEffects)
+from linearmodels.panel import (
+    BetweenOLS,
+    FamaMacBeth,
+    FirstDifferenceOLS,
+    PanelOLS,
+    PooledOLS,
+    RandomEffects,
+)
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
 __all__ = [

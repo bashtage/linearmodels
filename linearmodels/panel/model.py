@@ -9,26 +9,44 @@ from patsy.missing import NAAction
 from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
 
-from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
-                                           CovarianceManager, DriscollKraay,
-                                           FamaMacBethCovariance,
-                                           FamaMacBethKernelCovariance,
-                                           HeteroskedasticCovariance,
-                                           HomoskedasticCovariance)
+from linearmodels.panel.covariance import (
+    ACCovariance,
+    ClusteredCovariance,
+    CovarianceManager,
+    DriscollKraay,
+    FamaMacBethCovariance,
+    FamaMacBethKernelCovariance,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+)
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.results import (PanelEffectsResults, PanelResults,
-                                        RandomEffectsResults)
-from linearmodels.panel.utility import (AbsorbingEffectWarning,
-                                        absorbing_warn_msg, check_absorbed,
-                                        dummy_matrix, in_2core_graph,
-                                        not_absorbed)
-from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
-                                  InferenceUnavailableWarning,
-                                  InvalidTestStatistic, MemoryWarning,
-                                  MissingValueWarning, SingletonWarning,
-                                  WaldTestStatistic, ensure_unique_column,
-                                  has_constant, missing_warning,
-                                  panel_to_frame)
+from linearmodels.panel.results import (
+    PanelEffectsResults,
+    PanelResults,
+    RandomEffectsResults,
+)
+from linearmodels.panel.utility import (
+    AbsorbingEffectWarning,
+    absorbing_warn_msg,
+    check_absorbed,
+    dummy_matrix,
+    in_2core_graph,
+    not_absorbed,
+)
+from linearmodels.utility import (
+    AttrDict,
+    InapplicableTestStatistic,
+    InferenceUnavailableWarning,
+    InvalidTestStatistic,
+    MemoryWarning,
+    MissingValueWarning,
+    SingletonWarning,
+    WaldTestStatistic,
+    ensure_unique_column,
+    has_constant,
+    missing_warning,
+    panel_to_frame,
+)
 
 
 def panel_structure_stats(ids, name):

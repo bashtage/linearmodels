@@ -1,12 +1,18 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
+from typing import Any
+
 from numpy import asarray, unique
 from numpy.linalg import inv
 
-from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                        _cov_cluster, _cov_kernel,
-                                        kernel_optimal_bandwidth)
+from linearmodels.iv.covariance import (
+    KERNEL_LOOKUP,
+    HomoskedasticCovariance,
+    _cov_cluster,
+    _cov_kernel,
+    kernel_optimal_bandwidth,
+)
 
 
 class HomoskedasticWeightMatrix(object):
@@ -388,7 +394,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         self._kernel = cov_config.get("kernel", "")
         self._name = "GMM Covariance"
         if cov_type in ("robust", "heteroskedastic"):
-            score_cov_estimator = HeteroskedasticWeightMatrix
+            score_cov_estimator: Any = HeteroskedasticWeightMatrix
         elif cov_type in ("unadjusted", "homoskedastic"):
             score_cov_estimator = HomoskedasticWeightMatrix
         elif cov_type == "clustered":

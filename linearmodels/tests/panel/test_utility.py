@@ -6,8 +6,12 @@ import scipy.sparse.coo
 import scipy.sparse.csc
 import scipy.sparse.csr
 
-from linearmodels.panel.utility import (dummy_matrix, in_2core_graph,
-                                        in_2core_graph_slow, preconditioner)
+from linearmodels.panel.utility import (
+    dummy_matrix,
+    in_2core_graph,
+    in_2core_graph_slow,
+    preconditioner,
+)
 
 formats = {
     "csc": scipy.sparse.csc.csc_matrix,

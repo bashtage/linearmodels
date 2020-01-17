@@ -10,10 +10,13 @@ import pytest
 from linearmodels.iv import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS
-from linearmodels.tests.panel._utility import (access_attributes,
-                                               assert_frame_similar,
-                                               assert_results_equal, datatypes,
-                                               generate_data)
+from linearmodels.tests.panel._utility import (
+    access_attributes,
+    assert_frame_similar,
+    assert_results_equal,
+    datatypes,
+    generate_data,
+)
 
 pytestmark = pytest.mark.filterwarnings(
     "ignore::linearmodels.utility.MissingValueWarning"

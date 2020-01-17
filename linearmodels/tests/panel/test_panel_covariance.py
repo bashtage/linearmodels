@@ -1,10 +1,14 @@
 import numpy as np
 import pytest
 
-from linearmodels.panel.covariance import (ACCovariance, ClusteredCovariance,
-                                           CovarianceManager, DriscollKraay,
-                                           HeteroskedasticCovariance,
-                                           HomoskedasticCovariance)
+from linearmodels.panel.covariance import (
+    ACCovariance,
+    ClusteredCovariance,
+    CovarianceManager,
+    DriscollKraay,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+)
 
 
 class TestCovariance(object):

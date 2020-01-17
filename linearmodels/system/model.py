@@ -23,24 +23,35 @@ from pandas import DataFrame, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
-from linearmodels.system._utility import (LinearConstraint,
-                                          blocked_column_product,
-                                          blocked_cross_prod,
-                                          blocked_diag_product,
-                                          blocked_inner_prod, inv_matrix_sqrt)
-from linearmodels.system.covariance import (GMMHeteroskedasticCovariance,
-                                            GMMHomoskedasticCovariance,
-                                            GMMKernelCovariance,
-                                            HeteroskedasticCovariance,
-                                            HomoskedasticCovariance,
-                                            KernelCovariance)
-from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
-                                     HomoskedasticWeightMatrix,
-                                     KernelWeightMatrix)
+from linearmodels.system._utility import (
+    LinearConstraint,
+    blocked_column_product,
+    blocked_cross_prod,
+    blocked_diag_product,
+    blocked_inner_prod,
+    inv_matrix_sqrt,
+)
+from linearmodels.system.covariance import (
+    GMMHeteroskedasticCovariance,
+    GMMHomoskedasticCovariance,
+    GMMKernelCovariance,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+    KernelCovariance,
+)
+from linearmodels.system.gmm import (
+    HeteroskedasticWeightMatrix,
+    HomoskedasticWeightMatrix,
+    KernelWeightMatrix,
+)
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.utility import (AttrDict, InvalidTestStatistic,
-                                  WaldTestStatistic, has_constant,
-                                  missing_warning)
+from linearmodels.utility import (
+    AttrDict,
+    InvalidTestStatistic,
+    WaldTestStatistic,
+    has_constant,
+    missing_warning,
+)
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM"]
 

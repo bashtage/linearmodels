@@ -8,15 +8,23 @@ from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 from scipy.optimize import minimize
 
-from linearmodels.asset_pricing.covariance import (HeteroskedasticCovariance,
-                                                   HeteroskedasticWeight,
-                                                   KernelCovariance,
-                                                   KernelWeight)
-from linearmodels.asset_pricing.results import (GMMFactorModelResults,
-                                                LinearFactorModelResults)
+from linearmodels.asset_pricing.covariance import (
+    HeteroskedasticCovariance,
+    HeteroskedasticWeight,
+    KernelCovariance,
+    KernelWeight,
+)
+from linearmodels.asset_pricing.results import (
+    GMMFactorModelResults,
+    LinearFactorModelResults,
+)
 from linearmodels.iv.data import IVData
-from linearmodels.utility import (AttrDict, WaldTestStatistic, has_constant,
-                                  missing_warning)
+from linearmodels.utility import (
+    AttrDict,
+    WaldTestStatistic,
+    has_constant,
+    missing_warning,
+)
 
 
 def callback_factory(obj, args, disp=1):

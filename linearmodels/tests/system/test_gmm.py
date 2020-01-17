@@ -11,11 +11,12 @@ import pytest
 
 from linearmodels.iv.covariance import kernel_weight_parzen
 from linearmodels.system import IV3SLS, IVSystemGMM
-from linearmodels.system.gmm import (HeteroskedasticWeightMatrix,
-                                     HomoskedasticWeightMatrix,
-                                     KernelWeightMatrix)
-from linearmodels.tests.system._utility import (generate_3sls_data_v2,
-                                                simple_gmm)
+from linearmodels.system.gmm import (
+    HeteroskedasticWeightMatrix,
+    HomoskedasticWeightMatrix,
+    KernelWeightMatrix,
+)
+from linearmodels.tests.system._utility import generate_3sls_data_v2, simple_gmm
 from linearmodels.utility import AttrDict
 
 params = list(product([1, 2], [True, False]))

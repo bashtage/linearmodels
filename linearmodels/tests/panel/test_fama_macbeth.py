@@ -9,11 +9,13 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
-from linearmodels.tests.panel._utility import (access_attributes,
-                                               assert_frame_similar, datatypes,
-                                               generate_data)
-from linearmodels.utility import (InferenceUnavailableWarning,
-                                  MissingValueWarning)
+from linearmodels.tests.panel._utility import (
+    access_attributes,
+    assert_frame_similar,
+    datatypes,
+    generate_data,
+)
+from linearmodels.utility import InferenceUnavailableWarning, MissingValueWarning
 
 pytestmark = pytest.mark.filterwarnings(
     "ignore::linearmodels.utility.MissingValueWarning"

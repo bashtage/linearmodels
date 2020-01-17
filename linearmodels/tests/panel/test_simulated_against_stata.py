@@ -6,8 +6,7 @@ import pandas as pd
 import pytest
 
 from linearmodels.panel.data import PanelData
-from linearmodels.panel.model import (BetweenOLS, PanelOLS, PooledOLS,
-                                      RandomEffects)
+from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS, RandomEffects
 from linearmodels.tests.panel.results import parse_stata_results
 from linearmodels.utility import AttrDict
 

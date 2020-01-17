@@ -32,14 +32,22 @@ instrumental variable estimators and system estimators:
 Designed to work equally well with NumPy, Pandas or xarray data.
 """
 import os
+from typing import List, Optional, Union
 
-from linearmodels.asset_pricing.model import (LinearFactorModel,
-                                              LinearFactorModelGMM,
-                                              TradedFactorModel)
+from linearmodels.asset_pricing.model import (
+    LinearFactorModel,
+    LinearFactorModelGMM,
+    TradedFactorModel,
+)
 from linearmodels.iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVLIML
-from linearmodels.panel.model import (BetweenOLS, FamaMacBeth,
-                                      FirstDifferenceOLS, PanelOLS, PooledOLS,
-                                      RandomEffects)
+from linearmodels.panel.model import (
+    BetweenOLS,
+    FamaMacBeth,
+    FirstDifferenceOLS,
+    PanelOLS,
+    PooledOLS,
+    RandomEffects,
+)
 from linearmodels.system import IV3SLS, SUR, IVSystemGMM
 
 from ._version import get_versions
@@ -73,7 +81,11 @@ __all__ = [
 ]
 
 
-def test(extra_args=None, exit=True, append=True):
+def test(
+    extra_args: Optional[Union[str, List[str]]] = None,
+    exit: bool = True,
+    append: bool = True,
+):
     import sys
 
     try:
@@ -84,11 +96,13 @@ def test(extra_args=None, exit=True, append=True):
     cmd = ["--tb=auto"]
     if extra_args:
         if not isinstance(extra_args, list):
-            extra_args = [extra_args]
-        if append:
-            cmd += extra_args[:]
+            pytest_args = [extra_args]
         else:
-            cmd = extra_args
+            pytest_args = extra_args
+        if append:
+            cmd += pytest_args[:]
+        else:
+            cmd = pytest_args
     pkg = os.path.dirname(__file__)
     cmd = [pkg] + cmd
     print("running: pytest {}".format(" ".join(cmd)))

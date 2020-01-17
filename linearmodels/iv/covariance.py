@@ -4,8 +4,24 @@ Covariance estimation for 2SLS and LIML IV estimators
 from typing import Any, Callable, Dict, Union
 
 from mypy_extensions import VarArg
-from numpy import (arange, argsort, asarray, ceil, cos, empty, int64, ndarray,
-                   ones, pi, r_, sin, sum as npsum, unique, where, zeros)
+from numpy import (
+    arange,
+    argsort,
+    asarray,
+    ceil,
+    cos,
+    empty,
+    int64,
+    ndarray,
+    ones,
+    pi,
+    r_,
+    sin,
+    sum as npsum,
+    unique,
+    where,
+    zeros,
+)
 from numpy.linalg import inv, pinv
 
 from linearmodels.typing import Numeric, OptionalNumeric

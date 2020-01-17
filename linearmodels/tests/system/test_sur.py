@@ -10,9 +10,11 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
 from linearmodels.iv.model import _OLS as OLS
-from linearmodels.system._utility import (blocked_column_product,
-                                          blocked_diag_product,
-                                          inv_matrix_sqrt)
+from linearmodels.system._utility import (
+    blocked_column_product,
+    blocked_diag_product,
+    inv_matrix_sqrt,
+)
 from linearmodels.system.model import SUR
 from linearmodels.tests.system._utility import generate_data, simple_sur
 from linearmodels.utility import AttrDict, InvalidTestStatistic

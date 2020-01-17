@@ -6,9 +6,12 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import RandomEffects
-from linearmodels.tests.panel._utility import (access_attributes,
-                                               assert_frame_similar, datatypes,
-                                               generate_data)
+from linearmodels.tests.panel._utility import (
+    access_attributes,
+    assert_frame_similar,
+    datatypes,
+    generate_data,
+)
 
 pytestmark = pytest.mark.filterwarnings(
     "ignore::linearmodels.utility.MissingValueWarning"

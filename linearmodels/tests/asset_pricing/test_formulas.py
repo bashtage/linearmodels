@@ -4,9 +4,11 @@ import numpy as np
 from pandas.testing import assert_frame_equal
 import pytest
 
-from linearmodels.asset_pricing.model import (LinearFactorModel,
-                                              LinearFactorModelGMM,
-                                              TradedFactorModel)
+from linearmodels.asset_pricing.model import (
+    LinearFactorModel,
+    LinearFactorModelGMM,
+    TradedFactorModel,
+)
 from linearmodels.tests.asset_pricing._utility import generate_data
 
 FORMULA_FACTORS = "factor_1 + factor_2 + factor_3"

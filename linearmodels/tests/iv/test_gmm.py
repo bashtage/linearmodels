@@ -2,13 +2,18 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
-from linearmodels.iv.covariance import (kernel_weight_bartlett,
-                                        kernel_weight_parzen,
-                                        kernel_weight_quadratic_spectral)
-from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
-                                 HomoskedasticWeightMatrix, IVGMMCovariance,
-                                 KernelWeightMatrix,
-                                 OneWayClusteredWeightMatrix)
+from linearmodels.iv.covariance import (
+    kernel_weight_bartlett,
+    kernel_weight_parzen,
+    kernel_weight_quadratic_spectral,
+)
+from linearmodels.iv.gmm import (
+    HeteroskedasticWeightMatrix,
+    HomoskedasticWeightMatrix,
+    IVGMMCovariance,
+    KernelWeightMatrix,
+    OneWayClusteredWeightMatrix,
+)
 from linearmodels.tests.iv._utility import generate_data
 from linearmodels.utility import AttrDict
 

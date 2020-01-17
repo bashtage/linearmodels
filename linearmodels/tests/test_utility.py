@@ -9,11 +9,18 @@ import pytest
 from scipy import stats
 
 import linearmodels
-from linearmodels.utility import (AttrDict, InapplicableTestStatistic,
-                                  InvalidTestStatistic, WaldTestStatistic,
-                                  ensure_unique_column, format_wide,
-                                  has_constant, inv_sqrth, missing_warning,
-                                  panel_to_frame)
+from linearmodels.utility import (
+    AttrDict,
+    InapplicableTestStatistic,
+    InvalidTestStatistic,
+    WaldTestStatistic,
+    ensure_unique_column,
+    format_wide,
+    has_constant,
+    inv_sqrth,
+    missing_warning,
+    panel_to_frame,
+)
 
 MISSING_PANEL = "Panel" not in dir(pd)
 
@@ -152,11 +159,11 @@ def test_attr_dict():
 
     ad.__str__()
     with pytest.raises(AttributeError):
-        ad.__ordered_dict__ = None
+        ad.__private_dict__ = None
     with pytest.raises(AttributeError):
         ad.some_other_key
     with pytest.raises(KeyError):
-        ad["__ordered_dict__"] = None
+        ad["__private_dict__"] = None
 
     del ad[1]
     assert 1 not in ad.keys()

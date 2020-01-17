@@ -2,11 +2,30 @@ from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
 
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Union
+from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Optional, Union
 
-from numpy import (any as npany, arange, ascontiguousarray, average,
-                   column_stack, dtype, empty, empty_like, int8, int16, int32,
-                   int64, nanmean, ndarray, ones, ptp, sqrt, where, zeros)
+from numpy import (
+    any as npany,
+    arange,
+    asarray,
+    ascontiguousarray,
+    average,
+    column_stack,
+    dtype,
+    empty,
+    empty_like,
+    int8,
+    int16,
+    int32,
+    int64,
+    nanmean,
+    ndarray,
+    ones,
+    ptp,
+    sqrt,
+    where,
+    zeros,
+)
 from pandas import Categorical, DataFrame, Series
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
@@ -16,8 +35,7 @@ from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.data import IVData
 from linearmodels.iv.model import COVARIANCE_ESTIMATORS
 from linearmodels.iv.results import AbsorbingLSResults
-from linearmodels.panel.utility import (check_absorbed, dummy_matrix,
-                                        preconditioner)
+from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import missing_warning
@@ -170,8 +188,8 @@ def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
     csc_matrix
         Sparse matrix of dummies with unit column norm
     """
-    codes = get_codes(category_product(cat).cat)
-    return dummy_matrix(codes[:, None], precondition=precondition)[0]
+    codes = asarray(get_codes(category_product(cat).cat))[:, None]
+    return dummy_matrix(codes, precondition=precondition)[0]
 
 
 def category_continuous_interaction(
@@ -253,7 +271,7 @@ class Interaction(object):
         self,
         cat: OptionalArrayLike = None,
         cont: OptionalArrayLike = None,
-        nobs: int = None,
+        nobs: Optional[int] = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -361,13 +379,13 @@ class Interaction(object):
             )
             cat_hashes.append(hasher.hexdigest())
             hasher = _reset(hasher)
-        cat_hashes = tuple(sorted(cat_hashes))
+        sorted_hashes = tuple(sorted(cat_hashes))
 
         hashes = []
         cont = self.cont
         for col in cont:
             hasher.update(ascontiguousarray(to_numpy(cont[col]).data))
-            hashes.append(cat_hashes + (hasher.hexdigest(),))
+            hashes.append(sorted_hashes + (hasher.hexdigest(),))
             hasher = _reset(hasher)
 
         return sorted(hashes)
@@ -435,14 +453,14 @@ class AbsorbingRegressor(object):
         *,
         cat: DataFrame = None,
         cont: DataFrame = None,
-        interactions: List[Interaction] = None,
+        interactions: Optional[List[Interaction]] = None,
         weights: ndarray = None
     ):
         self._cat = cat
         self._cont = cont
         self._interactions = interactions
         self._weights = weights
-        self._approx_rank = None
+        self._approx_rank: Optional[int] = None
 
     @property
     def has_constant(self):
@@ -637,7 +655,7 @@ class AbsorbingLS(object):
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
         self._num_params = 0
-        self._regressors = None
+        self._regressors: OptionalArrayLike = None
         self._regressors_hash = None
 
     def _drop_missing(self) -> ndarray:
@@ -794,6 +812,7 @@ class AbsorbingLS(object):
         mu_exog = (root_w.T @ exog) / denom
 
         lsmr_options = {} if lsmr_options is None else lsmr_options
+        assert self._regressors is not None
         if self._regressors.shape[1] > 0:
             dep_resid = lsmr_annihilate(
                 self._regressors, dep, use_cache, self._regressors_hash, **lsmr_options
@@ -823,7 +842,7 @@ class AbsorbingLS(object):
         *,
         cov_type: str = "robust",
         debiased: bool = False,
-        lsmr_options: dict = None,
+        lsmr_options: Optional[Dict[str, Any]] = None,
         use_cache: bool = True,
         **cov_config: Any
     ):
