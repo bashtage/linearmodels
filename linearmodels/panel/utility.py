@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, TypeVar, Union
 
 import numpy as np
 import pandas as pd
@@ -43,8 +43,12 @@ Variables have been fully absorbed and have removed from the regression:
 {absorbed_variables}
 """
 
+SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
 
-def preconditioner(d: ArrayLike, *, copy: bool = False) -> Tuple[ArrayLike, np.ndarray]:
+
+def preconditioner(
+    d: Union[SparseArray, ArrayLike], *, copy: bool = False
+) -> Tuple[Union[SparseArray, ArrayLike], np.ndarray]:
     """
     Parameters
     ----------

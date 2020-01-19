@@ -1,7 +1,7 @@
 """
 Instrumental variable estimators
 """
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, TypeVar, Union
 
 from numpy import (
     all as npall,
@@ -42,6 +42,7 @@ from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.typing import Numeric, OptionalNumeric
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (
+    InvalidTestStatistic,
     WaldTestStatistic,
     has_constant,
     inv_sqrth,
@@ -75,6 +76,14 @@ COVARIANCE_ESTIMATORS = {
     "clustered": ClusteredCovariance,
     "OneWayClusteredCovariance": ClusteredCovariance,
 }
+
+CovarianceEstimator = TypeVar(
+    "CovarianceEstimator",
+    HomoskedasticCovariance,
+    HeteroskedasticCovariance,
+    KernelCovariance,
+    ClusteredCovariance,
+)
 
 WEIGHT_MATRICES = {
     "unadjusted": HomoskedasticWeightMatrix,
@@ -231,7 +240,7 @@ class IVLIML(object):
         weights: OptionalArrayLike = None,
         fuller: float = 0,
         kappa: OptionalNumeric = None
-    ):
+    ) -> "IVLIML":
         """
         Parameters
         ----------
@@ -277,7 +286,7 @@ class IVLIML(object):
         """
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
-        mod = IVLIML(
+        mod: "IVLIML" = IVLIML(
             dep, exog, endog, instr, weights=weights, fuller=fuller, kappa=kappa
         )
         mod.formula = formula
@@ -360,11 +369,11 @@ class IVLIML(object):
         return self._formula
 
     @formula.setter
-    def formula(self, value: str):
+    def formula(self, value: str) -> None:
         """Formula used to create the model"""
         self._formula = value
 
-    def _validate_inputs(self):
+    def _validate_inputs(self) -> None:
         x, z = self._x, self._z
         if x.shape[1] == 0:
             raise ValueError("Model must contain at least one regressor.")
@@ -451,7 +460,7 @@ class IVLIML(object):
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
-    ):
+    ) -> Union[OLSResults, IVResults]:
         """
         Estimate model parameters
 
@@ -516,15 +525,15 @@ class IVLIML(object):
         cov_config_copy = {k: v for k, v in cov_config.items()}
         if "center" in cov_config_copy:
             del cov_config_copy["center"]
-        cov_estimator = cov_estimator(wx, wy, wz, params, **cov_config_copy)
+        cov_estimator_inst = cov_estimator(wx, wy, wz, params, **cov_config_copy)
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
-        pe = self._post_estimation(params, cov_estimator, cov_type)
+        pe = self._post_estimation(params, cov_estimator_inst, cov_type)
         results.update(pe)
 
         return self._result_container(results, self)
 
-    def wresids(self, params: ndarray):
+    def wresids(self, params: ndarray) -> ndarray:
         """
         Compute weighted model residuals
 
@@ -545,7 +554,7 @@ class IVLIML(object):
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params: ndarray):
+    def resids(self, params: ndarray) -> ndarray:
         """
         Compute model residuals
 
@@ -562,26 +571,30 @@ class IVLIML(object):
         return self._y - self._x @ params
 
     @property
-    def has_constant(self):
+    def has_constant(self) -> bool:
         """Flag indicating the model includes a constant or equivalent"""
         return self._has_constant
 
     @property
-    def isnull(self):
+    def isnull(self) -> ndarray:
         """Locations of observations with missing values"""
         return self._drop_locs
 
     @property
-    def notnull(self):
+    def notnull(self) -> ndarray:
         """Locations of observations included in estimation"""
         return logical_not(self._drop_locs)
 
-    def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
+    def _f_statistic(
+        self, params: ndarray, cov: ndarray, debiased: bool
+    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
-    def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
+    def _post_estimation(
+        self, params: ndarray, cov_estimator: CovarianceEstimator, cov_type: str
+    ) -> Dict[str, Any]:
         columns = self._columns
         index = self._index
         eps = self.resids(params)
@@ -682,7 +695,7 @@ class IV2SLS(IVLIML):
     @staticmethod
     def from_formula(
         formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
-    ):
+    ) -> "IV2SLS":
         """
         Parameters
         ----------
@@ -787,7 +800,7 @@ class IVGMM(IVLIML):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config
+        **weight_config: Any
     ):
         self._method = "IV-GMM"
         self._result_container = IVGMMResults
@@ -807,7 +820,7 @@ class IVGMM(IVLIML):
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
         **weight_config: Any
-    ):
+    ) -> "IVGMM":
         """
         Parameters
         ----------
@@ -865,7 +878,7 @@ class IVGMM(IVLIML):
         return mod
 
     @staticmethod
-    def estimate_parameters(x: ndarray, y: ndarray, z: ndarray, w: ndarray):
+    def estimate_parameters(x: ndarray, y: ndarray, z: ndarray, w: ndarray) -> ndarray:
         """
         Parameters
         ----------
@@ -901,7 +914,7 @@ class IVGMM(IVLIML):
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Any
-    ):
+    ) -> Union[OLSResults, IVGMMResults]:
         """
         Estimate model parameters
 
@@ -990,7 +1003,9 @@ class IVGMM(IVLIML):
 
         return self._result_container(results, self)
 
-    def _gmm_post_estimation(self, params: ndarray, weight_mat: ndarray, iters: int):
+    def _gmm_post_estimation(
+        self, params: ndarray, weight_mat: ndarray, iters: int
+    ) -> Dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
         gmm_specific = {
@@ -1003,7 +1018,7 @@ class IVGMM(IVLIML):
 
         return gmm_specific
 
-    def _j_statistic(self, params: ndarray, weight_mat: ndarray):
+    def _j_statistic(self, params: ndarray, weight_mat: ndarray) -> WaldTestStatistic:
         """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
@@ -1072,8 +1087,8 @@ class IVGMMCUE(IVGMM):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config
-    ):
+        **weight_config: Any
+    ) -> None:
         self._method = "IV-GMM-CUE"
         super(IVGMMCUE, self).__init__(
             dependent,
@@ -1095,7 +1110,7 @@ class IVGMMCUE(IVGMM):
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
         **weight_config: Any
-    ):
+    ) -> "IVGMMCUE":
         """
         Parameters
         ----------
@@ -1151,7 +1166,7 @@ class IVGMMCUE(IVGMM):
         mod.formula = formula
         return mod
 
-    def j(self, params: ndarray, x: ndarray, y: ndarray, z: ndarray):
+    def j(self, params: ndarray, x: ndarray, y: ndarray, z: ndarray) -> float:
         r"""
         Optimization target
 
@@ -1194,7 +1209,7 @@ class IVGMMCUE(IVGMM):
         eps = y - x @ params[:, None]
         w = inv(weight_matrix(x, z, eps))
         g_bar = (z * eps).mean(0)
-        return nobs * g_bar.T @ w @ g_bar.T
+        return nobs * float(g_bar.T @ w @ g_bar.T)
 
     def estimate_parameters(
         self,
@@ -1204,7 +1219,7 @@ class IVGMMCUE(IVGMM):
         z: ndarray,
         display: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> ndarray:
         r"""
         Parameters
         ----------
@@ -1258,7 +1273,7 @@ class IVGMMCUE(IVGMM):
         debiased: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
         **cov_config: Any
-    ):
+    ) -> Union[OLSResults, IVGMMResults]:
         r"""
         Estimate model parameters
 

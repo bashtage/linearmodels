@@ -86,7 +86,7 @@ def singleton_data(request):
 
 
 const_perms = list(product(missing, datatypes))
-const_ids = list(map(lambda s: "-".join(map(str, s)), perms))
+const_ids = list(map(lambda s: "-".join(map(str, s)), const_perms))
 
 
 @pytest.fixture(params=const_perms, ids=const_ids)

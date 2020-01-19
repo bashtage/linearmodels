@@ -2,7 +2,18 @@ from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
 
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Hashable, Iterable, List, Optional, Union
+from typing import (
+    Any,
+    DefaultDict,
+    Dict,
+    Hashable,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 from numpy import (
     any as npany,
@@ -33,24 +44,36 @@ from scipy.sparse.linalg import lsmr
 
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.data import IVData
-from linearmodels.iv.model import COVARIANCE_ESTIMATORS
+from linearmodels.iv.model import (
+    COVARIANCE_ESTIMATORS,
+    ClusteredCovariance,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+    KernelCovariance,
+)
 from linearmodels.iv.results import AbsorbingLSResults
 from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
 from linearmodels.typing import AnyPandas
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
-from linearmodels.utility import missing_warning
+from linearmodels.utility import (
+    InvalidTestStatistic,
+    WaldTestStatistic,
+    missing_warning,
+)
 
 try:
     from xxhash import xxh64 as hash_func
 except ImportError:
     from hashlib import sha1 as hash_func
 
+Hasher = TypeVar("Hasher", bound=hash_func)
+
 SCALAR_DTYPES = {"int8": int8, "int16": int16, "int32": int32, "int64": int64}
 
 _VARIABLE_CACHE: DefaultDict[Hashable, Dict[str, ndarray]] = defaultdict(dict)
 
 
-def _reset(hasher):
+def _reset(hasher: Hasher) -> Hasher:
     try:
         hasher.reset()
         return hasher
@@ -64,7 +87,11 @@ def clear_cache() -> None:
 
 
 def lsmr_annihilate(
-    x: csc_matrix, y: ndarray, use_cache: bool = True, x_hash=None, **lsmr_options
+    x: csc_matrix,
+    y: ndarray,
+    use_cache: bool = True,
+    x_hash: Optional[Hashable] = None,
+    **lsmr_options: Union[float, bool]
 ) -> ndarray:
     r"""
     Removes projection of x on y from y
@@ -101,7 +128,8 @@ def lsmr_annihilate(
 
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts = dict(atol=1e-8, btol=1e-8, show=False)
+    default_opts: Dict[str, Union[float, bool]] = dict(atol=1e-8, btol=1e-8, show=False)
+    assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
     for i in range(y.shape[1]):
@@ -282,6 +310,7 @@ class Interaction(object):
 
     @property
     def nobs(self) -> int:
+        assert self._nobs is not None
         return self._nobs
 
     def _check_data(self) -> None:
@@ -323,7 +352,7 @@ class Interaction(object):
     def isnull(self) -> Series:
         return self.cat.isnull().any(1) | self.cont.isnull().any(1)
 
-    def drop(self, locs) -> None:
+    def drop(self, locs: ndarray) -> None:
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
 
@@ -365,7 +394,7 @@ class Interaction(object):
             return csc_matrix(empty((self._cat_data.shape[0], 0)))
 
     @property
-    def hash(self):
+    def hash(self) -> List[Tuple[str, ...]]:
         """
         Construct a hash that will be invariant for any permutation of
         inputs that produce the same fit when used as regressors"""
@@ -463,19 +492,20 @@ class AbsorbingRegressor(object):
         self._approx_rank: Optional[int] = None
 
     @property
-    def has_constant(self):
+    def has_constant(self) -> bool:
         """Flag indicating whether the regressors have a constant equivalent"""
         return self._cat is not None and self._cat.shape[1] > 0
 
     @property
-    def approx_rank(self):
+    def approx_rank(self) -> int:
         if self._approx_rank is None:
             self._regressors()
+        assert self._approx_rank is not None
         return self._approx_rank
 
     @property
-    def hash(self):
-        hashes = []
+    def hash(self) -> Tuple[Tuple[str, ...], ...]:
+        hashes: List[Tuple[str, ...]] = []
         hasher = hash_func()
         if self._cat is not None:
             for col in self._cat:
@@ -618,7 +648,7 @@ class AbsorbingLS(object):
         absorb: InteractionVar = None,
         interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
         weights: OptionalArrayLike = None
-    ):
+    ) -> None:
 
         self._dependent = IVData(dependent, "dependent")
         self._nobs = nobs = self._dependent.shape[0]
@@ -656,7 +686,7 @@ class AbsorbingLS(object):
         self._constant_absorbed = False
         self._num_params = 0
         self._regressors: OptionalArrayLike = None
-        self._regressors_hash = None
+        self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
     def _drop_missing(self) -> ndarray:
         missing = to_numpy(self.dependent.isnull)
@@ -674,13 +704,13 @@ class AbsorbingLS(object):
         missing_warning(missing)
         return missing
 
-    def _check_constant(self):
+    def _check_constant(self) -> bool:
         col_delta = ptp(self.exog.ndarray, 0)
         has_constant = npany(col_delta == 0)
         self._const_col = where(col_delta == 0)[0][0] if has_constant else None
         return has_constant
 
-    def _check_weights(self):
+    def _check_weights(self) -> None:
         if self._weights is None:
             nobs = self._dependent.shape[0]
             self._is_weighted = False
@@ -691,7 +721,7 @@ class AbsorbingLS(object):
             weights = weights / nanmean(weights)
             self._weight_data = IVData(weights, var_name="weights", nobs=self._nobs)
 
-    def _check_shape(self):
+    def _check_shape(self) -> None:
         nobs = self._nobs
         if self._absorb is not None:
             if self._absorb_inter.nobs != nobs:
@@ -746,23 +776,23 @@ class AbsorbingLS(object):
         raise RuntimeError("fit must be called once before absorbed_exog is available")
 
     @property
-    def weights(self):
+    def weights(self) -> IVData:
         return self._weight_data
 
     @property
-    def dependent(self):
+    def dependent(self) -> IVData:
         return self._dependent
 
     @property
-    def exog(self):
+    def exog(self) -> IVData:
         return self._exog
 
     @property
-    def has_constant(self):
+    def has_constant(self) -> bool:
         return self._has_constant
 
     @property
-    def instruments(self):
+    def instruments(self) -> IVData:
         return IVData(None, "instrument", nobs=self._dependent.shape[0])
 
     def _prepare_interactions(self) -> None:
@@ -783,7 +813,9 @@ class AbsorbingLS(object):
                         "interactions must contain DataFrames or Interactions"
                     )
 
-    def _first_time_fit(self, use_cache, lsmr_options):
+    def _first_time_fit(
+        self, use_cache: bool, lsmr_options: Optional[Dict[str, Union[float, bool]]]
+    ) -> None:
         weights = self.weights.ndarray if self._is_weighted else None
 
         areg = AbsorbingRegressor(
@@ -842,10 +874,10 @@ class AbsorbingLS(object):
         *,
         cov_type: str = "robust",
         debiased: bool = False,
-        lsmr_options: Optional[Dict[str, Any]] = None,
+        lsmr_options: Optional[Dict[str, Union[float, bool]]] = None,
         use_cache: bool = True,
         **cov_config: Any
-    ):
+    ) -> AbsorbingLSResults:
         """
         Estimate model parameters
 
@@ -924,18 +956,18 @@ class AbsorbingLS(object):
         cov_config_copy = {k: v for k, v in cov_config.items()}
         if "center" in cov_config_copy:
             del cov_config_copy["center"]
-        cov_estimator = cov_estimator(
+        cov_estimator_inst = cov_estimator(
             exog_resid, dep_resid, exog_resid, params, **cov_config_copy
         )
 
         results = {"kappa": 0.0, "liml_kappa": 0.0}
-        pe = self._post_estimation(params, cov_estimator, cov_type)
+        pe = self._post_estimation(params, cov_estimator_inst, cov_type)
         results.update(pe)
         results["df_model"] = self._num_params
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: ndarray):
+    def resids(self, params: ndarray) -> ndarray:
         """
         Compute model residuals
 
@@ -952,7 +984,7 @@ class AbsorbingLS(object):
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: ndarray):
+    def wresids(self, params: ndarray) -> ndarray:
         """
         Compute weighted model residuals
 
@@ -975,13 +1007,25 @@ class AbsorbingLS(object):
             to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
         )
 
-    def _f_statistic(self, params: ndarray, cov: ndarray, debiased: bool):
+    def _f_statistic(
+        self, params: ndarray, cov: ndarray, debiased: bool
+    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         const_loc = find_constant(self._exog.ndarray)
         resid_df = self._nobs - self._num_params
 
         return f_statistic(params, cov, debiased, resid_df, const_loc)
 
-    def _post_estimation(self, params: ndarray, cov_estimator, cov_type: str):
+    def _post_estimation(
+        self,
+        params: ndarray,
+        cov_estimator: Union[
+            HomoskedasticCovariance,
+            HeteroskedasticCovariance,
+            KernelCovariance,
+            ClusteredCovariance,
+        ],
+        cov_type: str,
+    ) -> Dict[str, Any]:
         columns = self._columns
         index = self._index
         eps = self.resids(params)

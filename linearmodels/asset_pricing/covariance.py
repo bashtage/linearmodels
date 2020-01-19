@@ -1,6 +1,7 @@
 """
 Covariance estimators for linear factor models
 """
+from numpy import ndarray
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -49,7 +50,7 @@ class _HACMixin(object):
             if bandwidth < 0:
                 raise ValueError("bandwidth must be non-negative.")
 
-    def _kernel_cov(self, z):
+    def _kernel_cov(self, z: ndarray) -> ndarray:
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel

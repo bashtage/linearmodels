@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import Any, Dict, Mapping, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from numpy import asarray, ndarray, unique
 from numpy.linalg import inv
@@ -44,7 +44,7 @@ class HomoskedasticWeightMatrix(object):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
-        self._bandwidth = 0
+        self._bandwidth: Optional[int] = 0
 
     def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
         """
@@ -221,6 +221,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         elif self._orig_bandwidth is None:
             self._bandwidth = nobs - 2
         bw = self._bandwidth
+        assert bw is not None
         w = self._kernels[self._kernel](bw, nobs - 1)
 
         s = _cov_kernel(ze, w)
@@ -246,7 +247,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         }
 
     @property
-    def bandwidth(self) -> float:
+    def bandwidth(self) -> Optional[int]:
         """Actual bandwidth used in estimating the weight matrix"""
         return self._bandwidth
 
@@ -454,7 +455,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return (c + c.T) / 2
 
     @property
-    def config(self) -> Mapping[str, Union[str, bool]]:
-        conf: Dict[str, Union[str, bool]] = {"debiased": self.debiased}
+    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
+        conf: Dict[str, Union[str, bool, ndarray]] = {"debiased": self.debiased}
         conf.update(self._cov_config)
         return conf

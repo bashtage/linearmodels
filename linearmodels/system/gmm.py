@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import Optional, Union
+from typing import Optional
 
 from numpy import array, empty, ndarray, repeat, sqrt
 
@@ -58,7 +58,7 @@ class HomoskedasticWeightMatrix(object):
         return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
-    def _str_extra(self) -> AttrDict[str, bool]:
+    def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
     def sigma(self, eps: ndarray, x: ndarray) -> ndarray:
@@ -116,7 +116,7 @@ class HomoskedasticWeightMatrix(object):
         return w
 
     @property
-    def config(self) -> AttrDict[str, Union[str, int]]:
+    def config(self) -> AttrDict:
         """
         Weight estimator configuration
 
@@ -330,7 +330,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         return self._bandwidth
 
     @property
-    def config(self) -> AttrDict[str, Union[str, int]]:
+    def config(self) -> AttrDict:
         """
         Weight estimator configuration
 

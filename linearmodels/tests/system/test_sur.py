@@ -103,7 +103,7 @@ def mvreg_gen_id(param):
     return idstr
 
 
-mvreg_ids = list(map(mvreg_gen_id, params))
+mvreg_ids = list(map(mvreg_gen_id, mvreg_params))
 
 
 @pytest.fixture(scope="module", params=mvreg_params, ids=mvreg_ids)

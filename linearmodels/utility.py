@@ -670,7 +670,7 @@ def quadratic_form_test(
     cov: ArrayLike,
     restriction: OptionalArrayLike = None,
     value: OptionalArrayLike = None,
-    formula: Optional[str] = None,
+    formula: Optional[Union[str, List[str]]] = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used" "simultaneously.")
