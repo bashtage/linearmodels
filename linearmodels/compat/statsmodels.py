@@ -2,7 +2,7 @@ from statsmodels.iolib import summary
 
 
 class Summary(summary.Summary):
-    def as_html(self):
+    def as_html(self) -> str:
         """
         Return tables as string
 

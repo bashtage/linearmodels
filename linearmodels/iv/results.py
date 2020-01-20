@@ -4,7 +4,7 @@ Results containers and post-estimation diagnostics for IV models
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Any, Dict, List, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from numpy import (
     array,
@@ -26,7 +26,10 @@ import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
+import linearmodels
 from linearmodels.iv._utility import annihilate, proj
+from linearmodels.iv.data import IVData
+from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 from linearmodels.utility import (
     InvalidTestStatistic,
     WaldTestStatistic,
@@ -73,7 +76,11 @@ class OLSResults(_SummaryStr):
         The model used to estimate parameters.
     """
 
-    def __init__(self, results: Dict[str, Any], model):
+    def __init__(
+        self,
+        results: Dict[str, Any],
+        model: Union["linearmodels.iv.model.IV2SLS", "linearmodels.iv.model.IVLIML"],
+    ) -> None:
         self._resid = results["eps"]
         self._wresid = results["weps"]
         self._params = results["params"]
@@ -141,7 +148,13 @@ class OLSResults(_SummaryStr):
         """
         return self.resids
 
-    def _out_of_sample(self, exog, endog, data, fitted, missing):
+    def _out_of_sample(
+        self,
+        exog: ArrayLike,
+        endog: ArrayLike,
+        data: ArrayLike,
+        missing: Optional[bool],
+    ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if not (exog is None and endog is None) and data is not None:
             raise ValueError(
@@ -155,13 +168,13 @@ class OLSResults(_SummaryStr):
 
     def predict(
         self,
-        exog=None,
-        endog=None,
+        exog: OptionalArrayLike = None,
+        endog: OptionalArrayLike = None,
         *,
-        data=None,
-        fitted=True,
-        idiosyncratic=False,
-        missing=False
+        data: Optional[DataFrame] = None,
+        fitted: bool = True,
+        idiosyncratic: bool = False,
+        missing: bool = False,
     ) -> DataFrame:
         """
         In- and out-of-sample predictions
@@ -203,7 +216,7 @@ class OLSResults(_SummaryStr):
         values corresponding to the original model specification.
         """
         if not (exog is None and endog is None and data is None):
-            return self._out_of_sample(exog, endog, data, fitted, missing)
+            return self._out_of_sample(exog, endog, data, missing)
         out = []
         if fitted:
             out.append(self.fitted_values)
@@ -366,7 +379,7 @@ class OLSResults(_SummaryStr):
         ci = asarray(self.params)[:, None] + asarray(self.std_errors)[:, None] * q
         return DataFrame(ci, index=self._vars, columns=["lower", "upper"])
 
-    def _top_right(self):
+    def _top_right(self) -> List[Tuple[str, str]]:
         f_stat = _str(self.f_statistic.stat)
         if isnan(self.f_statistic.stat):
             f_stat = "      N/A"
@@ -383,7 +396,13 @@ class OLSResults(_SummaryStr):
 
     @property
     def summary(self) -> Summary:
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -476,7 +495,11 @@ class OLSResults(_SummaryStr):
         return smry
 
     def wald_test(
-        self, restriction=None, value=None, *, formula=None
+        self,
+        restriction: Optional[Union[DataFrame, ndarray]] = None,
+        value: Optional[Union[Series, ndarray]] = None,
+        *,
+        formula: Optional[Union[str, List[str]]] = None,
     ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
@@ -546,12 +569,25 @@ class OLSResults(_SummaryStr):
 
 
 class AbsorbingLSResults(OLSResults):
-    def __init__(self, results: Dict[str, Any], model):
+    """
+    Results from IV estimation
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    model : AbsorbingLS
+        The model used to estimate parameters.
+    """
+
+    def __init__(
+        self, results: Dict[str, Any], model: "linearmodels.iv.absorbing.AbsorbingLS"
+    ) -> None:
         super(AbsorbingLSResults, self).__init__(results, model)
         self._absorbed_rsquared = results["absorbed_r2"]
         self._absorbed_effects = results["absorbed_effects"]
 
-    def _top_right(self):
+    def _top_right(self) -> List[Tuple[str, str]]:
         f_stat = _str(self.f_statistic.stat)
         if isnan(self.f_statistic.stat):
             f_stat = "      N/A"
@@ -577,7 +613,7 @@ class AbsorbingLSResults(OLSResults):
         return self._absorbed_effects
 
     @property
-    def df_absorbed(self) -> DataFrame:
+    def df_absorbed(self) -> int:
         """Number of variables absorbed"""
         return self.df_model - self.params.shape[0]
 
@@ -587,7 +623,16 @@ class FirstStageResults(_SummaryStr):
     First stage estimation results and diagnostics
     """
 
-    def __init__(self, dep, exog, endog, instr, weights, cov_type, cov_config):
+    def __init__(
+        self,
+        dep: IVData,
+        exog: IVData,
+        endog: IVData,
+        instr: IVData,
+        weights: IVData,
+        cov_type: str,
+        cov_config: Dict[str, Any],
+    ) -> None:
         self.dep = dep
         self.exog = exog
         self.endog = endog
@@ -597,7 +642,6 @@ class FirstStageResults(_SummaryStr):
         self._reg = DataFrame(reg, columns=self.exog.cols + self.endog.cols)
         self._cov_type = cov_type
         self._cov_config = cov_config
-        self._fitted = {}
 
     @cached_property
     def diagnostics(self) -> DataFrame:
@@ -711,7 +755,13 @@ class FirstStageResults(_SummaryStr):
 
     @property
     def summary(self) -> Summary:
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -775,7 +825,16 @@ class _CommonIVResults(OLSResults):
     Results from IV estimation
     """
 
-    def __init__(self, results: Dict[str, Any], model):
+    def __init__(
+        self,
+        results: Dict[str, Any],
+        model: Union[
+            "linearmodels.iv.model.IV2SLS",
+            "linearmodels.iv.model.IVLIML",
+            "linearmodels.iv.model.IVGMM",
+            "linearmodels.iv.model.IVGMMCUE",
+        ],
+    ) -> None:
         super(_CommonIVResults, self).__init__(results, model)
         self._liml_kappa = results.get("liml_kappa", None)
 
@@ -812,7 +871,11 @@ class IVResults(_CommonIVResults):
         The model used to estimate parameters.
     """
 
-    def __init__(self, results: Dict[str, Any], model):
+    def __init__(
+        self,
+        results: Dict[str, Any],
+        model: Union["linearmodels.iv.model.IV2SLS", "linearmodels.iv.model.IVLIML"],
+    ) -> None:
         super(IVResults, self).__init__(results, model)
         self._kappa = results.get("kappa", 1)
 
@@ -910,20 +973,27 @@ class IVResults(_CommonIVResults):
         stat = s * (nobs - nz) / (nobs - s)
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
-    def _endogeneity_setup(self, var_names=None):
+    def _endogeneity_setup(
+        self, variables: Optional[Union[str, List[str]]] = None
+    ) -> Tuple[ndarray, ndarray, ndarray, int, int, int, int]:
         """Setup function for some endogeneity iv"""
-        if var_names is not None and not isinstance(var_names, list):
-            var_names = [var_names]
+        if isinstance(variables, str):
+            variable_list = [variables]
+        elif isinstance(variables, list):
+            variable_list = variables
+        elif variables is not None:
+            raise TypeError("variables must be a str or a list of str.")
+
         nobs = self.model.dependent.shape[0]
         e2 = self.resids.values
         nendog, nexog = self.model.endog.shape[1], self.model.exog.shape[1]
-        if var_names is None:
+        if variables is None:
             assumed_exog = self.model.endog.ndarray
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
             still_endog = empty((nobs, 0))
         else:
-            assumed_exog = self.model.endog.pandas[var_names].values
-            ex = [c for c in self.model.endog.cols if c not in var_names]
+            assumed_exog = self.model.endog.pandas[variable_list].values
+            ex = [c for c in self.model.endog.cols if c not in variable_list]
             still_endog = self.model.endog.pandas[ex].values
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
         ntested = assumed_exog.shape[1]
@@ -942,13 +1012,15 @@ class IVResults(_CommonIVResults):
         e2 = proj(e2, self.model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
-    def durbin(self, variables=None) -> WaldTestStatistic:
+    def durbin(
+        self, variables: Optional[Union[str, List[str]]] = None
+    ) -> WaldTestStatistic:
         r"""
         Durbin's test of exogeneity
 
         Parameters
         ----------
-        variables : list(str), optional
+        variables : {str, List[str]}, default None
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -997,13 +1069,15 @@ class IVResults(_CommonIVResults):
         df = ntested
         return WaldTestStatistic(float(stat), null, df, name=name)
 
-    def wu_hausman(self, variables=None) -> WaldTestStatistic:
+    def wu_hausman(
+        self, variables: Optional[Union[str, List[str]]] = None
+    ) -> WaldTestStatistic:
         r"""
         Wu-Hausman test of exogeneity
 
         Parameters
         ----------
-        variables : list(str), optional
+        variables : {str, List[str]}, default None
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1283,7 +1357,11 @@ class IVGMMResults(_CommonIVResults):
         The model used to estimate parameters.
     """
 
-    def __init__(self, results, model):
+    def __init__(
+        self,
+        results: Dict[str, Any],
+        model: Union["linearmodels.iv.model.IVGMM", "linearmodels.iv.model.IVGMMCUE"],
+    ):
         super(IVGMMResults, self).__init__(results, model)
         self._weight_mat = results["weight_mat"]
         self._weight_type = results["weight_type"]
@@ -1292,7 +1370,7 @@ class IVGMMResults(_CommonIVResults):
         self._j_stat = results["j_stat"]
 
     @property
-    def weight_matrix(self) -> ndarray:
+    def weight_matrix(self) -> NDArray:
         """Weight matrix used in the final-step GMM estimation"""
         return self._weight_mat
 
@@ -1339,13 +1417,15 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._j_stat
 
-    def c_stat(self, variables=None) -> WaldTestStatistic:
+    def c_stat(
+        self, variables: Optional[Union[List[str], str]] = None
+    ) -> WaldTestStatistic:
         r"""
         C-test of endogeneity
 
         Parameters
         ----------
-        variables : list(str), optional
+        variables : {str, List[str]}, default None
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1393,16 +1473,21 @@ class IVGMMResults(_CommonIVResults):
             endog_e = empty((nobs, 0))
             null = "All endogenous variables are exogenous"
         else:
-            if not isinstance(variables, list):
-                variables = [variables]
-            exog_e = c_[exog.ndarray, endog.pandas[variables].values]
-            ex = [c for c in endog.pandas if c not in variables]
+            if isinstance(variables, list):
+                variable_lst = variables
+            elif isinstance(variables, str):
+                variable_lst = [variables]
+            else:
+                raise TypeError("variables must be a str of a list of str.")
+            exog_e = c_[exog.ndarray, endog.pandas[variable_lst].values]
+            ex = [c for c in endog.pandas if c not in variable_lst]
             endog_e = endog.pandas[ex].values
-            null = "Variables {0} are exogenous".format(", ".join(variables))
+            null = "Variables {0} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv import IVGMM
 
         mod = IVGMM(dependent, exog_e, endog_e, instruments)
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
+        assert isinstance(res_e, IVGMMResults)
         j_e = res_e.j_stat.stat
 
         x = self.model._x
@@ -1411,6 +1496,9 @@ class IVGMMResults(_CommonIVResults):
         nz = z.shape[1]
         weight_mat_c = res_e.weight_matrix.values[:nz, :nz]
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
+        from linearmodels.iv.model import IVGMM, IVGMMCUE
+
+        assert isinstance(self.model, (IVGMM, IVGMMCUE))
         j_c = self.model._j_statistic(params_c, weight_mat_c).stat
 
         stat = j_e - j_c
@@ -1439,9 +1527,9 @@ class IVModelComparison(_ModelComparison):
 
     def __init__(
         self,
-        results: Union[List[AnyResult], Dict[str, AnyResult]],
+        results: Union[Sequence[AnyResult], Dict[str, AnyResult]],
         *,
-        precision: str = "tstats"
+        precision: str = "tstats",
     ):
         super(IVModelComparison, self).__init__(results, precision=precision)
 
@@ -1462,7 +1550,13 @@ class IVModelComparison(_ModelComparison):
 
     @property
     def summary(self) -> Summary:
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -1554,7 +1648,9 @@ class IVModelComparison(_ModelComparison):
         return smry
 
 
-def compare(results, *, precision="tstats") -> IVModelComparison:
+def compare(
+    results: Sequence[AnyResult], *, precision: str = "tstats"
+) -> IVModelComparison:
     """
     Compare the results of multiple models
 

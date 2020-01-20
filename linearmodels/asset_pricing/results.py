@@ -4,6 +4,7 @@ Results for linear factor models
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,14 @@ from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
-from linearmodels.utility import _str, _SummaryStr, pval_format
+from linearmodels.typing import NDArray
+from linearmodels.utility import (
+    AttrDict,
+    WaldTestStatistic,
+    _str,
+    _SummaryStr,
+    pval_format,
+)
 
 
 class LinearFactorModelResults(_SummaryStr):
@@ -24,7 +32,7 @@ class LinearFactorModelResults(_SummaryStr):
         A dictionary of results from the model estimation.
     """
 
-    def __init__(self, results):
+    def __init__(self, results: AttrDict):
         self._jstat = results.jstat
         self._params = results.params
         self._param_names = results.param_names
@@ -47,8 +55,14 @@ class LinearFactorModelResults(_SummaryStr):
         self._cov_est = results.cov_est
 
     @property
-    def summary(self):
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+    def summary(self) -> Summary:
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -136,7 +150,13 @@ class LinearFactorModelResults(_SummaryStr):
         return smry
 
     @staticmethod
-    def _single_table(params, se, name, param_names, first=False):
+    def _single_table(
+        params: NDArray,
+        se: NDArray,
+        name: str,
+        param_names: List[str],
+        first: bool = False,
+    ) -> SimpleTable:
         tstats = params / se
         pvalues = 2 - 2 * stats.norm.cdf(tstats)
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
@@ -154,7 +174,7 @@ class LinearFactorModelResults(_SummaryStr):
         title = "{0} Coefficients".format(name)
         table_stubs = param_names
         if first:
-            header = [
+            header: Optional[List[str]] = [
                 "Parameter",
                 "Std. Err.",
                 "T-stat",
@@ -171,7 +191,7 @@ class LinearFactorModelResults(_SummaryStr):
         return table
 
     @property
-    def full_summary(self):
+    def full_summary(self) -> Summary:
         """Complete summary including factor loadings and mispricing measures"""
         smry = self.summary
         params = self.params
@@ -194,34 +214,34 @@ class LinearFactorModelResults(_SummaryStr):
         return smry
 
     @property
-    def nobs(self):
+    def nobs(self) -> int:
         """Number of observations"""
         return self._nobs
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Model type"""
         return self._name
 
     @property
-    def alphas(self):
+    def alphas(self) -> pd.Series:
         """Mispricing estimates"""
         return self.params.iloc[:, 0]
 
     @property
-    def betas(self):
+    def betas(self) -> pd.DataFrame:
         """Estimated factor loadings"""
         return self.params.iloc[:, 1:]
 
     @property
-    def params(self):
+    def params(self) -> pd.DataFrame:
         """Estimated parameters"""
         return pd.DataFrame(
             self._params, columns=self._cols, index=self._portfolio_names
         )
 
     @property
-    def std_errors(self):
+    def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
         se = np.sqrt(np.diag(self._cov))
         nportfolio, nfactor = self._params.shape
@@ -231,24 +251,24 @@ class LinearFactorModelResults(_SummaryStr):
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
 
     @cached_property
-    def tstats(self):
+    def tstats(self) -> pd.DataFrame:
         """Parameter t-statistics"""
         return self.params / self.std_errors
 
     @property
-    def cov_estimator(self):
+    def cov_estimator(self) -> str:
         """Type of covariance estimator used to compute covariance"""
         return str(self._cov_est)
 
     @property
-    def cov(self):
+    def cov(self) -> pd.DataFrame:
         """Estimated covariance of parameters"""
         return pd.DataFrame(
             self._cov, columns=self._param_names, index=self._param_names
         )
 
     @property
-    def j_statistic(self):
+    def j_statistic(self) -> WaldTestStatistic:
         r"""
         Model J statistic
 
@@ -267,44 +287,44 @@ class LinearFactorModelResults(_SummaryStr):
         return self._jstat
 
     @property
-    def risk_premia(self):
+    def risk_premia(self) -> pd.Series:
         """Estimated factor risk premia (lambda)"""
         return pd.Series(self._rp.squeeze(), index=self._rp_names)
 
     @property
-    def risk_premia_se(self):
+    def risk_premia_se(self) -> pd.Series:
         """Estimated factor risk premia standard errors"""
         se = np.sqrt(np.diag(self._rp_cov))
         return pd.Series(se, index=self._rp_names)
 
     @property
-    def risk_premia_tstats(self):
+    def risk_premia_tstats(self) -> pd.Series:
         """Risk premia t-statistics"""
         return self.risk_premia / self.risk_premia_se
 
     @property
-    def rsquared(self):
+    def rsquared(self) -> float:
         """Coefficient of determination (R**2)"""
         return self._rsquared
 
     @property
-    def total_ss(self):
+    def total_ss(self) -> float:
         """Total sum of squares"""
         return self._total_ss
 
     @property
-    def residual_ss(self):
+    def residual_ss(self) -> float:
         """Residual sum of squares"""
         return self._residual_ss
 
 
 class GMMFactorModelResults(LinearFactorModelResults):
-    def __init__(self, results):
+    def __init__(self, results: AttrDict):
         super(GMMFactorModelResults, self).__init__(results)
         self._iter = results.iter
 
     @property
-    def std_errors(self):
+    def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
         se = np.sqrt(np.diag(self._cov))
         ase = np.sqrt(np.diag(self._alpha_vcv))
@@ -314,6 +334,6 @@ class GMMFactorModelResults(LinearFactorModelResults):
         se = se.reshape((nportfolio, nfactor))
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
 
-    def iterations(self):
+    def iterations(self) -> int:
         """Number of steps in GMM estimation"""
         return self._iter

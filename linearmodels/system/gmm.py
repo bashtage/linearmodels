@@ -1,11 +1,14 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from numpy import array, empty, repeat, sqrt
+from typing import Optional
+
+from numpy import array, empty, ndarray, repeat, sqrt
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.system._utility import blocked_inner_prod
+from linearmodels.typing import NDArray
 from linearmodels.utility import AttrDict
 
 
@@ -36,30 +39,30 @@ class HomoskedasticWeightMatrix(object):
     ``center`` has no effect on this estimator since it is always centered.
     """
 
-    def __init__(self, center=False, debiased=False):
+    def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
-        self._bandwidth = 0
+        self._bandwidth: Optional[float] = 0
         self._name = "Homoskedastic (Unadjusted) Weighting"
         self._config = AttrDict(center=center, debiased=debiased)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = self._name
         extra = []
         for key in self._str_extra:
-            extra.append(": ".join([key, str(self._str_extra[key])]))
+            extra.append(": ".join([str(key), str(self._str_extra[key])]))
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
-    def _str_extra(self):
+    def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps, x):
+    def sigma(self, eps: NDArray, x: NDArray) -> NDArray:
         """
         Estimate residual covariance.
 
@@ -87,7 +90,9 @@ class HomoskedasticWeightMatrix(object):
 
         return sigma
 
-    def weight_matrix(self, x, z, eps, *, sigma=None):
+    def weight_matrix(
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
@@ -99,8 +104,8 @@ class HomoskedasticWeightMatrix(object):
             List of containing instruments for each equation in the system
         eps : ndarray
             Model errors (nobs by neqn)
-        sigma : ndarray
-            Fixed covariance of model errors
+        sigma : ndarray, default None
+            Fixed covariance of model errors. If None, estimated from eps.
 
         Returns
         -------
@@ -112,7 +117,7 @@ class HomoskedasticWeightMatrix(object):
         return w
 
     @property
-    def config(self):
+    def config(self) -> AttrDict:
         """
         Weight estimator configuration
 
@@ -152,11 +157,13 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     dependence between the moment conditions.
     """
 
-    def __init__(self, center=False, debiased=False):
+    def __init__(self, center: bool = False, debiased: bool = False) -> None:
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
         self._name = "Heteroskedastic (Robust) Weighting"
 
-    def weight_matrix(self, x, z, eps, *, sigma=None):
+    def weight_matrix(
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
@@ -168,6 +175,8 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
             Model instruments (exog and instruments), (nobs by ninstr)
         eps : ndarray
             Model errors (nobs by 1)
+        sigma : ndarray, default None
+            Fixed covariance of model errors. If None, estimated from eps.
 
         Returns
         -------
@@ -192,7 +201,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         return w
 
-    def _debias_scale(self, nobs, x, z):
+    def _debias_scale(self, nobs: int, x: NDArray, z: NDArray) -> float:
         if not self._debiased:
             return 1
         nvar = array(list(map(lambda a: a.shape[1], x)))
@@ -249,12 +258,12 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def __init__(
         self,
-        center=False,
-        debiased=False,
-        kernel="bartlett",
-        bandwidth=None,
-        optimal_bw=False,
-    ):
+        center: bool = False,
+        debiased: bool = False,
+        kernel: str = "bartlett",
+        bandwidth: Optional[float] = None,
+        optimal_bw: bool = False,
+    ) -> None:
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._name = "Kernel (HAC) Weighting"
         self._check_kernel(kernel)
@@ -262,7 +271,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         self._predefined_bw = self._bandwidth
         self._optimal_bw = optimal_bw
 
-    def weight_matrix(self, x, z, eps, *, sigma=None):
+    def weight_matrix(
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
@@ -274,6 +285,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
             Model instruments (exog and instruments), (nobs by ninstr)
         eps : ndarray
             Model errors (nobs by 1)
+        sigma : ndarray, default None
+            Fixed covariance of model errors. If None, estimated from eps.
+
 
         Returns
         -------
@@ -299,7 +313,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         return w
 
-    def _optimal_bandwidth(self, moments):
+    def _optimal_bandwidth(self, moments: NDArray) -> float:
         """Compute optimal bandwidth used in estimation if needed"""
         if self._predefined_bw is not None:
             return self._predefined_bw
@@ -309,15 +323,17 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
             m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
+        assert self._bandwidth is not None
         return self._bandwidth
 
     @property
-    def bandwidth(self):
+    def bandwidth(self) -> float:
         """Bandwidth used to estimate covariance of moment conditions"""
+        assert self._bandwidth is not None
         return self._bandwidth
 
     @property
-    def config(self):
+    def config(self) -> AttrDict:
         """
         Weight estimator configuration
 

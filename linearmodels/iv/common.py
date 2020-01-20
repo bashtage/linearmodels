@@ -1,12 +1,13 @@
-from typing import Optional
+from typing import Optional, Union
 
-from numpy import ix_, ndarray, ptp, where
+from numpy import ix_, ptp, where
 from numpy.linalg import inv
 
+from linearmodels.typing import NDArray
 from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic
 
 
-def find_constant(x):
+def find_constant(x: NDArray) -> Optional[int]:
     """
     Parameters
     ----------
@@ -26,12 +27,12 @@ def find_constant(x):
 
 
 def f_statistic(
-    params: ndarray,
-    cov: ndarray,
+    params: NDArray,
+    cov: NDArray,
     debiased: bool,
     resid_df: int,
     const_loc: Optional[int] = None,
-):
+) -> Union[WaldTestStatistic, InvalidTestStatistic]:
     """
     Parameters
     ----------

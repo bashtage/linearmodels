@@ -45,17 +45,17 @@ matrix:
     env:
     - PYTHON=3.6
     - NUMPY=1.14
-    - SCIPY=1.0
-    - PANDAS=0.22
-    - XARRAY=0.9
+    - SCIPY=1.0.1
+    - PANDAS=0.23
+    - XARRAY=0.10
     - STATSMODELS=0.9
   - python: 3.6
     env:
     - PYTHON=3.6
     - NUMPY=1.15
-    - SCIPY=1.0
-    - PANDAS=0.23
-    - STATSMODELS=0.9
+    - SCIPY=1.1
+    - PANDAS=0.24
+    - XARRAY=0.11
     - SKIP="--skip-slow --skip-smoke"
   - python: 3.6
     env:

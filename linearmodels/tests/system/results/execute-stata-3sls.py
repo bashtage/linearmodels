@@ -6,11 +6,12 @@ from linearmodels.compat.pandas import concat
 
 import os
 import subprocess
+from typing import List
 
 from linearmodels.tests.system._utility import generate_simultaneous_data
 
 data = generate_simultaneous_data()
-all_cols = []
+all_cols: List[str] = []
 out = []
 for key in data:
     eqn = data[key]

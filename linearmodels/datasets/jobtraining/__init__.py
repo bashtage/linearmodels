@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 DESCR = """
 H. Holzer, R. Block, M. Cheatham, and J. Knott (1993), "Are Training Subsidies
 Effective? The Michigan Experience," Industrial and Labor Relations Review 46,
@@ -36,7 +38,7 @@ lhrsemp                 lhrsemp - lhrsemp[t-1]
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "jobtraining.csv.bz2")

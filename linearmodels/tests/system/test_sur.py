@@ -93,20 +93,20 @@ def missing_data(request):
     return eqns
 
 
-params = list(product(const, rho, included_weights))
+mvreg_params = list(product(const, rho, included_weights))
 
 
-def gen_id(param):
+def mvreg_gen_id(param):
     idstr = "const" if param[0] else ""
     idstr += "-correl" if param[1] != 0 else ""
     idstr += "-weights" if param[2] else ""
     return idstr
 
 
-ids = list(map(gen_id, params))
+mvreg_ids = list(map(mvreg_gen_id, mvreg_params))
 
 
-@pytest.fixture(scope="module", params=params, ids=ids)
+@pytest.fixture(scope="module", params=mvreg_params, ids=mvreg_ids)
 def mvreg_data(request):
     const, rho, included_weights = request.param
     values = generate_data(
@@ -122,13 +122,16 @@ def mvreg_data(request):
 kernels = ["bartlett", "newey-west", "parzen", "gallant", "qs", "andrews"]
 bandwidths = [None, 0, 10]
 debiased = [True, False]
-params = list(product(kernels, bandwidths, debiased))
-ids = list(
-    map(lambda p: p[0] + ", BW: " + str(p[1]) + ", Debiased: " + str(p[2]), params)
+kernel_params = list(product(kernels, bandwidths, debiased))
+kernel_ids = list(
+    map(
+        lambda p: p[0] + ", BW: " + str(p[1]) + ", Debiased: " + str(p[2]),
+        kernel_params,
+    )
 )
 
 
-@pytest.fixture(params=params, ids=ids)
+@pytest.fixture(params=kernel_params, ids=kernel_ids)
 def kernel_options(request):
     return {
         "kernel": request.param[0],

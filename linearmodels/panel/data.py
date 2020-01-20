@@ -1,21 +1,19 @@
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import (
-    concat,
-    get_codes,
-    is_categorical,
-    is_datetime64_any_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-    is_string_like,
-)
+from linearmodels.compat.pandas import concat, get_codes, is_string_like
 
 from itertools import product
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas.api.types import (
+    is_categorical,
+    is_datetime64_any_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
+)
 
-from linearmodels.typing import AnyPandas, ArrayLike, Label
+from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ["PanelData"]
@@ -54,7 +52,7 @@ class _Panel(object):
     @classmethod
     def from_array(
         cls,
-        values: np.ndarray,
+        values: NDArray,
         items: Sequence[Label],
         major_axis: Sequence[Label],
         minor_axis: Sequence[Label],
@@ -85,7 +83,7 @@ class _Panel(object):
         return self._minor_axis
 
     @property
-    def values(self) -> np.ndarray:
+    def values(self) -> NDArray:
         return self._values
 
     def to_frame(self) -> DataFrame:
@@ -261,16 +259,16 @@ class PanelData(object):
         return self._frame
 
     @property
-    def values2d(self) -> np.ndarray:
+    def values2d(self) -> NDArray:
         """NumPy ndarray view of dataframe"""
         return np.asarray(self._frame)
 
     @property
-    def values3d(self) -> np.ndarray:
+    def values3d(self) -> NDArray:
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: np.ndarray) -> None:
+    def drop(self, locs: NDArray) -> None:
         """
         Drop observations from the panel.
 
@@ -340,7 +338,7 @@ class PanelData(object):
         return list(index.levels[0][get_codes(index)[0]].unique())
 
     @property
-    def entity_ids(self) -> np.ndarray:
+    def entity_ids(self) -> NDArray:
         """
         Get array containing entity group membership information
 
@@ -352,7 +350,7 @@ class PanelData(object):
         return np.asarray(get_codes(self._frame.index)[0])[:, None]
 
     @property
-    def time_ids(self) -> np.ndarray:
+    def time_ids(self) -> NDArray:
         """
         Get array containing time membership information
 
@@ -434,10 +432,9 @@ class PanelData(object):
 
         weight_sum: Dict[int, Series] = {}
 
-        # TODO
         def weighted_group_mean(
-            df: DataFrame, weights: DataFrame, root_w: np.ndarray, level: int
-        ):
+            df: DataFrame, weights: DataFrame, root_w: NDArray, level: int
+        ) -> NDArray:
             num = (root_w * df).groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
@@ -446,8 +443,9 @@ class PanelData(object):
                 weight_sum[level] = denom
             return np.asarray(num) / np.asarray(denom)
 
-        # TODO
-        def demean_pass(frame: DataFrame, weights: DataFrame, root_w: np.ndarray):
+        def demean_pass(
+            frame: DataFrame, weights: DataFrame, root_w: NDArray
+        ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):
                 mu = weighted_group_mean(frame, weights, root_w, level)

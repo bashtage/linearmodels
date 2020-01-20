@@ -1,10 +1,11 @@
 from collections import defaultdict
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, TypeVar, Union
 
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
+from linearmodels.typing import NDArray
 from linearmodels.typing.data import ArrayLike
 
 try:
@@ -43,8 +44,12 @@ Variables have been fully absorbed and have removed from the regression:
 {absorbed_variables}
 """
 
+SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
 
-def preconditioner(d: ArrayLike, *, copy: bool = False) -> Tuple[ArrayLike, np.ndarray]:
+
+def preconditioner(
+    d: Union[SparseArray, ArrayLike], *, copy: bool = False
+) -> Tuple[Union[SparseArray, ArrayLike], np.ndarray]:
     """
     Parameters
     ----------
@@ -100,7 +105,7 @@ def dummy_matrix(
     format: str = "csc",
     drop: str = "first",
     drop_all: bool = False,
-    precondition: bool = True
+    precondition: bool = True,
 ) -> Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, np.array]:
     """
     Parameters
@@ -193,7 +198,7 @@ def dummy_matrix(
     return out, cond
 
 
-def _remove_node(node: int, meta: np.ndarray, orig_dest: np.ndarray) -> Tuple[int, int]:
+def _remove_node(node: int, meta: NDArray, orig_dest: NDArray) -> Tuple[int, int]:
     """
     Parameters
     ----------
@@ -248,7 +253,7 @@ def _remove_node(node: int, meta: np.ndarray, orig_dest: np.ndarray) -> Tuple[in
     return next_node, next_count
 
 
-def _py_drop_singletons(meta: np.ndarray, orig_dest: np.ndarray) -> None:
+def _py_drop_singletons(meta: NDArray, orig_dest: NDArray) -> None:
     """
     Loop through the nodes and recursively drop singleton chains
 
@@ -273,7 +278,7 @@ if not HAS_CYTHON:
     _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
-def in_2core_graph(cats: ArrayLike) -> np.ndarray:
+def in_2core_graph(cats: ArrayLike) -> NDArray:
     """
     Parameters
     ----------
@@ -324,7 +329,7 @@ def in_2core_graph(cats: ArrayLike) -> np.ndarray:
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
 
-    def min_dtype(*args):
+    def min_dtype(*args: NDArray) -> str:
         bits = max([np.log2(max(arg.max(), 1)) for arg in args])
         return "int{0}".format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
 
@@ -346,7 +351,7 @@ def in_2core_graph(cats: ArrayLike) -> np.ndarray:
     return retain
 
 
-def in_2core_graph_slow(cats: ArrayLike) -> np.ndarray:
+def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     """
     Parameters
     ----------
@@ -385,7 +390,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> np.ndarray:
     return retain
 
 
-def check_absorbed(x: np.ndarray, variables: List[str]) -> None:
+def check_absorbed(x: NDArray, variables: List[str]) -> None:
     """
     Check a regressor matrix for variables absorbed
 
@@ -415,7 +420,7 @@ def check_absorbed(x: np.ndarray, variables: List[str]) -> None:
         raise AbsorbingEffectError(msg)
 
 
-def not_absorbed(x: np.ndarray) -> List[int]:
+def not_absorbed(x: NDArray) -> List[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
 

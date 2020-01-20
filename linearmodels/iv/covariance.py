@@ -24,13 +24,12 @@ from numpy import (
 )
 from numpy.linalg import inv, pinv
 
-from linearmodels.typing import Numeric, OptionalNumeric
+from linearmodels.typing import NDArray, Numeric, OptionalNumeric
 
 KernelWeight = Union[
-    Callable[[int, float], ndarray],
     Callable[[float, float], ndarray],
-    Callable[[int, VarArg(Any)], ndarray],
-    Callable[[Numeric, int], Any],
+    Callable[[float, int], ndarray],
+    Callable[[float, VarArg(Any)], ndarray],
 ]
 
 CLUSTER_ERR = """
@@ -41,7 +40,7 @@ property `notnull` contains the locations of the observations that have no
 missing values."""
 
 
-def _cov_cluster(z: ndarray, clusters: ndarray) -> ndarray:
+def _cov_cluster(z: NDArray, clusters: NDArray) -> NDArray:
     """
     Core cluster covariance estimator
 
@@ -76,7 +75,7 @@ def _cov_cluster(z: ndarray, clusters: ndarray) -> ndarray:
     return s
 
 
-def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
+def _cov_kernel(z: NDArray, w: NDArray) -> NDArray:
     """
     Core kernel covariance estimator
 
@@ -108,7 +107,7 @@ def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
     return s
 
 
-def kernel_weight_bartlett(bw: int, *args) -> ndarray:
+def kernel_weight_bartlett(bw: float, *args: int) -> NDArray:
     r"""
     Kernel weights from a Bartlett kernel
 
@@ -128,10 +127,10 @@ def kernel_weight_bartlett(bw: int, *args) -> ndarray:
 
        w_i = 1 - i / (m + 1), \, i < m
     """
-    return 1 - arange(bw + 1) / (bw + 1)
+    return 1 - arange(int(bw) + 1) / (int(bw) + 1)
 
 
-def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
+def kernel_weight_quadratic_spectral(bw: float, n: int) -> NDArray:
     r"""
     Kernel weights from a quadratic-spectral kernel
 
@@ -166,7 +165,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
         w[0] = 0
         return w
 
-    z = arange(n + 1) / bw
+    z = arange(n + 1) / float(bw)
     w = 6 * pi * z / 5
     w[0] = 1
     w[1:] = 3 / w[1:] ** 2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
@@ -174,7 +173,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
     return w
 
 
-def kernel_weight_parzen(bw: int, *args) -> ndarray:
+def kernel_weight_parzen(bw: float, *args: int) -> NDArray:
     r"""
     Kernel weights from a Parzen kernel
 
@@ -196,13 +195,13 @@ def kernel_weight_parzen(bw: int, *args) -> ndarray:
        w_i &  = 1-6z_i^2+6z_i^3, z \leq 0.5 \\
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
-    z = arange(bw + 1) / (bw + 1)
+    z = arange(int(bw) + 1) / (int(bw) + 1)
     w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
 
-def kernel_optimal_bandwidth(x: ndarray, kernel: str = "bartlett") -> int:
+def kernel_optimal_bandwidth(x: NDArray, kernel: str = "bartlett") -> int:
     """
     Parameters
     x : ndarray
@@ -314,10 +313,10 @@ class HomoskedasticCovariance(object):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -354,7 +353,7 @@ class HomoskedasticCovariance(object):
         )
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """Score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
@@ -369,7 +368,7 @@ class HomoskedasticCovariance(object):
         return self._scale * s2 * v
 
     @property
-    def cov(self) -> ndarray:
+    def cov(self) -> NDArray:
         """Covariance of estimated parameters"""
 
         x, z = self.x, self.z
@@ -387,7 +386,7 @@ class HomoskedasticCovariance(object):
         return (c + c.T) / 2
 
     @property
-    def s2(self) -> ndarray:
+    def s2(self) -> NDArray:
         """
         Estimated variance of residuals. Small-sample adjusted if debiased.
         """
@@ -453,10 +452,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -466,7 +465,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """Heteroskedasticity-robust score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
@@ -546,10 +545,10 @@ class KernelCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         kernel: str = "bartlett",
         bandwidth: OptionalNumeric = None,
         debiased: bool = False,
@@ -574,7 +573,7 @@ class KernelCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """HAC score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
@@ -667,11 +666,11 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
-        clusters: ndarray = None,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
+        clusters: NDArray = None,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -700,10 +699,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """Clustered estimator of score covariance"""
 
-        def rescale(s: ndarray, nc: int, nobs: int) -> ndarray:
+        def rescale(s: NDArray, nc: int, nobs: int) -> NDArray:
             scale = self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs)
             return s * scale if self.debiased else s
 

@@ -25,7 +25,7 @@ from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
 from statsmodels.iolib.summary import SimpleTable, fmt_params
 
-from linearmodels.typing import ArrayLike, Label, OptionalArrayLike
+from linearmodels.typing import ArrayLike, Label, NDArray, OptionalArrayLike
 
 
 class MissingValueWarning(Warning):
@@ -147,7 +147,7 @@ class AttrDict(MutableMapping):
 
 
 def has_constant(
-    x: np.ndarray, x_rank: Optional[int] = None
+    x: NDArray, x_rank: Optional[int] = None
 ) -> Tuple[bool, Optional[int]]:
     """
     Parameters
@@ -189,7 +189,7 @@ def has_constant(
     return bool(has_const), loc
 
 
-def inv_sqrth(x: np.ndarray) -> np.ndarray:
+def inv_sqrth(x: NDArray) -> NDArray:
     """
     Matrix inverse square root
 
@@ -412,6 +412,7 @@ class _SummaryStr(object):
     """
     Mixin class for results classes to automatically show the summary.
     """
+
     @property
     def summary(self) -> Summary:
         return Summary()
@@ -454,7 +455,7 @@ class _ModelComparison(_SummaryStr):
         self,
         results: Union[Dict[str, Any], Sequence[Any]],
         *,
-        precision: str = "tstats"
+        precision: str = "tstats",
     ) -> None:
         if not isinstance(results, dict):
             _results: Dict[str, Any] = {}
@@ -615,7 +616,7 @@ def format_wide(s: List[str], cols: int) -> List[List[str]]:
 
 
 def panel_to_frame(
-    x: np.ndarray,
+    x: NDArray,
     items: Sequence[Label],
     major_axis: Sequence[Label],
     minor_axis: Sequence[Label],
@@ -669,7 +670,7 @@ def quadratic_form_test(
     cov: ArrayLike,
     restriction: OptionalArrayLike = None,
     value: OptionalArrayLike = None,
-    formula: Optional[str] = None,
+    formula: Optional[Union[str, List[str]]] = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used" "simultaneously.")

@@ -1,6 +1,9 @@
 """
 Covariance estimators for linear factor models
 """
+from typing import Dict, Optional, Union
+
+from numpy import ndarray
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -8,22 +11,24 @@ from linearmodels.iv.covariance import (
     _cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.typing import NDArray
 
 
 class _HACMixin(object):
-    def __init__(self):
-        self._bandwidth = None  # pragma: no cover
-        self._moments = None  # pragma: no cover
+    def __init__(self) -> None:
+        self._bandwidth: Optional[float] = None  # pragma: no cover
+        self._moments: Optional[ndarray] = None  # pragma: no cover
 
     @property
-    def kernel(self):
+    def kernel(self) -> str:
         """Kernel used in estimation"""
         return self._kernel
 
     @property
-    def bandwidth(self):
+    def bandwidth(self) -> float:
         """Bandwidth used in estimation"""
         if self._bandwidth is None:
+            assert self._moments is not None
             moments = self._moments
             m = moments / moments.std(0)[None, :]
             m = m.sum(1)
@@ -32,29 +37,30 @@ class _HACMixin(object):
 
         return self._bandwidth
 
-    def _check_kernel(self, kernel):
+    def _check_kernel(self, kernel: str) -> None:
         if not isinstance(kernel, str):
             raise TypeError("kernel must be the name of a kernel")
         self._kernel = kernel.lower()
         if self._kernel not in KERNEL_LOOKUP:
             raise ValueError("Unknown kernel")
 
-    def _check_bandwidth(self, bandwidth):
+    def _check_bandwidth(self, bandwidth: Optional[float]) -> None:
         self._bandwidth = bandwidth
         if bandwidth is not None:
             try:
+                assert bandwidth is not None
                 bandwidth = float(bandwidth)
             except (TypeError, ValueError):
                 raise TypeError("bandwidth must be either None or a float")
             if bandwidth < 0:
                 raise ValueError("bandwidth must be non-negative.")
 
-    def _kernel_cov(self, z):
+    def _kernel_cov(self, z: NDArray) -> NDArray:
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel
-        kernel = KERNEL_LOOKUP[kernel]
-        weights = kernel(bw, nobs - 1)
+        kernel_estimator = KERNEL_LOOKUP[kernel]
+        weights = kernel_estimator(bw, nobs - 1)
         out = _cov_kernel(z, weights)
         return (out + out.T) / 2
 
@@ -82,16 +88,21 @@ class HeteroskedasticCovariance(object):
     """
 
     def __init__(
-        self, xe, *, jacobian=None, inv_jacobian=None, center=True, debiased=False, df=0
-    ):
+        self,
+        xe: NDArray,
+        *,
+        jacobian: Optional[ndarray] = None,
+        inv_jacobian: Optional[ndarray] = None,
+        center: bool = True,
+        debiased: bool = False,
+        df: int = 0,
+    ) -> None:
 
         self._moments = self._xe = xe
         self._jac = jacobian
         self._inv_jac = inv_jacobian
         self._center = center
-        if (jacobian is None and inv_jacobian is None) or (
-            jacobian is not None and inv_jacobian is not None
-        ):
+        if (jacobian is not None) == (inv_jacobian is not None):
             raise ValueError(
                 "One and only one of jacobian or inv_jacobian must be provided."
             )
@@ -100,20 +111,21 @@ class HeteroskedasticCovariance(object):
         if jacobian is not None:
             self._square = jacobian.shape[0] == jacobian.shape[1]
         else:
+            assert inv_jacobian is not None
             self._square = inv_jacobian.shape[0] == inv_jacobian.shape[1]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + ", id: {0}".format(hex(id(self)))
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Union[str, float]]:
         return {"type": self.__class__.__name__}
 
     @property
-    def s(self):
+    def s(self) -> NDArray:
         """
         Score/moment condition covariance
 
@@ -131,26 +143,28 @@ class HeteroskedasticCovariance(object):
         return (out + out.T) / 2
 
     @property
-    def jacobian(self):
+    def jacobian(self) -> NDArray:
         """The Jacobian"""
         if self._jac is None:
             self._jac = inv(self._inv_jac)
+        assert self._jac is not None
         return self._jac
 
     @property
-    def inv_jacobian(self):
+    def inv_jacobian(self) -> NDArray:
         """Inverse Jacobian"""
         if self._inv_jac is None:
             self._inv_jac = inv(self._jac)
+        assert self._inv_jac is not None
         return self._inv_jac
 
     @property
-    def square(self):
+    def square(self) -> bool:
         """Flag indicating if jacobian is square"""
         return self._square
 
     @property
-    def cov(self):
+    def cov(self) -> NDArray:
         """
         Compute parameter covariance
 
@@ -206,16 +220,16 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        xe,
+        xe: NDArray,
         *,
-        jacobian=None,
-        inv_jacobian=None,
-        kernel="bartlett",
-        bandwidth=None,
-        center=True,
-        debiased=False,
-        df=0
-    ):
+        jacobian: Optional[ndarray] = None,
+        inv_jacobian: Optional[ndarray] = None,
+        kernel: str = "bartlett",
+        bandwidth: Optional[int] = None,
+        center: bool = True,
+        debiased: bool = False,
+        df: int = 0,
+    ) -> None:
         super(KernelCovariance, self).__init__(
             xe,
             jacobian=jacobian,
@@ -227,19 +241,19 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
-    def __str__(self):
+    def __str__(self) -> str:
         descr = ", Kernel: {0}, Bandwidth: {1}".format(self._kernel, self.bandwidth)
         return self.__class__.__name__ + descr
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Union[str, float]]:
         out = super(KernelCovariance, self).config
         out["kernel"] = self._kernel
         out["bandwidth"] = self.bandwidth
         return out
 
     @property
-    def s(self):
+    def s(self) -> NDArray:
         """
         Score/moment condition covariance
 
@@ -266,11 +280,11 @@ class HeteroskedasticWeight(object):
         Flag indicating to center the moments when computing the weights
     """
 
-    def __init__(self, moments, center=True):
+    def __init__(self, moments: NDArray, center: bool = True) -> None:
         self._moments = moments
         self._center = center
 
-    def w(self, moments):
+    def w(self, moments: NDArray) -> NDArray:
         """
         Score/moment condition weighting matrix
 
@@ -308,12 +322,18 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         Non-negative integer bandwidth
     """
 
-    def __init__(self, moments, center=True, kernel="bartlett", bandwidth=None):
+    def __init__(
+        self,
+        moments: NDArray,
+        center: bool = True,
+        kernel: str = "bartlett",
+        bandwidth: Optional[int] = None,
+    ):
         super(KernelWeight, self).__init__(moments, center=center)
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
-    def w(self, moments):
+    def w(self, moments: NDArray) -> NDArray:
         """
         Score/moment condition weighting matrix
 

@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 DESCR = """
 age               Age
 age2              Age-squared
@@ -31,7 +33,7 @@ vgh               vg or good health
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "meps.csv.bz2")

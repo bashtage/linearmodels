@@ -1,22 +1,21 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from linearmodels.compat.pandas import (
-    concat,
-    is_categorical,
-    is_categorical_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-    is_string_like,
-)
+from linearmodels.compat.pandas import concat, is_string_like
 
 import copy
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import (
+    is_categorical,
+    is_categorical_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
+)
 
-from linearmodels.typing.data import OptionalArrayLike
+from linearmodels.typing import AnyPandas, ArrayLike, NDArray, OptionalArrayLike
 
 iv_data_types: Tuple[Type, ...] = (np.ndarray, pd.DataFrame, pd.Series)
 try:
@@ -31,7 +30,7 @@ dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
-def convert_columns(s, drop_first):
+def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
     if is_categorical(s):
         out = pd.get_dummies(s, drop_first=drop_first)
         out.columns = [str(s.name) + "." + str(c) for c in out]
@@ -39,7 +38,7 @@ def convert_columns(s, drop_first):
     return s
 
 
-def expand_categoricals(x, drop_first):
+def expand_categoricals(x: AnyPandas, drop_first: bool) -> AnyPandas:
     if x.shape[1] == 0:
         return x
     return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
@@ -175,7 +174,7 @@ class IVData(object):
         return self._pandas
 
     @property
-    def ndarray(self) -> np.ndarray:
+    def ndarray(self) -> NDArray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 
@@ -208,7 +207,7 @@ class IVData(object):
     def isnull(self) -> pd.Series:
         return np.any(self._pandas.isnull(), axis=1)
 
-    def drop(self, locs) -> None:
+    def drop(self, locs: ArrayLike) -> None:
         locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]

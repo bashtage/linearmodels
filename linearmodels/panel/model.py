@@ -1,9 +1,12 @@
 from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes
 
+from typing import Callable, Dict, Optional, Tuple, Type, Union
+
 import numpy as np
 from numpy.linalg import matrix_rank
 import pandas as pd
+from pandas import DataFrame, Series
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 from scipy.sparse import csc_matrix, diags
@@ -15,7 +18,6 @@ from linearmodels.panel.covariance import (
     CovarianceManager,
     DriscollKraay,
     FamaMacBethCovariance,
-    FamaMacBethKernelCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
 )
@@ -33,6 +35,7 @@ from linearmodels.panel.utility import (
     in_2core_graph,
     not_absorbed,
 )
+from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 from linearmodels.utility import (
     AttrDict,
     InapplicableTestStatistic,
@@ -48,8 +51,24 @@ from linearmodels.utility import (
     panel_to_frame,
 )
 
+CovarianceEstimator = Union[
+    ACCovariance,
+    ClusteredCovariance,
+    DriscollKraay,
+    HeteroskedasticCovariance,
+    HomoskedasticCovariance,
+]
 
-def panel_structure_stats(ids, name):
+CovarianceEstimatorType = Union[
+    Type[ACCovariance],
+    Type[ClusteredCovariance],
+    Type[DriscollKraay],
+    Type[HeteroskedasticCovariance],
+    Type[HomoskedasticCovariance],
+]
+
+
+def panel_structure_stats(ids: NDArray, name: str) -> Series:
     bc = np.bincount(ids)
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
@@ -74,7 +93,7 @@ class PanelFormulaParser(object):
     The general structure of a formula is `dep ~ exog`
     """
 
-    def __init__(self, formula, data, eval_env=2):
+    def __init__(self, formula: str, data: DataFrame, eval_env: int = 2) -> None:
         self._formula = formula
         self._data = PanelData(data, convert_dummies=False, copy=False)
         self._na_action = NAAction(on_NA="raise", NA_types=[])
@@ -82,7 +101,7 @@ class PanelFormulaParser(object):
         self._dependent = self._exog = None
         self._parse()
 
-    def _parse(self):
+    def _parse(self) -> None:
         parts = self._formula.split("~")
         parts[1] = " 0 + " + parts[1]
         cln_formula = "~".join(parts)
@@ -106,34 +125,34 @@ class PanelFormulaParser(object):
         self._lhs = "0 + " + self._lhs
 
     @property
-    def entity_effect(self):
+    def entity_effect(self) -> bool:
         """Formula contains entity effect"""
         return self._entity_effect
 
     @property
-    def time_effect(self):
+    def time_effect(self) -> bool:
         """Formula contains time effect"""
         return self._time_effect
 
     @property
-    def eval_env(self):
+    def eval_env(self) -> int:
         """Set or get the eval env depth"""
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value):
+    def eval_env(self, value: int) -> None:
         self._eval_env = value
 
     @property
-    def data(self):
-        """Returns a tuple containing the dependent, exog, endog and instruments"""
+    def data(self) -> Tuple[DataFrame, DataFrame]:
+        """Returns a tuple containing the dependent, exog, endog"""
         self._eval_env += 1
         out = self.dependent, self.exog
         self._eval_env -= 1
         return out
 
     @property
-    def dependent(self):
+    def dependent(self) -> DataFrame:
         """DataFrame containing the dependent variable"""
         return dmatrix(
             self._lhs,
@@ -144,7 +163,7 @@ class PanelFormulaParser(object):
         )
 
     @property
-    def exog(self):
+    def exog(self) -> DataFrame:
         """DataFrame containing the exogenous variables"""
         out = dmatrix(
             self._rhs,
@@ -204,12 +223,18 @@ class PooledOLS(object):
         y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
     """
 
-    def __init__(self, dependent, exog, *, weights=None):
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ) -> None:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
         self._original_shape = self.dependent.shape
-        self._constant = None
-        self._formula = None
+        self._constant = False
+        self._formula: Optional[str] = None
         self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
@@ -226,7 +251,7 @@ class PooledOLS(object):
         self._validate_data()
         self._singleton_index = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
         return out.format(
             name=self.__class__.__name__,
@@ -234,10 +259,10 @@ class PooledOLS(object):
             has_constant=self.has_constant,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
-    def reformat_clusters(self, clusters):
+    def reformat_clusters(self, clusters: ArrayLike) -> PanelData:
         """
         Reformat cluster variables
 
@@ -265,7 +290,7 @@ class PooledOLS(object):
         clusters.drop(~self.not_null)
         return clusters
 
-    def _info(self):
+    def _info(self) -> Tuple[Series, Series, None]:
         """Information about panel structure"""
 
         entity_info = panel_structure_stats(
@@ -278,7 +303,7 @@ class PooledOLS(object):
 
         return entity_info, time_info, other_info
 
-    def _adapt_weights(self, weights):
+    def _adapt_weights(self, weights: OptionalArrayLike) -> PanelData:
         """Check and transform weights depending on size"""
         if weights is None:
             self._is_weighted = False
@@ -320,14 +345,14 @@ class PooledOLS(object):
             raise ValueError("Weights do not have a supported shape.")
         return PanelData(frame)
 
-    def _check_exog_rank(self):
+    def _check_exog_rank(self) -> int:
         x = self.exog.values2d
         rank_of_x = matrix_rank(x)
         if rank_of_x < x.shape[1]:
             raise ValueError("exog does not have full column rank.")
         return rank_of_x
 
-    def _validate_data(self):
+    def _validate_data(self) -> None:
         """Check input shape and remove missing"""
         y = self._y = self.dependent.values2d
         x = self._x = self.exog.values2d
@@ -366,20 +391,22 @@ class PooledOLS(object):
         self._constant, self._constant_index = has_constant(x, rank_of_x)
 
     @property
-    def formula(self):
+    def formula(self) -> Optional[str]:
         """Formula used to construct the model"""
         return self._formula
 
     @formula.setter
-    def formula(self, value):
+    def formula(self, value: Optional[str]) -> None:
         self._formula = value
 
     @property
-    def has_constant(self):
+    def has_constant(self) -> bool:
         """Flag indicating the model a constant or implicit constant"""
         return self._constant
 
-    def _f_statistic(self, weps, y, x, root_w, df_resid):
+    def _f_statistic(
+        self, weps: NDArray, y: NDArray, x: NDArray, root_w: NDArray, df_resid: int
+    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         """Compute model F-statistic"""
         weps_const = y
         num_df = x.shape[1]
@@ -404,12 +431,18 @@ class PooledOLS(object):
             name=name,
         )
 
-    def _f_statistic_robust(self, params, cov_est, debiased, df_resid):
+    def _f_statistic_robust(
+        self,
+        params: NDArray,
+        cov_est: CovarianceEstimator,
+        debiased: bool,
+        df_resid: int,
+    ) -> Callable[[], Union[WaldTestStatistic, InvalidTestStatistic]]:
         """Compute Wald test that all parameters are 0, ex. constant"""
         sel = np.ones(params.shape[0], dtype=np.bool)
         name = "Model F-statistic (robust)"
 
-        def invalid_f():
+        def invalid_f() -> InvalidTestStatistic:
             return InvalidTestStatistic("Model contains only a constant", name=name)
 
         if self.has_constant:
@@ -417,7 +450,7 @@ class PooledOLS(object):
                 return invalid_f
             sel[self._constant_index] = False
 
-        def deferred_f():
+        def deferred_f() -> WaldTestStatistic:
             test_params = params[sel]
             test_cov = cov_est.cov[sel][:, sel]
             test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
@@ -433,7 +466,7 @@ class PooledOLS(object):
 
         return deferred_f
 
-    def _prepare_between(self):
+    def _prepare_between(self) -> Tuple[NDArray, NDArray, NDArray]:
         """Prepare values for between estimation of R2"""
         weights = self.weights if self._is_weighted else None
         y = self.dependent.mean("entity", weights=weights).values
@@ -446,7 +479,9 @@ class PooledOLS(object):
 
         return y, x, w
 
-    def _rsquared(self, params, reweight=False):
+    def _rsquared(
+        self, params: NDArray, reweight: bool = False
+    ) -> Tuple[float, float, float]:
         """Compute alternative measures of R2"""
         if self.has_constant and self.exog.nvar == 1:
             # Constant only fast track
@@ -497,13 +532,23 @@ class PooledOLS(object):
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)
         if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
-            r2w = 0
+            r2w = 0.0
         else:
-            r2w = 1 - residual_ss / total_ss
+            r2w = 1.0 - residual_ss / total_ss
 
         return r2o, r2w, r2b
 
-    def _postestimation(self, params, cov, debiased, df_resid, weps, y, x, root_w):
+    def _postestimation(
+        self,
+        params: NDArray,
+        cov: CovarianceEstimator,
+        debiased: bool,
+        df_resid: int,
+        weps: NDArray,
+        y: NDArray,
+        x: NDArray,
+        root_w: NDArray,
+    ) -> AttrDict:
         """Common post-estimation values"""
         deferred_f = self._f_statistic_robust(params, cov, debiased, df_resid)
         f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
@@ -543,12 +588,14 @@ class PooledOLS(object):
         return res
 
     @property
-    def not_null(self):
+    def not_null(self) -> NDArray:
         """Locations of non-missing observations"""
         return self._not_null
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "PooledOLS":
         """
         Create a model from a formula
 
@@ -587,7 +634,9 @@ class PooledOLS(object):
         mod.formula = formula
         return mod
 
-    def _choose_cov(self, cov_type, **cov_config):
+    def _choose_cov(
+        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
+    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
 
         cov_est = self._cov_estimators[cov_type]
         if cov_type != "clustered":
@@ -595,43 +644,50 @@ class PooledOLS(object):
 
         cov_config_upd = {k: v for k, v in cov_config.items()}
 
-        clusters = cov_config.get("clusters", None)
+        clusters: Optional[NDArray] = cov_config.get("clusters", None)
+        clusters_frame: Optional[DataFrame] = None
         if clusters is not None:
-            clusters = self.reformat_clusters(clusters).copy()
-            for col in clusters.dataframe:
-                cat = pd.Categorical(clusters.dataframe[col])
-                clusters.dataframe[col] = cat.codes.astype(np.int64)
-            clusters = clusters.dataframe
+            formatted_clusters = self.reformat_clusters(clusters).copy()
+            for col in formatted_clusters.dataframe:
+                cat = pd.Categorical(formatted_clusters.dataframe[col])
+                formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)
+            clusters_frame = formatted_clusters.dataframe
 
         cluster_entity = cov_config_upd.pop("cluster_entity", False)
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
             group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
-            if clusters is not None:
-                clusters[name] = group_ids
+            if clusters_frame is not None:
+                clusters_frame[name] = group_ids
             else:
-                clusters = pd.DataFrame(group_ids)
+                clusters_frame = pd.DataFrame(group_ids)
 
         cluster_time = cov_config_upd.pop("cluster_time", False)
         if cluster_time:
             group_ids = self.dependent.time_ids.squeeze()
             name = "cov.cluster.time"
             group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
-            if clusters is not None:
-                clusters[name] = group_ids
+            if clusters_frame is not None:
+                clusters_frame[name] = group_ids
             else:
-                clusters = pd.DataFrame(group_ids)
-        if self._singleton_index is not None and clusters is not None:
-            clusters = clusters.loc[~self._singleton_index]
+                clusters_frame = pd.DataFrame(group_ids)
+        if self._singleton_index is not None and clusters_frame is not None:
+            clusters_frame = clusters_frame.loc[~self._singleton_index]
 
         cov_config_upd["clusters"] = (
-            np.asarray(clusters) if clusters is not None else clusters
+            np.asarray(clusters_frame) if clusters_frame is not None else clusters_frame
         )
 
         return cov_est, cov_config_upd
 
-    def fit(self, *, cov_type="unadjusted", debiased=True, **cov_config):
+    def fit(
+        self,
+        *,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        **cov_config: Union[bool, float, str, NDArray],
+    ) -> PanelResults:
         """
         Estimate model parameters
 
@@ -700,7 +756,7 @@ class PooledOLS(object):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
         weps = wy - wx @ params
         index = self.dependent.index
@@ -740,7 +796,14 @@ class PooledOLS(object):
 
         return PanelResults(res)
 
-    def predict(self, params, *, exog=None, data=None, eval_env=4):
+    def predict(
+        self,
+        params: ArrayLike,
+        *,
+        exog: OptionalArrayLike = None,
+        data: Optional[DataFrame] = None,
+        eval_env: int = 4,
+    ) -> DataFrame:
         """
         Predict values for additional data
 
@@ -782,7 +845,9 @@ class PooledOLS(object):
         if exog is not None:
             exog = PanelData(exog).dataframe
         else:
-            parser = PanelFormulaParser(self.formula, data, eval_env=eval_env)
+            assert self._formula is not None
+            assert data is not None
+            parser = PanelFormulaParser(self._formula, data, eval_env=eval_env)
             exog = parser.exog
         x = exog.values
         params = np.atleast_2d(np.asarray(params))
@@ -855,21 +920,21 @@ class PanelOLS(PooledOLS):
 
     def __init__(
         self,
-        dependent,
-        exog,
+        dependent: ArrayLike,
+        exog: ArrayLike,
         *,
-        weights=None,
-        entity_effects=False,
-        time_effects=False,
-        other_effects=None,
-        singletons=True,
-        drop_absorbed=False
-    ):
+        weights: OptionalArrayLike = None,
+        entity_effects: bool = False,
+        time_effects: bool = False,
+        other_effects: OptionalArrayLike = None,
+        singletons: bool = True,
+        drop_absorbed: bool = False,
+    ) -> None:
         super(PanelOLS, self).__init__(dependent, exog, weights=weights)
 
         self._entity_effects = entity_effects
         self._time_effects = time_effects
-        self._other_effect_cats = None
+        self._other_effect_cats: Optional[PanelData] = None
         self._singletons = singletons
         self._other_effects = self._validate_effects(other_effects)
         self._has_effect = entity_effects or time_effects or self.other_effects
@@ -877,7 +942,7 @@ class PanelOLS(PooledOLS):
         self._singleton_index = None
         self._drop_singletons()
 
-    def _collect_effects(self):
+    def _collect_effects(self) -> NDArray:
         if not self._has_effect:
             return np.empty((self.dependent.shape[0], 0))
         effects = []
@@ -886,12 +951,13 @@ class PanelOLS(PooledOLS):
         if self.time_effects:
             effects.append(np.asarray(self.dependent.time_ids).squeeze())
         if self.other_effects:
+            assert self._other_effect_cats is not None
             other = self._other_effect_cats.dataframe
             for col in other:
                 effects.append(np.asarray(other[col]).squeeze())
         return np.column_stack(effects)
 
-    def _drop_singletons(self):
+    def _drop_singletons(self) -> None:
         if self._singletons or not self._has_effect:
             return
         effects = self._collect_effects()
@@ -913,17 +979,19 @@ class PanelOLS(PooledOLS):
         self.exog.drop(drop)
         self.weights.drop(drop)
         if self.other_effects:
+            assert self._other_effect_cats is not None
             self._other_effect_cats.drop(drop)
         # Reverify exog matrix
         self._check_exog_rank()
 
-    def __str__(self):
+    def __str__(self) -> str:
         out = super(PanelOLS, self).__str__()
         additional = (
             "\nEntity Effects: {ee}, Time Effects: {te}, Num Other Effects: {oe}"
         )
         oe = 0
         if self.other_effects:
+            assert self._other_effect_cats is not None
             oe = self._other_effect_cats.nvar
         additional = additional.format(
             ee=self.entity_effects, te=self.time_effects, oe=oe
@@ -931,7 +999,7 @@ class PanelOLS(PooledOLS):
         out += additional
         return out
 
-    def _validate_effects(self, effects):
+    def _validate_effects(self, effects: OptionalArrayLike) -> bool:
         """Check model effects"""
         if effects is None:
             return False
@@ -956,19 +1024,25 @@ class PanelOLS(PooledOLS):
         other_effects = PanelData(cats)
         other_effects.drop(~self.not_null)
         self._other_effect_cats = other_effects
-        cats = other_effects.values2d
+        cats_array = other_effects.values2d
         nested = False
-        if cats.shape[1] == 2:
-            nested = self._is_effect_nested(cats[:, [0]], cats[:, [1]])
-            nested |= self._is_effect_nested(cats[:, [1]], cats[:, [0]])
+        if cats_array.shape[1] == 2:
+            nested = self._is_effect_nested(cats_array[:, [0]], cats_array[:, [1]])
+            nested |= self._is_effect_nested(cats_array[:, [1]], cats_array[:, [0]])
             nesting_effect = "other effects"
         elif self.entity_effects:
-            nested = self._is_effect_nested(cats[:, [0]], self.dependent.entity_ids)
-            nested |= self._is_effect_nested(self.dependent.entity_ids, cats[:, [0]])
+            nested = self._is_effect_nested(
+                cats_array[:, [0]], self.dependent.entity_ids
+            )
+            nested |= self._is_effect_nested(
+                self.dependent.entity_ids, cats_array[:, [0]]
+            )
             nesting_effect = "entity effects"
         elif self.time_effects:
-            nested = self._is_effect_nested(cats[:, [0]], self.dependent.time_ids)
-            nested |= self._is_effect_nested(self.dependent.time_ids, cats[:, [0]])
+            nested = self._is_effect_nested(cats_array[:, [0]], self.dependent.time_ids)
+            nested |= self._is_effect_nested(
+                self.dependent.time_ids, cats_array[:, [0]]
+            )
             nesting_effect = "time effects"
         if nested:
             raise ValueError(
@@ -979,31 +1053,31 @@ class PanelOLS(PooledOLS):
         return True
 
     @property
-    def entity_effects(self):
+    def entity_effects(self) -> bool:
         """Flag indicating whether entity effects are included"""
         return self._entity_effects
 
     @property
-    def time_effects(self):
+    def time_effects(self) -> bool:
         """Flag indicating whether time effects are included"""
         return self._time_effects
 
     @property
-    def other_effects(self):
+    def other_effects(self) -> bool:
         """Flag indicating whether other (generic) effects are included"""
         return self._other_effects
 
     @classmethod
     def from_formula(
         cls,
-        formula,
-        data,
+        formula: str,
+        data: DataFrame,
         *,
-        weights=None,
-        other_effects=None,
-        singletons=True,
-        drop_absorbed=False
-    ):
+        weights: OptionalArrayLike = None,
+        other_effects: OptionalArrayLike = None,
+        singletons: bool = True,
+        drop_absorbed: bool = False,
+    ) -> "PanelOLS":
         """
         Create a model from a formula
 
@@ -1060,7 +1134,7 @@ class PanelOLS(PooledOLS):
         mod.formula = formula
         return mod
 
-    def _lsmr_path(self):
+    def _lsmr_path(self) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
         """Sparse implementation, works for all scenarios"""
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1070,7 +1144,8 @@ class PanelOLS(PooledOLS):
         wy = root_w * y
         wx = root_w * x
         if not self._has_effect:
-            return wy, wx, wybar, 0, 0
+            y_effect, x_effect = np.zeros_like(wy), np.zeros_like(wx)
+            return wy, wx, wybar, y_effect, x_effect
 
         wy_gm = wybar
         wx_gm = root_w * (w.T @ x / w.sum())
@@ -1082,6 +1157,7 @@ class PanelOLS(PooledOLS):
         if self.time_effects:
             cats.append(self.dependent.time_ids)
         if self.other_effects:
+            assert self._other_effect_cats is not None
             cats.append(self._other_effect_cats.values2d)
         cats = np.concatenate(cats, 1)
 
@@ -1118,7 +1194,7 @@ class PanelOLS(PooledOLS):
 
         return wy, wx, wybar, y_effects, x_effects
 
-    def _slow_path(self):
+    def _slow_path(self) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
         """Frisch-Waugh-Lovell implementation, works for all scenarios"""
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -1127,7 +1203,8 @@ class PanelOLS(PooledOLS):
         x = root_w * self.exog.values2d
         if not self._has_effect:
             ybar = root_w @ lstsq(root_w, y)[0]
-            return y, x, ybar, 0, 0
+            y_effect, x_effect = np.zeros_like(y), np.zeros_like(x)
+            return y, x, ybar, y_effect, x_effect
 
         drop_first = self._constant
         d = []
@@ -1138,6 +1215,7 @@ class PanelOLS(PooledOLS):
             d.append(self.dependent.dummies("time", drop_first=drop_first).values)
             drop_first = True
         if self.other_effects:
+            assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 dummies = pd.get_dummies(oe[c], drop_first=drop_first).astype(
@@ -1167,7 +1245,7 @@ class PanelOLS(PooledOLS):
         ybar = root_w @ lstsq(root_w, y)[0]
         return y, x, ybar, y_effects, x_effects
 
-    def _choose_twoway_algo(self):
+    def _choose_twoway_algo(self) -> bool:
         if not (self.entity_effects and self.time_effects):
             return False
         nentity, nobs = self.dependent.nentity, self.dependent.nobs
@@ -1189,7 +1267,7 @@ class PanelOLS(PooledOLS):
             )
         return low_memory
 
-    def _fast_path(self, low_memory):
+    def _fast_path(self, low_memory: bool) -> Tuple[NDArray, NDArray, NDArray]:
         """Dummy-variable free estimation without weights"""
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1205,6 +1283,7 @@ class PanelOLS(PooledOLS):
         x = self.exog
 
         if self.other_effects:
+            assert self._other_effect_cats is not None
             groups = self._other_effect_cats
             if self.entity_effects or self.time_effects:
                 groups = groups.copy()
@@ -1237,7 +1316,9 @@ class PanelOLS(PooledOLS):
 
         return y, x, ybar
 
-    def _weighted_fast_path(self, low_memory):
+    def _weighted_fast_path(
+        self, low_memory: bool
+    ) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
         """Dummy-variable free estimation with weights"""
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1248,7 +1329,8 @@ class PanelOLS(PooledOLS):
         if not self._has_effect:
             wy = root_w * self.dependent.values2d
             wx = root_w * self.exog.values2d
-            return wy, wx, wybar, 0, 0
+            y_effect, x_effect = np.zeros_like(wy), np.zeros_like(wx)
+            return wy, wx, wybar, y_effect, x_effect
 
         wy_gm = wybar
         wx_gm = root_w * (w.T @ x / w.sum())
@@ -1257,6 +1339,7 @@ class PanelOLS(PooledOLS):
         x = self.exog
 
         if self.other_effects:
+            assert self._other_effect_cats is not None
             groups = self._other_effect_cats
             if self.entity_effects or self.time_effects:
                 groups = groups.copy()
@@ -1292,13 +1375,14 @@ class PanelOLS(PooledOLS):
 
         return wy, wx, wybar, wy_effects, wx_effects
 
-    def _info(self):
+    def _info(self) -> Tuple[Series, Series, DataFrame]:
         """Information about model effects and panel structure"""
 
         entity_info, time_info, other_info = super(PanelOLS, self)._info()
 
         if self.other_effects:
             other_info = []
+            assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 name = "Observations per group (" + str(c) + ")"
@@ -1310,7 +1394,7 @@ class PanelOLS(PooledOLS):
         return entity_info, time_info, other_info
 
     @staticmethod
-    def _is_effect_nested(effects, clusters):
+    def _is_effect_nested(effects: NDArray, clusters: NDArray) -> bool:
         """Determine whether an effect is nested by the covariance clusters"""
         is_nested = np.zeros(effects.shape[1], dtype=np.bool)
         for i, e in enumerate(effects.T):
@@ -1323,11 +1407,14 @@ class PanelOLS(PooledOLS):
                 is_nested[i] = len(np.unique(ec)) == e_count
         return np.all(is_nested)
 
-    def _determine_df_adjustment(self, cov_type, **cov_config):
+    def _determine_df_adjustment(
+        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
+    ) -> bool:
         if cov_type != "clustered" or not self._has_effect:
             return True
         num_effects = self.entity_effects + self.time_effects
         if self.other_effects:
+            assert self._other_effect_cats is not None
             num_effects += self._other_effect_cats.shape[1]
 
         clusters = cov_config.get("clusters", None)
@@ -1342,15 +1429,15 @@ class PanelOLS(PooledOLS):
     def fit(
         self,
         *,
-        use_lsdv=False,
-        use_lsmr=False,
-        low_memory=None,
-        cov_type="unadjusted",
-        debiased=True,
-        auto_df=True,
-        count_effects=True,
-        **cov_config
-    ):
+        use_lsdv: bool = False,
+        use_lsmr: bool = False,
+        low_memory: Optional[bool] = None,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        auto_df: bool = True,
+        count_effects: bool = True,
+        **cov_config: Union[bool, float, str, NDArray],
+    ) -> PanelEffectsResults:
         """
         Estimate model parameters
 
@@ -1451,6 +1538,7 @@ class PanelOLS(PooledOLS):
             neffects += self.dependent.nobs - drop_first
             drop_first = True
         if self.other_effects:
+            assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 neffects += oe[c].nunique() - drop_first
@@ -1458,12 +1546,12 @@ class PanelOLS(PooledOLS):
 
         if self.entity_effects or self.time_effects or self.other_effects:
             if not self._drop_absorbed:
-                check_absorbed(x, self.exog.vars)
+                check_absorbed(x, list(map(str, self.exog.vars)))
             else:
                 retain = not_absorbed(x)
                 if len(retain) != x.shape[1]:
                     drop = set(range(x.shape[1])).difference(retain)
-                    dropped = ", ".join([self.exog.vars[i] for i in drop])
+                    dropped = ", ".join([str(self.exog.vars[i]) for i in drop])
                     import warnings
 
                     warnings.warn(
@@ -1493,7 +1581,7 @@ class PanelOLS(PooledOLS):
             self.dependent.time_ids,
             debiased=debiased,
             extra_df=extra_df,
-            **cov_config
+            **cov_config,
         )
         weps = y - x @ params
         eps = weps
@@ -1626,7 +1714,13 @@ class BetweenOLS(PooledOLS):
     where :math:`\bar{z}` is the time-average.
     """
 
-    def __init__(self, dependent, exog, *, weights=None):
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ) -> None:
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
         self._cov_estimators = CovarianceManager(
             self.__class__.__name__,
@@ -1635,7 +1729,9 @@ class BetweenOLS(PooledOLS):
             ClusteredCovariance,
         )
 
-    def _choose_cov(self, cov_type, **cov_config):
+    def _choose_cov(
+        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
+    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
         """Return covariance estimator reformat clusters"""
         cov_est = self._cov_estimators[cov_type]
         if cov_type != "clustered":
@@ -1644,23 +1740,30 @@ class BetweenOLS(PooledOLS):
 
         clusters = cov_config.get("clusters", None)
         if clusters is not None:
-            clusters = self.reformat_clusters(clusters).copy()
-            cluster_max = np.nanmax(clusters.values3d, axis=1)
-            delta = cluster_max - np.nanmin(clusters.values3d, axis=1)
+            clusters_panel = self.reformat_clusters(clusters).copy()
+            cluster_max = np.nanmax(clusters_panel.values3d, axis=1)
+            delta = cluster_max - np.nanmin(clusters_panel.values3d, axis=1)
             if np.any(delta != 0):
                 raise ValueError("clusters must not vary within an entity")
 
-            index = clusters.panel.minor_axis
-            reindex = clusters.entities
-            clusters = pd.DataFrame(cluster_max.T, index=index, columns=clusters.vars)
-            clusters = clusters.loc[reindex].astype(np.int64)
-            cov_config_upd["clusters"] = clusters
+            index = clusters_panel.panel.minor_axis
+            reindex = clusters_panel.entities
+            clusters_frame = pd.DataFrame(
+                cluster_max.T, index=index, columns=clusters_panel.vars
+            )
+            clusters_frame = clusters_frame.loc[reindex].astype(np.int64)
+            cov_config_upd["clusters"] = clusters_frame
 
         return cov_est, cov_config_upd
 
     def fit(
-        self, *, reweight=False, cov_type="unadjusted", debiased=True, **cov_config
-    ):
+        self,
+        *,
+        reweight: bool = False,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        **cov_config: Union[bool, float, str, NDArray],
+    ) -> PanelResults:
         """
         Estimate model parameters
 
@@ -1726,7 +1829,7 @@ class BetweenOLS(PooledOLS):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
         weps = wy - wx @ params
         index = self.dependent.index
@@ -1776,7 +1879,9 @@ class BetweenOLS(PooledOLS):
         return PanelResults(res)
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "BetweenOLS":
         """
         Create a model from a formula
 
@@ -1840,7 +1945,13 @@ class FirstDifferenceOLS(PooledOLS):
         \Delta y_{it}=\beta^{\prime}\Delta x_{it}+\Delta\epsilon_{it}
     """
 
-    def __init__(self, dependent, exog, *, weights=None):
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ):
         super(FirstDifferenceOLS, self).__init__(dependent, exog, weights=weights)
         if self._constant:
             raise ValueError(
@@ -1849,54 +1960,63 @@ class FirstDifferenceOLS(PooledOLS):
         if self.dependent.nobs < 2:
             raise ValueError("Panel must have at least 2 time periods")
 
-    def _choose_cov(self, cov_type, **cov_config):
+    def _choose_cov(
+        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
+    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
         """Return covariance estimator and reformat clusters"""
         cov_est = self._cov_estimators[cov_type]
         if cov_type != "clustered":
             return cov_est, cov_config
 
         cov_config_upd = {k: v for k, v in cov_config.items()}
+        clusters_frame: Optional[DataFrame] = None
         clusters = cov_config.get("clusters", None)
         if clusters is not None:
-            clusters = self.reformat_clusters(clusters).copy()
-            fd = clusters.first_difference()
-            fd = fd.values2d
-            if np.any(fd.flat[np.isfinite(fd.flat)] != 0):
+            clusters_panel = self.reformat_clusters(clusters).copy()
+            fd = clusters_panel.first_difference()
+            fd_array = fd.values2d
+            if np.any(fd_array.flat[np.isfinite(fd_array.flat)] != 0):
                 raise ValueError(
                     "clusters must be identical for values used "
                     "to compute the first difference"
                 )
-            clusters = clusters.dataframe.copy()
+            clusters_frame = clusters_panel.dataframe.copy()
 
         cluster_entity = cov_config_upd.pop("cluster_entity", False)
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
             group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
-            if clusters is not None:
-                clusters[name] = group_ids
+            if clusters_frame is not None:
+                clusters_frame[name] = group_ids
             else:
-                clusters = pd.DataFrame(group_ids)
-        clusters = PanelData(clusters)
-        values = clusters.values3d[:, 1:]
-        clusters = panel_to_frame(
+                clusters_frame = pd.DataFrame(group_ids)
+        cluster_data = PanelData(clusters_frame)
+        values = cluster_data.values3d[:, 1:]
+        cluster_frame = panel_to_frame(
             values,
-            clusters.panel.items,
-            clusters.panel.major_axis[1:],
-            clusters.panel.minor_axis,
+            cluster_data.panel.items,
+            cluster_data.panel.major_axis[1:],
+            cluster_data.panel.minor_axis,
             True,
         )
-        clusters = PanelData(clusters).dataframe
-        clusters = clusters.loc[self.dependent.first_difference().index]
-        clusters = clusters.astype(np.int64)
+        cluster_frame = PanelData(cluster_frame).dataframe
+        cluster_frame = cluster_frame.loc[self.dependent.first_difference().index]
+        cluster_frame = cluster_frame.astype(np.int64)
 
         cov_config_upd["clusters"] = (
-            clusters.values if clusters is not None else clusters
+            cluster_frame.values if cluster_frame is not None else None
         )
 
         return cov_est, cov_config_upd
 
-    def fit(self, *, cov_type="unadjusted", debiased=True, **cov_config):
+    def fit(
+        self,
+        *,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        **cov_config: Union[bool, float, str, NDArray],
+    ) -> PanelResults:
         """
         Estimate model parameters
 
@@ -1949,11 +2069,11 @@ class FirstDifferenceOLS(PooledOLS):
         identical within a first difference.  In most scenarios, this requires
         ids to be identical within an entity.
         """
-        y = self.dependent.first_difference()
-        time_ids = y.time_ids
-        entity_ids = y.entity_ids
-        index = y.index
-        y = y.values2d
+        y_fd = self.dependent.first_difference()
+        time_ids = y_fd.time_ids
+        entity_ids = y_fd.entity_ids
+        index = y_fd.index
+        y = y_fd.values2d
         x = self.exog.first_difference().values2d
 
         if np.all(self.weights.values2d == 1.0):
@@ -2028,7 +2148,9 @@ class FirstDifferenceOLS(PooledOLS):
         return PanelResults(res)
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "FirstDifferenceOLS":
         """
         Create a model from a formula
 
@@ -2096,7 +2218,9 @@ class RandomEffects(PooledOLS):
     """
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "RandomEffects":
         """
         Create a model from a formula
 
@@ -2136,8 +2260,13 @@ class RandomEffects(PooledOLS):
         return mod
 
     def fit(
-        self, *, small_sample=False, cov_type="unadjusted", debiased=True, **cov_config
-    ):
+        self,
+        *,
+        small_sample: bool = False,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        **cov_config: Union[bool, float, str, NDArray],
+    ) -> RandomEffectsResults:
         w = self.weights.values2d
         root_w = np.sqrt(w)
         y = self.dependent.demean("entity", weights=self.weights).values2d
@@ -2198,7 +2327,7 @@ class RandomEffects(PooledOLS):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
 
         weps = wy - wx @ params
@@ -2287,11 +2416,17 @@ class FamaMacBeth(PooledOLS):
     depending on ``cov_type``.
     """
 
-    def __init__(self, dependent, exog, *, weights=None):
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ):
         super(FamaMacBeth, self).__init__(dependent, exog, weights=weights)
         self._validate_blocks()
 
-    def _validate_blocks(self):
+    def _validate_blocks(self) -> None:
         x = self._x
         root_w = np.sqrt(self._w)
         wx = root_w * x
@@ -2301,7 +2436,7 @@ class FamaMacBeth(PooledOLS):
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
-        def validate_block(ex):
+        def validate_block(ex: NDArray) -> bool:
             return ex.shape[0] >= ex.shape[1] and matrix_rank(ex) == ex.shape[1]
 
         valid_blocks = wx.groupby(level=1).apply(validate_block)
@@ -2331,19 +2466,28 @@ class FamaMacBeth(PooledOLS):
                 MissingValueWarning,
             )
 
-    def fit(self, cov_type="unadjusted", debiased=True, **cov_config):
+    def fit(
+        self,
+        cov_type: str = "unadjusted",
+        debiased: bool = True,
+        bandwidth: Optional[float] = None,
+        kernel: Optional[str] = None,
+    ) -> PanelResults:
         """
         Estimate model parameters
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str, default "unadjusted"
             Name of covariance estimator. See Notes.
-        debiased : bool, optional
+        debiased : bool, default True
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
-            Additional covariance-specific options.  See Notes.
+        bandwidth : float, default None
+            The bandwidth to use when cov_type is "kernel". If None, it is
+            automatically computed.
+        kernel : str, default None
+            The kernel to use.  None chooses the default kernel.
 
         Returns
         -------
@@ -2358,17 +2502,11 @@ class FamaMacBeth(PooledOLS):
 
         Notes
         -----
-        Four covariance estimators are supported:
+        Two covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic', 'robust', 'heteroskedastic' - Use the
+        * 'unadjusted', 'homoskedastic', 'robust', 'heteroskedastic' use the
           standard covariance estimator of the T parameter estimates.
-        * 'kernel' - HAC estimator. Configurations options are:
-
-          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
-            Default is Bartlett's kernel, which is implements the the
-            Newey-West covariance estimator.
-          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
-            not provided, a naive default is used.
+        * 'kernel' is a HAC estimator. Configurations options are:
         """
         y = self._y
         x = self._x
@@ -2390,7 +2528,7 @@ class FamaMacBeth(PooledOLS):
             index=wy.index,
         )
 
-        def single(z: pd.DataFrame):
+        def single(z: pd.DataFrame) -> Series:
             exog = z.iloc[:, 1:].values
             if exog.shape[0] < exog.shape[1] or matrix_rank(exog) != exog.shape[1]:
                 return pd.Series([np.nan] * len(z.columns), index=z.columns)
@@ -2426,14 +2564,26 @@ class FamaMacBeth(PooledOLS):
         total_ss = float(w.T @ (e ** 2))
         r2 = 1 - residual_ss / total_ss
 
-        if cov_type in ("robust", "unadjusted", "homoskedastic", "heteroskedastic"):
-            cov_est = FamaMacBethCovariance
-        elif cov_type == "kernel":
-            cov_est = FamaMacBethKernelCovariance
-        else:
+        if cov_type not in (
+            "robust",
+            "unadjusted",
+            "homoskedastic",
+            "heteroskedastic",
+            "kernel",
+        ):
             raise ValueError("Unknown cov_type")
 
-        cov = cov_est(wy, wx, params, all_params, debiased=debiased, **cov_config)
+        bandwidth = 0.0 if cov_type != "kernel" else bandwidth
+        cov = FamaMacBethCovariance(
+            wy,
+            wx,
+            params,
+            all_params,
+            debiased=debiased,
+            kernel=kernel,
+            bandwidth=bandwidth,
+        )
+
         df_resid = wy.shape[0] - params.shape[0]
         res = self._postestimation(
             params, cov, debiased, df_resid, weps, wy, wx, root_w
@@ -2458,7 +2608,9 @@ class FamaMacBeth(PooledOLS):
         return PanelResults(res)
 
     @classmethod
-    def from_formula(cls, formula, data, *, weights=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "FamaMacBeth":
         """
         Create a model from a formula
 

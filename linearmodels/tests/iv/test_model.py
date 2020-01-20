@@ -1,11 +1,10 @@
-from linearmodels.compat.pandas import assert_series_equal
-
 import warnings
 
 import numpy as np
 from numpy.linalg import pinv
 from numpy.testing import assert_allclose, assert_equal
 import pandas as pd
+from pandas.testing import assert_series_equal
 import pytest
 from statsmodels.tools.tools import add_constant
 

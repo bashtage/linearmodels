@@ -1,11 +1,11 @@
 from typing import Dict, Tuple
 
 import numpy as np
-from numpy import ndarray
 from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 
+from linearmodels.typing import NDArray
 from linearmodels.typing.data import OptionalDataFrame
 
 PARSING_ERROR = """
@@ -21,7 +21,7 @@ The original Patsy error was:
 """
 
 
-def proj(y: ndarray, x: ndarray) -> ndarray:
+def proj(y: NDArray, x: NDArray) -> NDArray:
     """
     Projection of y on x from y
 
@@ -40,7 +40,7 @@ def proj(y: ndarray, x: ndarray) -> ndarray:
     return x @ (np.linalg.pinv(x) @ y)
 
 
-def annihilate(y: ndarray, x: ndarray) -> ndarray:
+def annihilate(y: NDArray, x: NDArray) -> NDArray:
     """
     Remove projection of y on x from y
 
@@ -85,7 +85,7 @@ class IVFormulaParser(object):
         self._components: Dict[str, str] = {}
         self._parse()
 
-    def _parse(self):
+    def _parse(self) -> None:
         blocks = self._formula.strip().split("~")
         if len(blocks) == 2:
             dep = blocks[0].strip()
@@ -134,7 +134,7 @@ class IVFormulaParser(object):
         return self._eval_env
 
     @eval_env.setter
-    def eval_env(self, value: int):
+    def eval_env(self, value: int) -> None:
         self._eval_env = value
 
     @property

@@ -111,6 +111,6 @@ with open("sur.do", "w") as stata_file:
 if os.path.exists(OUTFILE):
     os.unlink(OUTFILE)
 do_file = os.path.join(os.getcwd(), "sur.do")
-cmd = [STATA_PATH, "/e", "do", do_file]
-print(" ".join(cmd))
-subprocess.call(cmd)
+stata_cmd = [STATA_PATH, "/e", "do", do_file]
+print(" ".join(stata_cmd))
+subprocess.call(stata_cmd)

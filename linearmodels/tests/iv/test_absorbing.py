@@ -3,6 +3,7 @@ from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
 import struct
+from typing import Optional
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -204,15 +205,15 @@ configs = product(
     [0, 1],  # ncont
 )
 
-configs = [c for c in configs if (c[2] or c[5] or c[9])]
+data_configs = [c for c in configs if (c[2] or c[5] or c[9])]
 id_str = (
     "k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, "
     "cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}"
 )
-ids = [id_str.format(*config) for config in configs]
+data_ids = [id_str.format(*config) for config in configs]
 
 
-@pytest.fixture(scope="module", params=configs, ids=ids)
+@pytest.fixture(scope="module", params=data_configs, ids=data_ids)
 def data(request):
     return generate_data(*request.param)
 
@@ -230,15 +231,15 @@ configs_ols = product(
     [0, 1],  # ncont
 )
 
-configs_ols = [c for c in configs_ols if (c[0] or c[1])]
+configs_ols_data = [c for c in configs_ols if (c[0] or c[1])]
 id_str = (
     "k: {0}, const: {1}, nfactors: {2}, density: {3}, nobs: {4}, "
     "cont_interacts: {5}, format:{6}, singleton:{7}, weighted: {8}, ncont: {9}"
 )
-ids_ols = [id_str.format(*config) for config in configs_ols]
+ids_ols_data = [id_str.format(*config) for config in configs_ols]
 
 
-@pytest.fixture(scope="module", params=configs_ols, ids=ids_ols)
+@pytest.fixture(scope="module", params=configs_ols_data, ids=ids_ols_data)
 def ols_data(request):
     return generate_data(*request.param)
 
@@ -560,7 +561,9 @@ def test_instrments():
     assert mod.instruments.shape[1] == 0
 
 
-def assert_results_equal(o_res: OLSResults, a_res: AbsorbingLSResults, k: int = None):
+def assert_results_equal(
+    o_res: OLSResults, a_res: AbsorbingLSResults, k: Optional[int] = None
+) -> None:
     if k is None:
         k = a_res.params.shape[0]
     attrs = [v for v in dir(o_res) if not v.startswith("_")]

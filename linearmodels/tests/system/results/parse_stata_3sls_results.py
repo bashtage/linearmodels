@@ -1,5 +1,6 @@
 from io import StringIO
 import os
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -72,11 +73,11 @@ def process_block(results):
 
 
 with open(os.path.join(base, "stata-3sls-results.txt"), "r") as stata_results:
-    stata_results = stata_results.readlines()
-block = []
+    stata_result_contents = stata_results.readlines()
+block: List[str] = []
 results = {}
 key = None
-for line in stata_results:
+for line in stata_result_contents:
     if "!!!!" in line:
         if key is not None:
             results[key] = process_block(block)

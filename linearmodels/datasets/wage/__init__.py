@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 DESCR = """
 M. Blackburn and D. Neumark (1992), "Unobserved Ability, Efficiency Wages, and
 Interindustry Wage Differentials," Quarterly Journal of Economics 107, 1421-1436.
@@ -22,7 +24,7 @@ lwage                    natural log of wage
 """
 
 
-def load():
+def load() -> DataFrame:
     from linearmodels import datasets
 
     return datasets.load(__file__, "wage.csv.bz2")
