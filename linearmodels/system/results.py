@@ -1,7 +1,7 @@
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -9,6 +9,8 @@ from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
+import linearmodels
+from linearmodels.typing import ArrayLike
 from linearmodels.typing.data import OptionalDataFrame
 from linearmodels.utility import (
     AttrDict,
@@ -22,9 +24,11 @@ from linearmodels.utility import (
 
 __all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
+Equation = Union[Tuple[ArrayLike, ArrayLike], Dict[str, ArrayLike]]
+
 
 class _CommonResults(_SummaryStr):
-    def __init__(self, results):
+    def __init__(self, results: AttrDict) -> None:
         self._method = results.method
         self._params = results.params
         self._cov = results.cov
@@ -48,7 +52,7 @@ class _CommonResults(_SummaryStr):
         self._original_index = results.original_index
 
     @property
-    def method(self):
+    def method(self) -> str:
         """Estimation method"""
         return self._method
 
@@ -58,12 +62,12 @@ class _CommonResults(_SummaryStr):
         return DataFrame(self._cov, index=self._param_names, columns=self._param_names)
 
     @property
-    def cov_estimator(self):
+    def cov_estimator(self) -> str:
         """Type of covariance estimator used to compute covariance"""
         return self._cov_type
 
     @property
-    def cov_config(self):
+    def cov_config(self) -> Dict[str, bool]:
         """Configuration of covariance estimator used to compute covariance"""
         return self._cov_config
 
@@ -216,12 +220,12 @@ class SystemResults(_CommonResults):
         self._weight_estimtor = results.get("weight_estimator", None)
 
     @property
-    def model(self):
+    def model(self) -> "linearmodels.system.model.IV3SLS":
         """Model used in estimation"""
         return self._model
 
     @property
-    def equations(self):
+    def equations(self) -> AttrDict:
         """Individual equation results"""
         return self._individual
 
@@ -240,7 +244,13 @@ class SystemResults(_CommonResults):
         """Fitted values"""
         return DataFrame(self._fitted, index=self._index, columns=self.equation_labels)
 
-    def _out_of_sample(self, equations, data, missing, dataframe):
+    def _out_of_sample(
+        self,
+        equations: Optional[Dict[str, Equation]],
+        data: Optional[DataFrame],
+        missing: bool,
+        dataframe: bool,
+    ) -> Union[Dict[str, Series], DataFrame]:
         if equations is not None and data is not None:
             raise ValueError(
                 "Predictions can only be constructed using one "
@@ -249,26 +259,27 @@ class SystemResults(_CommonResults):
         pred: DataFrame = self.model.predict(
             self.params, equations=equations, data=data
         )
-        if not dataframe:
-            pred = {col: pred[[col]] for col in pred}
-            if not missing:
-                for key in pred:
-                    pred[key] = pred[key].dropna()
-        else:
-            pred = pred.dropna(how="all", axis=1)
+        if dataframe:
+            if missing:
+                pred = pred.dropna(how="all", axis=1)
+            return pred
 
-        return pred
+        pred_dict = {col: pred[[col]] for col in pred}
+        if missing:
+            pred_dict = {col: pred_dict[[col]].dropna() for col in pred}
+
+        return pred_dict
 
     def predict(
         self,
-        equations=None,
+        equations: Optional[Dict[str, Equation]] = None,
         *,
-        data=None,
-        fitted=True,
-        idiosyncratic=False,
-        missing=False,
-        dataframe=False
-    ):
+        data: Optional[DataFrame] = None,
+        fitted: bool = True,
+        idiosyncratic: bool = False,
+        missing: bool = False,
+        dataframe: bool = False,
+    ) -> Union[DataFrame, dict]:
         """
         In- and out-of-sample predictions
 
@@ -357,7 +368,7 @@ class SystemResults(_CommonResults):
         return DataFrame(self._wresid, index=self._index, columns=self.equation_labels)
 
     @property
-    def sigma(self):
+    def sigma(self) -> DataFrame:
         """Estimated residual covariance"""
         return self._sigma
 
@@ -521,7 +532,7 @@ class SystemEquationResult(_CommonResults):
         Dictionary of model estimation results
     """
 
-    def __init__(self, results):
+    def __init__(self, results: AttrDict) -> None:
         super(SystemEquationResult, self).__init__(results)
         self._eq_label = results.eq_label
         self._dependent = results.dependent
@@ -610,9 +621,10 @@ class SystemEquationResult(_CommonResults):
         instruments = self._instruments
         if instruments:
             endog = self._endog
-            extra_text = []
-            extra_text.append("Endogenous: " + ", ".join(endog))
-            extra_text.append("Instruments: " + ", ".join(instruments))
+            extra_text = [
+                "Endogenous: " + ", ".join(endog),
+                "Instruments: " + ", ".join(instruments),
+            ]
 
         extra_text.append("Covariance Estimator:")
         for line in str(self._cov_estimator).split("\n"):

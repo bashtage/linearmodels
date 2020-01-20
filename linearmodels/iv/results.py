@@ -174,7 +174,7 @@ class OLSResults(_SummaryStr):
         data: Optional[DataFrame] = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
-        missing: bool = False
+        missing: bool = False,
     ) -> DataFrame:
         """
         In- and out-of-sample predictions
@@ -499,7 +499,7 @@ class OLSResults(_SummaryStr):
         restriction: Optional[Union[DataFrame, ndarray]] = None,
         value: Optional[Union[Series, ndarray]] = None,
         *,
-        formula: Optional[Union[str, List[str]]] = None
+        formula: Optional[Union[str, List[str]]] = None,
     ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
@@ -1529,7 +1529,7 @@ class IVModelComparison(_ModelComparison):
         self,
         results: Union[Sequence[AnyResult], Dict[str, AnyResult]],
         *,
-        precision: str = "tstats"
+        precision: str = "tstats",
     ):
         super(IVModelComparison, self).__init__(results, precision=precision)
 

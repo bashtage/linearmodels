@@ -1,5 +1,6 @@
-from typing import Hashable, Optional, Union
+from typing import Hashable, Optional, Sequence, Union
 
+from numpy import ndarray
 from pandas import DataFrame, Series
 
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
@@ -11,7 +12,12 @@ __all__ = [
     "OptionalNumeric",
     "AnyPandas",
     "Label",
+    "NDArray",
+    "ArraySequence",
 ]
+
+NDArray = ndarray
+ArraySequence = Sequence[ndarray]
 
 Numeric = Union[int, float]
 OptionalNumeric = Optional[Union[int, float]]

@@ -6,6 +6,7 @@ from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 
+from linearmodels.typing import NDArray
 from linearmodels.typing.data import OptionalDataFrame
 
 PARSING_ERROR = """
@@ -21,7 +22,7 @@ The original Patsy error was:
 """
 
 
-def proj(y: ndarray, x: ndarray) -> ndarray:
+def proj(y: NDArray, x: NDArray) -> ndarray:
     """
     Projection of y on x from y
 
@@ -40,7 +41,7 @@ def proj(y: ndarray, x: ndarray) -> ndarray:
     return x @ (np.linalg.pinv(x) @ y)
 
 
-def annihilate(y: ndarray, x: ndarray) -> ndarray:
+def annihilate(y: NDArray, x: NDArray) -> ndarray:
     """
     Remove projection of y on x from y
 

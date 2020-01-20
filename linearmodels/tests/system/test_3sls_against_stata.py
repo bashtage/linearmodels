@@ -37,7 +37,7 @@ def fit(request):
         method=fit_method,
         debiased=debiased,
         iterate=iterate,
-        **kwargs
+        **kwargs,
     )
     return stata, res, rtol
 

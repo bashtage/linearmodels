@@ -1,20 +1,19 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from linearmodels.compat.pandas import (
-    concat,
-    is_categorical,
-    is_categorical_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-    is_string_like,
-)
+from linearmodels.compat.pandas import concat, is_string_like
 
 import copy
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import (
+    is_categorical,
+    is_categorical_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
+)
 
 from linearmodels.typing import AnyPandas, ArrayLike, OptionalArrayLike
 

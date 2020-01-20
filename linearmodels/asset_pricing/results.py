@@ -12,6 +12,7 @@ from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
+from linearmodels.typing import NDArray
 from linearmodels.utility import (
     AttrDict,
     WaldTestStatistic,
@@ -150,8 +151,8 @@ class LinearFactorModelResults(_SummaryStr):
 
     @staticmethod
     def _single_table(
-        params: np.ndarray,
-        se: np.ndarray,
+        params: NDArray,
+        se: NDArray,
         name: str,
         param_names: List[str],
         first: bool = False,

@@ -8,6 +8,7 @@ from numpy import array, empty, ndarray, repeat, sqrt
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.system._utility import blocked_inner_prod
+from linearmodels.typing import NDArray
 from linearmodels.utility import AttrDict
 
 
@@ -61,7 +62,7 @@ class HomoskedasticWeightMatrix(object):
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: ndarray, x: ndarray) -> ndarray:
+    def sigma(self, eps: NDArray, x: NDArray) -> ndarray:
         """
         Estimate residual covariance.
 
@@ -90,7 +91,7 @@ class HomoskedasticWeightMatrix(object):
         return sigma
 
     def weight_matrix(
-        self, x: ndarray, z: ndarray, eps: ndarray, *, sigma: Optional[ndarray] = None
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
     ) -> ndarray:
         """
         Construct a GMM weight matrix for a model.
@@ -161,7 +162,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         self._name = "Heteroskedastic (Robust) Weighting"
 
     def weight_matrix(
-        self, x: ndarray, z: ndarray, eps: ndarray, *, sigma: Optional[ndarray] = None
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
     ) -> ndarray:
         """
         Construct a GMM weight matrix for a model.
@@ -200,7 +201,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         return w
 
-    def _debias_scale(self, nobs: int, x: ndarray, z: ndarray) -> float:
+    def _debias_scale(self, nobs: int, x: NDArray, z: NDArray) -> float:
         if not self._debiased:
             return 1
         nvar = array(list(map(lambda a: a.shape[1], x)))
@@ -271,7 +272,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         self._optimal_bw = optimal_bw
 
     def weight_matrix(
-        self, x: ndarray, z: ndarray, eps: ndarray, *, sigma: Optional[ndarray] = None
+        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
     ) -> ndarray:
         """
         Construct a GMM weight matrix for a model.
@@ -312,7 +313,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         return w
 
-    def _optimal_bandwidth(self, moments: ndarray) -> float:
+    def _optimal_bandwidth(self, moments: NDArray) -> float:
         """Compute optimal bandwidth used in estimation if needed"""
         if self._predefined_bw is not None:
             return self._predefined_bw

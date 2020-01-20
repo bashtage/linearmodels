@@ -1,21 +1,19 @@
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import (
-    concat,
-    get_codes,
-    is_categorical,
-    is_datetime64_any_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-    is_string_like,
-)
+from linearmodels.compat.pandas import concat, get_codes, is_string_like
 
 from itertools import product
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas.api.types import (
+    is_categorical,
+    is_datetime64_any_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
+)
 
-from linearmodels.typing import AnyPandas, ArrayLike, Label
+from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ["PanelData"]
@@ -54,7 +52,7 @@ class _Panel(object):
     @classmethod
     def from_array(
         cls,
-        values: np.ndarray,
+        values: NDArray,
         items: Sequence[Label],
         major_axis: Sequence[Label],
         minor_axis: Sequence[Label],
@@ -270,7 +268,7 @@ class PanelData(object):
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: np.ndarray) -> None:
+    def drop(self, locs: NDArray) -> None:
         """
         Drop observations from the panel.
 
@@ -435,7 +433,7 @@ class PanelData(object):
         weight_sum: Dict[int, Series] = {}
 
         def weighted_group_mean(
-            df: DataFrame, weights: DataFrame, root_w: np.ndarray, level: int
+            df: DataFrame, weights: DataFrame, root_w: NDArray, level: int
         ) -> np.ndarray:
             num = (root_w * df).groupby(level=level).transform("sum")
             if level in weight_sum:
@@ -446,7 +444,7 @@ class PanelData(object):
             return np.asarray(num) / np.asarray(denom)
 
         def demean_pass(
-            frame: DataFrame, weights: DataFrame, root_w: np.ndarray
+            frame: DataFrame, weights: DataFrame, root_w: NDArray
         ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):

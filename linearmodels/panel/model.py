@@ -4,6 +4,7 @@ from linearmodels.compat.pandas import get_codes
 import numpy as np
 from numpy.linalg import matrix_rank
 import pandas as pd
+from pandas import Series
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 from scipy.sparse import csc_matrix, diags
@@ -49,7 +50,7 @@ from linearmodels.utility import (
 )
 
 
-def panel_structure_stats(ids, name):
+def panel_structure_stats(ids, name) -> Series:
     bc = np.bincount(ids)
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
@@ -700,7 +701,7 @@ class PooledOLS(object):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
         weps = wy - wx @ params
         index = self.dependent.index
@@ -863,7 +864,7 @@ class PanelOLS(PooledOLS):
         time_effects=False,
         other_effects=None,
         singletons=True,
-        drop_absorbed=False
+        drop_absorbed=False,
     ):
         super(PanelOLS, self).__init__(dependent, exog, weights=weights)
 
@@ -1002,7 +1003,7 @@ class PanelOLS(PooledOLS):
         weights=None,
         other_effects=None,
         singletons=True,
-        drop_absorbed=False
+        drop_absorbed=False,
     ):
         """
         Create a model from a formula
@@ -1349,7 +1350,7 @@ class PanelOLS(PooledOLS):
         debiased=True,
         auto_df=True,
         count_effects=True,
-        **cov_config
+        **cov_config,
     ):
         """
         Estimate model parameters
@@ -1493,7 +1494,7 @@ class PanelOLS(PooledOLS):
             self.dependent.time_ids,
             debiased=debiased,
             extra_df=extra_df,
-            **cov_config
+            **cov_config,
         )
         weps = y - x @ params
         eps = weps
@@ -1726,7 +1727,7 @@ class BetweenOLS(PooledOLS):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
         weps = wy - wx @ params
         index = self.dependent.index
@@ -2198,7 +2199,7 @@ class RandomEffects(PooledOLS):
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
-            **cov_config
+            **cov_config,
         )
 
         weps = wy - wx @ params

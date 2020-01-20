@@ -24,7 +24,7 @@ from numpy import (
 )
 from numpy.linalg import inv, pinv
 
-from linearmodels.typing import Numeric, OptionalNumeric
+from linearmodels.typing import NDArray, Numeric, OptionalNumeric
 
 KernelWeight = Union[
     Callable[[float, float], ndarray], Callable[[float, VarArg(Any)], ndarray],
@@ -38,7 +38,7 @@ property `notnull` contains the locations of the observations that have no
 missing values."""
 
 
-def _cov_cluster(z: ndarray, clusters: ndarray) -> ndarray:
+def _cov_cluster(z: NDArray, clusters: NDArray) -> ndarray:
     """
     Core cluster covariance estimator
 
@@ -73,7 +73,7 @@ def _cov_cluster(z: ndarray, clusters: ndarray) -> ndarray:
     return s
 
 
-def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
+def _cov_kernel(z: NDArray, w: NDArray) -> ndarray:
     """
     Core kernel covariance estimator
 
@@ -199,7 +199,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> ndarray:
     return w
 
 
-def kernel_optimal_bandwidth(x: ndarray, kernel: str = "bartlett") -> int:
+def kernel_optimal_bandwidth(x: NDArray, kernel: str = "bartlett") -> int:
     """
     Parameters
     x : ndarray
@@ -311,10 +311,10 @@ class HomoskedasticCovariance(object):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -450,10 +450,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -543,10 +543,10 @@ class KernelCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
         kernel: str = "bartlett",
         bandwidth: OptionalNumeric = None,
         debiased: bool = False,
@@ -664,11 +664,11 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
-        clusters: ndarray = None,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
+        clusters: NDArray = None,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -700,7 +700,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
     def s(self) -> ndarray:
         """Clustered estimator of score covariance"""
 
-        def rescale(s: ndarray, nc: int, nobs: int) -> ndarray:
+        def rescale(s: NDArray, nc: int, nobs: int) -> ndarray:
             scale = self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs)
             return s * scale if self.debiased else s
 

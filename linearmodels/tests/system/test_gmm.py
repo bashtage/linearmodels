@@ -269,7 +269,7 @@ def test_fixed_sigma(data):
     mod_sigma = IVSystemGMM(data.eqns, weight_type="unadjusted", sigma=sigma)
     res_sigma = mod_sigma.fit()
     assert np.any(res.params != res_sigma.params)
-    assert np.any(res.sigma != res_sigma.sigma)
+    assert np.any(np.asarray(res.sigma != res_sigma.sigma))
 
 
 def test_incorrect_sigma_shape(data):

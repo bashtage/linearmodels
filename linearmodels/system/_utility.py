@@ -1,13 +1,13 @@
-from typing import Optional, Sequence, Union
+from typing import Optional, Union
 
 import numpy as np
 from numpy.linalg import inv, matrix_rank
 import pandas as pd
 
-ArraySequence = Sequence[np.ndarray]
+from linearmodels.typing import ArraySequence, NDArray
 
 
-def blocked_column_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
+def blocked_column_product(x: ArraySequence, s: NDArray) -> np.ndarray:
     """
     Parameters
     ----------
@@ -32,7 +32,7 @@ def blocked_column_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     return np.vstack(out)
 
 
-def blocked_diag_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
+def blocked_diag_product(x: ArraySequence, s: NDArray) -> np.ndarray:
     """
     Parameters
     ----------
@@ -60,7 +60,7 @@ def blocked_diag_product(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     return out
 
 
-def blocked_inner_prod(x: ArraySequence, s: np.ndarray) -> np.ndarray:
+def blocked_inner_prod(x: ArraySequence, s: NDArray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -86,7 +86,7 @@ def blocked_inner_prod(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     """
     k = len(x)
     widths = list(map(lambda m: m.shape[1], x))
-    s_is_diag = np.all((s - np.diag(np.diag(s))) == 0.0)
+    s_is_diag = np.all(np.asarray((s - np.diag(np.diag(s))) == 0.0))
 
     w0 = widths[0]
     homogeneous = all([w == w0 for w in widths])
@@ -126,7 +126,7 @@ def blocked_inner_prod(x: ArraySequence, s: np.ndarray) -> np.ndarray:
     return out
 
 
-def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: np.ndarray) -> np.ndarray:
+def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: NDArray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -163,7 +163,7 @@ def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: np.ndarray) -> np.
     return np.concatenate(xp, 0)
 
 
-def blocked_full_inner_product(x: np.ndarray, s: np.ndarray) -> np.ndarray:
+def blocked_full_inner_product(x: NDArray, s: NDArray) -> np.ndarray:
     r"""
     Parameters
     ----------
@@ -191,7 +191,7 @@ def blocked_full_inner_product(x: np.ndarray, s: np.ndarray) -> np.ndarray:
     return x.T @ sx
 
 
-def inv_matrix_sqrt(s: np.ndarray) -> np.ndarray:
+def inv_matrix_sqrt(s: NDArray) -> np.ndarray:
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
     out = vals @ np.diag(vecs) @ vals.T

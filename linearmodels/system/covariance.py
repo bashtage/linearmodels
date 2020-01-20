@@ -10,6 +10,7 @@ from linearmodels.system._utility import (
     blocked_diag_product,
     blocked_inner_prod,
 )
+from linearmodels.typing import NDArray
 from linearmodels.utility import AttrDict
 
 
@@ -52,13 +53,13 @@ class HomoskedasticCovariance(object):
     def __init__(
         self,
         x: List[ndarray],
-        eps: ndarray,
-        sigma: ndarray,
-        full_sigma: ndarray,
+        eps: NDArray,
+        sigma: NDArray,
+        full_sigma: NDArray,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None
+        constraints: Optional[LinearConstraint] = None,
     ) -> None:
         self._eps = eps
         self._x = x
@@ -194,13 +195,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def __init__(
         self,
         x: List[ndarray],
-        eps: ndarray,
-        sigma: ndarray,
-        full_sigma: ndarray,
+        eps: NDArray,
+        sigma: NDArray,
+        full_sigma: NDArray,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None
+        constraints: Optional[LinearConstraint] = None,
     ) -> None:
 
         super(HeteroskedasticCovariance, self).__init__(
@@ -343,15 +344,15 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     def __init__(
         self,
         x: List[ndarray],
-        eps: ndarray,
-        sigma: ndarray,
-        full_sigma: ndarray,
+        eps: NDArray,
+        sigma: NDArray,
+        full_sigma: NDArray,
         *,
         gls: bool = False,
         debiased: bool = False,
         constraints: Optional[LinearConstraint] = None,
         kernel: str = "bartlett",
-        bandwidth: Optional[float] = None
+        bandwidth: Optional[float] = None,
     ):
         super(KernelCovariance, self).__init__(
             x,
@@ -416,12 +417,12 @@ class GMMHomoskedasticCovariance(object):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: ndarray,
-        w: ndarray,
+        eps: NDArray,
+        w: NDArray,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None
+        constraints: Optional[LinearConstraint] = None,
     ) -> None:
         self._x = x
         self._z = z
@@ -537,12 +538,12 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: ndarray,
-        w: ndarray,
+        eps: NDArray,
+        w: NDArray,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None
+        constraints: Optional[LinearConstraint] = None,
     ) -> None:
         super().__init__(
             x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints
@@ -613,14 +614,14 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: ndarray,
-        w: ndarray,
+        eps: NDArray,
+        w: NDArray,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
         constraints: Optional[LinearConstraint] = None,
         kernel: str = "bartlett",
-        bandwidth: Optional[float] = None
+        bandwidth: Optional[float] = None,
     ) -> None:
         super().__init__(
             x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints

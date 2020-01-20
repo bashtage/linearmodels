@@ -39,7 +39,7 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.typing import Numeric, OptionalNumeric
+from linearmodels.typing import NDArray, Numeric, OptionalNumeric
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (
     InvalidTestStatistic,
@@ -162,7 +162,7 @@ class IVLIML(object):
         *,
         weights: OptionalArrayLike = None,
         fuller: Numeric = 0,
-        kappa: OptionalNumeric = None
+        kappa: OptionalNumeric = None,
     ):
 
         self.dependent = IVData(dependent, var_name="dependent")
@@ -239,7 +239,7 @@ class IVLIML(object):
         *,
         weights: OptionalArrayLike = None,
         fuller: float = 0,
-        kappa: OptionalNumeric = None
+        kappa: OptionalNumeric = None,
     ) -> "IVLIML":
         """
         Parameters
@@ -299,7 +299,7 @@ class IVLIML(object):
         exog: OptionalArrayLike = None,
         endog: OptionalArrayLike = None,
         data: DataFrame = None,
-        eval_env: int = 4
+        eval_env: int = 4,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -393,7 +393,7 @@ class IVLIML(object):
 
     def _drop_missing(self) -> ndarray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing: ndarray = any(c_[[dh.isnull for dh in data]], 0)
+        missing: NDArray = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
             if npall(missing):
                 raise ValueError(
@@ -411,7 +411,7 @@ class IVLIML(object):
 
     @staticmethod
     def estimate_parameters(
-        x: ndarray, y: ndarray, z: ndarray, kappa: Numeric
+        x: NDArray, y: NDArray, z: NDArray, kappa: Numeric
     ) -> ndarray:
         """
         Parameter estimation without error checking
@@ -533,7 +533,7 @@ class IVLIML(object):
 
         return self._result_container(results, self)
 
-    def wresids(self, params: ndarray) -> ndarray:
+    def wresids(self, params: NDArray) -> ndarray:
         """
         Compute weighted model residuals
 
@@ -554,7 +554,7 @@ class IVLIML(object):
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params: ndarray) -> ndarray:
+    def resids(self, params: NDArray) -> ndarray:
         """
         Compute model residuals
 
@@ -586,14 +586,14 @@ class IVLIML(object):
         return logical_not(self._drop_locs)
 
     def _f_statistic(
-        self, params: ndarray, cov: ndarray, debiased: bool
+        self, params: NDArray, cov: NDArray, debiased: bool
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _post_estimation(
-        self, params: ndarray, cov_estimator: CovarianceEstimator, cov_type: str
+        self, params: NDArray, cov_estimator: CovarianceEstimator, cov_type: str
     ) -> Dict[str, Any]:
         columns = self._columns
         index = self._index
@@ -685,7 +685,7 @@ class IV2SLS(IVLIML):
         endog: OptionalArrayLike,
         instruments: OptionalArrayLike,
         *,
-        weights: OptionalArrayLike = None
+        weights: OptionalArrayLike = None,
     ):
         self._method = "IV-2SLS"
         super(IV2SLS, self).__init__(
@@ -800,7 +800,7 @@ class IVGMM(IVLIML):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config: Any
+        **weight_config: Any,
     ):
         self._method = "IV-GMM"
         self._result_container = IVGMMResults
@@ -819,7 +819,7 @@ class IVGMM(IVLIML):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config: Any
+        **weight_config: Any,
     ) -> "IVGMM":
         """
         Parameters
@@ -872,13 +872,13 @@ class IVGMM(IVLIML):
             instr,
             weights=weights,
             weight_type=weight_type,
-            **weight_config
+            **weight_config,
         )
         mod.formula = formula
         return mod
 
     @staticmethod
-    def estimate_parameters(x: ndarray, y: ndarray, z: ndarray, w: ndarray) -> ndarray:
+    def estimate_parameters(x: NDArray, y: NDArray, z: NDArray, w: NDArray) -> ndarray:
         """
         Parameters
         ----------
@@ -910,10 +910,10 @@ class IVGMM(IVLIML):
         *,
         iter_limit: int = 2,
         tol: float = 1e-4,
-        initial_weight: ndarray = None,
+        initial_weight: NDArray = None,
         cov_type: str = "robust",
         debiased: bool = False,
-        **cov_config: Any
+        **cov_config: Any,
     ) -> Union[OLSResults, IVGMMResults]:
         """
         Estimate model parameters
@@ -1004,7 +1004,7 @@ class IVGMM(IVLIML):
         return self._result_container(results, self)
 
     def _gmm_post_estimation(
-        self, params: ndarray, weight_mat: ndarray, iters: int
+        self, params: NDArray, weight_mat: NDArray, iters: int
     ) -> Dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1018,7 +1018,7 @@ class IVGMM(IVLIML):
 
         return gmm_specific
 
-    def _j_statistic(self, params: ndarray, weight_mat: ndarray) -> WaldTestStatistic:
+    def _j_statistic(self, params: NDArray, weight_mat: NDArray) -> WaldTestStatistic:
         """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
@@ -1087,7 +1087,7 @@ class IVGMMCUE(IVGMM):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config: Any
+        **weight_config: Any,
     ) -> None:
         self._method = "IV-GMM-CUE"
         super(IVGMMCUE, self).__init__(
@@ -1097,7 +1097,7 @@ class IVGMMCUE(IVGMM):
             instruments,
             weights=weights,
             weight_type=weight_type,
-            **weight_config
+            **weight_config,
         )
         if "center" not in weight_config:
             weight_config["center"] = True
@@ -1109,7 +1109,7 @@ class IVGMMCUE(IVGMM):
         *,
         weights: OptionalArrayLike = None,
         weight_type: str = "robust",
-        **weight_config: Any
+        **weight_config: Any,
     ) -> "IVGMMCUE":
         """
         Parameters
@@ -1161,12 +1161,12 @@ class IVGMMCUE(IVGMM):
             instr,
             weights=weights,
             weight_type=weight_type,
-            **weight_config
+            **weight_config,
         )
         mod.formula = formula
         return mod
 
-    def j(self, params: ndarray, x: ndarray, y: ndarray, z: ndarray) -> float:
+    def j(self, params: NDArray, x: NDArray, y: NDArray, z: NDArray) -> float:
         r"""
         Optimization target
 
@@ -1213,10 +1213,10 @@ class IVGMMCUE(IVGMM):
 
     def estimate_parameters(
         self,
-        starting: ndarray,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
+        starting: NDArray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
         display: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
     ) -> ndarray:
@@ -1267,12 +1267,12 @@ class IVGMMCUE(IVGMM):
     def fit(
         self,
         *,
-        starting: ndarray = None,
+        starting: NDArray = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
-        **cov_config: Any
+        **cov_config: Any,
     ) -> Union[OLSResults, IVGMMResults]:
         r"""
         Estimate model parameters
@@ -1327,7 +1327,7 @@ class IVGMMCUE(IVGMM):
                 instr,
                 weights=self.weights,
                 weight_type=self._weight_type,
-                **self._weight_config
+                **self._weight_config,
             ).fit()
             starting = asarray(res.params)
         else:
@@ -1382,7 +1382,7 @@ class _OLS(IVLIML):
         dependent: ArrayLike,
         exog: OptionalArrayLike,
         *,
-        weights: OptionalArrayLike = None
+        weights: OptionalArrayLike = None,
     ):
         super(_OLS, self).__init__(
             dependent, exog, None, None, weights=weights, kappa=0.0

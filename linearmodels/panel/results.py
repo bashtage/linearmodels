@@ -1,6 +1,7 @@
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -9,7 +10,10 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
+from linearmodels.typing import NDArray, OptionalArrayLike
 from linearmodels.utility import (
+    AttrDict,
+    WaldTestStatistic,
     _ModelComparison,
     _str,
     _SummaryStr,
@@ -25,7 +29,7 @@ class PanelResults(_SummaryStr):
     Results container for panel data models that do not include effects
     """
 
-    def __init__(self, res):
+    def __init__(self, res: AttrDict):
         self._params = res.params.squeeze()
         self._deferred_cov = res.deferred_cov
         self._debiased = res.debiased
@@ -59,29 +63,29 @@ class PanelResults(_SummaryStr):
         self._not_null = res.not_null
 
     @property
-    def params(self):
+    def params(self) -> Series:
         """Estimated parameters"""
         return Series(self._params, index=self._var_names, name="parameter")
 
     @cached_property
-    def cov(self):
+    def cov(self) -> DataFrame:
         """Estimated covariance of parameters"""
         return DataFrame(
             self._deferred_cov(), columns=self._var_names, index=self._var_names
         )
 
     @property
-    def std_errors(self):
+    def std_errors(self) -> Series:
         """Estimated parameter standard errors"""
         return Series(np.sqrt(np.diag(self.cov)), self._var_names, name="std_error")
 
     @property
-    def tstats(self):
+    def tstats(self) -> Series:
         """Parameter t-statistics"""
         return Series(self._params / self.std_errors, name="tstat")
 
     @cached_property
-    def pvalues(self):
+    def pvalues(self) -> Series:
         """
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
@@ -93,7 +97,7 @@ class PanelResults(_SummaryStr):
         return Series(pv, index=self._var_names, name="pvalue")
 
     @property
-    def df_resid(self):
+    def df_resid(self) -> int:
         """
         Residual degree of freedom
 
@@ -104,7 +108,7 @@ class PanelResults(_SummaryStr):
         return self._df_resid
 
     @property
-    def df_model(self):
+    def df_model(self) -> int:
         """
         Model degree of freedom
 
@@ -115,37 +119,37 @@ class PanelResults(_SummaryStr):
         return self._df_model
 
     @property
-    def nobs(self):
+    def nobs(self) -> int:
         """Number of observations used to estimate the model"""
         return self._nobs
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Model name"""
         return self._name
 
     @property
-    def total_ss(self):
+    def total_ss(self) -> float:
         """Total sum of squares"""
         return self._total_ss
 
     @property
-    def model_ss(self):
+    def model_ss(self) -> float:
         """Residual sum of squares"""
         return self._total_ss - self._residual_ss
 
     @property
-    def resid_ss(self):
+    def resid_ss(self) -> float:
         """Residual sum of squares"""
         return self._residual_ss
 
     @property
-    def rsquared(self):
+    def rsquared(self) -> float:
         """Model Coefficient of determination"""
         return self._r2
 
     @property
-    def rsquared_between(self):
+    def rsquared_between(self) -> float:
         """Between Coefficient of determination
 
         Returns
@@ -161,7 +165,7 @@ class PanelResults(_SummaryStr):
         return self._r2b
 
     @property
-    def rsquared_within(self):
+    def rsquared_within(self) -> float:
         """Within coefficient of determination
 
         Returns
@@ -177,7 +181,7 @@ class PanelResults(_SummaryStr):
         return self._r2w
 
     @property
-    def rsquared_overall(self):
+    def rsquared_overall(self) -> float:
         """Overall coefficient of determination
 
         Returns
@@ -194,21 +198,21 @@ class PanelResults(_SummaryStr):
         return self._r2o
 
     @property
-    def s2(self):
+    def s2(self) -> float:
         """Residual variance estimator"""
         return self._s2
 
     @property
-    def entity_info(self):
+    def entity_info(self) -> Series:
         """Statistics on observations per entity"""
         return self._entity_info
 
     @property
-    def time_info(self):
+    def time_info(self) -> Series:
         """Statistics on observations per time interval"""
         return self._time_info
 
-    def conf_int(self, level=0.95):
+    def conf_int(self, level: float = 0.95) -> DataFrame:
         """
         Confidence interval construction
 
@@ -237,7 +241,7 @@ class PanelResults(_SummaryStr):
         return DataFrame(ci, index=self._var_names, columns=["lower", "upper"])
 
     @property
-    def summary(self):
+    def summary(self) -> Summary:
         """
         Model estimation summary.
 
@@ -354,7 +358,7 @@ class PanelResults(_SummaryStr):
         return smry
 
     @property
-    def resids(self):
+    def resids(self) -> Series:
         """Model residuals
 
         Notes
@@ -364,7 +368,9 @@ class PanelResults(_SummaryStr):
         transformed data which has a different shape."""
         return Series(self._resids.squeeze(), index=self._index, name="residual")
 
-    def _out_of_sample(self, exog, data, fitted, missing):
+    def _out_of_sample(
+        self, exog: OptionalArrayLike, data: Optional[DataFrame], missing: bool
+    ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if exog is not None and data is not None:
             raise ValueError(
@@ -378,13 +384,13 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog=None,
+        exog: OptionalArrayLike = None,
         *,
-        data=None,
-        fitted=True,
-        effects=False,
-        idiosyncratic=False,
-        missing=False
+        data: Optional[DataFrame] = None,
+        fitted: bool = True,
+        effects: bool = False,
+        idiosyncratic: bool = False,
+        missing: bool = False,
     ) -> DataFrame:
         """
         In- and out-of-sample predictions
@@ -425,7 +431,7 @@ class PanelResults(_SummaryStr):
         predictions.
         """
         if not (exog is None and data is None):
-            return self._out_of_sample(exog, data, fitted, missing)
+            return self._out_of_sample(exog, data, missing)
         out = []
         if fitted:
             out.append(self.fitted_values)
@@ -442,12 +448,12 @@ class PanelResults(_SummaryStr):
         return out_df
 
     @property
-    def fitted_values(self):
+    def fitted_values(self) -> Series:
         """Fitted values"""
         return self._fitted
 
     @property
-    def estimated_effects(self):
+    def estimated_effects(self) -> Series:
         """
         Estimated effects
 
@@ -458,7 +464,7 @@ class PanelResults(_SummaryStr):
         return self._effects
 
     @property
-    def idiosyncratic(self):
+    def idiosyncratic(self) -> Series:
         """
         Idiosyncratic error
 
@@ -473,14 +479,14 @@ class PanelResults(_SummaryStr):
         return self._idiosyncratic
 
     @property
-    def wresids(self):
+    def wresids(self) -> Series:
         """Weighted model residuals"""
         return Series(
             self._wresids.squeeze(), index=self._index, name="weighted residual"
         )
 
     @property
-    def f_statistic_robust(self):
+    def f_statistic_robust(self) -> WaldTestStatistic:
         r"""
         Joint test of significance for non-constant regressors
 
@@ -512,7 +518,7 @@ class PanelResults(_SummaryStr):
         return self._deferred_f()
 
     @property
-    def f_statistic(self):
+    def f_statistic(self) -> WaldTestStatistic:
         r"""
         Joint test of significance for non-constant regressors
 
@@ -540,11 +546,17 @@ class PanelResults(_SummaryStr):
         return self._f_stat
 
     @property
-    def loglik(self):
+    def loglik(self) -> float:
         """Log-likelihood of model"""
         return self._loglik
 
-    def wald_test(self, restriction=None, value=None, *, formula=None):
+    def wald_test(
+        self,
+        restriction: Optional[Union[NDArray, DataFrame]] = None,
+        value: Optional[Union[NDArray, Series]] = None,
+        *,
+        formula: Optional[Union[str, List[str]]] = None,
+    ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
 
@@ -618,7 +630,7 @@ class PanelEffectsResults(PanelResults):
     Results container for panel data models that include effects
     """
 
-    def __init__(self, res):
+    def __init__(self, res: AttrDict) -> None:
         super(PanelEffectsResults, self).__init__(res)
         self._other_info = res.other_info
         self._f_pooled = res.f_pooled
@@ -632,7 +644,7 @@ class PanelEffectsResults(PanelResults):
         self._effects = res.effects
 
     @property
-    def f_pooled(self):
+    def f_pooled(self) -> WaldTestStatistic:
         r"""
         Test that included effects are jointly zero.
 
@@ -663,13 +675,13 @@ class PanelEffectsResults(PanelResults):
         return self._f_pooled
 
     @property
-    def included_effects(self):
+    def included_effects(self) -> List[str]:
         """List of effects included in the model"""
         entity_effect = self._entity_effect
         time_effect = self._time_effect
         other_effect = self._other_effect
+        effects = []
         if entity_effect or time_effect or other_effect:
-            effects = []
             if entity_effect:
                 effects.append("Entity")
             if time_effect:
@@ -678,22 +690,20 @@ class PanelEffectsResults(PanelResults):
                 oe = self.model._other_effect_cats.dataframe
                 for c in oe:
                     effects.append("Other Effect (" + str(c) + ")")
-        else:
-            effects = []
         return effects
 
     @property
-    def other_info(self):
+    def other_info(self) -> Optional[DataFrame]:
         """Statistics on observations per group for other effects"""
         return self._other_info
 
     @property
-    def rsquared_inclusive(self):
+    def rsquared_inclusive(self) -> float:
         """Model Coefficient of determination including fit of included effects"""
         return self._r2_ex_effects
 
     @property
-    def summary(self):
+    def summary(self) -> Summary:
         """
         Model estimation summary.
 
@@ -744,7 +754,7 @@ class PanelEffectsResults(PanelResults):
         return smry
 
     @property
-    def variance_decomposition(self):
+    def variance_decomposition(self) -> Series:
         """Decomposition of total variance into effects and residuals"""
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ["Effects", "Residual", "Percent due to Effects"]
@@ -756,7 +766,7 @@ class RandomEffectsResults(PanelResults):
     Results container for random effect panel data models
     """
 
-    def __init__(self, res):
+    def __init__(self, res: AttrDict) -> None:
         super(RandomEffectsResults, self).__init__(res)
         self._theta = res.theta
         self._sigma2_effects = res.sigma2_effects
@@ -764,37 +774,19 @@ class RandomEffectsResults(PanelResults):
         self._rho = res.rho
 
     @property
-    def variance_decomposition(self):
+    def variance_decomposition(self) -> Series:
         """Decomposition of total variance into effects and residuals"""
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ["Effects", "Residual", "Percent due to Effects"]
         return Series(vals, index=index, name="Variance Decomposition")
 
     @property
-    def theta(self):
+    def theta(self) -> DataFrame:
         """Values used in generalized demeaning"""
         return self._theta
 
 
-def compare(results, precision="tstats"):
-    """
-    Compare the results of multiple models
-
-    Parameters
-    ----------
-    results : {list, dict}
-        Set of results to compare.  If a dict, the keys will be used as model
-        names.
-    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
-        Estimator precision estimator to include in the comparison output.
-        Default is 'tstats'.
-
-    Returns
-    -------
-    PanelModelComparison
-        The model comparison object.
-    """
-    return PanelModelComparison(results, precision=precision)
+PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResults]
 
 
 class PanelModelComparison(_ModelComparison):
@@ -813,36 +805,41 @@ class PanelModelComparison(_ModelComparison):
 
     _supported = (PanelEffectsResults, PanelResults, RandomEffectsResults)
 
-    def __init__(self, results, *, precision="tstats"):
+    def __init__(
+        self,
+        results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
+        *,
+        precision: str = "tstats",
+    ) -> None:
         super(PanelModelComparison, self).__init__(results, precision=precision)
 
     @property
-    def rsquared_between(self):
+    def rsquared_between(self) -> Series:
         """Coefficients of determination (R**2)"""
         return self._get_property("rsquared_between")
 
     @property
-    def rsquared_within(self):
+    def rsquared_within(self) -> Series:
         """Coefficients of determination (R**2)"""
         return self._get_property("rsquared_within")
 
     @property
-    def rsquared_overall(self):
+    def rsquared_overall(self) -> Series:
         """Coefficients of determination (R**2)"""
         return self._get_property("rsquared_overall")
 
     @property
-    def estimator_method(self):
+    def estimator_method(self) -> Series:
         """Estimation methods"""
         return self._get_property("name")
 
     @property
-    def cov_estimator(self):
+    def cov_estimator(self) -> Series:
         """Covariance estimator descriptions"""
         return self._get_property("_cov_type")
 
     @property
-    def summary(self):
+    def summary(self) -> Summary:
         """
         Model estimation summary.
 
@@ -949,3 +946,27 @@ class PanelModelComparison(_ModelComparison):
         prec_type = self._PRECISION_TYPES[self._precision]
         smry.add_extra_txt(["{0} reported in parentheses".format(prec_type)])
         return smry
+
+
+def compare(
+    results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
+    precision: str = "tstats",
+) -> PanelModelComparison:
+    """
+    Compare the results of multiple models
+
+    Parameters
+    ----------
+    results : {list, dict}
+        Set of results to compare.  If a dict, the keys will be used as model
+        names.
+    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+        Estimator precision estimator to include in the comparison output.
+        Default is 'tstats'.
+
+    Returns
+    -------
+    PanelModelComparison
+        The model comparison object.
+    """
+    return PanelModelComparison(results, precision=precision)

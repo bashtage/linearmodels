@@ -11,6 +11,7 @@ from linearmodels.iv.covariance import (
     _cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.typing import NDArray
 
 
 class _HACMixin(object):
@@ -54,7 +55,7 @@ class _HACMixin(object):
             if bandwidth < 0:
                 raise ValueError("bandwidth must be non-negative.")
 
-    def _kernel_cov(self, z: ndarray) -> ndarray:
+    def _kernel_cov(self, z: NDArray) -> ndarray:
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel
@@ -88,13 +89,13 @@ class HeteroskedasticCovariance(object):
 
     def __init__(
         self,
-        xe: ndarray,
+        xe: NDArray,
         *,
         jacobian: Optional[ndarray] = None,
         inv_jacobian: Optional[ndarray] = None,
         center: bool = True,
         debiased: bool = False,
-        df: int = 0
+        df: int = 0,
     ) -> None:
 
         self._moments = self._xe = xe
@@ -219,7 +220,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        xe: ndarray,
+        xe: NDArray,
         *,
         jacobian: Optional[ndarray] = None,
         inv_jacobian: Optional[ndarray] = None,
@@ -227,7 +228,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         bandwidth: Optional[int] = None,
         center: bool = True,
         debiased: bool = False,
-        df: int = 0
+        df: int = 0,
     ) -> None:
         super(KernelCovariance, self).__init__(
             xe,
@@ -279,11 +280,11 @@ class HeteroskedasticWeight(object):
         Flag indicating to center the moments when computing the weights
     """
 
-    def __init__(self, moments: ndarray, center: bool = True) -> None:
+    def __init__(self, moments: NDArray, center: bool = True) -> None:
         self._moments = moments
         self._center = center
 
-    def w(self, moments: ndarray) -> ndarray:
+    def w(self, moments: NDArray) -> ndarray:
         """
         Score/moment condition weighting matrix
 
@@ -323,7 +324,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
 
     def __init__(
         self,
-        moments: ndarray,
+        moments: NDArray,
         center: bool = True,
         kernel: str = "bartlett",
         bandwidth: Optional[int] = None,
@@ -332,7 +333,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
-    def w(self, moments: ndarray) -> ndarray:
+    def w(self, moments: NDArray) -> ndarray:
         """
         Score/moment condition weighting matrix
 

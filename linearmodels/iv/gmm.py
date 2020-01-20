@@ -13,6 +13,7 @@ from linearmodels.iv.covariance import (
     _cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.typing import NDArray
 
 
 class HomoskedasticWeightMatrix(object):
@@ -46,7 +47,7 @@ class HomoskedasticWeightMatrix(object):
         self._debiased = debiased
         self._bandwidth: Optional[int] = 0
 
-    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
         """
         Parameters
         ----------
@@ -109,7 +110,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
-    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
         """
         Parameters
         ----------
@@ -193,7 +194,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._kernels = KERNEL_LOOKUP
         self._optimal_bw = optimal_bw
 
-    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
         """
         Parameters
         ----------
@@ -268,12 +269,12 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: ndarray, center: bool = False, debiased: bool = False
+        self, clusters: NDArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
-    def weight_matrix(self, x: ndarray, z: ndarray, eps: ndarray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
         """
         Parameters
         ----------
@@ -388,14 +389,14 @@ class IVGMMCovariance(HomoskedasticCovariance):
     # TODO: 2-way clustering
     def __init__(
         self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        params: ndarray,
-        w: ndarray,
+        x: NDArray,
+        y: NDArray,
+        z: NDArray,
+        params: NDArray,
+        w: NDArray,
         cov_type: str = "robust",
         debiased: bool = False,
-        **cov_config: Dict[str, Union[str, bool]]
+        **cov_config: Dict[str, Union[str, bool]],
     ) -> None:
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type

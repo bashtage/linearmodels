@@ -1,5 +1,5 @@
 from linearmodels.compat.numpy import lstsq
-from linearmodels.compat.pandas import get_codes, is_categorical, to_numpy
+from linearmodels.compat.pandas import get_codes, to_numpy
 
 from collections import defaultdict
 from typing import (
@@ -38,6 +38,7 @@ from numpy import (
     zeros,
 )
 from pandas import Categorical, DataFrame, Series
+from pandas.api.types import is_categorical
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
@@ -53,7 +54,7 @@ from linearmodels.iv.model import (
 )
 from linearmodels.iv.results import AbsorbingLSResults
 from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
-from linearmodels.typing import AnyPandas
+from linearmodels.typing import AnyPandas, NDArray
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 from linearmodels.utility import (
     InvalidTestStatistic,
@@ -88,10 +89,10 @@ def clear_cache() -> None:
 
 def lsmr_annihilate(
     x: csc_matrix,
-    y: ndarray,
+    y: NDArray,
     use_cache: bool = True,
     x_hash: Optional[Hashable] = None,
-    **lsmr_options: Union[float, bool]
+    **lsmr_options: Union[float, bool],
 ) -> ndarray:
     r"""
     Removes projection of x on y from y
@@ -352,7 +353,7 @@ class Interaction(object):
     def isnull(self) -> Series:
         return self.cat.isnull().any(1) | self.cont.isnull().any(1)
 
-    def drop(self, locs: ndarray) -> None:
+    def drop(self, locs: NDArray) -> None:
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
 
@@ -483,7 +484,7 @@ class AbsorbingRegressor(object):
         cat: DataFrame = None,
         cont: DataFrame = None,
         interactions: Optional[List[Interaction]] = None,
-        weights: ndarray = None
+        weights: NDArray = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -647,7 +648,7 @@ class AbsorbingLS(object):
         *,
         absorb: InteractionVar = None,
         interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
-        weights: OptionalArrayLike = None
+        weights: OptionalArrayLike = None,
     ) -> None:
 
         self._dependent = IVData(dependent, "dependent")
@@ -876,7 +877,7 @@ class AbsorbingLS(object):
         debiased: bool = False,
         lsmr_options: Optional[Dict[str, Union[float, bool]]] = None,
         use_cache: bool = True,
-        **cov_config: Any
+        **cov_config: Any,
     ) -> AbsorbingLSResults:
         """
         Estimate model parameters
@@ -967,7 +968,7 @@ class AbsorbingLS(object):
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: ndarray) -> ndarray:
+    def resids(self, params: NDArray) -> ndarray:
         """
         Compute model residuals
 
@@ -984,7 +985,7 @@ class AbsorbingLS(object):
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: ndarray) -> ndarray:
+    def wresids(self, params: NDArray) -> ndarray:
         """
         Compute weighted model residuals
 
@@ -1008,7 +1009,7 @@ class AbsorbingLS(object):
         )
 
     def _f_statistic(
-        self, params: ndarray, cov: ndarray, debiased: bool
+        self, params: NDArray, cov: NDArray, debiased: bool
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         const_loc = find_constant(self._exog.ndarray)
         resid_df = self._nobs - self._num_params
@@ -1017,7 +1018,7 @@ class AbsorbingLS(object):
 
     def _post_estimation(
         self,
-        params: ndarray,
+        params: NDArray,
         cov_estimator: Union[
             HomoskedasticCovariance,
             HeteroskedasticCovariance,

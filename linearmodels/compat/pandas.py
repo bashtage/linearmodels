@@ -1,4 +1,3 @@
-from distutils.version import LooseVersion
 from typing import Any
 
 import numpy as np
@@ -7,25 +6,12 @@ from pandas.core.arrays.categorical import CategoricalAccessor
 
 from linearmodels.typing import AnyPandas
 
-PD_LT_023 = LooseVersion(pd.__version__) < LooseVersion("0.23")
-
 __all__ = [
-    "is_string_dtype",
-    "is_numeric_dtype",
-    "is_categorical",
     "is_string_like",
-    "is_categorical_dtype",
-    "is_datetime64_any_dtype",
     "concat",
     "get_codes",
     "to_numpy",
-    "assert_series_equal",
 ]
-
-try:
-    from pandas.testing import assert_series_equal
-except ImportError:
-    from pandas.util.testing import assert_series_equal
 
 
 def concat(*args: AnyPandas, **kwargs: Any) -> AnyPandas:
@@ -34,52 +20,28 @@ def concat(*args: AnyPandas, **kwargs: Any) -> AnyPandas:
 
     See pandas.compat
     """
-    if PD_LT_023 and "sort" in kwargs:
+    if "sort" not in kwargs:
         kwargs = kwargs.copy()
-        del kwargs["sort"]
-    elif not PD_LT_023:
-        if "sort" not in kwargs:
-            kwargs = kwargs.copy()
-            kwargs["sort"] = False
+        kwargs["sort"] = False
 
     return pd.concat(*args, **kwargs)
 
 
-try:
-    from pandas.api.types import (
-        is_numeric_dtype,
-        is_categorical,
-        is_string_dtype,
-        is_categorical_dtype,
-        is_datetime64_any_dtype,
-    )
+# From pandas 0.20.1
+def is_string_like(obj: object) -> bool:
+    """
+    Check if the object is a string.
 
-    # From pandas 0.20.1
-    def is_string_like(obj: object) -> bool:
-        """
-        Check if the object is a string.
+    Parameters
+    ----------
+    obj : The object to check.
 
-        Parameters
-        ----------
-        obj : The object to check.
-
-        Returns
-        -------
-        bool
-            Whether `obj` is a string or not.
-        """
-        return isinstance(obj, str)
-
-
-except ImportError:  # pragma: no cover
-    from pandas.core.common import (
-        is_string_dtype,
-        is_numeric_dtype,
-        is_categorical,
-        is_categorical_dtype,
-        is_datetime64_any_dtype,
-        is_string_like,
-    )
+    Returns
+    -------
+    bool
+        Whether `obj` is a string or not.
+    """
+    return isinstance(obj, str)
 
 
 def get_codes(index: CategoricalAccessor) -> pd.Series:
