@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.core.arrays.categorical import CategoricalAccessor
 
-from linearmodels.typing import AnyPandas
+from linearmodels.typing import AnyPandas, NDArray
 
 __all__ = [
     "is_string_like",
@@ -54,7 +54,7 @@ def get_codes(index: CategoricalAccessor) -> pd.Series:
         return index.labels
 
 
-def to_numpy(df: AnyPandas) -> np.ndarray:
+def to_numpy(df: AnyPandas) -> NDArray:
     try:
         return df.to_numpy()
     except AttributeError:

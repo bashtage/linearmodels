@@ -10,7 +10,7 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
 import linearmodels
-from linearmodels.typing import ArrayLike
+from linearmodels.typing import ArrayLike, NDArray
 from linearmodels.typing.data import OptionalDataFrame
 from linearmodels.utility import (
     AttrDict,
@@ -246,7 +246,7 @@ class SystemResults(_CommonResults):
 
     def _out_of_sample(
         self,
-        equations: Optional[Dict[str, Equation]],
+        equations: Optional[Dict[str, Dict[str, ArrayLike]]],
         data: Optional[DataFrame],
         missing: bool,
         dataframe: bool,
@@ -272,7 +272,7 @@ class SystemResults(_CommonResults):
 
     def predict(
         self,
-        equations: Optional[Dict[str, Equation]] = None,
+        equations: Optional[Dict[str, Dict[str, ArrayLike]]] = None,
         *,
         data: Optional[DataFrame] = None,
         fitted: bool = True,
@@ -699,7 +699,7 @@ class GMMSystemResults(SystemResults):
         self._j_stat = results.j_stat
 
     @property
-    def w(self) -> np.ndarray:
+    def w(self) -> NDArray:
         """GMM weight matrix used in estimation"""
         return self._wmat
 

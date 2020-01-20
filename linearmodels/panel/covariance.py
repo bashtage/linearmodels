@@ -633,54 +633,6 @@ class CovarianceManager(object):
 
 class FamaMacBethCovariance(HomoskedasticCovariance):
     """
-    Heteroskedasticity robust covariance estimator for Fama-MacBeth
-
-    Parameters
-    ----------
-    y : ndarray
-        (entity x time) by 1 stacked array of dependent
-    x : ndarray
-        (entity x time) by variables stacked array of exogenous
-    params : ndarray
-        (variables by 1) array of estimated model parameters
-    all_params : ndarray
-        (nobs by variables) array of all estimated model parameters
-    debiased : bool, optional
-        Flag indicating whether to debias the estimator
-
-    Notes
-    -----
-    Covariance is the sample covariance of the set of all estimated
-    parameters.
-    """
-
-    def __init__(
-        self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
-        all_params: NDArray,
-        *,
-        debiased: bool = False,
-    ) -> None:
-        super(FamaMacBethCovariance, self).__init__(
-            y, x, params, None, None, debiased=debiased
-        )
-        self._all_params = all_params
-        self._name = "Fama-MacBeth Std Cov"
-
-    @cached_property
-    def cov(self) -> NDArray:
-        """Estimated covariance"""
-        e = self._all_params - self._params.T
-        e = e[np.all(np.isfinite(e), 1)]
-        nobs = e.shape[0]
-        cov = e.T @ e / nobs
-        return cov / (nobs - int(bool(self._debiased)))
-
-
-class FamaMacBethKernelCovariance(FamaMacBethCovariance):
-    """
     HAC estimator for Fama-MacBeth estimator
 
     Parameters
@@ -694,17 +646,23 @@ class FamaMacBethKernelCovariance(FamaMacBethCovariance):
     all_params : ndarray
         (nobs by variables) array of all estimated model parameters
     debiased : bool, optional
-        Flag indicating whether to debias the estimator
-    kernel : str, options
-        Name of one of the supported kernels
+        Flag indicating whether to debias the estimator.
     bandwidth : int, optional
-        Non-negative integer to use as bandwidth.  If not provided a rule-of-
-        thumb value is used.
+        Non-negative integer to use as bandwidth.  Set to 0 to disable
+        autocorrelation robustness. If not provided a rule-of- thumb
+        value is used.
+    kernel : str, options
+        Name of one of the supported kernels. If set to None, then the
+        estimator is not autocorrelation robust. This is equivalent to
+        setting the bandwidth to 0.
+
 
     Notes
     -----
     Covariance is a Kernel covariance of all estimated parameters.
     """
+
+    DEFAULT_KERNEL = "newey-west"
 
     def __init__(
         self,
@@ -714,15 +672,17 @@ class FamaMacBethKernelCovariance(FamaMacBethCovariance):
         all_params: NDArray,
         *,
         debiased: bool = False,
-        kernel: str = "newey-west",
         bandwidth: Optional[float] = None,
+        kernel: Optional[str] = None,
     ) -> None:
-        super(FamaMacBethKernelCovariance, self).__init__(
-            y, x, params, all_params, debiased=debiased
+        super(FamaMacBethCovariance, self).__init__(
+            y, x, params, None, None, debiased=debiased
         )
-        self._name = "Fama-MacBeth Kernel Cov"
+        self._all_params = all_params
+        cov_type = "Standard " if bandwidth == 0 else "Kernel "
+        self._name = f"Fama-MacBeth {cov_type}Cov"
         self._bandwidth = bandwidth
-        self._kernel = kernel
+        self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
 
     @cached_property
     def bandwidth(self) -> float:
@@ -743,6 +703,7 @@ class FamaMacBethKernelCovariance(FamaMacBethCovariance):
         nobs = e.shape[0]
 
         bw = self.bandwidth
+        assert self._kernel is not None
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
         cov = _cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))

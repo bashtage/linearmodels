@@ -88,7 +88,7 @@ class HomoskedasticCovariance(object):
         return out + ", id: {0}".format(hex(id(self)))
 
     @property
-    def sigma(self) -> ndarray:
+    def sigma(self) -> NDArray:
         """Error covariance"""
         return self._sigma
 
@@ -96,7 +96,7 @@ class HomoskedasticCovariance(object):
         # Sigma is pre-debiased
         return 1.0
 
-    def _mvreg_cov(self) -> ndarray:
+    def _mvreg_cov(self) -> NDArray:
         x = self._x
 
         xeex = blocked_inner_prod(x, self._sigma)
@@ -115,7 +115,7 @@ class HomoskedasticCovariance(object):
         cov = (cov + cov.T) / 2
         return cov
 
-    def _gls_cov(self) -> ndarray:
+    def _gls_cov(self) -> NDArray:
         x = self._x
         sigma = self._sigma
         sigma_inv = inv(sigma)
@@ -137,7 +137,7 @@ class HomoskedasticCovariance(object):
         return cov
 
     @property
-    def cov(self) -> ndarray:
+    def cov(self) -> NDArray:
         """Parameter covariance"""
         adj = self._adjustment()
         if self._gls:
@@ -239,11 +239,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         self._moments = xe
 
-    def _xeex(self) -> ndarray:
+    def _xeex(self) -> NDArray:
         nobs = self._moments.shape[0]
         return self._moments.T @ self._moments / nobs
 
-    def _cov(self, gls: bool) -> ndarray:
+    def _cov(self, gls: bool) -> NDArray:
         x = self._x
         nobs = x[0].shape[0]
         k = len(x)
@@ -266,10 +266,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         cov = (cov + cov.T) / 2
         return cov / nobs
 
-    def _mvreg_cov(self) -> ndarray:
+    def _mvreg_cov(self) -> NDArray:
         return self._cov(False)
 
-    def _gls_cov(self) -> ndarray:
+    def _gls_cov(self) -> NDArray:
         return self._cov(True)
 
     def _adjustment(self) -> Union[float, ndarray]:
@@ -370,7 +370,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._str_extra["Kernel"] = kernel
         self._cov_config["kernel"] = kernel
 
-    def _xeex(self) -> ndarray:
+    def _xeex(self) -> NDArray:
         return self._kernel_cov(self._moments)
 
     @property
@@ -443,7 +443,7 @@ class GMMHomoskedasticCovariance(object):
         return out + ", id: {0}".format(hex(id(self)))
 
     @property
-    def cov(self) -> ndarray:
+    def cov(self) -> NDArray:
         """Parameter covariance"""
         x, z = self._x, self._z
         k = len(x)
@@ -476,7 +476,7 @@ class GMMHomoskedasticCovariance(object):
         cov = (cov + cov.T) / 2
         return adj * cov
 
-    def _omega(self) -> ndarray:
+    def _omega(self) -> NDArray:
         z = self._z
         nobs = z[0].shape[0]
         sigma = self._sigma
@@ -561,7 +561,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
             loc += kz
         self._moments = ze
 
-    def _omega(self) -> ndarray:
+    def _omega(self) -> NDArray:
         z = self._z
         nobs = z[0].shape[0]
         omega = self._moments.T @ self._moments / nobs
@@ -631,7 +631,7 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self._check_kernel(kernel)
         self._cov_config["kernel"] = kernel
 
-    def _omega(self) -> ndarray:
+    def _omega(self) -> NDArray:
         return self._kernel_cov(self._moments)
 
     @property

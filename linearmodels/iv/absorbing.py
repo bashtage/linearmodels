@@ -93,7 +93,7 @@ def lsmr_annihilate(
     use_cache: bool = True,
     x_hash: Optional[Hashable] = None,
     **lsmr_options: Union[float, bool],
-) -> ndarray:
+) -> NDArray:
     r"""
     Removes projection of x on y from y
 
@@ -689,7 +689,7 @@ class AbsorbingLS(object):
         self._regressors: OptionalArrayLike = None
         self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
-    def _drop_missing(self) -> ndarray:
+    def _drop_missing(self) -> NDArray:
         missing = to_numpy(self.dependent.isnull)
         missing |= to_numpy(self.exog.isnull)
         missing |= to_numpy(self._absorb_inter.cat.isnull().any(1))
@@ -968,7 +968,7 @@ class AbsorbingLS(object):
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: NDArray) -> ndarray:
+    def resids(self, params: NDArray) -> NDArray:
         """
         Compute model residuals
 
@@ -985,7 +985,7 @@ class AbsorbingLS(object):
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: NDArray) -> ndarray:
+    def wresids(self, params: NDArray) -> NDArray:
         """
         Compute weighted model residuals
 

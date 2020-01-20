@@ -32,8 +32,10 @@ from linearmodels.utility import (
 
 
 def callback_factory(
-    obj: Callable, args: Tuple[bool, Any], disp: Union[bool, int] = 1
-) -> Callable:
+    obj: Callable[[NDArray, bool, NDArray], float],
+    args: Tuple[bool, Any],
+    disp: Union[bool, int] = 1,
+) -> Callable[[NDArray], None]:
     d = {"iter": 0}
     disp = int(disp)
 
@@ -90,7 +92,7 @@ class TradedFactorModel(object):
     def __repr__(self) -> str:
         return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
-    def _drop_missing(self) -> np.ndarray:
+    def _drop_missing(self) -> NDArray:
         data = (self.portfolios, self.factors)
         missing = np.any(np.c_[[dh.isnull for dh in data]], 0)
         if any(missing):
@@ -652,7 +654,7 @@ class LinearFactorModel(TradedFactorModel):
 
         return nobs, nf, nport, nrf, s1, s2, s3
 
-    def _jacobian(self, betas: NDArray, lam: NDArray, alphas: NDArray) -> np.ndarray:
+    def _jacobian(self, betas: NDArray, lam: NDArray, alphas: NDArray) -> NDArray:
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
@@ -686,7 +688,7 @@ class LinearFactorModel(TradedFactorModel):
         lam: NDArray,
         alphas: NDArray,
         pricing_errors: NDArray,
-    ) -> np.ndarray:
+    ) -> NDArray:
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
@@ -1013,7 +1015,7 @@ class LinearFactorModelGMM(LinearFactorModel):
 
         return GMMFactorModelResults(res_dict)
 
-    def _moments(self, parameters: NDArray, excess_returns: bool) -> np.ndarray:
+    def _moments(self, parameters: NDArray, excess_returns: bool) -> NDArray:
         """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
         p = self.portfolios.ndarray
@@ -1054,7 +1056,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         w = weight_est.w(g)
         return nobs * float(gbar.T @ w @ gbar)
 
-    def _jacobian(self, params: NDArray, excess_returns: bool) -> np.ndarray:
+    def _jacobian(self, params: NDArray, excess_returns: bool) -> NDArray:
         """Jacobian matrix for inference"""
         nobs, k = self.factors.shape
         n = self.portfolios.shape[1]

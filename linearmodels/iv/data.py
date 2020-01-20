@@ -15,7 +15,7 @@ from pandas.api.types import (
     is_string_dtype,
 )
 
-from linearmodels.typing import AnyPandas, ArrayLike, OptionalArrayLike
+from linearmodels.typing import AnyPandas, ArrayLike, NDArray, OptionalArrayLike
 
 iv_data_types: Tuple[Type, ...] = (np.ndarray, pd.DataFrame, pd.Series)
 try:
@@ -174,7 +174,7 @@ class IVData(object):
         return self._pandas
 
     @property
-    def ndarray(self) -> np.ndarray:
+    def ndarray(self) -> NDArray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 

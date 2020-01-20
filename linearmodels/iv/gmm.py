@@ -47,7 +47,7 @@ class HomoskedasticWeightMatrix(object):
         self._debiased = debiased
         self._bandwidth: Optional[int] = 0
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
         """
         Parameters
         ----------
@@ -110,7 +110,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
         """
         Parameters
         ----------
@@ -194,7 +194,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._kernels = KERNEL_LOOKUP
         self._optimal_bw = optimal_bw
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
         """
         Parameters
         ----------
@@ -274,7 +274,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> ndarray:
+    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
         """
         Parameters
         ----------
@@ -439,7 +439,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def cov(self) -> ndarray:
+    def cov(self) -> NDArray:
         x, z, eps, w = self.x, self.z, self.eps, self.w
         nobs = x.shape[0]
         xpz = x.T @ z / nobs

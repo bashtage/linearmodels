@@ -83,7 +83,7 @@ class _Panel(object):
         return self._minor_axis
 
     @property
-    def values(self) -> np.ndarray:
+    def values(self) -> NDArray:
         return self._values
 
     def to_frame(self) -> DataFrame:
@@ -259,12 +259,12 @@ class PanelData(object):
         return self._frame
 
     @property
-    def values2d(self) -> np.ndarray:
+    def values2d(self) -> NDArray:
         """NumPy ndarray view of dataframe"""
         return np.asarray(self._frame)
 
     @property
-    def values3d(self) -> np.ndarray:
+    def values3d(self) -> NDArray:
         """NumPy ndarray view of panel"""
         return self.panel.values
 
@@ -338,7 +338,7 @@ class PanelData(object):
         return list(index.levels[0][get_codes(index)[0]].unique())
 
     @property
-    def entity_ids(self) -> np.ndarray:
+    def entity_ids(self) -> NDArray:
         """
         Get array containing entity group membership information
 
@@ -350,7 +350,7 @@ class PanelData(object):
         return np.asarray(get_codes(self._frame.index)[0])[:, None]
 
     @property
-    def time_ids(self) -> np.ndarray:
+    def time_ids(self) -> NDArray:
         """
         Get array containing time membership information
 
@@ -434,7 +434,7 @@ class PanelData(object):
 
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: NDArray, level: int
-        ) -> np.ndarray:
+        ) -> NDArray:
             num = (root_w * df).groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]

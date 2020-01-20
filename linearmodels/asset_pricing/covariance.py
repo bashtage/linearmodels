@@ -55,7 +55,7 @@ class _HACMixin(object):
             if bandwidth < 0:
                 raise ValueError("bandwidth must be non-negative.")
 
-    def _kernel_cov(self, z: NDArray) -> ndarray:
+    def _kernel_cov(self, z: NDArray) -> NDArray:
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel
@@ -125,7 +125,7 @@ class HeteroskedasticCovariance(object):
         return {"type": self.__class__.__name__}
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """
         Score/moment condition covariance
 
@@ -143,7 +143,7 @@ class HeteroskedasticCovariance(object):
         return (out + out.T) / 2
 
     @property
-    def jacobian(self) -> ndarray:
+    def jacobian(self) -> NDArray:
         """The Jacobian"""
         if self._jac is None:
             self._jac = inv(self._inv_jac)
@@ -151,7 +151,7 @@ class HeteroskedasticCovariance(object):
         return self._jac
 
     @property
-    def inv_jacobian(self) -> ndarray:
+    def inv_jacobian(self) -> NDArray:
         """Inverse Jacobian"""
         if self._inv_jac is None:
             self._inv_jac = inv(self._jac)
@@ -164,7 +164,7 @@ class HeteroskedasticCovariance(object):
         return self._square
 
     @property
-    def cov(self) -> ndarray:
+    def cov(self) -> NDArray:
         """
         Compute parameter covariance
 
@@ -253,7 +253,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         return out
 
     @property
-    def s(self) -> ndarray:
+    def s(self) -> NDArray:
         """
         Score/moment condition covariance
 
@@ -284,7 +284,7 @@ class HeteroskedasticWeight(object):
         self._moments = moments
         self._center = center
 
-    def w(self, moments: NDArray) -> ndarray:
+    def w(self, moments: NDArray) -> NDArray:
         """
         Score/moment condition weighting matrix
 
@@ -333,7 +333,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
-    def w(self, moments: NDArray) -> ndarray:
+    def w(self, moments: NDArray) -> NDArray:
         """
         Score/moment condition weighting matrix
 

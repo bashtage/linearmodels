@@ -14,7 +14,6 @@ from numpy import (
     isscalar,
     logical_not,
     nanmean,
-    ndarray,
     ones,
     sqrt,
 )
@@ -391,7 +390,7 @@ class IVLIML(object):
             )
         self._has_constant, self._const_loc = has_constant(x)
 
-    def _drop_missing(self) -> ndarray:
+    def _drop_missing(self) -> NDArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
         missing: NDArray = any(c_[[dh.isnull for dh in data]], 0)
         if any(missing):
@@ -412,7 +411,7 @@ class IVLIML(object):
     @staticmethod
     def estimate_parameters(
         x: NDArray, y: NDArray, z: NDArray, kappa: Numeric
-    ) -> ndarray:
+    ) -> NDArray:
         """
         Parameter estimation without error checking
 
@@ -533,7 +532,7 @@ class IVLIML(object):
 
         return self._result_container(results, self)
 
-    def wresids(self, params: NDArray) -> ndarray:
+    def wresids(self, params: NDArray) -> NDArray:
         """
         Compute weighted model residuals
 
@@ -554,7 +553,7 @@ class IVLIML(object):
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params: NDArray) -> ndarray:
+    def resids(self, params: NDArray) -> NDArray:
         """
         Compute model residuals
 
@@ -576,12 +575,12 @@ class IVLIML(object):
         return self._has_constant
 
     @property
-    def isnull(self) -> ndarray:
+    def isnull(self) -> NDArray:
         """Locations of observations with missing values"""
         return self._drop_locs
 
     @property
-    def notnull(self) -> ndarray:
+    def notnull(self) -> NDArray:
         """Locations of observations included in estimation"""
         return logical_not(self._drop_locs)
 
@@ -878,7 +877,7 @@ class IVGMM(IVLIML):
         return mod
 
     @staticmethod
-    def estimate_parameters(x: NDArray, y: NDArray, z: NDArray, w: NDArray) -> ndarray:
+    def estimate_parameters(x: NDArray, y: NDArray, z: NDArray, w: NDArray) -> NDArray:
         """
         Parameters
         ----------
@@ -1219,7 +1218,7 @@ class IVGMMCUE(IVGMM):
         z: NDArray,
         display: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
-    ) -> ndarray:
+    ) -> NDArray:
         r"""
         Parameters
         ----------

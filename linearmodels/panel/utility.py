@@ -278,7 +278,7 @@ if not HAS_CYTHON:
     _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
-def in_2core_graph(cats: ArrayLike) -> np.ndarray:
+def in_2core_graph(cats: ArrayLike) -> NDArray:
     """
     Parameters
     ----------
@@ -351,7 +351,7 @@ def in_2core_graph(cats: ArrayLike) -> np.ndarray:
     return retain
 
 
-def in_2core_graph_slow(cats: ArrayLike) -> np.ndarray:
+def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     """
     Parameters
     ----------

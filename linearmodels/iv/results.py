@@ -29,7 +29,7 @@ from statsmodels.iolib.table import default_txt_fmt
 import linearmodels
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.iv.data import IVData
-from linearmodels.typing import ArrayLike, OptionalArrayLike
+from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 from linearmodels.utility import (
     InvalidTestStatistic,
     WaldTestStatistic,
@@ -1370,7 +1370,7 @@ class IVGMMResults(_CommonIVResults):
         self._j_stat = results["j_stat"]
 
     @property
-    def weight_matrix(self) -> ndarray:
+    def weight_matrix(self) -> NDArray:
         """Weight matrix used in the final-step GMM estimation"""
         return self._weight_mat
 

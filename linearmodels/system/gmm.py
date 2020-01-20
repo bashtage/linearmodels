@@ -62,7 +62,7 @@ class HomoskedasticWeightMatrix(object):
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: NDArray, x: NDArray) -> ndarray:
+    def sigma(self, eps: NDArray, x: NDArray) -> NDArray:
         """
         Estimate residual covariance.
 
@@ -92,7 +92,7 @@ class HomoskedasticWeightMatrix(object):
 
     def weight_matrix(
         self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
-    ) -> ndarray:
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
@@ -163,7 +163,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def weight_matrix(
         self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
-    ) -> ndarray:
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
@@ -273,7 +273,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def weight_matrix(
         self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
-    ) -> ndarray:
+    ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 

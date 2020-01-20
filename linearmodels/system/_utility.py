@@ -7,7 +7,7 @@ import pandas as pd
 from linearmodels.typing import ArraySequence, NDArray
 
 
-def blocked_column_product(x: ArraySequence, s: NDArray) -> np.ndarray:
+def blocked_column_product(x: ArraySequence, s: NDArray) -> NDArray:
     """
     Parameters
     ----------
@@ -32,7 +32,7 @@ def blocked_column_product(x: ArraySequence, s: NDArray) -> np.ndarray:
     return np.vstack(out)
 
 
-def blocked_diag_product(x: ArraySequence, s: NDArray) -> np.ndarray:
+def blocked_diag_product(x: ArraySequence, s: NDArray) -> NDArray:
     """
     Parameters
     ----------
@@ -60,7 +60,7 @@ def blocked_diag_product(x: ArraySequence, s: NDArray) -> np.ndarray:
     return out
 
 
-def blocked_inner_prod(x: ArraySequence, s: NDArray) -> np.ndarray:
+def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
     r"""
     Parameters
     ----------
@@ -126,7 +126,7 @@ def blocked_inner_prod(x: ArraySequence, s: NDArray) -> np.ndarray:
     return out
 
 
-def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: NDArray) -> np.ndarray:
+def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: NDArray) -> NDArray:
     r"""
     Parameters
     ----------
@@ -163,7 +163,7 @@ def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: NDArray) -> np.nda
     return np.concatenate(xp, 0)
 
 
-def blocked_full_inner_product(x: NDArray, s: NDArray) -> np.ndarray:
+def blocked_full_inner_product(x: NDArray, s: NDArray) -> NDArray:
     r"""
     Parameters
     ----------
@@ -191,7 +191,7 @@ def blocked_full_inner_product(x: NDArray, s: NDArray) -> np.ndarray:
     return x.T @ sx
 
 
-def inv_matrix_sqrt(s: NDArray) -> np.ndarray:
+def inv_matrix_sqrt(s: NDArray) -> NDArray:
     vecs, vals = np.linalg.eigh(s)
     vecs = 1.0 / np.sqrt(vecs)
     out = vals @ np.diag(vecs) @ vals.T
@@ -291,12 +291,12 @@ class LinearConstraint(object):
         self._t, self._l, self._a = t, left, a
 
     @property
-    def r(self) -> np.ndarray:
+    def r(self) -> NDArray:
         """Constrain loading matrix"""
         return self._r_pd
 
     @property
-    def t(self) -> np.ndarray:
+    def t(self) -> NDArray:
         """
         Constraint transformation matrix
 
@@ -314,7 +314,7 @@ class LinearConstraint(object):
         return self._t
 
     @property
-    def a(self) -> np.ndarray:
+    def a(self) -> NDArray:
         r"""
         Transformed constraint target
 

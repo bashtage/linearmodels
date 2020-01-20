@@ -103,7 +103,7 @@ def _missing_weights(weights: Dict[str, Optional[ArrayLike]]) -> None:
 
 def _parameters_from_xprod(
     xpx: NDArray, xpy: NDArray, constraints: Optional[LinearConstraint] = None
-) -> np.ndarray:
+) -> NDArray:
     r"""
     Estimate regression parameters from cross produces
 
@@ -607,9 +607,7 @@ class IV3SLS(object):
         self,
         params: ArrayLike,
         *,
-        equations: Optional[
-            Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]]
-        ] = None,
+        equations: Optional[Mapping[str, Mapping[str, ArrayLike]]] = None,
         data: Optional[DataFrame] = None,
         eval_env: int = 8,
     ) -> DataFrame:
@@ -623,10 +621,10 @@ class IV3SLS(object):
         equations : dict
             Dictionary-like structure containing exogenous and endogenous
             variables.  Each key is an equations label and must
-            match the labels used to fir the model. Each value must be either a tuple
-            of the form (exog, endog) or a dictionary with keys 'exog' and 'endog'.
-            If predictions are not required for one of more of the model equations,
-            these keys can be omitted.
+            match the labels used to fir the model. Each value must be a
+            dictionary with keys 'exog' and 'endog'. If predictions are not
+            required for one of more of the model equations, these keys can
+            be omitted.
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
@@ -668,7 +666,7 @@ class IV3SLS(object):
             assert isinstance(equations, abc.Mapping)
             if label in equations:
                 b = params[loc : loc + kx]
-                eqn: dict = equations[label]
+                eqn = equations[label]
                 exog = eqn.get("exog", None)
                 endog = eqn.get("endog", None)
                 if exog is None and endog is None:

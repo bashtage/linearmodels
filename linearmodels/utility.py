@@ -189,7 +189,7 @@ def has_constant(
     return bool(has_const), loc
 
 
-def inv_sqrth(x: NDArray) -> np.ndarray:
+def inv_sqrth(x: NDArray) -> NDArray:
     """
     Matrix inverse square root
 

@@ -1,7 +1,6 @@
 from typing import Dict, Tuple
 
 import numpy as np
-from numpy import ndarray
 from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
@@ -22,7 +21,7 @@ The original Patsy error was:
 """
 
 
-def proj(y: NDArray, x: NDArray) -> ndarray:
+def proj(y: NDArray, x: NDArray) -> NDArray:
     """
     Projection of y on x from y
 
@@ -41,7 +40,7 @@ def proj(y: NDArray, x: NDArray) -> ndarray:
     return x @ (np.linalg.pinv(x) @ y)
 
 
-def annihilate(y: NDArray, x: NDArray) -> ndarray:
+def annihilate(y: NDArray, x: NDArray) -> NDArray:
     """
     Remove projection of y on x from y
 
