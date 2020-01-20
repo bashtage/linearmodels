@@ -1,6 +1,5 @@
 import glob
 import os
-import sys
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from setuptools import Extension, find_packages, setup
