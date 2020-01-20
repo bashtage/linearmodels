@@ -171,7 +171,7 @@ class SystemFormulaParser(object):
             formula = "~ 0 +".join(formula.split("~"))
         return formula
 
-    def _parse(self):
+    def _parse(self) -> None:
         formula = self._formula
         data = self._data
         weights = self._weights
@@ -568,7 +568,7 @@ class IV3SLS(object):
         )
         self._constant_loc = constant_loc
 
-    def _drop_missing(self):
+    def _drop_missing(self) -> None:
         k = len(self._dependent)
         nobs = self._dependent[0].shape[0]
         self._original_index = self._dependent[0].rows.copy()
@@ -819,7 +819,7 @@ class IV3SLS(object):
 
         return beta, eps
 
-    def _construct_xhat(self):
+    def _construct_xhat(self) -> None:
         k = len(self._x)
         self._xhat = []
         self._wxhat = []
@@ -1381,7 +1381,7 @@ class IV3SLS(object):
             r, q=q, num_params=len(self._param_names), require_pandas=True
         )
 
-    def reset_constraints(self):
+    def reset_constraints(self) -> None:
         """Remove all model constraints"""
         self._constraints = None
 

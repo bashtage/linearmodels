@@ -238,7 +238,13 @@ class PanelResults(_SummaryStr):
 
     @property
     def summary(self):
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -688,7 +694,13 @@ class PanelEffectsResults(PanelResults):
 
     @property
     def summary(self):
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
@@ -831,7 +843,13 @@ class PanelModelComparison(_ModelComparison):
 
     @property
     def summary(self):
-        """:obj:`statsmodels.iolib.summary.Summary` : Summary table of model estimation results
+        """
+        Model estimation summary.
+
+        Returns
+        -------
+        Summary
+            Summary table of model estimation results
 
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.

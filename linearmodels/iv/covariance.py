@@ -27,10 +27,7 @@ from numpy.linalg import inv, pinv
 from linearmodels.typing import Numeric, OptionalNumeric
 
 KernelWeight = Union[
-    Callable[[int, float], ndarray],
-    Callable[[float, float], ndarray],
-    Callable[[int, VarArg(Any)], ndarray],
-    Callable[[Numeric, int], Any],
+    Callable[[float, float], ndarray], Callable[[float, VarArg(Any)], ndarray],
 ]
 
 CLUSTER_ERR = """
@@ -108,7 +105,7 @@ def _cov_kernel(z: ndarray, w: ndarray) -> ndarray:
     return s
 
 
-def kernel_weight_bartlett(bw: Numeric, *args: int) -> ndarray:
+def kernel_weight_bartlett(bw: float, *args: int) -> ndarray:
     r"""
     Kernel weights from a Bartlett kernel
 
@@ -131,7 +128,7 @@ def kernel_weight_bartlett(bw: Numeric, *args: int) -> ndarray:
     return 1 - arange(int(bw) + 1) / (int(bw) + 1)
 
 
-def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
+def kernel_weight_quadratic_spectral(bw: float, n: int) -> ndarray:
     r"""
     Kernel weights from a quadratic-spectral kernel
 
@@ -166,7 +163,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
         w[0] = 0
         return w
 
-    z = arange(n + 1) / bw
+    z = arange(n + 1) / float(bw)
     w = 6 * pi * z / 5
     w[0] = 1
     w[1:] = 3 / w[1:] ** 2 * (sin(w[1:]) / w[1:] - cos(w[1:]))
@@ -174,7 +171,7 @@ def kernel_weight_quadratic_spectral(bw: Numeric, n: int) -> ndarray:
     return w
 
 
-def kernel_weight_parzen(bw: Numeric, *args: int) -> ndarray:
+def kernel_weight_parzen(bw: float, *args: int) -> ndarray:
     r"""
     Kernel weights from a Parzen kernel
 

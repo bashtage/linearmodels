@@ -327,7 +327,7 @@ class PooledOLS(object):
             raise ValueError("exog does not have full column rank.")
         return rank_of_x
 
-    def _validate_data(self):
+    def _validate_data(self) -> None:
         """Check input shape and remove missing"""
         y = self._y = self.dependent.values2d
         x = self._x = self.exog.values2d
@@ -891,7 +891,7 @@ class PanelOLS(PooledOLS):
                 effects.append(np.asarray(other[col]).squeeze())
         return np.column_stack(effects)
 
-    def _drop_singletons(self):
+    def _drop_singletons(self) -> None:
         if self._singletons or not self._has_effect:
             return
         effects = self._collect_effects()

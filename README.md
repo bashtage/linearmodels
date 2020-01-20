@@ -136,10 +136,10 @@ is possible that older versions work.
 
 * Python 3.6+
 * NumPy (1.14+)
-* SciPy (1+)
-* pandas (0.22+)
+* SciPy (1.0.1+)
+* pandas (0.23+)
 * statsmodels (0.9+)
-* xarray (0.9+, optional)
+* xarray (0.10+, optional)
 * cython (optional)
 
 ### Testing

@@ -3,7 +3,10 @@ Linear factor models for applications in asset pricing
 """
 from linearmodels.compat.numpy import lstsq
 
+from typing import Any, Callable, Optional, Tuple, Type, Union
+
 import numpy as np
+from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 from scipy.optimize import minimize
@@ -19,6 +22,7 @@ from linearmodels.asset_pricing.results import (
     LinearFactorModelResults,
 )
 from linearmodels.iv.data import IVData
+from linearmodels.typing import ArrayLike
 from linearmodels.utility import (
     AttrDict,
     WaldTestStatistic,
@@ -27,11 +31,13 @@ from linearmodels.utility import (
 )
 
 
-def callback_factory(obj, args, disp=1):
+def callback_factory(
+    obj: Callable, args: Tuple[bool, Any], disp: Union[bool, int] = 1
+) -> Callable:
     d = {"iter": 0}
     disp = int(disp)
 
-    def callback(params):
+    def callback(params: np.ndarray) -> None:
         fval = obj(params, *args)
         if disp > 0 and (d["iter"] % disp == 0):
             print("Iteration: {0}, Objective: {1}".format(d["iter"], fval))
@@ -68,11 +74,11 @@ class TradedFactorModel(object):
     which must be excess returns on traded portfolios.
     """
 
-    def __init__(self, portfolios, factors):
+    def __init__(self, portfolios: ArrayLike, factors: ArrayLike):
         self.portfolios = IVData(portfolios, var_name="portfolio")
         self.factors = IVData(factors, var_name="factor")
         self._name = self.__class__.__name__
-        self._formula = None
+        self._formula: Optional[str] = None
         self._validate_data()
 
     def __str__(self) -> str:
@@ -84,7 +90,7 @@ class TradedFactorModel(object):
     def __repr__(self) -> str:
         return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
-    def _drop_missing(self):
+    def _drop_missing(self) -> np.ndarray:
         data = (self.portfolios, self.factors)
         missing = np.any(np.c_[[dh.isnull for dh in data]], 0)
         if any(missing):
@@ -99,7 +105,7 @@ class TradedFactorModel(object):
 
         return missing
 
-    def _validate_data(self):
+    def _validate_data(self) -> None:
         p = self.portfolios.ndarray
         f = self.factors.ndarray
         if p.shape[0] != f.shape[0]:
@@ -130,15 +136,17 @@ class TradedFactorModel(object):
             )
 
     @property
-    def formula(self):
+    def formula(self) -> Optional[str]:
         return self._formula
 
     @formula.setter
-    def formula(self, value):
+    def formula(self, value: Optional[str]) -> None:
         self._formula = value
 
     @staticmethod
-    def _prepare_data_from_formula(formula, data, portfolios):
+    def _prepare_data_from_formula(
+        formula: str, data: DataFrame, portfolios: DataFrame
+    ) -> Tuple[DataFrame, DataFrame, str]:
         na_action = NAAction(on_NA="raise", NA_types=[])
         orig_formula = formula
         if portfolios is not None:
@@ -146,15 +154,15 @@ class TradedFactorModel(object):
                 formula + " + 0", data, return_type="dataframe", NA_action=na_action
             )
         else:
-            formula = formula.split("~")
+            formula_components = formula.split("~")
             portfolios = dmatrix(
-                formula[0].strip() + " + 0",
+                formula_components[0].strip() + " + 0",
                 data,
                 return_type="dataframe",
                 NA_action=na_action,
             )
             factors = dmatrix(
-                formula[1].strip() + " + 0",
+                formula_components[1].strip() + " + 0",
                 data,
                 return_type="dataframe",
                 NA_action=na_action,
@@ -163,7 +171,9 @@ class TradedFactorModel(object):
         return factors, portfolios, orig_formula
 
     @classmethod
-    def from_formula(cls, formula, data, *, portfolios=None):
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, portfolios: Optional[DataFrame] = None
+    ) -> "TradedFactorModel":
         """
         Parameters
         ----------
@@ -207,7 +217,12 @@ class TradedFactorModel(object):
         mod.formula = formula
         return mod
 
-    def fit(self, cov_type="robust", debiased=True, **cov_config):
+    def fit(
+        self,
+        cov_type: str = "robust",
+        debiased: bool = True,
+        **cov_config: Union[str, bool, float]
+    ) -> LinearFactorModelResults:
         """
         Estimate model parameters
 
@@ -395,7 +410,14 @@ class LinearFactorModel(TradedFactorModel):
     :math:`\hat{\alpha}_i=\hat{\eta}_i`.
     """
 
-    def __init__(self, portfolios, factors, *, risk_free=False, sigma=None):
+    def __init__(
+        self,
+        portfolios: ArrayLike,
+        factors: ArrayLike,
+        *,
+        risk_free: bool = False,
+        sigma: Optional[ArrayLike] = None
+    ) -> None:
         self._risk_free = bool(risk_free)
         super(LinearFactorModel, self).__init__(portfolios, factors)
         self._validate_additional_data()
@@ -417,7 +439,7 @@ class LinearFactorModel(TradedFactorModel):
 
         return out
 
-    def _validate_additional_data(self):
+    def _validate_additional_data(self) -> None:
         f = self.factors.ndarray
         p = self.portfolios.ndarray
         nrp = f.shape[1] + int(self._risk_free)
@@ -430,8 +452,14 @@ class LinearFactorModel(TradedFactorModel):
 
     @classmethod
     def from_formula(
-        cls, formula, data, *, portfolios=None, risk_free=False, sigma=None
-    ):
+        cls,
+        formula: str,
+        data: DataFrame,
+        *,
+        portfolios: Optional[DataFrame] = None,
+        risk_free: bool = False,
+        sigma: Optional[ArrayLike] = None
+    ) -> "LinearFactorModel":
         """
         Parameters
         ----------
@@ -482,7 +510,12 @@ class LinearFactorModel(TradedFactorModel):
         mod.formula = formula
         return mod
 
-    def fit(self, cov_type="robust", debiased=True, **cov_config):
+    def fit(
+        self,
+        cov_type: str = "robust",
+        debiased: bool = True,
+        **cov_config: Union[bool, int]
+    ) -> LinearFactorModelResults:
         """
         Estimate model parameters
 
@@ -539,7 +572,7 @@ class LinearFactorModel(TradedFactorModel):
             cov_est = HeteroskedasticCovariance
         else:  # 'kernel':
             cov_est = KernelCovariance
-        cov_est = cov_est(
+        cov_est_inst = cov_est(
             moments,
             jacobian=jacobian,
             center=False,
@@ -549,7 +582,7 @@ class LinearFactorModel(TradedFactorModel):
         )
 
         # VCV
-        full_vcv = cov_est.cov
+        full_vcv = cov_est_inst.cov
         alpha_vcv = full_vcv[s2:, s2:]
         stat = float(alphas.T @ np.linalg.pinv(alpha_vcv) @ alphas)
         jstat = WaldTestStatistic(
@@ -603,12 +636,12 @@ class LinearFactorModel(TradedFactorModel):
             model=self,
             nobs=nobs,
             rp_names=rp_names,
-            cov_est=cov_est,
+            cov_est=cov_est_inst,
         )
 
         return LinearFactorModelResults(res)
 
-    def _boundaries(self):
+    def _boundaries(self) -> Tuple[int, int, int, int, int, int, int]:
         nobs, nf = self.factors.ndarray.shape
         nport = self.portfolios.ndarray.shape[1]
         nrf = int(bool(self._risk_free))
@@ -619,7 +652,9 @@ class LinearFactorModel(TradedFactorModel):
 
         return nobs, nf, nport, nrf, s1, s2, s3
 
-    def _jacobian(self, betas, lam, alphas):
+    def _jacobian(
+        self, betas: np.ndarray, lam: np.ndarray, alphas: np.ndarray
+    ) -> np.ndarray:
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
@@ -646,7 +681,14 @@ class LinearFactorModel(TradedFactorModel):
 
         return jac
 
-    def _moments(self, eps, betas, lam, alphas, pricing_errors):
+    def _moments(
+        self,
+        eps: np.ndarray,
+        betas: np.ndarray,
+        lam: np.ndarray,
+        alphas: np.ndarray,
+        pricing_errors: np.ndarray,
+    ) -> np.ndarray:
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
@@ -707,13 +749,22 @@ class LinearFactorModelGMM(LinearFactorModel):
     usual GMM J statistic.
     """
 
-    def __init__(self, factors, portfolios, *, risk_free=False):
+    def __init__(
+        self, factors: np.ndarray, portfolios: np.ndarray, *, risk_free: bool = False
+    ) -> None:
         super(LinearFactorModelGMM, self).__init__(
             factors, portfolios, risk_free=risk_free
         )
 
     @classmethod
-    def from_formula(cls, formula, data, *, portfolios=None, risk_free=False):
+    def from_formula(
+        cls,
+        formula: str,
+        data: DataFrame,
+        *,
+        portfolios: Optional[DataFrame] = None,
+        risk_free: bool = False
+    ) -> "LinearFactorModelGMM":
         """
         Parameters
         ----------
@@ -764,15 +815,15 @@ class LinearFactorModelGMM(LinearFactorModel):
 
     def fit(
         self,
-        center=True,
-        use_cue=False,
-        steps=2,
-        disp=10,
-        max_iter=1000,
-        cov_type="robust",
-        debiased=True,
-        **cov_config
-    ):
+        center: bool = True,
+        use_cue: bool = False,
+        steps: int = 2,
+        disp: int = 10,
+        max_iter: int = 1000,
+        cov_type: str = "robust",
+        debiased: bool = True,
+        **cov_config: Union[bool, int, str]
+    ) -> GMMFactorModelResults:
         """
         Estimate model parameters
 
@@ -830,70 +881,72 @@ class LinearFactorModelGMM(LinearFactorModel):
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
             raise ValueError("Unknown weight: {0}".format(cov_type))
         if cov_type in ("robust", "heteroskedastic"):
-            weight_est = HeteroskedasticWeight
+            weight_est: Union[
+                Type[HeteroskedasticWeight], Type[KernelWeight]
+            ] = HeteroskedasticWeight
             cov_est = HeteroskedasticCovariance
         else:  # 'kernel':
             weight_est = KernelWeight
             cov_est = KernelCovariance
-        weight_est = weight_est(g, center=center, **cov_config)
-        w = weight_est.w(g)
+        weight_est_instance = weight_est(g, center=center, **cov_config)
+        w = weight_est_instance.w(g)
 
         args = (excess_returns, w)
 
         # 2. Step 1 using w = inv(s) from SV
         callback = callback_factory(self._j, args, disp=disp)
-        res = minimize(
+        opt_res = minimize(
             self._j,
             sv,
             args=args,
             callback=callback,
             options={"disp": bool(disp), "maxiter": max_iter},
         )
-        params = res.x
-        last_obj = res.fun
+        params = opt_res.x
+        last_obj = opt_res.fun
         iters = 1
         # 3. Step 2 using step 1 estimates
         if not use_cue:
             while iters < steps:
                 iters += 1
                 g = self._moments(params, excess_returns)
-                w = weight_est.w(g)
+                w = weight_est_instance.w(g)
                 args = (excess_returns, w)
 
                 # 2. Step 1 using w = inv(s) from SV
                 callback = callback_factory(self._j, args, disp=disp)
-                res = minimize(
+                opt_res = minimize(
                     self._j,
                     params,
                     args=args,
                     callback=callback,
                     options={"disp": bool(disp), "maxiter": max_iter},
                 )
-                params = res.x
-                obj = res.fun
+                params = opt_res.x
+                obj = opt_res.fun
                 if np.abs(obj - last_obj) < 1e-6:
                     break
                 last_obj = obj
 
         else:
-            args = (excess_returns, weight_est)
+            args = (excess_returns, weight_est_instance)
             obj = self._j_cue
             callback = callback_factory(obj, args, disp=disp)
-            res = minimize(
+            opt_res = minimize(
                 obj,
                 params,
                 args=args,
                 callback=callback,
                 options={"disp": bool(disp), "maxiter": max_iter},
             )
-            params = res.x
+            params = opt_res.x
 
         # 4. Compute final S and G for inference
         g = self._moments(params, excess_returns)
         s = g.T @ g / nobs
         jac = self._jacobian(params, excess_returns)
 
-        cov_est = cov_est(
+        cov_est_inst = cov_est(
             g,
             jacobian=jac,
             center=center,
@@ -902,7 +955,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             **cov_config
         )
 
-        full_vcv = cov_est.cov
+        full_vcv = cov_est_inst.cov
         sel = slice((n * k), (n * k + k + nrf))
         rp = params[sel]
         rp_cov = full_vcv[sel, sel]
@@ -936,7 +989,7 @@ class LinearFactorModelGMM(LinearFactorModel):
             rp_names.insert(0, "risk_free")
         params = np.c_[alphas, betas]
         # 5. Return values
-        res = AttrDict(
+        res_dict = AttrDict(
             params=params,
             cov=full_vcv,
             betas=betas,
@@ -957,12 +1010,12 @@ class LinearFactorModelGMM(LinearFactorModel):
             nobs=nobs,
             rp_names=rp_names,
             iter=iters,
-            cov_est=cov_est,
+            cov_est=cov_est_inst,
         )
 
-        return GMMFactorModelResults(res)
+        return GMMFactorModelResults(res_dict)
 
-    def _moments(self, parameters, excess_returns):
+    def _moments(self, parameters: np.ndarray, excess_returns: bool) -> np.ndarray:
         """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
         p = self.portfolios.ndarray
@@ -983,14 +1036,19 @@ class LinearFactorModelGMM(LinearFactorModel):
         g = np.c_[eps * f, fe]
         return g
 
-    def _j(self, parameters, excess_returns, w):
+    def _j(self, parameters: np.ndarray, excess_returns: bool, w: np.ndarray) -> float:
         """Objective function"""
         g = self._moments(parameters, excess_returns)
         nobs = self.portfolios.shape[0]
         gbar = g.mean(0)[:, None]
         return nobs * float(gbar.T @ w @ gbar)
 
-    def _j_cue(self, parameters, excess_returns, weight_est):
+    def _j_cue(
+        self,
+        parameters: np.ndarray,
+        excess_returns: np.ndarray,
+        weight_est: Union[HeteroskedasticWeight, KernelWeight],
+    ) -> float:
         """CUE Objective function"""
         g = self._moments(parameters, excess_returns)
         gbar = g.mean(0)[:, None]
@@ -998,7 +1056,7 @@ class LinearFactorModelGMM(LinearFactorModel):
         w = weight_est.w(g)
         return nobs * float(gbar.T @ w @ gbar)
 
-    def _jacobian(self, params, excess_returns):
+    def _jacobian(self, params: np.ndarray, excess_returns: bool) -> np.ndarray:
         """Jacobian matrix for inference"""
         nobs, k = self.factors.shape
         n = self.portfolios.shape[1]

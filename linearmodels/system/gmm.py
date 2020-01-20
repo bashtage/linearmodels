@@ -41,7 +41,7 @@ class HomoskedasticWeightMatrix(object):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
-        self._bandwidth = 0
+        self._bandwidth: Optional[float] = 0
         self._name = "Homoskedastic (Unadjusted) Weighting"
         self._config = AttrDict(center=center, debiased=debiased)
 
@@ -49,7 +49,7 @@ class HomoskedasticWeightMatrix(object):
         out = self._name
         extra = []
         for key in self._str_extra:
-            extra.append(": ".join([key, str(self._str_extra[key])]))
+            extra.append(": ".join([str(key), str(self._str_extra[key])]))
         if extra:
             out += " (" + ", ".join(extra) + ")"
         return out
@@ -322,11 +322,13 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
             m = moments / moments.std(0)[None, :]
             m = m.sum(1)
             self._bandwidth = kernel_optimal_bandwidth(m, kernel=self.kernel)
+        assert self._bandwidth is not None
         return self._bandwidth
 
     @property
     def bandwidth(self) -> float:
         """Bandwidth used to estimate covariance of moment conditions"""
+        assert self._bandwidth is not None
         return self._bandwidth
 
     @property
