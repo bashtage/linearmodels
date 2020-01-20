@@ -24,6 +24,8 @@ linearmodels.panel.covariance.FamaMacBethCovariance
    .. autosummary::
       :toctree:
 
+      ~FamaMacBethCovariance.DEFAULT_KERNEL
+      ~FamaMacBethCovariance.bandwidth
       ~FamaMacBethCovariance.cov
       ~FamaMacBethCovariance.eps
       ~FamaMacBethCovariance.name

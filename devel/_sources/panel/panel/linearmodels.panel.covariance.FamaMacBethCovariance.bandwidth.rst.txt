@@ -1,6 +1,6 @@
-linearmodels.panel.covariance.FamaMacBethKernelCovariance.cov
+linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth
 =============================================================
 
 .. currentmodule:: linearmodels.panel.covariance
 
-.. autoproperty:: FamaMacBethKernelCovariance.cov
+.. autoproperty:: FamaMacBethCovariance.bandwidth
