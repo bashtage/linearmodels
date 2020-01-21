@@ -50,7 +50,7 @@ def callback_factory(
     return callback
 
 
-class TradedFactorModel(object):
+class _FactorModelBase(object):
     r"""Linear factor models estimator applicable to traded factors
 
     Parameters
@@ -173,6 +173,35 @@ class TradedFactorModel(object):
             )
 
         return factors, portfolios, orig_formula
+
+
+class TradedFactorModel(_FactorModelBase):
+    r"""Linear factor models estimator applicable to traded factors
+
+    Parameters
+    ----------
+    portfolios : array_like
+        Test portfolio returns (nobs by nportfolio)
+    factors : array_like
+        Priced factor returns (nobs by nfactor)
+
+    Notes
+    -----
+    Implements both time-series estimators of risk premia, factor loadings
+    and zero-alpha tests.
+
+    The model estimated is
+
+    .. math::
+
+        r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}
+
+    where :math:`r_{it}^e` is the excess return on test portfolio i and
+    :math:`f_t` are the traded factor returns.  The model is directly
+    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,
+    :math:`\lambda_i` are estimated using the sample averages of the factors,
+    which must be excess returns on traded portfolios.
+    """
 
     @classmethod
     def from_formula(
@@ -369,7 +398,7 @@ class TradedFactorModel(object):
         return LinearFactorModelResults(res)
 
 
-class _LinearFactorModelBase(TradedFactorModel):
+class _LinearFactorModelBase(_FactorModelBase):
     r"""Linear factor model estimator
 
     Parameters
