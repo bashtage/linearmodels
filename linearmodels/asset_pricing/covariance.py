@@ -334,7 +334,7 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         bandwidth: Optional[float] = None,
     ):
         super(KernelWeight, self).__init__(moments, center=center)
-        kernel = "bartlett" if kernel is not None else kernel
+        kernel = "bartlett" if kernel is None else kernel
         assert kernel is not None
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)

@@ -800,11 +800,15 @@ class IVGMM(IVLIML):
         weight_type: str = "robust",
         **weight_config: Any,
     ):
-        self._method = "IV-GMM"
         super(IVGMM, self).__init__(
             dependent, exog, endog, instruments, weights=weights
         )
+        self._method = "IV-GMM"
         self._result_container = IVGMMResults
+        if endog is None and instruments is None:
+            self._result_container = OLSResults
+            self._method = "OLS"
+
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type

@@ -28,6 +28,8 @@ from linearmodels.utility import (
     WaldTestStatistic,
     has_constant,
     missing_warning,
+    get_float,
+    get_string,
 )
 
 
@@ -285,12 +287,8 @@ class TradedFactorModel(object):
                 fe, jacobian=np.eye(f.shape[1]), center=False, debiased=debiased, df=1
             )
         elif cov_type == "kernel":
-            kernel: Optional[str] = None
-            if "kernel" in cov_config and cov_config["kernel"] is not None:
-                kernel = str(cov_config["kernel"])
-            bandwidth: Optional[float] = None
-            if "bandwidth" in cov_config and cov_config["bandwidth"] is not None:
-                bandwidth = int(cov_config["bandwith"])
+            kernel = get_string(cov_config, "kernel")
+            bandwidth = get_float(cov_config, "bandwidth")
             cov_est = KernelCovariance(
                 xe,
                 inv_jacobian=xpxi,
@@ -371,7 +369,7 @@ class TradedFactorModel(object):
         return LinearFactorModelResults(res)
 
 
-class LinearFactorModel(TradedFactorModel):
+class _LinearFactorModelBase(TradedFactorModel):
     r"""Linear factor model estimator
 
     Parameters
@@ -429,7 +427,7 @@ class LinearFactorModel(TradedFactorModel):
         sigma: Optional[ArrayLike] = None,
     ) -> None:
         self._risk_free = bool(risk_free)
-        super(LinearFactorModel, self).__init__(portfolios, factors)
+        super(_LinearFactorModelBase, self).__init__(portfolios, factors)
         self._validate_additional_data()
         if sigma is None:
             self._sigma_m12 = self._sigma_inv = self._sigma = np.eye(
@@ -442,7 +440,7 @@ class LinearFactorModel(TradedFactorModel):
             self._sigma_inv = np.linalg.inv(self._sigma)
 
     def __str__(self) -> str:
-        out = super(LinearFactorModel, self).__str__()
+        out = super(_LinearFactorModelBase, self).__str__()
         if np.any(self._sigma != np.eye(self.portfolios.shape[1])):
             out += " using GLS"
         out += "\nEstimated risk-free rate: {0}".format(self._risk_free)
@@ -459,6 +457,79 @@ class LinearFactorModel(TradedFactorModel):
                 "large as the number of risk premia, including the "
                 "risk free rate if estimated."
             )
+
+    def _boundaries(self) -> Tuple[int, int, int, int, int, int, int]:
+        nobs, nf = self.factors.ndarray.shape
+        nport = self.portfolios.ndarray.shape[1]
+        nrf = int(bool(self._risk_free))
+
+        s1 = (nf + 1) * nport
+        s2 = s1 + (nf + nrf)
+        s3 = s2 + nport
+
+        return nobs, nf, nport, nrf, s1, s2, s3
+
+
+class LinearFactorModel(_LinearFactorModelBase):
+    r"""Linear factor model estimator
+
+    Parameters
+    ----------
+    portfolios : array_like
+        Test portfolio returns (nobs by nportfolio)
+    factors : array_like
+        Priced factor returns (nobs by nfactor)
+    risk_free : bool, optional
+        Flag indicating whether the risk-free rate should be estimated
+        from returns along other risk premia.  If False, the returns are
+        assumed to be excess returns using the correct risk-free rate.
+    sigma : array_like, optional
+        Positive definite residual covariance (nportfolio by nportfolio)
+
+    Notes
+    -----
+    Suitable for traded or non-traded factors.
+
+    Implements a 2-step estimator of risk premia, factor loadings and model
+    tests.
+
+    The first stage model estimated is
+
+    .. math::
+
+        r_{it} = c_i + f_t \beta_i + \epsilon_{it}
+
+    where :math:`r_{it}` is the return on test portfolio i and
+    :math:`f_t` are the traded factor returns.  The parameters :math:`c_i`
+    are required to allow non-traded to be tested, but are not economically
+    interesting.  These are not reported.
+
+    The second stage model uses the estimated factor loadings from the first
+    and is
+
+    .. math::
+
+        \bar{r}_i = \lambda_0 + \hat{\beta}_i^\prime \lambda + \eta_i
+
+    where :math:`\bar{r}_i` is the average excess return to portfolio i and
+    :math:`\lambda_0` is only included if estimating the risk-free rate. GLS
+    is used in the second stage if ``sigma`` is provided.
+
+    The model is tested using the estimated values
+    :math:`\hat{\alpha}_i=\hat{\eta}_i`.
+    """
+
+    def __init__(
+        self,
+        portfolios: ArrayLike,
+        factors: ArrayLike,
+        *,
+        risk_free: bool = False,
+        sigma: Optional[ArrayLike] = None,
+    ) -> None:
+        super(LinearFactorModel, self).__init__(
+            portfolios, factors, risk_free=risk_free, sigma=sigma
+        )
 
     @classmethod
     def from_formula(
@@ -572,7 +643,7 @@ class LinearFactorModel(TradedFactorModel):
         pricing_errors = p - expected.T
         # Moments
         alphas = pricing_errors.mean(0)[:, None]
-        moments = self._moments(eps, betas, lam, alphas, pricing_errors)
+        moments = self._moments(eps, betas, alphas, pricing_errors)
         # Jacobian
         jacobian = self._jacobian(betas, lam, alphas)
 
@@ -651,17 +722,6 @@ class LinearFactorModel(TradedFactorModel):
 
         return LinearFactorModelResults(res)
 
-    def _boundaries(self) -> Tuple[int, int, int, int, int, int, int]:
-        nobs, nf = self.factors.ndarray.shape
-        nport = self.portfolios.ndarray.shape[1]
-        nrf = int(bool(self._risk_free))
-
-        s1 = (nf + 1) * nport
-        s2 = s1 + (nf + nrf)
-        s3 = s2 + nport
-
-        return nobs, nf, nport, nrf, s1, s2, s3
-
     def _jacobian(self, betas: NDArray, lam: NDArray, alphas: NDArray) -> NDArray:
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
@@ -690,12 +750,7 @@ class LinearFactorModel(TradedFactorModel):
         return jac
 
     def _moments(
-        self,
-        eps: NDArray,
-        betas: NDArray,
-        lam: NDArray,
-        alphas: NDArray,
-        pricing_errors: NDArray,
+        self, eps: NDArray, betas: NDArray, alphas: NDArray, pricing_errors: NDArray,
     ) -> NDArray:
         sigma_inv = self._sigma_inv
 
@@ -714,7 +769,7 @@ class LinearFactorModel(TradedFactorModel):
         return np.c_[g1, g2, g3]
 
 
-class LinearFactorModelGMM(LinearFactorModel):
+class LinearFactorModelGMM(_LinearFactorModelBase):
     r"""GMM estimator of Linear factor models
 
     Parameters
@@ -892,12 +947,8 @@ class LinearFactorModelGMM(LinearFactorModel):
             weight_est_instance = HeteroskedasticWeight(g, center=center)
             cov_est = HeteroskedasticCovariance
         else:  # 'kernel':
-            kernel: Optional[str] = None
-            if "kernel" in cov_config and cov_config["kernel"] is not None:
-                kernel = str(cov_config["kernel"])
-            bandwidth: Optional[float] = None
-            if "bandwidth" in cov_config and cov_config["bandwidth"] is not None:
-                bandwidth = float(cov_config["bandwith"])
+            kernel = get_string(cov_config, "kernel")
+            bandwidth = get_float(cov_config, "bandwidth")
             weight_est_instance = KernelWeight(
                 g, center=center, kernel=kernel, bandwidth=bandwidth
             )
@@ -1060,7 +1111,7 @@ class LinearFactorModelGMM(LinearFactorModel):
     def _j_cue(
         self,
         parameters: NDArray,
-        excess_returns: NDArray,
+        excess_returns: bool,
         weight_est: Union[HeteroskedasticWeight, KernelWeight],
     ) -> float:
         """CUE Objective function"""
