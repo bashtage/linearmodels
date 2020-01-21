@@ -6,12 +6,7 @@ from pandas.core.arrays.categorical import CategoricalAccessor
 
 from linearmodels.typing import AnyPandas, NDArray
 
-__all__ = [
-    "is_string_like",
-    "concat",
-    "get_codes",
-    "to_numpy",
-]
+__all__ = ["is_string_like", "concat", "get_codes", "to_numpy"]
 
 
 def concat(*args: AnyPandas, **kwargs: Any) -> AnyPandas:

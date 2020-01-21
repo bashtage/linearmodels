@@ -26,10 +26,10 @@ from linearmodels.typing import ArrayLike, NDArray
 from linearmodels.utility import (
     AttrDict,
     WaldTestStatistic,
-    has_constant,
-    missing_warning,
     get_float,
     get_string,
+    has_constant,
+    missing_warning,
 )
 
 
@@ -779,7 +779,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         return jac
 
     def _moments(
-        self, eps: NDArray, betas: NDArray, alphas: NDArray, pricing_errors: NDArray,
+        self, eps: NDArray, betas: NDArray, alphas: NDArray, pricing_errors: NDArray
     ) -> NDArray:
         sigma_inv = self._sigma_inv
 

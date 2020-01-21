@@ -21,14 +21,14 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import glob
-import os
-import hashlib
 from distutils.version import LooseVersion
-
-import linearmodels
+import glob
+import hashlib
+import os
 
 import sphinx_material
+
+import linearmodels
 
 # ...
 
