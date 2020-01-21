@@ -73,17 +73,17 @@ class HeteroskedasticCovariance(object):
     ----------
     xe : ndarray
         Scores/moment conditions
-    jacobian : ndarray, optional
+    jacobian : ndarray, default None
         Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
-    inv_jacobian : ndarray, optional
+    inv_jacobian : ndarray, default None
         Inverse jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
-    center : bool, optional
+    center : bool, default True
         Flag indicating to center the scores when computing the covariance
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating to use a debiased estimator
-    df : int, optional
+    df : int, default 0
         Degree of freedom value ot use if debiasing
     """
 
@@ -193,23 +193,24 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     Parameters
     ----------
     xe : ndarray
-        Scores/moment conditions
-    jacobian : ndarray, optional
+        The scores (moment) conditions.
+    jacobian : ndarray, default None
         Jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided
-    inv_jacobian : ndarray, optional
+        be provided.
+    inv_jacobian : ndarray, default None
         Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided
-    kernel : str, optional
-        Kernel name. See notes for available kernels.
-    bandwidth : int, optional
-        Non-negative integer bandwidth
-    center : bool, optional
-        Flag indicating to center the scores when computing the covariance
-    debiased : bool, optional
-        Flag indicating to use a debiased estimator
-    df : int, optional
-        Degree of freedom value ot use if debiasing
+        be provided.
+    kernel : str, default None
+        Kernel name. See notes for available kernels. The default is "bartlett".
+    bandwidth : int, default None
+        Non-negative integer bandwidth. If None, the optimal bandwidth is
+        estimated.
+    center : bool, default True
+        Flag indicating to center the scores when computing the covariance.
+    debiased : bool, default False
+        Flag indicating to use a debiased estimator.
+    df : int, default 0
+        Degree of freedom value ot use if debiasing.
 
     See Also
     --------
@@ -224,8 +225,8 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         *,
         jacobian: Optional[ndarray] = None,
         inv_jacobian: Optional[ndarray] = None,
-        kernel: str = "bartlett",
-        bandwidth: Optional[int] = None,
+        kernel: Optional[str] = None,
+        bandwidth: Optional[float] = None,
         center: bool = True,
         debiased: bool = False,
         df: int = 0,
@@ -238,6 +239,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
             debiased=debiased,
             df=df,
         )
+        kernel = "bartlett" if kernel is None else kernel
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 
@@ -276,7 +278,7 @@ class HeteroskedasticWeight(object):
     ----------
     moments : ndarray
         Moment conditions (nobs by nmoments)
-    center : bool, optional
+    center : bool, default True
         Flag indicating to center the moments when computing the weights
     """
 
@@ -314,22 +316,26 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
     ----------
     moments : ndarray
         Moment conditions (nobs by nmoments)
-    center : bool, optional
+    center : bool, default True
         Flag indicating to center the moments when computing the weights
-    kernel : str, optional
-        Kernel name. See notes for available kernels.
-    bandwidth : int, optional
-        Non-negative integer bandwidth
+    kernel : str, default None
+        Kernel name. See notes for available kernels. If None, the kernel
+        is set to "bartlett".
+    bandwidth : int, default None.
+        Non-negative integer bandwidth. If None, the optimal bandwidth is
+        estimated.
     """
 
     def __init__(
         self,
         moments: NDArray,
         center: bool = True,
-        kernel: str = "bartlett",
-        bandwidth: Optional[int] = None,
+        kernel: Optional[str] = None,
+        bandwidth: Optional[float] = None,
     ):
         super(KernelWeight, self).__init__(moments, center=center)
+        kernel = "bartlett" if kernel is None else kernel
+        assert kernel is not None
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 

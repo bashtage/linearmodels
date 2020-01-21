@@ -690,3 +690,62 @@ def quadratic_form_test(
     name = "Linear Equality Hypothesis Test"
 
     return WaldTestStatistic(stat, null, df, name=name)
+
+
+def get_string(d: Mapping[str, Any], key: str) -> Optional[str]:
+    """
+    Helper function that gets a string or None
+
+    Parameters
+    ----------
+    d : Mapping[str, Any]
+        A mapping.
+    key : str
+        The key to lookup.
+
+    Returns
+    -------
+    {str, None}
+        The string or None if the key is not in the dictionary. If in the
+        dictionary, a type check is performed and TypeError is raised if
+        not found.
+    """
+    out: Optional[str] = None
+    if key in d:
+        out = d[key]
+        if out is not None:
+            if isinstance(out, str):
+                return out
+            else:
+
+                raise TypeError(f"{key} found in the dictionary but it is not a str.")
+    return out
+
+
+def get_float(d: Mapping[str, Any], key: str) -> Optional[float]:
+    """
+    Helper function that gets a float or None
+
+    Parameters
+    ----------
+    d : Mapping[str, Any]
+        A mapping.
+    key : str
+        The key to lookup.
+
+    Returns
+    -------
+    {float, None}
+        The string or None if the key is not in the dictionary. If in the
+        dictionary, a type check is performed and TypeError is raised if
+        not found.
+    """
+    out: Optional[float] = None
+    if key in d:
+        out = d[key]
+        if out is not None:
+            if isinstance(out, (int, float, np.floating)):
+                return float(out)
+            else:
+                raise TypeError(f"{key} found in the dictionary but it is not a float.")
+    return out

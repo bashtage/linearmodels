@@ -1,2 +1,17 @@
 [build-system]
 requires = ["setuptools", "wheel", "numpy", "Cython>=0.29.14"]
+
+[tool.black]
+target-version = ['py36', 'py37', 'py38']
+exclude = '''
+(
+    \.egg
+  | \.git
+  | \.mypy_cache
+  | \.oytest_cache
+  | _build
+  | buck-out
+  | build
+  | dist
+)
+'''

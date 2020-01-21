@@ -1,7 +1,7 @@
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
 import os
 
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from setuptools import Extension, find_packages, setup
 from setuptools.dist import Distribution
 

@@ -43,7 +43,7 @@ def test_linear_model_parameters(data):
         loc += 1
     alphas = pricing_errors.mean(0)[:, None]
     moments[:, loc:] = pricing_errors - alphas.T
-    mod_moments = mod._moments(eps, b, lam, alphas, pricing_errors)
+    mod_moments = mod._moments(eps, b, alphas, pricing_errors)
 
     assert_allclose(res.betas, b)
     assert_allclose(res.risk_premia, lam.squeeze())
@@ -151,7 +151,7 @@ def test_linear_model_parameters_risk_free(data):
         loc += 1
     alphas = p.mean(0)[:, None] - bc @ lam
     moments[:, loc:] = pricing_errors - alphas.T
-    mod_moments = mod._moments(eps, bc, lam, alphas, pricing_errors)
+    mod_moments = mod._moments(eps, bc, alphas, pricing_errors)
 
     assert_allclose(res.betas, bc[:, 1:])
     assert_allclose(res.risk_premia, lam.squeeze())
@@ -257,7 +257,7 @@ def test_linear_model_parameters_risk_free_gls(data):
         loc += 1
     alphas = p.mean(0)[:, None] - bc @ lam
     moments[:, loc:] = pricing_errors - alphas.T
-    mod_moments = mod._moments(eps, bc, lam, alphas, pricing_errors)
+    mod_moments = mod._moments(eps, bc, alphas, pricing_errors)
 
     assert_allclose(res.betas, bc[:, 1:])
     assert_allclose(res.risk_premia, lam.squeeze())
