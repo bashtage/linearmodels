@@ -3,7 +3,7 @@ Linear factor models for applications in asset pricing
 """
 from linearmodels.compat.numpy import lstsq
 
-from typing import Any, Callable, Optional, Tuple, Type, Union
+from typing import Any, Callable, Optional, Tuple, Union
 
 import numpy as np
 from pandas import DataFrame
@@ -223,7 +223,7 @@ class TradedFactorModel(object):
         self,
         cov_type: str = "robust",
         debiased: bool = True,
-        **cov_config: Union[str, bool, float],
+        **cov_config: Union[str, float],
     ) -> LinearFactorModelResults:
         """
         Estimate model parameters
@@ -285,13 +285,20 @@ class TradedFactorModel(object):
                 fe, jacobian=np.eye(f.shape[1]), center=False, debiased=debiased, df=1
             )
         elif cov_type == "kernel":
+            kernel: Optional[str] = None
+            if "kernel" in cov_config and cov_config["kernel"] is not None:
+                kernel = str(cov_config["kernel"])
+            bandwidth: Optional[float] = None
+            if "bandwidth" in cov_config and cov_config["bandwidth"] is not None:
+                bandwidth = int(cov_config["bandwith"])
             cov_est = KernelCovariance(
                 xe,
                 inv_jacobian=xpxi,
                 center=False,
                 debiased=debiased,
                 df=fc.shape[1],
-                **cov_config,
+                bandwidth=bandwidth,
+                kernel=kernel,
             )
             bw = cov_est.bandwidth
             _cov_config = {k: v for k, v in cov_config.items()}
@@ -302,7 +309,8 @@ class TradedFactorModel(object):
                 center=False,
                 debiased=debiased,
                 df=1,
-                **_cov_config,
+                bandwidth=bw,
+                kernel=kernel,
             )
         else:
             raise ValueError("Unknown cov_type: {0}".format(cov_type))
@@ -881,14 +889,20 @@ class LinearFactorModelGMM(LinearFactorModel):
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
             raise ValueError("Unknown weight: {0}".format(cov_type))
         if cov_type in ("robust", "heteroskedastic"):
-            weight_est: Union[
-                Type[HeteroskedasticWeight], Type[KernelWeight]
-            ] = HeteroskedasticWeight
+            weight_est_instance = HeteroskedasticWeight(g, center=center)
             cov_est = HeteroskedasticCovariance
         else:  # 'kernel':
-            weight_est = KernelWeight
+            kernel: Optional[str] = None
+            if "kernel" in cov_config and cov_config["kernel"] is not None:
+                kernel = str(cov_config["kernel"])
+            bandwidth: Optional[float] = None
+            if "bandwidth" in cov_config and cov_config["bandwidth"] is not None:
+                bandwidth = float(cov_config["bandwith"])
+            weight_est_instance = KernelWeight(
+                g, center=center, kernel=kernel, bandwidth=bandwidth
+            )
             cov_est = KernelCovariance
-        weight_est_instance = weight_est(g, center=center, **cov_config)
+
         w = weight_est_instance.w(g)
 
         args = (excess_returns, w)

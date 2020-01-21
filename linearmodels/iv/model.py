@@ -208,8 +208,7 @@ class IVLIML(object):
                 additional.append("kappa={0}".format(kappa))
             if additional:
                 self._method += "(" + ", ".join(additional) + ")"
-        if not hasattr(self, "_result_container"):
-            self._result_container: IVResultType = IVResults
+        self._result_container: IVResultType = IVResults
 
         self._kappa = kappa
         self._fuller = fuller
@@ -802,10 +801,10 @@ class IVGMM(IVLIML):
         **weight_config: Any,
     ):
         self._method = "IV-GMM"
-        self._result_container = IVGMMResults
         super(IVGMM, self).__init__(
             dependent, exog, endog, instruments, weights=weights
         )
+        self._result_container = IVGMMResults
         weight_matrix_estimator = WEIGHT_MATRICES[weight_type]
         self._weight = weight_matrix_estimator(**weight_config)
         self._weight_type = weight_type
