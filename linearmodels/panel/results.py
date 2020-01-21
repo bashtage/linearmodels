@@ -150,7 +150,8 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared_between(self) -> float:
-        """Between Coefficient of determination
+        """
+        Between Coefficient of determination
 
         Returns
         -------
@@ -166,7 +167,8 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared_within(self) -> float:
-        """Within coefficient of determination
+        """
+        Within coefficient of determination
 
         Returns
         -------
@@ -182,7 +184,8 @@ class PanelResults(_SummaryStr):
 
     @property
     def rsquared_overall(self) -> float:
-        """Overall coefficient of determination
+        """
+        Overall coefficient of determination
 
         Returns
         -------
@@ -359,7 +362,8 @@ class PanelResults(_SummaryStr):
 
     @property
     def resids(self) -> Series:
-        """Model residuals
+        """
+        Model residuals
 
         Notes
         -----

@@ -51,7 +51,8 @@ def callback_factory(
 
 
 class _FactorModelBase(object):
-    r"""Linear factor models estimator applicable to traded factors
+    r"""
+    Base class for all factor models.
 
     Parameters
     ----------
@@ -59,23 +60,6 @@ class _FactorModelBase(object):
         Test portfolio returns (nobs by nportfolio)
     factors : array_like
         Priced factor returns (nobs by nfactor)
-
-    Notes
-    -----
-    Implements both time-series estimators of risk premia, factor loadings
-    and zero-alpha tests.
-
-    The model estimated is
-
-    .. math::
-
-        r_{it}^e = \alpha_i + f_t \beta_i + \epsilon_{it}
-
-    where :math:`r_{it}^e` is the excess return on test portfolio i and
-    :math:`f_t` are the traded factor returns.  The model is directly
-    tested using the estimated values :math:`\hat{\alpha}_i`. Risk premia,
-    :math:`\lambda_i` are estimated using the sample averages of the factors,
-    which must be excess returns on traded portfolios.
     """
 
     def __init__(self, portfolios: ArrayLike, factors: ArrayLike):
@@ -176,7 +160,8 @@ class _FactorModelBase(object):
 
 
 class TradedFactorModel(_FactorModelBase):
-    r"""Linear factor models estimator applicable to traded factors
+    r"""
+    Linear factor models estimator applicable to traded factors
 
     Parameters
     ----------
@@ -399,52 +384,8 @@ class TradedFactorModel(_FactorModelBase):
 
 
 class _LinearFactorModelBase(_FactorModelBase):
-    r"""Linear factor model estimator
-
-    Parameters
-    ----------
-    portfolios : array_like
-        Test portfolio returns (nobs by nportfolio)
-    factors : array_like
-        Priced factor returns (nobs by nfactor)
-    risk_free : bool, optional
-        Flag indicating whether the risk-free rate should be estimated
-        from returns along other risk premia.  If False, the returns are
-        assumed to be excess returns using the correct risk-free rate.
-    sigma : array_like, optional
-        Positive definite residual covariance (nportfolio by nportfolio)
-
-    Notes
-    -----
-    Suitable for traded or non-traded factors.
-
-    Implements a 2-step estimator of risk premia, factor loadings and model
-    tests.
-
-    The first stage model estimated is
-
-    .. math::
-
-        r_{it} = c_i + f_t \beta_i + \epsilon_{it}
-
-    where :math:`r_{it}` is the return on test portfolio i and
-    :math:`f_t` are the traded factor returns.  The parameters :math:`c_i`
-    are required to allow non-traded to be tested, but are not economically
-    interesting.  These are not reported.
-
-    The second stage model uses the estimated factor loadings from the first
-    and is
-
-    .. math::
-
-        \bar{r}_i = \lambda_0 + \hat{\beta}_i^\prime \lambda + \eta_i
-
-    where :math:`\bar{r}_i` is the average excess return to portfolio i and
-    :math:`\lambda_0` is only included if estimating the risk-free rate. GLS
-    is used in the second stage if ``sigma`` is provided.
-
-    The model is tested using the estimated values
-    :math:`\hat{\alpha}_i=\hat{\eta}_i`.
+    r"""
+    Linear factor model base class
     """
 
     def __init__(
@@ -500,7 +441,8 @@ class _LinearFactorModelBase(_FactorModelBase):
 
 
 class LinearFactorModel(_LinearFactorModelBase):
-    r"""Linear factor model estimator
+    r"""
+    Linear factor model estimator
 
     Parameters
     ----------
@@ -799,7 +741,8 @@ class LinearFactorModel(_LinearFactorModelBase):
 
 
 class LinearFactorModelGMM(_LinearFactorModelBase):
-    r"""GMM estimator of Linear factor models
+    r"""
+    GMM estimator of Linear factor models
 
     Parameters
     ----------

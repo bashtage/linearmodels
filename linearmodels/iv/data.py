@@ -45,7 +45,8 @@ def expand_categoricals(x: AnyPandas, drop_first: bool) -> AnyPandas:
 
 
 class IVData(object):
-    """Simple class to abstract different input data formats
+    """
+    Type abstraction for use in univariate models.
 
     Parameters
     ----------
