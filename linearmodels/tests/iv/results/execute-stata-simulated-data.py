@@ -76,7 +76,8 @@ for val in product(*inputs):
 results = """
 estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
 
-results += """stats(r2 r2_a mss rss rmse {extra}, fmt(%13.12g)) unstack append
+results += """\
+stats(r2 r2_a mss rss rmse {extra}, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
 file write myfile  "********* Variance *************" _n
 file close myfile

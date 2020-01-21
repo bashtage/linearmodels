@@ -11,7 +11,8 @@ iv_tempplate = """
 ivregress {method} rent pcturban (hsngval = faminc i.region){variance_option}
 estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g))) """
 
-iv_tempplate += """stats(r2 r2_a p mss rss rmse {extra}, fmt(%13.12g)) unstack append
+iv_tempplate += """\
+stats(r2 r2_a p mss rss rmse {extra}, fmt(%13.12g)) unstack append
 file open myfile using {outfile}, write append
 file write myfile  "********* Variance *************" _n
 file close myfile

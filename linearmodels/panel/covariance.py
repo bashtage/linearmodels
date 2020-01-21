@@ -669,7 +669,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         y: NDArray,
         x: NDArray,
         params: NDArray,
-        all_params: NDArray,
+        all_params: DataFrame,
         *,
         debiased: bool = False,
         bandwidth: Optional[float] = None,
@@ -688,7 +688,8 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
     def bandwidth(self) -> float:
         """Estimator bandwidth"""
         if self._bandwidth is None:
-            e = self._all_params - self._params.T
+            all_params = np.asarray(self._all_params)
+            e = all_params - self._params.T
             e = e[np.all(np.isfinite(e), 1)]
             stde = np.sum(e / e.std(0)[None, :], 1)
             self._bandwidth = kernel_optimal_bandwidth(stde, self._kernel)
@@ -698,7 +699,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
     @cached_property
     def cov(self) -> NDArray:
         """Estimated covariance"""
-        e = self._all_params - self._params.T
+        e = np.asarray(self._all_params) - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
         nobs = e.shape[0]
 
@@ -707,3 +708,15 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
         cov = _cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))
+
+    @property
+    def all_params(self) -> DataFrame:
+        """
+        The set of parameters estimated for each of the time periods
+
+        Returns
+        -------
+        DataFrame
+            The parameters (nobs, nparam).
+        """
+        return self._all_params

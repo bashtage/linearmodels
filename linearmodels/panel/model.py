@@ -2539,7 +2539,6 @@ class FamaMacBeth(PooledOLS):
         all_params = yx.groupby(level=1).apply(single)
         all_params = all_params.iloc[:, 1:]
         params = all_params.mean(0).values[:, None]
-        all_params = all_params.values
 
         wy = wy.values
         wx = wx.values
