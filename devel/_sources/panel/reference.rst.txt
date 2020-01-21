@@ -61,7 +61,6 @@ Panel Model Covariance Estimators
    DriscollKraay
    ACCovariance
    FamaMacBethCovariance
-   FamaMacBethKernelCovariance
 
 .. _panel-module-reference-data:
 

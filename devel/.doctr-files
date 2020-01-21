@@ -397,6 +397,7 @@ devel/_sources/panel/panel/linearmodels.panel.covariance.DriscollKraay.name.rst.
 devel/_sources/panel/panel/linearmodels.panel.covariance.DriscollKraay.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.covariance.DriscollKraay.s2.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.DEFAULT_KERNEL.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.all_params.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.cov.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.deferred_cov.rst.txt
@@ -1224,6 +1225,7 @@ devel/panel/panel/linearmodels.panel.covariance.DriscollKraay.html
 devel/panel/panel/linearmodels.panel.covariance.DriscollKraay.name.html
 devel/panel/panel/linearmodels.panel.covariance.DriscollKraay.s2.html
 devel/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.DEFAULT_KERNEL.html
+devel/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.all_params.html
 devel/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.bandwidth.html
 devel/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.cov.html
 devel/panel/panel/linearmodels.panel.covariance.FamaMacBethCovariance.deferred_cov.html
