@@ -793,6 +793,28 @@ class RandomEffectsResults(PanelResults):
 PanelModelResults = Union[PanelEffectsResults, PanelResults, RandomEffectsResults]
 
 
+class FamaMacBethResults(PanelResults):
+    """
+    Results container for Fama MacBeth panel data models
+    """
+
+    def __init__(self, res: AttrDict):
+        super().__init__(res)
+        self._all_params = res.all_params
+
+    @property
+    def all_params(self) -> DataFrame:
+        """
+        The set of parameters estimated for each of the time periods
+
+        Returns
+        -------
+        DataFrame
+            The parameters (nobs, nparam).
+        """
+        return self._all_params
+
+
 class PanelModelComparison(_ModelComparison):
     """
     Comparison of multiple models
@@ -807,7 +829,12 @@ class PanelModelComparison(_ModelComparison):
         Default is 'tstats'.
     """
 
-    _supported = (PanelEffectsResults, PanelResults, RandomEffectsResults)
+    _supported = (
+        PanelEffectsResults,
+        PanelResults,
+        RandomEffectsResults,
+        FamaMacBethResults,
+    )
 
     def __init__(
         self,
