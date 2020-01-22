@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.wresids
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.wresids

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.FamaMacBethResults.predict
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: FamaMacBethResults.predict

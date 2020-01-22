@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.std\_errors
+=========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.std_errors

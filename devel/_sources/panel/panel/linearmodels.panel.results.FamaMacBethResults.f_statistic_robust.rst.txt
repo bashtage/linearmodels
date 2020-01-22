@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.f\_statistic\_robust
+==================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.f_statistic_robust
