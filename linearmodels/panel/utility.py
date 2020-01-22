@@ -1,12 +1,15 @@
+from linearmodels.compat.pandas import concat
+
 from collections import defaultdict
-from typing import Dict, List, Tuple, TypeVar, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, TypeVar, Union
 
 import numpy as np
-import pandas as pd
+from pandas import DataFrame, date_range
 import scipy.sparse as sp
 
 from linearmodels.typing import NDArray
 from linearmodels.typing.data import ArrayLike
+from linearmodels.utility import panel_to_frame
 
 try:
     from linearmodels.panel._utility import _drop_singletons
@@ -106,7 +109,7 @@ def dummy_matrix(
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
-) -> Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, np.array]:
+) -> Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, NDArray]:
     """
     Parameters
     ----------
@@ -139,7 +142,7 @@ def dummy_matrix(
     cond : ndarray
         Conditioning number of each column
     """
-    if isinstance(cats, pd.DataFrame):
+    if isinstance(cats, DataFrame):
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     else:
         codes = cats
@@ -291,7 +294,7 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
     retain : ndarray
         Boolean array that marks non-singleton entries as True
     """
-    if isinstance(cats, pd.DataFrame):
+    if isinstance(cats, DataFrame):
         cats = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     if cats.shape[1] == 1:
         # Fast, simple path
@@ -313,6 +316,7 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
     shift = np.r_[0, max_cat[:-1] + 1]
     zero_cats += shift
     orig_dest_lst = []
+    inverter = np.empty_like(zero_cats[:, 0])
     for i in range(ncats):
         col_order = list(range(ncats))
         col_order.remove(i)
@@ -321,7 +325,6 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
         idx = np.argsort(temp[:, 0])
         orig_dest_lst.append(temp[idx])
         if i == 0:
-            inverter = np.empty_like(zero_cats[:, 0])
             inverter[idx] = np.arange(nobs)
     orig_dest = np.concatenate(orig_dest_lst, 0)
     # b.
@@ -331,7 +334,7 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
 
     def min_dtype(*args: NDArray) -> str:
         bits = max([np.log2(max(arg.max(), 1)) for arg in args])
-        return "int{0}".format(min([i for i in (8, 16, 32, 64) if bits < (i - 1)]))
+        return "int{0}".format(min([j for j in (8, 16, 32, 64) if bits < (j - 1)]))
 
     dtype = min_dtype(offset, node_id, count, orig_dest)
     meta = np.column_stack(
@@ -369,7 +372,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     This is a reference implementation that can be very slow to remove
     all singleton nodes in some graphs.
     """
-    if isinstance(cats, pd.DataFrame):
+    if isinstance(cats, DataFrame):
         cats = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     if cats.shape[1] == 1:
         return in_2core_graph(cats)
@@ -446,3 +449,143 @@ def not_absorbed(x: NDArray) -> List[int]:
     drop = np.where(np.abs(np.diag(r)) < threshold)[0]
     retain = set(range(x.shape[1])).difference(drop)
     return sorted(retain)
+
+
+class PanelModelData(NamedTuple):
+    """
+    Typed namedtuple to hold simulated panel data
+    """
+
+    data: DataFrame
+    weights: DataFrame
+    other_effects: DataFrame
+    clusters: DataFrame
+
+
+def generate_panel_data(
+    nentity: int = 971,
+    ntime: int = 7,
+    nexog: int = 5,
+    const: bool = False,
+    missing: float = 0,
+    other_effects: int = 2,
+    ncats: Union[int, List[int]] = 4,
+    rng: Optional[np.random.RandomState] = None,
+) -> PanelModelData:
+    """
+
+    Parameters
+    ----------
+    nentity : int, default 971
+        The number of entities in the panel.
+    ntime : int, default 7
+        The number of time periods in the panel.
+    nexog : int, default 5
+        The number of explanatory variables in the dataset.
+    const : bool, default False
+        Flag indicating that the model should include a constant.
+    missing : float, default 0
+        The percentage of values that are missing. Should be between 0 and 100.
+    other_effects : int, default 2
+        The number of other effects generated.
+    ncats : Union[int, Sequence[int]], default 4
+        The number of categories to use in other_effects and variance
+        clusters. If list-like, then it must have as many elements
+        as other_effects.
+    rng : RandomState, default None
+        A NumPy RandomState instance. If not provided, one is initialized
+        using a fixed seed.
+
+    Returns
+    -------
+    PanelModelData
+        A namedtuple derived class containing 4 DataFrames:
+
+        * `data` - A simulated data with variables y and x# for # in 0,...,4.
+          If const is True, then also contains a column named const.
+        * `weights` - Simulated non-negative weights.
+        * `other_effects` - Simulated effects.
+        * `clusters` - Simulated data to use in clustered covariance estimation.
+    """
+    if rng is None:
+        rng = np.random.RandomState(
+            [
+                0xA14E2429,
+                0x448D2E51,
+                0x91B558E7,
+                0x6A3F5CD2,
+                0x22B43ABB,
+                0xE746C92D,
+                0xCE691A7D,
+                0x66746EE7,
+            ]
+        )
+
+    n, t, k = nentity, ntime, nexog
+    k += int(const)
+    x = rng.standard_normal((k, t, n))
+    beta = np.arange(1, k + 1)[:, None, None] / k
+    y = (
+        (x * beta).sum(0)
+        + rng.standard_normal((t, n))
+        + 2 * rng.standard_normal((1, n))
+    )
+    w = rng.chisquare(5, (t, n)) / 5
+    c = None
+    cats = [f"cat.{i}" for i in range(other_effects)]
+    if other_effects:
+        if not isinstance(ncats, list):
+            ncats = [ncats] * other_effects
+        c = []
+        for i in range(other_effects):
+            nc = ncats[i]
+            c.append(rng.randint(0, nc, (1, t, n)))
+        c = np.concatenate(c, 0)
+
+    vcats = [f"varcat.{i}" for i in range(2)]
+    vc2 = np.ones((2, t, 1)) @ rng.randint(0, n // 2, (2, 1, n))
+    vc1 = vc2[[0]]
+
+    if const:
+        x[0] = 1.0
+
+    if missing > 0:
+        locs = rng.choice(n * t, int(n * t * missing))
+        y.flat[locs] = np.nan
+        locs = rng.choice(n * t * k, int(n * t * k * missing))
+        x.flat[locs] = np.nan
+
+    entities = [f"firm{i}" for i in range(n)]
+    time = date_range("1-1-1900", periods=t, freq="A-DEC")
+    var_names = [f"x{i}" for i in range(k)]
+    if const:
+        var_names[1:] = var_names[:-1]
+        var_names[0] = "const"
+    # y = DataFrame(y, index=time, columns=entities)
+    y_df = panel_to_frame(
+        y[None], items=["y"], major_axis=time, minor_axis=entities, swap=True
+    )
+    index = y_df.index
+    w_df = panel_to_frame(
+        w[None], items=["w"], major_axis=time, minor_axis=entities, swap=True
+    )
+    w_df = w_df.reindex(index)
+    x_df = panel_to_frame(
+        x, items=var_names, major_axis=time, minor_axis=entities, swap=True
+    )
+    x_df = x_df.reindex(index)
+    c_df = panel_to_frame(
+        c, items=cats, major_axis=time, minor_axis=entities, swap=True
+    )
+    other_eff = c_df.reindex(index)
+    vc1_df = panel_to_frame(
+        vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True
+    )
+    vc1_df = vc1_df.reindex(index)
+    vc2_df = panel_to_frame(
+        vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True
+    )
+    vc2_df = vc2_df.reindex(index)
+    clusters = concat([vc1_df, vc2_df])
+    data = concat([y_df, x_df], axis=1)
+    return PanelModelData(data, w_df, other_eff, clusters)

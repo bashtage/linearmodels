@@ -21,7 +21,12 @@ from linearmodels.utility import (
     quadratic_form_test,
 )
 
-__all__ = ["PanelResults", "PanelEffectsResults", "RandomEffectsResults"]
+__all__ = [
+    "PanelResults",
+    "PanelEffectsResults",
+    "RandomEffectsResults",
+    "FamaMacBethResults",
+]
 
 
 class PanelResults(_SummaryStr):

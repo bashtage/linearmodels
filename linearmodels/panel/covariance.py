@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union
 
 import numpy as np
 from numpy.linalg import inv
@@ -13,6 +13,7 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.typing import NDArray
+from linearmodels.utility import get_array_like, get_bool, get_float, get_string
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -20,6 +21,9 @@ __all__ = [
     "ClusteredCovariance",
     "DriscollKraay",
     "CovarianceManager",
+    "ACCovariance",
+    "FamaMacBethCovariance",
+    "setup_covariance_estimator",
 ]
 
 
@@ -39,9 +43,9 @@ class HomoskedasticCovariance(object):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator
-    extra_df : int, optional
+    extra_df : int, default 0
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
@@ -67,6 +71,8 @@ class HomoskedasticCovariance(object):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
+
+    DEFAULT_KERNEL = "newey-west"
 
     def __init__(
         self,
@@ -137,9 +143,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator
-    extra_df : int, optional
+    extra_df : int, default 0
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
@@ -216,16 +222,16 @@ class ClusteredCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator
-    extra_df : int, optional
+    extra_df : int, default 0
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
-    clusters : ndarray, optional
+    clusters : ndarray, default None
         nobs by 1 or nobs by 2 array of cluster group ids
-    group_debias : bool, optional
-        Flag indicating whether to apply small-number of groups adjustment
+    group_debias : bool, default None
+        Flag indicating whether to apply small-number of groups adjustment.
 
     Returns
     -------
@@ -283,7 +289,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         clusters = np.asarray(clusters).squeeze()
-        self._group_debias = group_debias
+        self._group_debias = bool(group_debias)
         dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
         if clusters.ndim > 2 or dim1 > 2:
             raise ValueError("Only 1 or 2-way clustering supported.")
@@ -357,15 +363,16 @@ class DriscollKraay(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator
-    extra_df : int, optional
+    extra_df : int, default 0
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
-        adjusted for extra_df irrespective of the setting of debiased
-    kernel : str, options
-        Name of one of the supported kernels
-    bandwidth : int, optional
+        adjusted for extra_df irrespective of the setting of debiased.
+    kernel : str, default None
+        Name of one of the supported kernels. If None, uses the Newey-West
+        kernel.
+    bandwidth : int, default None
         Non-negative integer to use as bandwidth.  If not provided a rule-of-
         thumb value is used.
 
@@ -416,14 +423,15 @@ class DriscollKraay(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        kernel: str = "newey-west",
+        kernel: Optional[str] = None,
         bandwidth: Optional[float] = None,
     ) -> None:
+
         super(DriscollKraay, self).__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         self._name = "Driscoll-Kraay"
-        self._kernel = kernel
+        self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
 
     @cached_property
@@ -468,15 +476,16 @@ class ACCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator
-    extra_df : int, optional
+    extra_df : int, default 0
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
-    kernel : str, options
-        Name of one of the supported kernels
-    bandwidth : int, optional
+    kernel : str, default None
+        Name of one of the supported kernels. If None, uses the Newey-West
+        kernel.
+    bandwidth : int, default None
         Non-negative integer to use as bandwidth.  If not provided a rule-of-
         thumb value is used.
 
@@ -532,14 +541,14 @@ class ACCovariance(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        kernel: str = "newey-west",
+        kernel: Optional[str] = None,
         bandwidth: Optional[float] = None,
     ) -> None:
         super(ACCovariance, self).__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         self._name = "Autocorrelation Rob. Cov."
-        self._kernel = kernel
+        self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
 
     def _single_cov(self, xe: NDArray, bw: float) -> NDArray:
@@ -614,7 +623,7 @@ class CovarianceManager(object):
     }
 
     def __init__(
-        self, estimator: CovarianceEstimator, *cov_estimators: CovarianceEstimatorType
+        self, estimator: str, *cov_estimators: CovarianceEstimatorType
     ) -> None:
         self._estimator = estimator
         self._supported = cov_estimators
@@ -645,24 +654,21 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         (variables by 1) array of estimated model parameters
     all_params : ndarray
         (nobs by variables) array of all estimated model parameters
-    debiased : bool, optional
+    debiased : bool, default False
         Flag indicating whether to debias the estimator.
-    bandwidth : int, optional
+    bandwidth : int, default None
         Non-negative integer to use as bandwidth.  Set to 0 to disable
         autocorrelation robustness. If not provided a rule-of- thumb
         value is used.
-    kernel : str, options
-        Name of one of the supported kernels. If set to None, then the
-        estimator is not autocorrelation robust. This is equivalent to
-        setting the bandwidth to 0.
+    kernel : str, default None
+        Name of one of the supported kernels. If None, uses the Newey-West
+        kernel.
 
 
     Notes
     -----
     Covariance is a Kernel covariance of all estimated parameters.
     """
-
-    DEFAULT_KERNEL = "newey-west"
 
     def __init__(
         self,
@@ -720,3 +726,68 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
             The parameters (nobs, nparam).
         """
         return self._all_params
+
+
+def setup_covariance_estimator(
+    cov_estimators: CovarianceManager,
+    cov_type: str,
+    y: NDArray,
+    x: NDArray,
+    params: NDArray,
+    entity_ids: NDArray,
+    time_ids: NDArray,
+    *,
+    debiased: bool = False,
+    extra_df: int = 0,
+    **cov_config: Any,
+) -> Union[HomoskedasticCovariance]:
+    estimator = cov_estimators[cov_type]
+    kernel = get_string(cov_config, "kernel")
+    bandwidth = get_float(cov_config, "bandwidth")
+    group_debias = get_bool(cov_config, "group_debias")
+    clusters = get_array_like(cov_config, "clusters")
+
+    if estimator is HomoskedasticCovariance:
+        return HomoskedasticCovariance(
+            y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
+        )
+    elif estimator is HeteroskedasticCovariance:
+        return HeteroskedasticCovariance(
+            y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
+        )
+    elif estimator is ClusteredCovariance:
+        return ClusteredCovariance(
+            y,
+            x,
+            params,
+            entity_ids,
+            time_ids,
+            debiased=debiased,
+            extra_df=extra_df,
+            clusters=clusters,
+            group_debias=group_debias,
+        )
+    elif estimator is DriscollKraay:
+        return DriscollKraay(
+            y,
+            x,
+            params,
+            entity_ids,
+            time_ids,
+            debiased=debiased,
+            extra_df=extra_df,
+            kernel=kernel,
+            bandwidth=bandwidth,
+        )
+    else:  # ACCovariance:
+        return ACCovariance(
+            y,
+            x,
+            params,
+            entity_ids,
+            time_ids,
+            debiased=debiased,
+            extra_df=extra_df,
+            kernel=kernel,
+            bandwidth=bandwidth,
+        )

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Iterable, Optional
 
 import numpy as np
 import pandas as pd
@@ -9,17 +9,19 @@ from linearmodels.typing import AnyPandas, NDArray
 __all__ = ["is_string_like", "concat", "get_codes", "to_numpy"]
 
 
-def concat(*args: AnyPandas, **kwargs: Any) -> AnyPandas:
+def concat(
+    objs: Iterable[AnyPandas], axis: int = 0, sort: Optional[bool] = None
+) -> AnyPandas:
     """
     Shim around pandas concat that passes sort if allowed
 
     See pandas.compat
     """
-    if "sort" not in kwargs:
-        kwargs = kwargs.copy()
-        kwargs["sort"] = False
+    if sort is None:
+        sort = False
+    assert sort is not None
 
-    return pd.concat(*args, **kwargs)
+    return pd.concat(objs, axis=axis, sort=sort)
 
 
 # From pandas 0.20.1

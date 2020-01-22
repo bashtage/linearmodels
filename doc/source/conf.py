@@ -26,9 +26,8 @@ import glob
 import hashlib
 import os
 
-import sphinx_material
-
 import linearmodels
+import sphinx_material
 
 # ...
 

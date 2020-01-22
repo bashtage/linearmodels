@@ -20,6 +20,7 @@ from linearmodels.panel.covariance import (
     FamaMacBethCovariance,
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
+    setup_covariance_estimator,
 )
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (
@@ -289,7 +290,7 @@ class PooledOLS(object):
                 "and time periods as the model data."
             )
         clusters.drop(~self.not_null)
-        return clusters
+        return clusters.copy()
 
     def _info(self) -> Tuple[Series, Series, None]:
         """Information about panel structure"""
@@ -529,6 +530,8 @@ class PooledOLS(object):
         weights = self.weights if self._is_weighted else None
         wy = self.dependent.demean("entity", weights=weights, return_panel=False)
         wx = self.exog.demean("entity", weights=weights, return_panel=False)
+        assert isinstance(wy, np.ndarray)
+        assert isinstance(wx, np.ndarray)
         weps = wy - wx @ params
         residual_ss = float(weps.T @ weps)
         total_ss = float(wy.T @ wy)
@@ -626,7 +629,9 @@ class PooledOLS(object):
         Examples
         --------
         >>> from linearmodels import PooledOLS
-        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -635,26 +640,28 @@ class PooledOLS(object):
         mod.formula = formula
         return mod
 
-    def _choose_cov(
-        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
-    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
+    def _setup_clusters(
+        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+    ) -> Dict[str, Union[bool, float, str, NDArray]]:
 
-        cov_est = self._cov_estimators[cov_type]
-        if cov_type != "clustered":
-            return cov_est, cov_config
+        cov_config_upd = cov_config.copy()
+        cluster_types = ("clusters", "cluster_entity", "cluster_time")
+        common = set(cov_config.keys()).intersection(cluster_types)
+        if not common:
+            return cov_config_upd
 
         cov_config_upd = {k: v for k, v in cov_config.items()}
 
         clusters: Optional[NDArray] = cov_config.get("clusters", None)
         clusters_frame: Optional[DataFrame] = None
         if clusters is not None:
-            formatted_clusters = self.reformat_clusters(clusters).copy()
+            formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
                 cat = pd.Categorical(formatted_clusters.dataframe[col])
                 formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)
             clusters_frame = formatted_clusters.dataframe
 
-        cluster_entity = cov_config_upd.pop("cluster_entity", False)
+        cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
@@ -664,7 +671,7 @@ class PooledOLS(object):
             else:
                 clusters_frame = pd.DataFrame(group_ids)
 
-        cluster_time = cov_config_upd.pop("cluster_time", False)
+        cluster_time = bool(cov_config_upd.pop("cluster_time", False))
         if cluster_time:
             group_ids = self.dependent.time_ids.squeeze()
             name = "cov.cluster.time"
@@ -680,7 +687,7 @@ class PooledOLS(object):
             np.asarray(clusters_frame) if clusters_frame is not None else clusters_frame
         )
 
-        return cov_est, cov_config_upd
+        return cov_config_upd
 
     def fit(
         self,
@@ -749,14 +756,21 @@ class PooledOLS(object):
         nobs = y.shape[0]
         df_model = x.shape[1]
         df_resid = nobs - df_model
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(
+        cov_config = self._setup_clusters(cov_config)
+        extra_df = 0
+        if "extra_df" in cov_config:
+            cov_config = cov_config.copy()
+            extra_df = int(cov_config.get("extra_df", 0))
+        cov = setup_covariance_estimator(
+            self._cov_estimators,
+            cov_type,
             wy,
             wx,
             params,
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
+            extra_df=extra_df,
             **cov_config,
         )
         weps = wy - wx @ params
@@ -1027,6 +1041,7 @@ class PanelOLS(PooledOLS):
         self._other_effect_cats = other_effects
         cats_array = other_effects.values2d
         nested = False
+        nesting_effect = ""
         if cats_array.shape[1] == 2:
             nested = self._is_effect_nested(cats_array[:, [0]], cats_array[:, [1]])
             nested |= self._is_effect_nested(cats_array[:, [1]], cats_array[:, [0]])
@@ -1115,7 +1130,9 @@ class PanelOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import PanelOLS
-        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', panel_data.data)
         >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
         """
         parser = PanelFormulaParser(formula, data)
@@ -1569,12 +1586,13 @@ class PanelOLS(PooledOLS):
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
         # Check clusters if singletons were removed
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
+        cov_config = self._setup_clusters(cov_config)
         if auto_df:
             count_effects = self._determine_df_adjustment(cov_type, **cov_config)
         extra_df = neffects if count_effects else 0
-
-        cov = cov_est(
+        cov = setup_covariance_estimator(
+            self._cov_estimators,
+            cov_type,
             y,
             x,
             params,
@@ -1584,6 +1602,7 @@ class PanelOLS(PooledOLS):
             extra_df=extra_df,
             **cov_config,
         )
+
         weps = y - x @ params
         eps = weps
         _y = self.dependent.values2d
@@ -1730,18 +1749,17 @@ class BetweenOLS(PooledOLS):
             ClusteredCovariance,
         )
 
-    def _choose_cov(
-        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
-    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
+    def _setup_clusters(
+        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+    ) -> Dict[str, Union[bool, float, str, NDArray]]:
         """Return covariance estimator reformat clusters"""
-        cov_est = self._cov_estimators[cov_type]
-        if cov_type != "clustered":
-            return cov_est, cov_config
-        cov_config_upd = {k: v for k, v in cov_config.items()}
+        cov_config_upd = cov_config.copy()
+        if "clusters" not in cov_config:
+            return cov_config_upd
 
         clusters = cov_config.get("clusters", None)
         if clusters is not None:
-            clusters_panel = self.reformat_clusters(clusters).copy()
+            clusters_panel = self.reformat_clusters(clusters)
             cluster_max = np.nanmax(clusters_panel.values3d, axis=1)
             delta = cluster_max - np.nanmin(clusters_panel.values3d, axis=1)
             if np.any(delta != 0):
@@ -1755,7 +1773,7 @@ class BetweenOLS(PooledOLS):
             clusters_frame = clusters_frame.loc[reindex].astype(np.int64)
             cov_config_upd["clusters"] = clusters_frame
 
-        return cov_est, cov_config_upd
+        return cov_config_upd
 
     def fit(
         self,
@@ -1822,14 +1840,21 @@ class BetweenOLS(PooledOLS):
         df_resid = y.shape[0] - x.shape[1]
         df_model = (x.shape[1],)
         nobs = y.shape[0]
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(
+        cov_config = self._setup_clusters(cov_config)
+        extra_df = 0
+        if "extra_df" in cov_config:
+            cov_config = cov_config.copy()
+            extra_df = int(cov_config.get("extra_df", 0))
+        cov = setup_covariance_estimator(
+            self._cov_estimators,
+            cov_type,
             wy,
             wx,
             params,
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
+            extra_df=extra_df,
             **cov_config,
         )
         weps = wy - wx @ params
@@ -1912,7 +1937,9 @@ class BetweenOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import BetweenOLS
-        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -1961,19 +1988,19 @@ class FirstDifferenceOLS(PooledOLS):
         if self.dependent.nobs < 2:
             raise ValueError("Panel must have at least 2 time periods")
 
-    def _choose_cov(
-        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
-    ) -> Tuple[CovarianceEstimatorType, Dict[str, Union[bool, float, str, NDArray]]]:
-        """Return covariance estimator and reformat clusters"""
-        cov_est = self._cov_estimators[cov_type]
-        if cov_type != "clustered":
-            return cov_est, cov_config
+    def _setup_clusters(
+        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+    ) -> Dict[str, Union[bool, float, str, DataFrame]]:
+        cov_config_upd = cov_config.copy()
+        cluster_types = ("clusters", "cluster_entity")
+        common = set(cov_config.keys()).intersection(cluster_types)
+        if not common:
+            return cov_config_upd
 
-        cov_config_upd = {k: v for k, v in cov_config.items()}
-        clusters_frame: Optional[DataFrame] = None
         clusters = cov_config.get("clusters", None)
+        clusters_frame: Optional[DataFrame] = None
         if clusters is not None:
-            clusters_panel = self.reformat_clusters(clusters).copy()
+            clusters_panel = self.reformat_clusters(clusters)
             fd = clusters_panel.first_difference()
             fd_array = fd.values2d
             if np.any(fd_array.flat[np.isfinite(fd_array.flat)] != 0):
@@ -2009,7 +2036,7 @@ class FirstDifferenceOLS(PooledOLS):
             cluster_frame.values if cluster_frame is not None else None
         )
 
-        return cov_est, cov_config_upd
+        return cov_config_upd
 
     def fit(
         self,
@@ -2040,8 +2067,8 @@ class FirstDifferenceOLS(PooledOLS):
         --------
         >>> from linearmodels import FirstDifferenceOLS
         >>> mod = FirstDifferenceOLS(y, x)
-        >>> res = mod.fit(cov_type='robust')
-        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> robust = mod.fit(cov_type='robust')
+        >>> clustered = mod.fit(cov_type='clustered', cluster_entity=True)
 
         Notes
         -----
@@ -2101,9 +2128,23 @@ class FirstDifferenceOLS(PooledOLS):
         wy = root_w * y
         params = lstsq(wx, wy)[0]
         df_resid = y.shape[0] - x.shape[1]
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(
-            wy, wx, params, entity_ids, time_ids, debiased=debiased, **cov_config
+        cov_config = self._setup_clusters(cov_config)
+        extra_df = 0
+        if "extra_df" in cov_config:
+            cov_config = cov_config.copy()
+            extra_df = int(cov_config.get("extra_df", 0))
+
+        cov = setup_covariance_estimator(
+            self._cov_estimators,
+            cov_type,
+            wy,
+            wx,
+            params,
+            entity_ids,
+            time_ids,
+            debiased=debiased,
+            extra_df=extra_df,
+            **cov_config,
         )
 
         weps = wy - wx @ params
@@ -2181,7 +2222,9 @@ class FirstDifferenceOLS(PooledOLS):
         Examples
         --------
         >>> from linearmodels import FirstDifferenceOLS
-        >>> mod = FirstDifferenceOLS.from_formula('y ~ x1', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = FirstDifferenceOLS.from_formula('y ~ x1', panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -2218,6 +2261,15 @@ class RandomEffects(PooledOLS):
     common to all entities i.
     """
 
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ) -> None:
+        super().__init__(dependent, exog, weights=weights)
+
     @classmethod
     def from_formula(
         cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
@@ -2251,7 +2303,9 @@ class RandomEffects(PooledOLS):
         Examples
         --------
         >>> from linearmodels import RandomEffects
-        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -2283,7 +2337,7 @@ class RandomEffects(PooledOLS):
 
         wybar = self.dependent.mean("entity", weights=self.weights)
         wxbar = self.exog.mean("entity", weights=self.weights)
-        params = lstsq(wxbar, wybar)[0]
+        params = lstsq(np.asarray(wxbar), np.asarray(wybar))[0]
         wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
@@ -2320,14 +2374,22 @@ class RandomEffects(PooledOLS):
         params = lstsq(wx, wy)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
-        cov_est, cov_config = self._choose_cov(cov_type, **cov_config)
-        cov = cov_est(
+        cov_config = self._setup_clusters(cov_config)
+        extra_df = 0
+        if "extra_df" in cov_config:
+            cov_config = cov_config.copy()
+            extra_df = int(cov_config.get("extra_df", 0))
+
+        cov = setup_covariance_estimator(
+            self._cov_estimators,
+            cov_type,
             wy,
             wx,
             params,
             self.dependent.entity_ids,
             self.dependent.time_ids,
             debiased=debiased,
+            extra_df=extra_df,
             **cov_config,
         )
 
@@ -2641,7 +2703,9 @@ class FamaMacBeth(PooledOLS):
         Examples
         --------
         >>> from linearmodels import BetweenOLS
-        >>> mod = FamaMacBeth.from_formula('y ~ 1 + x1', panel_data)
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = FamaMacBeth.from_formula('y ~ 1 + x1', panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
