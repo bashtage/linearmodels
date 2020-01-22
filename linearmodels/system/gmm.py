@@ -264,6 +264,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         bandwidth: Optional[float] = None,
         optimal_bw: bool = False,
     ) -> None:
+        _HACMixin.__init__(self, kernel, bandwidth)
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._name = "Kernel (HAC) Weighting"
         self._check_kernel(kernel)

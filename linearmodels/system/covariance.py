@@ -354,6 +354,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         kernel: str = "bartlett",
         bandwidth: Optional[float] = None,
     ):
+        _HACMixin.__init__(self, kernel, bandwidth)
         super(KernelCovariance, self).__init__(
             x,
             eps,
@@ -623,6 +624,7 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         kernel: str = "bartlett",
         bandwidth: Optional[float] = None,
     ) -> None:
+        _HACMixin.__init__(self, kernel, bandwidth)
         super().__init__(
             x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints
         )
