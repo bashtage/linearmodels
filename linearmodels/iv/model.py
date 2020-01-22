@@ -866,7 +866,7 @@ class IVGMM(IVLIML):
         >>> mod = IVGMM.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(
-            IVGMM, formula, data, weights, weight_type, **weight_config,
+            IVGMM, formula, data, weights, weight_type, **weight_config
         )
         assert isinstance(mod, IVGMM)
         return mod
@@ -1148,7 +1148,7 @@ class IVGMMCUE(IVGMM):
         >>> mod = IVGMMCUE.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(
-            IVGMMCUE, formula, data, weights, weight_type, **weight_config,
+            IVGMMCUE, formula, data, weights, weight_type, **weight_config
         )
         assert isinstance(mod, IVGMMCUE)
         return mod

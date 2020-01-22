@@ -7,6 +7,7 @@ from linearmodels.panel.model import (
     RandomEffects,
 )
 from linearmodels.panel.results import compare
+from linearmodels.panel.utility import generate_panel_data
 
 __all__ = [
     "PanelOLS",
@@ -16,4 +17,5 @@ __all__ = [
     "BetweenOLS",
     "FamaMacBeth",
     "compare",
+    "generate_panel_data",
 ]

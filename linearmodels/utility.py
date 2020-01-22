@@ -478,9 +478,11 @@ class _ModelComparison(_SummaryStr):
         self._precision = precision
 
     def _get_series_property(self, name: str) -> DataFrame:
-        out = [(k, getattr(v, name)) for k, v in self._results.items()]
+        out: List[Tuple[str, Series]] = [
+            (k, getattr(v, name)) for k, v in self._results.items()
+        ]
         cols = [v[0] for v in out]
-        values = concat([v[1] for v in out], 1)
+        values = concat([v[1] for v in out], axis=1)
         values.columns = cols
         return values
 
@@ -748,4 +750,69 @@ def get_float(d: Mapping[str, Any], key: str) -> Optional[float]:
                 return float(out)
             else:
                 raise TypeError(f"{key} found in the dictionary but it is not a float.")
+    return out
+
+
+def get_bool(d: Mapping[str, Any], key: str) -> bool:
+    """
+    Helper function that gets a bool, defaulting to False.
+
+    Parameters
+    ----------
+    d : Mapping[str, Any]
+        A mapping.
+    key : str
+        The key to lookup.
+
+    Returns
+    -------
+    bool
+        The boolean if the key is in the dictionary. If not found, returns
+        False.
+    """
+    out = False
+    if key in d:
+        out = d[key]
+        if not (isinstance(out, bool) or out is None):
+            raise TypeError(f"{key} found in the dictionary but it is not a bool.")
+    return bool(out)
+
+
+def get_array_like(d: Mapping[str, Any], key: str) -> Optional[ArrayLike]:
+    """
+    Helper function that gets a bool or None
+
+    Parameters
+    ----------
+    d : Mapping[str, Any]
+        A mapping.
+    key : str
+        The key to lookup.
+
+    Returns
+    -------
+    {bool, None}
+        The string or None if the key is not in the dictionary. If in the
+        dictionary, a type check is performed and TypeError is raised if
+        not found.
+    """
+
+    out: Optional[bool] = None
+    if key in d:
+        out = d[key]
+        if out is not None:
+            array_like: Union[Any] = (np.ndarray, DataFrame, Series)
+            try:
+                import xarray as xr
+
+                array_like += (xr.DataArray,)
+            except ImportError:
+                pass
+
+            if isinstance(out, array_like):
+                return out
+            else:
+                raise TypeError(
+                    f"{key} found in the dictionary but it is not array-like."
+                )
     return out

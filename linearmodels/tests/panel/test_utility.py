@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
@@ -7,7 +9,9 @@ import scipy.sparse.csc
 import scipy.sparse.csr
 
 from linearmodels.panel.utility import (
+    PanelModelData,
     dummy_matrix,
+    generate_panel_data,
     in_2core_graph,
     in_2core_graph_slow,
     preconditioner,
@@ -208,3 +212,27 @@ def test_preconditioner_subclass():
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values ** 2).sum(0)), cond)
     assert type(val_cond) == type(values)
+
+
+@pytest.mark.parametrize("missing", [0, 0.2])
+@pytest.mark.parametrize("const", [True, False])
+@pytest.mark.parametrize("other_effects", [0, 1, 2])
+@pytest.mark.parametrize("cat_list", [True, False])
+def test_generate_panel_data(missing, const, other_effects, cat_list):
+    if cat_list:
+        ncats: Union[List[int], int] = [13] * other_effects
+    else:
+        ncats = 21
+
+    dataset = generate_panel_data(
+        missing=missing, const=const, other_effects=other_effects, ncats=ncats
+    )
+
+    assert isinstance(dataset, PanelModelData)
+    if missing > 0:
+        assert np.any(np.asarray(np.isnan(dataset.data)))
+    if const:
+        assert "const" in dataset.data
+        print(dataset.data["const"])
+        assert (dataset.data["const"].dropna() == 1.0).all()
+    assert dataset.other_effects.shape == (dataset.data.shape[0], other_effects)
