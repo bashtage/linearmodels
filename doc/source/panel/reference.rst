@@ -37,9 +37,10 @@ Estimation Results
 .. autosummary::
    :toctree: panel/
 
+   FamaMacBethResults
+   PanelResults
    PanelEffectsResults
    RandomEffectsResults
-   PanelResults
    PanelModelComparison
 
 .. _panel-module-reference-covariance:

@@ -57,6 +57,7 @@ def test_fama_macbeth(data):
     all_params = params
     params = params.mean(0)
     assert_allclose(params.squeeze(), res.params)
+    assert_allclose(all_params, res.all_params.dropna(how="all"))
     e_params = all_params - params[None, :]
     ntime = e_params.shape[0]
     cov = e_params.T @ e_params / ntime / (ntime - 1)

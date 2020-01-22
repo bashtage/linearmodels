@@ -23,6 +23,7 @@ from linearmodels.panel.covariance import (
 )
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.results import (
+    FamaMacBethResults,
     PanelEffectsResults,
     PanelResults,
     RandomEffectsResults,
@@ -2472,7 +2473,7 @@ class FamaMacBeth(PooledOLS):
         debiased: bool = True,
         bandwidth: Optional[float] = None,
         kernel: Optional[str] = None,
-    ) -> PanelResults:
+    ) -> FamaMacBethResults:
         """
         Estimate model parameters
 
@@ -2602,9 +2603,10 @@ class FamaMacBeth(PooledOLS):
                 fitted=fitted,
                 effects=effects,
                 idiosyncratic=idiosyncratic,
+                all_params=all_params,
             )
         )
-        return PanelResults(res)
+        return FamaMacBethResults(res)
 
     @classmethod
     def from_formula(
