@@ -15,13 +15,17 @@ from linearmodels.typing import NDArray
 
 
 class _HACMixin(object):
-    def __init__(self) -> None:
+    def __init__(self, kernel: str, bandwidth: Optional[float]) -> None:
+        self._kernel: Optional[str] = None
         self._bandwidth: Optional[float] = None  # pragma: no cover
         self._moments: Optional[ndarray] = None  # pragma: no cover
+        self._check_kernel(kernel)
+        self._check_bandwidth(bandwidth)
 
     @property
     def kernel(self) -> str:
         """Kernel used in estimation"""
+        assert self._kernel is not None
         return self._kernel
 
     @property
@@ -59,6 +63,7 @@ class _HACMixin(object):
         nobs = z.shape[0]
         bw = self.bandwidth
         kernel = self._kernel
+        assert kernel is not None
         kernel_estimator = KERNEL_LOOKUP[kernel]
         weights = kernel_estimator(bw, nobs - 1)
         out = _cov_kernel(z, weights)
@@ -231,6 +236,8 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         debiased: bool = False,
         df: int = 0,
     ) -> None:
+        kernel = "bartlett" if kernel is None else kernel
+        _HACMixin.__init__(self, kernel, bandwidth)
         super(KernelCovariance, self).__init__(
             xe,
             jacobian=jacobian,
@@ -239,9 +246,6 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
             debiased=debiased,
             df=df,
         )
-        kernel = "bartlett" if kernel is None else kernel
-        self._check_kernel(kernel)
-        self._check_bandwidth(bandwidth)
 
     def __str__(self) -> str:
         descr = ", Kernel: {0}, Bandwidth: {1}".format(self._kernel, self.bandwidth)
@@ -250,7 +254,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     @property
     def config(self) -> Dict[str, Union[str, float]]:
         out = super(KernelCovariance, self).config
-        out["kernel"] = self._kernel
+        out["kernel"] = self.kernel
         out["bandwidth"] = self.bandwidth
         return out
 
@@ -333,11 +337,9 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         kernel: Optional[str] = None,
         bandwidth: Optional[float] = None,
     ):
-        super(KernelWeight, self).__init__(moments, center=center)
         kernel = "bartlett" if kernel is None else kernel
-        assert kernel is not None
-        self._check_kernel(kernel)
-        self._check_bandwidth(bandwidth)
+        _HACMixin.__init__(self, kernel, bandwidth)
+        super(KernelWeight, self).__init__(moments, center=center)
 
     def w(self, moments: NDArray) -> NDArray:
         """
