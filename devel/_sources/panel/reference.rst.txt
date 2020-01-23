@@ -75,3 +75,13 @@ Panel Data Structures
    :toctree: panel/
 
    PanelData
+
+Helper Functions
+----------------
+.. module:: linearmodels.panel.utility
+   :synopsis: Utilities for working with panel data
+
+.. autosummary::
+   :toctree: panel/
+
+   generate_panel_data

@@ -24,6 +24,7 @@ linearmodels.panel.covariance.ClusteredCovariance
    .. autosummary::
       :toctree:
 
+      ~ClusteredCovariance.DEFAULT_KERNEL
       ~ClusteredCovariance.cov
       ~ClusteredCovariance.eps
       ~ClusteredCovariance.name
