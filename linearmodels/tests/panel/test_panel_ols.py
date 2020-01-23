@@ -1,8 +1,7 @@
-from linearmodels.compat.numpy import lstsq
-
 from itertools import product
 
 import numpy as np
+from numpy.linalg import lstsq
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
@@ -158,7 +157,7 @@ def test_const_data_entity(const_data):
 
     x = mod.exog.dataframe
     d = mod.dependent.dummies("entity", drop_first=True)
-    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values)[0]
+    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values, rcond=None)[0]
 
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
@@ -182,7 +181,7 @@ def test_const_data_entity_weights(const_data):
     z = np.ones_like(x)
     wd = root_w * d.values
     wz = root_w
-    d = d - z @ lstsq(wz, wd)[0]
+    d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_columns)
@@ -198,7 +197,7 @@ def test_const_data_time(const_data):
 
     x = mod.exog.dataframe
     d = mod.dependent.dummies("time", drop_first=True)
-    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values)[0]
+    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values, rcond=None)[0]
 
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
@@ -222,7 +221,7 @@ def test_const_data_time_weights(const_data):
     z = np.ones_like(x)
     wd = root_w * d.values
     wz = root_w
-    d = d - z @ lstsq(wz, wd)[0]
+    d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_columns)
@@ -243,7 +242,7 @@ def test_const_data_both(const_data):
     d2.columns = ["d.time.{0}".format(i) for i in d2]
     d = np.c_[d1.values, d2.values]
     d = pd.DataFrame(d, index=x.index, columns=list(d1.columns) + list(d2.columns))
-    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values)[0]
+    d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values, rcond=None)[0]
 
     xd = np.c_[x.values, d.values]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d.columns))
@@ -269,7 +268,7 @@ def test_const_data_both_weights(const_data):
     z = np.ones_like(x)
     wd = root_w * d
     wz = root_w
-    d = d - z @ lstsq(wz, wd)[0]
+    d = d - z @ lstsq(wz, wd, rcond=None)[0]
     d = pd.DataFrame(d, index=x.index, columns=list(d1.columns) + list(d2.columns))
 
     xd = np.c_[x.values, d.values]
@@ -300,7 +299,7 @@ def test_panel_entity_lsdv(data):
     if mod.has_constant:
         d = mod.dependent.dummies("entity", drop_first=True)
         z = np.ones_like(y)
-        d_demean = d.values - z @ lstsq(z, d.values)[0]
+        d_demean = d.values - z @ lstsq(z, d.values, rcond=None)[0]
     else:
         d = mod.dependent.dummies("entity", drop_first=False)
         d_demean = d.values
@@ -377,13 +376,13 @@ def test_panel_entity_fwl(data):
     if mod.has_constant:
         d = mod.dependent.dummies("entity", drop_first=True)
         z = np.ones_like(y)
-        d_demean = d.values - z @ lstsq(z, d.values)[0]
+        d_demean = d.values - z @ lstsq(z, d.values, rcond=None)[0]
     else:
         d = mod.dependent.dummies("entity", drop_first=False)
         d_demean = d.values
 
-    x = x - d_demean @ lstsq(d_demean, x)[0]
-    y = y - d_demean @ lstsq(d_demean, y)[0]
+    x = x - d_demean @ lstsq(d_demean, x, rcond=None)[0]
+    y = y - d_demean @ lstsq(d_demean, y, rcond=None)[0]
 
     ols_mod = IV2SLS(y, x, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -405,7 +404,7 @@ def test_panel_time_lsdv(large_data):
     d = d.values
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_cols)
@@ -480,10 +479,10 @@ def test_panel_time_fwl(data):
     d = d.values
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
-    x = x - d @ lstsq(d, x)[0]
-    y = y - d @ lstsq(d, y)[0]
+    x = x - d @ lstsq(d, x, rcond=None)[0]
+    y = y - d @ lstsq(d, y, rcond=None)[0]
 
     ols_mod = IV2SLS(y, x, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -506,7 +505,7 @@ def test_panel_both_lsdv(data):
 
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(
@@ -585,10 +584,10 @@ def test_panel_both_fwl(data):
 
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
-    x = x - d @ lstsq(d, x)[0]
-    y = y - d @ lstsq(d, y)[0]
+    x = x - d @ lstsq(d, x, rcond=None)[0]
+    y = y - d @ lstsq(d, y, rcond=None)[0]
 
     ols_mod = IV2SLS(y, x, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted")
@@ -614,7 +613,7 @@ def test_panel_entity_lsdv_weighted(data):
         root_w = np.sqrt(w.values)
         wd = root_w * d
         wz = root_w * z
-        d = d - z @ lstsq(wz, wd)[0]
+        d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
@@ -694,7 +693,7 @@ def test_panel_time_lsdv_weighted(large_data):
         root_w = np.sqrt(w.values)
         wd = root_w * d
         wz = root_w * z
-        d = d - z @ lstsq(wz, wd)[0]
+        d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_cols))
@@ -776,7 +775,7 @@ def test_panel_both_lsdv_weighted(data):
         root_w = np.sqrt(w.values)
         wd = root_w * d
         wz = root_w * z
-        d = d - z @ lstsq(wz, wd)[0]
+        d = d - z @ lstsq(wz, wd, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(
@@ -904,7 +903,7 @@ def test_panel_other_lsdv(data):
 
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
     xd = np.c_[x.values, d]
     xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + list(d_columns))
@@ -994,10 +993,10 @@ def test_panel_other_fwl(data):
 
     if mod.has_constant:
         z = np.ones_like(y)
-        d = d - z @ lstsq(z, d)[0]
+        d = d - z @ lstsq(z, d, rcond=None)[0]
 
-    x = x - d @ lstsq(d, x)[0]
-    y = y - d @ lstsq(d, y)[0]
+    x = x - d @ lstsq(d, x, rcond=None)[0]
+    y = y - d @ lstsq(d, y, rcond=None)[0]
 
     ols_mod = IV2SLS(y, x, None, None)
     res2 = ols_mod.fit(cov_type="unadjusted")

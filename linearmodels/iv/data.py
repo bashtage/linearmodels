@@ -4,7 +4,7 @@ A data abstraction that allow multiple input data formats
 from linearmodels.compat.pandas import concat, is_string_like
 
 import copy
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -15,16 +15,7 @@ from pandas.api.types import (
     is_string_dtype,
 )
 
-from linearmodels.typing import AnyPandas, ArrayLike, NDArray, OptionalArrayLike
-
-iv_data_types: Tuple[Type, ...] = (np.ndarray, pd.DataFrame, pd.Series)
-try:
-    import xarray as xr
-
-    HAS_XARRAY = True
-    iv_data_types = iv_data_types + (xr.DataArray,)
-except ImportError:
-    HAS_XARRAY = False
+from linearmodels.typing import AnyPandas, ArrayLike, NDArray
 
 dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
@@ -68,7 +59,7 @@ class IVData(object):
 
     def __init__(
         self,
-        x: OptionalArrayLike,
+        x: Optional["IVDataLike"],
         var_name: str = "x",
         nobs: Optional[int] = None,
         convert_dummies: bool = True,
@@ -206,10 +197,13 @@ class IVData(object):
 
     @property
     def isnull(self) -> pd.Series:
-        return np.any(self._pandas.isnull(), axis=1)
+        return self._pandas.isnull().any(axis=1)
 
     def drop(self, locs: ArrayLike) -> None:
         locs = np.asarray(locs)
         self._pandas = self.pandas.loc[~locs]
         self._ndarray = self._ndarray[~locs]
         self._row_labels = list(pd.Series(self._row_labels).loc[~locs])
+
+
+IVDataLike = Union[IVData, ArrayLike]

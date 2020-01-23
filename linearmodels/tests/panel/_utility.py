@@ -1,6 +1,5 @@
-from linearmodels.compat.numpy import lstsq
-
 import numpy as np
+from numpy.linalg import lstsq
 from numpy.random import standard_normal
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, date_range, get_dummies
@@ -58,7 +57,7 @@ def lsdv(
 
     wy = w * y.values
     wx = w * x.values
-    params = lstsq(wx, wy)[0]
+    params = lstsq(wx, wy, rcond=None)[0]
     params = params.squeeze()
 
     return params[:nvar]

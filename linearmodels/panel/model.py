@@ -1,10 +1,9 @@
-from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes
 
 from typing import Callable, Dict, Optional, Tuple, Type, Union
 
 import numpy as np
-from numpy.linalg import matrix_rank
+from numpy.linalg import lstsq, matrix_rank
 import pandas as pd
 from pandas import DataFrame, Series
 from patsy.highlevel import ModelDesc, dmatrix
@@ -201,9 +200,9 @@ __all__ = [
 # TODO: Defer estimation of 3 R2 values -- slow
 
 
-class PooledOLS(object):
+class _PanelModelBase(object):
     r"""
-    Pooled coefficient estimator for panel data
+    Base class for all panel models
 
     Parameters
     ----------
@@ -215,14 +214,6 @@ class PooledOLS(object):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
-
-    Notes
-    -----
-    The model is given by
-
-    .. math::
-
-        y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
     """
 
     def __init__(
@@ -471,12 +462,12 @@ class PooledOLS(object):
     def _prepare_between(self) -> Tuple[NDArray, NDArray, NDArray]:
         """Prepare values for between estimation of R2"""
         weights = self.weights if self._is_weighted else None
-        y = self.dependent.mean("entity", weights=weights).values
-        x = self.exog.mean("entity", weights=weights).values
+        y = np.asarray(self.dependent.mean("entity", weights=weights))
+        x = np.asarray(self.exog.mean("entity", weights=weights))
         # Weight transformation
         wcount, wmean = self.weights.count("entity"), self.weights.mean("entity")
         wsum = wcount * wmean
-        w = wsum.values
+        w = np.asarray(wsum)
         w = w / w.mean()
 
         return y, x, w
@@ -596,50 +587,6 @@ class PooledOLS(object):
         """Locations of non-missing observations"""
         return self._not_null
 
-    @classmethod
-    def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
-    ) -> "PooledOLS":
-        """
-        Create a model from a formula
-
-        Parameters
-        ----------
-        formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
-        data : array_like
-            Data structure that can be coerced into a PanelData.  In most
-            cases, this should be a multi-index DataFrame where the level 0
-            index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
-            Weights to use in estimation.  Assumes residual variance is
-            proportional to inverse of weight to that the residual times
-            the weight should be homoskedastic.
-
-        Returns
-        -------
-        PooledOLS
-            Model specified using the formula
-
-        Notes
-        -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
-
-        Examples
-        --------
-        >>> from linearmodels import PooledOLS
-        >>> from linearmodels.panel import generate_panel_data
-        >>> panel_data = generate_panel_data()
-        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data.data)
-        >>> res = mod.fit()
-        """
-        parser = PanelFormulaParser(formula, data)
-        dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
-        mod.formula = formula
-        return mod
-
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
     ) -> Dict[str, Union[bool, float, str, NDArray]]:
@@ -688,6 +635,145 @@ class PooledOLS(object):
         )
 
         return cov_config_upd
+
+    def predict(
+        self,
+        params: ArrayLike,
+        *,
+        exog: OptionalArrayLike = None,
+        data: Optional[DataFrame] = None,
+        eval_env: int = 4,
+    ) -> DataFrame:
+        """
+        Predict values for additional data
+
+        Parameters
+        ----------
+        params : array_like
+            Model parameters (nvar by 1)
+        exog : array_like
+            Exogenous regressors (nobs by nvar)
+        data : DataFrame
+            Values to use when making predictions from a model constructed
+            from a formula
+        eval_env : int
+            Depth of use when evaluating formulas using Patsy.
+
+        Returns
+        -------
+        DataFrame
+            Fitted values from supplied data and parameters
+
+        Notes
+        -----
+        If `data` is not None, then `exog` must be None.
+        Predictions from models constructed using formulas can
+        be computed using either `exog`, which will treat these are
+        arrays of values corresponding to the formula-processed data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+        """
+        if data is not None and self.formula is None:
+            raise ValueError(
+                "Unable to use data when the model was not " "created using a formula."
+            )
+        if data is not None and exog is not None:
+            raise ValueError(
+                "Predictions can only be constructed using one "
+                "of exog or data, but not both."
+            )
+        if exog is not None:
+            exog = PanelData(exog).dataframe
+        else:
+            assert self._formula is not None
+            assert data is not None
+            parser = PanelFormulaParser(self._formula, data, eval_env=eval_env)
+            exog = parser.exog
+        x = exog.values
+        params = np.atleast_2d(np.asarray(params))
+        if params.shape[0] == 1:
+            params = params.T
+        pred = pd.DataFrame(x @ params, index=exog.index, columns=["predictions"])
+
+        return pred
+
+
+class PooledOLS(_PanelModelBase):
+    r"""
+    Pooled coefficient estimator for panel data
+
+    Parameters
+    ----------
+    dependent : array_like
+        Dependent (left-hand-side) variable (time by entity)
+    exog : array_like
+        Exogenous or right-hand-side variables (variable by time by entity).
+    weights : array_like, optional
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
+
+    Notes
+    -----
+    The model is given by
+
+    .. math::
+
+        y_{it}=\beta^{\prime}x_{it}+\epsilon_{it}
+    """
+
+    def __init__(
+        self,
+        dependent: ArrayLike,
+        exog: ArrayLike,
+        *,
+        weights: OptionalArrayLike = None,
+    ) -> None:
+        super().__init__(dependent, exog, weights=weights)
+
+    @classmethod
+    def from_formula(
+        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+    ) -> "PooledOLS":
+        """
+        Create a model from a formula
+
+        Parameters
+        ----------
+        formula : str
+            Formula to transform into model. Conforms to patsy formula rules.
+        data : array_like
+            Data structure that can be coerced into a PanelData.  In most
+            cases, this should be a multi-index DataFrame where the level 0
+            index contains the entities and the level 1 contains the time.
+        weights: array_like, optional
+            Weights to use in estimation.  Assumes residual variance is
+            proportional to inverse of weight to that the residual times
+            the weight should be homoskedastic.
+
+        Returns
+        -------
+        PooledOLS
+            Model specified using the formula
+
+        Notes
+        -----
+        Unlike standard patsy, it is necessary to explicitly include a
+        constant using the constant indicator (1)
+
+        Examples
+        --------
+        >>> from linearmodels import PooledOLS
+        >>> from linearmodels.panel import generate_panel_data
+        >>> panel_data = generate_panel_data()
+        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data.data)
+        >>> res = mod.fit()
+        """
+        parser = PanelFormulaParser(formula, data)
+        dependent, exog = parser.data
+        mod = cls(dependent, exog, weights=weights)
+        mod.formula = formula
+        return mod
 
     def fit(
         self,
@@ -751,7 +837,7 @@ class PooledOLS(object):
         wx = root_w * x
         wy = root_w * y
 
-        params = lstsq(wx, wy)[0]
+        params = lstsq(wx, wy, rcond=None)[0]
 
         nobs = y.shape[0]
         df_model = x.shape[1]
@@ -777,7 +863,7 @@ class PooledOLS(object):
         index = self.dependent.index
         fitted = pd.DataFrame(x @ params, index, ["fitted_values"])
         effects = pd.DataFrame(
-            np.full_like(fitted.values, np.nan), index, ["estimated_effects"]
+            np.full_like(np.asarray(fitted), np.nan), index, ["estimated_effects"]
         )
         eps = y - fitted.values
         idiosyncratic = pd.DataFrame(eps, index, ["idiosyncratic"])
@@ -873,7 +959,7 @@ class PooledOLS(object):
         return pred
 
 
-class PanelOLS(PooledOLS):
+class PanelOLS(_PanelModelBase):
     r"""
     One- and two-way fixed effects estimator for panel data
 
@@ -1249,8 +1335,8 @@ class PanelOLS(PooledOLS):
             z = np.ones_like(root_w)
             d -= z * (z.T @ d / z.sum())
 
-        x_mean = lstsq(wd, x)[0]
-        y_mean = lstsq(wd, y)[0]
+        x_mean = lstsq(wd, x, rcond=None)[0]
+        y_mean = lstsq(wd, y, rcond=None)[0]
 
         # Save fitted unweighted effects to use in eps calculation
         x_effects = d @ x_mean
@@ -1260,7 +1346,7 @@ class PanelOLS(PooledOLS):
         x = x - wd @ x_mean
         y = y - wd @ y_mean
 
-        ybar = root_w @ lstsq(root_w, y)[0]
+        ybar = root_w @ lstsq(root_w, y, rcond=None)[0]
         return y, x, ybar, y_effects, x_effects
 
     def _choose_twoway_algo(self) -> bool:
@@ -1581,7 +1667,7 @@ class PanelOLS(PooledOLS):
                     self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
                     x_effects = x_effects[retain]
 
-        params = lstsq(x, y)[0]
+        params = lstsq(x, y, rcond=None)[0]
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
@@ -1653,10 +1739,10 @@ class PanelOLS(PooledOLS):
             df_num, df_denom = (df_model - wx.shape[1]), df_resid
             if not self.has_constant:
                 # Correction for when models does not have explicit constant
-                wy -= root_w * lstsq(root_w, wy)[0]
-                wx -= root_w * lstsq(root_w, wx)[0]
+                wy -= root_w * lstsq(root_w, wy, rcond=None)[0]
+                wx -= root_w * lstsq(root_w, wx, rcond=None)[0]
                 df_num -= 1
-            weps_pooled = wy - wx @ lstsq(wx, wy)[0]
+            weps_pooled = wy - wx @ lstsq(wx, wy, rcond=None)[0]
             resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
             num = (resid_ss_pooled - resid_ss) / df_num
 
@@ -1708,7 +1794,7 @@ class PanelOLS(PooledOLS):
         return PanelEffectsResults(res)
 
 
-class BetweenOLS(PooledOLS):
+class BetweenOLS(_PanelModelBase):
     r"""
     Between estimator for panel data
 
@@ -1835,7 +1921,7 @@ class BetweenOLS(PooledOLS):
 
         wx = root_w * x
         wy = root_w * y
-        params = lstsq(wx, wy)[0]
+        params = lstsq(wx, wy, rcond=None)[0]
 
         df_resid = y.shape[0] - x.shape[1]
         df_model = (x.shape[1],)
@@ -1949,7 +2035,7 @@ class BetweenOLS(PooledOLS):
         return mod
 
 
-class FirstDifferenceOLS(PooledOLS):
+class FirstDifferenceOLS(_PanelModelBase):
     r"""
     First difference model for panel data
 
@@ -2126,7 +2212,7 @@ class FirstDifferenceOLS(PooledOLS):
 
         wx = root_w * x
         wy = root_w * y
-        params = lstsq(wx, wy)[0]
+        params = lstsq(wx, wy, rcond=None)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov_config = self._setup_clusters(cov_config)
         extra_df = 0
@@ -2157,7 +2243,7 @@ class FirstDifferenceOLS(PooledOLS):
             ["idiosyncratic"],
         )
         effects = pd.DataFrame(
-            np.full_like(fitted.values, np.nan),
+            np.full_like(np.asarray(fitted), np.nan),
             self.dependent.index,
             ["estimated_effects"],
         )
@@ -2234,7 +2320,7 @@ class FirstDifferenceOLS(PooledOLS):
         return mod
 
 
-class RandomEffects(PooledOLS):
+class RandomEffects(_PanelModelBase):
     r"""
     One-way Random Effects model for panel data
 
@@ -2332,12 +2418,12 @@ class RandomEffects(PooledOLS):
             x_gm = (w * self.exog.values2d).sum(0) / w_sum
             y += root_w * y_gm
             x += root_w * x_gm
-        params = lstsq(x, y)[0]
+        params = lstsq(x, y, rcond=None)[0]
         weps = y - x @ params
 
         wybar = self.dependent.mean("entity", weights=self.weights)
         wxbar = self.exog.mean("entity", weights=self.weights)
-        params = lstsq(np.asarray(wxbar), np.asarray(wybar))[0]
+        params = lstsq(np.asarray(wxbar), np.asarray(wybar), rcond=None)[0]
         wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
@@ -2345,7 +2431,7 @@ class RandomEffects(PooledOLS):
         nvar = x.shape[1]
         sigma2_e = float(weps.T @ weps) / (nobs - nvar - neffects + 1)
         ssr = float(wu.T @ wu)
-        t = self.dependent.count("entity").values
+        t = np.asarray(self.dependent.count("entity"))
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
             ssr = float((t * wu).T @ wu)
@@ -2361,7 +2447,7 @@ class RandomEffects(PooledOLS):
             sigma2_u = max(0, ssr / (neffects - nvar) - sigma2_e / t_bar)
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
-        theta = 1 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
+        theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
         theta_out = pd.DataFrame(theta, columns=["theta"], index=wybar.index)
         wy = root_w * self.dependent.values2d
         wx = root_w * self.exog.values2d
@@ -2371,7 +2457,7 @@ class RandomEffects(PooledOLS):
         wxbar = (theta * wxbar).loc[reindex]
         wy -= wybar.values
         wx -= wxbar.values
-        params = lstsq(wx, wy)[0]
+        params = lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
         cov_config = self._setup_clusters(cov_config)
@@ -2406,7 +2492,7 @@ class RandomEffects(PooledOLS):
         residual_ss = float(weps.T @ weps)
         wmu = 0
         if self.has_constant:
-            wmu = root_w * lstsq(root_w, wy)[0]
+            wmu = root_w * lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
         total_ss = float(wy_demeaned.T @ wy_demeaned)
         r2 = 1 - residual_ss / total_ss
@@ -2438,7 +2524,7 @@ class RandomEffects(PooledOLS):
         return RandomEffectsResults(res)
 
 
-class FamaMacBeth(PooledOLS):
+class FamaMacBeth(_PanelModelBase):
     r"""
     Pooled coefficient estimator for panel data
 
@@ -2596,19 +2682,19 @@ class FamaMacBeth(PooledOLS):
             if exog.shape[0] < exog.shape[1] or matrix_rank(exog) != exog.shape[1]:
                 return pd.Series([np.nan] * len(z.columns), index=z.columns)
             dep = z.iloc[:, :1].values
-            params = lstsq(exog, dep)[0]
+            params = lstsq(exog, dep, rcond=None)[0]
             return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
         all_params = all_params.iloc[:, 1:]
         params = all_params.mean(0).values[:, None]
 
-        wy = wy.values
-        wx = wx.values
+        wy = np.asarray(wy)
+        wx = np.asarray(wx)
         index = self.dependent.index
         fitted = pd.DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
         effects = pd.DataFrame(
-            np.full_like(fitted.values, np.nan), index, ["estimated_effects"]
+            np.full(fitted.shape, np.nan), index, ["estimated_effects"]
         )
         idiosyncratic = pd.DataFrame(
             self.dependent.values2d - fitted.values, index, ["idiosyncratic"]

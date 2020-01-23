@@ -1,8 +1,7 @@
-from linearmodels.compat.numpy import lstsq
-
 from itertools import product
 
 import numpy as np
+from numpy.linalg import lstsq
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
@@ -52,7 +51,7 @@ def test_fama_macbeth(data):
         if _x.shape[0] < _x.shape[1]:
             continue
         _x = _x.loc[_y.index]
-        params.append(lstsq(_x.values, _y.values)[0])
+        params.append(lstsq(_x.values, _y.values, rcond=None)[0])
     params = np.array(params).squeeze()
     all_params = params
     params = params.mean(0)

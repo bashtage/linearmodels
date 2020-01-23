@@ -1494,7 +1494,7 @@ class IVGMMResults(_CommonIVResults):
         y = self.model._y
         z = self.model._z
         nz = z.shape[1]
-        weight_mat_c = res_e.weight_matrix.values[:nz, :nz]
+        weight_mat_c = asarray(res_e.weight_matrix)[:nz, :nz]
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
@@ -1534,17 +1534,17 @@ class IVModelComparison(_ModelComparison):
         super(IVModelComparison, self).__init__(results, precision=precision)
 
     @property
-    def rsquared_adj(self) -> float:
+    def rsquared_adj(self) -> Series:
         """Sample-size adjusted coefficients of determination (R**2)"""
         return self._get_property("rsquared_adj")
 
     @property
-    def estimator_method(self) -> str:
+    def estimator_method(self) -> Series:
         """Estimation methods"""
         return self._get_property("_method")
 
     @property
-    def cov_estimator(self) -> str:
+    def cov_estimator(self) -> Series:
         """Covariance estimator descriptions"""
         return self._get_property("cov_estimator")
 
@@ -1574,14 +1574,14 @@ class IVModelComparison(_ModelComparison):
             "F-statistic",
             "P-value (F-stat)",
         ]
-        dep_name: Dict[str, Union[IVResults, IVGMMResults, OLSResults]] = {}
+        dep_name: Dict[str, str] = {}
         for key in self._results:
-            dep_name[key] = self._results[key].model.dependent.cols[0]
-        dep_name = Series(dep_name)
+            dep_name[key] = str(self._results[key].model.dependent.cols[0])
+        dep_names = Series(dep_name)
 
         vals = concat(
             [
-                dep_name,
+                dep_names,
                 self.estimator_method,
                 self.nobs,
                 self.cov_estimator,

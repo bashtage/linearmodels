@@ -16,7 +16,8 @@ __all__ = [
     "ArraySequence",
 ]
 
-NDArray = ndarray
+# Workaround for https://github.com/python/mypy/issues/7866
+NDArray = Union[ndarray]
 ArraySequence = Sequence[ndarray]
 
 Numeric = Union[int, float]

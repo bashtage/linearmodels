@@ -1,11 +1,10 @@
 """
 Linear factor models for applications in asset pricing
 """
-from linearmodels.compat.numpy import lstsq
-
 from typing import Any, Callable, Optional, Tuple, Union
 
 import numpy as np
+from numpy.linalg import lstsq
 from pandas import DataFrame
 from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
@@ -600,7 +599,7 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         # Step 1, n regressions to get B
         fc = np.c_[np.ones((nobs, 1)), f]
-        b = lstsq(fc, p)[0]  # nf+1 by np
+        b = lstsq(fc, p, rcond=None)[0]  # nf+1 by np
         eps = p - fc @ b
         if excess_returns:
             betas = b[1:].T
@@ -609,7 +608,7 @@ class LinearFactorModel(_LinearFactorModelBase):
             betas[:, 0] = 1.0
 
         sigma_m12 = self._sigma_m12
-        lam = lstsq(sigma_m12 @ betas, sigma_m12 @ p.mean(0)[:, None])[0]
+        lam = lstsq(sigma_m12 @ betas, sigma_m12 @ p.mean(0)[:, None], rcond=None)[0]
         expected = betas @ lam
         pricing_errors = p - expected.T
         # Moments

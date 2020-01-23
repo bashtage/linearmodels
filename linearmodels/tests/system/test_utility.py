@@ -1,6 +1,5 @@
-from linearmodels.compat.numpy import lstsq
-
 import numpy as np
+from numpy.linalg import lstsq
 from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
@@ -121,9 +120,9 @@ def test_linear_constraint():
     x = np.random.randn(200, 5)
     y = np.random.randn(200, 1)
     xt = x @ lc.t
-    bc = lstsq(xt, y)[0]
+    bc = lstsq(xt, y, rcond=None)[0]
     ec = y - xt @ bc
-    b = lstsq(x[:, 2:], y)[0]
+    b = lstsq(x[:, 2:], y, rcond=None)[0]
     e = y - x[:, 2:] @ b
     assert_allclose(ec.T @ ec, e.T @ e)
 

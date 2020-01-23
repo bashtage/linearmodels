@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import Optional
+from typing import List, Optional
 
 from numpy import array, empty, ndarray, repeat, sqrt
 
@@ -62,7 +62,7 @@ class HomoskedasticWeightMatrix(object):
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: NDArray, x: NDArray) -> NDArray:
+    def sigma(self, eps: NDArray, x: List[NDArray]) -> NDArray:
         """
         Estimate residual covariance.
 
@@ -273,22 +273,26 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         self._optimal_bw = optimal_bw
 
     def weight_matrix(
-        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+        self,
+        x: List[NDArray],
+        z: List[NDArray],
+        eps: NDArray,
+        *,
+        sigma: Optional[ndarray] = None,
     ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
         Parameters
         ----------
-        x : ndarray
-            Model regressors (exog and endog), (nobs by nvar)
-        z : ndarray
-            Model instruments (exog and instruments), (nobs by ninstr)
+        x : List[ndarray]
+            Model regressors (exog and endog)
+        z : List[ndarray]
+            Model instruments (exog and instruments)
         eps : ndarray
-            Model errors (nobs by 1)
+            Model errors (nobs by nequation)
         sigma : ndarray, default None
             Fixed covariance of model errors. If None, estimated from eps.
-
 
         Returns
         -------

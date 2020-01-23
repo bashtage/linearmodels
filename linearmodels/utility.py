@@ -1,4 +1,3 @@
-from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import concat
 from linearmodels.compat.statsmodels import Summary
 
@@ -20,6 +19,7 @@ from typing import (
 )
 
 import numpy as np
+from numpy.linalg import lstsq
 from pandas import DataFrame, MultiIndex, Series
 from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
@@ -183,7 +183,7 @@ def has_constant(
     has_const = has_const or rank < min(x.shape)
     loc = None
     if has_const:
-        out = lstsq(x, np.ones((n, 1)))
+        out = lstsq(x, np.ones((n, 1)), rcond=None)
         beta = out[0].ravel()
         loc = np.argmax(np.abs(beta) * x.var(0))
     return bool(has_const), loc

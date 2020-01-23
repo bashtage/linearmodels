@@ -1,7 +1,8 @@
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 import numpy as np
 import pandas as pd
+from pandas import Index
 from pandas.core.arrays.categorical import CategoricalAccessor
 
 from linearmodels.typing import AnyPandas, NDArray
@@ -41,7 +42,7 @@ def is_string_like(obj: object) -> bool:
     return isinstance(obj, str)
 
 
-def get_codes(index: CategoricalAccessor) -> pd.Series:
+def get_codes(index: Union[Index, CategoricalAccessor]) -> pd.Series:
     """
     Tries .codes before falling back to .labels
     """
