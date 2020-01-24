@@ -171,8 +171,8 @@ Documentation
    :target: https://travis-ci.org/bashtage/linearmodels
 .. |codecov| image:: https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/bashtage/linearmodels
-.. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/c771bce50a164b6fa71c344b374f140d
-   :target: https://www.codacy.com/app/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade
+.. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/745a24a69cb2466b95df6a53c83892de
+   :target: https://www.codacy.com/manual/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade
 .. |codebeat badge| image:: https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243
    :target: https://codebeat.co/projects/github-com-bashtage-linearmodels-master
 .. |Code Quality: Python| image:: https://img.shields.io/lgtm/grade/python/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18

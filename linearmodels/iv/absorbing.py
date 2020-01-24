@@ -670,8 +670,8 @@ class AbsorbingLS(object):
         self._interactions = interactions
         self._interaction_list: List[Interaction] = []
         self._prepare_interactions()
-        self._absorbed_dependent = None
-        self._absorbed_exog = None
+        self._absorbed_dependent: Optional[DataFrame] = None
+        self._absorbed_exog: Optional[DataFrame] = None
         self._x = None
 
         self._check_shape()

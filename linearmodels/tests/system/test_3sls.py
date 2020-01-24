@@ -236,7 +236,7 @@ def test_multivariate_iv():
     mod = IV3SLS(eqns)
     res = mod.fit()
 
-    common_mod = IV3SLS.multivariate_ls(dep, exog, endog, instr)
+    common_mod = IV3SLS.multivariate_iv(dep, exog, endog, instr)
     common_res = common_mod.fit()
 
     assert_series_equal(res.params, common_res.params)
@@ -249,7 +249,7 @@ def test_multivariate_iv_bad_data():
     instr = DataFrame(instr, columns=["instr.{0}".format(i) for i in range(3)])
 
     with pytest.raises(ValueError):
-        IV3SLS.multivariate_ls(dep, None, None, instr)
+        IV3SLS.multivariate_iv(dep, None, None, instr)
 
 
 def test_fitted(data):

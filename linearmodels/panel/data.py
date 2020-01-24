@@ -16,7 +16,7 @@ from pandas.api.types import (
 from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
-__all__ = ["PanelData", "PanelLike"]
+__all__ = ["PanelData", "PanelDataLike"]
 
 
 class _Panel(object):
@@ -37,6 +37,7 @@ class _Panel(object):
     def __init__(self, df: DataFrame):
         self._items = df.columns
         index = df.index
+        assert isinstance(index, MultiIndex)
         self._major_axis = Index(index.levels[1][get_codes(index)[1]]).unique()
         self._minor_axis = Index(index.levels[0][get_codes(index)[0]]).unique()
         self._full_index = MultiIndex.from_product([self._minor_axis, self._major_axis])
@@ -153,7 +154,7 @@ class PanelData(object):
 
     def __init__(
         self,
-        x: ArrayLike,
+        x: "PanelDataLike",
         var_name: str = "x",
         convert_dummies: bool = True,
         drop_first: bool = True,
@@ -193,22 +194,19 @@ class PanelData(object):
             raise ValueError("Series can only be used with a 2-level MultiIndex")
 
         if isinstance(x, DataFrame):
-            if isinstance(x, DataFrame):
-                if isinstance(x.index, MultiIndex):
-                    if len(x.index.levels) != 2:
-                        raise ValueError(
-                            "DataFrame input must have a " "MultiIndex with 2 levels"
-                        )
-                    if isinstance(self._original, (DataFrame, PanelData, Series)):
-                        for i in range(2):
-                            index_names[i] = x.index.levels[i].name or index_names[i]
-                    self._frame = x
-                    if copy:
-                        self._frame = self._frame.copy()
-                else:
-                    self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
+            if isinstance(x.index, MultiIndex):
+                if len(x.index.levels) != 2:
+                    raise ValueError(
+                        "DataFrame input must have a " "MultiIndex with 2 levels"
+                    )
+                if isinstance(self._original, (DataFrame, PanelData, Series)):
+                    for i in range(2):
+                        index_names[i] = x.index.levels[i].name or index_names[i]
+                self._frame = x
+                if copy:
+                    self._frame = self._frame.copy()
             else:
-                self._frame = x.swapaxes(1, 2).to_frame(filter_observations=False)
+                self._frame = DataFrame({var_name: x.T.stack(dropna=False)})
         elif isinstance(x, np.ndarray):
             if x.ndim not in (2, 3):
                 raise ValueError("2 or 3-d array required for numpy input")
@@ -221,6 +219,7 @@ class PanelData(object):
             entity_str = "entity.{0:0>" + str(int(np.log10(n) + 0.01)) + "}"
             entities = [entity_str.format(i) for i in range(n)]
             time = list(range(t))
+            assert isinstance(x, np.ndarray)
             x = x.astype(np.float64, copy=False)
             panel = _Panel.from_array(
                 x, items=variables, major_axis=time, minor_axis=entities
@@ -233,7 +232,7 @@ class PanelData(object):
             self._frame = expand_categoricals(self._frame, drop_first)
             self._frame = self._frame.astype(np.float64, copy=False)
 
-        time_index = Series(self._frame.index.levels[1])
+        time_index = Series(self.index.levels[1])
         if not (
             is_numeric_dtype(time_index.dtype)
             or is_datetime64_any_dtype(time_index.dtype)
@@ -328,13 +327,13 @@ class PanelData(object):
     @property
     def time(self) -> List[Label]:
         """List of time index names"""
-        index = self._frame.index
+        index = self.index
         return list(index.levels[1][get_codes(index)[1]].unique())
 
     @property
     def entities(self) -> List[Label]:
         """List of entity index names"""
-        index = self._frame.index
+        index = self.index
         return list(index.levels[0][get_codes(index)[0]].unique())
 
     @property
@@ -347,7 +346,8 @@ class PanelData(object):
         ndarray
             2d array containing entity ids corresponding dataframe view
         """
-        return np.asarray(get_codes(self._frame.index)[0])[:, None]
+        index = self.index
+        return np.asarray(get_codes(index)[0])[:, None]
 
     @property
     def time_ids(self) -> NDArray:
@@ -359,7 +359,8 @@ class PanelData(object):
         ndarray
             2d array containing time ids corresponding dataframe view
         """
-        return np.asarray(get_codes(self._frame.index)[1])[:, None]
+        index = self.index
+        return np.asarray(get_codes(index)[1])[:, None]
 
     def _demean_both_low_mem(self, weights: Optional["PanelData"]) -> "PanelData":
         groups = PanelData(
@@ -396,7 +397,7 @@ class PanelData(object):
         return PanelData(resid)
 
     def general_demean(
-        self, groups: "PanelData", weights: Optional["PanelData"] = None
+        self, groups: "PanelDataLike", weights: Optional["PanelData"] = None
     ) -> "PanelData":
         """
         Multi-way demeaning using only groupby
@@ -587,7 +588,9 @@ class PanelData(object):
     @property
     def index(self) -> MultiIndex:
         """Return the index of the multi-index dataframe view"""
-        return self._frame.index
+        index = self._frame.index
+        assert isinstance(index, MultiIndex)
+        return index
 
     def copy(self) -> "PanelData":
         """Return a deep copy"""
@@ -687,12 +690,12 @@ class PanelData(object):
         if group not in ("entity", "time"):
             raise ValueError
         axis = 0 if group == "entity" else 1
-        labels = get_codes(self._frame.index)
-        levels = self._frame.index.levels
+        labels = get_codes(self.index)
+        levels = self.index.levels
         cat = Categorical(levels[axis][labels[axis]])
         dummies = get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == "entity" else self.time
         return dummies[[c for c in cols if c in dummies]].astype(np.float64, copy=False)
 
 
-PanelLike = Union[PanelData, ArrayLike]
+PanelDataLike = Union[PanelData, ArrayLike]

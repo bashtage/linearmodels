@@ -33,12 +33,12 @@ def data(request):
     model, vcv, weights, missing = request.param.split("-")
     y_vars = ["y"]
     x_vars = ["x1", "x2", "x3", "x4", "x5"]
-    vars = y_vars + x_vars
+    variables = y_vars + x_vars
     if missing:
-        for i, v in enumerate(vars):
-            vars[i] = v + missing
-        y_vars = vars[:1]
-        x_vars = vars[1:]
+        for i, v in enumerate(variables):
+            variables[i] = v + missing
+        y_vars = variables[:1]
+        x_vars = variables[1:]
     y = sim_data[y_vars]
     x = sim_data[["intercept"] + x_vars]
     mod = MODELS[model]

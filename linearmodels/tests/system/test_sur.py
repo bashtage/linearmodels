@@ -473,8 +473,8 @@ def test_contrains_reset(data):
     q = Series([0, 1], index=r.index)
     mod.add_constraints(r, q)
     cons = mod.constraints
-    assert_allclose(cons.r.values, r.values)
-    assert_allclose(cons.q.values, q.values)
+    assert_allclose(np.asarray(cons.r), np.asarray(r))
+    assert_allclose(np.asarray(cons.q), np.asarray(q))
     mod.reset_constraints()
     cons = mod.constraints
     assert cons is None
@@ -614,10 +614,10 @@ def test_restricted_f_statistic():
 
 def test_model_repr(data):
     mod = SUR(data)
-    repr = mod.__repr__()
-    assert str(len(data)) in repr
-    assert str(hex(id(mod))) in repr
-    assert "Seemingly Unrelated Regression (SUR)" in repr
+    mod_repr = mod.__repr__()
+    assert str(len(data)) in mod_repr
+    assert str(hex(id(mod))) in mod_repr
+    assert "Seemingly Unrelated Regression (SUR)" in mod_repr
 
 
 @pytest.mark.smoke

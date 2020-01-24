@@ -139,7 +139,9 @@ class IVData(object):
                 raise TypeError(type_err)
             if isinstance(x, xr.DataArray):
                 if x.ndim == 1:
-                    x = xr.concat([x], dim=var_name).transpose()
+                    x = xr.concat([x], dim=var_name)
+                    assert isinstance(x, xr.DataArray)
+                    x = x.transpose()
 
                 index = list(x.coords[x.dims[0]].values)
                 xr_cols = x.coords[x.dims[1]].values

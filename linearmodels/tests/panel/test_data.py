@@ -778,7 +778,7 @@ def test_original_unmodified(data):
     pre_w = data.w.copy()
     mod = PanelOLS(data.y, data.x, weights=data.w)
     mod.fit(debiased=True)
-    if isinstance(data.y, (DataFrame)):
+    if isinstance(data.y, DataFrame):
         for after, before in ((data.y, pre_y), (data.x, pre_x), (data.w, pre_w)):
             assert_frame_equal(before, after)
 
@@ -831,10 +831,10 @@ def test_incorrect_time_axis_xarray():
     x = np.random.randn(3, 3, 1000)
     entities = ["entity.{0}".format(i) for i in range(1000)]
     time = ["time.{0}".format(i) for i in range(3)]
-    vars = ["x.{0}".format(i) for i in range(3)]
+    variables = ["x.{0}".format(i) for i in range(3)]
     da = xr.DataArray(
         x,
-        coords={"entities": entities, "time": time, "vars": vars},
+        coords={"entities": entities, "time": time, "vars": variables},
         dims=["vars", "time", "entities"],
     )
     with pytest.raises(ValueError):
@@ -842,7 +842,7 @@ def test_incorrect_time_axis_xarray():
 
     da = xr.DataArray(
         x,
-        coords={"entities": entities, "time": time, "vars": vars},
+        coords={"entities": entities, "time": time, "vars": variables},
         dims=["vars", "time", "entities"],
     )
     with pytest.raises(ValueError):

@@ -122,7 +122,7 @@ def generate_data(
     factor_density=10,
     nobs=2000,
     cont_interactions=1,
-    format="interaction",
+    factor_format="interaction",
     singleton_interaction=False,
     weighted=False,
     ncont=0,
@@ -148,7 +148,7 @@ def generate_data(
 
     if factors:
         factors = pd.concat(factors, 1)
-        if format == "interaction":
+        if factor_format == "interaction":
             if nfactors and ncont:
                 factors = Interaction(
                     factors.iloc[:, :nfactors], factors.iloc[:, nfactors:]
@@ -163,7 +163,7 @@ def generate_data(
     interactions = []
     for i in range(cont_interactions):
         ncat = nobs // density[min(i, len(density) - 1)]
-        fact = rs.randint(ncat, size=(nobs))
+        fact = rs.randint(ncat, size=nobs)
         effects = rs.standard_normal(nobs)
         y += effects
         df = pd.DataFrame(
@@ -171,7 +171,7 @@ def generate_data(
         )
         df_eff = pd.DataFrame(effects[:, None], columns=["effect_{0}".format(i)])
         interactions.append(Interaction(df, df_eff))
-    if format == "pandas":
+    if factor_format == "pandas":
         for i, interact in enumerate(interactions):
             interactions[i] = pd.concat([interact.cat, interact.cont], 1)
     interactions = interactions if interactions else None
@@ -505,7 +505,10 @@ def test_against_ols(ols_data):
     if ols_data.absorb is not None:
         absorb.append(to_numpy(ols_data.absorb.cont))
         if ols_data.absorb.cat.shape[1] > 0:
-            absorb.append(dummy_matrix(ols_data.absorb.cat, precondition=False)[0].A)
+            dummies: sp.csc_matrix = dummy_matrix(
+                ols_data.absorb.cat, precondition=False
+            )[0]
+            absorb.append(dummies.A)
         has_dummy = ols_data.absorb.cat.shape[1] > 0
     if ols_data.interactions is not None:
         for interact in ols_data.interactions:
@@ -535,7 +538,9 @@ def test_against_ols(ols_data):
 
 
 def test_cache():
-    gen = generate_data(2, True, 2, format="pandas", ncont=0, cont_interactions=1)
+    gen = generate_data(
+        2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
+    )
     first = len(_VARIABLE_CACHE)
     mod = AbsorbingLS(
         gen.y, gen.x, absorb=gen.absorb.iloc[:, :1], interactions=gen.interactions
@@ -554,7 +559,9 @@ def test_cache():
 
 
 def test_instrments():
-    gen = generate_data(2, True, 2, format="pandas", ncont=0, cont_interactions=1)
+    gen = generate_data(
+        2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
+    )
     mod = AbsorbingLS(
         gen.y, gen.x, absorb=gen.absorb.iloc[:, :1], interactions=gen.interactions
     )
@@ -608,20 +615,26 @@ def assert_results_equal(
 
 
 def test_center_cov_arg():
-    gen = generate_data(2, True, 2, format="pandas", ncont=0, cont_interactions=1)
+    gen = generate_data(
+        2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
+    )
     mod = AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
     res = mod.fit(center=True)
     assert "center" not in res.cov_config
 
 
 def test_drop_missing():
-    gen = generate_data(2, True, 2, format="pandas", ncont=0, cont_interactions=1)
+    gen = generate_data(
+        2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
+    )
     gen.y[::53] = np.nan
     gen.x[::79] = np.nan
     with pytest.warns(MissingValueWarning):
         AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
 
-    gen = generate_data(2, True, 2, format="pandas", ncont=0, cont_interactions=1)
+    gen = generate_data(
+        2, True, 2, factor_format="pandas", ncont=0, cont_interactions=1
+    )
     for col in gen.absorb:
         gen.absorb[col] = gen.absorb[col].astype("int64").astype("object")
         col_iloc = gen.absorb.columns.get_loc(col)

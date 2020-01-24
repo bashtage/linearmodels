@@ -178,8 +178,8 @@ def test_weight_ambiguity(data):
     if isinstance(data.x, pd.DataFrame):
         t = len(data.y.index.levels[1])
         entities = data.x.index.levels[0]
-        slice = pd.IndexSlice[entities[0] : entities[t - 1]]
-        x = data.x.loc[slice, :]
+        index_slice = pd.IndexSlice[entities[0] : entities[t - 1]]
+        x = data.x.loc[index_slice, :]
     else:
         t = data.x.shape[1]
         x = data.x[:, :, :t]

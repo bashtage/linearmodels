@@ -158,7 +158,7 @@ def test_linear_constraint_repr():
     assert np.all(lc.q == 0)
     assert lc.q.shape == (10,)
     assert isinstance(lc.r, pd.DataFrame)
-    assert np.all(lc.r.values == np.eye(10))
+    assert np.all(np.asarray(lc.r) == np.eye(10))
 
 
 def test_blocked_full_inner_product():

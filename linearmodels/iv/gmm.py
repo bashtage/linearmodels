@@ -396,7 +396,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         w: NDArray,
         cov_type: str = "robust",
         debiased: bool = False,
-        **cov_config: Dict[str, Union[str, bool]],
+        **cov_config: Union[str, bool],
     ) -> None:
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type

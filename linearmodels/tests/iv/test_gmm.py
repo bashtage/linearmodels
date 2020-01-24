@@ -175,8 +175,8 @@ class TestClusterWeight(object):
         s = np.zeros((ze.shape[1], ze.shape[1]))
         for val in uc:
             obs = ze[data.clusters == val]
-            sum = obs.sum(0)[:, None]
-            s += sum @ sum.T
+            total = obs.sum(0)[:, None]
+            s += total @ total.T
         assert_allclose(weight, s / data.nobs)
 
     def test_debiased(self, data):
@@ -187,8 +187,8 @@ class TestClusterWeight(object):
         s = np.zeros((ze.shape[1], ze.shape[1]))
         for val in uc:
             obs = ze[data.clusters == val]
-            sum = obs.sum(0)[:, None]
-            s += sum @ sum.T
+            total = obs.sum(0)[:, None]
+            s += total @ total.T
         nobs, nvar = data.nobs, data.nvar
         groups = len(uc)
         scale = (nobs - 1) / (nobs - nvar) * groups / (groups - 1)

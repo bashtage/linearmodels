@@ -76,10 +76,10 @@ with open(os.path.join(base, "stata-3sls-results.txt"), "r") as stata_results:
     stata_result_contents = stata_results.readlines()
 block: List[str] = []
 results = {}
-key = None
+key = ""
 for line in stata_result_contents:
     if "!!!!" in line:
-        if key is not None:
+        if key:
             results[key] = process_block(block)
 
         key = line.replace("!", "").strip()

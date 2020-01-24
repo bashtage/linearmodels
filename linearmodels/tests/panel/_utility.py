@@ -140,7 +140,7 @@ def generate_data(
         vc2 = vc2.reindex(y.index)
 
     if datatype == "xarray":
-        # TODO: This is broken now, need to transfor multiindex to xarray 3d
+        # TODO: This is broken now, need to transform MultiIndex to xarray 3d
         import xarray as xr
 
         x = xr.DataArray(
