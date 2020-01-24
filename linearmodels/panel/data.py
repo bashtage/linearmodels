@@ -1,10 +1,10 @@
-from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import concat, get_codes, is_string_like
 
 from itertools import product
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
+from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from pandas.api.types import (
     is_categorical,
@@ -16,7 +16,7 @@ from pandas.api.types import (
 from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
 from linearmodels.utility import ensure_unique_column, panel_to_frame
 
-__all__ = ["PanelData"]
+__all__ = ["PanelData", "PanelLike"]
 
 
 class _Panel(object):
@@ -179,9 +179,9 @@ class PanelData(object):
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items = x.coords[x.dims[0]].values.tolist()
-                        major = x.coords[x.dims[1]].values.tolist()
-                        minor = x.coords[x.dims[2]].values.tolist()
+                        items: List[Hashable] = x.coords[x.dims[0]].values.tolist()
+                        major: List[Hashable] = x.coords[x.dims[1]].values.tolist()
+                        minor: List[Hashable] = x.coords[x.dims[2]].values.tolist()
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
@@ -303,7 +303,7 @@ class PanelData(object):
     @property
     def isnull(self) -> Series:
         """Locations with missing observations"""
-        return np.any(self._frame.isnull(), axis=1)
+        return self._frame.isnull().any(axis=1)
 
     @property
     def nobs(self) -> int:
@@ -390,7 +390,7 @@ class PanelData(object):
         d = PanelData(d).demean(group, weights=weights)
         d = d.values2d
         e = e.values2d
-        resid = e - d @ lstsq(d, e)[0]
+        resid = e - d @ lstsq(d, e, rcond=None)[0]
         resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
 
         return PanelData(resid)
@@ -585,7 +585,7 @@ class PanelData(object):
         return out.reindex(reindex)
 
     @property
-    def index(self) -> Index:
+    def index(self) -> MultiIndex:
         """Return the index of the multi-index dataframe view"""
         return self._frame.index
 
@@ -693,3 +693,6 @@ class PanelData(object):
         dummies = get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == "entity" else self.time
         return dummies[[c for c in cols if c in dummies]].astype(np.float64, copy=False)
+
+
+PanelLike = Union[PanelData, ArrayLike]

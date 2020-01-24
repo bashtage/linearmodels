@@ -12,5 +12,6 @@ try:
 except ImportError:
     ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]  # type: ignore
 
+
 OptionalArrayLike = Optional[ArrayLike]
 OptionalDataFrame = Optional[pd.DataFrame]

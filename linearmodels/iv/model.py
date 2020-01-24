@@ -29,7 +29,7 @@ from linearmodels.iv.covariance import (
     HomoskedasticCovariance,
     KernelCovariance,
 )
-from linearmodels.iv.data import IVData
+from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.iv.gmm import (
     HeteroskedasticWeightMatrix,
     HomoskedasticWeightMatrix,
@@ -38,8 +38,7 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.typing import NDArray, Numeric, OptionalNumeric
-from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+from linearmodels.typing import ArrayLike, NDArray, Numeric, OptionalNumeric
 from linearmodels.utility import (
     InvalidTestStatistic,
     WaldTestStatistic,
@@ -154,12 +153,12 @@ class IVLIML(object):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike,
-        endog: OptionalArrayLike,
-        instruments: OptionalArrayLike,
+        dependent: IVDataLike,
+        exog: Optional[IVDataLike],
+        endog: Optional[IVDataLike],
+        instruments: Optional[IVDataLike],
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         fuller: Numeric = 0,
         kappa: OptionalNumeric = None,
     ):
@@ -235,7 +234,7 @@ class IVLIML(object):
         formula: str,
         data: DataFrame,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         fuller: float = 0,
         kappa: OptionalNumeric = None,
     ) -> "IVLIML":
@@ -294,8 +293,8 @@ class IVLIML(object):
         self,
         params: ArrayLike,
         *,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
+        exog: Optional[IVDataLike] = None,
+        endog: Optional[IVDataLike] = None,
         data: DataFrame = None,
         eval_env: int = 4,
     ) -> DataFrame:
@@ -678,12 +677,12 @@ class IV2SLS(IVLIML):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike,
-        endog: OptionalArrayLike,
-        instruments: OptionalArrayLike,
+        dependent: IVDataLike,
+        exog: Optional[IVDataLike],
+        endog: Optional[IVDataLike],
+        instruments: Optional[IVDataLike],
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
     ):
         self._method = "IV-2SLS"
         super(IV2SLS, self).__init__(
@@ -692,7 +691,7 @@ class IV2SLS(IVLIML):
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        formula: str, data: DataFrame, *, weights: Optional[IVDataLike] = None
     ) -> "IV2SLS":
         """
         Parameters
@@ -791,12 +790,12 @@ class IVGMM(IVLIML):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike,
-        endog: OptionalArrayLike,
-        instruments: OptionalArrayLike,
+        dependent: IVDataLike,
+        exog: Optional[IVDataLike],
+        endog: Optional[IVDataLike],
+        instruments: Optional[IVDataLike],
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ):
@@ -819,7 +818,7 @@ class IVGMM(IVLIML):
         formula: str,
         data: DataFrame,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> "IVGMM":
@@ -1074,12 +1073,12 @@ class IVGMMCUE(IVGMM):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike,
-        endog: OptionalArrayLike,
-        instruments: OptionalArrayLike,
+        dependent: IVDataLike,
+        exog: Optional[IVDataLike],
+        endog: Optional[IVDataLike],
+        instruments: Optional[IVDataLike],
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> None:
@@ -1101,7 +1100,7 @@ class IVGMMCUE(IVGMM):
         formula: str,
         data: DataFrame,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> "IVGMMCUE":
@@ -1366,10 +1365,10 @@ class _OLS(IVLIML):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike,
+        dependent: IVDataLike,
+        exog: IVDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[IVDataLike] = None,
     ):
         super(_OLS, self).__init__(
             dependent, exog, None, None, weights=weights, kappa=0.0
@@ -1381,7 +1380,7 @@ def _gmm_model_from_formula(
     cls: Union[Type[IVGMM], Type[IVGMMCUE]],
     formula: str,
     data: DataFrame,
-    weights: OptionalArrayLike,
+    weights: Optional[IVDataLike],
     weight_type: str,
     **weight_config: Any,
 ) -> Union[IVGMM, IVGMMCUE]:

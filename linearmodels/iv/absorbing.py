@@ -1,4 +1,3 @@
-from linearmodels.compat.numpy import lstsq
 from linearmodels.compat.pandas import get_codes, to_numpy
 
 from collections import defaultdict
@@ -37,6 +36,7 @@ from numpy import (
     where,
     zeros,
 )
+from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Series
 from pandas.api.types import is_categorical
 import scipy.sparse as sp
@@ -272,7 +272,7 @@ class Interaction(object):
     >>> from linearmodels.iv.absorbing import Interaction
     >>> rs = np.random.RandomState(0)
     >>> n = 100000
-    >>> cats = rs.randint(2,size=n)  # binary dummy
+    >>> cats = rs.randint(2, size=n)  # binary dummy
     >>> cont = rs.standard_normal((n, 3))
     >>> interact = Interaction(cats, cont)
     >>> interact.sparse.shape  # Get the shape of the dummy matrix
@@ -280,9 +280,9 @@ class Interaction(object):
 
     >>> rs = np.random.RandomState(0)
     >>> import pandas as pd
-    >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(5,size=n)))
-    ...                  for _ in range(4)],1)
-    >>> cats.describe()
+    >>> cats_df = pd.concat([pd.Series(pd.Categorical(rs.randint(5,size=n)))
+    ...                     for _ in range(4)],1)
+    >>> cats_df.describe()
                  0       1       2       3
     count   100000  100000  100000  100000
     unique       5       5       5       5
@@ -948,7 +948,7 @@ class AbsorbingLS(object):
         else:
             if exog_resid.shape[1]:
                 check_absorbed(exog_resid, self.exog.cols)
-            params = lstsq(exog_resid, dep_resid)[0]
+            params = lstsq(exog_resid, dep_resid, rcond=None)[0]
             self._num_params += exog_resid.shape[1]
 
         cov_estimator = COVARIANCE_ESTIMATORS[cov_type]
@@ -1061,7 +1061,7 @@ class AbsorbingLS(object):
         if self._const_col is not None:
             col = self._const_col
             x = to_numpy(self._absorbed_exog)[:, col : col + 1]
-            mu = (lstsq(x, to_numpy(e))[0]).squeeze()
+            mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu
 
         aborbed_total_ss = float(e.T @ e)

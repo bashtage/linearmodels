@@ -11,15 +11,13 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
-from linearmodels.compat.numpy import lstsq
-
 from collections import abc
 from functools import reduce
 import textwrap
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy as np
-from numpy.linalg import inv, matrix_rank, solve
+from numpy.linalg import inv, lstsq, matrix_rank, solve
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -840,7 +838,7 @@ class IV3SLS(object):
                 self._xhat.append(x)
                 self._wxhat.append(self._wx[i])
             else:
-                delta = lstsq(z, x)[0]
+                delta = lstsq(z, x, rcond=None)[0]
                 xhat = z @ delta
                 self._xhat.append(xhat)
                 w = self._w[i]
@@ -920,7 +918,7 @@ class IV3SLS(object):
             cons = bool(self.has_constant.iloc[i])
             if cons:
                 wc = np.ones_like(wy) * np.sqrt(w)
-                wye = wy - wc @ lstsq(wc, wy)[0]
+                wye = wy - wc @ lstsq(wc, wy, rcond=None)[0]
             total_ss = float(wye.T @ wye)
             stats = self._common_indiv_results(
                 i,
@@ -1119,7 +1117,9 @@ class IV3SLS(object):
         resid: NDArray,
         method: str,
         cov_type: str,
-        cov_est: NDArray,
+        cov_est: Union[
+            HomoskedasticCovariance, HeteroskedasticCovariance, KernelCovariance
+        ],
         iter_count: int,
         debiased: bool,
         constant: bool,
@@ -1251,7 +1251,7 @@ class IV3SLS(object):
         eps: NDArray,
         sigma: NDArray,
         method: str,
-        full_cov: NDArray,
+        full_cov: bool,
         debiased: bool,
         r2s: Sequence[float],
     ) -> Series:
@@ -1314,7 +1314,7 @@ class IV3SLS(object):
         est_sigma: NDArray,
         gls_eps: NDArray,
         eps: NDArray,
-        full_cov: NDArray,
+        full_cov: bool,
         cov_type: str,
         iter_count: int,
         **cov_config: bool,
@@ -1346,7 +1346,7 @@ class IV3SLS(object):
 
             if cons:
                 c = np.sqrt(self._w[i])
-                ye = self._wy[i] - c @ lstsq(c, self._wy[i])[0]
+                ye = self._wy[i] - c @ lstsq(c, self._wy[i], rcond=None)[0]
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
@@ -1933,7 +1933,7 @@ class IVSystemGMM(IV3SLS):
 
             if cons:
                 c = np.sqrt(self._w[i])
-                ye = self._wy[i] - c @ lstsq(c, self._wy[i])[0]
+                ye = self._wy[i] - c @ lstsq(c, self._wy[i], rcond=None)[0]
             else:
                 ye = self._wy[i]
             total_ss = float(ye.T @ ye)
@@ -1983,7 +1983,7 @@ class IVSystemGMM(IV3SLS):
     @classmethod
     def from_formula(
         cls,
-        formula: str,
+        formula: Union[str, Dict[str, str]],
         data: DataFrame,
         *,
         weights: Optional[Dict[str, ArrayLike]] = None,

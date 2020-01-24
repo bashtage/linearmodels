@@ -1,6 +1,5 @@
-from linearmodels.compat.numpy import lstsq
-
 import numpy as np
+from numpy.linalg import lstsq
 import pandas as pd
 
 from linearmodels.utility import AttrDict
@@ -158,7 +157,7 @@ def simple_sur(y, x):
     b = []
     eps = []
     for i in range(k):
-        b.append(lstsq(x[i], y[i])[0])
+        b.append(lstsq(x[i], y[i], rcond=None)[0])
         eps.append(y[i] - x[i] @ b[-1])
     b = np.vstack(b)
     out["beta0"] = b
@@ -197,8 +196,8 @@ def simple_3sls(y, x, z):
     eps = []
     xhat = []
     for i in range(k):
-        xhat.append(z[i] @ lstsq(z[i], x[i])[0])
-        b.append(lstsq(xhat[i], y[i])[0])
+        xhat.append(z[i] @ lstsq(z[i], x[i], rcond=None)[0])
+        b.append(lstsq(xhat[i], y[i], rcond=None)[0])
         eps.append(y[i] - x[i] @ b[-1])
     b = np.vstack(b)
     out["beta0"] = b

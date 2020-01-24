@@ -109,7 +109,7 @@ def dummy_matrix(
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
-) -> Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, NDArray]:
+) -> Tuple[Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, NDArray], NDArray]:
     """
     Parameters
     ----------
