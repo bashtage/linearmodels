@@ -704,6 +704,7 @@ devel/_sources/system/system/linearmodels.system.model.IV3SLS.fit.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.formula.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.from_formula.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.has_constant.rst.txt
+devel/_sources/system/system/linearmodels.system.model.IV3SLS.multivariate_iv.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.multivariate_ls.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.param_names.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IV3SLS.predict.rst.txt
@@ -715,7 +716,6 @@ devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.fit.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.formula.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.from_formula.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.has_constant.rst.txt
-devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.multivariate_ls.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.param_names.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.predict.rst.txt
 devel/_sources/system/system/linearmodels.system.model.IVSystemGMM.reset_constraints.rst.txt
@@ -1576,6 +1576,7 @@ devel/system/system/linearmodels.system.model.IV3SLS.formula.html
 devel/system/system/linearmodels.system.model.IV3SLS.from_formula.html
 devel/system/system/linearmodels.system.model.IV3SLS.has_constant.html
 devel/system/system/linearmodels.system.model.IV3SLS.html
+devel/system/system/linearmodels.system.model.IV3SLS.multivariate_iv.html
 devel/system/system/linearmodels.system.model.IV3SLS.multivariate_ls.html
 devel/system/system/linearmodels.system.model.IV3SLS.param_names.html
 devel/system/system/linearmodels.system.model.IV3SLS.predict.html
@@ -1587,7 +1588,6 @@ devel/system/system/linearmodels.system.model.IVSystemGMM.formula.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.from_formula.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.has_constant.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.html
-devel/system/system/linearmodels.system.model.IVSystemGMM.multivariate_ls.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.param_names.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.predict.html
 devel/system/system/linearmodels.system.model.IVSystemGMM.reset_constraints.html

@@ -16,7 +16,6 @@ linearmodels.system.model.IVSystemGMM
       ~IVSystemGMM.add_constraints
       ~IVSystemGMM.fit
       ~IVSystemGMM.from_formula
-      ~IVSystemGMM.multivariate_ls
       ~IVSystemGMM.predict
       ~IVSystemGMM.reset_constraints
    
