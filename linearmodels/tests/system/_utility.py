@@ -236,7 +236,6 @@ def simple_3sls(y, x, z):
 
     eps = np.hstack(eps)
     nobs = eps.shape[0]
-    sigma = eps.T @ eps / nobs
     out["eps"] = eps
     out["cov"] = np.linalg.inv(bx.T @ omegainv @ bx)
 

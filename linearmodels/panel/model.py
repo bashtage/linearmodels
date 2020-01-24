@@ -21,7 +21,7 @@ from linearmodels.panel.covariance import (
     HomoskedasticCovariance,
     setup_covariance_estimator,
 )
-from linearmodels.panel.data import PanelData
+from linearmodels.panel.data import PanelData, PanelDataLike
 from linearmodels.panel.results import (
     FamaMacBethResults,
     PanelEffectsResults,
@@ -36,7 +36,7 @@ from linearmodels.panel.utility import (
     in_2core_graph,
     not_absorbed,
 )
-from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
+from linearmodels.typing import ArrayLike, NDArray
 from linearmodels.utility import (
     AttrDict,
     InapplicableTestStatistic,
@@ -94,7 +94,7 @@ class PanelFormulaParser(object):
     The general structure of a formula is `dep ~ exog`
     """
 
-    def __init__(self, formula: str, data: DataFrame, eval_env: int = 2) -> None:
+    def __init__(self, formula: str, data: PanelDataLike, eval_env: int = 2) -> None:
         self._formula = formula
         self._data = PanelData(data, convert_dummies=False, copy=False)
         self._na_action = NAAction(on_NA="raise", NA_types=[])
@@ -218,10 +218,10 @@ class _PanelModelBase(object):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ) -> None:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
@@ -242,7 +242,7 @@ class _PanelModelBase(object):
         )
         self._original_index = self.dependent.index.copy()
         self._validate_data()
-        self._singleton_index = None
+        self._singleton_index: Optional[NDArray] = None
 
     def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
@@ -255,7 +255,7 @@ class _PanelModelBase(object):
     def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
-    def reformat_clusters(self, clusters: ArrayLike) -> PanelData:
+    def reformat_clusters(self, clusters: PanelDataLike) -> PanelData:
         """
         Reformat cluster variables
 
@@ -296,7 +296,7 @@ class _PanelModelBase(object):
 
         return entity_info, time_info, other_info
 
-    def _adapt_weights(self, weights: OptionalArrayLike) -> PanelData:
+    def _adapt_weights(self, weights: Optional[PanelDataLike]) -> PanelData:
         """Check and transform weights depending on size"""
         if weights is None:
             self._is_weighted = False
@@ -588,7 +588,7 @@ class _PanelModelBase(object):
         return self._not_null
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
     ) -> Dict[str, Union[bool, float, str, NDArray]]:
 
         cov_config_upd = cov_config.copy()
@@ -640,8 +640,8 @@ class _PanelModelBase(object):
         self,
         params: ArrayLike,
         *,
-        exog: OptionalArrayLike = None,
-        data: Optional[DataFrame] = None,
+        exog: Optional[PanelDataLike] = None,
+        data: Optional[PanelDataLike] = None,
         eval_env: int = 4,
     ) -> DataFrame:
         """
@@ -724,16 +724,20 @@ class PooledOLS(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ) -> None:
         super().__init__(dependent, exog, weights=weights)
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        cls,
+        formula: str,
+        data: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
     ) -> "PooledOLS":
         """
         Create a model from a formula
@@ -901,7 +905,7 @@ class PooledOLS(_PanelModelBase):
         self,
         params: ArrayLike,
         *,
-        exog: OptionalArrayLike = None,
+        exog: Optional[PanelDataLike] = None,
         data: Optional[DataFrame] = None,
         eval_env: int = 4,
     ) -> DataFrame:
@@ -1021,13 +1025,13 @@ class PanelOLS(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
         entity_effects: bool = False,
         time_effects: bool = False,
-        other_effects: OptionalArrayLike = None,
+        other_effects: Optional[PanelDataLike] = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
     ) -> None:
@@ -1100,7 +1104,7 @@ class PanelOLS(_PanelModelBase):
         out += additional
         return out
 
-    def _validate_effects(self, effects: OptionalArrayLike) -> bool:
+    def _validate_effects(self, effects: Optional[PanelDataLike]) -> bool:
         """Check model effects"""
         if effects is None:
             return False
@@ -1173,10 +1177,10 @@ class PanelOLS(_PanelModelBase):
     def from_formula(
         cls,
         formula: str,
-        data: DataFrame,
+        data: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
-        other_effects: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
+        other_effects: Optional[PanelDataLike] = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
     ) -> "PanelOLS":
@@ -1822,10 +1826,10 @@ class BetweenOLS(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ) -> None:
         super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
         self._cov_estimators = CovarianceManager(
@@ -1836,7 +1840,7 @@ class BetweenOLS(_PanelModelBase):
         )
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
     ) -> Dict[str, Union[bool, float, str, NDArray]]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = cov_config.copy()
@@ -1992,7 +1996,11 @@ class BetweenOLS(_PanelModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        cls,
+        formula: str,
+        data: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
     ) -> "BetweenOLS":
         """
         Create a model from a formula
@@ -2061,10 +2069,10 @@ class FirstDifferenceOLS(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ):
         super(FirstDifferenceOLS, self).__init__(dependent, exog, weights=weights)
         if self._constant:
@@ -2075,7 +2083,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             raise ValueError("Panel must have at least 2 time periods")
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, ArrayLike]]
+        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
     ) -> Dict[str, Union[bool, float, str, DataFrame]]:
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity")
@@ -2277,7 +2285,11 @@ class FirstDifferenceOLS(_PanelModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        cls,
+        formula: str,
+        data: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
     ) -> "FirstDifferenceOLS":
         """
         Create a model from a formula
@@ -2349,16 +2361,20 @@ class RandomEffects(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ) -> None:
         super().__init__(dependent, exog, weights=weights)
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        cls,
+        formula: str,
+        data: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
     ) -> "RandomEffects":
         """
         Create a model from a formula
@@ -2567,10 +2583,10 @@ class FamaMacBeth(_PanelModelBase):
 
     def __init__(
         self,
-        dependent: ArrayLike,
-        exog: ArrayLike,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
         *,
-        weights: OptionalArrayLike = None,
+        weights: Optional[PanelDataLike] = None,
     ):
         super(FamaMacBeth, self).__init__(dependent, exog, weights=weights)
         self._validate_blocks()
@@ -2758,7 +2774,11 @@ class FamaMacBeth(_PanelModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, weights: OptionalArrayLike = None
+        cls,
+        formula: str,
+        data: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
     ) -> "FamaMacBeth":
         """
         Create a model from a formula

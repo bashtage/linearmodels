@@ -978,10 +978,8 @@ class IVResults(_CommonIVResults):
     ) -> Tuple[ndarray, ndarray, ndarray, int, int, int, int]:
         """Setup function for some endogeneity iv"""
         if isinstance(variables, str):
-            variable_list = [variables]
-        elif isinstance(variables, list):
-            variable_list = variables
-        elif variables is not None:
+            variables = [variables]
+        elif variables is not None and not isinstance(variables, list):
             raise TypeError("variables must be a str or a list of str.")
 
         nobs = self.model.dependent.shape[0]
@@ -992,8 +990,9 @@ class IVResults(_CommonIVResults):
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
             still_endog = empty((nobs, 0))
         else:
-            assumed_exog = self.model.endog.pandas[variable_list].values
-            ex = [c for c in self.model.endog.cols if c not in variable_list]
+            assert isinstance(variables, list)
+            assumed_exog = self.model.endog.pandas[variables].values
+            ex = [c for c in self.model.endog.cols if c not in variables]
             still_endog = self.model.endog.pandas[ex].values
             aug_exog = c_[self.model.exog.ndarray, assumed_exog]
         ntested = assumed_exog.shape[1]

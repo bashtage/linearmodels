@@ -105,7 +105,7 @@ def preconditioner(
 def dummy_matrix(
     cats: ArrayLike,
     *,
-    format: str = "csc",
+    output_format: str = "csc",
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
@@ -116,7 +116,7 @@ def dummy_matrix(
     cats: {DataFrame, ndarray}
         Array containing the category codes of pandas categoricals
         (nobs, ncats)
-    format: {'csc', 'csr', 'coo', 'array'}
+    output_format: {'csc', 'csr', 'coo', 'array'}
         Output format. Default is csc (csc_matrix). Supported output
         formats are:
 
@@ -176,21 +176,21 @@ def dummy_matrix(
         data["cols"].append(cols)
         total_dummies += ncategories - (i > 0)
 
-    if format in ("csc", "array"):
+    if output_format in ("csc", "array"):
         fmt = sp.csc_matrix
-    elif format == "csr":
+    elif output_format == "csr":
         fmt = sp.csr_matrix
-    elif format == "coo":
+    elif output_format == "coo":
         fmt = sp.coo_matrix
     else:
-        raise ValueError("Unknown format: {0}".format(format))
+        raise ValueError("Unknown format: {0}".format(output_format))
     out = fmt(
         (
             np.concatenate(data["values"]),
             (np.concatenate(data["rows"]), np.concatenate(data["cols"])),
         )
     )
-    if format == "array":
+    if output_format == "array":
         out = out.toarray()
 
     if precondition:

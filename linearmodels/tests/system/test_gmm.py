@@ -22,12 +22,12 @@ params = list(product([1, 2], [True, False]))
 
 
 def gen_id(r):
-    id = "steps:{0}".format(r[0])
+    _id = "steps:{0}".format(r[0])
     if r[1]:
-        id += ",robust"
+        _id += ",robust"
     else:
-        id += ",unadjusted"
-    return id
+        _id += ",unadjusted"
+    return _id
 
 
 ids = list(map(gen_id, params))
@@ -203,7 +203,7 @@ def test_weight_options(data):
     assert np.all(np.diag(res.w) >= np.diag(base_res.w))
 
     mod = IVSystemGMM(data.eqns, weight_type="robust", debiased=True)
-    res = mod.fit(cov_type="robust")
+    mod.fit(cov_type="robust")
 
 
 @pytest.mark.smoke

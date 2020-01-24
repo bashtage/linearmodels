@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Type, Union
 
 import numpy as np
 from numpy.linalg import inv
-from pandas import DataFrame
+from pandas import DataFrame, MultiIndex
 from property_cached import cached_property
 
 from linearmodels.iv.covariance import (
@@ -232,11 +232,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs by 1 or nobs by 2 array of cluster group ids
     group_debias : bool, default None
         Flag indicating whether to apply small-number of groups adjustment.
-
-    Returns
-    -------
-    ndarray
-        Estimated parameter covariance
 
     Notes
     -----
@@ -576,8 +571,9 @@ class ACCovariance(HomoskedasticCovariance):
         index = [self._entity_ids.squeeze(), self._time_ids.squeeze()]
         xe = DataFrame(xe, index=index)
         xe = xe.sort_index(level=[0, 1])
-
-        entities = xe.index.levels[0]
+        xe_index = xe.index
+        assert isinstance(xe_index, MultiIndex)
+        entities = xe_index.levels[0]
         nentity = len(entities)
         xeex = np.zeros((xe.shape[1], xe.shape[1]))
         for entity in entities:

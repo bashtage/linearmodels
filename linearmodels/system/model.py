@@ -15,6 +15,7 @@ from collections import abc
 from functools import reduce
 import textwrap
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
+import warnings
 
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
@@ -93,8 +94,6 @@ def _missing_weights(weights: Dict[str, Optional[ArrayLike]]) -> None:
     """Raise warning if missing weighs found"""
     missing = [key for key in weights if weights[key] is None]
     if missing:
-        import warnings
-
         msg = "Weights not found for equation labels:\n{0}".format(", ".join(missing))
         warnings.warn(msg, UserWarning)
 
@@ -287,9 +286,9 @@ class SystemFormulaParser(object):
         return self._get_variable("instruments")
 
 
-class IV3SLS(object):
+class _SystemModelBase(object):
     r"""
-    Three-stage Least Squares (3SLS) Estimator
+    Base class for system estimators
 
     Parameters
     ----------
@@ -311,64 +310,6 @@ class IV3SLS(object):
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
-
-    Notes
-    -----
-    Estimates a set of regressions which are seemingly unrelated in the sense
-    that separate estimation would lead to consistent parameter estimates.
-    Each equation is of the form
-
-    .. math::
-
-        y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}
-
-    where k denotes the equation and i denoted the observation index. By
-    stacking vertically arrays of dependent and placing the exogenous
-    variables into a block diagonal array, the entire system can be compactly
-    expressed as
-
-    .. math::
-
-        Y = X\beta + \epsilon
-
-    where
-
-    .. math::
-
-        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
-
-    and
-
-    .. math::
-
-        X = \left[\begin{array}{cccc}
-                 X_1 & 0 & \ldots & 0 \\
-                 0 & X_2 & \dots & 0 \\
-                 \vdots & \vdots & \ddots & \vdots \\
-                 0 & 0 & \dots & X_K
-            \end{array}\right]
-
-    The system instrumental variable (IV) estimator is
-
-    .. math::
-
-        \hat{\beta}_{IV} & = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
-                         & = (\hat{X}'\hat{X})^{-1}\hat{X}'Y
-
-    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X` and.  When certain conditions are
-    satisfied, a GLS estimator of the form
-
-    .. math::
-
-        \hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y
-
-    can improve accuracy of coefficient estimates where
-
-    .. math::
-
-        \Omega = \Sigma \otimes I_N
-
-    where :math:`\Sigma` is the covariance matrix of the residuals.
     """
 
     def __init__(
@@ -691,120 +632,6 @@ class IV3SLS(object):
         )
         return out
 
-    def fit(
-        self,
-        *,
-        method: Optional[str] = None,
-        full_cov: bool = True,
-        iterate: bool = False,
-        iter_limit: int = 100,
-        tol: float = 1e-6,
-        cov_type: str = "robust",
-        **cov_config: bool,
-    ) -> SystemResults:
-        """
-        Estimate model parameters
-
-        Parameters
-        ----------
-        method : {None, 'gls', 'ols'}
-            Estimation method.  Default auto selects based on regressors,
-            using OLS only if all regressors are identical. The other two
-            arguments force the use of GLS or OLS.
-        full_cov : bool
-            Flag indicating whether to utilize information in correlations
-            when estimating the model with GLS
-        iterate : bool
-            Flag indicating to iterate GLS until convergence of iter limit
-            iterations have been completed
-        iter_limit : int
-            Maximum number of iterations for iterative GLS
-        tol : float
-            Tolerance to use when checking for convergence in iterative GLS
-        cov_type : str
-            Name of covariance estimator. Valid options are
-
-            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
-            * 'robust', 'heteroskedastic' - Heteroskedasticity robust
-              covariance estimator
-            * 'kernel' - Allows for heteroskedasticity and autocorrelation
-
-        **cov_config
-            Additional parameters to pass to covariance estimator. All
-            estimators support debiased which employs a small-sample adjustment
-
-        Returns
-        -------
-        results : SystemResults
-            Estimation results
-
-        See Also
-        --------
-        linearmodels.system.covariance.HomoskedasticCovariance
-        linearmodels.system.covariance.HeteroskedasticCovariance
-        linearmodels.system.covariance.KernelCovariance
-        """
-        if method is None:
-            method = (
-                "ols" if (self._common_exog and self._constraints is None) else "gls"
-            )
-
-        cov_type = cov_type.lower()
-        if cov_type not in COV_TYPES:
-            raise ValueError("Unknown cov_type: {0}".format(cov_type))
-        cov_type = COV_TYPES[cov_type]
-        k = len(self._dependent)
-        col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
-        col_idx = np.cumsum(col_sizes)
-        total_cols = col_idx[-1]
-        self._construct_xhat()
-        beta, eps = self._multivariate_ls_fit()
-        nobs = eps.shape[0]
-        debiased = cov_config.get("debiased", False)
-        full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
-
-        if method == "ols":
-            return self._multivariate_ls_finalize(
-                beta, eps, sigma, cov_type, **cov_config
-            )
-
-        beta_hist = [beta]
-        nobs = eps.shape[0]
-        iter_count = 0
-        delta = np.inf
-        while (
-            (iter_count < iter_limit and iterate) or iter_count == 0
-        ) and delta >= tol:
-            beta, eps, sigma, est_sigma = self._gls_estimate(
-                eps, nobs, total_cols, col_idx, full_cov, debiased
-            )
-            beta_hist.append(beta)
-            delta = beta_hist[-1] - beta_hist[-2]
-            delta = np.sqrt(np.mean(delta ** 2))
-            iter_count += 1
-
-        sigma_m12 = inv_matrix_sqrt(sigma)
-        wy = blocked_column_product(self._wy, sigma_m12)
-        wx = blocked_diag_product(self._wx, sigma_m12)
-        gls_eps = wy - wx @ beta
-
-        y = blocked_column_product(self._y, np.eye(k))
-        x = blocked_diag_product(self._x, np.eye(k))
-        eps = y - x @ beta
-
-        return self._gls_finalize(
-            beta,
-            sigma,
-            full_sigma,
-            est_sigma,
-            gls_eps,
-            eps,
-            full_cov,
-            cov_type,
-            iter_count,
-            **cov_config,
-        )
-
     def _multivariate_ls_fit(self) -> Tuple[NDArray, NDArray]:
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
@@ -955,128 +782,6 @@ class IV3SLS(object):
         """Vector indicating which equations contain constants"""
         return self._has_constant
 
-    @classmethod
-    def multivariate_ls(
-        cls,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
-        instruments: OptionalArrayLike = None,
-    ) -> "IV3SLS":
-        """
-        Interface for specification of multivariate IV models
-
-        Parameters
-        ----------
-        dependent : array_like
-            nobs by ndep array of dependent variables
-        exog : array_like, optional
-            nobs by nexog array of exogenous regressors common to all models
-        endog : array_like, optional
-            nobs by nendog array of endogenous regressors common to all models
-        instruments : array_like, optional
-            nobs by ninstr array of instruments to use in all equations
-
-        Returns
-        -------
-        model : IV3SLS
-            Model instance
-
-        Notes
-        -----
-        At least one of exog or endog must be provided.
-
-        Utility function to simplify the construction of multivariate IV
-        models which all use the same regressors and instruments. Constructs
-        the dictionary of equations from the variables using the common
-        exogenous, endogenous and instrumental variables.
-        """
-        equations = {}
-        dependent = IVData(dependent, var_name="dependent")
-        if exog is None and endog is None:
-            raise ValueError("At least one of exog or endog must be provided")
-        exog = IVData(exog, var_name="exog")
-        endog = IVData(endog, var_name="endog", nobs=dependent.shape[0])
-        instr = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
-        for col in dependent.pandas:
-            equations[col] = (
-                dependent.pandas[[col]],
-                exog.pandas,
-                endog.pandas,
-                instr.pandas,
-            )
-        return cls(equations)
-
-    @classmethod
-    def from_formula(
-        cls,
-        formula: Union[str, Dict[str, str]],
-        data: DataFrame,
-        *,
-        sigma: Optional[ArrayLike] = None,
-        weights: Optional[Mapping[str, ArrayLike]] = None,
-    ) -> "IV3SLS":
-        """
-        Specify a 3SLS using the formula interface
-
-        Parameters
-        ----------
-        formula : {str, dict-like}
-            Either a string or a dictionary of strings where each value in
-            the dictionary represents a single equation. See Notes for a
-            description of the accepted syntax
-        data : DataFrame
-            Frame containing named variables
-        sigma : array_like
-            Prespecified residual covariance to use in GLS estimation. If
-            not provided, FGLS is implemented based on an estimate of sigma.
-        weights : dict-like
-            Dictionary like object (e.g. a DataFrame) containing variable
-            weights.  Each entry must have the same number of observations as
-            data.  If an equation label is not a key weights, the weights will
-            be set to unity
-
-        Returns
-        -------
-        model : IV3SLS
-            Model instance
-
-        Notes
-        -----
-        Models can be specified in one of two ways. The first uses curly
-        braces to encapsulate equations.  The second uses a dictionary
-        where each key is an equation name.
-
-        Examples
-        --------
-        The simplest format uses standard Patsy formulas for each equation
-        in a dictionary.  Best practice is to use an Ordered Dictionary
-
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
-        >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
-        >>> from linearmodels.system import IV3SLS
-        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
-        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
-        >>> mod = IV3SLS.from_formula(formula, data)
-
-        The second format uses curly braces {} to surround distinct equations
-
-        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
-        >>> mod = IV3SLS.from_formula(formula, data)
-
-        It is also possible to include equation labels when using curly braces
-
-        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
-        >>> mod = IV3SLS.from_formula(formula, data)
-        """
-        parser = SystemFormulaParser(formula, data, weights)
-        eqns = parser.data
-        mod = cls(eqns, sigma=sigma)
-        mod.formula = formula
-        return mod
-
     def _f_stat(
         self, stats: AttrDict, debiased: bool
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
@@ -1118,7 +823,11 @@ class IV3SLS(object):
         method: str,
         cov_type: str,
         cov_est: Union[
-            HomoskedasticCovariance, HeteroskedasticCovariance, KernelCovariance
+            HomoskedasticCovariance,
+            HeteroskedasticCovariance,
+            KernelCovariance,
+            GMMHeteroskedasticCovariance,
+            GMMHomoskedasticCovariance,
         ],
         iter_count: int,
         debiased: bool,
@@ -1460,7 +1169,357 @@ class IV3SLS(object):
         return self._param_names
 
 
-class SUR(IV3SLS):
+class _LSSystemModelBase(_SystemModelBase):
+    """Base class for least-squares-based system estimators"""
+
+    def fit(
+        self,
+        *,
+        method: Optional[str] = None,
+        full_cov: bool = True,
+        iterate: bool = False,
+        iter_limit: int = 100,
+        tol: float = 1e-6,
+        cov_type: str = "robust",
+        **cov_config: bool,
+    ) -> SystemResults:
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        method : {None, 'gls', 'ols'}
+            Estimation method.  Default auto selects based on regressors,
+            using OLS only if all regressors are identical. The other two
+            arguments force the use of GLS or OLS.
+        full_cov : bool
+            Flag indicating whether to utilize information in correlations
+            when estimating the model with GLS
+        iterate : bool
+            Flag indicating to iterate GLS until convergence of iter limit
+            iterations have been completed
+        iter_limit : int
+            Maximum number of iterations for iterative GLS
+        tol : float
+            Tolerance to use when checking for convergence in iterative GLS
+        cov_type : str
+            Name of covariance estimator. Valid options are
+
+            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
+            * 'robust', 'heteroskedastic' - Heteroskedasticity robust
+              covariance estimator
+            * 'kernel' - Allows for heteroskedasticity and autocorrelation
+
+        **cov_config
+            Additional parameters to pass to covariance estimator. All
+            estimators support debiased which employs a small-sample adjustment
+
+        Returns
+        -------
+        results : SystemResults
+            Estimation results
+
+        See Also
+        --------
+        linearmodels.system.covariance.HomoskedasticCovariance
+        linearmodels.system.covariance.HeteroskedasticCovariance
+        linearmodels.system.covariance.KernelCovariance
+        """
+        if method is None:
+            method = (
+                "ols" if (self._common_exog and self._constraints is None) else "gls"
+            )
+
+        cov_type = cov_type.lower()
+        if cov_type not in COV_TYPES:
+            raise ValueError("Unknown cov_type: {0}".format(cov_type))
+        cov_type = COV_TYPES[cov_type]
+        k = len(self._dependent)
+        col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
+        col_idx = np.cumsum(col_sizes)
+        total_cols = col_idx[-1]
+        self._construct_xhat()
+        beta, eps = self._multivariate_ls_fit()
+        nobs = eps.shape[0]
+        debiased = cov_config.get("debiased", False)
+        full_sigma = sigma = (eps.T @ eps / nobs) * self._sigma_scale(debiased)
+
+        if method == "ols":
+            return self._multivariate_ls_finalize(
+                beta, eps, sigma, cov_type, **cov_config
+            )
+
+        beta_hist = [beta]
+        nobs = eps.shape[0]
+        iter_count = 0
+        delta = np.inf
+        while (
+            (iter_count < iter_limit and iterate) or iter_count == 0
+        ) and delta >= tol:
+            beta, eps, sigma, est_sigma = self._gls_estimate(
+                eps, nobs, total_cols, col_idx, full_cov, debiased
+            )
+            beta_hist.append(beta)
+            delta = beta_hist[-1] - beta_hist[-2]
+            delta = np.sqrt(np.mean(delta ** 2))
+            iter_count += 1
+
+        sigma_m12 = inv_matrix_sqrt(sigma)
+        wy = blocked_column_product(self._wy, sigma_m12)
+        wx = blocked_diag_product(self._wx, sigma_m12)
+        gls_eps = wy - wx @ beta
+
+        y = blocked_column_product(self._y, np.eye(k))
+        x = blocked_diag_product(self._x, np.eye(k))
+        eps = y - x @ beta
+
+        return self._gls_finalize(
+            beta,
+            sigma,
+            full_sigma,
+            est_sigma,
+            gls_eps,
+            eps,
+            full_cov,
+            cov_type,
+            iter_count,
+            **cov_config,
+        )
+
+
+class IV3SLS(_LSSystemModelBase):
+    r"""
+    Three-stage Least Squares (3SLS) Estimator
+
+    Parameters
+    ----------
+    equations : dict
+        Dictionary-like structure containing dependent, exogenous, endogenous
+        and instrumental variables.  Each key is an equations label and must
+        be a string. Each value must be either a tuple of the form (dependent,
+        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
+        and at least one of 'exog' or 'endog' and 'instruments'.  When using a
+        tuple, values must be provided for all 4 variables, although either
+        empty arrays or `None` can be passed if a category of variable is not
+        included in a model. The dictionary may contain optional keys for
+        'exog', 'endog', 'instruments', and 'weights'. 'exog' can be omitted
+        if all variables in an equation are endogenous. Alternatively, 'exog'
+        can contain either an empty array or `None` to indicate that an
+        equation contains no exogenous regressors. Similarly 'endog' and
+        'instruments' can either be omitted or may contain an empty array (or
+        `None`) if all variables in an equation are exogenous.
+    sigma : array_like
+        Prespecified residual covariance to use in GLS estimation. If not
+        provided, FGLS is implemented based on an estimate of sigma.
+
+    Notes
+    -----
+    Estimates a set of regressions which are seemingly unrelated in the sense
+    that separate estimation would lead to consistent parameter estimates.
+    Each equation is of the form
+
+    .. math::
+
+        y_{i,k} = x_{i,k}\beta_i + \epsilon_{i,k}
+
+    where k denotes the equation and i denoted the observation index. By
+    stacking vertically arrays of dependent and placing the exogenous
+    variables into a block diagonal array, the entire system can be compactly
+    expressed as
+
+    .. math::
+
+        Y = X\beta + \epsilon
+
+    where
+
+    .. math::
+
+        Y = \left[\begin{array}{x}Y_1 \\ Y_2 \\ \vdots \\ Y_K\end{array}\right]
+
+    and
+
+    .. math::
+
+        X = \left[\begin{array}{cccc}
+                 X_1 & 0 & \ldots & 0 \\
+                 0 & X_2 & \dots & 0 \\
+                 \vdots & \vdots & \ddots & \vdots \\
+                 0 & 0 & \dots & X_K
+            \end{array}\right]
+
+    The system instrumental variable (IV) estimator is
+
+    .. math::
+
+        \hat{\beta}_{IV} & = (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y \\
+                         & = (\hat{X}'\hat{X})^{-1}\hat{X}'Y
+
+    where :math:`\hat{X} = Z(Z'Z)^{-1}Z'X` and.  When certain conditions are
+    satisfied, a GLS estimator of the form
+
+    .. math::
+
+        \hat{\beta}_{3SLS} = (\hat{X}'\Omega^{-1}\hat{X})^{-1}\hat{X}'\Omega^{-1}Y
+
+    can improve accuracy of coefficient estimates where
+
+    .. math::
+
+        \Omega = \Sigma \otimes I_N
+
+    where :math:`\Sigma` is the covariance matrix of the residuals.
+    """
+
+    def __init__(
+        self,
+        equations: Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]],
+        *,
+        sigma: Optional[ArrayLike] = None,
+    ) -> None:
+        super().__init__(equations, sigma=sigma)
+
+    @classmethod
+    def multivariate_iv(
+        cls,
+        dependent: ArrayLike,
+        exog: OptionalArrayLike = None,
+        endog: OptionalArrayLike = None,
+        instruments: OptionalArrayLike = None,
+    ) -> "IV3SLS":
+        """
+        Interface for specification of multivariate IV models
+
+        Parameters
+        ----------
+        dependent : array_like
+            nobs by ndep array of dependent variables
+        exog : array_like, optional
+            nobs by nexog array of exogenous regressors common to all models
+        endog : array_like, optional
+            nobs by nendog array of endogenous regressors common to all models
+        instruments : array_like, optional
+            nobs by ninstr array of instruments to use in all equations
+
+        Returns
+        -------
+        model : IV3SLS
+            Model instance
+
+        Notes
+        -----
+        At least one of exog or endog must be provided.
+
+        Utility function to simplify the construction of multivariate IV
+        models which all use the same regressors and instruments. Constructs
+        the dictionary of equations from the variables using the common
+        exogenous, endogenous and instrumental variables.
+        """
+        equations = {}
+        dependent = IVData(dependent, var_name="dependent")
+        if exog is None and endog is None:
+            raise ValueError("At least one of exog or endog must be provided")
+        exog = IVData(exog, var_name="exog")
+        endog = IVData(endog, var_name="endog", nobs=dependent.shape[0])
+        instr = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
+        for col in dependent.pandas:
+            equations[col] = (
+                dependent.pandas[[col]],
+                exog.pandas,
+                endog.pandas,
+                instr.pandas,
+            )
+        return cls(equations)
+
+    @classmethod
+    def multivariate_ls(
+        cls,
+        dependent: ArrayLike,
+        exog: OptionalArrayLike = None,
+        endog: OptionalArrayLike = None,
+        instruments: OptionalArrayLike = None,
+    ) -> "IV3SLS":
+        """
+        Deprecated. Use multivariate_iv.
+        """
+        warnings.warn(
+            "multivariate_ls is deprecated and will be removed " "after July 24, 2020.",
+            FutureWarning,
+        )
+        return cls.multivariate_iv(dependent, exog, endog, instruments)
+
+    @classmethod
+    def from_formula(
+        cls,
+        formula: Union[str, Dict[str, str]],
+        data: DataFrame,
+        *,
+        sigma: Optional[ArrayLike] = None,
+        weights: Optional[Mapping[str, ArrayLike]] = None,
+    ) -> "IV3SLS":
+        """
+        Specify a 3SLS using the formula interface
+
+        Parameters
+        ----------
+        formula : {str, dict-like}
+            Either a string or a dictionary of strings where each value in
+            the dictionary represents a single equation. See Notes for a
+            description of the accepted syntax
+        data : DataFrame
+            Frame containing named variables
+        sigma : array_like
+            Prespecified residual covariance to use in GLS estimation. If
+            not provided, FGLS is implemented based on an estimate of sigma.
+        weights : dict-like
+            Dictionary like object (e.g. a DataFrame) containing variable
+            weights.  Each entry must have the same number of observations as
+            data.  If an equation label is not a key weights, the weights will
+            be set to unity
+
+        Returns
+        -------
+        model : IV3SLS
+            Model instance
+
+        Notes
+        -----
+        Models can be specified in one of two ways. The first uses curly
+        braces to encapsulate equations.  The second uses a dictionary
+        where each key is an equation name.
+
+        Examples
+        --------
+        The simplest format uses standard Patsy formulas for each equation
+        in a dictionary.  Best practice is to use an Ordered Dictionary
+
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
+        >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
+        >>> from linearmodels.system import IV3SLS
+        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
+        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
+        >>> mod = IV3SLS.from_formula(formula, data)
+
+        The second format uses curly braces {} to surround distinct equations
+
+        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IV3SLS.from_formula(formula, data)
+
+        It is also possible to include equation labels when using curly braces
+
+        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> mod = IV3SLS.from_formula(formula, data)
+        """
+        parser = SystemFormulaParser(formula, data, weights)
+        eqns = parser.data
+        mod = cls(eqns, sigma=sigma)
+        mod.formula = formula
+        return mod
+
+
+class SUR(_LSSystemModelBase):
     r"""
     Seemingly unrelated regression estimation (SUR/SURE)
 
@@ -1673,7 +1732,7 @@ class SUR(IV3SLS):
         return mod
 
 
-class IVSystemGMM(IV3SLS):
+class IVSystemGMM(_SystemModelBase):
     r"""
     System Generalized Method of Moments (GMM) estimation of linear IV models
 
@@ -1753,7 +1812,7 @@ class IVSystemGMM(IV3SLS):
         *,
         sigma: Optional[ArrayLike] = None,
         weight_type: str = "robust",
-        **weight_config: Union[bool, str],
+        **weight_config: Union[bool, str, float],
     ) -> None:
         super().__init__(equations, sigma=sigma)
         self._weight_type = weight_type
@@ -1763,8 +1822,6 @@ class IVSystemGMM(IV3SLS):
             raise ValueError("Unknown estimator for weight_type")
 
         if weight_type not in ("unadjusted", "homoskedastic") and sigma is not None:
-            import warnings
-
             warnings.warn(
                 "sigma has been provided but the estimated weight "
                 "matrix not unadjusted (homoskedastic).  sigma will "

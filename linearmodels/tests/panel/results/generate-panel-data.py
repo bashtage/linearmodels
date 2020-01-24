@@ -43,17 +43,17 @@ z = z.reset_index()
 z["firm_id"] = z.firm.astype("category")
 z["firm_id"] = z.firm_id.cat.codes
 
-vars = ["y", "x1", "x2", "x3", "x4", "x5"]
+variables = ["y", "x1", "x2", "x3", "x4", "x5"]
 missing = 0.05
-for v in vars:
+for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
     temp.loc[locs] = np.nan
     z[v + "_light"] = temp
 
-vars = ["y", "x1", "x2", "x3", "x4", "x5"]
+variables = ["y", "x1", "x2", "x3", "x4", "x5"]
 missing = 0.20
-for v in vars:
+for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
     temp.loc[locs] = np.nan

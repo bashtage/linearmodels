@@ -138,8 +138,9 @@ class AttrDict(MutableMapping):
         del self.__private_dict__[key]
 
     def __dir__(self) -> Iterable[str]:
-        out = list(super(AttrDict, self).__dir__()) + list(self.__private_dict__.keys())
-        filtered = filter(lambda s: isinstance(s, str) and s.isidentifier(), out)
+        out = list(map(str, self.__private_dict__.keys()))
+        out += list(super(AttrDict, self).__dir__())
+        filtered = [key for key in out if key.isidentifier()]
         return sorted(set(filtered))
 
     def __iter__(self) -> Iterator[Label]:
@@ -659,7 +660,7 @@ def panel_to_frame(
         x = x.reshape((shape[0], shape[1] * shape[2])).T
     df = DataFrame(x, columns=items, index=mi)
     if swap:
-        df.index = df.index.swaplevel()
+        df.index = mi.swaplevel()
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
     df.index.set_levels(final_levels, [0, 1], inplace=True)
@@ -770,10 +771,10 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
         The boolean if the key is in the dictionary. If not found, returns
         False.
     """
-    out = False
+    out: Optional[bool] = False
     if key in d:
         out = d[key]
-        if not (isinstance(out, bool) or out is None):
+        if not (out is None or isinstance(out, bool)):
             raise TypeError(f"{key} found in the dictionary but it is not a bool.")
     return bool(out)
 

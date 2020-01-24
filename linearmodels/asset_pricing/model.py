@@ -20,7 +20,7 @@ from linearmodels.asset_pricing.results import (
     GMMFactorModelResults,
     LinearFactorModelResults,
 )
-from linearmodels.iv.data import IVData
+from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.typing import ArrayLike, NDArray
 from linearmodels.utility import (
     AttrDict,
@@ -33,7 +33,10 @@ from linearmodels.utility import (
 
 
 def callback_factory(
-    obj: Callable[[NDArray, bool, NDArray], float],
+    obj: Union[
+        Callable[[NDArray, bool, NDArray], float],
+        Callable[[NDArray, bool, Union[HeteroskedasticWeight, KernelWeight]], float],
+    ],
     args: Tuple[bool, Any],
     disp: Union[bool, int] = 1,
 ) -> Callable[[NDArray], None]:
@@ -61,7 +64,7 @@ class _FactorModelBase(object):
         Priced factor returns (nobs by nfactor)
     """
 
-    def __init__(self, portfolios: ArrayLike, factors: ArrayLike):
+    def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
         self.portfolios = IVData(portfolios, var_name="portfolio")
         self.factors = IVData(factors, var_name="factor")
         self._name = self.__class__.__name__
@@ -186,6 +189,9 @@ class TradedFactorModel(_FactorModelBase):
     :math:`\lambda_i` are estimated using the sample averages of the factors,
     which must be excess returns on traded portfolios.
     """
+
+    def __init__(self, portfolios: IVDataLike, factors: IVDataLike):
+        super().__init__(portfolios, factors)
 
     @classmethod
     def from_formula(
@@ -389,8 +395,8 @@ class _LinearFactorModelBase(_FactorModelBase):
 
     def __init__(
         self,
-        portfolios: ArrayLike,
-        factors: ArrayLike,
+        portfolios: IVDataLike,
+        factors: IVDataLike,
         *,
         risk_free: bool = False,
         sigma: Optional[ArrayLike] = None,
@@ -491,8 +497,8 @@ class LinearFactorModel(_LinearFactorModelBase):
 
     def __init__(
         self,
-        portfolios: ArrayLike,
-        factors: ArrayLike,
+        portfolios: IVDataLike,
+        factors: IVDataLike,
         *,
         risk_free: bool = False,
         sigma: Optional[ArrayLike] = None,
@@ -784,7 +790,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     """
 
     def __init__(
-        self, factors: NDArray, portfolios: NDArray, *, risk_free: bool = False
+        self, factors: IVDataLike, portfolios: IVDataLike, *, risk_free: bool = False
     ) -> None:
         super(LinearFactorModelGMM, self).__init__(
             factors, portfolios, risk_free=risk_free
@@ -966,10 +972,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         else:
             args = (excess_returns, weight_est_instance)
-            obj = self._j_cue
-            callback = callback_factory(obj, args, disp=disp)
+            callback = callback_factory(self._j_cue, args, disp=disp)
             opt_res = minimize(
-                obj,
+                self._j_cue,
                 params,
                 args=args,
                 callback=callback,

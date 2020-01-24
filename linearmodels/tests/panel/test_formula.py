@@ -85,11 +85,11 @@ def test_basic_formulas(data, models, formula):
     np.testing.assert_allclose(res.params, res2.params)
 
     parts = formula.split("~")
-    vars = parts[1].replace(" 1 ", " const ").split("+")
-    vars = list(map(lambda s: s.strip(), vars))
+    variables = parts[1].replace(" 1 ", " const ").split("+")
+    variables = list(map(lambda s: s.strip(), variables))
     x = data.x
-    res2 = model(data.y, x[vars]).fit()
-    wres2 = model(data.y, x[vars], weights=data.w).fit()
+    res2 = model(data.y, x[variables]).fit()
+    wres2 = model(data.y, x[variables], weights=data.w).fit()
     np.testing.assert_allclose(res.params, res2.params)
     np.testing.assert_allclose(wres.params, wres2.params)
     assert isinstance(mod, model)
@@ -109,8 +109,8 @@ def test_basic_formulas(data, models, formula):
     np.testing.assert_allclose(res.params, res2.params)
 
     x["Intercept"] = 1.0
-    vars = ["Intercept"] + vars
-    mod2 = model(data.y, x[vars])
+    variables = ["Intercept"] + variables
+    mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
     np.testing.assert_allclose(res.params, res2.params)
     assert mod.formula == formula
@@ -192,12 +192,12 @@ def test_basic_formulas_predict(data, models, formula):
     np.testing.assert_allclose(pred.values, pred2.values, atol=1e-8)
 
     parts = formula.split("~")
-    vars = parts[1].replace(" 1 ", " const ").split("+")
-    vars = list(map(lambda s: s.strip(), vars))
+    variables = parts[1].replace(" 1 ", " const ").split("+")
+    variables = list(map(lambda s: s.strip(), variables))
     x = data.x
-    res2 = model(data.y, x[vars]).fit()
-    pred3 = res2.predict(x[vars])
-    pred4 = res.predict(x[vars])
+    res2 = model(data.y, x[variables]).fit()
+    pred3 = res2.predict(x[variables])
+    pred4 = res.predict(x[variables])
     np.testing.assert_allclose(pred.values, pred3.values, atol=1e-8)
     np.testing.assert_allclose(pred.values, pred4.values, atol=1e-8)
 
@@ -212,11 +212,11 @@ def test_basic_formulas_predict(data, models, formula):
     pred = res.predict(data=joined)
 
     x["Intercept"] = 1.0
-    vars = ["Intercept"] + vars
-    mod2 = model(data.y, x[vars])
+    variables = ["Intercept"] + variables
+    mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
-    pred2 = res.predict(x[vars])
-    pred3 = res2.predict(x[vars])
+    pred2 = res.predict(x[variables])
+    pred3 = res2.predict(x[variables])
     np.testing.assert_allclose(pred, pred2, atol=1e-8)
     np.testing.assert_allclose(pred, pred3, atol=1e-8)
 
@@ -235,10 +235,10 @@ def test_formulas_predict_error(data, models, formula):
         mod.predict(params=res.params, exog=joined, data=joined)
 
     parts = formula.split("~")
-    vars = parts[1].replace(" 1 ", " const ").split("+")
-    vars = list(map(lambda s: s.strip(), vars))
+    variables = parts[1].replace(" 1 ", " const ").split("+")
+    variables = list(map(lambda s: s.strip(), variables))
     x = data.x
-    res = model(data.y, x[vars]).fit()
+    res = model(data.y, x[variables]).fit()
     with pytest.raises(ValueError):
         res.predict(data=joined)
 

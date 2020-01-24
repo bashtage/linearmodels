@@ -1,7 +1,7 @@
 """
 Instrumental variable estimators
 """
-from typing import Any, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
 
 from numpy import (
     all as npall,
@@ -11,6 +11,7 @@ from numpy import (
     atleast_2d,
     average,
     c_,
+    eye,
     isscalar,
     logical_not,
     nanmean,
@@ -971,6 +972,7 @@ class IVGMM(IVLIML):
         # _params = params = self.estimate_parameters(wx, wy, wz, wmat)
 
         iters, norm = 1, 10 * tol + 1
+        vinv = eye(params.shape[0])
         while iters < iter_limit and norm > tol:
             eps = wy - wx @ params
             wmat = inv(weight_matrix(wx, wz, eps))
@@ -1205,7 +1207,7 @@ class IVGMMCUE(IVGMM):
         z: NDArray,
         display: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
-    ) -> NDArray:
+    ) -> Tuple[NDArray, int]:
         r"""
         Parameters
         ----------
