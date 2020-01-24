@@ -1,6 +1,14 @@
 Change Log
 ----------
 
+Version 4.16 (Unreleased)
+=========================
+* Added typing to all public-facing classes and methods (:issue:`229`, :issue:`228`).
+* Added :class:`~linearmodels.panel.results.FamaMacBethResults` which has
+  the property :meth:`~linearmodels.panel.results.FamaMacBethResults.all_params`
+  that contains a (nobs, nparam) DataFrame of parameters estimated in each time
+  period (:issue:`230`).
+
 Version 4.15
 ============
 * Blackened the code.
