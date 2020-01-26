@@ -1,9 +1,10 @@
 Change Log
 ----------
 
-Version 4.16 (Unreleased)
-=========================
-* Added typing to all public-facing classes and methods (:issue:`229`, :issue:`228`).
+Version 4.16
+============
+* Verify typing using mypy (:issue:`232`, :issue:`234`, :issue:`235`, :issue:`238`).
+* Added typing to all public-facing classes and methods (:issue:`228`, :issue:`229`).
 * Added :class:`~linearmodels.panel.results.FamaMacBethResults` which has
   the property :meth:`~linearmodels.panel.results.FamaMacBethResults.all_params`
   that contains a (nobs, nparam) DataFrame of parameters estimated in each time

@@ -1,4 +1,4 @@
-numpy>=1.14
+numpy>=1.15
 pandas>=0.23
 scipy>=1
 statsmodels>=0.9
@@ -6,3 +6,4 @@ patsy
 property_cached>=1.6.3
 mypy_extensions>=0.4
 Cython>=0.29.14
+

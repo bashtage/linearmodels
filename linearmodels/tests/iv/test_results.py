@@ -24,6 +24,9 @@ def result_checker(res):
     for attr in dir(res):
         if attr.startswith("_") or attr in ("test_linear_constraint", "wald_test"):
             continue
+        print(attr)
+        if attr == "summary":
+            print(attr)
         if attr == "first_stage":
             result_checker(getattr(res, attr))
         attr = getattr(res, attr)
@@ -36,12 +39,13 @@ def result_checker(res):
 
 def test_results(data, model):
     mod = model(data.dep, data.exog, data.endog, data.instr)
+    # OLS-like results
+    result_checker(model(data.dep, data.exog, None, None).fit())
+
     result_checker(mod.fit(cov_type="unadjusted"))
     result_checker(mod.fit(cov_type="robust"))
     result_checker(mod.fit(cov_type="kernel"))
     result_checker(mod.fit(cov_type="clustered", clusters=data.clusters))
-
-    result_checker(model(data.dep, data.exog, None, None).fit())
 
 
 def test_results_single(data, model):
