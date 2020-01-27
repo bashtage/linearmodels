@@ -1,6 +1,0 @@
-linearmodels.iv.absorbing.AbsorbingLSResults.kappa
-==================================================
-
-.. currentmodule:: linearmodels.iv.absorbing
-
-.. autoproperty:: AbsorbingLSResults.kappa

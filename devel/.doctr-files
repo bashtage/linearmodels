@@ -107,12 +107,10 @@ devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.f_stati
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.fitted_values.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.has_constant.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.idiosyncratic.rst.txt
-devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.kappa.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.method.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.model_ss.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.nobs.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.params.rst.txt
-devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.predict.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.pvalues.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.resid_ss.rst.txt
 devel/_sources/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.resids.rst.txt
@@ -974,12 +972,10 @@ devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.fitted_values.ht
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.has_constant.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.idiosyncratic.html
-devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.kappa.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.method.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.model_ss.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.nobs.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.params.html
-devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.predict.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.pvalues.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.resid_ss.html
 devel/iv/absorbing/linearmodels.iv.absorbing.AbsorbingLSResults.resids.html
