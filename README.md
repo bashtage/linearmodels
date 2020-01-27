@@ -135,7 +135,7 @@ others are the version that are being used in the test environment.  It
 is possible that older versions work.
 
 * Python 3.6+
-* NumPy (1.14+)
+* NumPy (1.15+)
 * SciPy (1.0.1+)
 * pandas (0.23+)
 * statsmodels (0.9+)

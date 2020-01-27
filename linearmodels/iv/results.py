@@ -64,7 +64,7 @@ def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[
     return out[:-1]
 
 
-class OLSResults(_SummaryStr):
+class _LSModelResultsBase(_SummaryStr):
     """
     Results from OLS model estimation
 
@@ -76,11 +76,7 @@ class OLSResults(_SummaryStr):
         The model used to estimate parameters.
     """
 
-    def __init__(
-        self,
-        results: Dict[str, Any],
-        model: Union["linearmodels.iv.model.IV2SLS", "linearmodels.iv.model.IVLIML"],
-    ) -> None:
+    def __init__(self, results: Dict[str, Any], model: Any,) -> None:
         self._resid = results["eps"]
         self._wresid = results["weps"]
         self._params = results["params"]
@@ -148,88 +144,6 @@ class OLSResults(_SummaryStr):
         """
         return self.resids
 
-    def _out_of_sample(
-        self,
-        exog: ArrayLike,
-        endog: ArrayLike,
-        data: ArrayLike,
-        missing: Optional[bool],
-    ) -> DataFrame:
-        """Interface between model predict and predict for OOS fits"""
-        if not (exog is None and endog is None) and data is not None:
-            raise ValueError(
-                "Predictions can only be constructed using one "
-                "of exog/endog or data, but not both."
-            )
-        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
-        if not missing:
-            pred = pred.loc[pred.notnull().all(1)]
-        return pred
-
-    def predict(
-        self,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
-        *,
-        data: Optional[DataFrame] = None,
-        fitted: bool = True,
-        idiosyncratic: bool = False,
-        missing: bool = False,
-    ) -> DataFrame:
-        """
-        In- and out-of-sample predictions
-
-        Parameters
-        ----------
-        exog : array_like
-            Exogenous values to use in out-of-sample prediction (nobs by nexog)
-        endog : array_like
-            Endogenous values to use in out-of-sample prediction (nobs by nendog)
-        data : DataFrame, optional
-            DataFrame to use for out-of-sample predictions when model was
-            constructed using a formula.
-        fitted : bool, optional
-            Flag indicating whether to include the fitted values
-        idiosyncratic : bool, optional
-            Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool, optional
-            Flag indicating to adjust for dropped observations.  If True, the
-            values returned will have the same size as the original input data
-            before filtering missing values.  If False, then missing
-            observations will not be returned.
-
-        Returns
-        -------
-        DataFrame
-            DataFrame containing columns for all selected outputs
-
-        Notes
-        -----
-        If `exog`, `endog` and `data` are all `None`, in-sample predictions
-        (fitted values) will be returned.
-
-        If `data` is not none, then `exog` and `endog` must be none.
-        Predictions from models constructed using formulas can
-        be computed using either `exog` and `endog`, which will treat these are
-        arrays of values corresponding to the formula-process data, or using
-        `data` which will be processed using the formula used to construct the
-        values corresponding to the original model specification.
-        """
-        if not (exog is None and endog is None and data is None):
-            return self._out_of_sample(exog, endog, data, missing)
-        out = []
-        if fitted:
-            out.append(self.fitted_values)
-        if idiosyncratic:
-            out.append(self.idiosyncratic)
-        if len(out) == 0:
-            raise ValueError("At least one output must be selected")
-        out_df: DataFrame = concat(out, 1)
-        if missing:
-            index = self._original_index
-            out_df = out_df.reindex(index)
-        return out_df
-
     @property
     def wresids(self) -> Series:
         """Weighted estimated residuals"""
@@ -254,11 +168,6 @@ class OLSResults(_SummaryStr):
     def has_constant(self) -> bool:
         """Flag indicating the model includes a constant or equivalent"""
         return self.model.has_constant
-
-    @property
-    def kappa(self) -> float:
-        """k-class estimator value"""
-        return self._kappa
 
     @property
     def rsquared(self) -> float:
@@ -480,19 +389,14 @@ class OLSResults(_SummaryStr):
         else:
             extra_text.append("Model contains no parameters")
 
-        instruments = self.model.instruments
-        if instruments.shape[1] > 0:
-
-            endog = self.model.endog
-            extra_text.append("Endogenous: " + ", ".join(endog.cols))
-            extra_text.append("Instruments: " + ", ".join(instruments.cols))
-            cov_descr = str(self._cov_estimator)
-            for line in cov_descr.split("\n"):
-                extra_text.append(line)
+        extra_text = self._update_extra_text(extra_text)
         if extra_text:
             smry.add_extra_txt(extra_text)
 
         return smry
+
+    def _update_extra_text(self, extra_text: List[str]) -> List[str]:
+        return extra_text
 
     def wald_test(
         self,
@@ -568,7 +472,124 @@ class OLSResults(_SummaryStr):
         )
 
 
-class AbsorbingLSResults(OLSResults):
+class OLSResults(_LSModelResultsBase):
+    """
+    Results from OLS model estimation
+
+    Parameters
+    ----------
+    results : dict[str, any]
+        A dictionary of results from the model estimation.
+    model : _OLS
+        The model used to estimate parameters.
+    """
+
+    def __init__(
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVModelBase",
+    ) -> None:
+        super().__init__(results, model)
+
+    def _out_of_sample(
+        self,
+        exog: ArrayLike,
+        endog: ArrayLike,
+        data: ArrayLike,
+        missing: Optional[bool],
+    ) -> DataFrame:
+        """Interface between model predict and predict for OOS fits"""
+        if not (exog is None and endog is None) and data is not None:
+            raise ValueError(
+                "Predictions can only be constructed using one "
+                "of exog/endog or data, but not both."
+            )
+        pred = self.model.predict(self.params, exog=exog, endog=endog, data=data)
+        if not missing:
+            pred = pred.loc[pred.notnull().all(1)]
+        return pred
+
+    def predict(
+        self,
+        exog: OptionalArrayLike = None,
+        endog: OptionalArrayLike = None,
+        *,
+        data: Optional[DataFrame] = None,
+        fitted: bool = True,
+        idiosyncratic: bool = False,
+        missing: bool = False,
+    ) -> DataFrame:
+        """
+        In- and out-of-sample predictions
+
+        Parameters
+        ----------
+        exog : array_like
+            Exogenous values to use in out-of-sample prediction (nobs by nexog)
+        endog : array_like
+            Endogenous values to use in out-of-sample prediction (nobs by nendog)
+        data : DataFrame, optional
+            DataFrame to use for out-of-sample predictions when model was
+            constructed using a formula.
+        fitted : bool, optional
+            Flag indicating whether to include the fitted values
+        idiosyncratic : bool, optional
+            Flag indicating whether to include the estimated idiosyncratic shock
+        missing : bool, optional
+            Flag indicating to adjust for dropped observations.  If True, the
+            values returned will have the same size as the original input data
+            before filtering missing values.  If False, then missing
+            observations will not be returned.
+
+        Returns
+        -------
+        DataFrame
+            DataFrame containing columns for all selected outputs
+
+        Notes
+        -----
+        If `exog`, `endog` and `data` are all `None`, in-sample predictions
+        (fitted values) will be returned.
+
+        If `data` is not none, then `exog` and `endog` must be none.
+        Predictions from models constructed using formulas can
+        be computed using either `exog` and `endog`, which will treat these are
+        arrays of values corresponding to the formula-process data, or using
+        `data` which will be processed using the formula used to construct the
+        values corresponding to the original model specification.
+        """
+        if not (exog is None and endog is None and data is None):
+            return self._out_of_sample(exog, endog, data, missing)
+        out = []
+        if fitted:
+            out.append(self.fitted_values)
+        if idiosyncratic:
+            out.append(self.idiosyncratic)
+        if len(out) == 0:
+            raise ValueError("At least one output must be selected")
+        out_df: DataFrame = concat(out, 1)
+        if missing:
+            index = self._original_index
+            out_df = out_df.reindex(index)
+        return out_df
+
+    @property
+    def kappa(self) -> float:
+        """k-class estimator value"""
+        return self._kappa
+
+    def _update_extra_text(self, extra_text: List[str]) -> List[str]:
+        instruments = self.model.instruments
+        if instruments.shape[1] > 0:
+
+            endog = self.model.endog
+            extra_text.append("Endogenous: " + ", ".join(endog.cols))
+            extra_text.append("Instruments: " + ", ".join(instruments.cols))
+            cov_descr = str(self._cov_estimator)
+            for line in cov_descr.split("\n"):
+                extra_text.append(line)
+        return extra_text
+
+
+class AbsorbingLSResults(_LSModelResultsBase):
     """
     Results from IV estimation
 
@@ -685,8 +706,11 @@ class FirstStageResults(_SummaryStr):
         else:
             px = x @ pinv(x)
         ez = z - px @ z
-        out: Dict[str, Series] = {}
         individual_results = self.individual
+        out_df = DataFrame(
+            index=["rsquared", "partial.rsquared", "f.stat", "f.pval", "f.dist"],
+            columns=[],
+        )
         for col in endog.pandas:
             y = w * endog.pandas[[col]].values
             ey = y - px @ y
@@ -704,8 +728,8 @@ class FirstStageResults(_SummaryStr):
                 "f.pval": w_test.pval,
                 "f.dist": w_test.dist_name,
             }
-            out[col] = Series(inner)
-        out_df = DataFrame(out).T
+            out_df[col] = Series(inner)
+        out_df = out_df.T
 
         dep = self.dep
         r2sls = IV2SLS(dep, exog, endog, instr, weights=weights).fit(
@@ -766,6 +790,14 @@ class FirstStageResults(_SummaryStr):
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
+        smry = Summary()
+        if not self.individual:
+            table = SimpleTable([[]])
+            smry.tables.append(table)
+            smry.add_extra_txt(
+                "Model contains no endogenous variables. No first stage results."
+            )
+            return smry
         stubs_lookup = {
             "rsquared": "R-squared",
             "partial.rsquared": "Partial R-squared",
@@ -774,7 +806,7 @@ class FirstStageResults(_SummaryStr):
             "f.pval": "P-value (Partial F-stat)",
             "f.dist": "Partial F-stat Distn",
         }
-        smry = Summary()
+
         diagnostics = self.diagnostics
         vals = []
         for c in diagnostics:
@@ -826,16 +858,9 @@ class _CommonIVResults(OLSResults):
     """
 
     def __init__(
-        self,
-        results: Dict[str, Any],
-        model: Union[
-            "linearmodels.iv.model.IV2SLS",
-            "linearmodels.iv.model.IVLIML",
-            "linearmodels.iv.model.IVGMM",
-            "linearmodels.iv.model.IVGMMCUE",
-        ],
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVModelBase",
     ) -> None:
-        super(_CommonIVResults, self).__init__(results, model)
+        super().__init__(results, model)
         self._liml_kappa = results.get("liml_kappa", None)
 
     @property
@@ -872,9 +897,7 @@ class IVResults(_CommonIVResults):
     """
 
     def __init__(
-        self,
-        results: Dict[str, Any],
-        model: Union["linearmodels.iv.model.IV2SLS", "linearmodels.iv.model.IVLIML"],
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVLSModelBase",
     ) -> None:
         super(IVResults, self).__init__(results, model)
         self._kappa = results.get("kappa", 1)
@@ -1357,9 +1380,7 @@ class IVGMMResults(_CommonIVResults):
     """
 
     def __init__(
-        self,
-        results: Dict[str, Any],
-        model: Union["linearmodels.iv.model.IVGMM", "linearmodels.iv.model.IVGMMCUE"],
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVGMMBase",
     ):
         super(IVGMMResults, self).__init__(results, model)
         self._weight_mat = results["weight_mat"]

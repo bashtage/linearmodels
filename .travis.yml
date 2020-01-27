@@ -44,7 +44,7 @@ matrix:
   - python: 3.6
     env:
     - PYTHON=3.6
-    - NUMPY=1.14
+    - NUMPY=1.15
     - SCIPY=1.0.1
     - PANDAS=0.23
     - XARRAY=0.10

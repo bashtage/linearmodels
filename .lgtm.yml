@@ -4,3 +4,4 @@ extraction:
       exclude:
         - versioneer.py
         - linearmodels/_version.py
+

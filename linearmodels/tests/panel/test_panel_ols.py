@@ -164,30 +164,6 @@ def test_const_data_entity(const_data):
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
-def test_const_data_entity_weights(const_data):
-    y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, entity_effects=True, weights=const_data.w)
-    res = mod.fit(debiased=False)
-
-    y = mod.dependent.dataframe
-    w = mod.weights.dataframe
-    x = mod.exog.dataframe
-    d = mod.dependent.dummies("entity", drop_first=True)
-    d_columns = list(d.columns)
-
-    root_w = np.sqrt(w.values)
-    z = np.ones_like(x)
-    wd = root_w * d.values
-    wz = root_w
-    d = d - z @ lstsq(wz, wd, rcond=None)[0]
-
-    xd = np.c_[x.values, d.values]
-    xd = pd.DataFrame(xd, index=x.index, columns=list(x.columns) + d_columns)
-
-    res2 = IV2SLS(y, xd, None, None, weights=w).fit()
-    assert_allclose(res.params, res2.params.iloc[:1])
-
-
 def test_const_data_time(const_data):
     y, x = const_data.y, const_data.x
     mod = PanelOLS(y, x, time_effects=True)
@@ -204,15 +180,19 @@ def test_const_data_time(const_data):
     assert_allclose(res.params, res2.params.iloc[:1])
 
 
-def test_const_data_time_weights(const_data):
+@pytest.mark.parametrize("entity", [True, False])
+def test_const_data_single_effect_weights(const_data, entity):
     y, x = const_data.y, const_data.x
-    mod = PanelOLS(y, x, time_effects=True, weights=const_data.w)
+    mod = PanelOLS(
+        y, x, entity_effects=entity, time_effects=not entity, weights=const_data.w
+    )
     res = mod.fit(debiased=False)
 
     y = mod.dependent.dataframe
     w = mod.weights.dataframe
     x = mod.exog.dataframe
-    d = mod.dependent.dummies("time", drop_first=True)
+    dummy_type = "entity" if entity else "time"
+    d = mod.dependent.dummies(dummy_type, drop_first=True)
     d_columns = list(d.columns)
 
     root_w = np.sqrt(w.values)
