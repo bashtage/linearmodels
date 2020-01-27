@@ -36,6 +36,6 @@ until release 0.20.
    faq
 
 
-.. _Basic Examples: panel/examples/examples.ipynb
-.. _Using Formulas: panel/examples/using-formulas.ipynb
-.. _Data Formats: panel/examples/data-formats.ipynb
+.. _Basic Examples: examples/examples.ipynb
+.. _Using Formulas: examples/using-formulas.ipynb
+.. _Data Formats: examples/data-formats.ipynb
