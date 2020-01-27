@@ -37,9 +37,10 @@ Estimation Results
 .. autosummary::
    :toctree: panel/
 
+   FamaMacBethResults
+   PanelResults
    PanelEffectsResults
    RandomEffectsResults
-   PanelResults
    PanelModelComparison
 
 .. _panel-module-reference-covariance:
@@ -61,7 +62,6 @@ Panel Model Covariance Estimators
    DriscollKraay
    ACCovariance
    FamaMacBethCovariance
-   FamaMacBethKernelCovariance
 
 .. _panel-module-reference-data:
 
@@ -75,3 +75,13 @@ Panel Data Structures
    :toctree: panel/
 
    PanelData
+
+Helper Functions
+----------------
+.. module:: linearmodels.panel.utility
+   :synopsis: Utilities for working with panel data
+
+.. autosummary::
+   :toctree: panel/
+
+   generate_panel_data

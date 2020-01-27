@@ -29,5 +29,5 @@ tests.
    reference
    mathematical-formula
 
-.. _Basic Examples: iv/examples/basic-examples.ipynb
-.. _Advanced Examples: iv/examples/advanced-examples.ipynb
+.. _Basic Examples: examples/basic-examples.ipynb
+.. _Advanced Examples: examples/advanced-examples.ipynb

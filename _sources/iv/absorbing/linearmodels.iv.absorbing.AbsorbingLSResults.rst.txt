@@ -14,7 +14,6 @@ linearmodels.iv.absorbing.AbsorbingLSResults
       :toctree:
 
       ~AbsorbingLSResults.conf_int
-      ~AbsorbingLSResults.predict
       ~AbsorbingLSResults.wald_test
    
    
@@ -40,7 +39,6 @@ linearmodels.iv.absorbing.AbsorbingLSResults
       ~AbsorbingLSResults.fitted_values
       ~AbsorbingLSResults.has_constant
       ~AbsorbingLSResults.idiosyncratic
-      ~AbsorbingLSResults.kappa
       ~AbsorbingLSResults.method
       ~AbsorbingLSResults.model_ss
       ~AbsorbingLSResults.nobs

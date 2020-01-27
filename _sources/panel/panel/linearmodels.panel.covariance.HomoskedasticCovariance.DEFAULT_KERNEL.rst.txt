@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.HomoskedasticCovariance.DEFAULT\_KERNEL
+=====================================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoattribute:: HomoskedasticCovariance.DEFAULT_KERNEL

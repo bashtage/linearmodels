@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.summary
+=====================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.summary

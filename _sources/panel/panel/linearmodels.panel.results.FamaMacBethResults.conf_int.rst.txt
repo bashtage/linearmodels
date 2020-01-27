@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.results.FamaMacBethResults.conf\_int
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. automethod:: FamaMacBethResults.conf_int

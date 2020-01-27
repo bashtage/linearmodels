@@ -1,0 +1,6 @@
+linearmodels.panel.utility.generate\_panel\_data
+================================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. autofunction:: generate_panel_data

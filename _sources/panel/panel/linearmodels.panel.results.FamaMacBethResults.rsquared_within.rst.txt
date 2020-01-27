@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.rsquared\_within
+==============================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.rsquared_within

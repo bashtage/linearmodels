@@ -1,8 +1,0 @@
-:orphan:
-
-linearmodels.iv.absorbing.AbsorbingLSResults.predict
-====================================================
-
-.. currentmodule:: linearmodels.iv.absorbing
-
-.. automethod:: AbsorbingLSResults.predict

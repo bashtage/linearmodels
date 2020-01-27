@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.df\_resid
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.df_resid

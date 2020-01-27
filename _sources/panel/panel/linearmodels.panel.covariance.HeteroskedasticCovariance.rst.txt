@@ -24,6 +24,7 @@ linearmodels.panel.covariance.HeteroskedasticCovariance
    .. autosummary::
       :toctree:
 
+      ~HeteroskedasticCovariance.DEFAULT_KERNEL
       ~HeteroskedasticCovariance.cov
       ~HeteroskedasticCovariance.eps
       ~HeteroskedasticCovariance.name

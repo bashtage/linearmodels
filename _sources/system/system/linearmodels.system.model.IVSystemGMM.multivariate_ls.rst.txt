@@ -1,8 +1,0 @@
-:orphan:
-
-linearmodels.system.model.IVSystemGMM.multivariate\_ls
-======================================================
-
-.. currentmodule:: linearmodels.system.model
-
-.. automethod:: IVSystemGMM.multivariate_ls

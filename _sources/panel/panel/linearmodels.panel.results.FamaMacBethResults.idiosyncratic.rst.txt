@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.idiosyncratic
+===========================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.idiosyncratic

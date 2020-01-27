@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.fitted\_values
+============================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.fitted_values

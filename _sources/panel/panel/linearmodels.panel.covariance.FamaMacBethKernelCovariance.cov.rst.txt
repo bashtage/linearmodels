@@ -1,6 +1,0 @@
-linearmodels.panel.covariance.FamaMacBethKernelCovariance.cov
-=============================================================
-
-.. currentmodule:: linearmodels.panel.covariance
-
-.. autoproperty:: FamaMacBethKernelCovariance.cov

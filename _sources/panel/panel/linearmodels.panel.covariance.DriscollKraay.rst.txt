@@ -24,6 +24,7 @@ linearmodels.panel.covariance.DriscollKraay
    .. autosummary::
       :toctree:
 
+      ~DriscollKraay.DEFAULT_KERNEL
       ~DriscollKraay.cov
       ~DriscollKraay.eps
       ~DriscollKraay.name

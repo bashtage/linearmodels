@@ -24,6 +24,7 @@ linearmodels.panel.covariance.ACCovariance
    .. autosummary::
       :toctree:
 
+      ~ACCovariance.DEFAULT_KERNEL
       ~ACCovariance.cov
       ~ACCovariance.eps
       ~ACCovariance.name

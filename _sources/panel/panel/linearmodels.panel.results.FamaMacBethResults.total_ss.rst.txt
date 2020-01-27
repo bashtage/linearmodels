@@ -1,0 +1,6 @@
+linearmodels.panel.results.FamaMacBethResults.total\_ss
+=======================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: FamaMacBethResults.total_ss
