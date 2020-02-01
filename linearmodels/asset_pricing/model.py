@@ -571,7 +571,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         self,
         cov_type: str = "robust",
         debiased: bool = True,
-        **cov_config: Union[bool, int],
+        **cov_config: Union[bool, int, str],
     ) -> LinearFactorModelResults:
         """
         Estimate model parameters

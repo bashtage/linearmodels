@@ -1,7 +1,7 @@
 from linearmodels.compat.pandas import concat
 
 from collections import defaultdict
-from typing import Dict, List, NamedTuple, Optional, Tuple, TypeVar, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, TypeVar, Union
 
 import numpy as np
 from pandas import DataFrame, date_range
@@ -48,11 +48,14 @@ Variables have been fully absorbed and have removed from the regression:
 """
 
 SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
+SparseOrDense = TypeVar(
+    "SparseOrDense", NDArray, sp.csc_matrix, sp.csr_matrix, sp.coo_matrix
+)
 
 
 def preconditioner(
-    d: Union[SparseArray, ArrayLike], *, copy: bool = False
-) -> Tuple[Union[SparseArray, ArrayLike], np.ndarray]:
+    d: SparseOrDense, *, copy: bool = False
+) -> Tuple[SparseOrDense, NDArray]:
     """
     Parameters
     ----------
@@ -393,7 +396,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     return retain
 
 
-def check_absorbed(x: NDArray, variables: List[str]) -> None:
+def check_absorbed(x: NDArray, variables: Sequence[str]) -> None:
     """
     Check a regressor matrix for variables absorbed
 

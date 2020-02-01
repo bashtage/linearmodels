@@ -126,7 +126,7 @@ def test_direct_simple(data):
     out = simple_3sls(y, x, z)
     assert_allclose(res.params.values, out.beta1.squeeze())
     assert_allclose(res.sigma, out.sigma)
-    assert_allclose(res.resids.values, out.eps, atol=1e-4)
+    assert_allclose(np.asarray(res.resids), out.eps, atol=1e-4)
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
 
 
@@ -157,7 +157,7 @@ def test_single_equation(data):
     out = simple_3sls(y, x, z)
     assert_allclose(res.params.values, out.beta1.squeeze())
     assert_allclose(res.sigma, out.sigma)
-    assert_allclose(res.resids.values, out.eps)
+    assert_allclose(np.asarray(res.resids), out.eps)
     assert_allclose(np.diag(res.cov), np.diag(out.cov))
 
 

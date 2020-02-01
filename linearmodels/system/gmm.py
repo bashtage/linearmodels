@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from numpy import array, empty, ndarray, repeat, sqrt
 
@@ -62,7 +62,7 @@ class HomoskedasticWeightMatrix(object):
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: NDArray, x: List[NDArray]) -> NDArray:
+    def sigma(self, eps: NDArray, x: Sequence[NDArray]) -> NDArray:
         """
         Estimate residual covariance.
 
@@ -91,16 +91,21 @@ class HomoskedasticWeightMatrix(object):
         return sigma
 
     def weight_matrix(
-        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+        self,
+        x: Sequence[NDArray],
+        z: Sequence[NDArray],
+        eps: NDArray,
+        *,
+        sigma: Optional[ndarray] = None,
     ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
         Parameters
         ----------
-        x : ndarray
+        x : list[ndarray]
             List of containing model regressors for each equation in the system
-        z : ndarray
+        z : list[ndarray]
             List of containing instruments for each equation in the system
         eps : ndarray
             Model errors (nobs by neqn)
@@ -162,16 +167,21 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         self._name = "Heteroskedastic (Robust) Weighting"
 
     def weight_matrix(
-        self, x: NDArray, z: NDArray, eps: NDArray, *, sigma: Optional[ndarray] = None
+        self,
+        x: Sequence[NDArray],
+        z: Sequence[NDArray],
+        eps: NDArray,
+        *,
+        sigma: Optional[ndarray] = None,
     ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
 
         Parameters
         ----------
-        x : ndarray
+        x : list[ndarray]
             Model regressors (exog and endog), (nobs by nvar)
-        z : ndarray
+        z : list[ndarray]
             Model instruments (exog and instruments), (nobs by ninstr)
         eps : ndarray
             Model errors (nobs by 1)
@@ -201,7 +211,9 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
         return w
 
-    def _debias_scale(self, nobs: int, x: NDArray, z: NDArray) -> float:
+    def _debias_scale(
+        self, nobs: int, x: Sequence[NDArray], z: Sequence[NDArray]
+    ) -> float:
         if not self._debiased:
             return 1
         nvar = array(list(map(lambda a: a.shape[1], x)))
@@ -274,8 +286,8 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def weight_matrix(
         self,
-        x: List[NDArray],
-        z: List[NDArray],
+        x: Sequence[NDArray],
+        z: Sequence[NDArray],
         eps: NDArray,
         *,
         sigma: Optional[ndarray] = None,

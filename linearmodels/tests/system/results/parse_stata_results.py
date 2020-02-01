@@ -1,6 +1,6 @@
 from io import StringIO
 import os
-from typing import List
+from typing import Dict, List
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ cwd = os.path.split(os.path.abspath(__file__))[0]
 with open(os.path.join(cwd, filename), "r") as results_file:
     results = results_file.readlines()
 
-blocks = {}
+blocks: Dict[str, List[str]] = {}
 block: List[str] = []
 key = ""
 for line in results:
@@ -115,4 +115,4 @@ def process_params(params):
     return values
 
 
-stata_results = {block: split_block(blocks[block]) for block in blocks}
+stata_results = {block: split_block(blocks[str(block)]) for block in blocks}

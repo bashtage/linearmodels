@@ -795,7 +795,7 @@ class FirstStageResults(_SummaryStr):
             table = SimpleTable([[]])
             smry.tables.append(table)
             smry.add_extra_txt(
-                "Model contains no endogenous variables. No first stage results."
+                ["Model contains no endogenous variables. No first stage results."]
             )
             return smry
         stubs_lookup = {
@@ -1669,7 +1669,9 @@ class IVModelComparison(_ModelComparison):
 
 
 def compare(
-    results: Sequence[AnyResult], *, precision: str = "tstats"
+    results: Union[Dict[str, AnyResult], Sequence[AnyResult]],
+    *,
+    precision: str = "tstats",
 ) -> IVModelComparison:
     """
     Compare the results of multiple models

@@ -267,7 +267,7 @@ class PanelData(object):
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: NDArray) -> None:
+    def drop(self, locs: Union[Series, NDArray]) -> None:
         """
         Drop observations from the panel.
 

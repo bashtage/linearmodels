@@ -60,8 +60,8 @@ def cov_data():
     res = mod.fit(cov_type="unadjusted")
     x = mod._x
     z = mod._z
-    eps = res.resids.values
-    sigma = res.sigma
+    eps = np.asarray(res.resids)
+    sigma = np.asarray(res.sigma)
     return x, z, eps, sigma
 
 

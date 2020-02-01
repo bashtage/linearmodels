@@ -93,11 +93,10 @@ def test_linear_model_time_series(data):
         cov = res.cov.values[
             (nf + 1) * i : (nf + 1) * (i + 1), (nf + 1) * i : (nf + 1) * (i + 1)
         ]
-        ols_cov = ols_res.cov.values
 
-        assert_allclose(cov, ols_cov)
-    assert_allclose(res.params.values.ravel(), np.array(all_params))
-    assert_allclose(res.tstats.values.ravel(), np.array(all_tstats))
+        assert_allclose(cov, np.asarray(ols_res.cov))
+    assert_allclose(np.asarray(res.params).ravel(), np.array(all_params))
+    assert_allclose(np.asarray(res.tstats).ravel(), np.array(all_tstats))
     assert_allclose(res.risk_premia, np.asarray(factors).mean(0)[1:])
 
     xpxi_direct = np.eye((nf + 1) * nport + nf)
@@ -111,7 +110,7 @@ def test_linear_model_time_series(data):
     xe = np.c_[x * e, f - f.mean(0)[None, :]]
     xeex_direct = xe.T @ xe / nobs
     cov = xpxi_direct @ xeex_direct @ xpxi_direct / (nobs - nfp1)
-    assert_allclose(cov, res.cov.values)
+    assert_allclose(cov, np.asarray(res.cov))
 
     alphas = np.array(all_params)[0::nfp1][:, None]
     alpha_cov = cov[0 : (nfp1 * nport) : nfp1, 0 : (nfp1 * nport) : nfp1]
@@ -194,7 +193,7 @@ def test_drop_missing(data):
     f.drop(isnull)
 
     res2 = TradedFactorModel(p, f).fit()
-    assert_equal(res.params.values, res2.params.values)
+    assert_equal(np.asarray(res.params), np.asarray(res2.params))
 
 
 def test_unknown_kernel(data):

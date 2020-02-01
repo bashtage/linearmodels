@@ -580,7 +580,7 @@ def param_table(results: Any, title: str, pad_bottom: bool = False) -> SimpleTab
     )
 
 
-def format_wide(s: List[str], cols: int) -> List[List[str]]:
+def format_wide(s: Sequence[str], cols: int) -> List[List[str]]:
     """
     Format a list of strings.
 

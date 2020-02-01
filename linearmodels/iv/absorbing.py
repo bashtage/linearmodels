@@ -218,7 +218,9 @@ def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
         Sparse matrix of dummies with unit column norm
     """
     codes = asarray(get_codes(category_product(cat).cat))[:, None]
-    return dummy_matrix(codes, precondition=precondition)[0]
+    mat = dummy_matrix(codes, precondition=precondition)[0]
+    assert isinstance(mat, csc_matrix)
+    return mat
 
 
 def category_continuous_interaction(
@@ -244,7 +246,9 @@ def category_continuous_interaction(
     if not precondition:
         return interact
     else:
-        return preconditioner(interact)[0]
+        contioned = preconditioner(interact)[0]
+        assert isinstance(contioned, csc_matrix)
+        return contioned
 
 
 class Interaction(object):
@@ -686,7 +690,7 @@ class AbsorbingLS(object):
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
         self._num_params = 0
-        self._regressors: OptionalArrayLike = None
+        self._regressors: Optional[csc_matrix] = None
         self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
     def _drop_missing(self) -> NDArray:
@@ -845,7 +849,7 @@ class AbsorbingLS(object):
         mu_exog = (root_w.T @ exog) / denom
 
         lsmr_options = {} if lsmr_options is None else lsmr_options
-        assert self._regressors is not None
+        assert isinstance(self._regressors, csc_matrix)
         if self._regressors.shape[1] > 0:
             dep_resid = lsmr_annihilate(
                 self._regressors, dep, use_cache, self._regressors_hash, **lsmr_options

@@ -297,7 +297,7 @@ def test_absorbing_exceptions(rs):
 
 
 def test_clear_cache():
-    _VARIABLE_CACHE["key"] = "value"
+    _VARIABLE_CACHE["key"] = {"a": np.empty(100)}
     clear_cache()
     assert len(_VARIABLE_CACHE) == 0
 
@@ -505,9 +505,8 @@ def test_against_ols(ols_data):
     if ols_data.absorb is not None:
         absorb.append(to_numpy(ols_data.absorb.cont))
         if ols_data.absorb.cat.shape[1] > 0:
-            dummies: sp.csc_matrix = dummy_matrix(
-                ols_data.absorb.cat, precondition=False
-            )[0]
+            dummies = dummy_matrix(ols_data.absorb.cat, precondition=False)[0]
+            assert isinstance(dummies, sp.csc_matrix)
             absorb.append(dummies.A)
         has_dummy = ols_data.absorb.cat.shape[1] > 0
     if ols_data.interactions is not None:

@@ -128,7 +128,7 @@ def test_linear_restriction(data):
     q = np.eye(nvar)
     ts = res.wald_test(q, np.zeros(nvar))
     p = res.params.values[:, None]
-    c = res.cov.values
+    c = np.asarray(res.cov)
     stat = float(p.T @ np.linalg.inv(c) @ p)
     assert_allclose(stat, ts.stat)
     assert ts.df == nvar
