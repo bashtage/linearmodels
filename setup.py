@@ -20,35 +20,9 @@ of models.
 *                               WARNING                                      *
 ******************************************************************************
 """
+with open("README.md", "r") as readme:
+    long_description = readme.read()
 
-try:
-    markdown = os.stat("README.md").st_mtime
-    if os.path.exists("README.rst"):
-        rst = os.stat("README.rst").st_mtime
-    else:
-        rst = markdown - 1
-
-    if rst >= markdown:
-        with open("README.rst", "r") as rst:
-            description = rst.read()
-    else:
-        import pypandoc
-
-        osx_line_ending = "\r"
-        windows_line_ending = "\r\n"
-        linux_line_ending = "\n"
-
-        description = pypandoc.convert_file("README.md", "rst")
-        description = description.replace(windows_line_ending, linux_line_ending)
-        description = description.replace(osx_line_ending, linux_line_ending)
-        with open("README.rst", "w") as rst:
-            rst.write(description)
-
-except (ImportError, OSError):
-    import warnings
-
-    warnings.warn("Unable to convert README.md to README.rst", UserWarning)
-    description = open("README.md").read()
 
 additional_files = ["py.typed"]
 for filename in glob.iglob("./linearmodels/datasets/**", recursive=True):
@@ -98,7 +72,8 @@ def run_setup(binary=True):
         author="Kevin Sheppard",
         author_email="kevin.k.sheppard@gmail.com",
         url="http://github.com/bashtage/linearmodels",
-        long_description=description,
+        long_description=long_description,
+        long_description_content_type='text/markdown',
         install_requires=open("requirements.txt").read().split("\n"),
         include_package_data=True,
         package_data={"linearmodels": additional_files},

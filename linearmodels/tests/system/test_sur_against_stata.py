@@ -61,7 +61,11 @@ def model_data(request) -> AttrDict:
     mod = SUR(rekeyed_data)
     if constraint is not None:
         mod.add_constraints(constraint)
-    res = mod.fit(**cov_kwds)
+
+    if model_type != "ss":
+        res = mod.fit(cov_type="unadjusted")
+    else:
+        res = mod.fit(cov_type="unadjusted", debiased=True)
 
     return AttrDict(
         data=rekeyed_data,
