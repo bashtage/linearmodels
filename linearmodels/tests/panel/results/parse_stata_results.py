@@ -65,9 +65,10 @@ def parse_block(block):
 
 
 def data():
+    data_blocks = {}
     for key in blocks:
-        blocks[key] = parse_block(blocks[key])
-    return blocks
+        data_blocks[key] = parse_block(blocks[key])
+    return data_blocks
 
 
 if __name__ == "__main__":

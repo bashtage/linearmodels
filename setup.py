@@ -50,7 +50,7 @@ except (ImportError, OSError):
     warnings.warn("Unable to convert README.md to README.rst", UserWarning)
     description = open("README.md").read()
 
-additional_files = []
+additional_files = ["py.typed"]
 for filename in glob.iglob("./linearmodels/datasets/**", recursive=True):
     if ".csv.bz" in filename:
         additional_files.append(filename.replace("./linearmodels/", ""))

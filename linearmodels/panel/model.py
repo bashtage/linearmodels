@@ -784,7 +784,7 @@ class PooledOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray],
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -850,7 +850,9 @@ class PooledOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            extra_df = int(cov_config.get("extra_df", 0))
+            _extra_df = cov_config.get("extra_df", 0)
+            assert isinstance(_extra_df, (int, str))
+            extra_df = int(_extra_df)
         cov = setup_covariance_estimator(
             self._cov_estimators,
             cov_type,
@@ -1544,7 +1546,7 @@ class PanelOLS(_PanelModelBase):
         debiased: bool = True,
         auto_df: bool = True,
         count_effects: bool = True,
-        **cov_config: Union[bool, float, str, NDArray],
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> PanelEffectsResults:
         """
         Estimate model parameters
@@ -1871,7 +1873,7 @@ class BetweenOLS(_PanelModelBase):
         reweight: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray],
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -1934,7 +1936,9 @@ class BetweenOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            extra_df = int(cov_config.get("extra_df", 0))
+            _extra_df = cov_config.get("extra_df", 0)
+            assert isinstance(_extra_df, (int, str))
+            extra_df = int(_extra_df)
         cov = setup_covariance_estimator(
             self._cov_estimators,
             cov_type,
@@ -2137,7 +2141,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray],
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2226,7 +2230,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            extra_df = int(cov_config.get("extra_df", 0))
+            _extra_df = cov_config.get("extra_df", 0)
+            assert isinstance(_extra_df, (int, str))
+            extra_df = int(_extra_df)
 
         cov = setup_covariance_estimator(
             self._cov_estimators,
@@ -2422,7 +2428,7 @@ class RandomEffects(_PanelModelBase):
         small_sample: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray],
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> RandomEffectsResults:
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -2480,7 +2486,9 @@ class RandomEffects(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            extra_df = int(cov_config.get("extra_df", 0))
+            _extra_df = cov_config.get("extra_df", 0)
+            assert isinstance(_extra_df, (int, str))
+            extra_df = int(_extra_df)
 
         cov = setup_covariance_estimator(
             self._cov_estimators,

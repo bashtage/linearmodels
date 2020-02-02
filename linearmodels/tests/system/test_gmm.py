@@ -54,8 +54,8 @@ def weight_data():
     x = mod._x
     z = mod._z
     res = mod.fit(cov_type="unadjusted")
-    eps = res.resids.values
-    sigma = res.sigma
+    eps = np.asarray(res.resids)
+    sigma = np.asarray(res.sigma)
     return x, z, eps, sigma
 
 
@@ -92,7 +92,7 @@ def test_cov(data):
     mod = IVSystemGMM(data.eqns, weight_type=data.weight_type)
     res = mod.fit(cov_type=data.weight_type, iter_limit=data.steps)
     simple = simple_gmm(data.y, data.x, data.z, data.robust, steps=data.steps)
-    assert_allclose(res.cov.values, simple.cov)
+    assert_allclose(np.asarray(res.cov), simple.cov)
 
 
 def test_formula_equivalence(data):
@@ -139,7 +139,7 @@ def test_formula_equivalence(data):
 
 
 def test_formula_equivalence_weights(data):
-    weights = AttrDict()
+    weights = {}
     eqn_copy = AttrDict()
     for key in data.eqns:
         eqn = {k: v for k, v in data.eqns[key].items()}

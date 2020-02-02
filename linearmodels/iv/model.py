@@ -1495,7 +1495,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: NDArray = None,
+        starting: Union[NDArray, Series] = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,

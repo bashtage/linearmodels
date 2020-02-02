@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -19,8 +20,8 @@ def repl_const(df):
     return df
 
 
-def parse_file(name):
-    blocks = defaultdict(list)
+def parse_file(name: str) -> Dict[str, List[str]]:
+    blocks: Dict[str, List[str]] = defaultdict(list)
     current_key = ""
     with open(name, "r") as stata:
         for line in stata:
@@ -106,10 +107,11 @@ def finalize(params, stats, cov, weight_mat):
 
 def process_results(filename):
     blocks = parse_file(filename)
+    final_blocks = {}
     for key in blocks:
         out = parse_block(blocks[key])
-        blocks[key] = finalize(out.params, out.stats, out.cov, out.weight_mat)
-    return blocks
+        final_blocks[key] = finalize(out.params, out.stats, out.cov, out.weight_mat)
+    return final_blocks
 
 
 if __name__ == "__main__":

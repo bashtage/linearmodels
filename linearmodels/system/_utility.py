@@ -291,8 +291,8 @@ class LinearConstraint(object):
         self._t, self._l, self._a = t, left, a
 
     @property
-    def r(self) -> NDArray:
-        """Constrain loading matrix"""
+    def r(self) -> pd.DataFrame:
+        """Constraint loading matrix"""
         return self._r_pd
 
     @property

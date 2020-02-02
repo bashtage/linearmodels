@@ -375,7 +375,7 @@ def test_ols_against_gls(data):
     mod = SUR(data)
     res = mod.fit(method="gls")
     sigma = res.sigma
-    sigma_m12 = inv_matrix_sqrt(sigma)
+    sigma_m12 = inv_matrix_sqrt(np.asarray(sigma))
     key = list(data.keys())[0]
 
     if isinstance(data[key], Mapping):

@@ -60,7 +60,7 @@ def test_fama_macbeth(data):
     e_params = all_params - params[None, :]
     ntime = e_params.shape[0]
     cov = e_params.T @ e_params / ntime / (ntime - 1)
-    assert_allclose(cov, res.cov.values)
+    assert_allclose(cov, np.asarray(res.cov))
     access_attributes(res)
 
 

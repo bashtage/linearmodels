@@ -4,7 +4,7 @@ Results for linear factor models
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -154,7 +154,7 @@ class LinearFactorModelResults(_SummaryStr):
         params: NDArray,
         se: NDArray,
         name: str,
-        param_names: List[str],
+        param_names: Sequence[str],
         first: bool = False,
     ) -> SimpleTable:
         tstats = params / se
@@ -172,7 +172,7 @@ class LinearFactorModelResults(_SummaryStr):
                 txt_row.append(f(v))
             data.append(txt_row)
         title = "{0} Coefficients".format(name)
-        table_stubs = param_names
+        table_stubs = list(param_names)
         if first:
             header: Optional[List[str]] = [
                 "Parameter",

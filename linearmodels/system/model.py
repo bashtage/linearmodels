@@ -1670,7 +1670,7 @@ class SUR(_LSSystemModelBase):
         data: DataFrame,
         *,
         sigma: Optional[ArrayLike] = None,
-        weights: Optional[Dict[str, ArrayLike]] = None,
+        weights: Optional[Mapping[str, ArrayLike]] = None,
     ) -> "SUR":
         """
         Specify a SUR using the formula interface
@@ -1838,7 +1838,7 @@ class IVSystemGMM(_SystemModelBase):
         tol: float = 1e-6,
         initial_weight: Optional[NDArray] = None,
         cov_type: str = "robust",
-        **cov_config: bool,
+        **cov_config: Union[bool, float],
     ) -> GMMSystemResults:
         """
         Estimate model parameters
