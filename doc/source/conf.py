@@ -87,10 +87,10 @@ for file_to_copy in files:
     existing_hash = ""
     with open(file_to_copy, "rb") as example:
         example_file = example.read()
-        example_hash = hashlib.md5(example_file).hexdigest()
+        example_hash = hashlib.sha512(example_file).hexdigest()
     if os.path.exists(out_file):
         with open(out_file, "rb") as existing:
-            existing_hash = hashlib.md5(existing.read()).hexdigest()
+            existing_hash = hashlib.sha512(existing.read()).hexdigest()
     if existing_hash != example_hash:
         print(f"Copying {file_to_copy} to {out_file}")
         with open(out_file, "wb") as out:
