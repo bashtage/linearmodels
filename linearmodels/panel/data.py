@@ -180,9 +180,9 @@ class PanelData(object):
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items: List[Hashable] = x.coords[x.dims[0]].values.tolist()
-                        major: List[Hashable] = x.coords[x.dims[1]].values.tolist()
-                        minor: List[Hashable] = x.coords[x.dims[2]].values.tolist()
+                        items: List[Hashable] = np.asarray(x.coords[x.dims[0]]).tolist()
+                        major: List[Hashable] = np.asarray(x.coords[x.dims[1]]).tolist()
+                        minor: List[Hashable] = np.asarray(x.coords[x.dims[2]]).tolist()
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
