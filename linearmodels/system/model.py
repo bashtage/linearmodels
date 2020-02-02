@@ -1974,14 +1974,14 @@ class IVSystemGMM(_SystemModelBase):
         sigma: NDArray,
         iter_count: int,
         cov_type: str,
-        cov_config: Dict[str, bool],
+        cov_config: Dict[str, Union[bool, float]],
         cov_est: Union[GMMHeteroskedasticCovariance, GMMHomoskedasticCovariance],
     ) -> GMMSystemResults:
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
         # Repackage results for individual equations
         individual = AttrDict()
-        debiased = cov_config.get("debiased", False)
+        debiased = bool(cov_config.get("debiased", False))
         method = "{0}-Step System GMM".format(iter_count)
         if iter_count > 2:
             method = "Iterative System GMM"

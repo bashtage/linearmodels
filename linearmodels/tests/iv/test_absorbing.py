@@ -37,7 +37,7 @@ pytestmark = pytest.mark.filterwarnings(
 
 class Hasher(object):
     @property
-    def hash_func(self):
+    def hash_func(self) -> None:
         try:
             import xxhash
 
