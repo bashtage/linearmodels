@@ -260,10 +260,10 @@ def test_smoke(data):
 
 def test_absorbing_exceptions(rs):
     with pytest.raises(TypeError):
+        absorbed = rs.standard_normal((NOBS, 2))
+        assert isinstance(absorbed, np.ndarray)
         AbsorbingLS(
-            rs.standard_normal(NOBS),
-            rs.standard_normal((NOBS, 2)),
-            absorb=rs.standard_normal((NOBS, 2)),
+            rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)), absorb=absorbed,
         )
     with pytest.raises(ValueError):
         AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS - 1, 2)))
@@ -289,10 +289,12 @@ def test_absorbing_exceptions(rs):
     with pytest.raises(RuntimeError):
         mod.absorbed_exog
     with pytest.raises(TypeError):
+        interactions = rs.randint(0, 10, size=(NOBS, 2))
+        assert isinstance(interactions, np.ndarray)
         AbsorbingLS(
             rs.standard_normal(NOBS),
             rs.standard_normal((NOBS, 2)),
-            interactions=rs.randint(0, 10, size=(NOBS, 2)),
+            interactions=interactions,
         )
 
 

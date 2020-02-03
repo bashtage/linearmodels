@@ -15,7 +15,7 @@ except ImportError:
 
 
 class TestDataHandler(object):
-    def test_numpy_2d(self):
+    def test_numpy_2d(self) -> None:
         x = np.empty((10, 2))
         xdh = IVData(x)
         assert xdh.ndim == x.ndim
@@ -27,7 +27,7 @@ class TestDataHandler(object):
         assert xdh.shape == (10, 2)
         assert xdh.labels == {0: xdh.rows, 1: xdh.cols}
 
-    def test_numpy_1d(self):
+    def test_numpy_1d(self) -> None:
         x = np.empty(10)
         xdh = IVData(x)
         assert xdh.ndim == 2
@@ -38,7 +38,7 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 1)
 
-    def test_pandas_df_numeric(self):
+    def test_pandas_df_numeric(self) -> None:
         x = np.empty((10, 2))
         index = pd.date_range("2017-01-01", periods=10)
         xdf = pd.DataFrame(x, columns=["a", "b"], index=index)
@@ -51,7 +51,7 @@ class TestDataHandler(object):
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 2)
 
-    def test_pandas_series_numeric(self):
+    def test_pandas_series_numeric(self) -> None:
         x = np.empty(10)
         index = pd.date_range("2017-01-01", periods=10)
         xs = pd.Series(x, name="charlie", index=index)
@@ -65,7 +65,7 @@ class TestDataHandler(object):
         assert xdh.shape == (10, 1)
 
     @pytest.mark.skipif(MISSING_XARRAY, reason="xarray not installed")
-    def test_xarray_1d(self):
+    def test_xarray_1d(self) -> None:
         x_np = np.random.randn(10)
         x = xr.DataArray(x_np)
         dh = IVData(x, "some_variable")
@@ -85,7 +85,7 @@ class TestDataHandler(object):
         assert_frame_equal(expected, dh.pandas)
 
     @pytest.mark.skipif(MISSING_XARRAY, reason="xarray not installed")
-    def test_xarray_2d(self):
+    def test_xarray_2d(self) -> None:
         x_np = np.random.randn(10, 2)
         x = xr.DataArray(x_np)
         dh = IVData(x)
@@ -104,7 +104,7 @@ class TestDataHandler(object):
         expected = pd.DataFrame(x_np, columns=dh.cols, index=dh.rows)
         assert_frame_equal(expected, dh.pandas)
 
-    def test_invalid_types(self):
+    def test_invalid_types(self) -> None:
         with pytest.raises(ValueError):
             IVData(np.empty((1, 1, 1)))
         with pytest.raises(ValueError):
@@ -113,12 +113,12 @@ class TestDataHandler(object):
 
             class AnotherClass(object):
                 @property
-                def ndim(self):
+                def ndim(self) -> int:
                     return 2
 
             IVData(AnotherClass())
 
-    def test_string_cat_equiv(self):
+    def test_string_cat_equiv(self) -> None:
         s1 = pd.Series(["a", "b", "a", "b", "c", "d", "a", "b"])
         s2 = pd.Series(np.arange(8.0))
         s3 = pd.Series(
@@ -131,7 +131,7 @@ class TestDataHandler(object):
         dh_cat = IVData(df_cat)
         assert_frame_equal(dh.pandas, dh_cat.pandas)
 
-    def test_existing_datahandler(self):
+    def test_existing_datahandler(self) -> None:
         x = np.empty((10, 2))
         index = pd.date_range("2017-01-01", periods=10)
         xdf = pd.DataFrame(x, columns=["a", "b"], index=index)
@@ -144,7 +144,7 @@ class TestDataHandler(object):
         assert xdh.ndim == xdh2.ndim
         assert_frame_equal(xdh.pandas, xdh2.pandas)
 
-    def test_categorical(self):
+    def test_categorical(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
@@ -158,7 +158,7 @@ class TestDataHandler(object):
         assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
         assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
-    def test_categorical_series(self):
+    def test_categorical_series(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         s = pd.Series(cat, name="cat", index=index)
@@ -170,7 +170,7 @@ class TestDataHandler(object):
         assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
         assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
-    def test_categorical_no_conversion(self):
+    def test_categorical_no_conversion(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         s = pd.Series(cat, index=index, name="cat")
@@ -182,7 +182,7 @@ class TestDataHandler(object):
         df = pd.DataFrame(s)
         assert_frame_equal(dh.pandas, df)
 
-    def test_categorical_keep_first(self):
+    def test_categorical_keep_first(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
         cat = pd.Categorical(["a", "b", "a", "b", "a", "a", "b", "c", "c", "a"])
         num = np.empty(10)
@@ -197,16 +197,16 @@ class TestDataHandler(object):
         assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
         assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
 
-    def test_nobs_missing_error(self):
+    def test_nobs_missing_error(self) -> None:
         with pytest.raises(ValueError):
             IVData(None)
 
-    def test_incorrect_nobs(self):
+    def test_incorrect_nobs(self) -> None:
         x = np.empty((10, 1))
         with pytest.raises(ValueError):
             IVData(x, nobs=100)
 
-    def test_mixed_data(self):
+    def test_mixed_data(self) -> None:
         s = pd.Series([1, 2, "a", -3.0])
         with pytest.raises(ValueError):
             IVData(s)

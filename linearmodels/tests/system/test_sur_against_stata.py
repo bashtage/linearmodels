@@ -1,3 +1,5 @@
+from typing import Dict, Union
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
@@ -18,7 +20,7 @@ pytestmark = pytest.mark.filterwarnings(
 
 
 @pytest.fixture(scope="module", params=list(stata_results.keys()))
-def model_data(request):
+def model_data(request) -> AttrDict:
     key = request.param
     dgp, model_type = key.split("-")
     if dgp == "basic":
@@ -32,7 +34,7 @@ def model_data(request):
                 data[data_key]["exog"] = exog
     else:  # dgp == 'missing'
         data = missing_data
-    cov_kwds = {"cov_type": "unadjusted"}
+    cov_kwds: Dict[str, Union[str, bool]] = {"cov_type": "unadjusted"}
     if model_type == "ss":
         cov_kwds["debiased"] = True
     stata_result = stata_results[key]
@@ -59,7 +61,11 @@ def model_data(request):
     mod = SUR(rekeyed_data)
     if constraint is not None:
         mod.add_constraints(constraint)
-    res = mod.fit(**cov_kwds)
+
+    if model_type != "ss":
+        res = mod.fit(cov_type="unadjusted")
+    else:
+        res = mod.fit(cov_type="unadjusted", debiased=True)
 
     return AttrDict(
         data=rekeyed_data,
@@ -73,13 +79,13 @@ def model_data(request):
     )
 
 
-def test_params(model_data):
+def test_params(model_data: AttrDict) -> None:
     res = model_data.res
     stata_params = model_data.stata_result.params
     assert_allclose(res.params, stata_params.param)
 
 
-def test_cov(model_data):
+def test_cov(model_data: AttrDict) -> None:
     res = model_data.res
     stata_cov = model_data.stata_result.variance
     sigma_stata = np.diag(stata_cov)[:, None]
@@ -90,25 +96,25 @@ def test_cov(model_data):
     assert_allclose(corr, corr_stata, rtol=1, atol=1e-6)
 
 
-def test_tstats(model_data):
+def test_tstats(model_data: AttrDict) -> None:
     res = model_data.res
     stata_params = model_data.stata_result.params
     assert_allclose(res.tstats, stata_params.tstat)
 
 
-def test_pvals(model_data):
+def test_pvals(model_data: AttrDict) -> None:
     res = model_data.res
     stata_params = model_data.stata_result.params
     assert_allclose(res.pvalues, stata_params.pval, atol=1e-6)
 
 
-def test_sigma(model_data):
+def test_sigma(model_data: AttrDict) -> None:
     res = model_data.res
     stata_sigma = model_data.stata_result.sigma
     assert_allclose(res.sigma, stata_sigma)
 
 
-def test_f_stat(model_data):
+def test_f_stat(model_data: AttrDict) -> None:
     res = model_data.res
     stata_stats = model_data.stata_result.stats
     for i, key in enumerate(res.equations):
@@ -123,7 +129,7 @@ def test_f_stat(model_data):
         assert_allclose(pval, stata_pval, atol=1e-6)
 
 
-def test_r2(model_data):
+def test_r2(model_data: AttrDict) -> None:
     res = model_data.res
     stata_stats = model_data.stata_result.stats
     for i, key in enumerate(res.equations):
@@ -133,7 +139,7 @@ def test_r2(model_data):
         assert_allclose(stat, stata_stat)
 
 
-def test_sum_of_squares(model_data):
+def test_sum_of_squares(model_data: AttrDict) -> None:
     res = model_data.res
     stata_stats = model_data.stata_result.stats
     for i, key in enumerate(res.equations):
@@ -146,7 +152,7 @@ def test_sum_of_squares(model_data):
         assert_allclose(stat, stata_stat)
 
 
-def test_df_model(model_data):
+def test_df_model(model_data: AttrDict) -> None:
     res = model_data.res
     stata_stats = model_data.stata_result.stats
     for i, key in enumerate(res.equations):

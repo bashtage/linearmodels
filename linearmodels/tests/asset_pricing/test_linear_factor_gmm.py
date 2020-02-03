@@ -35,10 +35,10 @@ def test_linear_model_gmm_moments_jacobian(data):
         for j in range(fc.shape[1]):
             mom.append(eps * fc[:, [j]])
     mom.append(f - mu)
-    mom = np.hstack(tuple(mom))
+    mom_arr = np.hstack(tuple(mom))
 
     mod_jac = mod._jacobian(params, True)
-    jac = np.zeros((mom.shape[1], params.shape[0]))
+    jac = np.zeros((mom_arr.shape[1], params.shape[0]))
     nport, nf = p.shape[1], f.shape[1]
     # 1,1
     jac[: (nport * (nf + 1)), : nport * nf] = np.kron(np.eye(nport), fc.T @ x / n)
@@ -57,10 +57,10 @@ def test_linear_model_gmm_moments_jacobian(data):
     # 2,2
     jac[-nf:, -nf:] = np.eye(nf)
 
-    assert_allclose(mom, mod_mom)
+    assert_allclose(mom_arr, mod_mom)
     assert_allclose(jac, mod_jac)
 
-    me = mom - mom.mean(0)[None, :]
+    me = mom_arr - mom_arr.mean(0)[None, :]
     s = me.T @ me / n
     s = (s + s.T) / 2
     cov = np.linalg.inv(jac.T @ np.linalg.inv(s) @ jac) / n
