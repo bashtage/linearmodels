@@ -936,7 +936,9 @@
 ./asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.total_ss.html
 ./asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.tstats.html
 ./asset-pricing/examples/examples.html
+./asset-pricing/examples/examples.ipynb
 ./asset-pricing/examples/formulas.html
+./asset-pricing/examples/formulas.ipynb
 ./asset-pricing/index.html
 ./asset-pricing/introduction.html
 ./asset-pricing/mathematical-formula.html
@@ -998,9 +1000,13 @@
 ./iv/absorbing/linearmodels.iv.absorbing.Interaction.nobs.html
 ./iv/absorbing/linearmodels.iv.absorbing.Interaction.sparse.html
 ./iv/examples/absorbing-regression.html
+./iv/examples/absorbing-regression.ipynb
 ./iv/examples/advanced-examples.html
+./iv/examples/advanced-examples.ipynb
 ./iv/examples/basic-examples.html
+./iv/examples/basic-examples.ipynb
 ./iv/examples/using-formulas.html
+./iv/examples/using-formulas.ipynb
 ./iv/index.html
 ./iv/introduction.html
 ./iv/iv/linearmodels.iv.covariance.ClusteredCovariance.config.html
@@ -1235,8 +1241,11 @@
 ./iv/reference.html
 ./objects.inv
 ./panel/examples/data-formats.html
+./panel/examples/data-formats.ipynb
 ./panel/examples/examples.html
+./panel/examples/examples.ipynb
 ./panel/examples/using-formulas.html
+./panel/examples/using-formulas.ipynb
 ./panel/faq.html
 ./panel/index.html
 ./panel/introduction.html
@@ -1521,8 +1530,11 @@
 ./searchindex.js
 ./sitemap.xml
 ./system/examples/examples.html
+./system/examples/examples.ipynb
 ./system/examples/formulas.html
+./system/examples/formulas.ipynb
 ./system/examples/three-stage-ls.html
+./system/examples/three-stage-ls.ipynb
 ./system/index.html
 ./system/mathematical-formula.html
 ./system/reference.html
