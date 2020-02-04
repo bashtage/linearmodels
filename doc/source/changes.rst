@@ -1,6 +1,10 @@
 Change Log
 ----------
 
+Version 4.17
+============
+* Fixed various typing issues (:issue:`239`, :issue:`240`).
+
 Version 4.16
 ============
 * Verify typing using mypy (:issue:`232`, :issue:`234`, :issue:`235`, :issue:`238`).
