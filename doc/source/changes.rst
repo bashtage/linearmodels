@@ -1,6 +1,14 @@
 Change Log
 ----------
 
+
+Since 4.17
+==========
+* Fixed a bug in :class:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`
+  which used incorrect values for a tuning parameter in the bandwidth estimation
+  for the Parzen and Quadratic Spectral kernels (:issue:`242`).
+
+
 Version 4.17
 ============
 * Fixed various typing issues (:issue:`239`, :issue:`240`).

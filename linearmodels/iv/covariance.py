@@ -239,10 +239,10 @@ def kernel_optimal_bandwidth(x: NDArray, kernel: str = "bartlett") -> int:
         m_star = int(ceil(4 * (t / 100) ** (2 / 9)))
     elif kernel in ("qs", "andrews", "quadratic-spectral"):
         q, c = 2, 1.3221
-        m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
+        m_star = int(ceil(4 * (t / 100) ** (2 / 25)))
     elif kernel in ("gallant", "parzen"):
         q, c = 2, 2.6614
-        m_star = int(ceil(4 * (t / 100) ** (2 / 25)))
+        m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
     else:
         raise ValueError("Unknown kernel: {0}".format(kernel))
     sigma = empty(m_star + 1)
