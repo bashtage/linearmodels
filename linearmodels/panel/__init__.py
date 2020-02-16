@@ -6,8 +6,9 @@ from linearmodels.panel.model import (
     PooledOLS,
     RandomEffects,
 )
-from linearmodels.panel.results import compare
-from linearmodels.panel.utility import generate_panel_data
+
+from .results import compare
+from .utility import generate_panel_data
 
 __all__ = [
     "PanelOLS",

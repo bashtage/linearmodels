@@ -34,13 +34,14 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 import os
 from typing import List, Optional, Union
 
-from linearmodels.asset_pricing.model import (
+from ._version import get_versions
+from .asset_pricing.model import (
     LinearFactorModel,
     LinearFactorModelGMM,
     TradedFactorModel,
 )
-from linearmodels.iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVLIML
-from linearmodels.panel.model import (
+from .iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from .panel.model import (
     BetweenOLS,
     FamaMacBeth,
     FirstDifferenceOLS,
@@ -48,9 +49,7 @@ from linearmodels.panel.model import (
     PooledOLS,
     RandomEffects,
 )
-from linearmodels.system import IV3SLS, SUR, IVSystemGMM
-
-from ._version import get_versions
+from .system import IV3SLS, SUR, IVSystemGMM
 
 OLS = _OLS
 WARN_ON_MISSING = os.environ.get("LINEARMODELS_WARN_ON_MISSING", True)

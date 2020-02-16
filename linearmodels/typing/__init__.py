@@ -3,7 +3,7 @@ from typing import Hashable, Optional, Sequence, Union
 from numpy import ndarray
 from pandas import DataFrame, Series
 
-from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+from .data import ArrayLike, OptionalArrayLike
 
 __all__ = [
     "ArrayLike",
