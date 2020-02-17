@@ -8,12 +8,13 @@ from property_cached import cached_property
 from linearmodels.iv.covariance import (
     CLUSTER_ERR,
     KERNEL_LOOKUP,
-    _cov_cluster,
-    _cov_kernel,
+    cov_cluster,
+    cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
+from linearmodels.shared.utility import get_array_like, get_bool, get_float, get_string
 from linearmodels.typing import NDArray
-from linearmodels.utility import get_array_like, get_bool, get_float, get_string
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -210,8 +211,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     Parameters
     ----------
-    Parameters
-    ----------
     y : ndarray
         nobs by 1 stacked array of dependent
     x : ndarray
@@ -294,12 +293,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._clusters = clusters
         self._name = "Clustered"
 
-    @staticmethod
-    def _calc_group_debias(clusters: NDArray) -> float:
-        n = clusters.shape[0]
-        ngroups = np.unique(clusters).shape[0]
-        return (ngroups / (ngroups - 1)) * ((n - 1) / n)
-
     @cached_property
     def cov(self) -> NDArray:
         """Estimated covariance"""
@@ -310,30 +303,23 @@ class ClusteredCovariance(HomoskedasticCovariance):
         eps = self.eps
         xe = x * eps
         if self._clusters.ndim == 1:
-            xeex = _cov_cluster(xe, self._clusters)
+            xeex = cov_cluster(xe, self._clusters)
             if self._group_debias:
-                xeex *= self._calc_group_debias(self._clusters)
+                xeex *= group_debias_coefficient(self._clusters)
 
         else:
             clusters0 = self._clusters[:, 0]
             clusters1 = self._clusters[:, 1]
-            xeex0 = _cov_cluster(xe, clusters0)
-            xeex1 = _cov_cluster(xe, clusters1)
+            xeex0 = cov_cluster(xe, clusters0)
+            xeex1 = cov_cluster(xe, clusters1)
 
-            sort_keys = np.lexsort(self._clusters.T)
-            locs = np.arange(self._clusters.shape[0])
-            lex_sorted = self._clusters[sort_keys]
-            sorted_locs = locs[sort_keys]
-            diff = np.any(lex_sorted[1:] != lex_sorted[:-1], 1)
-            clusters01 = np.cumsum(np.r_[0, diff])
-            resort_locs = np.argsort(sorted_locs)
-            clusters01 = clusters01[resort_locs]
-            xeex01 = _cov_cluster(xe, clusters01)
+            clusters01 = cluster_union(self._clusters)
+            xeex01 = cov_cluster(xe, clusters01)
 
             if self._group_debias:
-                xeex0 *= self._calc_group_debias(clusters0)
-                xeex1 *= self._calc_group_debias(clusters1)
-                xeex01 *= self._calc_group_debias(clusters01)
+                xeex0 *= group_debias_coefficient(clusters0)
+                xeex1 *= group_debias_coefficient(clusters1)
+                xeex01 *= group_debias_coefficient(clusters01)
 
             xeex = xeex0 + xeex1 - xeex01
 
@@ -448,7 +434,7 @@ class DriscollKraay(HomoskedasticCovariance):
             bw = np.floor(4 * (xe_nobs / 100) ** (2 / 9))
         assert bw is not None
         w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
-        xeex = _cov_kernel(xe.values, w) * (xe_nobs / nobs)
+        xeex = cov_kernel(xe.values, w) * (xe_nobs / nobs)
         xeex *= self._scale
 
         out = (xpxi @ xeex @ xpxi) / nobs
@@ -549,7 +535,7 @@ class ACCovariance(HomoskedasticCovariance):
     def _single_cov(self, xe: NDArray, bw: float) -> NDArray:
         nobs = xe.shape[0]
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
-        return _cov_kernel(xe, w)
+        return cov_kernel(xe, w)
 
     @cached_property
     def cov(self) -> NDArray:
@@ -708,7 +694,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         bw = self.bandwidth
         assert self._kernel is not None
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
-        cov = _cov_kernel(e, w)
+        cov = cov_kernel(e, w)
         return cov / (nobs - int(bool(self._debiased)))
 
     @property

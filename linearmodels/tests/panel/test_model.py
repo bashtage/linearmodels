@@ -11,7 +11,7 @@ from linearmodels.panel.utility import AbsorbingEffectError
 from linearmodels.tests.panel._utility import datatypes, generate_data, lsdv
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]

@@ -8,16 +8,19 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import FamaMacBeth
+from linearmodels.shared.exceptions import (
+    InferenceUnavailableWarning,
+    MissingValueWarning,
+)
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
     datatypes,
     generate_data,
 )
-from linearmodels.utility import InferenceUnavailableWarning, MissingValueWarning
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]
@@ -101,7 +104,9 @@ def test_fitted_effects_residuals(data):
     assert_frame_similar(res.estimated_effects, expected)
 
 
-@pytest.mark.filterwarnings("always::linearmodels.utility.MissingValueWarning")
+@pytest.mark.filterwarnings(
+    "always::linearmodels.shared.exceptions.MissingValueWarning"
+)
 def test_block_size_warnings():
     y = np.arange(12.0)[:, None]
     x = np.ones((12, 3))

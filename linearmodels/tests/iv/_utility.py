@@ -1,6 +1,6 @@
 import numpy as np
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 def generate_data(nkp=(1000, 5, 3)):

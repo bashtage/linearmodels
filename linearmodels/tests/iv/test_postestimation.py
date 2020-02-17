@@ -7,7 +7,7 @@ import pytest
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.iv import IV2SLS, IVGMM
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 CWD = os.path.split(os.path.abspath(__file__))[0]
 

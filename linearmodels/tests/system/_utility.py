@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import lstsq
 import pandas as pd
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 def generate_data(

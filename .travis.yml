@@ -47,7 +47,6 @@ matrix:
     - NUMPY=1.15
     - SCIPY=1.0.1
     - PANDAS=0.23
-    - XARRAY=0.10
     - STATSMODELS=0.9
   - python: 3.6
     env:

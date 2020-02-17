@@ -3,10 +3,10 @@ from pandas.testing import assert_series_equal
 import pytest
 
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 

@@ -6,7 +6,7 @@ from scipy import stats
 
 from linearmodels.asset_pricing.model import LinearFactorModel
 from linearmodels.iv.covariance import (
-    _cov_kernel,
+    cov_kernel,
     kernel_optimal_bandwidth,
     kernel_weight_bartlett,
 )
@@ -118,7 +118,7 @@ def test_linear_model_parameters(data):
     mom = std_mom.sum(1)
     bw = kernel_optimal_bandwidth(mom)
     w = kernel_weight_bartlett(bw, n - 1)
-    s = _cov_kernel(moments, w)
+    s = cov_kernel(moments, w)
     cov = ginv @ s @ ginv.T / n
     cov = cov[order][:, order]
     cov = (cov + cov.T) / 2

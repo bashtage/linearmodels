@@ -4,7 +4,7 @@ import numpy as np
 from pandas import DataFrame, Series, date_range
 import pytest
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 @pytest.fixture(scope="module")

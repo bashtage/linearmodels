@@ -27,7 +27,8 @@ from linearmodels.iv.absorbing import (
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import AbsorbingLSResults, OLSResults
 from linearmodels.panel.utility import dummy_matrix
-from linearmodels.utility import AttrDict, MissingValueWarning
+from linearmodels.shared.exceptions import MissingValueWarning
+from linearmodels.shared.utility import AttrDict
 
 NOBS = 100
 pytestmark = pytest.mark.filterwarnings(

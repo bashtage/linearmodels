@@ -7,9 +7,9 @@ import numpy as np
 from pandas import DataFrame, date_range
 import scipy.sparse as sp
 
+from linearmodels.shared.utility import panel_to_frame
 from linearmodels.typing import NDArray
 from linearmodels.typing.data import ArrayLike
-from linearmodels.utility import panel_to_frame
 
 try:
     from linearmodels.panel._utility import _drop_singletons

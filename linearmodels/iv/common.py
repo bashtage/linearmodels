@@ -3,8 +3,8 @@ from typing import Optional, Union
 from numpy import ix_, ptp, where
 from numpy.linalg import inv
 
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.typing import NDArray
-from linearmodels.utility import InvalidTestStatistic, WaldTestStatistic
 
 
 def find_constant(x: NDArray) -> Optional[int]:

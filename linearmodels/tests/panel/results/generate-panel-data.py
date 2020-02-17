@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from linearmodels.panel.data import PanelData
-from linearmodels.utility import panel_to_frame
+from linearmodels.shared.utility import panel_to_frame
 
 np.random.seed(12345)
 n, t, k = 1000, 3, 6

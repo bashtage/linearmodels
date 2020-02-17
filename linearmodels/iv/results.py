@@ -29,16 +29,14 @@ from statsmodels.iolib.table import default_txt_fmt
 import linearmodels
 from linearmodels.iv._utility import annihilate, proj
 from linearmodels.iv.data import IVData
-from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
-from linearmodels.utility import (
+from linearmodels.shared.base import _ModelComparison, _SummaryStr
+from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
     WaldTestStatistic,
-    _ModelComparison,
-    _str,
-    _SummaryStr,
-    pval_format,
     quadratic_form_test,
 )
+from linearmodels.shared.io import _str, pval_format
+from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 
 
 def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:

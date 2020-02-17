@@ -9,18 +9,15 @@ import pytest
 from scipy import stats
 
 import linearmodels
-from linearmodels.utility import (
-    AttrDict,
+from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
     InvalidTestStatistic,
     WaldTestStatistic,
-    ensure_unique_column,
-    format_wide,
-    has_constant,
-    inv_sqrth,
-    missing_warning,
-    panel_to_frame,
 )
+from linearmodels.shared.io import format_wide
+from linearmodels.shared.linalg import has_constant, inv_sqrth
+from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
 
 MISSING_PANEL = "Panel" not in dir(pd)
 

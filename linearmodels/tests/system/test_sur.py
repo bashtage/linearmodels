@@ -9,6 +9,8 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
 from linearmodels.iv.model import _OLS as OLS
+from linearmodels.shared.hypotheses import InvalidTestStatistic
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     blocked_column_product,
     blocked_diag_product,
@@ -16,7 +18,6 @@ from linearmodels.system._utility import (
 )
 from linearmodels.system.model import SUR
 from linearmodels.tests.system._utility import generate_data, simple_sur
-from linearmodels.utility import AttrDict, InvalidTestStatistic
 
 p = [3, [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]]
 const = [True, False]
@@ -681,7 +682,9 @@ def test_fitted(data):
     assert_frame_equal(expected, res.fitted_values)
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
+)
 def test_predict(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
@@ -722,7 +725,9 @@ def test_predict(missing_data):
         assert pred[key].shape[0] == nobs
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
+)
 def test_predict_error(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()

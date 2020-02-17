@@ -40,14 +40,10 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
+from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.typing import ArrayLike, NDArray, Numeric, OptionalNumeric
-from linearmodels.utility import (
-    InvalidTestStatistic,
-    WaldTestStatistic,
-    has_constant,
-    inv_sqrth,
-    missing_warning,
-)
 
 IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
 

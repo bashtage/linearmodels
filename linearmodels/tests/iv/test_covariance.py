@@ -9,14 +9,14 @@ from linearmodels.iv.covariance import (
     HeteroskedasticCovariance,
     HomoskedasticCovariance,
     KernelCovariance,
-    _cov_kernel,
     kernel_optimal_bandwidth,
     kernel_weight_bartlett,
     kernel_weight_parzen,
     kernel_weight_quadratic_spectral,
 )
+from linearmodels.shared.covariance import cov_kernel
+from linearmodels.shared.utility import AttrDict
 from linearmodels.tests.iv._utility import generate_data
-from linearmodels.utility import AttrDict
 
 
 @pytest.fixture(params=["bartlett", "qs", "parzen"], scope="module")
@@ -41,7 +41,7 @@ def data():
 
 def test_cov_kernel():
     with pytest.raises(ValueError):
-        _cov_kernel(np.arange(100), 1 - np.arange(101) / 101)
+        cov_kernel(np.arange(100), 1 - np.arange(101) / 101)
 
 
 def test_kernel_bartlett():

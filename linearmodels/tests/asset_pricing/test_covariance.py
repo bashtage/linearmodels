@@ -8,7 +8,7 @@ from linearmodels.asset_pricing.covariance import (
     KernelCovariance,
     KernelWeight,
 )
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 @pytest.fixture

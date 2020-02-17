@@ -15,7 +15,7 @@ from linearmodels.iv.model import _OLS
 from linearmodels.tests.asset_pricing._utility import generate_data, get_all
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 

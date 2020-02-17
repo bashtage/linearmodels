@@ -25,7 +25,7 @@ from linearmodels.panel.model import (
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]

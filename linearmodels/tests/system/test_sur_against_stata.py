@@ -5,6 +5,7 @@ from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system import SUR
 from linearmodels.tests.system.results.generate_data import (
     basic_data,
@@ -12,10 +13,9 @@ from linearmodels.tests.system.results.generate_data import (
     missing_data,
 )
 from linearmodels.tests.system.results.parse_stata_results import stata_results
-from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 

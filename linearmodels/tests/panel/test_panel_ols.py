@@ -12,6 +12,8 @@ from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
 from linearmodels.panel.utility import AbsorbingEffectWarning
+from linearmodels.shared.exceptions import MemoryWarning
+from linearmodels.shared.utility import AttrDict
 from linearmodels.tests.panel._utility import (
     access_attributes,
     assert_frame_similar,
@@ -19,10 +21,9 @@ from linearmodels.tests.panel._utility import (
     datatypes,
     generate_data,
 )
-from linearmodels.utility import AttrDict, MemoryWarning
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning",
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning",
     "ignore:the matrix subclass:PendingDeprecationWarning",
 )
 
@@ -1286,7 +1287,7 @@ def test_low_memory_auto():
         mod.fit()
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.SingletonWarning")
+@pytest.mark.filterwarnings("ignore::linearmodels.shared.exceptions.SingletonWarning")
 def test_singleton_removal():
     entities = []
     for i in range(6):
@@ -1305,7 +1306,7 @@ def test_singleton_removal():
     assert_allclose(res.params, res_with.params)
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.SingletonWarning")
+@pytest.mark.filterwarnings("ignore::linearmodels.shared.exceptions.SingletonWarning")
 def test_masked_singleton_removal():
     nobs = 8
     entities = ["A", "B", "C", "D"] * 2
@@ -1333,7 +1334,7 @@ def test_singleton_removal_other_effects(data):
 
 
 @pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.SingletonWarning")
+@pytest.mark.filterwarnings("ignore::linearmodels.shared.exceptions.SingletonWarning")
 @pytest.mark.parametrize("other_effects", [1, 2])
 def test_singleton_removal_mixed(singleton_data, other_effects):
     if other_effects == 1:
