@@ -1,6 +1,6 @@
 # Linear Models
 
-|                            |                                                                                                                                                                                                                                                          |
+| Metric                     |                                                                                                                                                                                                                                                          |
 | :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Latest Release**         | [![PyPI version](https://badge.fury.io/py/linearmodels.svg)](https://badge.fury.io/py/linearmodels)                                                                                                                                                      |
 | **Continuous Integration** | [![Build Status](https://travis-ci.org/bashtage/linearmodels.svg?branch=master)](https://travis-ci.org/bashtage/linearmodels)                                                                                                                            |
