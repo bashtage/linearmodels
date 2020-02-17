@@ -1,0 +1,6 @@
+linearmodels.shared.covariance.cov\_kernel
+==========================================
+
+.. currentmodule:: linearmodels.shared.covariance
+
+.. autofunction:: cov_kernel

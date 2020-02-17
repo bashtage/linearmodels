@@ -4,10 +4,12 @@ Change Log
 
 Since 4.17
 ==========
+* Added a clustered covariance estimator
+  (:class:`linearmodels.system.covariance.ClusteredCovariance`) for system regressions
+  (:issue:`241`).
 * Fixed a bug in :class:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`
   which used incorrect values for a tuning parameter in the bandwidth estimation
   for the Parzen and Quadratic Spectral kernels (:issue:`242`).
-
 
 Version 4.17
 ============

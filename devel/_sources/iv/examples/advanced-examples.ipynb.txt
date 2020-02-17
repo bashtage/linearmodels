@@ -36,7 +36,7 @@
    "metadata": {},
    "source": [
     "## Importing data\n",
-    "The data uses comes from the Medical Expenditure Panel Survey (MEPS) and includes data on out-of-pocket drug expenditure (in logs), individual characteristics, whether an individual was insured through an employer or union (a likely endogenous variable), and some candidate instruments including the percentage of income from Social Security Income, the size of the individual's firm and whether the firm has multiple locations."
+    "The data uses comes from the Medical Expenditure Panel Survey (MEPS) and includes data on out-of-pocket drug expenditure (in logs), individual characteristics, whether an individual was insured through an employer or union (a likely endogenous variable), and some candidate instruments including the percentage of income from Social Security Income, the size of the individual\"s firm and whether the firm has multiple locations."
    ]
   },
   {
@@ -64,8 +64,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "controls = ['totchr', 'female', 'age', 'linc','blhisp']\n",
-    "print(data[['ldrugexp','hi_empunion'] + controls].describe(percentiles=[]))"
+    "controls = [\"totchr\", \"female\", \"age\", \"linc\",\"blhisp\"]\n",
+    "print(data[[\"ldrugexp\",\"hi_empunion\"] + controls].describe(percentiles=[]))"
    ]
   },
   {
@@ -81,7 +81,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "instruments = ['ssiratio', 'lowincome', 'multlc', 'firmsz']\n",
+    "instruments = [\"ssiratio\", \"lowincome\", \"multlc\", \"firmsz\"]\n",
     "print(data[instruments].describe(percentiles=[]))"
    ]
   },
@@ -89,7 +89,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "And finally the simple correlation between the endogenous variable and the instruments.  Instruments must be correlated to be relevant (but also must be exogenous, which can't be examined using simple correlation).  The correlation of `firmsz` is especially low, which might lead to the weak instruments problem if used exclusively.  "
+    "And finally the simple correlation between the endogenous variable and the instruments.  Instruments must be correlated to be relevant (but also must be exogenous, which can\"t be examined using simple correlation).  The correlation of `firmsz` is especially low, which might lead to the weak instruments problem if used exclusively.  "
    ]
   },
   {
@@ -98,7 +98,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "data[['hi_empunion'] + instruments].corr()"
+    "data[[\"hi_empunion\"] + instruments].corr()"
    ]
   },
   {
@@ -115,8 +115,8 @@
    "outputs": [],
    "source": [
     "from statsmodels.api import OLS, add_constant\n",
-    "data['const'] = 1\n",
-    "controls = ['const'] + controls"
+    "data[\"const\"] = 1\n",
+    "controls = [\"const\"] + controls"
    ]
   },
   {
@@ -135,7 +135,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivolsmod = IV2SLS(data.ldrugexp, data[['hi_empunion'] + controls], None, None)\n",
+    "ivolsmod = IV2SLS(data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None)\n",
     "res_ols = ivolsmod.fit()\n",
     "print(res_ols)"
    ]
@@ -175,7 +175,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']])\n",
+    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]])\n",
     "res_2sls_robust = ivmod.fit()"
    ]
   },
@@ -187,12 +187,12 @@
     "\n",
     "All estimator allow for three types of parameter covariance estimator:\n",
     "\n",
-    "* ``'unadjusted'`` is the classic homoskedastic estimator\n",
-    "* ``'robust'``  is robust to heteroskedasticity\n",
-    "* ``'clustered'`` allows one- or two-way clustering to account for additional sources of dependence between the model scores\n",
-    "* ``'kernel'`` produces a heteroskedasticity-autocorrelation robust covariance estimator\n",
+    "* ``\"unadjusted\"`` is the classic homoskedastic estimator\n",
+    "* ``\"robust\"``  is robust to heteroskedasticity\n",
+    "* ``\"clustered\"`` allows one- or two-way clustering to account for additional sources of dependence between the model scores\n",
+    "* ``\"kernel\"`` produces a heteroskedasticity-autocorrelation robust covariance estimator\n",
     "\n",
-    "The default is ``'robust'``.\n",
+    "The default is ``\"robust\"``.\n",
     "\n",
     "These are all passed using the keyword input ``cov_type``.  Using clustered requires also passing the clustering variable(s).\n",
     "\n"
@@ -204,8 +204,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']])\n",
-    "res_2sls_std = ivmod.fit(cov_type='unadjusted')"
+    "ivmod = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]])\n",
+    "res_2sls_std = ivmod.fit(cov_type=\"unadjusted\")"
    ]
   },
   {
@@ -225,7 +225,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod =IVGMM(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']])\n",
+    "ivmod =IVGMM(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]])\n",
     "res_gmm = ivmod.fit()"
    ]
   },
@@ -243,9 +243,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IVGMM(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']], \n",
-    "                weight_type='clustered', clusters=data.age)\n",
-    "res_gmm_clustered = ivmod.fit(cov_type='clustered', clusters=data.age)"
+    "ivmod = IVGMM(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]], \n",
+    "                weight_type=\"clustered\", clusters=data.age)\n",
+    "res_gmm_clustered = ivmod.fit(cov_type=\"clustered\", clusters=data.age)"
    ]
   },
   {
@@ -262,8 +262,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IVGMMCUE(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']])\n",
-    "res_gmm_cue = ivmod.fit(cov_type='robust', display=True)"
+    "ivmod = IVGMMCUE(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]])\n",
+    "res_gmm_cue = ivmod.fit(cov_type=\"robust\", display=True)"
    ]
   },
   {
@@ -285,13 +285,13 @@
     "from collections import OrderedDict\n",
     "from linearmodels.iv.results import compare\n",
     "res = OrderedDict()\n",
-    "res['OLS'] = res_ols\n",
-    "res['2SLS'] = res_2sls\n",
-    "res['2SLS-Homo'] = res_2sls_std\n",
-    "res['2SLS-Hetero'] = res_2sls_robust\n",
-    "res['GMM'] = res_gmm\n",
-    "res['GMM Cluster(Age)'] = res_gmm_clustered\n",
-    "res['GMM-CUE'] = res_gmm_cue\n",
+    "res[\"OLS\"] = res_ols\n",
+    "res[\"2SLS\"] = res_2sls\n",
+    "res[\"2SLS-Homo\"] = res_2sls_std\n",
+    "res[\"2SLS-Hetero\"] = res_2sls_robust\n",
+    "res[\"GMM\"] = res_gmm\n",
+    "res[\"GMM Cluster(Age)\"] = res_gmm_clustered\n",
+    "res[\"GMM-CUE\"] = res_gmm_cue\n",
     "print(compare(res))"
    ]
   },
@@ -301,7 +301,7 @@
    "source": [
     "## Testing endogeneity\n",
     "\n",
-    "The Durbin test is a classic of endogeneity which compares OLS estimates with 2SLS and exploits the fact that OLS estimates will be relatively efficient.  Durbin's test is not robust to heteroskedasticity."
+    "The Durbin test is a classic of endogeneity which compares OLS estimates with 2SLS and exploits the fact that OLS estimates will be relatively efficient.  Durbin\"s test is not robust to heteroskedasticity."
    ]
   },
   {
@@ -343,10 +343,10 @@
    "outputs": [],
    "source": [
     "import pandas as pd\n",
-    "step1 = IV2SLS(data.hi_empunion, data[['ssiratio'] + controls], None, None).fit()\n",
+    "step1 = IV2SLS(data.hi_empunion, data[[\"ssiratio\"] + controls], None, None).fit()\n",
     "resids = step1.resids\n",
-    "exog = pd.concat([data[['hi_empunion'] + controls], resids],1)\n",
-    "step2 = IV2SLS(data.ldrugexp, exog, None, None).fit(cov_type='unadjusted')\n",
+    "exog = pd.concat([data[[\"hi_empunion\"] + controls], resids],1)\n",
+    "step2 = IV2SLS(data.ldrugexp, exog, None, None).fit(cov_type=\"unadjusted\")\n",
     "print(step2.tstats.residual **2)"
    ]
   },
@@ -354,7 +354,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Wooldridge's regression-based test of exogeneity is robust to heteroskedasticity since it inherits the covariance estimator from the model. Here there is little difference."
+    "Wooldridge\"s regression-based test of exogeneity is robust to heteroskedasticity since it inherits the covariance estimator from the model. Here there is little difference."
    ]
   },
   {
@@ -370,7 +370,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Wooldridge's score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test."
+    "Wooldridge\"s score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test."
    ]
   },
   {
@@ -433,8 +433,8 @@
    "source": [
     "od = OrderedDict()\n",
     "for col in instruments:\n",
-    "    od[col] = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[col]).fit(cov_type='robust')\n",
-    "od['OLS'] = res_ols\n",
+    "    od[col] = IV2SLS(data.ldrugexp, data[controls], data.hi_empunion, data[col]).fit(cov_type=\"robust\")\n",
+    "od[\"OLS\"] = res_ols\n",
     "print(compare(od))"
    ]
   },
@@ -487,9 +487,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "ivmod = IVLIML(data.ldrugexp, data[controls], data.hi_empunion, data[['ssiratio','multlc']])\n",
-    "res_liml = ivmod.fit(cov_type='robust')\n",
-    "print(compare({'2SLS':res_2sls_robust,'LIML': res_liml, 'GMM': res_gmm}))"
+    "ivmod = IVLIML(data.ldrugexp, data[controls], data.hi_empunion, data[[\"ssiratio\",\"multlc\"]])\n",
+    "res_liml = ivmod.fit(cov_type=\"robust\")\n",
+    "print(compare({\"2SLS\":res_2sls_robust,\"LIML\": res_liml, \"GMM\": res_gmm}))"
    ]
   },
   {
@@ -524,10 +524,10 @@
    "outputs": [],
    "source": [
     "import pandas as pd\n",
-    "ivolsmod = IV2SLS(data.ldrugexp, data[['hi_empunion'] + controls], None, None)\n",
+    "ivolsmod = IV2SLS(data.ldrugexp, data[[\"hi_empunion\"] + controls], None, None)\n",
     "res_ivols = ivolsmod.fit()\n",
     "sm_ols = res_ols.params\n",
-    "sm_ols.name = 'sm'\n",
+    "sm_ols.name = \"sm\"\n",
     "print(pd.concat([res_ivols.params, sm_ols], 1))"
    ]
   }
@@ -552,6 +552,15 @@
   },
   "nbsphinx": {
    "allow_errors": true
+  },
+  "pycharm": {
+   "stem_cell": {
+    "cell_type": "raw",
+    "source": [],
+    "metadata": {
+     "collapsed": false
+    }
+   }
   }
  },
  "nbformat": 4,

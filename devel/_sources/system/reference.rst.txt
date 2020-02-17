@@ -56,6 +56,7 @@ SUR and 3SLS
    HomoskedasticCovariance
    HeteroskedasticCovariance
    KernelCovariance
+   ClusteredCovariance
 
 Generalized Method of Moments (GMM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,3 +82,4 @@ GMM Moment Weighting
    HomoskedasticWeightMatrix
    HeteroskedasticWeightMatrix
    KernelWeightMatrix
+

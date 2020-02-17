@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.InvalidTestStatistic.pval
+========================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: InvalidTestStatistic.pval

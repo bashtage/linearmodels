@@ -1,0 +1,6 @@
+linearmodels.shared.covariance.cov\_cluster
+===========================================
+
+.. currentmodule:: linearmodels.shared.covariance
+
+.. autofunction:: cov_cluster

@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.InvalidTestStatistic.critical\_values
+====================================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: InvalidTestStatistic.critical_values

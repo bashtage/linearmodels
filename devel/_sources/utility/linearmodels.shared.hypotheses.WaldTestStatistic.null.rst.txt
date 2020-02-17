@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.WaldTestStatistic.null
+=====================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: WaldTestStatistic.null

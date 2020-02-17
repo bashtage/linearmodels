@@ -24,7 +24,7 @@
    "source": [
     "## Import data\n",
     "\n",
-    "The data used comes from Ken French's [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
+    "The data used comes from Ken French\"s [website](http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor.  The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort. "
    ]
   },
   {
@@ -55,7 +55,7 @@
    },
    "outputs": [],
    "source": [
-    "data.iloc[:,6:] = data.iloc[:,6:].values - data[['RF']].values"
+    "data.iloc[:,6:] = data.iloc[:,6:].values - data[[\"RF\"]].values"
    ]
   },
   {
@@ -78,8 +78,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import TradedFactorModel\n",
-    "portfolios = data[['S1V1','S1V3','S1V5','S3V1','S3V3','S3V5','S5V1','S5V3','S5V5']]\n",
-    "factors = data[['MktRF']]\n",
+    "portfolios = data[[\"S1V1\",\"S1V3\",\"S1V5\",\"S3V1\",\"S3V3\",\"S3V5\",\"S5V1\",\"S5V3\",\"S5V5\"]]\n",
+    "factors = data[[\"MktRF\"]]\n",
     "mod = TradedFactorModel(portfolios, factors)\n",
     "res = mod.fit()\n",
     "print(res)"
@@ -100,7 +100,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "factors = data[['MktRF', 'SMB', 'HML']]\n",
+    "factors = data[[\"MktRF\", \"SMB\", \"HML\"]]\n",
     "mod = TradedFactorModel(portfolios, factors)\n",
     "res = mod.fit()\n",
     "print(res)"
@@ -119,8 +119,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "indu = ['NoDur', 'Durbl', 'Manuf', 'Enrgy', 'Chems', 'BusEq', \n",
-    "        'Telcm', 'Utils', 'Shops',  'Hlth', 'Money',  'Other']\n",
+    "indu = [\"NoDur\", \"Durbl\", \"Manuf\", \"Enrgy\", \"Chems\", \"BusEq\", \n",
+    "        \"Telcm\", \"Utils\", \"Shops\",  \"Hlth\", \"Money\",  \"Other\"]\n",
     "portfolios = data[indu]\n",
     "mod = TradedFactorModel(portfolios, factors)\n",
     "res = mod.fit()\n",
@@ -188,8 +188,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import LinearFactorModel\n",
-    "factors = data[['MktRF', 'SMB', 'HML', 'Mom']]\n",
-    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "factors = data[[\"MktRF\", \"SMB\", \"HML\", \"Mom\"]]\n",
+    "portfolios = data[[\"S1M1\",\"S1M3\",\"S1M5\",\"S3M1\",\"S3M3\",\"S3M5\",\"S5M1\",\"S5M3\",\"S5M5\"]]\n",
     "mod = LinearFactorModel(portfolios, factors)\n",
     "res = mod.fit()\n",
     "print(res)"
@@ -234,8 +234,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import LinearFactorModel\n",
-    "factors = data[['MktRF', 'HML', 'Mom']]\n",
-    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "factors = data[[\"MktRF\", \"HML\", \"Mom\"]]\n",
+    "portfolios = data[[\"S1M1\",\"S1M3\",\"S1M5\",\"S3M1\",\"S3M3\",\"S3M5\",\"S5M1\",\"S5M3\",\"S5M5\"]]\n",
     "mod = LinearFactorModel(portfolios, factors)\n",
     "print(mod.fit())"
    ]
@@ -256,8 +256,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import LinearFactorModel\n",
-    "factors = data[['MktRF', 'HML', 'Mom']]\n",
-    "portfolios = data[['S1M1','S1M3','S1M5','S3M1','S3M3','S3M5','S5M1','S5M3','S5M5']]\n",
+    "factors = data[[\"MktRF\", \"HML\", \"Mom\"]]\n",
+    "portfolios = data[[\"S1M1\",\"S1M3\",\"S1M5\",\"S3M1\",\"S3M3\",\"S3M5\",\"S5M1\",\"S5M3\",\"S5M5\"]]\n",
     "mod = LinearFactorModel(portfolios, factors, risk_free=True)\n",
     "print(mod.fit())"
    ]
@@ -266,7 +266,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns.  Kernel-based HAC estimators (e.g. Newey-West) can be used by setting `cov_type='kernel'`.\n",
+    "The default covariance estimator allows for heteroskedasticity but assumes there is no autocorrelation in the model errors or factor returns.  Kernel-based HAC estimators (e.g. Newey-West) can be used by setting `cov_type=\"kernel\"`.\n",
     "\n",
     "This reduces the J-statistic indicating there might be some serial correlation although the model is still firmly rejected."
    ]
@@ -278,7 +278,7 @@
    "outputs": [],
    "source": [
     "mod = LinearFactorModel(portfolios, factors)\n",
-    "print(mod.fit(cov_type='kernel'))"
+    "print(mod.fit(cov_type=\"kernel\"))"
    ]
   },
   {
@@ -324,7 +324,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = mod.fit(cov_type='kernel', kernel='bartlett', disp=0)\n",
+    "res = mod.fit(cov_type=\"kernel\", kernel=\"bartlett\", disp=0)\n",
     "print(res)"
    ]
   },
@@ -388,6 +388,15 @@
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
    "version": "3.5.3"
+  },
+  "pycharm": {
+   "stem_cell": {
+    "cell_type": "raw",
+    "source": [],
+    "metadata": {
+     "collapsed": false
+    }
+   }
   }
  },
  "nbformat": 4,

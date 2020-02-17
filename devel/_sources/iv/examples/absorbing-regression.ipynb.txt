@@ -32,7 +32,7 @@
     "firm_id = rs.randint(nobs//5, size=nobs) \n",
     "firm_effects = rs.standard_normal(firm_id.max()+1)\n",
     "firm_effects = firm_effects[firm_id]\n",
-    "cats = pd.DataFrame({'state': pd.Categorical(state_id), 'firm': pd.Categorical(firm_id)})\n",
+    "cats = pd.DataFrame({\"state\": pd.Categorical(state_id), \"firm\": pd.Categorical(firm_id)})\n",
     "eps = rs.standard_normal(nobs)\n",
     "x = rs.standard_normal((nobs,2))\n",
     "x = np.column_stack([np.ones(nobs), x])\n",
@@ -98,7 +98,7 @@
     "from linearmodels.iv.absorbing import AbsorbingLS\n",
     "\n",
     "mod = AbsorbingLS(y, x[:,1:], absorb=cats)\n",
-    "res = mod.fit(use_cache=False, lsmr_options={'show': True})"
+    "res = mod.fit(use_cache=False, lsmr_options={\"show\": True})"
    ]
   }
  ],

@@ -1,0 +1,31 @@
+linearmodels.system.covariance.ClusteredCovariance
+==================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoclass:: ClusteredCovariance
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~ClusteredCovariance.cov
+      ~ClusteredCovariance.cov_config
+      ~ClusteredCovariance.sigma
+   
+   
+   

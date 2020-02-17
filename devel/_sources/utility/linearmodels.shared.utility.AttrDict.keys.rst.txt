@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.shared.utility.AttrDict.keys
+=========================================
+
+.. currentmodule:: linearmodels.shared.utility
+
+.. automethod:: AttrDict.keys

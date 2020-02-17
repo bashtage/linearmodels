@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.shared.utility.AttrDict.pop
+========================================
+
+.. currentmodule:: linearmodels.shared.utility
+
+.. automethod:: AttrDict.pop

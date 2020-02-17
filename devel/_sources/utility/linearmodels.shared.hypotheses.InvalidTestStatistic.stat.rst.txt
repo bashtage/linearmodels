@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.InvalidTestStatistic.stat
+========================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: InvalidTestStatistic.stat
