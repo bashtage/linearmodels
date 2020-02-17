@@ -13,8 +13,8 @@ from pandas.api.types import (
     is_string_dtype,
 )
 
+from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
 from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
-from linearmodels.utility import ensure_unique_column, panel_to_frame
 
 __all__ = ["PanelData", "PanelDataLike"]
 

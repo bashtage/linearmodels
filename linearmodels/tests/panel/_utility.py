@@ -6,7 +6,7 @@ from pandas import Categorical, DataFrame, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.panel.data import PanelData
-from linearmodels.utility import AttrDict, panel_to_frame
+from linearmodels.shared.utility import AttrDict, panel_to_frame
 
 try:
     import xarray  # noqa: F401

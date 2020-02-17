@@ -9,10 +9,9 @@ from numpy.linalg import inv
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
-    _cov_cluster,
-    _cov_kernel,
     kernel_optimal_bandwidth,
 )
+from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import NDArray
 
 
@@ -225,7 +224,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         assert bw is not None
         w = self._kernels[self._kernel](bw, nobs - 1)
 
-        s = _cov_kernel(ze, w)
+        s = cov_kernel(ze, w)
         s *= 1 if not self._debiased else nobs / (nobs - nvar)
 
         return s
@@ -304,7 +303,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
             )
         clusters = asarray(clusters).copy().squeeze()
 
-        s = _cov_cluster(ze, clusters)
+        s = cov_cluster(ze, clusters)
 
         if self._debiased:
             num_clusters = len(unique(clusters))

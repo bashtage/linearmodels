@@ -5,7 +5,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 base = os.path.split(os.path.abspath(__file__))[0]
 

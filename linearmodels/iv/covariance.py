@@ -6,7 +6,6 @@ from typing import Any, Callable, Dict, Union
 from mypy_extensions import VarArg
 from numpy import (
     arange,
-    argsort,
     asarray,
     ceil,
     cos,
@@ -15,15 +14,14 @@ from numpy import (
     ndarray,
     ones,
     pi,
-    r_,
     sin,
     sum as npsum,
     unique,
-    where,
     zeros,
 )
 from numpy.linalg import inv, pinv
 
+from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import NDArray, Numeric, OptionalNumeric
 
 KernelWeight = Union[
@@ -38,73 +36,6 @@ in the regression variables have have been dropped.  When using a clustered
 covariance estimator, drop missing data before estimating the model. The model
 property `notnull` contains the locations of the observations that have no
 missing values."""
-
-
-def _cov_cluster(z: NDArray, clusters: NDArray) -> NDArray:
-    """
-    Core cluster covariance estimator
-
-    Parameters
-    ----------
-    z : ndarray
-        n by k mean zero data array
-    clusters : ndarray
-        n by 1 array
-
-    Returns
-    -------
-    ndarray
-       k by k cluster asymptotic covariance
-    """
-
-    num_clusters = len(unique(clusters))
-
-    sort_args = argsort(clusters)
-    clusters = clusters[sort_args]
-    locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
-    z = z[sort_args]
-    n, k = z.shape
-    s = zeros((k, k))
-
-    for i in range(num_clusters):
-        st, en = locs[i], locs[i + 1]
-        z_bar = z[st:en].sum(axis=0)[:, None]
-        s += z_bar @ z_bar.T
-
-    s /= n
-    return s
-
-
-def _cov_kernel(z: NDArray, w: NDArray) -> NDArray:
-    """
-    Core kernel covariance estimator
-
-    Parameters
-    ----------
-    z : ndarray
-        n by k mean zero data array
-    w : ndarray
-        m by 1
-
-    Returns
-    -------
-    ndarray
-       k by k kernel asymptotic covariance
-    """
-    k = len(w)
-    n = z.shape[0]
-    if k > n:
-        raise ValueError(
-            "Length of w ({0}) is larger than the number "
-            "of elements in z ({1})".format(k, n)
-        )
-    s = z.T @ z
-    for i in range(1, len(w)):
-        op = z[i:].T @ z[:-i]
-        s += w[i] * (op + op.T)
-
-    s /= n
-    return s
 
 
 def kernel_weight_bartlett(bw: float, *args: int) -> NDArray:
@@ -586,7 +517,7 @@ class KernelCovariance(HomoskedasticCovariance):
         bw = self.config["bandwidth"]
         if bw is None:
             self._auto_bandwidth = True
-            from linearmodels.utility import has_constant
+            from linearmodels.shared.linalg import has_constant
 
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))
@@ -598,7 +529,7 @@ class KernelCovariance(HomoskedasticCovariance):
         self._bandwidth = bw
         w = self._kernels[kernel](bw, nobs - 1)
 
-        s = _cov_kernel(xhat_e, w)
+        s = cov_kernel(xhat_e, w)
 
         return self._scale * s
 
@@ -713,19 +644,19 @@ class ClusteredCovariance(HomoskedasticCovariance):
         nobs, nvar = x.shape
         clusters = self._clusters
         if self._clusters.ndim == 1:
-            s = _cov_cluster(xhat_e, clusters)
+            s = cov_cluster(xhat_e, clusters)
             s = rescale(s, self._num_clusters[0], nobs)
         else:
-            s0 = _cov_cluster(xhat_e, clusters[:, 0].squeeze())
+            s0 = cov_cluster(xhat_e, clusters[:, 0].squeeze())
             s0 = rescale(s0, self._num_clusters[0], nobs)
 
-            s1 = _cov_cluster(xhat_e, clusters[:, 1].squeeze())
+            s1 = cov_cluster(xhat_e, clusters[:, 1].squeeze())
             s1 = rescale(s1, self._num_clusters[1], nobs)
 
             c0 = clusters[:, 0] - clusters[:, 0].min() + 1
             c1 = clusters[:, 1] - clusters[:, 1].min() + 1
             c01 = (c0 * (c1.max() + 1) + c1).astype(int64)
-            s01 = _cov_cluster(xhat_e, c01.squeeze())
+            s01 = cov_cluster(xhat_e, c01.squeeze())
             nc = len(unique(c01))
             s01 = rescale(s01, nc, nobs)
 

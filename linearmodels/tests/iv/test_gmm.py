@@ -14,8 +14,8 @@ from linearmodels.iv.gmm import (
     KernelWeightMatrix,
     OneWayClusteredWeightMatrix,
 )
+from linearmodels.shared.utility import AttrDict
 from linearmodels.tests.iv._utility import generate_data
-from linearmodels.utility import AttrDict
 
 
 @pytest.fixture(params=[None, 12], scope="module")

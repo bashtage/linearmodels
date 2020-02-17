@@ -7,11 +7,11 @@ import pytest
 
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import BetweenOLS, PanelOLS, PooledOLS, RandomEffects
+from linearmodels.shared.utility import AttrDict
 from linearmodels.tests.panel.results import parse_stata_results
-from linearmodels.utility import AttrDict
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 STATA_RESULTS = parse_stata_results.data()

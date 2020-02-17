@@ -1,9 +1,13 @@
 from typing import List, Optional, Union
 
-from numpy import empty, eye, ndarray, ones, sqrt, vstack, zeros
+from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
 
 from linearmodels.asset_pricing.covariance import _HACMixin
+from linearmodels.iv.covariance import cov_cluster
+from linearmodels.panel.covariance import cluster_union
+from linearmodels.shared.covariance import group_debias_coefficient
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     LinearConstraint,
     blocked_cross_prod,
@@ -11,7 +15,11 @@ from linearmodels.system._utility import (
     blocked_inner_prod,
 )
 from linearmodels.typing import NDArray
-from linearmodels.utility import AttrDict
+
+CLUSTERS_FORMAT = """\
+clusters must be an ndarray with as shape (nobs, ncluster) where ncluster is the \
+number of clustering variables.  Clustering is only supported in 1 or 2 dimensions.
+"""
 
 
 class HomoskedasticCovariance(object):
@@ -379,6 +387,151 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         """Optional configuration information used in covariance"""
         out = AttrDict([(k, v) for k, v in self._cov_config.items()])
         out["bandwidth"] = self.bandwidth
+        return out
+
+
+class ClusteredCovariance(HeteroskedasticCovariance):
+    r"""
+    Heteroskedastic covariance estimation for system regression
+
+    Parameters
+    ----------
+    x : List[ndarray]
+        ndependent element list of regressor
+    eps : ndarray
+        Model residuals, ndependent by nobs
+    sigma : ndarray
+        Covariance matrix estimator of eps
+    gls : bool
+        Flag indicating to compute the GLS covariance estimator.  If False,
+        assume OLS was used
+    debiased : bool
+        Flag indicating to apply a small sample adjustment
+    constraints : {None, LinearConstraint}, optional
+        Constraints used in estimation, if any
+    clusters : ndarray, default None
+        Optional array of cluster id.  Must be integer valued, and have shape
+        (nobs, ncluster) where ncluster is 1 or 2.
+    group_debias : bool, default False
+        Flag indicating whether to debias by the number of groups.
+
+    Notes
+    -----
+    If GLS is used, the covariance is estimated by
+
+    .. math::
+
+        (X'\Omega^{-1}X)^{-1}\tilde{S}_{\mathcal{G}}(X'\Omega^{-1}X)^{-1}
+
+    where X is a block diagonal matrix of exogenous variables and where
+    :math:`\tilde{S}_{\mathcal{G}}` is a clustered estimator of the model
+    scores based on the model residuals and the weighted X matrix
+    :math:`\Omega^{-1/2}X`.
+
+    When GLS is not used, the covariance is estimated by
+
+    .. math::
+
+        (X'X)^{-1}\hat{S}_{\mathcal{G}}(X'X)^{-1}
+
+    where :math:`\hat{S}` is a clustered estimator of the covariance of the
+    model scores.
+
+    See Also
+    --------
+    linearmodels.shared.covariance.cov_cluster
+    linearmodels.shared.covariance.group_debias_coefficient
+    """
+
+    def __init__(
+        self,
+        x: List[ndarray],
+        eps: NDArray,
+        sigma: NDArray,
+        full_sigma: NDArray,
+        *,
+        gls: bool = False,
+        debiased: bool = False,
+        constraints: Optional[LinearConstraint] = None,
+        clusters: Optional[NDArray] = None,
+        group_debias: bool = False,
+    ) -> None:
+        super().__init__(
+            x,
+            eps,
+            sigma,
+            full_sigma,
+            gls=gls,
+            debiased=debiased,
+            constraints=constraints,
+        )
+        self._group_debias = group_debias
+        self._nclusters: List[int] = []
+        self._clusters = self._check_clusters(clusters)
+        self._str_extra["Number of Grouping Variables"] = self._clusters.shape[1]
+        if self._clusters.shape[1] > 0:
+            num_cl = [f"{nc} (Variable {i})" for i, nc in enumerate(self._nclusters)]
+            self._str_extra["Number of Groups"] = " and ".join(num_cl)
+        self._str_extra["Group Debias"] = self._group_debias
+
+    def _check_clusters(self, clusters: Optional[NDArray],) -> NDArray:
+        """Check cluster dimension and ensure ndarray"""
+        if clusters is None:
+            return empty((self._eps.size, 0))
+        _clusters = asarray(clusters)
+
+        if _clusters.ndim not in (1, 2):
+            raise ValueError(CLUSTERS_FORMAT, ValueError)
+        elif _clusters.ndim == 1:
+            _clusters = _clusters[:, None]
+        shape = _clusters.shape
+        if shape[0] != self._eps.shape[0] or not 1 <= shape[1] <= 2:
+            raise ValueError(CLUSTERS_FORMAT, ValueError)
+        from pandas import DataFrame
+
+        df = DataFrame(_clusters)
+        nunique = df.nunique()
+        if _clusters.shape[1] == 2:
+            both = df.groupby([0, 1]).ngroups
+            if both == nunique.max():
+                raise ValueError(
+                    "clusters must be non-nested. You must drop nested "
+                    "the nested cluster before computing the clustered"
+                    "covariance."
+                )
+        self._nclusters = list(nunique)
+        return _clusters
+
+    def _xeex(self) -> NDArray:
+        if self._clusters.shape[1] == 0:
+            # Heteroskedastic but not clustered
+            return super()._xeex()
+        elif self._clusters.shape[1] == 1:
+            s = cov_cluster(self._moments, self._clusters[:, 0])
+            if self._group_debias:
+                s *= group_debias_coefficient(self._clusters[:, 0])
+            return s
+
+        else:
+            xeex0 = cov_cluster(self._moments, self._clusters[:, 0])
+            xeex1 = cov_cluster(self._moments, self._clusters[:, 1])
+
+            clusters01 = cluster_union(self._clusters)
+            xeex01 = cov_cluster(self._moments, clusters01)
+
+            if self._group_debias:
+                xeex0 *= group_debias_coefficient(self._clusters[:, 0])
+                xeex1 *= group_debias_coefficient(self._clusters[:, 1])
+                xeex01 *= group_debias_coefficient(clusters01)
+
+            return xeex0 + xeex1 - xeex01
+
+    @property
+    def cov_config(self) -> AttrDict:
+        """Optional configuration information used in covariance"""
+        out = AttrDict([(k, v) for k, v in self._cov_config.items()])
+        out["clusters"] = self._clusters
+        out["group_debias"] = self._group_debias
         return out
 
 

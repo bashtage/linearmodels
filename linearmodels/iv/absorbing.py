@@ -54,13 +54,10 @@ from linearmodels.iv.model import (
 )
 from linearmodels.iv.results import AbsorbingLSResults
 from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
+from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.typing import AnyPandas, NDArray
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
-from linearmodels.utility import (
-    InvalidTestStatistic,
-    WaldTestStatistic,
-    missing_warning,
-)
 
 try:
     from xxhash import xxh64 as hash_func

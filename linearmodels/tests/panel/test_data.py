@@ -13,8 +13,8 @@ import pytest
 
 from linearmodels.panel.data import PanelData, _Panel
 from linearmodels.panel.model import PanelOLS
+from linearmodels.shared.utility import panel_to_frame
 from linearmodels.tests.panel._utility import MISSING_XARRAY, datatypes, generate_data
-from linearmodels.utility import panel_to_frame
 
 try:
     import xarray as xr
@@ -23,7 +23,7 @@ except ImportError:
 
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 PERC_MISSING = [0, 0.02, 0.10, 0.33]

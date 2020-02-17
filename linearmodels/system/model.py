@@ -23,6 +23,10 @@ from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.data import IVData
+from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     LinearConstraint,
     blocked_column_product,
@@ -32,6 +36,7 @@ from linearmodels.system._utility import (
     inv_matrix_sqrt,
 )
 from linearmodels.system.covariance import (
+    ClusteredCovariance,
     GMMHeteroskedasticCovariance,
     GMMHomoskedasticCovariance,
     GMMKernelCovariance,
@@ -46,13 +51,6 @@ from linearmodels.system.gmm import (
 )
 from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.typing import ArrayLike, ArraySequence, NDArray, OptionalArrayLike
-from linearmodels.utility import (
-    AttrDict,
-    InvalidTestStatistic,
-    WaldTestStatistic,
-    has_constant,
-    missing_warning,
-)
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM"]
 
@@ -69,12 +67,14 @@ COV_TYPES = {
     "heteroskedastic": "robust",
     "kernel": "kernel",
     "hac": "kernel",
+    "clustered": "clustered",
 }
 
 COV_EST = {
     "unadjusted": HomoskedasticCovariance,
     "robust": HeteroskedasticCovariance,
     "kernel": KernelCovariance,
+    "clustered": ClusteredCovariance,
 }
 
 GMM_W_EST = {
@@ -826,6 +826,7 @@ class _SystemModelBase(object):
             HomoskedasticCovariance,
             HeteroskedasticCovariance,
             KernelCovariance,
+            ClusteredCovariance,
             GMMHeteroskedasticCovariance,
             GMMHomoskedasticCovariance,
         ],
@@ -1209,6 +1210,8 @@ class _LSSystemModelBase(_SystemModelBase):
             * 'robust', 'heteroskedastic' - Heteroskedasticity robust
               covariance estimator
             * 'kernel' - Allows for heteroskedasticity and autocorrelation
+            * 'clustered' - Allows for 1 and 2-way clustering of errors
+              (Rogers).
 
         **cov_config
             Additional parameters to pass to covariance estimator. All
@@ -1224,6 +1227,7 @@ class _LSSystemModelBase(_SystemModelBase):
         linearmodels.system.covariance.HomoskedasticCovariance
         linearmodels.system.covariance.HeteroskedasticCovariance
         linearmodels.system.covariance.KernelCovariance
+        linearmodels.system.covariance.ClusteredCovariance
         """
         if method is None:
             method = (

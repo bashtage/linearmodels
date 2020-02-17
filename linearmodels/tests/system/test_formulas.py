@@ -7,9 +7,9 @@ import pytest
 
 from linearmodels import IV3SLS, SUR, IVSystemGMM
 from linearmodels.formula import iv_3sls, iv_system_gmm, sur
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system.model import SystemFormulaParser
 from linearmodels.tests.system._utility import generate_3sls_data_v2
-from linearmodels.utility import AttrDict
 
 data = generate_3sls_data_v2(k=2, const=False)
 joined = []

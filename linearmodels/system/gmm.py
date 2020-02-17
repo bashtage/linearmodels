@@ -7,9 +7,9 @@ from numpy import array, empty, ndarray, repeat, sqrt
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
+from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import blocked_inner_prod
 from linearmodels.typing import NDArray
-from linearmodels.utility import AttrDict
 
 
 class HomoskedasticWeightMatrix(object):

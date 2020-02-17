@@ -4,6 +4,7 @@ import pytest
 
 from linearmodels.iv.covariance import kernel_weight_bartlett, kernel_weight_parzen
 from linearmodels.system.covariance import (
+    ClusteredCovariance,
     GMMHeteroskedasticCovariance,
     GMMHomoskedasticCovariance,
     GMMKernelCovariance,
@@ -127,7 +128,7 @@ def test_gmm_str_repr(gmm_cov):
 
 
 def test_homoskedastic_direct(cov_data, debias):
-    x, z, eps, sigma = cov_data
+    x, _, eps, sigma = cov_data
     cov = HomoskedasticCovariance(x, eps, sigma, sigma, debiased=debias)
     k = len(x)
     nobs = x[0].shape[0]
@@ -154,7 +155,7 @@ def test_homoskedastic_direct(cov_data, debias):
 
 
 def test_heteroskedastic_direct(cov_data, debias):
-    x, z, eps, sigma = cov_data
+    x, _, eps, sigma = cov_data
     cov = HeteroskedasticCovariance(x, eps, sigma, sigma, debiased=debias)
     k = len(x)
     xe = [x[i] * eps[:, i : i + 1] for i in range(k)]
@@ -180,7 +181,7 @@ def test_heteroskedastic_direct(cov_data, debias):
 
 
 def test_kernel_direct(cov_data, debias):
-    x, z, eps, sigma = cov_data
+    x, _, eps, sigma = cov_data
     k = len(x)
     bandwidth = 12
     cov = KernelCovariance(
@@ -218,6 +219,73 @@ def test_kernel_direct(cov_data, debias):
     s = np.sqrt(np.diag(cov.cov))[:, None]
     c_direct = direct / (s @ s.T)
     assert_allclose(r_direct, c_direct, atol=1e-5)
+
+
+def test_clustered_direct(cov_data, debias):
+    x, _, eps, sigma = cov_data
+    clustered = ClusteredCovariance(
+        x,
+        eps,
+        sigma,
+        sigma,
+        gls=False,
+        debiased=debias,
+        clusters=np.arange(eps.shape[0]),
+    )
+    hetero = HeteroskedasticCovariance(
+        x, eps, sigma, sigma, gls=False, debiased=debias,
+    )
+    assert_allclose(clustered.cov, hetero.cov)
+
+
+CLUSTERS = [
+    None,
+    np.arange(500) % 41,
+    np.column_stack([np.arange(500) % 37]),
+    np.column_stack([np.arange(500) % 37, np.arange(500) % 41]),
+]
+
+
+@pytest.mark.parametrize("group_debias", [True, False])
+@pytest.mark.parametrize("clusters", CLUSTERS)
+def test_clustered_smoke(cov_data, debias, clusters, group_debias):
+    x, _, eps, sigma = cov_data
+    clustered = ClusteredCovariance(
+        x,
+        eps,
+        sigma,
+        sigma,
+        gls=False,
+        debiased=debias,
+        clusters=clusters,
+        group_debias=group_debias,
+    )
+    assert isinstance(clustered.cov, np.ndarray)
+    assert "clusters" in clustered.cov_config
+    assert "group_debias" in clustered.cov_config
+    assert clustered.cov_config["group_debias"] is group_debias
+
+
+def test_clustered_error(cov_data, debias):
+    x, _, eps, sigma = cov_data
+    nobs = eps.shape[0]
+    clusters = np.zeros((nobs, 2))
+    clusters[:, 0] = np.arange(nobs) % 20
+    clusters[:, 1] = np.arange(nobs) % 40
+    with pytest.raises(ValueError, match="clusters must be non-nested"):
+        ClusteredCovariance(
+            x, eps, sigma, sigma, gls=False, debiased=debias, clusters=clusters,
+        )
+    clusters = np.ones((nobs, 3))
+    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+        ClusteredCovariance(
+            x, eps, sigma, sigma, gls=False, debiased=debias, clusters=clusters,
+        )
+    clusters = np.ones((nobs, 2, 2))
+    with pytest.raises(ValueError, match="clusters must be an ndarray"):
+        ClusteredCovariance(
+            x, eps, sigma, sigma, gls=False, debiased=debias, clusters=clusters,
+        )
 
 
 def test_gmm_homoskedastic_direct(cov_data, debias):
@@ -326,3 +394,4 @@ def test_gmm_kernel_direct(cov_data):
         direct *= adj
     direct = (direct + direct.T) / 2
     assert_allclose(direct, cov_est.cov)
+    assert "kernel" in cov_est.cov_config

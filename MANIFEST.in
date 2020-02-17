@@ -6,7 +6,6 @@ recursive-include linearmodels/datasets *
 recursive-include examples *
 include versioneer.py
 include linearmodels/_version.py
-include README.rst
 include README.md
 include requirements.txt
 include requirements-dev.txt

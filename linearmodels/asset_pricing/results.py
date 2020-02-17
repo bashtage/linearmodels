@@ -12,14 +12,11 @@ from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
+from linearmodels.shared.base import _SummaryStr
+from linearmodels.shared.hypotheses import WaldTestStatistic
+from linearmodels.shared.io import _str, pval_format
+from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray
-from linearmodels.utility import (
-    AttrDict,
-    WaldTestStatistic,
-    _str,
-    _SummaryStr,
-    pval_format,
-)
 
 
 class LinearFactorModelResults(_SummaryStr):

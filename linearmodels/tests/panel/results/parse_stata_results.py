@@ -4,7 +4,7 @@ from typing import List
 
 import pandas as pd
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 filename = "stata-panel-simulated-results.txt"
 

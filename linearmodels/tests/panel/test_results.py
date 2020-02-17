@@ -99,7 +99,9 @@ def test_incorrect_type(data):
         compare(dict(model1=res, model2=res2))
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
+)
 def test_predict(generated_data):
     mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()
@@ -133,7 +135,9 @@ def test_predict(generated_data):
     assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
 
 
-@pytest.mark.filterwarnings("ignore::linearmodels.utility.MissingValueWarning")
+@pytest.mark.filterwarnings(
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
+)
 def test_predict_no_selection(generated_data):
     mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
     res = mod.fit()

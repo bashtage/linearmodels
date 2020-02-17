@@ -10,7 +10,7 @@ from linearmodels.panel.model import PanelOLS
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 pytestmark = pytest.mark.filterwarnings(
-    "ignore::linearmodels.utility.MissingValueWarning"
+    "ignore::linearmodels.shared.exceptions.MissingValueWarning"
 )
 
 missing = [0.0, 0.20]

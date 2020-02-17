@@ -36,21 +36,21 @@ from linearmodels.panel.utility import (
     in_2core_graph,
     not_absorbed,
 )
-from linearmodels.typing import ArrayLike, NDArray
-from linearmodels.utility import (
-    AttrDict,
-    InapplicableTestStatistic,
+from linearmodels.shared.exceptions import (
     InferenceUnavailableWarning,
-    InvalidTestStatistic,
     MemoryWarning,
     MissingValueWarning,
     SingletonWarning,
-    WaldTestStatistic,
-    ensure_unique_column,
-    has_constant,
     missing_warning,
-    panel_to_frame,
 )
+from linearmodels.shared.hypotheses import (
+    InapplicableTestStatistic,
+    InvalidTestStatistic,
+    WaldTestStatistic,
+)
+from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
+from linearmodels.typing import ArrayLike, NDArray
 
 CovarianceEstimator = Union[
     ACCovariance,
@@ -1312,7 +1312,7 @@ class PanelOLS(_PanelModelBase):
         y = root_w * self.dependent.values2d
         x = root_w * self.exog.values2d
         if not self._has_effect:
-            ybar = root_w @ lstsq(root_w, y)[0]
+            ybar = root_w @ lstsq(root_w, y, rcond=None)[0]
             y_effect, x_effect = np.zeros_like(y), np.zeros_like(x)
             return y, x, ybar, y_effect, x_effect
 

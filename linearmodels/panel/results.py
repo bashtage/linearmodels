@@ -10,16 +10,11 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
+from linearmodels.shared.base import _ModelComparison, _SummaryStr
+from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
+from linearmodels.shared.io import _str, pval_format
+from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray, OptionalArrayLike
-from linearmodels.utility import (
-    AttrDict,
-    WaldTestStatistic,
-    _ModelComparison,
-    _str,
-    _SummaryStr,
-    pval_format,
-    quadratic_form_test,
-)
 
 __all__ = [
     "PanelResults",

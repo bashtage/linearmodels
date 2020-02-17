@@ -8,7 +8,7 @@ from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
-    _cov_kernel,
+    cov_kernel,
     kernel_optimal_bandwidth,
 )
 from linearmodels.typing import NDArray
@@ -66,7 +66,7 @@ class _HACMixin(object):
         assert kernel is not None
         kernel_estimator = KERNEL_LOOKUP[kernel]
         weights = kernel_estimator(bw, nobs - 1)
-        out = _cov_kernel(z, weights)
+        out = cov_kernel(z, weights)
         return (out + out.T) / 2
 
 

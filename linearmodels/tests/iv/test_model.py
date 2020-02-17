@@ -11,7 +11,7 @@ from statsmodels.tools.tools import add_constant
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 @pytest.fixture(scope="module")

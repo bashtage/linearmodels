@@ -21,15 +21,11 @@ from linearmodels.asset_pricing.results import (
     LinearFactorModelResults,
 )
 from linearmodels.iv.data import IVData, IVDataLike
+from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.hypotheses import WaldTestStatistic
+from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.utility import AttrDict, get_float, get_string
 from linearmodels.typing import ArrayLike, NDArray
-from linearmodels.utility import (
-    AttrDict,
-    WaldTestStatistic,
-    get_float,
-    get_string,
-    has_constant,
-    missing_warning,
-)
 
 
 def callback_factory(

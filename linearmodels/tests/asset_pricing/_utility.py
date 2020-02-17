@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from linearmodels.utility import AttrDict
+from linearmodels.shared.utility import AttrDict
 
 
 def generate_data(

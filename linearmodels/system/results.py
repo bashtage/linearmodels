@@ -10,17 +10,12 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
 import linearmodels
+from linearmodels.shared.base import _SummaryStr
+from linearmodels.shared.hypotheses import WaldTestStatistic
+from linearmodels.shared.io import _str, format_wide, param_table, pval_format
+from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, NDArray
 from linearmodels.typing.data import OptionalDataFrame
-from linearmodels.utility import (
-    AttrDict,
-    WaldTestStatistic,
-    _str,
-    _SummaryStr,
-    format_wide,
-    param_table,
-    pval_format,
-)
 
 __all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
