@@ -1054,14 +1054,14 @@ def hausman(
 
     """
 
-    def alt_cov(res: PanelResults, sigma: float) -> DataFrame:
+    def alt_cov(res: PanelResults, s2: float) -> DataFrame:
         """
         Calculate covariance using the supplied error variance. Based on
         https://github.com/bashtage/linearmodels/blob/4.17/linearmodels/panel/covariance.py#L119
         """
         cov_obj = res._deferred_cov.__self__
         x = cov_obj._x
-        out = sigma * np.linalg.inv(x.T @ x)
+        out = s2 * np.linalg.inv(x.T @ x)
         out = (out + out.T) / 2
         return DataFrame(out, columns=res.model.exog.vars, index=res.model.exog.vars)
 
@@ -1089,13 +1089,16 @@ def hausman(
 
     b0 = consistent.params[common_cols]
     b1 = efficient.params[common_cols]
-    if sigmamore or sigmaless:
-        s2 = efficient.s2 if sigmamore else consistent.s2
-        var0 = alt_cov(consistent, s2).loc[common_cols, common_cols]
-        var1 = alt_cov(efficient, s2).loc[common_cols, common_cols]
-    else:
-        var0 = consistent.cov.loc[common_cols, common_cols]
-        var1 = efficient.cov.loc[common_cols, common_cols]
+    var0 = (
+        consistent.cov
+        if not sigmamore
+        else alt_cov(consistent, s2=efficient.s2)
+    ).loc[common_cols, common_cols]
+    var1 = (
+        efficient.cov
+        if not sigmaless
+        else alt_cov(efficient, s2=consistent.s2)
+    ).loc[common_cols, common_cols]
 
     var_diff = var0 - var1
     b_diff = b0 - b1
