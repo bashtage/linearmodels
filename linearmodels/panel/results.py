@@ -1,7 +1,8 @@
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
+import warnings
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -11,7 +12,11 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
-from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
+from linearmodels.shared.hypotheses import (
+    WaldTestStatistic,
+    InvalidTestStatistic,
+    quadratic_form_test,
+)
 from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray, OptionalArrayLike
@@ -1002,3 +1007,119 @@ def compare(
         The model comparison object.
     """
     return PanelModelComparison(results, precision=precision)
+
+
+def hausman(
+    consistent: PanelResults,
+    efficient: PanelResults,
+    include_constant: bool = False,
+    sigmamore: bool = False,
+    sigmaless: bool = False,
+) -> Tuple[Union[InvalidTestStatistic, WaldTestStatistic], DataFrame]:
+    r"""
+    Perform Hausman specification test on two models.
+
+    Parameters
+    ----------
+    consistent : PanelResults
+        Result from panel regression, known to be consistent. Typically
+        fixed effects regression.
+    efficient : PanelResults
+        Result from panel regression, known to be efficient. Typically
+        random effects regression.
+    include_constant : bool, optional
+        Flag indicating whether to include the constant term in the comparison.
+    sigmamore : bool, optional
+        Flag indicating whether to base the test on the estimated parameter
+        covariance from the efficient model.
+    sigmaless : bool, optional
+        Flag indicating whether to base the test on the estimated parameter
+        covariance from the consistent model.
+
+    Returns
+    -------
+    WaldTestStatistic
+        Object containing test statistic, p-value, distribution and null
+    DataFrame
+        Overview of coefficients used in the test, and their differences and standard errors
+
+    Notes
+    -----
+    The test is computed by
+    .. math::
+        H=(b_{1}-b_{0})'\big(\operatorname{Var}(b_{0})-\operatorname{Var}(b_{1})\big)^{-1}(b_{1}-b_{0})
+
+        where :math:`b_{1}` is the array of coefficients from the model known to be consistent, and
+        :math:`b_{1}` is the array of coefficients from the model known to be efficient.
+
+    """
+
+    def alt_cov(res: PanelResults, sigma: float) -> DataFrame:
+        """
+        Calculate covariance using the supplied error variance. Based on
+        https://github.com/bashtage/linearmodels/blob/4.17/linearmodels/panel/covariance.py#L119
+        """
+        cov_obj = res._deferred_cov.__self__
+        x = cov_obj._x
+        out = sigma * np.linalg.inv(x.T @ x)
+        out = (out + out.T) / 2
+        return DataFrame(out, columns=res.model.exog.vars, index=res.model.exog.vars)
+
+    def matrix_positive_definite(mat: Union[NDArray, DataFrame]) -> bool:
+        """
+        Check if matrix is positive definite.
+        """
+        if np.array_equal(mat, mat.T):
+            try:
+                np.linalg.cholesky(mat)
+                return True
+            except np.linalg.LinAlgError:
+                pass
+        return False
+
+    if sigmamore and sigmaless:
+        raise ValueError("Conflicting test parameters")
+
+    common_cols = set(consistent.params.index) & set(efficient.params.index)
+    if not include_constant:
+        if consistent.model.has_constant:
+            common_cols.discard(consistent.model.exog.vars[consistent.model._constant_index])
+        if efficient.model.has_constant:
+            common_cols.discard(efficient.model.exog.vars[efficient.model._constant_index])
+
+    b0 = consistent.params[common_cols]
+    b1 = efficient.params[common_cols]
+    if sigmamore or sigmaless:
+        s2 = efficient.s2 if sigmamore else consistent.s2
+        var0 = alt_cov(consistent, s2).loc[common_cols, common_cols]
+        var1 = alt_cov(efficient, s2).loc[common_cols, common_cols]
+    else:
+        var0 = consistent.cov.loc[common_cols, common_cols]
+        var1 = efficient.cov.loc[common_cols, common_cols]
+
+    var_diff = var0 - var1
+    b_diff = b0 - b1
+    std_errors = Series(np.sqrt(np.diagonal(var_diff)), index=var0.index)
+    estimates = DataFrame(
+        data={"b0": b0, "b1": b1, "b0-b1": b_diff, "Std. Err.": std_errors}
+    )
+    if not matrix_positive_definite(var_diff):
+        warnings.warn("(Var(b0) - Var(b1) is not positive definite)")
+        inv = np.linalg.inv
+    else:
+        inv = np.linalg.pinv
+    test_stat = b_diff.T @ inv(var_diff) @ b_diff
+
+    test: Union[InvalidTestStatistic, WaldTestStatistic]
+    if test_stat >= 0:
+        test = WaldTestStatistic(
+            test_stat,
+            null="No systematic difference in coefficients between models",
+            df=b0.size,
+            name="Hausman specification test",
+        )
+    else:
+        test = InvalidTestStatistic(
+            "chi2<0. Model does not meet the assumptions of the Hausman test."
+        )
+    return test, estimates

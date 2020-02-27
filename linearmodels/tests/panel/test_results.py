@@ -1,3 +1,4 @@
+from functools import partial
 from itertools import product
 
 import numpy as np
@@ -10,7 +11,7 @@ from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
-from linearmodels.panel.results import compare
+from linearmodels.panel.results import compare, hausman
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
@@ -170,3 +171,30 @@ def test_wald_test(data):
 
     with pytest.raises(ValueError):
         res.wald_test(restriction, np.zeros(2), formula=formula)
+
+
+@pytest.mark.parametrize("include_constant", (False, True), ids=("", "include_constant"))
+@pytest.mark.parametrize("sigmamore", (False, True), ids=("", "sigmamore"))
+@pytest.mark.parametrize("sigmaless", (False, True), ids=("", "sigmaless"))
+def test_hausman_test(recwarn, data, include_constant, sigmamore, sigmaless):
+    dependent = data.set_index(["nr", "year"]).lwage
+    exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
+    fe_res = PanelOLS(dependent, exog, entity_effects=True).fit()
+    re_res = RandomEffects(dependent, exog).fit()
+    func = partial(
+        hausman,
+        consistent=fe_res,
+        efficient=re_res,
+        include_constant=include_constant,
+        sigmamore=sigmamore,
+        sigmaless=sigmaless,
+    )
+    if sigmamore and sigmaless:
+        with pytest.raises(ValueError):
+            func()
+    else:
+        wald, estimates = func()
+        if include_constant:
+            warnings = {str(warn.message) for warn in recwarn}
+            assert 'invalid value encountered in sqrt' in warnings
+            assert '(Var(b0) - Var(b1) is not positive definite)' in warnings
