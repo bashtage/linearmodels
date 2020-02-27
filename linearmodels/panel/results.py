@@ -17,6 +17,7 @@ from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
     quadratic_form_test,
 )
+from linearmodels.panel.covariance import ClusteredCovariance, HeteroskedasticCovariance
 from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray, OptionalArrayLike
@@ -27,6 +28,7 @@ __all__ = [
     "RandomEffectsResults",
     "FamaMacBethResults",
     "compare",
+    "hausman",
 ]
 
 
@@ -1080,24 +1082,33 @@ def hausman(
     if sigmamore and sigmaless:
         raise ValueError("Conflicting test parameters")
 
+    invalid_cov = (ClusteredCovariance, HeteroskedasticCovariance)
+    if any(
+        isinstance(res._deferred_cov.__self__, invalid_cov)
+        for res in (consistent, efficient)
+    ):
+        raise TypeError(
+            "Hausman test cannot be used with clustered or robust covariance"
+        )
+
     common_cols = set(consistent.params.index) & set(efficient.params.index)
     if not include_constant:
         if consistent.model.has_constant:
-            common_cols.discard(consistent.model.exog.vars[consistent.model._constant_index])
+            common_cols.discard(
+                consistent.model.exog.vars[consistent.model._constant_index]
+            )
         if efficient.model.has_constant:
-            common_cols.discard(efficient.model.exog.vars[efficient.model._constant_index])
+            common_cols.discard(
+                efficient.model.exog.vars[efficient.model._constant_index]
+            )
 
     b0 = consistent.params[common_cols]
     b1 = efficient.params[common_cols]
     var0 = (
-        consistent.cov
-        if not sigmamore
-        else alt_cov(consistent, s2=efficient.s2)
+        consistent.cov if not sigmamore else alt_cov(consistent, s2=efficient.s2)
     ).loc[common_cols, common_cols]
     var1 = (
-        efficient.cov
-        if not sigmaless
-        else alt_cov(efficient, s2=consistent.s2)
+        efficient.cov if not sigmaless else alt_cov(efficient, s2=consistent.s2)
     ).loc[common_cols, common_cols]
 
     var_diff = var0 - var1
