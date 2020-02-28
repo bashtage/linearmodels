@@ -176,7 +176,7 @@ def test_wald_test(data):
 @pytest.mark.parametrize("include_constant", (False, True), ids=("", "include_constant"))
 @pytest.mark.parametrize("sigmamore", (False, True), ids=("", "sigmamore"))
 @pytest.mark.parametrize("sigmaless", (False, True), ids=("", "sigmaless"))
-def test_hausman_test(recwarn, data, include_constant, sigmamore, sigmaless):
+def test_wu_husman(request, recwarn, data, include_constant, sigmamore, sigmaless):
     dependent = data.set_index(["nr", "year"]).lwage
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
     fe_res = PanelOLS(dependent, exog, entity_effects=True).fit()
@@ -191,9 +191,22 @@ def test_hausman_test(recwarn, data, include_constant, sigmamore, sigmaless):
     if sigmamore and sigmaless:
         with pytest.raises(ValueError):
             func()
+        return
+    wald, estimates = func()
+    if include_constant:
+        warnings = {str(warn.message) for warn in recwarn}
+        assert 'invalid value encountered in sqrt' in warnings
+        assert '(Var(b0) - Var(b1) is not positive definite)' in warnings
+        assert estimates.shape == (4, 4)
     else:
-        wald, estimates = func()
-        if include_constant:
-            warnings = {str(warn.message) for warn in recwarn}
-            assert 'invalid value encountered in sqrt' in warnings
-            assert '(Var(b0) - Var(b1) is not positive definite)' in warnings
+        assert estimates.shape == (3, 4)
+    pre_calculated_results = {
+        "test_wu_husman[data0]": 112.1182236555156,
+        "test_wu_husman[data0-include_constant]": 112.1182236555168,
+        "test_wu_husman[data0-sigmamore]": 86.79072977130164,
+        "test_wu_husman[data0-sigmamore-include_constant]": 86.79072977130375,
+        "test_wu_husman[data0-sigmaless]": 88.49415027018209,
+        "test_wu_husman[data0-sigmaless-include_constant]": 88.49415027018102,
+    }
+    expected = pre_calculated_results[request.node.name]
+    assert wald.stat == pytest.approx(expected, abs=1e-9)
