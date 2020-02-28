@@ -11,7 +11,7 @@ from linearmodels.datasets import wage_panel
 from linearmodels.iv.model import IV2SLS
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS, RandomEffects
-from linearmodels.panel.results import compare, hausman
+from linearmodels.panel.results import compare
 from linearmodels.tests.panel._utility import datatypes, generate_data
 
 
@@ -182,9 +182,8 @@ def test_hausman_test(recwarn, data, include_constant, sigmamore, sigmaless):
     fe_res = PanelOLS(dependent, exog, entity_effects=True).fit()
     re_res = RandomEffects(dependent, exog).fit()
     func = partial(
-        hausman,
-        consistent=fe_res,
-        efficient=re_res,
+        re_res.wu_hausman,
+        other=fe_res,
         include_constant=include_constant,
         sigmamore=sigmamore,
         sigmaless=sigmaless,
