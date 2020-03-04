@@ -1,4 +1,4 @@
-"C:\Program Files (x86)\LyX 2.2\bin\lyx" --force-overwrite --export latex mathematical-detail.lyx
+"C:\Program Files (x86)\LyX 2.3\bin\LyX" --force-overwrite --export latex mathematical-detail.lyx
 pandoc -s mathematical-detail.tex -o mathematical-detail.rst
 copy /Y mathematical-detail.rst mathematical-detail-pre.txt
 del mathematical-detail.rst

@@ -1,7 +1,3 @@
-
-Formulas and Mathematical Detail
-================================
-
 Models
 ------
 
@@ -54,8 +50,9 @@ of dummies will contain all values and the second will have one dropped.
 **Weights**
 
 When weights are used, the results are identical to the LSDV model where
-all variables :math:`y_{it,}`\ :math:`x_{it}`, :math:`d_{1,it}` and
-:math:`d_{2,it}`\ (if included) are multiplied by :math:`\sqrt{w_{it}}`.
+all variables – :math:`y_{it,}`\ :math:`x_{it}`, :math:`d_{1,it}` and
+:math:`d_{2,it}`\ (if included) – are multiplied by
+:math:`\sqrt{w_{it}}`.
 
 Random Effect Estimation (RandomEffects)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,11 +194,11 @@ The clustered covariance estimator supports 1 and 2 way clustering.
 
 where in the case of one-way clustering,
 
-.. math:: \hat{S}_{\mathcal{G}}=\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\sum_{g=1}^{G}\xi_{g}^{\prime}\xi_{g}
+.. math:: \hat{S}_{\mathcal{G}}=\frac{G}{G-1}\frac{n_{obs}-1}{n_{obs}}\frac{1}{n_{obs}}\sum_{g=1}^{G}\xi_{g}^{\prime}\xi_{g}
 
 where
 
-.. math:: \xi_{g}=\sum_{it\in G_{g}}\hat{\epsilon}_{ii}^{2}x_{it}^{\prime}x_{it}
+.. math:: \xi_{g}=\sum_{it\in G_{g}}\hat{\epsilon}_{ii}x_{it}
 
 and :math:`it\in G_{g}` indicates that observation belongs to group
 :math:`g`. The two-way clustered replaces
