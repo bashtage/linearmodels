@@ -200,7 +200,7 @@
                 <span class=k >return</span> <span class=n >out</span>
             <span class=k >else</span><span class=p >:</span>
 
-                <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{key}</span><span class=s2 > found in the dictionary but it is not a str."</span><span class=p >)</span>
+                <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{</span><span class=n >key</span><span class=si >}</span><span class=s2 > found in the dictionary but it is not a str."</span><span class=p >)</span>
     <span class=k >return</span> <span class=n >out</span>
 
 
@@ -229,7 +229,7 @@
             <span class=k >if</span> <span class=nb >isinstance</span><span class=p >(</span><span class=n >out</span><span class=p >,</span> <span class=p >(</span><span class=nb >int</span><span class=p >,</span> <span class=nb >float</span><span class=p >,</span> <span class=n >np</span><span class=o >.</span><span class=n >floating</span><span class=p >)):</span>
                 <span class=k >return</span> <span class=nb >float</span><span class=p >(</span><span class=n >out</span><span class=p >)</span>
             <span class=k >else</span><span class=p >:</span>
-                <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{key}</span><span class=s2 > found in the dictionary but it is not a float."</span><span class=p >)</span>
+                <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{</span><span class=n >key</span><span class=si >}</span><span class=s2 > found in the dictionary but it is not a float."</span><span class=p >)</span>
     <span class=k >return</span> <span class=n >out</span>
 
 
@@ -254,7 +254,7 @@
     <span class=k >if</span> <span class=n >key</span> <span class=ow >in</span> <span class=n >d</span><span class=p >:</span>
         <span class=n >out</span> <span class=o >=</span> <span class=n >d</span><span class=p >[</span><span class=n >key</span><span class=p >]</span>
         <span class=k >if</span> <span class=ow >not</span> <span class=p >(</span><span class=n >out</span> <span class=ow >is</span> <span class=kc >None</span> <span class=ow >or</span> <span class=nb >isinstance</span><span class=p >(</span><span class=n >out</span><span class=p >,</span> <span class=nb >bool</span><span class=p >)):</span>
-            <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{key}</span><span class=s2 > found in the dictionary but it is not a bool."</span><span class=p >)</span>
+            <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"</span><span class=si >{</span><span class=n >key</span><span class=si >}</span><span class=s2 > found in the dictionary but it is not a bool."</span><span class=p >)</span>
     <span class=k >return</span> <span class=nb >bool</span><span class=p >(</span><span class=n >out</span><span class=p >)</span>
 
 
@@ -293,7 +293,7 @@
                 <span class=k >return</span> <span class=n >out</span>
             <span class=k >else</span><span class=p >:</span>
                 <span class=k >raise</span> <span class=ne >TypeError</span><span class=p >(</span>
-                    <span class=sa >f</span><span class=s2 >"</span><span class=si >{key}</span><span class=s2 > found in the dictionary but it is not array-like."</span>
+                    <span class=sa >f</span><span class=s2 >"</span><span class=si >{</span><span class=n >key</span><span class=si >}</span><span class=s2 > found in the dictionary but it is not array-like."</span>
                 <span class=p >)</span>
     <span class=k >return</span> <span class=n >out</span>
-</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.3. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.4. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
