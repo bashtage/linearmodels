@@ -195,7 +195,6 @@ def test_wu_husman(request, recwarn, data, include_constant, sigmamore, sigmales
     wald, estimates = func()
     if include_constant:
         warnings = {str(warn.message) for warn in recwarn}
-        assert 'invalid value encountered in sqrt' in warnings
         assert '(Var(b0) - Var(b1) is not positive definite)' in warnings
         assert estimates.shape == (4, 4)
     else:
