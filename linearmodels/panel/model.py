@@ -2430,6 +2430,57 @@ class RandomEffects(_PanelModelBase):
         debiased: bool = True,
         **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> RandomEffectsResults:
+        """
+        Estimate model parameters
+
+        Parameters
+        ----------
+        small_sample : bool, default False
+            Apply a small-sample correction to the estimate of the variance of
+            the random effect.
+        cov_type : str, default "unadjusted"
+            Name of covariance estimator. See Notes.
+        debiased : bool, default True
+            Flag indicating whether to debiased the covariance estimator using
+            a degree of freedom adjustment.
+        **cov_config
+            Additional covariance-specific options.  See Notes.
+
+        Returns
+        -------
+        RandomEffectsResults
+            Estimation results
+
+        Examples
+        --------
+        >>> from linearmodels import RandomEffects
+        >>> mod = RandomEffects(y, x)
+        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+
+        Notes
+        -----
+        Four covariance estimators are supported:
+
+        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
+        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+          White's estimator
+        * 'clustered` - One or two way clustering.  Configuration options are:
+
+          * ``clusters`` - Input containing containing 1 or 2 variables.
+            Clusters should be integer values, although other types will
+            be coerced to integer values by treating as categorical variables
+          * ``cluster_entity`` - Boolean flag indicating to use entity
+            clusters
+          * ``cluster_time`` - Boolean indicating to use time clusters
+
+        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+
+          * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
+            Default is Bartlett's kernel, which is produces a covariance
+            estimator similar to the Newey-West covariance estimator.
+          * ``bandwidth`` - Bandwidth to use when computing the kernel.  If
+            not provided, a naive default is used.
+        """
         w = self.weights.values2d
         root_w = np.sqrt(w)
         y = self.dependent.demean("entity", weights=self.weights).values2d
