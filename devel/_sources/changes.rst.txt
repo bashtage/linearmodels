@@ -4,6 +4,10 @@ Change Log
 
 Since 4.17
 ==========
+* Added alternative measures of :math:`R^2` using the squared correlation. See
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_overall`,
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_within`, and
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_between` (:issue:`157`).
 * Added a clustered covariance estimator
   (:class:`linearmodels.system.covariance.ClusteredCovariance`) for system regressions
   (:issue:`241`).

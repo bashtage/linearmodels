@@ -26,6 +26,9 @@ linearmodels.panel.results.PanelEffectsResults
    .. autosummary::
       :toctree:
 
+      ~PanelEffectsResults.corr_squared_between
+      ~PanelEffectsResults.corr_squared_overall
+      ~PanelEffectsResults.corr_squared_within
       ~PanelEffectsResults.cov
       ~PanelEffectsResults.df_model
       ~PanelEffectsResults.df_resid

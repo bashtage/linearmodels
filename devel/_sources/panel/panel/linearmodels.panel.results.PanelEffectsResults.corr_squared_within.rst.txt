@@ -1,0 +1,6 @@
+linearmodels.panel.results.PanelEffectsResults.corr\_squared\_within
+====================================================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autoproperty:: PanelEffectsResults.corr_squared_within

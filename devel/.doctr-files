@@ -501,6 +501,9 @@ devel/_sources/panel/panel/linearmodels.panel.model.RandomEffects.reformat_clust
 devel/_sources/panel/panel/linearmodels.panel.model.RandomEffects.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.conf_int.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_between.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_overall.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_within.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.cov.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.df_model.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.df_resid.rst.txt
@@ -533,6 +536,9 @@ devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.tstats.
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.wald_test.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.FamaMacBethResults.wresids.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.conf_int.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_between.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_overall.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_within.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.cov.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.df_model.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelEffectsResults.df_resid.rst.txt
@@ -584,6 +590,9 @@ devel/_sources/panel/panel/linearmodels.panel.results.PanelModelComparison.std_e
 devel/_sources/panel/panel/linearmodels.panel.results.PanelModelComparison.summary.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelModelComparison.tstats.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.conf_int.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.cov.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.df_model.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.df_resid.rst.txt
@@ -616,6 +625,9 @@ devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.tstats.rst.tx
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.wald_test.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.PanelResults.wresids.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.conf_int.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_between.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_overall.rst.txt
+devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_within.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.cov.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.df_model.rst.txt
 devel/_sources/panel/panel/linearmodels.panel.results.RandomEffectsResults.df_resid.rst.txt
@@ -836,7 +848,6 @@ devel/_static/fonts/specimen/FontAwesome.woff2
 devel/_static/fonts/specimen/MaterialIcons-Regular.ttf
 devel/_static/fonts/specimen/MaterialIcons-Regular.woff
 devel/_static/fonts/specimen/MaterialIcons-Regular.woff2
-devel/_static/guzzle.css
 devel/_static/icons/android-chrome-192x192.png
 devel/_static/icons/android-chrome-512x512.png
 devel/_static/icons/apple-touch-icon.png
@@ -945,9 +956,7 @@ devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFacto
 devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.total_ss.html
 devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.tstats.html
 devel/asset-pricing/examples/examples.html
-devel/asset-pricing/examples/examples.ipynb
 devel/asset-pricing/examples/formulas.html
-devel/asset-pricing/examples/formulas.ipynb
 devel/asset-pricing/index.html
 devel/asset-pricing/introduction.html
 devel/asset-pricing/mathematical-formula.html
@@ -1009,13 +1018,9 @@ devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.isnull.html
 devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.nobs.html
 devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.sparse.html
 devel/iv/examples/absorbing-regression.html
-devel/iv/examples/absorbing-regression.ipynb
 devel/iv/examples/advanced-examples.html
-devel/iv/examples/advanced-examples.ipynb
 devel/iv/examples/basic-examples.html
-devel/iv/examples/basic-examples.ipynb
 devel/iv/examples/using-formulas.html
-devel/iv/examples/using-formulas.ipynb
 devel/iv/index.html
 devel/iv/introduction.html
 devel/iv/iv/linearmodels.iv.covariance.ClusteredCovariance.config.html
@@ -1250,11 +1255,8 @@ devel/iv/mathematical-formula.html
 devel/iv/reference.html
 devel/objects.inv
 devel/panel/examples/data-formats.html
-devel/panel/examples/data-formats.ipynb
 devel/panel/examples/examples.html
-devel/panel/examples/examples.ipynb
 devel/panel/examples/using-formulas.html
-devel/panel/examples/using-formulas.ipynb
 devel/panel/faq.html
 devel/panel/index.html
 devel/panel/introduction.html
@@ -1382,6 +1384,9 @@ devel/panel/panel/linearmodels.panel.model.RandomEffects.predict.html
 devel/panel/panel/linearmodels.panel.model.RandomEffects.reformat_clusters.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.all_params.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.conf_int.html
+devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_between.html
+devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_overall.html
+devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.corr_squared_within.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.cov.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.df_model.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.df_resid.html
@@ -1414,6 +1419,9 @@ devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.tstats.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.wald_test.html
 devel/panel/panel/linearmodels.panel.results.FamaMacBethResults.wresids.html
 devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.conf_int.html
+devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_between.html
+devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_overall.html
+devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.corr_squared_within.html
 devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.cov.html
 devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.df_model.html
 devel/panel/panel/linearmodels.panel.results.PanelEffectsResults.df_resid.html
@@ -1465,6 +1473,9 @@ devel/panel/panel/linearmodels.panel.results.PanelModelComparison.std_errors.htm
 devel/panel/panel/linearmodels.panel.results.PanelModelComparison.summary.html
 devel/panel/panel/linearmodels.panel.results.PanelModelComparison.tstats.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.conf_int.html
+devel/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_between.html
+devel/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_overall.html
+devel/panel/panel/linearmodels.panel.results.PanelResults.corr_squared_within.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.cov.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.df_model.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.df_resid.html
@@ -1497,6 +1508,9 @@ devel/panel/panel/linearmodels.panel.results.PanelResults.tstats.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.wald_test.html
 devel/panel/panel/linearmodels.panel.results.PanelResults.wresids.html
 devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.conf_int.html
+devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_between.html
+devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_overall.html
+devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.corr_squared_within.html
 devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.cov.html
 devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.df_model.html
 devel/panel/panel/linearmodels.panel.results.RandomEffectsResults.df_resid.html
@@ -1539,11 +1553,8 @@ devel/search.html
 devel/searchindex.js
 devel/sitemap.xml
 devel/system/examples/examples.html
-devel/system/examples/examples.ipynb
 devel/system/examples/formulas.html
-devel/system/examples/formulas.ipynb
 devel/system/examples/three-stage-ls.html
-devel/system/examples/three-stage-ls.ipynb
 devel/system/index.html
 devel/system/mathematical-formula.html
 devel/system/reference.html

@@ -27,6 +27,9 @@ linearmodels.panel.results.FamaMacBethResults
       :toctree:
 
       ~FamaMacBethResults.all_params
+      ~FamaMacBethResults.corr_squared_between
+      ~FamaMacBethResults.corr_squared_overall
+      ~FamaMacBethResults.corr_squared_within
       ~FamaMacBethResults.cov
       ~FamaMacBethResults.df_model
       ~FamaMacBethResults.df_resid
