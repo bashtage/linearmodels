@@ -472,6 +472,23 @@ class _PanelModelBase(object):
 
         return y, x, w
 
+    def _rsquared_corr(self, params: NDArray) -> Tuple[float, float, float]:
+        """Correlation-based measures of R2"""
+        # Overall
+        y = self.dependent.values2d
+        x = self.exog.values2d
+        r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        # Between
+        y = np.asarray(self.dependent.mean("entity"))
+        x = np.asarray(self.exog.mean("entity"))
+        r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        # Within
+        y = self.dependent.demean("entity", return_panel=False)
+        x = self.exog.demean("entity", return_panel=False)
+        r2w = np.corrcoef(y.T, (x @ params).T)[0, 1]
+
+        return r2o, r2w, r2b
+
     def _rsquared(
         self, params: NDArray, reweight: bool = False
     ) -> Tuple[float, float, float]:
@@ -548,6 +565,7 @@ class _PanelModelBase(object):
         deferred_f = self._f_statistic_robust(params, cov, debiased, df_resid)
         f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
+        c2o, c2w, c2b = self._rsquared_corr(params)
         f_pooled = InapplicableTestStatistic(
             reason="Model has no effects", name="Pooled F-stat"
         )
@@ -568,6 +586,9 @@ class _PanelModelBase(object):
             r2b=r2b,
             r2=r2w,
             r2o=r2o,
+            c2o=c2o,
+            c2b=c2b,
+            c2w=c2w,
             s2=cov.s2,
             model=self,
             cov_type=cov.name,

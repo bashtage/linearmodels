@@ -16,15 +16,17 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+
+
 #
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
 from distutils.version import LooseVersion
 import glob
 import hashlib
 import os
+from typing import Dict, List
 
 import linearmodels
 import sphinx_material
@@ -119,9 +121,9 @@ author = "Kevin Sheppard"
 #
 # The short X.Y version.
 # The short X.Y version.
-version = LooseVersion(linearmodels.__version__)
-if "+" in version.version:
-    version = linearmodels.__version__
+loose_version = LooseVersion(linearmodels.__version__)
+short_version = version = linearmodels.__version__
+if "+" in loose_version.version:
     version = version.replace(".dirty", "")
     version = version.split("+")
     commits, tag = version[1].split(".")
@@ -130,9 +132,6 @@ if "+" in version.version:
     tag = " (+" + commits + ", " + tag + ")"
     short_version = version + short_tag
     version = version + tag
-else:
-    short_version = version = linearmodels.__version__
-
 
 # The full version, including alpha/beta/rc tags.
 release = linearmodels.__version__
@@ -147,7 +146,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = []
+exclude_patterns: List[str] = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "colorful"
@@ -205,7 +204,7 @@ html_sidebars = {
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+latex_elements: Dict[str, str] = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',

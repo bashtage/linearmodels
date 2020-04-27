@@ -1,3 +1,6 @@
+Formulas and Mathematical Detail
+================================
+
 Models
 ------
 
@@ -238,3 +241,96 @@ where
 
 and :math:`K\left(i,bw\right)` is a kernel weighting function. Kernel
 supported include the Bartlett, Parzen and Quadratic Spectral.
+
+:math:`R^{2}` Estimates
+-----------------------
+
+There are 3 different :math:`R^{2}` estimates computed for the models
+produced using 2 different methods. When models contain entity effects
+and are not weighted, the two methods agree.
+
+The correlation-based measures **do not** make use of weights. They are
+prefixed as :math:`\texttt{corr\_squared\_}` in estimation results.
+
+Between :math:`R^{2}`
+~~~~~~~~~~~~~~~~~~~~~
+
+Define :math:`\bar{y}_{iw}` and :math:`\bar{x}_{iw}` to be entity-wise
+weighted means, and the entity-wise weight to be
+
+.. math:: w_{i}=\frac{\sum_{t}w_{it}}{\left(NT\right)^{-1}\sum_{i}\sum_{t}w_{it}}.
+
+The weighted between residuals are
+
+.. math:: \bar{\epsilon}_{iw}=\sqrt{w_{i}}\left(\bar{y}_{iw}-\bar{x}_{iw}\hat{\beta}\right)
+
+and the weighted between :math:`R^{2}` is defined
+
+.. math:: R_{B}^{2}=1-\frac{\bar{\epsilon}_{w}^{\prime}\bar{\epsilon}_{w}}{\ddot{\bar{y}}_{w}^{\prime}\ddot{\bar{y}}_{w}}
+
+.. math:: 
+
+where :math:`\ddot{\bar{y}}_{iw}=\bar{y}_{iw}` if the model does not
+contains a constant or
+:math:`\ddot{\bar{y}}_{iw}=\bar{y}_{iw}-\bar{\bar{y}}_{w}` if the model
+does. The overall weighted mean is defined
+
+.. math:: \bar{\bar{y}}_{w}=\frac{\sum_{i=1}^{N}w_{i}\bar{y}_{iw}}{\sum_{i=1}^{N}w_{i}}.
+
+Within\ :math:`R^{2}` (correlation method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This measure matches Stata. It does not reflect weighting.
+
+.. math:: \rho_{B}^{2}=\textrm{Corr}\left[\bar{x}_{t}\hat{\beta},\bar{y}_{i}\right]^{2}
+
+Overall :math:`R^{2}`
+~~~~~~~~~~~~~~~~~~~~~
+
+Define the weighted residual as
+
+.. math:: \epsilon_{it,w}=\sqrt{w}\left(y_{it}-x_{it}\hat{\beta}\right)
+
+and the mean deviated dependent as
+
+.. math:: \tilde{y}_{it,w}=\sqrt{w_{it}}\left(y_{it}-\bar{\bar{y}}_{w}\right)
+
+where
+
+.. math:: \bar{\bar{y}}_{w}=\frac{\sum_{i}\sum_{t}w_{it}y_{it}}{\sum_{i}\sum_{t}w_{it}}
+
+if the model contains a constant or :math:`\bar{\bar{y}}_{w}=0` if not.
+Then
+
+.. math:: R_{O}^{2}=1-\frac{\sum_{i}\sum_{t}\epsilon_{it,w}^{2}}{\sum_{i}\sum_{t}\tilde{y}_{it,w}^{2}}.
+
+Overall :math:`R^{2}` (correlation method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This measure matches Stata. It does not reflect weighting.
+
+.. math:: \rho_{O}^{2}=\textrm{Corr}\left[x_{it}\hat{\beta},y_{it}\right]
+
+Within :math:`R^{2}`
+~~~~~~~~~~~~~~~~~~~~
+
+Define
+:math:`\tilde{y}_{it,w}=\sqrt{w_{it}}\left(y_{it}-\bar{y}_{iw}\right)`
+and
+:math:`\tilde{x}_{it,w}=\sqrt{w_{it}}\left(x_{it}-\bar{x}_{iw}\right)`
+and the residuals as
+
+.. math:: \tilde{\epsilon}_{it,w}=\tilde{y}_{it,w}-\tilde{x}_{it,w}\hat{\beta}.
+
+The within\ :math:`R^{2}` is defined as
+
+.. math:: R_{W}^{2}=1-\frac{\sum_{i}\sum_{t}\tilde{\epsilon}_{it,w}}{\sum_{i}\sum_{t}\tilde{y}_{it,w}}
+
+.. _withinr2-correlation-method-1:
+
+Within\ :math:`R^{2}` (correlation method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This measure matches Stata. It does not reflect weighting.
+
+.. math:: \rho_{W}^{2}=\textrm{Corr}\left[\left(x_{it}-\bar{x}_{t}\right)\hat{\beta},\left(y_{it}-\bar{y}_{i}\right)\right]^{2}
