@@ -45,6 +45,9 @@ class PanelResults(_SummaryStr):
         self._r2w = res.r2w
         self._r2b = res.r2b
         self._r2o = res.r2o
+        self._c2w = res.c2w
+        self._c2b = res.c2b
+        self._c2o = res.c2o
         self._s2 = res.s2
         self._entity_info = res.entity_info
         self._time_info = res.time_info
@@ -162,7 +165,11 @@ class PanelResults(_SummaryStr):
         Notes
         -----
         The between rsquared measures the fit of the time-averaged dependent
-        variable on the time averaged dependent variables.
+        variable on the time averaged dependent variables. It accounts for the
+        weights used in the estimation of the model.
+
+        See the mathematical reference in the documentation for the formal
+        definition of this measure.
         """
         return self._r2b
 
@@ -179,7 +186,11 @@ class PanelResults(_SummaryStr):
         Notes
         -----
         The within rsquared measures the fit of the dependent purged of entity
-        effects on the exogenous purged of entity effects.
+        effects on the exogenous purged of entity effects. It accounts for the
+        weights used in the estimation of the model.
+
+        See the mathematical reference in the documentation for the formal
+        definition of this measure.
         """
         return self._r2w
 
@@ -197,9 +208,92 @@ class PanelResults(_SummaryStr):
         -----
         The overall rsquared measures the fit of the dependent
         variable on the dependent variables ignoring any included effects.
-        """
+        It accounts for the weights used in the estimation of the model.
 
+        See the mathematical reference in the documentation for the formal
+        definition of this measure.
+        """
         return self._r2o
+
+    @property
+    def corr_squared_between(self) -> float:
+        r"""
+        Between Coefficient of determination using squared correlation
+
+        Returns
+        -------
+        float
+            Between coefficient of determination
+
+        Notes
+        -----
+        The between rsquared measures the fit of the time-averaged dependent
+        variable on the time averaged dependent variables.
+
+        This measure is based on the squared correlation between the
+        entity-wise averaged dependent variables and their average
+        predictions.
+
+        .. math::
+
+           Corr[\bar{y}_i, \bar{x}_i\hat{\beta}]
+
+        This measure **does not** account for weights.
+        """
+        return self._c2b
+
+    @property
+    def corr_squared_within(self) -> float:
+        r"""
+        Within coefficient of determination using squared correlation
+
+        Returns
+        -------
+        float
+            Within coefficient of determination
+
+        Notes
+        -----
+        The within rsquared measures the fit of the dependent purged of entity
+        effects on the exogenous purged of entity effects.
+
+        This measure is based on the squared correlation between the
+        entity-wise demeaned dependent variables and their demeaned
+        predictions.
+
+        .. math::
+
+           Corr[y_{it}-\bar{y}_i, (x_{it}-\bar{x}_i)\hat{\beta}]
+
+        This measure **does not** account for weights.
+        """
+        return self._c2w
+
+    @property
+    def corr_squared_overall(self) -> float:
+        r"""
+        Overall coefficient of determination using squared correlation
+
+        Returns
+        -------
+        float
+            Between coefficient of determination
+
+        Notes
+        -----
+        The overall rsquared measures the fit of the dependent
+        variable on the dependent variables ignoring any included effects.
+
+        This measure is based on the squared correlation between the
+        dependent variables and their predictions.
+
+        .. math::
+
+           Corr[y_{it}, x_{it}\hat{\beta}]
+
+        This measure **does not** account for weights.
+        """
+        return self._c2o
 
     @property
     def s2(self) -> float:

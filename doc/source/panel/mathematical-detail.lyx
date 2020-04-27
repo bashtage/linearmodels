@@ -855,5 +855,316 @@ and
  
 \end_layout
 
+\begin_layout Subsection
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ Estimates
+\end_layout
+
+\begin_layout Standard
+There are 3 different 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ estimates computed for the models produced using 2 different methods.
+ When models contain entity effects and are not weighted, the two methods
+ agree.
+\end_layout
+
+\begin_layout Standard
+\noindent
+The correlation-based measures 
+\series bold
+do not
+\series default
+ make use of weights.
+ They are prefixed as 
+\begin_inset Formula $\texttt{corr\_squared\_}$
+\end_inset
+
+ in estimation results.
+\end_layout
+
+\begin_layout Subsubsection
+Between 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Define 
+\begin_inset Formula $\bar{y}_{iw}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{x}_{iw}$
+\end_inset
+
+ to be entity-wise weighted means, and the entity-wise weight to be
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+w_{i}=\frac{\sum_{t}w_{it}}{\left(NT\right)^{-1}\sum_{i}\sum_{t}w_{it}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The weighted between residuals are
+\begin_inset Formula 
+\[
+\bar{\epsilon}_{iw}=\sqrt{w_{i}}\left(\bar{y}_{iw}-\bar{x}_{iw}\hat{\beta}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and the weighted between 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is defined
+\begin_inset Formula 
+\[
+R_{B}^{2}=1-\frac{\bar{\epsilon}_{w}^{\prime}\bar{\epsilon}_{w}}{\ddot{\bar{y}}_{w}^{\prime}\ddot{\bar{y}}_{w}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\ddot{\bar{y}}_{iw}=\bar{y}_{iw}$
+\end_inset
+
+ if the model does not contains a constant or 
+\begin_inset Formula $\ddot{\bar{y}}_{iw}=\bar{y}_{iw}-\bar{\bar{y}}_{w}$
+\end_inset
+
+ if the model does.
+ The overall weighted mean is defined 
+\begin_inset Formula 
+\[
+\bar{\bar{y}}_{w}=\frac{\sum_{i=1}^{N}w_{i}\bar{y}_{iw}}{\sum_{i=1}^{N}w_{i}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+\noindent
+Within
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ (correlation method)
+\end_layout
+
+\begin_layout Standard
+\noindent
+This measure matches Stata.
+ It does not reflect weighting.
+\begin_inset Formula 
+\[
+\rho_{B}^{2}=\textrm{Corr}\left[\bar{x}_{t}\hat{\beta},\bar{y}_{i}\right]^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+\noindent
+Overall 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Define the weighted residual as 
+\begin_inset Formula 
+\[
+\epsilon_{it,w}=\sqrt{w}\left(y_{it}-x_{it}\hat{\beta}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and the mean deviated dependent as 
+\begin_inset Formula 
+\[
+\tilde{y}_{it,w}=\sqrt{w_{it}}\left(y_{it}-\bar{\bar{y}}_{w}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula 
+\[
+\bar{\bar{y}}_{w}=\frac{\sum_{i}\sum_{t}w_{it}y_{it}}{\sum_{i}\sum_{t}w_{it}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+if the model contains a constant or 
+\begin_inset Formula $\bar{\bar{y}}_{w}=0$
+\end_inset
+
+ if not.
+ Then
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+R_{O}^{2}=1-\frac{\sum_{i}\sum_{t}\epsilon_{it,w}^{2}}{\sum_{i}\sum_{t}\tilde{y}_{it,w}^{2}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+\noindent
+Overall 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ (correlation method)
+\end_layout
+
+\begin_layout Standard
+\noindent
+This measure matches Stata.
+ It does not reflect weighting.
+\begin_inset Formula 
+\[
+\rho_{O}^{2}=\textrm{Corr}\left[x_{it}\hat{\beta},y_{it}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+\noindent
+Within 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Define 
+\begin_inset Formula $\tilde{y}_{it,w}=\sqrt{w_{it}}\left(y_{it}-\bar{y}_{iw}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $\tilde{x}_{it,w}=\sqrt{w_{it}}\left(x_{it}-\bar{x}_{iw}\right)$
+\end_inset
+
+ and the residuals as 
+\begin_inset Formula 
+\[
+\tilde{\epsilon}_{it,w}=\tilde{y}_{it,w}-\tilde{x}_{it,w}\hat{\beta}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The within
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is defined as 
+\begin_inset Formula 
+\[
+R_{W}^{2}=1-\frac{\sum_{i}\sum_{t}\tilde{\epsilon}_{it,w}}{\sum_{i}\sum_{t}\tilde{y}_{it,w}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+\noindent
+Within
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ (correlation method)
+\end_layout
+
+\begin_layout Standard
+\noindent
+This measure matches Stata.
+ It does not reflect weighting.
+\begin_inset Formula 
+\[
+\rho_{W}^{2}=\textrm{Corr}\left[\left(x_{it}-\bar{x}_{t}\right)\hat{\beta},\left(y_{it}-\bar{y}_{i}\right)\right]^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document

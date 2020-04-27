@@ -1,3 +1,4 @@
+from typing import Dict
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
 
@@ -38,11 +39,11 @@ for filename in glob.iglob("./examples/**", recursive=True):
 
 
 class BinaryDistribution(Distribution):
-    def is_pure(self):
+    def is_pure(self) -> bool:
         return False
 
 
-def run_setup(binary=True):
+def run_setup(binary: bool = True) -> None:
     extensions = []
     if binary:
         from Cython.Build import cythonize
@@ -50,7 +51,7 @@ def run_setup(binary=True):
 
         macros = [("NPY_NO_DEPRECATED_API", "1")]
         # macros.append(('CYTHON_TRACE', '1'))
-        directives = {}  # {'linetrace': True, 'binding':True}
+        directives: Dict[str, bool] = {}  # {'linetrace': True, 'binding':True}
         extension = Extension(
             "linearmodels.panel._utility",
             ["linearmodels/panel/_utility.pyx"],
@@ -72,7 +73,7 @@ def run_setup(binary=True):
         author_email="kevin.k.sheppard@gmail.com",
         url="http://github.com/bashtage/linearmodels",
         long_description=long_description,
-        long_description_content_type='text/markdown',
+        long_description_content_type="text/markdown",
         install_requires=open("requirements.txt").read().split("\n"),
         include_package_data=True,
         package_data={"linearmodels": additional_files},
