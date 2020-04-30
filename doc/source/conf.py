@@ -185,6 +185,11 @@ html_theme_options = {
         "index": "Models for panel data, system regression, instrumental \
         variables and asset pricing."
     },
+    "version_dropdown": True,
+    "version_info": {
+        "Release": "https://bashtage.github.io/linearmodels/",
+        "Development": "https://bashtage.github.io/arch/linearmodels/",
+    },
 }
 
 html_favicon = "images/favicon.ico"
