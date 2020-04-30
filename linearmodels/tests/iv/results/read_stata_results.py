@@ -35,7 +35,7 @@ def parse_file(name: str) -> Dict[str, List[str]]:
 
 
 def parse_block(block):
-    block = [l.strip().split("\t") for l in block]
+    block = [line.strip().split("\t") for line in block]
     params = []
     cov = []
     weight_mat = []
