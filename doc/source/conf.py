@@ -188,7 +188,7 @@ html_theme_options = {
     "version_dropdown": True,
     "version_info": {
         "Release": "https://bashtage.github.io/linearmodels/",
-        "Development": "https://bashtage.github.io/arch/linearmodels/",
+        "Development": "https://bashtage.github.io/linearmodels/devel/",
     },
 }
 
