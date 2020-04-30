@@ -40,24 +40,24 @@ from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 
 
 def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
-    col_size = max([max(map(len, l)) for l in lists])
+    col_size = max([max(map(len, stubs)) for stubs in lists])
     out: List[str] = []
-    for l in lists:
-        out.extend(l)
+    for stubs in lists:
+        out.extend(stubs)
         out.append(sep * (col_size + 2))
     return out[:-1]
 
 
 def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[str]]:
     col_sizes = []
-    for l in lists:
-        size = list(map(lambda r: list(map(len, r)), l))
+    for table in lists:
+        size = list(map(lambda r: list(map(len, r)), table))
         col_sizes.append(list(array(size).max(0)))
     col_size = array(col_sizes).max(axis=0)
     sep_cols: List[str] = [sep * (cs + 2) for cs in col_size]
     out: List[List[str]] = []
-    for l in lists:
-        out.extend(l)
+    for table in lists:
+        out.extend(table)
         out.append(sep_cols)
     return out[:-1]
 
