@@ -236,7 +236,7 @@ def assert_frame_similar(result, expected):
 def access_attributes(result):
     d = dir(result)
     for key in d:
-        if not key.startswith("_") and key not in ("wald_test",):
+        if not key.startswith("_") and key not in ("wald_test", "wu_hausman"):
             val = getattr(result, key)
             if callable(val):
                 val()

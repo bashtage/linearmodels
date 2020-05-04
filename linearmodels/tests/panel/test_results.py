@@ -170,3 +170,40 @@ def test_wald_test(data):
 
     with pytest.raises(ValueError):
         res.wald_test(restriction, np.zeros(2), formula=formula)
+
+
+@pytest.mark.parametrize("constant", (False, True), ids=("", "constant"))
+@pytest.mark.parametrize("sigmamore", (False, True), ids=("", "sigmamore"))
+@pytest.mark.parametrize("sigmaless", (False, True), ids=("", "sigmaless"))
+def test_wu_hausman(recwarn, data, constant, sigmamore, sigmaless):
+    if sigmamore and sigmaless:
+        return
+    data = data.set_index(["nr", "year"])
+    dependent = data["hours"]
+    exog = add_constant(data[["exper", "expersq"]])
+    re_res = RandomEffects(dependent, exog).fit()
+    fe_res = PanelOLS(dependent, exog, entity_effects=True).fit()
+    opts = {
+        "include_constant": constant,
+        "sigmamore": sigmamore,
+        "sigmaless": sigmaless,
+    }
+    wald, estimates = re_res.wu_hausman(other=fe_res, **opts)
+    if constant:
+        warnings = {str(warn.message) for warn in recwarn}
+        assert "(Var(b0) - Var(b1) is not positive definite)" in warnings
+        assert estimates.shape == (3, 4)
+    else:
+        assert estimates.shape == (2, 4)
+    stata_results = {
+        "": (7.190854126884934, 0.0274489582259534),
+        "include_constant": (7.190854126885962, 0.0660570908629669),
+        "sigmaless": (6.953506564342694, 0.0309075965524561),
+        "include_constant-sigmaless": (6.953506564340507, 0.0733945334224529),
+        "sigmamore": (6.945610047252053, 0.0310298689573541),
+        "include_constant-sigmamore": (6.94561004725098, 0.0736517192483979),
+    }
+    test_id = "-".join([key for key, val in opts.items() if val is True])
+    expected_stat, expected_pval = stata_results[test_id]
+    assert wald.stat == pytest.approx(expected_stat, abs=1e-9)
+    assert wald.pval == pytest.approx(expected_pval, abs=1e-9)
