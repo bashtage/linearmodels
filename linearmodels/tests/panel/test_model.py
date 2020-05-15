@@ -232,4 +232,5 @@ def test_all_missing(data):
 
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()
+    print(w)
     assert len(w) == 0

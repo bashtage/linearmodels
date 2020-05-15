@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from pandas.api.types import (
-    is_categorical,
     is_categorical_dtype,
     is_numeric_dtype,
     is_string_dtype,
@@ -22,7 +21,7 @@ type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 
 
 def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
-    if is_categorical(s):
+    if is_categorical_dtype(s):
         out = pd.get_dummies(s, drop_first=drop_first)
         out.columns = [str(s.name) + "." + str(c) for c in out]
         return out
