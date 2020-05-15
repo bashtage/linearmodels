@@ -98,3 +98,24 @@ def format_wide(s: Sequence[str], cols: int) -> List[List[str]]:
                 line = temp
     lines.append([line])
     return lines
+
+
+def add_star(value: str, pvalue: float, star: bool) -> str:
+    """
+    Add 1, 2 or 3 stars to a string base on the p-value
+
+    Adds 1 star if the pvalue is less than 10%, 2 if less than 5% and 3 is
+    less than 1%.
+
+    Parameters
+    ----------
+    value : str
+        The formatted parameter value as a string.
+    pvalue : float
+        The p-value of the parameter
+    star : bool
+        Flag indicating whether the star should be added
+    """
+    if not star:
+        return value
+    return value + "*" * sum([pvalue <= c for c in (0.01, 0.05, 0.1)])

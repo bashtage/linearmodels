@@ -7,7 +7,7 @@ import numpy as np
 from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from pandas.api.types import (
-    is_categorical,
+    is_categorical_dtype,
     is_datetime64_any_dtype,
     is_numeric_dtype,
     is_string_dtype,
@@ -95,7 +95,7 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
     if is_string_dtype(s.dtype) and s.map(is_string_like).all():
         s = s.astype("category")
 
-    if is_categorical(s):
+    if is_categorical_dtype(s):
         out = get_dummies(s, drop_first=drop_first)
         out.columns = [str(s.name) + "." + str(c) for c in out]
         return out

@@ -303,25 +303,35 @@ def test_model_missing(data):
     assert_equal(mod.notnull, ~missing)
 
 
-def test_compare(data):
+@pytest.mark.parametrize("stars", [False, True])
+def test_compare(data, stars):
     res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
     res2 = IV2SLS(data.dep, data.exog, data.endog, data.instr[:, :-1]).fit()
     res3 = IVGMM(data.dep, data.exog[:, :2], data.endog, data.instr).fit()
     res4 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
-    c = compare([res1, res2, res3, res4])
+    c = compare([res1, res2, res3, res4], stars=stars)
     assert len(c.rsquared) == 4
-    c.summary
+    assert isinstance(str(c.summary), str)
+    if stars:
+        total = 1 * (c.pvalues < 0.10) + (c.pvalues < 0.05) + (c.pvalues < 0.01)
+        total_stars = np.asarray(total).sum()
+        count = sum([char == "*" for char in str(c.summary)])
+        print(c.pvalues)
+        print(total)
+        print(c.summary)
+        assert count == total_stars
+
     c = compare({"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4})
-    c.summary
+    assert isinstance(str(c.summary), str)
     res = {"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4}
-    c = compare(res)
-    c.summary
-    c.pvalues
+    c = compare(res, stars=stars)
+    assert isinstance(str(c.summary), str)
+    assert isinstance(c.pvalues, pd.DataFrame)
 
     res1 = IV2SLS(data.dep, data.exog[:, :1], None, None).fit()
     res2 = IV2SLS(data.dep, data.exog[:, :2], None, None).fit()
-    c = compare({"Model A": res1, "Model B": res2})
-    c.summary
+    c = compare({"Model A": res1, "Model B": res2}, stars=stars)
+    assert isinstance(str(c.summary), str)
 
 
 def test_compare_single(data):
@@ -366,7 +376,7 @@ def test_gmm_cue_optimization_options(data):
     res_lbfgsb = mod.fit(display=False, opt_options=opt_options)
     assert res_none.iterations > 2
     assert res_bfgs.iterations > 2
-    assert res_lbfgsb.iterations > 2
+    assert res_lbfgsb.iterations >= 1
 
     mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
     res2 = mod2.fit()

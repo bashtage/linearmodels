@@ -35,7 +35,7 @@ from linearmodels.shared.hypotheses import (
     WaldTestStatistic,
     quadratic_form_test,
 )
-from linearmodels.shared.io import _str, pval_format
+from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 
 
@@ -1539,6 +1539,9 @@ class IVModelComparison(_ModelComparison):
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
+    stars : bool
+        Add stars based on the p-value of the coefficient where 1, 2 and
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
     """
 
     _supported = (IVResults, IVGMMResults, OLSResults)
@@ -1548,8 +1551,11 @@ class IVModelComparison(_ModelComparison):
         results: Union[Sequence[AnyResult], Dict[str, AnyResult]],
         *,
         precision: str = "tstats",
+        stars: bool = False,
     ):
-        super(IVModelComparison, self).__init__(results, precision=precision)
+        super(IVModelComparison, self).__init__(
+            results, precision=precision, stars=stars
+        )
 
     @property
     def rsquared_adj(self) -> Series:
@@ -1616,10 +1622,15 @@ class IVModelComparison(_ModelComparison):
 
         params = self.params
         precision = getattr(self, self._precision)
+        pvalues = asarray(self.pvalues)
         params_fmt = []
         params_stub = []
+
         for i in range(len(params)):
-            params_fmt.append([_str(v) for v in params.values[i]])
+            formatted_and_starred = []
+            for v, pv in zip(params.values[i], pvalues[i]):
+                formatted_and_starred.append(add_star(_str(v), pv, self._stars))
+            params_fmt.append(formatted_and_starred)
             precision_fmt = []
             for v in precision.values[i]:
                 v_str = _str(v)
@@ -1670,6 +1681,7 @@ def compare(
     results: Union[Dict[str, AnyResult], Sequence[AnyResult]],
     *,
     precision: str = "tstats",
+    stars: bool = False,
 ) -> IVModelComparison:
     """
     Compare the results of multiple models
@@ -1682,10 +1694,13 @@ def compare(
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
+    stars : bool
+        Add stars based on the p-value of the coefficient where 1, 2 and
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
 
     Returns
     -------
     IVModelComparison
         The model comparison object.
     """
-    return IVModelComparison(results, precision=precision)
+    return IVModelComparison(results, precision=precision, stars=stars)

@@ -38,7 +38,7 @@ from numpy import (
 )
 from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Series
-from pandas.api.types import is_categorical
+from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
@@ -173,7 +173,7 @@ def category_product(cats: AnyPandas) -> Series:
 
     sizes = []
     for c in cats:
-        if not is_categorical(cats[c]):
+        if not is_categorical_dtype(cats[c]):
             raise TypeError("cats must contain only categorical variables")
         col = cats[c]
         max_code = get_codes(col.cat).max()
@@ -333,7 +333,7 @@ class Interaction(object):
         if self._cat_data.shape[1] == self._cont_data.shape[1] == 0:
             raise ValueError("Both cat and cont are empty arrays")
         cat_data = self._cat_data.pandas
-        convert = [col for col in cat_data if not (is_categorical(cat_data[col]))]
+        convert = [col for col in cat_data if not (is_categorical_dtype(cat_data[col]))]
         if convert:
             cat_data = DataFrame(
                 {col: cat_data[col].astype("category") for col in cat_data}
@@ -455,7 +455,7 @@ class Interaction(object):
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
         """
-        cat_cols = [col for col in frame if is_categorical(frame[col])]
+        cat_cols = [col for col in frame if is_categorical_dtype(frame[col])]
         cont_cols = [col for col in frame if col not in cat_cols]
         return Interaction(frame[cat_cols], frame[cont_cols], nobs=frame.shape[0])
 

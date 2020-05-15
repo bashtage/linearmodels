@@ -47,8 +47,9 @@ def test_single(data, precision):
         getattr(comp, value)
 
 
+@pytest.mark.parametrize("stars", [False, True])
 @pytest.mark.parametrize("precision", ("tstats", "std_errors", "pvalues"))
-def test_multiple(data, precision):
+def test_multiple(data, precision, stars):
     dependent = data.set_index(["nr", "year"]).lwage
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
     res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
@@ -59,8 +60,10 @@ def test_multiple(data, precision):
     res3 = PooledOLS(dependent, exog).fit()
     exog = data.set_index(["nr", "year"])[["exper"]]
     res4 = RandomEffects(dependent, exog).fit()
-    comp = compare([res, res2, res3, res4], precision=precision)
+    comp = compare([res, res2, res3, res4], precision=precision, stars=stars)
     assert len(comp.rsquared) == 4
+    if stars:
+        assert "***" in str(comp)
     d = dir(comp)
     for value in d:
         if value.startswith("_"):

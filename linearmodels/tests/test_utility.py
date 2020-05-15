@@ -15,7 +15,7 @@ from linearmodels.shared.hypotheses import (
     InvalidTestStatistic,
     WaldTestStatistic,
 )
-from linearmodels.shared.io import format_wide
+from linearmodels.shared.io import add_star, format_wide
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
 
@@ -227,3 +227,18 @@ def test_panel_to_midf():
     expected3 = expected3.loc[mi]
     expected3.index.names = ["major", "minor"]
     pd.testing.assert_frame_equal(df3, expected3)
+
+
+@pytest.mark.parametrize("pvalue", [0.2, 0.11, 0.10, 0.050001, 0.05, 0.01, 0.005])
+def test_add_star(pvalue):
+    if pvalue <= 0.01:
+        expected = "***"
+    elif pvalue <= 0.05:
+        expected = "**"
+    elif pvalue <= 0.10:
+        expected = "*"
+    else:
+        expected = ""
+
+    result = add_star("", pvalue, True)
+    assert expected == result
