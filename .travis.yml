@@ -127,6 +127,7 @@ script:
       cd ../..
       mkdir empty && cd empty
       python -c "import linearmodels;linearmodels.test()"
+      cd ..
     else
       pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIP}
     fi

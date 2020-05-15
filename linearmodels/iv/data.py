@@ -8,11 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import (
-    is_categorical_dtype,
-    is_numeric_dtype,
-    is_string_dtype,
-)
+from pandas.api.types import is_categorical_dtype, is_numeric_dtype, is_string_dtype
 
 from linearmodels.typing import AnyPandas, ArrayLike, NDArray
 

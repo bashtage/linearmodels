@@ -118,4 +118,4 @@ def add_star(value: str, pvalue: float, star: bool) -> str:
     """
     if not star:
         return value
-    return value + "*" * sum([pvalue < c for c in (0.1, 0.05, 0.1)])
+    return value + "*" * sum([pvalue <= c for c in (0.01, 0.05, 0.1)])

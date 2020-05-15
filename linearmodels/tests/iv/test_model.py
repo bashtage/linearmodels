@@ -316,6 +316,9 @@ def test_compare(data, stars):
         total = 1 * (c.pvalues < 0.10) + (c.pvalues < 0.05) + (c.pvalues < 0.01)
         total_stars = np.asarray(total).sum()
         count = sum([char == "*" for char in str(c.summary)])
+        print(c.pvalues)
+        print(total)
+        print(c.summary)
         assert count == total_stars
 
     c = compare({"Model A": res1, "Model B": res2, "Model C": res3, "Model D": res4})

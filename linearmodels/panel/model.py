@@ -477,15 +477,25 @@ class _PanelModelBase(object):
         # Overall
         y = self.dependent.values2d
         x = self.exog.values2d
-        r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        xb = (x @ params)
+        r2o = 0.0
+        if y.std() > 0 and xb.std() > 0:
+            r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
         # Between
         y = np.asarray(self.dependent.mean("entity"))
         x = np.asarray(self.exog.mean("entity"))
-        r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        xb = (x @ params)
+        r2b = 0.0
+        if y.std() > 0 and xb.std() > 0:
+            r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
+
         # Within
         y = self.dependent.demean("entity", return_panel=False)
         x = self.exog.demean("entity", return_panel=False)
-        r2w = np.corrcoef(y.T, (x @ params).T)[0, 1]
+        xb = (x @ params)
+        r2w = 0.0
+        if y.std() > 0 and xb.std() > 0:
+            r2w = np.corrcoef(y.T, xb.T)[0, 1]
 
         return r2o, r2w, r2b
 
