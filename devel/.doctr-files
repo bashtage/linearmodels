@@ -956,7 +956,9 @@ devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFacto
 devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.total_ss.html
 devel/asset-pricing/asset-pricing/linearmodels.asset_pricing.results.LinearFactorModelResults.tstats.html
 devel/asset-pricing/examples/examples.html
+devel/asset-pricing/examples/examples.ipynb
 devel/asset-pricing/examples/formulas.html
+devel/asset-pricing/examples/formulas.ipynb
 devel/asset-pricing/index.html
 devel/asset-pricing/introduction.html
 devel/asset-pricing/mathematical-formula.html
@@ -1018,9 +1020,13 @@ devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.isnull.html
 devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.nobs.html
 devel/iv/absorbing/linearmodels.iv.absorbing.Interaction.sparse.html
 devel/iv/examples/absorbing-regression.html
+devel/iv/examples/absorbing-regression.ipynb
 devel/iv/examples/advanced-examples.html
+devel/iv/examples/advanced-examples.ipynb
 devel/iv/examples/basic-examples.html
+devel/iv/examples/basic-examples.ipynb
 devel/iv/examples/using-formulas.html
+devel/iv/examples/using-formulas.ipynb
 devel/iv/index.html
 devel/iv/introduction.html
 devel/iv/iv/linearmodels.iv.covariance.ClusteredCovariance.config.html
@@ -1255,8 +1261,11 @@ devel/iv/mathematical-formula.html
 devel/iv/reference.html
 devel/objects.inv
 devel/panel/examples/data-formats.html
+devel/panel/examples/data-formats.ipynb
 devel/panel/examples/examples.html
+devel/panel/examples/examples.ipynb
 devel/panel/examples/using-formulas.html
+devel/panel/examples/using-formulas.ipynb
 devel/panel/faq.html
 devel/panel/index.html
 devel/panel/introduction.html
@@ -1553,8 +1562,11 @@ devel/search.html
 devel/searchindex.js
 devel/sitemap.xml
 devel/system/examples/examples.html
+devel/system/examples/examples.ipynb
 devel/system/examples/formulas.html
+devel/system/examples/formulas.ipynb
 devel/system/examples/three-stage-ls.html
+devel/system/examples/three-stage-ls.ipynb
 devel/system/index.html
 devel/system/mathematical-formula.html
 devel/system/reference.html
