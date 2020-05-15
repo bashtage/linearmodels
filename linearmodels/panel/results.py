@@ -12,7 +12,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
-from linearmodels.shared.io import _str, pval_format
+from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray, OptionalArrayLike
 
@@ -922,6 +922,9 @@ class PanelModelComparison(_ModelComparison):
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
+    stars : bool
+        Add stars based on the p-value of the coefficient where 1, 2 and
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
     """
 
     _supported = (
@@ -936,8 +939,9 @@ class PanelModelComparison(_ModelComparison):
         results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
         *,
         precision: str = "tstats",
+        stars: bool = False,
     ) -> None:
-        super(PanelModelComparison, self).__init__(results, precision=precision)
+        super().__init__(results, precision=precision, stars=stars)
 
     @property
     def rsquared_between(self) -> Series:
@@ -1022,10 +1026,15 @@ class PanelModelComparison(_ModelComparison):
 
         params = self.params
         precision = getattr(self, self._precision)
+        pvalues = np.asarray(self.pvalues)
         params_fmt = []
         params_stub = []
         for i in range(len(params)):
-            params_fmt.append([_str(v) for v in params.values[i]])
+            formatted_and_starred = []
+            for v, pv in zip(params.values[i], pvalues[i]):
+                formatted_and_starred.append(add_star(_str(v), pv, self._stars))
+            params_fmt.append(formatted_and_starred)
+
             precision_fmt = []
             for v in precision.values[i]:
                 v_str = _str(v)
@@ -1076,7 +1085,9 @@ class PanelModelComparison(_ModelComparison):
 
 def compare(
     results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
+    *,
     precision: str = "tstats",
+    stars: bool = False,
 ) -> PanelModelComparison:
     """
     Compare the results of multiple models
@@ -1089,10 +1100,13 @@ def compare(
     precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
         Estimator precision estimator to include in the comparison output.
         Default is 'tstats'.
+    stars : bool
+        Add stars based on the p-value of the coefficient where 1, 2 and
+        3-stars correspond to p-values of 10%, 5% and 1%, respectively.
 
     Returns
     -------
     PanelModelComparison
         The model comparison object.
     """
-    return PanelModelComparison(results, precision=precision)
+    return PanelModelComparison(results, precision=precision, stars=stars)

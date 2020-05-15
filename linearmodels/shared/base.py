@@ -49,6 +49,7 @@ class _ModelComparison(_SummaryStr):
         results: Union[Dict[str, Any], Sequence[Any]],
         *,
         precision: str = "tstats",
+        stars: bool = False,
     ) -> None:
         if not isinstance(results, dict):
             _results: Dict[str, Any] = {}
@@ -69,6 +70,7 @@ class _ModelComparison(_SummaryStr):
                 "or 'pvalues'."
             )
         self._precision = precision
+        self._stars = stars
 
     def _get_series_property(self, name: str) -> DataFrame:
         out: List[Tuple[str, Series]] = [

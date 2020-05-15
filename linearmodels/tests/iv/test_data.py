@@ -47,7 +47,7 @@ class TestDataHandler(object):
         assert xdh.cols == list(xdf.columns)
         assert xdh.rows == list(xdf.index)
         assert_equal(xdh.ndarray, x)
-        df = pd.DataFrame(x, columns=xdh.cols, index=xdh.rows)
+        df = pd.DataFrame(x, columns=xdh.cols, index=xdh.rows).asfreq("D")
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 2)
 
@@ -60,7 +60,7 @@ class TestDataHandler(object):
         assert xdh.cols == [xs.name]
         assert xdh.rows == list(xs.index)
         assert_equal(xdh.ndarray, x[:, None])
-        df = pd.DataFrame(x[:, None], columns=xdh.cols, index=xdh.rows)
+        df = pd.DataFrame(x[:, None], columns=xdh.cols, index=xdh.rows).asfreq("D")
         assert_frame_equal(xdh.pandas, df)
         assert xdh.shape == (10, 1)
 
