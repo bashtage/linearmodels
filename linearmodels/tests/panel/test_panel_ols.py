@@ -1400,3 +1400,24 @@ def test_absorbed_option(data):
     mod = PanelOLS(data.y, data.x, entity_effects=True, drop_absorbed=False)
     res_false = mod.fit(auto_df=False, count_effects=False, debiased=False)
     assert_results_equal(res, res_false)
+
+
+def test_fully_absorbed():
+    x = np.arange(10)
+    x = np.repeat(x, (2,))[:, None]
+    y = x @ np.array([1]) + np.random.standard_normal(x.shape[0])
+    mi = pd.MultiIndex.from_product([np.arange(10), [1, 2]])
+    x = pd.DataFrame(x, index=mi, columns=["x"])
+    y = pd.Series(y, index=mi, name="y")
+    with pytest.raises(ValueError, match="All columns in exog have been fully"):
+        PanelOLS(y, x, drop_absorbed=True, entity_effects=True).fit()
+
+
+def test_zero_endog():
+    x = np.arange(10)
+    x = np.repeat(x, (2,))[:, None]
+    y = x @ np.array([0])
+    mi = pd.MultiIndex.from_product([np.arange(10), [1, 2]])
+    x = pd.DataFrame(x, index=mi, columns=["x"])
+    y = pd.Series(y, index=mi, name="y")
+    PanelOLS(y, x).fit()

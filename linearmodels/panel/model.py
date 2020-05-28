@@ -415,7 +415,7 @@ class _PanelModelBase(object):
         num = float(weps_const.T @ weps_const - resid_ss)
         denom = resid_ss
         denom_df = df_resid
-        stat = float((num / num_df) / (denom / denom_df))
+        stat = float((num / num_df) / (denom / denom_df)) if denom > 0.0 else 0.0
         return WaldTestStatistic(
             stat,
             null="All parameters ex. constant not zero",
@@ -477,14 +477,14 @@ class _PanelModelBase(object):
         # Overall
         y = self.dependent.values2d
         x = self.exog.values2d
-        xb = (x @ params)
+        xb = x @ params
         r2o = 0.0
         if y.std() > 0 and xb.std() > 0:
             r2o = np.corrcoef(y.T, (x @ params).T)[0, 1]
         # Between
         y = np.asarray(self.dependent.mean("entity"))
         x = np.asarray(self.exog.mean("entity"))
-        xb = (x @ params)
+        xb = x @ params
         r2b = 0.0
         if y.std() > 0 and xb.std() > 0:
             r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
@@ -492,7 +492,7 @@ class _PanelModelBase(object):
         # Within
         y = self.dependent.demean("entity", return_panel=False)
         x = self.exog.demean("entity", return_panel=False)
-        xb = (x @ params)
+        xb = x @ params
         r2w = 0.0
         if y.std() > 0 and xb.std() > 0:
             r2w = np.corrcoef(y.T, xb.T)[0, 1]
@@ -524,7 +524,7 @@ class _PanelModelBase(object):
             e = y - (w * y).sum() / w.sum()
 
         total_ss = float(w.T @ (e ** 2))
-        r2b = 1 - residual_ss / total_ss
+        r2b = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         #############################################
         # R2 - Overall
@@ -540,7 +540,7 @@ class _PanelModelBase(object):
         mu = (w * y).sum() / w.sum() if self.has_constant else 0
         we = wy - root_w * mu
         total_ss = float(we.T @ we)
-        r2o = 1 - residual_ss / total_ss
+        r2o = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         #############################################
         # R2 - Within
@@ -556,7 +556,7 @@ class _PanelModelBase(object):
         if self.dependent.nobs == 1 or (self.exog.nvar == 1 and self.has_constant):
             r2w = 0.0
         else:
-            r2w = 1.0 - residual_ss / total_ss
+            r2w = 1.0 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         return r2o, r2w, r2b
 
@@ -582,7 +582,10 @@ class _PanelModelBase(object):
         entity_info, time_info, other_info = self._info()
         nobs = weps.shape[0]
         sigma2 = float(weps.T @ weps / nobs)
-        loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+        if sigma2 > 0.0:
+            loglik = -0.5 * nobs * (np.log(2 * np.pi) + np.log(sigma2) + 1)
+        else:
+            loglik = np.nan
 
         res = AttrDict(
             params=params,
@@ -1690,6 +1693,11 @@ class PanelOLS(_PanelModelBase):
                 check_absorbed(x, list(map(str, self.exog.vars)))
             else:
                 retain = not_absorbed(x)
+                if not retain:
+                    raise ValueError(
+                        "All columns in exog have been fully absorbed by the included"
+                        " effects. This model cannot be estimated."
+                    )
                 if len(retain) != x.shape[1]:
                     drop = set(range(x.shape[1])).difference(retain)
                     dropped = ", ".join([str(self.exog.vars[i]) for i in drop])
@@ -1744,7 +1752,7 @@ class PanelOLS(_PanelModelBase):
         sigma2_tot = float(eps_effects.T @ eps_effects / nobs)
         sigma2_eps = float(eps.T @ eps / nobs)
         sigma2_effects = sigma2_tot - sigma2_eps
-        rho = sigma2_effects / sigma2_tot
+        rho = sigma2_effects / sigma2_tot if sigma2_tot > 0.0 else 0.0
 
         resid_ss = float(weps.T @ weps)
         if self.has_constant:
@@ -1752,7 +1760,7 @@ class PanelOLS(_PanelModelBase):
         else:
             mu = 0
         total_ss = float((y - mu).T @ (y - mu))
-        r2 = 1 - resid_ss / total_ss
+        r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
         root_w = np.sqrt(self.weights.values2d)
         y_ex = root_w * self.dependent.values2d
@@ -1765,7 +1773,9 @@ class PanelOLS(_PanelModelBase):
         ):
             mu_ex = root_w * ((root_w.T @ y_ex) / (root_w.T @ root_w))
         total_ss_ex_effect = float((y_ex - mu_ex).T @ (y_ex - mu_ex))
-        r2_ex_effects = 1 - resid_ss / total_ss_ex_effect
+        r2_ex_effects = (
+            1 - resid_ss / total_ss_ex_effect if total_ss_ex_effect > 0.0 else 0.0
+        )
 
         res = self._postestimation(params, cov, debiased, df_resid, weps, y, x, root_w)
         ######################################
