@@ -444,6 +444,9 @@ def not_absorbed(x: NDArray) -> List[int]:
         return list(range(x.shape[1]))
     xpx = x.T @ x
     vals, vecs = np.linalg.eigh(xpx)
+    if vals.max() == 0.0:
+        return []
+
     tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
     absorbed = vals < tol
     nabsorbed = absorbed.sum()
