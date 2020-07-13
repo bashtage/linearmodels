@@ -9,7 +9,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
-import scipy.sparse as sp
+from scipy import sparse as sp
 from scipy.sparse import csc_matrix
 
 from linearmodels.iv._utility import annihilate

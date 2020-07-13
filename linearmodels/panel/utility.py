@@ -17,6 +17,8 @@ from typing import (
 import numpy as np
 from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
+from pandas import DataFrame, date_range
+from scipy import sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
 from linearmodels.typing import BoolArray, Float64Array, IntArray

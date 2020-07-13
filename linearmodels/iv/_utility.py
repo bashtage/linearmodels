@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Dict, Tuple
 
+from formulaic import model_matrix
+from formulaic.materializers.types import NAAction as fNAAction
 import numpy as np
 from pandas import DataFrame
-from patsy.highlevel import dmatrix
 from patsy.missing import NAAction
 
 from linearmodels.typing import Float64Array
@@ -117,10 +118,10 @@ class IVFormulaParser(object):
                     "instrument block must not start or end with +. This "
                     "block was: {0}".format(instr)
                 )
-            if exog2:
-                exog += exog2
             if exog:
                 exog = exog[:-1].strip() if exog[-1] == "+" else exog
+            if exog2:
+                exog += exog2
             exog = "0" if not exog else "0 + " + exog
         else:
             raise ValueError("formula contains more then 2 separators (~)")
@@ -152,55 +153,54 @@ class IVFormulaParser(object):
     @property
     def dependent(self) -> DataFrame:
         """Dependent variable"""
-        dep = self.components["dependent"]
-        dep = dmatrix(
-            "0 + " + dep,
+        dep_fmla = self.components["dependent"]
+        dep = model_matrix(
+            dep_fmla,
             self._data,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+            context=self._eval_env,
+            ensure_full_rank=False,
+            na_action=fNAAction("raise"),
         )
-        return dep
+        return DataFrame(dep)
 
     @property
     def exog(self) -> OptionalDataFrame:
         """Exogenous variables"""
-        exog = self.components["exog"]
-        exog = dmatrix(
-            exog,
+        exog_fmla = self.components["exog"]
+        exog = model_matrix(
+            exog_fmla,
             self._data,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+            context=self._eval_env,
+            ensure_full_rank=False,
+            na_action=fNAAction("raise"),
         )
-        return self._empty_check(exog)
+        return self._empty_check(DataFrame(exog))
 
     @property
     def endog(self) -> OptionalDataFrame:
         """Endogenous variables"""
-        endog = self.components["endog"]
-        endog = dmatrix(
-            "0 + " + endog,
+        endog_fmla = "0 +" + self.components["endog"]
+        endog = model_matrix(
+            endog_fmla,
             self._data,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+            context=self._eval_env,
+            ensure_full_rank=False,
+            na_action=fNAAction("raise"),
         )
-        return self._empty_check(endog)
+        return self._empty_check(DataFrame(endog))
 
     @property
     def instruments(self) -> OptionalDataFrame:
         """Instruments"""
-        instr = self.components["instruments"]
-        instr = dmatrix(
-            "0 + " + instr,
+        instr_fmla = "0 +" + self.components["instruments"]
+        instr = model_matrix(
+            instr_fmla,
             self._data,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+            context=self._eval_env,
+            ensure_full_rank=False,
+            na_action=fNAAction("raise"),
         )
-
-        return self._empty_check(instr)
+        return self._empty_check(DataFrame(instr))
 
     @property
     def components(self) -> Dict[str, str]:

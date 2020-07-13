@@ -169,7 +169,7 @@ def test_invalid_formula(data, model_and_func):
     with pytest.raises(ValueError):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
-    with pytest.raises(SyntaxError):
+    with pytest.raises(KeyError):
         model.from_formula(formula, data).fit()
 
 
