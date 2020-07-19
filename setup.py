@@ -1,9 +1,9 @@
-from typing import Dict
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
-import glob
-
 from setuptools import Extension, find_packages, setup
 from setuptools.dist import Distribution
+
+from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+import glob
+from typing import Dict
 
 import versioneer
 
