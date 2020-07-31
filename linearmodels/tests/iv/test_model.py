@@ -8,6 +8,7 @@ from pandas.testing import assert_series_equal
 import pytest
 from statsmodels.tools.tools import add_constant
 
+from linearmodels.datasets import card
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
@@ -383,3 +384,42 @@ def test_gmm_cue_optimization_options(data):
     assert res_none.j_stat.stat <= res2.j_stat.stat
     assert res_bfgs.j_stat.stat <= res2.j_stat.stat
     assert res_lbfgsb.j_stat.stat <= res2.j_stat.stat
+
+
+def test_weighted_r2():
+    # GH 274
+    data = card.load()
+    data = add_constant(data)
+
+    dep = ["wage"]
+    endog = ["educ"]
+    exog = [
+        "const",
+        "exper",
+        "expersq",
+        "black",
+        "smsa",
+        "south",
+        "smsa66",
+        "reg662",
+        "reg663",
+        "reg664",
+        "reg665",
+        "reg666",
+        "reg667",
+        "reg668",
+        "reg669",
+    ]
+    instr = ["nearc4"]
+    data = data[dep + exog + endog + instr].dropna()
+
+    weights = np.random.random([len(data)]) ** 3
+    res = IV2SLS(data.educ, data[instr + exog], None, None, weights=weights).fit()
+
+    res_2sls = IV2SLS(
+        np.log(data.wage), data[exog], data[endog], data[instr], weights=weights
+    ).fit()
+    fs_educ = res_2sls.first_stage.individual["educ"]
+    assert_allclose(fs_educ.rsquared, res.rsquared)
+    index = res.params.index
+    assert_allclose(fs_educ.params[index], res.params[index])

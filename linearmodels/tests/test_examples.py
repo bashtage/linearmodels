@@ -13,8 +13,8 @@ except ImportError:
 
 try:
     import jupyter_client
-    import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
+    import nbformat
 
     kernels = jupyter_client.kernelspec.find_kernel_specs()
 except ImportError:  # pragma: no cover
