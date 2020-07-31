@@ -114,6 +114,9 @@ install:
   - python setup.py develop
 
 script:
+  - flake8 linearmodels
+  - black --check linearmodels
+  - isort --check linearmodels
   - |
     if [[ ${TEST_INSTALL} = true ]]; then
       python setup.py bdist_wheel
@@ -131,7 +134,6 @@ script:
     else
       pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIP}
     fi
-  - flake8 linearmodels
   - set -e
   - |
     if [[ ${DOCBUILD} = true ]]; then

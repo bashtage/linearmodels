@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
+from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
@@ -14,7 +15,6 @@ from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_tes
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray, OptionalArrayLike
-from property_cached import cached_property
 
 __all__ = [
     "PanelResults",

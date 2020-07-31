@@ -8,6 +8,7 @@ from typing import List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
+from property_cached import cached_property
 from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
@@ -16,7 +17,6 @@ from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import NDArray
-from property_cached import cached_property
 
 
 class LinearFactorModelResults(_SummaryStr):

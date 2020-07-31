@@ -21,6 +21,7 @@ from numpy import (
 )
 from numpy.linalg import inv, pinv
 from pandas import DataFrame, Series, concat, to_numeric
+from property_cached import cached_property
 import scipy.stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
@@ -36,7 +37,6 @@ from linearmodels.shared.hypotheses import (
 )
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
-from property_cached import cached_property
 
 
 def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
@@ -764,13 +764,14 @@ class FirstStageResults(_SummaryStr):
         """
         from linearmodels.iv.model import _OLS
 
-        w = sqrt(self.weights.ndarray)
-        exog_instr = w * c_[self.exog.ndarray, self.instr.ndarray]
-        exog_instr = DataFrame(exog_instr, columns=self.exog.cols + self.instr.cols)
+        exog_instr = DataFrame(
+            c_[self.exog.ndarray, self.instr.ndarray],
+            columns=self.exog.cols + self.instr.cols,
+        )
         res: Dict[str, OLSResults] = {}
         for col in self.endog.pandas:
-            dep = w.squeeze() * self.endog.pandas[col]
-            mod = _OLS(dep, exog_instr)
+            dep = self.endog.pandas[col]
+            mod = _OLS(dep, exog_instr, weights=self.weights.ndarray)
             res[col] = mod.fit(cov_type=self._cov_type, **self._cov_config)
 
         return res

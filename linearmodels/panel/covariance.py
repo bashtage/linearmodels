@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Type, Union
 import numpy as np
 from numpy.linalg import inv
 from pandas import DataFrame, MultiIndex
+from property_cached import cached_property
 
 from linearmodels.iv.covariance import (
     CLUSTER_ERR,
@@ -14,7 +15,6 @@ from linearmodels.iv.covariance import (
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
 from linearmodels.shared.utility import get_array_like, get_bool, get_float, get_string
 from linearmodels.typing import NDArray
-from property_cached import cached_property
 
 __all__ = [
     "HomoskedasticCovariance",
