@@ -26,7 +26,11 @@ from linearmodels.iv.absorbing import (
 )
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import AbsorbingLSResults, OLSResults
-from linearmodels.panel.utility import dummy_matrix
+from linearmodels.panel.utility import (
+    AbsorbingEffectError,
+    AbsorbingEffectWarning,
+    dummy_matrix,
+)
 from linearmodels.shared.exceptions import MissingValueWarning
 from linearmodels.shared.utility import AttrDict
 
@@ -645,3 +649,26 @@ def test_drop_missing():
         gen.absorb[col] = pd.Categorical(to_numpy(gen.absorb[col]))
     with pytest.warns(MissingValueWarning):
         AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
+
+
+def test_drop_absorb():
+    rg = np.random.RandomState(0)
+    absorb = rg.randint(0, 10, size=1000)
+    x = rg.standard_normal((1000, 3))
+    y = rg.standard_normal((1000))
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    x = pd.concat([x, pd.get_dummies(df.c).iloc[:, :2]], axis=1)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
+    with pytest.warns(AbsorbingEffectWarning):
+        res = mod.fit()
+    assert len(res.params) == 3
+    assert all(f"x{i}" in res.params for i in range(3))
+    assert isinstance(str(res.summary), str)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]])
+    with pytest.raises(AbsorbingEffectError):
+        mod.fit()

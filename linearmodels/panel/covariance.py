@@ -283,6 +283,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         clusters = np.asarray(clusters).squeeze()
+        assert clusters is not None
         self._group_debias = bool(group_debias)
         dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
         if clusters.ndim > 2 or dim1 > 2:

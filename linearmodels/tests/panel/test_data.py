@@ -166,7 +166,7 @@ def test_dimensions(mi_df):
 def test_drop(mi_df):
     dh = PanelData(mi_df)
     orig = dh.dataframe.copy()
-    sel = np.zeros(orig.shape[0], dtype=np.bool)
+    sel = np.zeros(orig.shape[0], dtype=bool)
     sel[::3] = True
     dh.drop(sel)
     assert dh.dataframe.shape[0] == len(sel) - sel.sum()

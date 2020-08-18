@@ -40,6 +40,7 @@ from .asset_pricing.model import (
     LinearFactorModelGMM,
     TradedFactorModel,
 )
+from .iv.absorbing import AbsorbingLS
 from .iv.model import _OLS, IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from .panel.model import (
     BetweenOLS,
@@ -58,6 +59,7 @@ DROP_MISSING = os.environ.get("LINEARMODELS_DROP_MISSING", True)
 DROP_MISSING = False if DROP_MISSING in ("0", "False") else True
 
 __all__ = [
+    "AbsorbingLS",
     "PooledOLS",
     "PanelOLS",
     "FirstDifferenceOLS",

@@ -383,7 +383,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     retain_idx = np.arange(cats.shape[0])
     num_singleton = 1
     while num_singleton > 0 and cats.shape[0] > 0:
-        singleton = np.zeros(cats.shape[0], dtype=np.bool)
+        singleton = np.zeros(cats.shape[0], dtype=bool)
         for i in range(ncats):
             ucats, counts = np.unique(cats[:, i], return_counts=True)
             singleton |= np.isin(cats[:, i], ucats[counts == 1])
@@ -391,7 +391,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
         if num_singleton:
             cats = cats[~singleton]
             retain_idx = retain_idx[~singleton]
-    retain = np.zeros(nobs, dtype=np.bool)
+    retain = np.zeros(nobs, dtype=bool)
     retain[retain_idx] = True
     return retain
 
@@ -420,7 +420,7 @@ def check_absorbed(x: NDArray, variables: Sequence[str]) -> None:
             abs_vec = np.abs(absorbed_vecs[:, i])
             tol = abs_vec.max() * np.finfo(np.float64).eps * abs_vec.shape[0]
             vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
-            rows.append(" " * 10 + ", ".join((variables[vi] for vi in vars_idx)))
+            rows.append(" " * 10 + ", ".join((str(variables[vi]) for vi in vars_idx)))
         absorbed_variables = "\n".join(rows)
         msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
         raise AbsorbingEffectError(msg)

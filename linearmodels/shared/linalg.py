@@ -27,13 +27,13 @@ def has_constant(
         Column location of constant
     """
     if np.any(np.all(x == 1, axis=0)):
-        loc = np.argwhere(np.all(x == 1, axis=0))
-        return True, int(loc)
+        loc: Optional[int] = int(np.argwhere(np.all(x == 1, axis=0)))
+        return True, loc
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):
-        loc = (np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)
-        loc = np.argwhere(loc)
-        return True, int(loc)
+        loc_arr = (np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)
+        loc = int(np.argwhere(loc_arr))
+        return True, loc
 
     n = x.shape[0]
     aug_rank = np.linalg.matrix_rank(np.c_[np.ones((n, 1)), x])
@@ -45,7 +45,7 @@ def has_constant(
     if has_const:
         out = lstsq(x, np.ones((n, 1)), rcond=None)
         beta = out[0].ravel()
-        loc = np.argmax(np.abs(beta) * x.var(0))
+        loc = int(np.argmax(np.abs(beta) * x.var(0)))
     return bool(has_const), loc
 
 

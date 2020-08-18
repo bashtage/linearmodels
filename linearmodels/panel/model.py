@@ -1,6 +1,6 @@
 from linearmodels.compat.pandas import get_codes
 
-from typing import Callable, Dict, Optional, Tuple, Type, Union
+from typing import Callable, Dict, Mapping, Optional, Tuple, Type, Union
 
 import numpy as np
 from numpy.linalg import lstsq, matrix_rank
@@ -231,7 +231,7 @@ class _PanelModelBase(object):
         self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
-        self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=np.bool)
+        self._not_null = np.ones(self.dependent.values2d.shape[0], dtype=bool)
         self._cov_estimators = CovarianceManager(
             self.__class__.__name__,
             HomoskedasticCovariance,
@@ -432,7 +432,7 @@ class _PanelModelBase(object):
         df_resid: int,
     ) -> Callable[[], Union[WaldTestStatistic, InvalidTestStatistic]]:
         """Compute Wald test that all parameters are 0, ex. constant"""
-        sel = np.ones(params.shape[0], dtype=np.bool)
+        sel = np.ones(params.shape[0], dtype=bool)
         name = "Model F-statistic (robust)"
 
         def invalid_f() -> InvalidTestStatistic:
@@ -623,7 +623,7 @@ class _PanelModelBase(object):
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, NDArray]]:
+    ) -> Mapping[str, Union[bool, float, str, NDArray]]:
 
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
@@ -1413,15 +1413,15 @@ class PanelOLS(_PanelModelBase):
 
     def _fast_path(self, low_memory: bool) -> Tuple[NDArray, NDArray, NDArray]:
         """Dummy-variable free estimation without weights"""
-        y = self.dependent.values2d
-        x = self.exog.values2d
-        ybar = y.mean(0)
+        _y = self.dependent.values2d
+        _x = self.exog.values2d
+        ybar = _y.mean(0)
 
         if not self._has_effect:
-            return y, x, ybar
+            return _y, _x, ybar
 
         y_gm = ybar
-        x_gm = x.mean(0)
+        x_gm = _x.mean(0)
 
         y = self.dependent
         x = self.exog
@@ -1540,7 +1540,7 @@ class PanelOLS(_PanelModelBase):
     @staticmethod
     def _is_effect_nested(effects: NDArray, clusters: NDArray) -> bool:
         """Determine whether an effect is nested by the covariance clusters"""
-        is_nested = np.zeros(effects.shape[1], dtype=np.bool)
+        is_nested = np.zeros(effects.shape[1], dtype=bool)
         for i, e in enumerate(effects.T):
             e = (e - e.min()).astype(np.int64)
             e_count = len(np.unique(e))
@@ -1884,7 +1884,7 @@ class BetweenOLS(_PanelModelBase):
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, NDArray]]:
+    ) -> Mapping[str, Union[bool, float, str, NDArray]]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = cov_config.copy()
         if "clusters" not in cov_config:

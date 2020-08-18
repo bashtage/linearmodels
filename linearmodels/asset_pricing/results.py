@@ -241,6 +241,7 @@ class LinearFactorModelResults(_SummaryStr):
     def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
         se = np.sqrt(np.diag(self._cov))
+        assert isinstance(se, np.ndarray)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * nfactor
         se = se[:nloadings]

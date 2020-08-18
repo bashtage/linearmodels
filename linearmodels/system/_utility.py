@@ -55,9 +55,8 @@ def blocked_diag_product(x: ArraySequence, s: NDArray) -> NDArray:
             row.append(s[i, j] * x[j])
         row = np.hstack(row)
         out.append(row)
-    out = np.vstack(out)
 
-    return out
+    return np.vstack(out)
 
 
 def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
@@ -311,6 +310,7 @@ class LinearConstraint(object):
         """
         if self._t is None:
             self._compute_transform()
+        assert isinstance(self._t, np.ndarray)
         return self._t
 
     @property
@@ -341,6 +341,7 @@ class LinearConstraint(object):
         """
         if self._a is None:
             self._compute_transform()
+        assert isinstance(self._a, np.ndarray)
         return self._a
 
     @property

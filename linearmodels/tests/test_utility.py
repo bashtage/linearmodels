@@ -23,7 +23,7 @@ MISSING_PANEL = "Panel" not in dir(pd)
 
 
 def test_missing_warning():
-    missing = np.zeros(500, dtype=np.bool)
+    missing = np.zeros(500, dtype=bool)
     with warnings.catch_warnings(record=True) as w:
         missing_warning(missing)
         assert len(w) == 0

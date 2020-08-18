@@ -13,6 +13,7 @@ from typing import (
     TypeVar,
     Union,
 )
+import warnings
 
 from numpy import (
     any as npany,
@@ -53,7 +54,15 @@ from linearmodels.iv.model import (
     KernelCovariance,
 )
 from linearmodels.iv.results import AbsorbingLSResults
-from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
+from linearmodels.panel.utility import (
+    AbsorbingEffectError,
+    AbsorbingEffectWarning,
+    absorbing_warn_msg,
+    check_absorbed,
+    dummy_matrix,
+    not_absorbed,
+    preconditioner,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.typing import AnyPandas, NDArray
@@ -485,7 +494,7 @@ class AbsorbingRegressor(object):
         cat: DataFrame = None,
         cont: DataFrame = None,
         interactions: Optional[List[Interaction]] = None,
-        weights: NDArray = None,
+        weights: Optional[NDArray] = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -580,9 +589,10 @@ class AbsorbingLS(object):
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
         each continuous variable.
-
     weights : ArrayLike, optional
         Observation weights used in estimation
+    drop_absorbed : bool, optional
+        Flag indicating whether to drop absorbed variables
 
     Notes
     -----
@@ -650,6 +660,7 @@ class AbsorbingLS(object):
         absorb: InteractionVar = None,
         interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
         weights: OptionalArrayLike = None,
+        drop_absorbed: bool = False,
     ) -> None:
 
         self._dependent = IVData(dependent, "dependent")
@@ -666,6 +677,7 @@ class AbsorbingLS(object):
             raise TypeError("absorb must ba a DataFrame or an Interaction")
         self._weights = weights
         self._is_weighted = False
+        self._drop_absorbed = drop_absorbed
         self._check_weights()
 
         self._interactions = interactions
@@ -673,7 +685,6 @@ class AbsorbingLS(object):
         self._prepare_interactions()
         self._absorbed_dependent: Optional[DataFrame] = None
         self._absorbed_exog: Optional[DataFrame] = None
-        self._x = None
 
         self._check_shape()
         self._original_index = self._dependent.pandas.index
@@ -710,7 +721,7 @@ class AbsorbingLS(object):
         col_delta = ptp(self.exog.ndarray, 0)
         has_constant = npany(col_delta == 0)
         self._const_col = where(col_delta == 0)[0][0] if has_constant else None
-        return has_constant
+        return bool(has_constant)
 
     def _check_weights(self) -> None:
         if self._weights is None:
@@ -942,13 +953,36 @@ class AbsorbingLS(object):
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, lsmr_options)
 
-        self._x = exog_resid = to_numpy(self.absorbed_exog)
+        exog_resid = to_numpy(self.absorbed_exog)
         dep_resid = to_numpy(self.absorbed_dependent)
         if self._exog.shape[1] == 0:
             params = empty((0, 1))
         else:
             if exog_resid.shape[1]:
-                check_absorbed(exog_resid, self.exog.cols)
+                try:
+                    check_absorbed(exog_resid, self.exog.cols)
+                except AbsorbingEffectError:
+                    # TODO: Far too much shared code with PanelOLS
+                    #  Needs refactor
+                    if not self._drop_absorbed:
+                        raise
+                    retain = not_absorbed(exog_resid)
+                    if not retain:
+                        raise ValueError(
+                            "All columns in exog have been fully absorbed by the "
+                            "included effects. This model cannot be estimated."
+                        )
+                    exog_resid = exog_resid[:, retain]
+                    self._columns = [self._columns[i] for i in retain]
+                    self._absorbed_exog = DataFrame(
+                        exog_resid, index=self._exog.pandas.index, columns=self._columns
+                    )
+                    drop = set(range(exog_resid.shape[1])).difference(retain)
+                    dropped = ", ".join([str(self.exog.vars[i]) for i in drop])
+                    warnings.warn(
+                        absorbing_warn_msg.format(absorbed_variables=dropped),
+                        AbsorbingEffectWarning,
+                    )
             params = lstsq(exog_resid, dep_resid, rcond=None)[0]
             self._num_params += exog_resid.shape[1]
 

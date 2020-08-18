@@ -512,7 +512,7 @@ class _SystemModelBase(object):
         k = len(self._dependent)
         nobs = self._dependent[0].shape[0]
         self._original_index = self._dependent[0].rows.copy()
-        missing = np.zeros(nobs, dtype=np.bool)
+        missing = np.zeros(nobs, dtype=bool)
 
         values = [self._dependent, self._exog, self._endog, self._instr, self._weights]
         for i in range(k):
