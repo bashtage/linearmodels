@@ -1,6 +1,7 @@
 global-include *.csv *.py *.dta *.ipynb *.png
 
 recursive-include doc/source *
+recursive-include linearmodels *.pyx
 recursive-include linearmodels/tests *.txt *.csv *.dta
 recursive-include linearmodels/datasets *
 recursive-include examples *

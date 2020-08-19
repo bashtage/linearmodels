@@ -23,10 +23,10 @@ for key in data:
             else:
                 out.append(vals[col])
                 all_cols.append(col)
-out = pd.concat(out, 1, sort=False)
-if "const" in out:
-    out.pop("const")
-out.to_stata("simulated-3sls.dta", write_index=False)
+out_df = pd.concat(out, 1, sort=False)
+if "const" in out_df:
+    out_df.pop("const")
+out_df.to_stata("simulated-3sls.dta", write_index=False)
 SEP = """
 
 file open myfile using {outfile}, write append

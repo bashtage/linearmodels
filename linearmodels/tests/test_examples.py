@@ -13,12 +13,16 @@ except ImportError:
 
 try:
     import jupyter_client
+    import matplotlib  # noqa: F401
     from nbconvert.preprocessors import ExecutePreprocessor
     import nbformat
+    import seaborn  # noqa: F401
 
     kernels = jupyter_client.kernelspec.find_kernel_specs()
+    SKIP = False
 except ImportError:  # pragma: no cover
-    pytest.mark.skip(reason="Required packages not available")
+    SKIP = False
+    pytestmark = pytest.mark.skip(reason="Required packages not available")
 
 kernel_name = "python%s" % sys.version_info.major
 
@@ -38,6 +42,7 @@ def notebook(request):
 
 
 @pytest.mark.slow
+@pytest.mark.skipif(SKIP, reason="Required packages not available")
 def test_notebook(notebook):
     nb_name = os.path.split(notebook)[-1]
     if MISSING_XARRAY and nb_name in NOTEBOOKS_USING_XARRAY:

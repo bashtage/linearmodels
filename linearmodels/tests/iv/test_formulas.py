@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, concat
 from pandas.testing import assert_frame_equal
 import pytest
@@ -213,9 +213,10 @@ def test_formula_function(data, model_and_func):
     instr = data[["z1", "z2", "z3"]]
     mod = model(dep, exog, endog, instr)
     res2 = mod.fit()
-    assert_equal(res.params.values, res2.params.values)
+
+    assert_allclose(res.params.values, res2.params.values, rtol=1e-5)
     res3 = func(fmla, data).fit()
-    assert_equal(res.params.values, res3.params.values)
+    assert_allclose(res.params.values, res3.params.values, rtol=1e-5)
 
     with pytest.raises(ValueError):
         res2.predict(data=data)

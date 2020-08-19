@@ -2,8 +2,7 @@ from typing import Callable, Dict, Optional, Tuple, Type, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq, matrix_rank
-import pandas as pd
-from pandas import DataFrame, Series
+from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
 from scipy.sparse import csc_matrix, diags
@@ -72,7 +71,7 @@ def panel_structure_stats(ids: NDArray, name: str) -> Series:
     bc = np.bincount(ids)
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
-    return pd.Series(out, index=index, name=name)
+    return Series(out, index=index, name=name)
 
 
 class PanelFormulaParser(object):
@@ -304,7 +303,7 @@ class _PanelModelBase(object):
             frame.columns = ["weight"]
             return PanelData(frame)
 
-        frame = pd.DataFrame(columns=self.dependent.entities, index=self.dependent.time)
+        frame = DataFrame(columns=self.dependent.entities, index=self.dependent.time)
         nobs, nentity = self.exog.nobs, self.exog.nentity
 
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
@@ -318,8 +317,8 @@ class _PanelModelBase(object):
                 "equal. You must use an 2-d array to avoid ambiguity."
             )
         if (
-            isinstance(weights, (pd.Series, pd.DataFrame))
-            and isinstance(weights.index, pd.MultiIndex)
+            isinstance(weights, (Series, DataFrame))
+            and isinstance(weights.index, MultiIndex)
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
             frame = weights
@@ -638,7 +637,7 @@ class _PanelModelBase(object):
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
-                cat = pd.Categorical(formatted_clusters.dataframe[col])
+                cat = Categorical(formatted_clusters.dataframe[col])
                 formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)
             clusters_frame = formatted_clusters.dataframe
 
@@ -646,21 +645,21 @@ class _PanelModelBase(object):
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
+            group_ids = Series(group_ids, index=self.dependent.index, name=name)
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
-                clusters_frame = pd.DataFrame(group_ids)
+                clusters_frame = DataFrame(group_ids)
 
         cluster_time = bool(cov_config_upd.pop("cluster_time", False))
         if cluster_time:
             group_ids = self.dependent.time_ids.squeeze()
             name = "cov.cluster.time"
-            group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
+            group_ids = Series(group_ids, index=self.dependent.index, name=name)
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
-                clusters_frame = pd.DataFrame(group_ids)
+                clusters_frame = DataFrame(group_ids)
         if self._singleton_index is not None and clusters_frame is not None:
             clusters_frame = clusters_frame.loc[~self._singleton_index]
 
@@ -727,7 +726,7 @@ class _PanelModelBase(object):
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
-        pred = pd.DataFrame(x @ params, index=exog.index, columns=["predictions"])
+        pred = DataFrame(x @ params, index=exog.index, columns=["predictions"])
 
         return pred
 
@@ -901,12 +900,12 @@ class PooledOLS(_PanelModelBase):
         )
         weps = wy - wx @ params
         index = self.dependent.index
-        fitted = pd.DataFrame(x @ params, index, ["fitted_values"])
-        effects = pd.DataFrame(
+        fitted = DataFrame(x @ params, index, ["fitted_values"])
+        effects = DataFrame(
             np.full_like(np.asarray(fitted), np.nan), index, ["estimated_effects"]
         )
         eps = y - fitted.values
-        idiosyncratic = pd.DataFrame(eps, index, ["idiosyncratic"])
+        idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         residual_ss = float(weps.T @ weps)
         e = y
         if self._constant:
@@ -994,7 +993,7 @@ class PooledOLS(_PanelModelBase):
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
-        pred = pd.DataFrame(x @ params, index=exog.index, columns=["predictions"])
+        pred = DataFrame(x @ params, index=exog.index, columns=["predictions"])
 
         return pred
 
@@ -1158,9 +1157,9 @@ class PanelOLS(_PanelModelBase):
         cats = {}
         effects_frame = effects.dataframe
         for col in effects_frame:
-            cat = pd.Categorical(effects_frame[col])
+            cat = Categorical(effects_frame[col])
             cats[col] = cat.codes.astype(np.int64)
-        cats = pd.DataFrame(cats, index=effects_frame.index)
+        cats = DataFrame(cats, index=effects_frame.index)
         cats = cats[effects_frame.columns]
         other_effects = PanelData(cats)
         other_effects.drop(~self.not_null)
@@ -1362,9 +1361,7 @@ class PanelOLS(_PanelModelBase):
             assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
-                dummies = pd.get_dummies(oe[c], drop_first=drop_first).astype(
-                    np.float64
-                )
+                dummies = get_dummies(oe[c], drop_first=drop_first).astype(np.float64)
                 d.append(dummies.values)
                 drop_first = True
 
@@ -1533,7 +1530,7 @@ class PanelOLS(_PanelModelBase):
                 other_info.append(
                     panel_structure_stats(oe[c].values.astype(np.int32), name)
                 )
-            other_info = pd.DataFrame(other_info)
+            other_info = DataFrame(other_info)
 
         return entity_info, time_info, other_info
 
@@ -1552,7 +1549,9 @@ class PanelOLS(_PanelModelBase):
         return bool(np.all(is_nested))
 
     def _determine_df_adjustment(
-        self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
+        self,
+        cov_type: str,
+        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
     ) -> bool:
         if cov_type != "clustered" or not self._has_effect:
             return True
@@ -1746,8 +1745,8 @@ class PanelOLS(_PanelModelBase):
                 w = self.weights.values2d
                 eps -= (w * eps).sum() / w.sum()
         index = self.dependent.index
-        fitted = pd.DataFrame(_x @ params, index, ["fitted_values"])
-        idiosyncratic = pd.DataFrame(eps, index, ["idiosyncratic"])
+        fitted = DataFrame(_x @ params, index, ["fitted_values"])
+        idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         eps_effects = _y - fitted.values
 
         sigma2_tot = float(eps_effects.T @ eps_effects / nobs)
@@ -1804,13 +1803,13 @@ class PanelOLS(_PanelModelBase):
                 name="Pooled F-statistic",
             )
             res.update(f_pooled=f_pooled)
-            effects = pd.DataFrame(
+            effects = DataFrame(
                 eps_effects - eps,
                 columns=["estimated_effects"],
                 index=self.dependent.index,
             )
         else:
-            effects = pd.DataFrame(
+            effects = DataFrame(
                 np.zeros_like(eps),
                 columns=["estimated_effects"],
                 index=self.dependent.index,
@@ -1901,7 +1900,7 @@ class BetweenOLS(_PanelModelBase):
 
             index = clusters_panel.panel.minor_axis
             reindex = clusters_panel.entities
-            clusters_frame = pd.DataFrame(
+            clusters_frame = DataFrame(
                 cluster_max.T, index=index, columns=clusters_panel.vars
             )
             clusters_frame = clusters_frame.loc[reindex].astype(np.int64)
@@ -1995,16 +1994,16 @@ class BetweenOLS(_PanelModelBase):
         )
         weps = wy - wx @ params
         index = self.dependent.index
-        fitted = pd.DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
+        fitted = DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
         eps = y - x @ params
-        effects = pd.DataFrame(eps, self.dependent.entities, ["estimated_effects"])
+        effects = DataFrame(eps, self.dependent.entities, ["estimated_effects"])
         entities = fitted.index.levels[0][fitted.index.codes[0]]
         effects = effects.loc[entities]
         effects.index = fitted.index
         dep = self.dependent.dataframe
         fitted = fitted.reindex(dep.index)
         effects = effects.reindex(dep.index)
-        idiosyncratic = pd.DataFrame(
+        idiosyncratic = DataFrame(
             np.asarray(dep) - np.asarray(fitted) - np.asarray(effects),
             dep.index,
             ["idiosyncratic"],
@@ -2154,11 +2153,11 @@ class FirstDifferenceOLS(_PanelModelBase):
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids = pd.Series(group_ids, index=self.dependent.index, name=name)
+            group_ids = Series(group_ids, index=self.dependent.index, name=name)
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
-                clusters_frame = pd.DataFrame(group_ids)
+                clusters_frame = DataFrame(group_ids)
         cluster_data = PanelData(clusters_frame)
         values = cluster_data.values3d[:, 1:]
         cluster_frame = panel_to_frame(
@@ -2290,15 +2289,15 @@ class FirstDifferenceOLS(_PanelModelBase):
         )
 
         weps = wy - wx @ params
-        fitted = pd.DataFrame(
+        fitted = DataFrame(
             self.exog.values2d @ params, self.dependent.index, ["fitted_values"]
         )
-        idiosyncratic = pd.DataFrame(
+        idiosyncratic = DataFrame(
             self.dependent.values2d - fitted.values,
             self.dependent.index,
             ["idiosyncratic"],
         )
-        effects = pd.DataFrame(
+        effects = DataFrame(
             np.full_like(np.asarray(fitted), np.nan),
             self.dependent.index,
             ["estimated_effects"],
@@ -2563,7 +2562,7 @@ class RandomEffects(_PanelModelBase):
         rho = sigma2_u / (sigma2_u + sigma2_e)
 
         theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
-        theta_out = pd.DataFrame(theta, columns=["theta"], index=wybar.index)
+        theta_out = DataFrame(theta, columns=["theta"], index=wybar.index)
         wy = root_w * self.dependent.values2d
         wx = root_w * self.exog.values2d
         index = self.dependent.index
@@ -2599,13 +2598,13 @@ class RandomEffects(_PanelModelBase):
         weps = wy - wx @ params
         eps = weps / root_w
         index = self.dependent.index
-        fitted = pd.DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
-        effects = pd.DataFrame(
+        fitted = DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
+        effects = DataFrame(
             self.dependent.values2d - np.asarray(fitted) - eps,
             index,
             ["estimated_effects"],
         )
-        idiosyncratic = pd.DataFrame(eps, index, ["idiosyncratic"])
+        idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         residual_ss = float(weps.T @ weps)
         wmu = 0
         if self.has_constant:
@@ -2698,7 +2697,7 @@ class FamaMacBeth(_PanelModelBase):
         wx = root_w * x
 
         exog = self.exog.dataframe
-        wx = pd.DataFrame(
+        wx = DataFrame(
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
@@ -2783,24 +2782,24 @@ class FamaMacBeth(_PanelModelBase):
         dep = self.dependent.dataframe
         exog = self.exog.dataframe
         index = self.dependent.index
-        wy = pd.DataFrame(wy[self._not_null], index=index, columns=dep.columns)
-        wx = pd.DataFrame(
+        wy = DataFrame(wy[self._not_null], index=index, columns=dep.columns)
+        wx = DataFrame(
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
-        yx = pd.DataFrame(
+        yx = DataFrame(
             np.c_[wy.values, wx.values],
             columns=list(wy.columns) + list(wx.columns),
             index=wy.index,
         )
 
-        def single(z: pd.DataFrame) -> Series:
+        def single(z: DataFrame) -> Series:
             exog = z.iloc[:, 1:].values
             if exog.shape[0] < exog.shape[1] or matrix_rank(exog) != exog.shape[1]:
-                return pd.Series([np.nan] * len(z.columns), index=z.columns)
+                return Series([np.nan] * len(z.columns), index=z.columns)
             dep = z.iloc[:, :1].values
             params = lstsq(exog, dep, rcond=None)[0]
-            return pd.Series(np.r_[np.nan, params.ravel()], index=z.columns)
+            return Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
         all_params = all_params.iloc[:, 1:]
@@ -2809,11 +2808,9 @@ class FamaMacBeth(_PanelModelBase):
         wy = np.asarray(wy)
         wx = np.asarray(wx)
         index = self.dependent.index
-        fitted = pd.DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
-        effects = pd.DataFrame(
-            np.full(fitted.shape, np.nan), index, ["estimated_effects"]
-        )
-        idiosyncratic = pd.DataFrame(
+        fitted = DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
+        effects = DataFrame(np.full(fitted.shape, np.nan), index, ["estimated_effects"])
+        idiosyncratic = DataFrame(
             self.dependent.values2d - fitted.values, index, ["idiosyncratic"]
         )
 

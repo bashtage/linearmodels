@@ -6,5 +6,3 @@ patsy
 property_cached>=1.6.3
 mypy_extensions>=0.4
 Cython>=0.29.21
-
-

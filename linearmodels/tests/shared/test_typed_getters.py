@@ -1,3 +1,5 @@
+from typing import Any, Tuple, Type
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -11,10 +13,10 @@ from linearmodels.shared.typed_getters import (
     get_string,
 )
 
-ARRAY_LIKE = (np.ndarray, pd.Series, pd.DataFrame)
-PANEL_LIKE = ARRAY_LIKE + (PanelData,)
-ARRAYS = (np.array([1.0]), pd.Series([1.0]), pd.DataFrame([[1.0]]))
-PANELS = ARRAYS + (PanelData(np.array([[[1.0]]])),)
+ARRAY_LIKE: Tuple[Type, ...] = (np.ndarray, pd.Series, pd.DataFrame)
+PANEL_LIKE: Tuple[Type, ...] = ARRAY_LIKE + (PanelData,)
+ARRAYS: Tuple[Any, ...] = (np.array([1.0]), pd.Series([1.0]), pd.DataFrame([[1.0]]))
+PANELS: Tuple[Any, ...] = ARRAYS + (PanelData(np.array([[[1.0]]])),)
 try:
     import xarray as xr
 

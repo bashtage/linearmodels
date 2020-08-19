@@ -1,5 +1,14 @@
-import numpy as np
-from numpy import argsort, r_, unique, where, zeros
+from numpy import (
+    any as npany,
+    arange,
+    argsort,
+    cumsum,
+    lexsort,
+    r_,
+    unique,
+    where,
+    zeros,
+)
 
 from linearmodels.typing import NDArray
 
@@ -29,7 +38,7 @@ def group_debias_coefficient(clusters: NDArray) -> float:
     where g is the number of groups and n is the sample size.
     """
     n = clusters.shape[0]
-    ngroups = np.unique(clusters).shape[0]
+    ngroups = unique(clusters).shape[0]
     return (ngroups / (ngroups - 1)) * ((n - 1) / n)
 
 
@@ -47,13 +56,13 @@ def cluster_union(clusters: NDArray) -> NDArray:
     ndarray
         A nobs array of integer cluster group memberships
     """
-    sort_keys = np.lexsort(clusters.T)
-    locs = np.arange(clusters.shape[0])
+    sort_keys = lexsort(clusters.T)
+    locs = arange(clusters.shape[0])
     lex_sorted = clusters[sort_keys]
     sorted_locs = locs[sort_keys]
-    diff = np.any(lex_sorted[1:] != lex_sorted[:-1], 1)
-    union = np.cumsum(np.r_[0, diff])
-    resort_locs = np.argsort(sorted_locs)
+    diff = npany(lex_sorted[1:] != lex_sorted[:-1], 1)
+    union = cumsum(r_[0, diff])
+    resort_locs = argsort(sorted_locs)
     return union[resort_locs]
 
 
