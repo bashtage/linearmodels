@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import concat
-
 from collections import defaultdict
 from typing import (
     Dict,
@@ -14,7 +12,7 @@ from typing import (
 )
 
 import numpy as np
-from pandas import DataFrame, date_range
+from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
@@ -619,6 +617,6 @@ def generate_panel_data(
         vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True
     )
     vc2_df = vc2_df.reindex(index)
-    clusters = concat([vc1_df, vc2_df])
-    data = concat([y_df, x_df], axis=1)
+    clusters = concat([vc1_df, vc2_df], sort=False)
+    data = concat([y_df, x_df], axis=1, sort=False)
     return PanelModelData(data, w_df, other_eff, clusters)

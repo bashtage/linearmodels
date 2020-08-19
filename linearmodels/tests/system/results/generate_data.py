@@ -6,8 +6,6 @@ Important cases
 3. Constraints across equations
 """
 
-from linearmodels.compat.pandas import concat
-
 import numpy as np
 import pandas as pd
 
@@ -47,5 +45,5 @@ for i, dataset in enumerate((basic_data, common_data, missing_data)):
             out.extend([dep])
 
 if __name__ == "__main__":
-    df = concat(out, 1)
+    df = pd.concat(out, 1, sort=False)
     df.to_stata("simulated-sur.dta")

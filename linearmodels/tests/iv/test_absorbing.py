@@ -1,4 +1,3 @@
-from linearmodels.compat.pandas import get_codes
 from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
@@ -452,7 +451,7 @@ def test_absorbing_regressors(cat, cont, interact, weights):
 
     expected = []
     for i, col in enumerate(cat):
-        expected_rank += pd.Series(get_codes(cat[col].cat)).nunique() - (i > 0)
+        expected_rank += pd.Series(cat[col].cat.codes).nunique() - (i > 0)
     expected.append(dummy_matrix(cat, precondition=False)[0])
     expected_rank += cont.shape[1]
     expected.append(csc_matrix(cont))
@@ -479,7 +478,7 @@ def test_absorbing_regressors_hash(cat, cont, interact, weights):
     # Build hash
     hashes = []
     for col in cat:
-        hashes.append((hasher.single(get_codes(cat[col].cat).to_numpy().data),))
+        hashes.append((hasher.single(cat[col].cat.codes.to_numpy().data),))
     for col in cont:
         hashes.append((hasher.single(cont[col].to_numpy().data),))
     hashes = sorted(hashes)

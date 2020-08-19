@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import get_codes
-
 from collections import defaultdict
 from typing import (
     Any,
@@ -25,7 +23,6 @@ from numpy import (
     dtype,
     empty,
     empty_like,
-    finfo,
     int8,
     int16,
     int32,
@@ -38,7 +35,7 @@ from numpy import (
     where,
     zeros,
 )
-from numpy.linalg import lstsq, norm
+from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Series
 from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
@@ -56,7 +53,6 @@ from linearmodels.iv.model import (
 )
 from linearmodels.iv.results import AbsorbingLSResults
 from linearmodels.panel.utility import (
-    AbsorbingEffectError,
     AbsorbingEffectWarning,
     absorbing_warn_msg,
     check_absorbed,
@@ -186,7 +182,7 @@ def category_product(cats: AnyPandas) -> Series:
         if not is_categorical_dtype(cats[c]):
             raise TypeError("cats must contain only categorical variables")
         col = cats[c]
-        max_code = get_codes(col.cat).max()
+        max_code = col.cat.codes.max()
         size = 1
         while max_code >= 2 ** size:
             size += 1
@@ -203,7 +199,7 @@ def category_product(cats: AnyPandas) -> Series:
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
     for i, col in enumerate(cats):
-        codes += get_codes(cats[col].cat).astype(dtype_val) << SCALAR_DTYPES[dtype_str](
+        codes += cats[col].cat.codes.astype(dtype_val) << SCALAR_DTYPES[dtype_str](
             cum_size
         )
         cum_size += sizes[i]
@@ -224,7 +220,7 @@ def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
     csc_matrix
         Sparse matrix of dummies with unit column norm
     """
-    codes = asarray(get_codes(category_product(cat).cat))[:, None]
+    codes = asarray(category_product(cat).cat.codes)[:, None]
     mat = dummy_matrix(codes, precondition=precondition)[0]
     assert isinstance(mat, csc_matrix)
     return mat
@@ -248,7 +244,7 @@ def category_continuous_interaction(
     csc_matrix
         Sparse matrix of dummy interactions with unit column norm
     """
-    codes = get_codes(category_product(cat).cat)
+    codes = category_product(cat).cat.codes
     interact = csc_matrix((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
     if not precondition:
         return interact
@@ -415,9 +411,7 @@ class Interaction(object):
         cat_hashes = []
         cat = self.cat
         for col in cat:
-            hasher.update(
-                ascontiguousarray(get_codes(self.cat[col].cat).to_numpy().data)
-            )
+            hasher.update(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
             cat_hashes.append(hasher.hexdigest())
             hasher = _reset(hasher)
         sorted_hashes = tuple(sorted(cat_hashes))
@@ -522,13 +516,13 @@ class AbsorbingRegressor(object):
         if self._cat is not None:
             for col in self._cat:
                 hasher.update(
-                    ascontiguousarray(get_codes(self._cat[col].cat).to_numpy().data)
+                    ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
                 )
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._cont is not None:
             for col in self._cont:
-                hasher.update(ascontiguousarray(self._cont[col].to_numpy().data))
+                hasher.update(ascontiguousarray(self._cont[col].to_numpy()).data)
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._interactions is not None:
@@ -1037,7 +1031,8 @@ class AbsorbingLS(object):
         resids if all weights are unity.
         """
         return (
-            self._absorbed_dependent.to_numpy() - self._absorbed_exog.to_numpy() @ params
+            self._absorbed_dependent.to_numpy()
+            - self._absorbed_exog.to_numpy() @ params
         )
 
     def _f_statistic(

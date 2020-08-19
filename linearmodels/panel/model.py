@@ -1,6 +1,4 @@
-from linearmodels.compat.pandas import get_codes
-
-from typing import Callable, Dict, Mapping, Optional, Tuple, Type, Union, cast
+from typing import Callable, Dict, Optional, Tuple, Type, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq, matrix_rank
@@ -2000,7 +1998,7 @@ class BetweenOLS(_PanelModelBase):
         fitted = pd.DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
         eps = y - x @ params
         effects = pd.DataFrame(eps, self.dependent.entities, ["estimated_effects"])
-        entities = fitted.index.levels[0][get_codes(fitted.index)[0]]
+        entities = fitted.index.levels[0][fitted.index.codes[0]]
         effects = effects.loc[entities]
         effects.index = fitted.index
         dep = self.dependent.dataframe
@@ -2569,7 +2567,7 @@ class RandomEffects(_PanelModelBase):
         wy = root_w * self.dependent.values2d
         wx = root_w * self.exog.values2d
         index = self.dependent.index
-        reindex = index.levels[0][get_codes(index)[0]]
+        reindex = index.levels[0][index.codes[0]]
         wybar = (theta * wybar).loc[reindex]
         wxbar = (theta * wxbar).loc[reindex]
         wy -= wybar.values

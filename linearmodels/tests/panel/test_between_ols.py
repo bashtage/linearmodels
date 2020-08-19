@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import get_codes
-
 from itertools import product
 
 import numpy as np
@@ -338,7 +336,7 @@ def test_fitted_effects_residuals(both_data_types):
     assert_frame_similar(res.fitted_values, expected)
 
     index = mod.dependent.dataframe.index
-    reindex = index.levels[0][get_codes(index)[0]]
+    reindex = index.levels[0][index.codes[0]]
     resids = res.resids.copy()
     resids = resids.reindex(reindex)
     resids.index = index

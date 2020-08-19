@@ -1,11 +1,17 @@
-from linearmodels.compat.pandas import concat, get_codes, is_string_like
-
 from itertools import product
 from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    concat,
+    get_dummies,
+)
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -38,8 +44,8 @@ class _Panel(object):
         self._items = df.columns
         index = df.index
         assert isinstance(index, MultiIndex)
-        self._major_axis = Index(index.levels[1][get_codes(index)[1]]).unique()
-        self._minor_axis = Index(index.levels[0][get_codes(index)[0]]).unique()
+        self._major_axis = Index(index.levels[1][index.codes[1]]).unique()
+        self._minor_axis = Index(index.levels[0][index.codes[0]]).unique()
         self._full_index = MultiIndex.from_product([self._minor_axis, self._major_axis])
         new_df = df.reindex(self._full_index)
         new_df.index.names = df.index.names
@@ -92,7 +98,7 @@ class _Panel(object):
 
 
 def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
-    if is_string_dtype(s.dtype) and s.map(is_string_like).all():
+    if is_string_dtype(s.dtype) and s.map(lambda v: isinstance(v, str)).all():
         s = s.astype("category")
 
     if is_categorical_dtype(s):
@@ -103,7 +109,9 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
 
 
 def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
-    return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return concat(
+        [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
+    )
 
 
 class PanelData(object):
@@ -328,13 +336,13 @@ class PanelData(object):
     def time(self) -> List[Label]:
         """List of time index names"""
         index = self.index
-        return list(index.levels[1][get_codes(index)[1]].unique())
+        return list(index.levels[1][index.codes[1]].unique())
 
     @property
     def entities(self) -> List[Label]:
         """List of entity index names"""
         index = self.index
-        return list(index.levels[0][get_codes(index)[0]].unique())
+        return list(index.levels[0][index.codes[0]].unique())
 
     @property
     def entity_ids(self) -> NDArray:
@@ -347,7 +355,7 @@ class PanelData(object):
             2d array containing entity ids corresponding dataframe view
         """
         index = self.index
-        return np.asarray(get_codes(index)[0])[:, None]
+        return np.asarray(index.codes[0])[:, None]
 
     @property
     def time_ids(self) -> NDArray:
@@ -360,7 +368,7 @@ class PanelData(object):
             2d array containing time ids corresponding dataframe view
         """
         index = self.index
-        return np.asarray(get_codes(index)[1])[:, None]
+        return np.asarray(index.codes[1])[:, None]
 
     def _demean_both_low_mem(self, weights: Optional["PanelData"]) -> "PanelData":
         groups = PanelData(
@@ -689,7 +697,7 @@ class PanelData(object):
         if group not in ("entity", "time"):
             raise ValueError
         axis = 0 if group == "entity" else 1
-        labels = get_codes(self.index)
+        labels = self.index.codes
         levels = self.index.levels
         cat = Categorical(levels[axis][labels[axis]])
         dummies = get_dummies(cat, drop_first=drop_first)

@@ -1,10 +1,8 @@
-from linearmodels.compat.pandas import concat
-
 from itertools import product
 
 import numpy as np
 from numpy.testing import assert_allclose
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, concat
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
@@ -131,7 +129,7 @@ def test_formula_equivalence(data):
     formulas = {}
     for i, f in enumerate(formula):
         formulas["eq{0}".format(i)] = f
-    df = concat(df, 1)
+    df = concat(df, 1, sort=False)
     formula_mod = IVSystemGMM.from_formula(formulas, df, weight_type="unadjusted")
     res = mod.fit(cov_type="unadjusted")
     formula_res = formula_mod.fit(cov_type="unadjusted")
@@ -180,7 +178,7 @@ def test_formula_equivalence_weights(data):
         fmla += " + ".join(instr.columns) + " ] "
         formulas[key] = fmla
         df.extend([dep, ex, en, instr])
-    df = concat(df, 1)
+    df = concat(df, 1, sort=False)
     formula_mod = IVSystemGMM.from_formula(
         formulas, df, weights=weights, weight_type="unadjusted"
     )

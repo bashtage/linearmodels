@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import concat
-
 import numpy as np
 import pandas as pd
 
@@ -32,7 +30,7 @@ x = PanelData(x)
 y = PanelData(y)
 w = PanelData(w)
 
-z = concat([x.dataframe, y.dataframe, w.dataframe], 1)
+z = pd.concat([x.dataframe, y.dataframe, w.dataframe], 1, sort=False)
 final_index = pd.MultiIndex.from_product([minor, major])
 final_index.levels[0].name = "firm"
 z = z.reindex(final_index)
