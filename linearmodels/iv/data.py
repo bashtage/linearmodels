@@ -139,10 +139,10 @@ class IVData(object):
                     x = x.transpose()
 
                 index = list(x.coords[x.dims[0]].values)
-                xr_cols = x.coords[x.dims[1]].values
-                if is_numeric_dtype(xr_cols.dtype):
+                xr_col_values = x.coords[x.dims[1]].values
+                xr_cols = list(xr_col_values)
+                if is_numeric_dtype(xr_col_values.dtype):
                     xr_cols = [var_name + ".{0}".format(i) for i in range(x.shape[1])]
-                xr_cols = list(xr_cols)
                 self._ndarray = x.values.astype(np.float64)
                 self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
                 self._row_labels = index
@@ -170,7 +170,7 @@ class IVData(object):
     @property
     def shape(self) -> Tuple[int, int]:
         """Tuple containing shape"""
-        return self._ndarray.shape
+        return self._ndarray.shape[0], self._ndarray.shape[1]
 
     @property
     def ndim(self) -> int:

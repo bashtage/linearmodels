@@ -325,9 +325,9 @@ numpydoc_xref_aliases = {
     "IVGMMResults": "linearmodels.iv.results.IVGMMResults",
     "IVModelComparison": "linearmodels.iv.results.IVModelComparison",
     "IVResults": "linearmodels.iv.results.IVResults",
-    "InvalidTestStatistic": "linearmodels.utility.InvalidTestStatistic",
+    "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
     "OLSResults": "linearmodels.iv.results.OLSResults",
-    "WaldTestStatistic": "linearmodels.utility.WaldTestStatistic",
+    "WaldTestStatistic": "linearmodels.shared.WaldTestStatistic",
     "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
     "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
     "PanelResults": "linearmodels.panel.results.PanelResults",
@@ -340,5 +340,5 @@ numpydoc_xref_aliases = {
     "LinearFactorModelResults": "linearmodels.asset_pricing.results.LinearFactorModelResults",
     "PanelData": "linearmodels.panel.data.PanelData",
     "IVData": "linearmodels.iv.data.IVData",
-    "AttrDict": "linearmodels.utility.AttrDict",
+    "AttrDict": "linearmodels.shared.AttrDict",
 }

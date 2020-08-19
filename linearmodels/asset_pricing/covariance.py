@@ -3,7 +3,7 @@ Covariance estimators for linear factor models
 """
 from typing import Dict, Optional, Union
 
-from numpy import ndarray
+from numpy import empty, ndarray
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
@@ -18,7 +18,7 @@ class _HACMixin(object):
     def __init__(self, kernel: str, bandwidth: Optional[float]) -> None:
         self._kernel: Optional[str] = None
         self._bandwidth: Optional[float] = None  # pragma: no cover
-        self._moments: Optional[ndarray] = None  # pragma: no cover
+        self._moments: ndarray = empty((0,))  # pragma: no cover
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
 

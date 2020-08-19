@@ -1,7 +1,7 @@
 """
 Linear factor models for applications in asset pricing
 """
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Any, Callable, Optional, Tuple, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -24,7 +24,8 @@ from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
-from linearmodels.shared.utility import AttrDict, get_float, get_string
+from linearmodels.shared.typed_getters import get_float, get_string
+from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, NDArray
 
 
@@ -78,7 +79,7 @@ class _FactorModelBase(object):
 
     def _drop_missing(self) -> NDArray:
         data = (self.portfolios, self.factors)
-        missing = np.any(np.c_[[dh.isnull for dh in data]], 0)
+        missing = cast(NDArray, np.any(np.c_[[dh.isnull for dh in data]], 0))
         if any(missing):
             if all(missing):
                 raise ValueError(
@@ -967,12 +968,12 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
                 last_obj = obj
 
         else:
-            args = (excess_returns, weight_est_instance)
-            callback = callback_factory(self._j_cue, args, disp=disp)
+            cue_args = (excess_returns, weight_est_instance)
+            callback = callback_factory(self._j_cue, cue_args, disp=disp)
             opt_res = minimize(
                 self._j_cue,
                 params,
-                args=args,
+                args=cue_args,
                 callback=callback,
                 options={"disp": bool(disp), "maxiter": max_iter},
             )

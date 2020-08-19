@@ -1,4 +1,4 @@
-from linearmodels.compat.pandas import get_codes, to_numpy
+from linearmodels.compat.pandas import get_codes
 
 from collections import defaultdict
 from typing import (
@@ -25,6 +25,7 @@ from numpy import (
     dtype,
     empty,
     empty_like,
+    finfo,
     int8,
     int16,
     int32,
@@ -37,7 +38,7 @@ from numpy import (
     where,
     zeros,
 )
-from numpy.linalg import lstsq
+from numpy.linalg import lstsq, norm
 from pandas import Categorical, DataFrame, Series
 from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
@@ -248,7 +249,7 @@ def category_continuous_interaction(
         Sparse matrix of dummy interactions with unit column norm
     """
     codes = get_codes(category_product(cat).cat)
-    interact = csc_matrix((to_numpy(cont).flat, (arange(codes.shape[0]), codes)))
+    interact = csc_matrix((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
     if not precondition:
         return interact
     else:
@@ -415,7 +416,7 @@ class Interaction(object):
         cat = self.cat
         for col in cat:
             hasher.update(
-                ascontiguousarray(to_numpy(get_codes(self.cat[col].cat)).data)
+                ascontiguousarray(get_codes(self.cat[col].cat).to_numpy().data)
             )
             cat_hashes.append(hasher.hexdigest())
             hasher = _reset(hasher)
@@ -424,7 +425,7 @@ class Interaction(object):
         hashes = []
         cont = self.cont
         for col in cont:
-            hasher.update(ascontiguousarray(to_numpy(cont[col]).data))
+            hasher.update(ascontiguousarray(cont[col].to_numpy()).data)
             hashes.append(sorted_hashes + (hasher.hexdigest(),))
             hasher = _reset(hasher)
 
@@ -521,13 +522,13 @@ class AbsorbingRegressor(object):
         if self._cat is not None:
             for col in self._cat:
                 hasher.update(
-                    ascontiguousarray(to_numpy(get_codes(self._cat[col].cat)).data)
+                    ascontiguousarray(get_codes(self._cat[col].cat).to_numpy().data)
                 )
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._cont is not None:
             for col in self._cont:
-                hasher.update(ascontiguousarray(to_numpy(self._cont[col]).data))
+                hasher.update(ascontiguousarray(self._cont[col].to_numpy().data))
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._interactions is not None:
@@ -550,7 +551,7 @@ class AbsorbingRegressor(object):
         if self._cat is not None and self._cat.shape[1] > 0:
             regressors.append(dummy_matrix(self._cat, precondition=False)[0])
         if self._cont is not None and self._cont.shape[1] > 0:
-            regressors.append(csc_matrix(to_numpy(self._cont)))
+            regressors.append(csc_matrix(self._cont.to_numpy()))
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 
@@ -702,12 +703,12 @@ class AbsorbingLS(object):
         self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
     def _drop_missing(self) -> NDArray:
-        missing = to_numpy(self.dependent.isnull)
-        missing |= to_numpy(self.exog.isnull)
-        missing |= to_numpy(self._absorb_inter.cat.isnull().any(1))
-        missing |= to_numpy(self._absorb_inter.cont.isnull().any(1))
+        missing = self.dependent.isnull.to_numpy()
+        missing |= self.exog.isnull.to_numpy()
+        missing |= self._absorb_inter.cat.isnull().any(1).to_numpy()
+        missing |= self._absorb_inter.cont.isnull().any(1).to_numpy()
         for interact in self._interaction_list:
-            missing |= to_numpy(interact.isnull)
+            missing |= interact.isnull.to_numpy()
         if npany(missing):
             self.dependent.drop(missing)
             self.exog.drop(missing)
@@ -873,13 +874,34 @@ class AbsorbingLS(object):
             dep_resid += root_w * mu_dep
             exog_resid += root_w * mu_exog
 
+        if not self._drop_absorbed:
+            check_absorbed(exog_resid, self.exog.cols, exog)
+        else:
+            ncol = exog_resid.shape[1]
+            retain = not_absorbed(exog_resid)
+            if not retain:
+                raise ValueError(
+                    "All columns in exog have been fully absorbed by the "
+                    "included effects. This model cannot be estimated."
+                )
+            elif len(retain) < ncol:
+                drop = set(range(ncol)).difference(retain)
+                dropped = ", ".join([str(self.exog.cols[i]) for i in drop])
+                warnings.warn(
+                    absorbing_warn_msg.format(absorbed_variables=dropped),
+                    AbsorbingEffectWarning,
+                )
+
+            exog_resid = exog_resid[:, retain]
+            self._columns = [self._columns[i] for i in retain]
+
         self._absorbed_dependent = DataFrame(
             dep_resid,
             index=self._dependent.pandas.index,
             columns=self._dependent.pandas.columns,
         )
         self._absorbed_exog = DataFrame(
-            exog_resid, index=self._exog.pandas.index, columns=self._exog.pandas.columns
+            exog_resid, index=self._exog.pandas.index, columns=self._columns
         )
 
     def fit(
@@ -953,36 +975,11 @@ class AbsorbingLS(object):
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, lsmr_options)
 
-        exog_resid = to_numpy(self.absorbed_exog)
-        dep_resid = to_numpy(self.absorbed_dependent)
+        exog_resid = self.absorbed_exog.to_numpy()
+        dep_resid = self.absorbed_dependent.to_numpy()
         if self._exog.shape[1] == 0:
             params = empty((0, 1))
         else:
-            if exog_resid.shape[1]:
-                try:
-                    check_absorbed(exog_resid, self.exog.cols)
-                except AbsorbingEffectError:
-                    # TODO: Far too much shared code with PanelOLS
-                    #  Needs refactor
-                    if not self._drop_absorbed:
-                        raise
-                    retain = not_absorbed(exog_resid)
-                    if not retain:
-                        raise ValueError(
-                            "All columns in exog have been fully absorbed by the "
-                            "included effects. This model cannot be estimated."
-                        )
-                    exog_resid = exog_resid[:, retain]
-                    self._columns = [self._columns[i] for i in retain]
-                    self._absorbed_exog = DataFrame(
-                        exog_resid, index=self._exog.pandas.index, columns=self._columns
-                    )
-                    drop = set(range(exog_resid.shape[1])).difference(retain)
-                    dropped = ", ".join([str(self.exog.vars[i]) for i in drop])
-                    warnings.warn(
-                        absorbing_warn_msg.format(absorbed_variables=dropped),
-                        AbsorbingEffectWarning,
-                    )
             params = lstsq(exog_resid, dep_resid, rcond=None)[0]
             self._num_params += exog_resid.shape[1]
 
@@ -1040,7 +1037,7 @@ class AbsorbingLS(object):
         resids if all weights are unity.
         """
         return (
-            to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
+            self._absorbed_dependent.to_numpy() - self._absorbed_exog.to_numpy() @ params
         )
 
     def _f_statistic(
@@ -1071,7 +1068,7 @@ class AbsorbingLS(object):
             columns=["fitted_values"],
         )
         absorbed_effects = DataFrame(
-            to_numpy(self._absorbed_dependent) - to_numpy(fitted),
+            self._absorbed_dependent.to_numpy() - fitted.to_numpy(),
             columns=["absorbed_effects"],
             index=self._dependent.rows,
         )
@@ -1091,11 +1088,11 @@ class AbsorbingLS(object):
         total_ss = float(e.T @ e)
         r2 = max(1 - residual_ss / total_ss, 0.0)
 
-        e = to_numpy(self._absorbed_dependent)  # already scaled by root_w
+        e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
         if self._const_col is not None:
             col = self._const_col
-            x = to_numpy(self._absorbed_exog)[:, col : col + 1]
+            x = self._absorbed_exog.to_numpy()[:, col : col + 1]
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu
 

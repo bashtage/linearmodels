@@ -1,6 +1,6 @@
 from linearmodels.compat.pandas import get_codes
 
-from typing import Callable, Dict, Mapping, Optional, Tuple, Type, Union
+from typing import Callable, Dict, Mapping, Optional, Tuple, Type, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq, matrix_rank
@@ -49,6 +49,7 @@ from linearmodels.shared.hypotheses import (
     WaldTestStatistic,
 )
 from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
 from linearmodels.typing import ArrayLike, NDArray
 
@@ -311,7 +312,8 @@ class _PanelModelBase(object):
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
             return PanelData(weights)
 
-        weights = np.squeeze(weights)
+        if isinstance(weights, NDArray):
+            weights = np.squeeze(weights)
         if weights.shape[0] == nobs and nobs == nentity:
             raise AmbiguityError(
                 "Unable to distinguish nobs form nentity since they are "
@@ -333,7 +335,7 @@ class _PanelModelBase(object):
             frame.iloc[:, :] = weights
         elif weights.shape[0] == nentity * nobs:
             frame = self.dependent.dataframe.copy()
-            frame.iloc[:, :] = weights[:, None]
+            frame.iloc[:, :] = np.asarray(weights)[:, None]
         else:
             raise ValueError("Weights do not have a supported shape.")
         return PanelData(frame)
@@ -490,8 +492,8 @@ class _PanelModelBase(object):
             r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
 
         # Within
-        y = self.dependent.demean("entity", return_panel=False)
-        x = self.exog.demean("entity", return_panel=False)
+        y = cast(NDArray, self.dependent.demean("entity", return_panel=False))
+        x = cast(NDArray, self.exog.demean("entity", return_panel=False))
         xb = x @ params
         r2w = 0.0
         if y.std() > 0 and xb.std() > 0:
@@ -514,7 +516,7 @@ class _PanelModelBase(object):
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(w)
         else:
-            root_w = np.sqrt(w)
+            root_w = cast(NDArray, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
@@ -532,7 +534,7 @@ class _PanelModelBase(object):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
-        root_w = np.sqrt(w)
+        root_w = cast(NDArray, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
@@ -623,7 +625,7 @@ class _PanelModelBase(object):
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Mapping[str, Union[bool, float, str, NDArray]]:
+    ) -> Dict[str, Union[bool, float, str, NDArray, DataFrame, PanelData]]:
 
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
@@ -633,7 +635,7 @@ class _PanelModelBase(object):
 
         cov_config_upd = {k: v for k, v in cov_config.items()}
 
-        clusters: Optional[NDArray] = cov_config.get("clusters", None)
+        clusters = get_panel_data_like(cov_config, "clusters")
         clusters_frame: Optional[DataFrame] = None
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
@@ -871,7 +873,7 @@ class PooledOLS(_PanelModelBase):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
-        root_w = np.sqrt(w)
+        root_w = cast(NDArray, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
 
@@ -1437,38 +1439,38 @@ class PanelOLS(_PanelModelBase):
                     effect = self.dependent.time_ids
                 col = ensure_unique_column("additional.effect", groups.dataframe)
                 groups.dataframe[col] = effect
-            y = y.general_demean(groups)
-            x = x.general_demean(groups)
+            y = cast(PanelData, y.general_demean(groups))
+            x = cast(PanelData, x.general_demean(groups))
         elif self.entity_effects and self.time_effects:
-            y = y.demean("both", low_memory=low_memory)
-            x = x.demean("both", low_memory=low_memory)
+            y = cast(PanelData, y.demean("both", low_memory=low_memory))
+            x = cast(PanelData, x.demean("both", low_memory=low_memory))
         elif self.entity_effects:
-            y = y.demean("entity")
-            x = x.demean("entity")
+            y = cast(PanelData, y.demean("entity"))
+            x = cast(PanelData, x.demean("entity"))
         else:  # self.time_effects
-            y = y.demean("time")
-            x = x.demean("time")
+            y = cast(PanelData, y.demean("time"))
+            x = cast(PanelData, x.demean("time"))
 
-        y = y.values2d
-        x = x.values2d
+        y_arr = y.values2d
+        x_arr = x.values2d
 
         if self.has_constant:
-            y = y + y_gm
-            x = x + x_gm
+            y_arr = y_arr + y_gm
+            x_arr = x_arr + x_gm
         else:
             ybar = 0
 
-        return y, x, ybar
+        return y_arr, x_arr, ybar
 
     def _weighted_fast_path(
         self, low_memory: bool
     ) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
         """Dummy-variable free estimation with weights"""
-        y = self.dependent.values2d
-        x = self.exog.values2d
+        y_arr = self.dependent.values2d
+        x_arr = self.exog.values2d
         w = self.weights.values2d
-        root_w = np.sqrt(w)
-        wybar = root_w * (w.T @ y / w.sum())
+        root_w = cast(NDArray, np.sqrt(w))
+        wybar = root_w * (w.T @ y_arr / w.sum())
 
         if not self._has_effect:
             wy = root_w * self.dependent.values2d
@@ -1477,7 +1479,7 @@ class PanelOLS(_PanelModelBase):
             return wy, wx, wybar, y_effect, x_effect
 
         wy_gm = wybar
-        wx_gm = root_w * (w.T @ x / w.sum())
+        wx_gm = root_w * (w.T @ x_arr / w.sum())
 
         y = self.dependent
         x = self.exog
@@ -1549,7 +1551,7 @@ class PanelOLS(_PanelModelBase):
                 cmax = c.max()
                 ec = e * (cmax + 1) + c
                 is_nested[i] = len(np.unique(ec)) == e_count
-        return np.all(is_nested)
+        return bool(np.all(is_nested))
 
     def _determine_df_adjustment(
         self, cov_type: str, **cov_config: Union[bool, float, str, NDArray]
@@ -1567,6 +1569,7 @@ class PanelOLS(_PanelModelBase):
 
         effects = self._collect_effects()
         if num_effects == 1:
+            assert isinstance(clusters, NDArray)
             return not self._is_effect_nested(effects, clusters)
         return True  # Default case for 2-way -- not completely clear
 
@@ -1666,7 +1669,7 @@ class PanelOLS(_PanelModelBase):
             )
             if not weighted:
                 y, x, ybar = self._fast_path(low_memory=low_memory)
-                y_effects = 0.0
+                y_effects = np.array([0.0])
                 x_effects = np.zeros(x.shape[1])
             else:
                 y, x, ybar, y_effects, x_effects = self._weighted_fast_path(
@@ -1758,11 +1761,11 @@ class PanelOLS(_PanelModelBase):
         if self.has_constant:
             mu = ybar
         else:
-            mu = 0
+            mu = np.array([0.0])
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
-        root_w = np.sqrt(self.weights.values2d)
+        root_w = cast(NDArray, np.sqrt(self.weights.values2d))
         y_ex = root_w * self.dependent.values2d
         mu_ex = 0
         if (
@@ -1884,7 +1887,7 @@ class BetweenOLS(_PanelModelBase):
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Mapping[str, Union[bool, float, str, NDArray]]:
+    ) -> Dict[str, Union[bool, float, str, NDArray, DataFrame, PanelData]]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = cov_config.copy()
         if "clusters" not in cov_config:
@@ -1964,7 +1967,7 @@ class BetweenOLS(_PanelModelBase):
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
         else:
-            root_w = np.sqrt(w)
+            root_w = cast(NDArray, np.sqrt(w))
 
         wx = root_w * x
         wy = root_w * y
@@ -2261,7 +2264,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             w = w.values
 
             w /= w.mean()
-            root_w = np.sqrt(w)
+            root_w = cast(NDArray, np.sqrt(w))
 
         wx = root_w * x
         wy = root_w * y
@@ -2523,7 +2526,7 @@ class RandomEffects(_PanelModelBase):
             not provided, a naive default is used.
         """
         w = self.weights.values2d
-        root_w = np.sqrt(w)
+        root_w = cast(NDArray, np.sqrt(w))
         y = self.dependent.demean("entity", weights=self.weights).values2d
         x = self.exog.demean("entity", weights=self.weights).values2d
         if self.has_constant:
@@ -2819,7 +2822,7 @@ class FamaMacBeth(_PanelModelBase):
         eps = self.dependent.values2d - fitted.values
         weps = wy - wx @ params
         w = self.weights.values2d
-        root_w = np.sqrt(w)
+        root_w = cast(NDArray, np.sqrt(w))
         #
         residual_ss = float(weps.T @ weps)
         y = e = self.dependent.values2d

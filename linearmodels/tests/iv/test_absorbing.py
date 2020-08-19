@@ -1,4 +1,4 @@
-from linearmodels.compat.pandas import get_codes, to_numpy
+from linearmodels.compat.pandas import get_codes
 from linearmodels.compat.statsmodels import Summary
 
 from itertools import product
@@ -395,7 +395,7 @@ def test_interaction_cont_only(cont):
     interact = Interaction(cont=cont)
     assert interact.nobs == cont.shape[0]
     assert_frame_equal(cont, interact.cont)
-    expected = to_numpy(cont)
+    expected = cont.to_numpy()
     actual = interact.sparse
     assert isinstance(actual, csc_matrix)
     assert_allclose(expected, actual.A)
@@ -410,7 +410,7 @@ def test_interaction_cat_cont(cat, cont):
     expected = []
     for i in range(cont.shape[1]):
         element = base.copy()
-        element[np.where(element)] = to_numpy(cont.iloc[:, i])
+        element[np.where(element)] = cont.iloc[:, i].to_numpy()
         expected.append(element)
     expected = np.column_stack(expected)
     actual = interact.sparse
@@ -439,7 +439,7 @@ def test_empty_interaction():
 
 def test_interaction_cat_cont_convert(cat, cont):
     base = Interaction(cat, cont)
-    interact = Interaction(to_numpy(cat), cont)
+    interact = Interaction(cat.to_numpy(), cont)
     assert_allclose(base.sparse.A, interact.sparse.A)
 
 
@@ -479,9 +479,9 @@ def test_absorbing_regressors_hash(cat, cont, interact, weights):
     # Build hash
     hashes = []
     for col in cat:
-        hashes.append((hasher.single(to_numpy(get_codes(cat[col].cat)).data),))
+        hashes.append((hasher.single(get_codes(cat[col].cat).to_numpy().data),))
     for col in cont:
-        hashes.append((hasher.single(to_numpy(cont[col]).data),))
+        hashes.append((hasher.single(cont[col].to_numpy().data),))
     hashes = sorted(hashes)
     if interact is not None:
         for inter in interact:
@@ -510,7 +510,7 @@ def test_against_ols(ols_data):
     absorb = []
     has_dummy = False
     if ols_data.absorb is not None:
-        absorb.append(to_numpy(ols_data.absorb.cont))
+        absorb.append(ols_data.absorb.cont.to_numpy())
         if ols_data.absorb.cat.shape[1] > 0:
             dummies = dummy_matrix(ols_data.absorb.cat, precondition=False)[0]
             assert isinstance(dummies, sp.csc_matrix)
@@ -646,7 +646,7 @@ def test_drop_missing():
         gen.absorb[col] = gen.absorb[col].astype("int64").astype("object")
         col_iloc = gen.absorb.columns.get_loc(col)
         gen.absorb.iloc[::91, col_iloc] = np.nan
-        gen.absorb[col] = pd.Categorical(to_numpy(gen.absorb[col]))
+        gen.absorb[col] = pd.Categorical(gen.absorb[col].to_numpy())
     with pytest.warns(MissingValueWarning):
         AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
 
@@ -670,5 +670,8 @@ def test_drop_absorb():
     assert all(f"x{i}" in res.params for i in range(3))
     assert isinstance(str(res.summary), str)
     mod = AbsorbingLS(y, x, absorb=df[["c"]])
+    with pytest.raises(AbsorbingEffectError):
+        mod.fit()
+    mod = AbsorbingLS(y, x.iloc[:, -2:], absorb=df[["c"]])
     with pytest.raises(AbsorbingEffectError):
         mod.fit()

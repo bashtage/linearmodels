@@ -1,7 +1,7 @@
 """
 Instrumental variable estimators
 """
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
 
 from numpy import (
     all as npall,
@@ -326,7 +326,7 @@ class _IVModelBase(object):
 
     def _drop_missing(self) -> NDArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing: NDArray = any(column_stack([dh.isnull for dh in data]), axis=1)
+        missing = cast(NDArray, any(column_stack([dh.isnull for dh in data]), axis=1))
         if any(missing):
             if npall(missing):
                 raise ValueError(
@@ -392,7 +392,7 @@ class _IVModelBase(object):
     @property
     def notnull(self) -> NDArray:
         """Locations of observations included in estimation"""
-        return logical_not(self._drop_locs)
+        return cast(NDArray, logical_not(self._drop_locs))
 
     def _f_statistic(
         self, params: NDArray, cov: NDArray, debiased: bool
@@ -1150,7 +1150,7 @@ class IVGMM(_IVGMMBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-4,
-        initial_weight: NDArray = None,
+        initial_weight: Optional[NDArray] = None,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Any,

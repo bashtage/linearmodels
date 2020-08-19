@@ -1,7 +1,17 @@
 from linearmodels.compat.pandas import concat
 
 from collections import defaultdict
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, TypeVar, Union
+from typing import (
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import numpy as np
 from pandas import DataFrame, date_range
@@ -81,7 +91,7 @@ def preconditioner(
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = np.sqrt((d ** 2).sum(0))
+        cond = cast(NDArray, np.sqrt((d ** 2).sum(0)))
         d /= cond
         if klass is not None:
             d = d.view(klass)
@@ -94,7 +104,7 @@ def preconditioner(
     elif copy:
         d = d.copy()
 
-    cond = np.sqrt(d.multiply(d).sum(0)).A1
+    cond = cast(NDArray, np.sqrt(d.multiply(d).sum(0)).A1)
     locs = np.zeros_like(d.indices)
     locs[d.indptr[1:-1]] = 1
     locs = np.cumsum(locs)
@@ -396,7 +406,9 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
     return retain
 
 
-def check_absorbed(x: NDArray, variables: Sequence[str]) -> None:
+def check_absorbed(
+    x: NDArray, variables: Sequence[str], x_orig: Optional[NDArray] = None
+) -> None:
     """
     Check a regressor matrix for variables absorbed
 
@@ -406,7 +418,13 @@ def check_absorbed(x: NDArray, variables: Sequence[str]) -> None:
         Regressor matrix to check
     variables : List[str]
         List of variable names
+    x_orig : ndarray, optional
+        Original data. If provided uses a norm check to ascertain if all
+        variables have been absorbed.
     """
+    if x.size == 0:
+        return
+
     rank = np.linalg.matrix_rank(x)
     if rank < x.shape[1]:
         xpx = x.T @ x
@@ -424,6 +442,15 @@ def check_absorbed(x: NDArray, variables: Sequence[str]) -> None:
         absorbed_variables = "\n".join(rows)
         msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
         raise AbsorbingEffectError(msg)
+    if x_orig is None:
+        return
+
+    new_norm = np.linalg.norm(x, axis=0)
+    orig_norm = np.linalg.norm(x_orig, axis=0)
+    if np.all(((new_norm / orig_norm) ** 2) < np.finfo(float).eps):
+        raise AbsorbingEffectError(
+            "All exog variables have been absorbed. The model cannot be estimated."
+        )
 
 
 def not_absorbed(x: NDArray) -> List[int]:
@@ -537,16 +564,16 @@ def generate_panel_data(
         + 2 * rng.standard_normal((1, n))
     )
     w = rng.chisquare(5, (t, n)) / 5
-    c = None
+    c: Optional[NDArray] = None
     cats = [f"cat.{i}" for i in range(other_effects)]
     if other_effects:
         if not isinstance(ncats, list):
             ncats = [ncats] * other_effects
-        c = []
+        _c = []
         for i in range(other_effects):
             nc = ncats[i]
-            c.append(rng.randint(0, nc, (1, t, n)))
-        c = np.concatenate(c, 0)
+            _c.append(rng.randint(0, nc, (1, t, n)))
+        c = np.concatenate(_c, 0)
 
     vcats = [f"varcat.{i}" for i in range(2)]
     vc2 = np.ones((2, t, 1)) @ rng.randint(0, n // 2, (2, 1, n))

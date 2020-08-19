@@ -7,7 +7,7 @@ from pandas.core.arrays.categorical import CategoricalAccessor
 
 from linearmodels.typing import AnyPandas, NDArray
 
-__all__ = ["is_string_like", "concat", "get_codes", "to_numpy"]
+__all__ = ["is_string_like", "concat", "get_codes"]
 
 
 def concat(
@@ -52,10 +52,3 @@ def get_codes(
         return index.codes
     except AttributeError:
         return index.labels
-
-
-def to_numpy(df: AnyPandas) -> NDArray:
-    try:
-        return df.to_numpy()
-    except AttributeError:
-        return np.asarray(df)

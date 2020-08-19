@@ -1,7 +1,7 @@
 from linearmodels.compat.pandas import concat, get_codes, is_string_like
 
 from itertools import product
-from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -428,7 +428,6 @@ class PanelData(object):
                     columns=["weights"],
                 )
             )
-        weights = weights.values2d
         groups = groups.values2d.astype(np.int64, copy=False)
 
         weight_sum: Dict[int, Series] = {}
@@ -461,13 +460,13 @@ class PanelData(object):
         init_index = DataFrame(groups)
         init_index.set_index(list(init_index.columns), inplace=True)
 
-        root_w = np.sqrt(weights)
-        weights = DataFrame(weights, index=init_index.index)
+        root_w = cast(NDArray, np.sqrt(weights.values2d))
+        weights_df = DataFrame(weights.values2d, index=init_index.index)
         wframe = root_w * self._frame
         wframe.index = init_index.index
 
         previous = wframe
-        current = demean_pass(previous, weights, root_w)
+        current = demean_pass(previous, weights_df, root_w)
         if groups.shape[1] == 1:
             current.index = self._frame.index
             return PanelData(current)
@@ -476,13 +475,13 @@ class PanelData(object):
         max_rmse = np.sqrt(np.asarray(self._frame).var(0).max())
         scale = np.asarray(self._frame.std())
         exclude = exclude | (scale < 1e-14 * max_rmse)
-        replacement = np.maximum(scale, 1)
+        replacement = cast(NDArray, np.maximum(scale, 1))
         scale[exclude] = replacement[exclude]
         scale = scale[None, :]
 
         while np.max(np.abs(np.asarray(current) - np.asarray(previous)) / scale) > 1e-8:
             previous = current
-            current = demean_pass(previous, weights, root_w)
+            current = demean_pass(previous, weights_df, root_w)
         current.index = self._frame.index
 
         return PanelData(current)

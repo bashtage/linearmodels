@@ -6,9 +6,9 @@ nbconvert
 nbformat
 nbsphinx
 numpydoc
-pytest>=5.0
+pytest>=6.0
 seaborn
 sphinx
 sphinx-material
 sphinxcontrib-spelling
-xarray>=0.9
+xarray>=0.13
