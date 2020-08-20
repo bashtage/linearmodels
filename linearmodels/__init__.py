@@ -86,7 +86,8 @@ def test(
     extra_args: Optional[Union[str, List[str]]] = None,
     exit: bool = True,
     append: bool = True,
-) -> None:
+    location: str = "",
+) -> int:
     import sys
 
     try:
@@ -104,12 +105,20 @@ def test(
             cmd += pytest_args[:]
         else:
             cmd = pytest_args
+    print(location)
     pkg = os.path.dirname(__file__)
+    print(pkg)
+    if location:
+        pkg = os.path.abspath(os.path.join(pkg, location))
+        print(pkg)
+    if not os.path.exists(pkg):
+        raise RuntimeError(f"{pkg} was not found. Unable to run tests")
     cmd = [pkg] + cmd
     print("running: pytest {}".format(" ".join(cmd)))
     status = pytest.main(cmd)
     if exit:
         sys.exit(status)
+    return status
 
 
 __version__ = get_versions()["version"]
