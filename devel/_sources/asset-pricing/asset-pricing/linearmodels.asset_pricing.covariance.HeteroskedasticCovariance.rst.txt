@@ -1,4 +1,4 @@
-linearmodels.asset\_pricing.covariance.HeteroskedasticCovariance
+﻿linearmodels.asset\_pricing.covariance.HeteroskedasticCovariance
 ================================================================
 
 .. currentmodule:: linearmodels.asset_pricing.covariance

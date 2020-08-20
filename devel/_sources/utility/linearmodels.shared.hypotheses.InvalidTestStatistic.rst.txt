@@ -1,4 +1,4 @@
-linearmodels.shared.hypotheses.InvalidTestStatistic
+﻿linearmodels.shared.hypotheses.InvalidTestStatistic
 ===================================================
 
 .. currentmodule:: linearmodels.shared.hypotheses

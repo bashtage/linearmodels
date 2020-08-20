@@ -1,4 +1,4 @@
-linearmodels.system.model.SUR
+﻿linearmodels.system.model.SUR
 =============================
 
 .. currentmodule:: linearmodels.system.model

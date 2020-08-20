@@ -1,4 +1,4 @@
-linearmodels.panel.results.PanelEffectsResults
+﻿linearmodels.panel.results.PanelEffectsResults
 ==============================================
 
 .. currentmodule:: linearmodels.panel.results

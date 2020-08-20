@@ -1,4 +1,4 @@
-linearmodels.panel.utility.generate\_panel\_data
+﻿linearmodels.panel.utility.generate\_panel\_data
 ================================================
 
 .. currentmodule:: linearmodels.panel.utility

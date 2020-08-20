@@ -1,4 +1,4 @@
-linearmodels.shared.covariance.cov\_kernel
+﻿linearmodels.shared.covariance.cov\_kernel
 ==========================================
 
 .. currentmodule:: linearmodels.shared.covariance

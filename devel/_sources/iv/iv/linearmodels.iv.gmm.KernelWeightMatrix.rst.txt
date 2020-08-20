@@ -1,4 +1,4 @@
-linearmodels.iv.gmm.KernelWeightMatrix
+﻿linearmodels.iv.gmm.KernelWeightMatrix
 ======================================
 
 .. currentmodule:: linearmodels.iv.gmm

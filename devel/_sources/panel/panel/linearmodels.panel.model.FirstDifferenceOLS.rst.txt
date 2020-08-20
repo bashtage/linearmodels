@@ -1,4 +1,4 @@
-linearmodels.panel.model.FirstDifferenceOLS
+﻿linearmodels.panel.model.FirstDifferenceOLS
 ===========================================
 
 .. currentmodule:: linearmodels.panel.model

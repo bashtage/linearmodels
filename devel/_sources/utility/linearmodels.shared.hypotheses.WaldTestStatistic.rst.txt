@@ -1,4 +1,4 @@
-linearmodels.shared.hypotheses.WaldTestStatistic
+﻿linearmodels.shared.hypotheses.WaldTestStatistic
 ================================================
 
 .. currentmodule:: linearmodels.shared.hypotheses

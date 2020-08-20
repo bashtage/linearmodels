@@ -1,4 +1,4 @@
-linearmodels.iv.gmm.OneWayClusteredWeightMatrix
+﻿linearmodels.iv.gmm.OneWayClusteredWeightMatrix
 ===============================================
 
 .. currentmodule:: linearmodels.iv.gmm

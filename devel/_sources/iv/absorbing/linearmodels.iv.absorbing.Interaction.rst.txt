@@ -1,4 +1,4 @@
-linearmodels.iv.absorbing.Interaction
+﻿linearmodels.iv.absorbing.Interaction
 =====================================
 
 .. currentmodule:: linearmodels.iv.absorbing

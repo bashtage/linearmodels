@@ -1,4 +1,4 @@
-linearmodels.shared.utility.AttrDict
+﻿linearmodels.shared.utility.AttrDict
 ====================================
 
 .. currentmodule:: linearmodels.shared.utility

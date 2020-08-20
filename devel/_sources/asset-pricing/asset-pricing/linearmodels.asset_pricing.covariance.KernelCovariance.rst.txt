@@ -1,4 +1,4 @@
-linearmodels.asset\_pricing.covariance.KernelCovariance
+﻿linearmodels.asset\_pricing.covariance.KernelCovariance
 =======================================================
 
 .. currentmodule:: linearmodels.asset_pricing.covariance

@@ -1,4 +1,4 @@
-linearmodels.iv.results.IVResults
+﻿linearmodels.iv.results.IVResults
 =================================
 
 .. currentmodule:: linearmodels.iv.results

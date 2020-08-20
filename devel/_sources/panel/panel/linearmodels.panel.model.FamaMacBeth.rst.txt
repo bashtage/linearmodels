@@ -1,4 +1,4 @@
-linearmodels.panel.model.FamaMacBeth
+﻿linearmodels.panel.model.FamaMacBeth
 ====================================
 
 .. currentmodule:: linearmodels.panel.model

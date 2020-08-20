@@ -1,4 +1,4 @@
-linearmodels.shared.covariance.cov\_cluster
+﻿linearmodels.shared.covariance.cov\_cluster
 ===========================================
 
 .. currentmodule:: linearmodels.shared.covariance

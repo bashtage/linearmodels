@@ -1,4 +1,4 @@
-linearmodels.panel.covariance.ACCovariance
+﻿linearmodels.panel.covariance.ACCovariance
 ==========================================
 
 .. currentmodule:: linearmodels.panel.covariance

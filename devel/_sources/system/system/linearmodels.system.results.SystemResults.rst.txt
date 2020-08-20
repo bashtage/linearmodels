@@ -1,4 +1,4 @@
-linearmodels.system.results.SystemResults
+﻿linearmodels.system.results.SystemResults
 =========================================
 
 .. currentmodule:: linearmodels.system.results
