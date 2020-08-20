@@ -1,10 +1,9 @@
-from linearmodels.compat.pandas import concat
 from linearmodels.compat.statsmodels import Summary
 
 from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 import numpy as np
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, concat
 
 
 class _SummaryStr(object):
@@ -77,7 +76,7 @@ class _ModelComparison(_SummaryStr):
             (k, getattr(v, name)) for k, v in self._results.items()
         ]
         cols = [v[0] for v in out]
-        values = concat([v[1] for v in out], axis=1)
+        values = concat([v[1] for v in out], axis=1, sort=False)
         values.columns = cols
         return values
 

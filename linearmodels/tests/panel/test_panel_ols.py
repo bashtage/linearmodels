@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import get_codes
-
 from itertools import product
 
 import numpy as np
@@ -52,7 +50,7 @@ def absorbed_data(request):
         absorbed = np.tile(absorbed, (1, x.shape[1], 1))
         data.x = np.concatenate([data.x, absorbed])
     elif isinstance(data.x, pd.DataFrame):
-        codes = get_codes(data.x.index)
+        codes = data.x.index.codes
         absorbed = np.array(codes[0]).astype(np.double)
         data.x["x_absorbed"] = absorbed
     return data

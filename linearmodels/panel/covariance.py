@@ -13,8 +13,13 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
-from linearmodels.shared.utility import get_array_like, get_bool, get_float, get_string
-from linearmodels.typing import NDArray
+from linearmodels.shared.typed_getters import (
+    get_array_like,
+    get_bool,
+    get_float,
+    get_string,
+)
+from linearmodels.typing import ArrayLike, NDArray
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -274,7 +279,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        clusters: Optional[NDArray] = None,
+        clusters: Optional[ArrayLike] = None,
         group_debias: bool = False,
     ) -> None:
         super(ClusteredCovariance, self).__init__(
@@ -283,6 +288,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         if clusters is None:
             clusters = np.arange(self._x.shape[0])
         clusters = np.asarray(clusters).squeeze()
+        assert clusters is not None
         self._group_debias = bool(group_debias)
         dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
         if clusters.ndim > 2 or dim1 > 2:
@@ -431,7 +437,7 @@ class DriscollKraay(HomoskedasticCovariance):
         xe_nobs = xe.shape[0]
         bw = self._bandwidth
         if self._bandwidth is None:
-            bw = np.floor(4 * (xe_nobs / 100) ** (2 / 9))
+            bw = float(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
         assert bw is not None
         w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
         xeex = cov_kernel(xe.values, w) * (xe_nobs / nobs)
@@ -549,7 +555,7 @@ class ACCovariance(HomoskedasticCovariance):
         nobs = len(time_ids)
         bw = self._bandwidth
         if self._bandwidth is None:
-            bw = np.floor(4 * (nobs / 100) ** (2 / 9))
+            bw = float(np.floor(4 * (nobs / 100) ** (2 / 9)))
         assert bw is not None
 
         xe = x * eps

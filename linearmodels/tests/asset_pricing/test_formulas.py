@@ -1,6 +1,5 @@
-from linearmodels.compat.pandas import concat
-
 import numpy as np
+from pandas import concat
 from pandas.testing import assert_frame_equal
 import pytest
 
@@ -35,7 +34,7 @@ def non_traded_model(request):
 def data():
     premia = np.array([0.1, 0.1, 0.1])
     out = generate_data(nportfolio=10, output="pandas", alpha=True, premia=premia)
-    out["joined"] = concat([out.factors, out.portfolios], 1)
+    out["joined"] = concat([out.factors, out.portfolios], 1, sort=False)
     return out
 
 

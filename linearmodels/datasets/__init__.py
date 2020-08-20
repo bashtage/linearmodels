@@ -1,7 +1,6 @@
 from os.path import abspath, join, split
 
-import pandas as pd
-from pandas import DataFrame
+from pandas import DataFrame, read_csv
 
 
 def get_path(f: str) -> str:
@@ -9,4 +8,4 @@ def get_path(f: str) -> str:
 
 
 def load(module: str, file_name: str) -> DataFrame:
-    return pd.read_csv(join(get_path(module), file_name), compression="bz2")
+    return read_csv(join(get_path(module), file_name), compression="bz2")

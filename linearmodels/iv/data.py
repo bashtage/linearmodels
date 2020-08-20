@@ -1,8 +1,6 @@
 """
 A data abstraction that allow multiple input data formats
 """
-from linearmodels.compat.pandas import concat, is_string_like
-
 import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -27,7 +25,9 @@ def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
 def expand_categoricals(x: AnyPandas, drop_first: bool) -> AnyPandas:
     if x.shape[1] == 0:
         return x
-    return concat([convert_columns(x[c], drop_first) for c in x.columns], axis=1)
+    return pd.concat(
+        [convert_columns(x[c], drop_first) for c in x.columns], axis=1, sort=False
+    )
 
 
 class IVData(object):
@@ -104,7 +104,10 @@ class IVData(object):
             all_numeric = True
             for col in x:
                 c = x[col]
-                if is_string_dtype(c.dtype) and c.map(is_string_like).all():
+                if (
+                    is_string_dtype(c.dtype)
+                    and c.map(lambda v: isinstance(v, str)).all()
+                ):
                     c = c.astype("category")
                     if not copied:
                         x = x.copy()
@@ -139,10 +142,10 @@ class IVData(object):
                     x = x.transpose()
 
                 index = list(x.coords[x.dims[0]].values)
-                xr_cols = x.coords[x.dims[1]].values
-                if is_numeric_dtype(xr_cols.dtype):
+                xr_col_values = x.coords[x.dims[1]].values
+                xr_cols = list(xr_col_values)
+                if is_numeric_dtype(xr_col_values.dtype):
                     xr_cols = [var_name + ".{0}".format(i) for i in range(x.shape[1])]
-                xr_cols = list(xr_cols)
                 self._ndarray = x.values.astype(np.float64)
                 self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
                 self._row_labels = index
@@ -170,7 +173,7 @@ class IVData(object):
     @property
     def shape(self) -> Tuple[int, int]:
         """Tuple containing shape"""
-        return self._ndarray.shape
+        return self._ndarray.shape[0], self._ndarray.shape[1]
 
     @property
     def ndim(self) -> int:

@@ -1,7 +1,7 @@
 """
 Linear factor models for applications in asset pricing
 """
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Any, Callable, Optional, Tuple, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -24,7 +24,8 @@ from linearmodels.iv.data import IVData, IVDataLike
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
-from linearmodels.shared.utility import AttrDict, get_float, get_string
+from linearmodels.shared.typed_getters import get_float, get_string
+from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, NDArray
 
 
@@ -78,7 +79,7 @@ class _FactorModelBase(object):
 
     def _drop_missing(self) -> NDArray:
         data = (self.portfolios, self.factors)
-        missing = np.any(np.c_[[dh.isnull for dh in data]], 0)
+        missing = cast(NDArray, np.any(np.c_[[dh.isnull for dh in data]], 0))
         if any(missing):
             if all(missing):
                 raise ValueError(
@@ -622,17 +623,25 @@ class LinearFactorModel(_LinearFactorModelBase):
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
             raise ValueError("Unknown weight: {0}".format(cov_type))
         if cov_type in ("robust", "heteroskedastic"):
-            cov_est = HeteroskedasticCovariance
+            cov_est_inst = HeteroskedasticCovariance(
+                moments,
+                jacobian=jacobian,
+                center=False,
+                debiased=debiased,
+                df=fc.shape[1],
+            )
         else:  # 'kernel':
-            cov_est = KernelCovariance
-        cov_est_inst = cov_est(
-            moments,
-            jacobian=jacobian,
-            center=False,
-            debiased=debiased,
-            df=fc.shape[1],
-            **cov_config,
-        )
+            bandwidth = get_float(cov_config, "bandwidth")
+            kernel = get_string(cov_config, "kernel")
+            cov_est_inst = KernelCovariance(
+                moments,
+                jacobian=jacobian,
+                center=False,
+                debiased=debiased,
+                df=fc.shape[1],
+                kernel=kernel,
+                bandwidth=bandwidth,
+            )
 
         # VCV
         full_vcv = cov_est_inst.cov
@@ -914,6 +923,8 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         sv = np.r_[betas, lam, mu][:, None]
         g = self._moments(sv, excess_returns)
         g -= g.mean(0)[None, :] if center else 0
+        kernel: Optional[str] = None
+        bandwidth: Optional[float] = None
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
             raise ValueError("Unknown weight: {0}".format(cov_type))
         if cov_type in ("robust", "heteroskedastic"):
@@ -967,12 +978,12 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
                 last_obj = obj
 
         else:
-            args = (excess_returns, weight_est_instance)
-            callback = callback_factory(self._j_cue, args, disp=disp)
+            cue_args = (excess_returns, weight_est_instance)
+            callback = callback_factory(self._j_cue, cue_args, disp=disp)
             opt_res = minimize(
                 self._j_cue,
                 params,
-                args=args,
+                args=cue_args,
                 callback=callback,
                 options={"disp": bool(disp), "maxiter": max_iter},
             )
@@ -982,15 +993,24 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         g = self._moments(params, excess_returns)
         s = g.T @ g / nobs
         jac = self._jacobian(params, excess_returns)
-
-        cov_est_inst = cov_est(
-            g,
-            jacobian=jac,
-            center=center,
-            debiased=debiased,
-            df=self.factors.shape[1],
-            **cov_config,
-        )
+        if cov_est is HeteroskedasticCovariance:
+            cov_est_inst = HeteroskedasticCovariance(
+                g,
+                jacobian=jac,
+                center=center,
+                debiased=debiased,
+                df=self.factors.shape[1],
+            )
+        else:
+            cov_est_inst = KernelCovariance(
+                g,
+                jacobian=jac,
+                center=center,
+                debiased=debiased,
+                df=self.factors.shape[1],
+                kernel=kernel,
+                bandwidth=bandwidth,
+            )
 
         full_vcv = cov_est_inst.cov
         sel = slice((n * k), (n * k + k + nrf))

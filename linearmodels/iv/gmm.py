@@ -70,7 +70,7 @@ class HomoskedasticWeightMatrix(object):
         return w
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
         """
         Weight estimator configuration
 
@@ -230,7 +230,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
         """
         Weight estimator configuration
 
@@ -313,7 +313,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
         """
         Weight estimator configuration
 
@@ -455,7 +455,9 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return (c + c.T) / 2
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray]]:
-        conf: Dict[str, Union[str, bool, ndarray]] = {"debiased": self.debiased}
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+        conf: Dict[str, Union[str, bool, ndarray, Optional[int]]] = {
+            "debiased": self.debiased
+        }
         conf.update(self._cov_config)
         return conf

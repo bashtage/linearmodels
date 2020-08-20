@@ -4,7 +4,7 @@ Results for linear factor models
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, cast
 
 import numpy as np
 import pandas as pd
@@ -241,6 +241,7 @@ class LinearFactorModelResults(_SummaryStr):
     def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
         se = np.sqrt(np.diag(self._cov))
+        assert isinstance(se, np.ndarray)
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * nfactor
         se = se[:nloadings]
@@ -323,7 +324,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
     @property
     def std_errors(self) -> pd.DataFrame:
         """Estimated parameter standard errors"""
-        se = np.sqrt(np.diag(self._cov))
+        se = cast(NDArray, np.sqrt(np.diag(self._cov)))
         ase = np.sqrt(np.diag(self._alpha_vcv))
         nportfolio, nfactor = self._params.shape
         nloadings = nportfolio * (nfactor - 1)

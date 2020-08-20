@@ -14,7 +14,7 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 from collections import abc
 from functools import reduce
 import textwrap
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 import warnings
 
 import numpy as np
@@ -397,8 +397,8 @@ class _SystemModelBase(object):
                 if len(eq_data) == 5:
                     self._weights.append(IVData(eq_data[4]))
                 else:
-                    dep = self._dependent[-1].ndarray
-                    self._weights.append(IVData(np.ones_like(dep)))
+                    dep_shape = self._dependent[-1].shape
+                    self._weights.append(IVData(np.ones(dep_shape)))
 
             elif isinstance(eq_data, (dict, Mapping)):
                 dep = IVData(eq_data["dependent"], var_name=dep_name)
@@ -448,7 +448,7 @@ class _SystemModelBase(object):
             # Common exog requires weights are also equal
             w0 = self._weights[0].ndarray
             for w in self._weights:
-                self._common_exog = self._common_exog and np.all(w.ndarray == w0)
+                self._common_exog = self._common_exog and bool(np.all(w.ndarray == w0))
         constant = []
         constant_loc = []
 
@@ -463,10 +463,10 @@ class _SystemModelBase(object):
             y = dep.ndarray
             x = np.concatenate([exog.ndarray, endog.ndarray], 1)
             z = np.concatenate([exog.ndarray, instr.ndarray], 1)
-            w = w.ndarray
-            w = w / np.nanmean(w)
-            w_sqrt = np.sqrt(w)
-            self._w.append(w)
+            w_arr = w.ndarray
+            w_arr = w_arr / np.nanmean(w_arr)
+            w_sqrt = np.sqrt(w_arr)
+            self._w.append(w_arr)
             self._y.append(y)
             self._x.append(x)
             self._z.append(z)
@@ -512,7 +512,7 @@ class _SystemModelBase(object):
         k = len(self._dependent)
         nobs = self._dependent[0].shape[0]
         self._original_index = self._dependent[0].rows.copy()
-        missing = np.zeros(nobs, dtype=np.bool)
+        missing = np.zeros(nobs, dtype=bool)
 
         values = [self._dependent, self._exog, self._endog, self._instr, self._weights]
         for i in range(k):
@@ -637,10 +637,10 @@ class _SystemModelBase(object):
         k = len(wxhat)
 
         xpx = blocked_inner_prod(wxhat, np.eye(len(wxhat)))
-        xpy = []
+        _xpy = []
         for i in range(k):
-            xpy.append(wxhat[i].T @ wy[i])
-        xpy = np.vstack(xpy)
+            _xpy.append(wxhat[i].T @ wy[i])
+        xpy = np.vstack(_xpy)
         beta = _parameters_from_xprod(xpx, xpy, constraints=self.constraints)
 
         loc = 0
@@ -650,9 +650,9 @@ class _SystemModelBase(object):
             b = beta[loc : loc + nb]
             eps.append(wy[i] - wx[i] @ b)
             loc += nb
-        eps = np.hstack(eps)
+        eps_arr = np.hstack(eps)
 
-        return beta, eps
+        return beta, eps_arr
 
     def _construct_xhat(self) -> None:
         k = len(self._x)
@@ -969,7 +969,7 @@ class _SystemModelBase(object):
 
         # System regression on a constant using weights if provided
         wy, w = self._wy, self._w
-        wi = [np.sqrt(weights) for weights in w]
+        wi = [cast(NDArray, np.sqrt(weights)) for weights in w]
         if method == "ols":
             est_sigma = np.eye(len(wy))
         else:  # gls
@@ -1112,7 +1112,7 @@ class _SystemModelBase(object):
             return 1.0
         nobs = float(self._wx[0].shape[0])
         scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
-        scales = np.sqrt(nobs / scales)
+        scales = cast(NDArray, np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 
     @property
@@ -1240,7 +1240,7 @@ class _LSSystemModelBase(_SystemModelBase):
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
         col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
-        col_idx = np.cumsum(col_sizes)
+        col_idx = [int(i) for i in np.cumsum(col_sizes)]
         total_cols = col_idx[-1]
         self._construct_xhat()
         beta, eps = self._multivariate_ls_fit()
@@ -1265,7 +1265,7 @@ class _LSSystemModelBase(_SystemModelBase):
             )
             beta_hist.append(beta)
             delta = beta_hist[-1] - beta_hist[-2]
-            delta = np.sqrt(np.mean(delta ** 2))
+            delta = float(np.sqrt(np.mean(delta ** 2)))
             iter_count += 1
 
         sigma_m12 = inv_matrix_sqrt(sigma)
@@ -1887,14 +1887,14 @@ class IVSystemGMM(_SystemModelBase):
         beta_last = beta = self._blocked_gmm(
             wx, wy, wz, w=w, constraints=self.constraints
         )
-        eps = []
+        _eps = []
         loc = 0
         for i in range(k):
             nb = wx[i].shape[1]
             b = beta[loc : loc + nb]
-            eps.append(wy[i] - wx[i] @ b)
+            _eps.append(wy[i] - wx[i] @ b)
             loc += nb
-        eps = np.hstack(eps)
+        eps = np.hstack(_eps)
         sigma = self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
         vinv = None
         iters = 1
@@ -1915,14 +1915,14 @@ class IVSystemGMM(_SystemModelBase):
             norm = delta.T @ vinv @ delta
             beta_last = beta
 
-            eps = []
+            _eps = []
             loc = 0
             for i in range(k):
                 nb = wx[i].shape[1]
                 b = beta[loc : loc + nb]
-                eps.append(wy[i] - wx[i] @ b)
+                _eps.append(wy[i] - wx[i] @ b)
                 loc += nb
-            eps = np.hstack(eps)
+            eps = np.hstack(_eps)
             iters += 1
 
         cov_type = COV_TYPES[cov_type]
@@ -1932,15 +1932,15 @@ class IVSystemGMM(_SystemModelBase):
         )
 
         weps = eps
-        eps = []
+        _eps = []
         loc = 0
         x, y = self._x, self._y
         for i in range(k):
             nb = x[i].shape[1]
             b = beta[loc : loc + nb]
-            eps.append(y[i] - x[i] @ b)
+            _eps.append(y[i] - x[i] @ b)
             loc += nb
-        eps = np.hstack(eps)
+        eps = np.hstack(_eps)
         iters += 1
         return self._finalize_results(
             beta, cov.cov, weps, eps, w, sigma, iters - 1, cov_type, cov_config, cov

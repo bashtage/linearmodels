@@ -30,50 +30,49 @@ matrix:
     env:
     - PYTHON=3.7
     - USE_PYPI=true
-    - XARRAY=0.13
-    - NUMPY=1.16
+    - XARRAY=0.14
+    - NUMPY=1.17
     - DOCBUILD=true
     - PIP_PACKAGES="xxhash"
   - python: 3.8
     env:
     - PYTHON=3.8
     - USE_PYPI=true
-    - XARRAY=0.14
+    - XARRAY=0.16
     - PIP_PACKAGES="xxhash"
     - TEST_INSTALL=true
   - python: 3.6
     env:
     - PYTHON=3.6
-    - NUMPY=1.15
-    - SCIPY=1.0.1
-    - PANDAS=0.23
+    - NUMPY=1.16
+    - SCIPY=1.2.2
+    - PANDAS=0.24.2
     - STATSMODELS=0.9
   - python: 3.6
     env:
     - PYTHON=3.6
-    - NUMPY=1.15
-    - SCIPY=1.1
-    - PANDAS=0.24
+    - NUMPY=1.16
+    - SCIPY=1.3.3
+    - PANDAS=0.24.2
     - XARRAY=0.11
     - SKIP="--skip-slow --skip-smoke"
   - python: 3.6
     env:
     - PYTHON=3.6
-    - NUMPY=1.16
-    - SCIPY=1.3
-    - PANDAS=0.24
-    - XARRAY=0.10
-    - STATSMODELS=0.10
+    - NUMPY=1.17
+    - SCIPY=1.4.1
+    - PANDAS=1.0.5
+    - XARRAY=0.15
+    - STATSMODELS=0.11
     - PIP_PACKAGES="xxhash"
     - SKIP="--skip-slow --skip-smoke"
   - python: 3.7
     env:
     - PYTHON=3.7
-    - NUMPY=1.17
-    - SCIPY=1.3
-    - PANDAS=0.25
+    - NUMPY=1.18
+    - SCIPY=1.3.3
+    - PANDAS=0.25.3
     - XARRAY=0.12
-    - STATSMODELS=0.10
     - OPENBLAS=1
   - python: 3.8
     env:

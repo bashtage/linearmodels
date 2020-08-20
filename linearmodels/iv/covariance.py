@@ -1,7 +1,7 @@
 """
 Covariance estimation for 2SLS and LIML IV estimators
 """
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict, Optional, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (
@@ -601,7 +601,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         y: NDArray,
         z: NDArray,
         params: NDArray,
-        clusters: NDArray = None,
+        clusters: Optional[NDArray] = None,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
@@ -609,7 +609,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
-        clusters = asarray(clusters).squeeze()
+        clusters = cast(NDArray, asarray(clusters).squeeze())
         self._clusters = clusters
         if clusters.ndim == 1:
             self._num_clusters = [len(unique(clusters))]

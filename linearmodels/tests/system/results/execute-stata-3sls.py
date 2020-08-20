@@ -2,11 +2,11 @@
 Important cases
 
 """
-from linearmodels.compat.pandas import concat
-
 import os
 import subprocess
 from typing import List
+
+import pandas as pd
 
 from linearmodels.tests.system._utility import generate_simultaneous_data
 
@@ -23,10 +23,10 @@ for key in data:
             else:
                 out.append(vals[col])
                 all_cols.append(col)
-out = concat(out, 1)
-if "const" in out:
-    out.pop("const")
-out.to_stata("simulated-3sls.dta", write_index=False)
+out_df = pd.concat(out, 1, sort=False)
+if "const" in out_df:
+    out_df.pop("const")
+out_df.to_stata("simulated-3sls.dta", write_index=False)
 SEP = """
 
 file open myfile using {outfile}, write append

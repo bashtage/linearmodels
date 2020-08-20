@@ -634,6 +634,7 @@ class GMMHomoskedasticCovariance(object):
         z = self._z
         nobs = z[0].shape[0]
         sigma = self._sigma
+        assert sigma is not None
         omega = blocked_inner_prod(z, sigma)
         omega /= nobs
 

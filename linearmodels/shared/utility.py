@@ -13,9 +13,9 @@ from typing import (
 )
 
 import numpy as np
-from pandas import DataFrame, MultiIndex, Series
+from pandas import DataFrame, MultiIndex
 
-from linearmodels.typing import ArrayLike, Label, NDArray
+from linearmodels.typing import Label, NDArray
 
 
 class AttrDict(MutableMapping):
@@ -124,7 +124,7 @@ def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> s
 
 
 def panel_to_frame(
-    x: NDArray,
+    x: Optional[NDArray],
     items: Sequence[Label],
     major_axis: Sequence[Label],
     minor_axis: Sequence[Label],
@@ -171,127 +171,3 @@ def panel_to_frame(
     df.index.set_levels(final_levels, [0, 1], inplace=True)
     df.index.names = ["major", "minor"]
     return df
-
-
-def get_string(d: Mapping[str, Any], key: str) -> Optional[str]:
-    """
-    Helper function that gets a string or None
-
-    Parameters
-    ----------
-    d : Mapping[str, Any]
-        A mapping.
-    key : str
-        The key to lookup.
-
-    Returns
-    -------
-    {str, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
-    """
-    out: Optional[str] = None
-    if key in d:
-        out = d[key]
-        if out is not None:
-            if isinstance(out, str):
-                return out
-            else:
-
-                raise TypeError(f"{key} found in the dictionary but it is not a str.")
-    return out
-
-
-def get_float(d: Mapping[str, Any], key: str) -> Optional[float]:
-    """
-    Helper function that gets a float or None
-
-    Parameters
-    ----------
-    d : Mapping[str, Any]
-        A mapping.
-    key : str
-        The key to lookup.
-
-    Returns
-    -------
-    {float, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
-    """
-    out: Optional[float] = None
-    if key in d:
-        out = d[key]
-        if out is not None:
-            if isinstance(out, (int, float, np.floating)):
-                return float(out)
-            else:
-                raise TypeError(f"{key} found in the dictionary but it is not a float.")
-    return out
-
-
-def get_bool(d: Mapping[str, Any], key: str) -> bool:
-    """
-    Helper function that gets a bool, defaulting to False.
-
-    Parameters
-    ----------
-    d : Mapping[str, Any]
-        A mapping.
-    key : str
-        The key to lookup.
-
-    Returns
-    -------
-    bool
-        The boolean if the key is in the dictionary. If not found, returns
-        False.
-    """
-    out: Optional[bool] = False
-    if key in d:
-        out = d[key]
-        if not (out is None or isinstance(out, bool)):
-            raise TypeError(f"{key} found in the dictionary but it is not a bool.")
-    return bool(out)
-
-
-def get_array_like(d: Mapping[str, Any], key: str) -> Optional[ArrayLike]:
-    """
-    Helper function that gets a bool or None
-
-    Parameters
-    ----------
-    d : Mapping[str, Any]
-        A mapping.
-    key : str
-        The key to lookup.
-
-    Returns
-    -------
-    {bool, None}
-        The string or None if the key is not in the dictionary. If in the
-        dictionary, a type check is performed and TypeError is raised if
-        not found.
-    """
-
-    out: Optional[bool] = None
-    if key in d:
-        out = d[key]
-        if out is not None:
-            array_like: Union[Any] = (np.ndarray, DataFrame, Series)
-            try:
-                import xarray as xr
-
-                array_like += (xr.DataArray,)
-            except ImportError:
-                pass
-
-            if isinstance(out, array_like):
-                return out
-            else:
-                raise TypeError(
-                    f"{key} found in the dictionary but it is not array-like."
-                )
-    return out

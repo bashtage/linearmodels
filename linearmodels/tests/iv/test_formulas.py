@@ -1,8 +1,6 @@
-from linearmodels.compat.pandas import concat
-
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
-from pandas import Categorical, DataFrame
+from numpy.testing import assert_allclose
+from pandas import Categorical, DataFrame, concat
 from pandas.testing import assert_frame_equal
 import pytest
 
@@ -210,14 +208,15 @@ def test_formula_function(data, model_and_func):
         data[["x4"]],
         np.exp(data[["x5"]]),
     ]
-    exog = concat(exog, 1)
+    exog = concat(exog, 1, sort=False)
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
     mod = model(dep, exog, endog, instr)
     res2 = mod.fit()
-    assert_equal(res.params.values, res2.params.values)
+
+    assert_allclose(res.params.values, res2.params.values, rtol=1e-5)
     res3 = func(fmla, data).fit()
-    assert_equal(res.params.values, res3.params.values)
+    assert_allclose(res.params.values, res3.params.values, rtol=1e-5)
 
     with pytest.raises(ValueError):
         res2.predict(data=data)
@@ -235,7 +234,7 @@ def test_predict_formula_function(data, model_and_func):
         data[["x4"]],
         np.exp(data[["x5"]]),
     ]
-    exog = concat(exog, 1)
+    exog = concat(exog, 1, sort=False)
     endog = data[["x1", "x2"]]
     pred = res.predict(exog, endog)
     pred2 = res.predict(data=data)

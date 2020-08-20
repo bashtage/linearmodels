@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import get_codes
-
 from datetime import datetime
 from itertools import product
 
@@ -166,7 +164,7 @@ def test_dimensions(mi_df):
 def test_drop(mi_df):
     dh = PanelData(mi_df)
     orig = dh.dataframe.copy()
-    sel = np.zeros(orig.shape[0], dtype=np.bool)
+    sel = np.zeros(orig.shape[0], dtype=bool)
     sel[::3] = True
     dh.drop(sel)
     assert dh.dataframe.shape[0] == len(sel) - sel.sum()
@@ -520,7 +518,7 @@ def test_demean_weighted(data):
     w.drop(missing)
 
     entity_demean = x.demean("entity", weights=w)
-    d = get_dummies(Categorical(get_codes(x.index)[0]))
+    d = get_dummies(Categorical(x.index.codes[0]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -530,7 +528,7 @@ def test_demean_weighted(data):
     assert_allclose(1 + np.abs(entity_demean.values2d), 1 + np.abs(e))
 
     time_demean = x.demean("time", weights=w)
-    d = get_dummies(Categorical(get_codes(x.index)[1]))
+    d = get_dummies(Categorical(x.index.codes[1]))
     d = d.values
     root_w = np.sqrt(w.values2d)
     wx = root_w * x.values2d
@@ -547,7 +545,7 @@ def test_mean_weighted(data):
     x.drop(missing)
     w.drop(missing)
     entity_mean = x.mean("entity", weights=w)
-    c = x.index.levels[0][get_codes(x.index)[0]]
+    c = x.index.levels[0][x.index.codes[0]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[entity_mean.index]
     d = d.values
@@ -558,7 +556,7 @@ def test_mean_weighted(data):
     assert_allclose(entity_mean, mu)
 
     time_mean = x.mean("time", weights=w)
-    c = x.index.levels[1][get_codes(x.index)[1]]
+    c = x.index.levels[1][x.index.codes[1]]
     d = get_dummies(Categorical(c, ordered=True))
     d = d[list(time_mean.index)]
     d = d.values

@@ -26,7 +26,7 @@ class TestCovariance(object):
     entity_ids = np.empty(0)
     time_ids = np.empty(0)
     params = np.empty(0)
-    df_resid = np.empty(0)
+    df_resid = 0
 
     @classmethod
     def setup_class(cls) -> None:

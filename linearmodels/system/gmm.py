@@ -1,7 +1,7 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
-from typing import Optional, Sequence
+from typing import Optional, Sequence, cast
 
 from numpy import array, empty, ndarray, repeat, sqrt
 
@@ -96,7 +96,7 @@ class HomoskedasticWeightMatrix(object):
         z: Sequence[NDArray],
         eps: NDArray,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray,
     ) -> NDArray:
         """
         Construct a GMM weight matrix for a model.
@@ -219,7 +219,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         nvar = array(list(map(lambda a: a.shape[1], x)))
         ninstr = array(list(map(lambda a: a.shape[1], z)))
         nvar = repeat(nvar, ninstr)
-        nvar = sqrt(nvar)[:, None]
+        nvar = cast(NDArray, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
 

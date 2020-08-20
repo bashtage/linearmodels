@@ -1,5 +1,3 @@
-from linearmodels.compat.pandas import get_codes, to_numpy
-
 from collections import defaultdict
 from typing import (
     Any,
@@ -13,6 +11,7 @@ from typing import (
     TypeVar,
     Union,
 )
+import warnings
 
 from numpy import (
     any as npany,
@@ -40,7 +39,6 @@ from numpy.linalg import lstsq
 from pandas import Categorical, DataFrame, Series
 from pandas.api.types import is_categorical_dtype
 import scipy.sparse as sp
-from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import lsmr
 
 from linearmodels.iv.common import f_statistic, find_constant
@@ -53,7 +51,14 @@ from linearmodels.iv.model import (
     KernelCovariance,
 )
 from linearmodels.iv.results import AbsorbingLSResults
-from linearmodels.panel.utility import check_absorbed, dummy_matrix, preconditioner
+from linearmodels.panel.utility import (
+    AbsorbingEffectWarning,
+    absorbing_warn_msg,
+    check_absorbed,
+    dummy_matrix,
+    not_absorbed,
+    preconditioner,
+)
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.typing import AnyPandas, NDArray
@@ -66,7 +71,6 @@ except ImportError:
 
 Hasher = TypeVar("Hasher", bound=hash_func)
 
-SCALAR_DTYPES = {"int8": int8, "int16": int16, "int32": int32, "int64": int64}
 
 _VARIABLE_CACHE: DefaultDict[Hashable, Dict[str, ndarray]] = defaultdict(dict)
 
@@ -85,7 +89,7 @@ def clear_cache() -> None:
 
 
 def lsmr_annihilate(
-    x: csc_matrix,
+    x: sp.csc_matrix,
     y: NDArray,
     use_cache: bool = True,
     x_hash: Optional[Hashable] = None,
@@ -143,7 +147,7 @@ def lsmr_annihilate(
             resid = _VARIABLE_CACHE[regressor_hash][variable_digest]
         else:
             beta = lsmr(x, _y, **default_opts)[0]
-            resid = y[:, i : i + 1] - (x.dot(csc_matrix(beta[:, None]))).A
+            resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).A
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
     if resids:
@@ -176,7 +180,7 @@ def category_product(cats: AnyPandas) -> Series:
         if not is_categorical_dtype(cats[c]):
             raise TypeError("cats must contain only categorical variables")
         col = cats[c]
-        max_code = get_codes(col.cat).max()
+        max_code = col.cat.codes.max()
         size = 1
         while max_code >= 2 ** size:
             size += 1
@@ -193,14 +197,20 @@ def category_product(cats: AnyPandas) -> Series:
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
     for i, col in enumerate(cats):
-        codes += get_codes(cats[col].cat).astype(dtype_val) << SCALAR_DTYPES[dtype_str](
-            cum_size
-        )
+        if dtype_str == "int8":
+            shift: Union[int8, int16, int32, int64] = int8(cum_size)
+        elif dtype_str == "int16":
+            shift = int16(cum_size)
+        elif dtype_str == "int32":
+            shift = int32(cum_size)
+        else:  # elif dtype_str == "int64":
+            shift = int64(cum_size)
+        codes += cats[col].cat.codes.astype(dtype_val) << shift
         cum_size += sizes[i]
     return Series(Categorical(codes), index=cats.index)
 
 
-def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
+def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
     """
     Parameters
     ----------
@@ -214,15 +224,15 @@ def category_interaction(cat: Series, precondition: bool = True) -> csc_matrix:
     csc_matrix
         Sparse matrix of dummies with unit column norm
     """
-    codes = asarray(get_codes(category_product(cat).cat))[:, None]
+    codes = asarray(category_product(cat).cat.codes)[:, None]
     mat = dummy_matrix(codes, precondition=precondition)[0]
-    assert isinstance(mat, csc_matrix)
+    assert isinstance(mat, sp.csc_matrix)
     return mat
 
 
 def category_continuous_interaction(
     cat: AnyPandas, cont: AnyPandas, precondition: bool = True
-) -> csc_matrix:
+) -> sp.csc_matrix:
     """
     Parameters
     ----------
@@ -238,13 +248,13 @@ def category_continuous_interaction(
     csc_matrix
         Sparse matrix of dummy interactions with unit column norm
     """
-    codes = get_codes(category_product(cat).cat)
-    interact = csc_matrix((to_numpy(cont).flat, (arange(codes.shape[0]), codes)))
+    codes = category_product(cat).cat.codes
+    interact = sp.csc_matrix((cont.to_numpy().flat, (arange(codes.shape[0]), codes)))
     if not precondition:
         return interact
     else:
         contioned = preconditioner(interact)[0]
-        assert isinstance(contioned, csc_matrix)
+        assert isinstance(contioned, sp.csc_matrix)
         return contioned
 
 
@@ -359,7 +369,7 @@ class Interaction(object):
         self._cont_data.drop(locs)
 
     @property
-    def sparse(self) -> csc_matrix:
+    def sparse(self) -> sp.csc_matrix:
         r"""
         Construct a sparse interaction matrix
 
@@ -391,9 +401,9 @@ class Interaction(object):
         elif self.cat.shape[1]:
             return category_interaction(category_product(self.cat), precondition=False)
         elif self.cont.shape[1]:
-            return csc_matrix(self._cont_data.ndarray)
+            return sp.csc_matrix(self._cont_data.ndarray)
         else:  # empty interaction
-            return csc_matrix(empty((self._cat_data.shape[0], 0)))
+            return sp.csc_matrix(empty((self._cat_data.shape[0], 0)))
 
     @property
     def hash(self) -> List[Tuple[str, ...]]:
@@ -405,9 +415,7 @@ class Interaction(object):
         cat_hashes = []
         cat = self.cat
         for col in cat:
-            hasher.update(
-                ascontiguousarray(to_numpy(get_codes(self.cat[col].cat)).data)
-            )
+            hasher.update(ascontiguousarray(self.cat[col].cat.codes.to_numpy().data))
             cat_hashes.append(hasher.hexdigest())
             hasher = _reset(hasher)
         sorted_hashes = tuple(sorted(cat_hashes))
@@ -415,7 +423,7 @@ class Interaction(object):
         hashes = []
         cont = self.cont
         for col in cont:
-            hasher.update(ascontiguousarray(to_numpy(cont[col]).data))
+            hasher.update(ascontiguousarray(cont[col].to_numpy()).data)
             hashes.append(sorted_hashes + (hasher.hexdigest(),))
             hasher = _reset(hasher)
 
@@ -485,7 +493,7 @@ class AbsorbingRegressor(object):
         cat: DataFrame = None,
         cont: DataFrame = None,
         interactions: Optional[List[Interaction]] = None,
-        weights: NDArray = None,
+        weights: Optional[NDArray] = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -512,13 +520,13 @@ class AbsorbingRegressor(object):
         if self._cat is not None:
             for col in self._cat:
                 hasher.update(
-                    ascontiguousarray(to_numpy(get_codes(self._cat[col].cat)).data)
+                    ascontiguousarray(self._cat[col].cat.codes.to_numpy()).data
                 )
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._cont is not None:
             for col in self._cont:
-                hasher.update(ascontiguousarray(to_numpy(self._cont[col]).data))
+                hasher.update(ascontiguousarray(self._cont[col].to_numpy()).data)
                 hashes.append((hasher.hexdigest(),))
                 hasher = _reset(hasher)
         if self._interactions is not None:
@@ -532,16 +540,16 @@ class AbsorbingRegressor(object):
         return tuple(sorted(hashes))
 
     @property
-    def regressors(self) -> csc_matrix:
+    def regressors(self) -> sp.csc_matrix:
         return self._regressors()
 
-    def _regressors(self) -> csc_matrix:
+    def _regressors(self) -> sp.csc_matrix:
         regressors = []
 
         if self._cat is not None and self._cat.shape[1] > 0:
             regressors.append(dummy_matrix(self._cat, precondition=False)[0])
         if self._cont is not None and self._cont.shape[1] > 0:
-            regressors.append(csc_matrix(to_numpy(self._cont)))
+            regressors.append(sp.csc_matrix(self._cont.to_numpy()))
         if self._interactions is not None:
             regressors.extend([interact.sparse for interact in self._interactions])
 
@@ -556,7 +564,7 @@ class AbsorbingRegressor(object):
             return regressor_mat
         else:
             self._approx_rank = 0
-            return csc_matrix(empty((0, 0)))
+            return sp.csc_matrix(empty((0, 0)))
 
 
 class AbsorbingLS(object):
@@ -580,9 +588,10 @@ class AbsorbingLS(object):
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
         each continuous variable.
-
     weights : ArrayLike, optional
         Observation weights used in estimation
+    drop_absorbed : bool, optional
+        Flag indicating whether to drop absorbed variables
 
     Notes
     -----
@@ -650,6 +659,7 @@ class AbsorbingLS(object):
         absorb: InteractionVar = None,
         interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
         weights: OptionalArrayLike = None,
+        drop_absorbed: bool = False,
     ) -> None:
 
         self._dependent = IVData(dependent, "dependent")
@@ -666,6 +676,7 @@ class AbsorbingLS(object):
             raise TypeError("absorb must ba a DataFrame or an Interaction")
         self._weights = weights
         self._is_weighted = False
+        self._drop_absorbed = drop_absorbed
         self._check_weights()
 
         self._interactions = interactions
@@ -673,7 +684,6 @@ class AbsorbingLS(object):
         self._prepare_interactions()
         self._absorbed_dependent: Optional[DataFrame] = None
         self._absorbed_exog: Optional[DataFrame] = None
-        self._x = None
 
         self._check_shape()
         self._original_index = self._dependent.pandas.index
@@ -687,16 +697,16 @@ class AbsorbingLS(object):
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
         self._num_params = 0
-        self._regressors: Optional[csc_matrix] = None
+        self._regressors: Optional[sp.csc_matrix] = None
         self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
     def _drop_missing(self) -> NDArray:
-        missing = to_numpy(self.dependent.isnull)
-        missing |= to_numpy(self.exog.isnull)
-        missing |= to_numpy(self._absorb_inter.cat.isnull().any(1))
-        missing |= to_numpy(self._absorb_inter.cont.isnull().any(1))
+        missing = self.dependent.isnull.to_numpy()
+        missing |= self.exog.isnull.to_numpy()
+        missing |= self._absorb_inter.cat.isnull().any(1).to_numpy()
+        missing |= self._absorb_inter.cont.isnull().any(1).to_numpy()
         for interact in self._interaction_list:
-            missing |= to_numpy(interact.isnull)
+            missing |= interact.isnull.to_numpy()
         if npany(missing):
             self.dependent.drop(missing)
             self.exog.drop(missing)
@@ -710,7 +720,7 @@ class AbsorbingLS(object):
         col_delta = ptp(self.exog.ndarray, 0)
         has_constant = npany(col_delta == 0)
         self._const_col = where(col_delta == 0)[0][0] if has_constant else None
-        return has_constant
+        return bool(has_constant)
 
     def _check_weights(self) -> None:
         if self._weights is None:
@@ -846,7 +856,7 @@ class AbsorbingLS(object):
         mu_exog = (root_w.T @ exog) / denom
 
         lsmr_options = {} if lsmr_options is None else lsmr_options
-        assert isinstance(self._regressors, csc_matrix)
+        assert isinstance(self._regressors, sp.csc_matrix)
         if self._regressors.shape[1] > 0:
             dep_resid = lsmr_annihilate(
                 self._regressors, dep, use_cache, self._regressors_hash, **lsmr_options
@@ -862,13 +872,34 @@ class AbsorbingLS(object):
             dep_resid += root_w * mu_dep
             exog_resid += root_w * mu_exog
 
+        if not self._drop_absorbed:
+            check_absorbed(exog_resid, self.exog.cols, exog)
+        else:
+            ncol = exog_resid.shape[1]
+            retain = not_absorbed(exog_resid)
+            if not retain:
+                raise ValueError(
+                    "All columns in exog have been fully absorbed by the "
+                    "included effects. This model cannot be estimated."
+                )
+            elif len(retain) < ncol:
+                drop = set(range(ncol)).difference(retain)
+                dropped = ", ".join([str(self.exog.cols[i]) for i in drop])
+                warnings.warn(
+                    absorbing_warn_msg.format(absorbed_variables=dropped),
+                    AbsorbingEffectWarning,
+                )
+
+            exog_resid = exog_resid[:, retain]
+            self._columns = [self._columns[i] for i in retain]
+
         self._absorbed_dependent = DataFrame(
             dep_resid,
             index=self._dependent.pandas.index,
             columns=self._dependent.pandas.columns,
         )
         self._absorbed_exog = DataFrame(
-            exog_resid, index=self._exog.pandas.index, columns=self._exog.pandas.columns
+            exog_resid, index=self._exog.pandas.index, columns=self._columns
         )
 
     def fit(
@@ -942,13 +973,11 @@ class AbsorbingLS(object):
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, lsmr_options)
 
-        self._x = exog_resid = to_numpy(self.absorbed_exog)
-        dep_resid = to_numpy(self.absorbed_dependent)
+        exog_resid = self.absorbed_exog.to_numpy()
+        dep_resid = self.absorbed_dependent.to_numpy()
         if self._exog.shape[1] == 0:
             params = empty((0, 1))
         else:
-            if exog_resid.shape[1]:
-                check_absorbed(exog_resid, self.exog.cols)
             params = lstsq(exog_resid, dep_resid, rcond=None)[0]
             self._num_params += exog_resid.shape[1]
 
@@ -1005,8 +1034,11 @@ class AbsorbingLS(object):
         Uses weighted versions of data instead of raw data.  Identical to
         resids if all weights are unity.
         """
+        assert isinstance(self._absorbed_dependent, DataFrame)
+        assert isinstance(self._absorbed_exog, DataFrame)
         return (
-            to_numpy(self._absorbed_dependent) - to_numpy(self._absorbed_exog) @ params
+            self._absorbed_dependent.to_numpy()
+            - self._absorbed_exog.to_numpy() @ params
         )
 
     def _f_statistic(
@@ -1036,8 +1068,9 @@ class AbsorbingLS(object):
             index=self._dependent.rows,
             columns=["fitted_values"],
         )
+        assert isinstance(self._absorbed_dependent, DataFrame)
         absorbed_effects = DataFrame(
-            to_numpy(self._absorbed_dependent) - to_numpy(fitted),
+            self._absorbed_dependent.to_numpy() - fitted.to_numpy(),
             columns=["absorbed_effects"],
             index=self._dependent.rows,
         )
@@ -1057,11 +1090,12 @@ class AbsorbingLS(object):
         total_ss = float(e.T @ e)
         r2 = max(1 - residual_ss / total_ss, 0.0)
 
-        e = to_numpy(self._absorbed_dependent)  # already scaled by root_w
+        e = self._absorbed_dependent.to_numpy()  # already scaled by root_w
         # If absorbing contains a constant, but exog does not, no need to demean
+        assert isinstance(self._absorbed_exog, DataFrame)
         if self._const_col is not None:
             col = self._const_col
-            x = to_numpy(self._absorbed_exog)[:, col : col + 1]
+            x = self._absorbed_exog.to_numpy()[:, col : col + 1]
             mu = (lstsq(x, e, rcond=None)[0]).squeeze()
             e = e - x * mu
 
