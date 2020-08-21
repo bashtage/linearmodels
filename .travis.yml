@@ -89,6 +89,7 @@ matrix:
 before_install:
   - sudo apt-get install -y pandoc enchant
   - git fetch --tags
+  - export REPO_DIR=$PWD
   - |
     if [[ ${USE_PYPI} = false ]]; then
       wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh -nv
@@ -110,7 +111,16 @@ before_install:
   - pip list
 
 install:
-  - python setup.py develop
+  - python setup.py build
+  - |
+    if [[ ${TEST_INSTALL} = true ]]; then
+       python setup.py bdist_wheel
+       export WHEEL_FILE=$(ls -t -U dist/*.whl | grep -m 1 "linearmodels")
+       echo $WHEEL_FILE
+       pip install $WHEEL_FILE
+    else
+       pip install -e . --no-build-isolation -v
+    fi
 
 script:
   - flake8 linearmodels
@@ -118,20 +128,16 @@ script:
   - isort --check linearmodels
   - |
     if [[ ${TEST_INSTALL} = true ]]; then
-      python setup.py bdist_wheel
-      cd dist
-      export WHEEL_FILE=$(ls -t -U | grep -m 1 "linearmodels")
-      echo $WHEEL_FILE
-      pip install $WHEEL_FILE
-      cd ..
-      cd linearmodels/tests
-      pytest test_examples.py
-      cd ../..
+      pytest linearmodels/tests/test_examples.py
       mkdir empty && cd empty
-      python -c "import linearmodels;linearmodels.test()"
+      echo python -c "import linearmodels;linearmodels.test(['-n','2','--skip-slow'])"
+      python -c "import linearmodels;linearmodels.test(['-n','2','--skip-slow'])"
+      ls
       cd ..
+      ls
     else
-      pytest -n 2 --cov-config .coveragerc --cov=linearmodels linearmodels --durations=10 ${SKIP}
+      echo pytest -n 2 --cov-config .coveragerc --cov=linearmodels --durations=10 ${SKIP} linearmodels
+      pytest -n 2 --cov-config .coveragerc --cov=linearmodels --durations=10 ${SKIP} linearmodels
     fi
   - set -e
   - |
