@@ -474,7 +474,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
             self._str_extra["Number of Groups"] = " and ".join(num_cl)
         self._str_extra["Group Debias"] = self._group_debias
 
-    def _check_clusters(self, clusters: Optional[NDArray],) -> NDArray:
+    def _check_clusters(self, clusters: Optional[NDArray]) -> NDArray:
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
             return empty((self._eps.size, 0))

@@ -74,7 +74,7 @@ class _LSModelResultsBase(_SummaryStr):
         The model used to estimate parameters.
     """
 
-    def __init__(self, results: Dict[str, Any], model: Any,) -> None:
+    def __init__(self, results: Dict[str, Any], model: Any) -> None:
         self._resid = results["eps"]
         self._wresid = results["weps"]
         self._params = results["params"]
@@ -483,7 +483,9 @@ class OLSResults(_LSModelResultsBase):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVModelBase",
+        self,
+        results: Dict[str, Any],
+        model: "linearmodels.iv.model._IVModelBase",
     ) -> None:
         super().__init__(results, model)
 
@@ -857,7 +859,9 @@ class _CommonIVResults(OLSResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVModelBase",
+        self,
+        results: Dict[str, Any],
+        model: "linearmodels.iv.model._IVModelBase",
     ) -> None:
         super().__init__(results, model)
         self._liml_kappa = results.get("liml_kappa", None)
@@ -896,7 +900,7 @@ class IVResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVLSModelBase",
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVLSModelBase"
     ) -> None:
         super(IVResults, self).__init__(results, model)
         self._kappa = results.get("kappa", 1)
@@ -1379,7 +1383,7 @@ class IVGMMResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVGMMBase",
+        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVGMMBase"
     ):
         super(IVGMMResults, self).__init__(results, model)
         self._weight_mat = results["weight_mat"]

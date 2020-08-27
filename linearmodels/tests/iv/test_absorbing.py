@@ -267,7 +267,9 @@ def test_absorbing_exceptions(rs):
         absorbed = rs.standard_normal((NOBS, 2))
         assert isinstance(absorbed, np.ndarray)
         AbsorbingLS(
-            rs.standard_normal(NOBS), rs.standard_normal((NOBS, 2)), absorb=absorbed,
+            rs.standard_normal(NOBS),
+            rs.standard_normal((NOBS, 2)),
+            absorb=absorbed,
         )
     with pytest.raises(ValueError):
         AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS - 1, 2)))
