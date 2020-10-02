@@ -39,7 +39,7 @@
 <span class=s2 >missing values."""</span>
 
 
-<span class=k >def</span> <span class=nf >kernel_weight_bartlett</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=o >*</span><span class=n >args</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
+<div class=viewcode-block  id=kernel_weight_bartlett ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.kernel_weight_bartlett.html#linearmodels.iv.covariance.kernel_weight_bartlett">[docs]</a><span class=k >def</span> <span class=nf >kernel_weight_bartlett</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=o >*</span><span class=n >args</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Kernel weights from a Bartlett kernel</span>
 
@@ -59,10 +59,10 @@
 
 <span class=sd >       w_i = 1 - i / (m + 1), \, i &lt; m</span>
 <span class=sd >    """</span>
-    <span class=k >return</span> <span class=mi >1</span> <span class=o >-</span> <span class=n >arange</span><span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span> <span class=o >/</span> <span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span>
+    <span class=k >return</span> <span class=mi >1</span> <span class=o >-</span> <span class=n >arange</span><span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span> <span class=o >/</span> <span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span></div>
 
 
-<span class=k >def</span> <span class=nf >kernel_weight_quadratic_spectral</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=n >n</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
+<div class=viewcode-block  id=kernel_weight_quadratic_spectral ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.kernel_weight_quadratic_spectral.html#linearmodels.iv.covariance.kernel_weight_quadratic_spectral">[docs]</a><span class=k >def</span> <span class=nf >kernel_weight_quadratic_spectral</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=n >n</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Kernel weights from a quadratic-spectral kernel</span>
 
@@ -102,10 +102,10 @@
     <span class=n >w</span><span class=p >[</span><span class=mi >0</span><span class=p >]</span> <span class=o >=</span> <span class=mi >1</span>
     <span class=n >w</span><span class=p >[</span><span class=mi >1</span><span class=p >:]</span> <span class=o >=</span> <span class=mi >3</span> <span class=o >/</span> <span class=n >w</span><span class=p >[</span><span class=mi >1</span><span class=p >:]</span> <span class=o >**</span> <span class=mi >2</span> <span class=o >*</span> <span class=p >(</span><span class=n >sin</span><span class=p >(</span><span class=n >w</span><span class=p >[</span><span class=mi >1</span><span class=p >:])</span> <span class=o >/</span> <span class=n >w</span><span class=p >[</span><span class=mi >1</span><span class=p >:]</span> <span class=o >-</span> <span class=n >cos</span><span class=p >(</span><span class=n >w</span><span class=p >[</span><span class=mi >1</span><span class=p >:]))</span>
 
-    <span class=k >return</span> <span class=n >w</span>
+    <span class=k >return</span> <span class=n >w</span></div>
 
 
-<span class=k >def</span> <span class=nf >kernel_weight_parzen</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=o >*</span><span class=n >args</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
+<div class=viewcode-block  id=kernel_weight_parzen ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.kernel_weight_parzen.html#linearmodels.iv.covariance.kernel_weight_parzen">[docs]</a><span class=k >def</span> <span class=nf >kernel_weight_parzen</span><span class=p >(</span><span class=n >bw</span><span class=p >:</span> <span class=nb >float</span><span class=p >,</span> <span class=o >*</span><span class=n >args</span><span class=p >:</span> <span class=nb >int</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Kernel weights from a Parzen kernel</span>
 
@@ -130,7 +130,7 @@
     <span class=n >z</span> <span class=o >=</span> <span class=n >arange</span><span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span> <span class=o >/</span> <span class=p >(</span><span class=nb >int</span><span class=p >(</span><span class=n >bw</span><span class=p >)</span> <span class=o >+</span> <span class=mi >1</span><span class=p >)</span>
     <span class=n >w</span> <span class=o >=</span> <span class=mi >1</span> <span class=o >-</span> <span class=mi >6</span> <span class=o >*</span> <span class=n >z</span> <span class=o >**</span> <span class=mi >2</span> <span class=o >+</span> <span class=mi >6</span> <span class=o >*</span> <span class=n >z</span> <span class=o >**</span> <span class=mi >3</span>
     <span class=n >w</span><span class=p >[</span><span class=n >z</span> <span class=o >&gt;</span> <span class=mf >0.5</span><span class=p >]</span> <span class=o >=</span> <span class=mi >2</span> <span class=o >*</span> <span class=p >(</span><span class=mi >1</span> <span class=o >-</span> <span class=n >z</span><span class=p >[</span><span class=n >z</span> <span class=o >&gt;</span> <span class=mf >0.5</span><span class=p >])</span> <span class=o >**</span> <span class=mi >3</span>
-    <span class=k >return</span> <span class=n >w</span>
+    <span class=k >return</span> <span class=n >w</span></div>
 
 
 <span class=k >def</span> <span class=nf >kernel_optimal_bandwidth</span><span class=p >(</span><span class=n >x</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >,</span> <span class=n >kernel</span><span class=p >:</span> <span class=nb >str</span> <span class=o >=</span> <span class=s2 >"bartlett"</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=nb >int</span><span class=p >:</span>
@@ -200,7 +200,7 @@
 <span class=p >}</span>
 
 
-<span class=k >class</span> <span class=nc >HomoskedasticCovariance</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
+<div class=viewcode-block  id=HomoskedasticCovariance ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.HomoskedasticCovariance.html#linearmodels.iv.covariance.HomoskedasticCovariance">[docs]</a><span class=k >class</span> <span class=nc >HomoskedasticCovariance</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Covariance estimation for homoskedastic data</span>
 
@@ -334,7 +334,7 @@
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >config</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Any</span><span class=p >]:</span>
-        <span class=k >return</span> <span class=p >{</span><span class=s2 >"debiased"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >debiased</span><span class=p >,</span> <span class=s2 >"kappa"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >_kappa</span><span class=p >}</span>
+        <span class=k >return</span> <span class=p >{</span><span class=s2 >"debiased"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >debiased</span><span class=p >,</span> <span class=s2 >"kappa"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >_kappa</span><span class=p >}</span></div>
 
 
 <div class=viewcode-block  id=HeteroskedasticCovariance ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.HeteroskedasticCovariance.html#linearmodels.iv.covariance.HeteroskedasticCovariance">[docs]</a><span class=k >class</span> <span class=nc >HeteroskedasticCovariance</span><span class=p >(</span><span class=n >HomoskedasticCovariance</span><span class=p >):</span>
@@ -408,7 +408,7 @@
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_scale</span> <span class=o >*</span> <span class=n >s</span></div>
 
 
-<span class=k >class</span> <span class=nc >KernelCovariance</span><span class=p >(</span><span class=n >HomoskedasticCovariance</span><span class=p >):</span>
+<div class=viewcode-block  id=KernelCovariance ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.KernelCovariance.html#linearmodels.iv.covariance.KernelCovariance">[docs]</a><span class=k >class</span> <span class=nc >KernelCovariance</span><span class=p >(</span><span class=n >HomoskedasticCovariance</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Kernel weighted (HAC) covariance estimation</span>
 
@@ -541,7 +541,7 @@
             <span class=s2 >"bandwidth"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >_bandwidth</span><span class=p >,</span>
             <span class=s2 >"kernel"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >_kernel</span><span class=p >,</span>
             <span class=s2 >"kappa"</span><span class=p >:</span> <span class=bp >self</span><span class=o >.</span><span class=n >_kappa</span><span class=p >,</span>
-        <span class=p >}</span>
+        <span class=p >}</span></div>
 
 
 <div class=viewcode-block  id=ClusteredCovariance ><a class=viewcode-back  href="../../../iv/iv/linearmodels.iv.covariance.ClusteredCovariance.html#linearmodels.iv.covariance.ClusteredCovariance">[docs]</a><span class=k >class</span> <span class=nc >ClusteredCovariance</span><span class=p >(</span><span class=n >HomoskedasticCovariance</span><span class=p >):</span>

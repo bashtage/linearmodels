@@ -26,7 +26,7 @@
 <span class=p >]</span>
 
 
-<div class=viewcode-block  id=PanelResults ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.html#linearmodels.panel.results.PanelResults">[docs]</a><span class=k >class</span> <span class=nc >PanelResults</span><span class=p >(</span><span class=n >_SummaryStr</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >PanelResults</span><span class=p >(</span><span class=n >_SummaryStr</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Results container for panel data models that do not include effects</span>
 <span class=sd >    """</span>
@@ -72,12 +72,12 @@
         <span class=sd >"""Estimated parameters"""</span>
         <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_params</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"parameter"</span><span class=p >)</span>
 
-<div class=viewcode-block  id=PanelResults.cov ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.cov.html#linearmodels.panel.results.PanelResults.cov">[docs]</a>    <span class=nd >@cached_property</span>
+    <span class=nd >@cached_property</span>
     <span class=k >def</span> <span class=nf >cov</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >DataFrame</span><span class=p >:</span>
         <span class=sd >"""Estimated covariance of parameters"""</span>
         <span class=k >return</span> <span class=n >DataFrame</span><span class=p >(</span>
             <span class=bp >self</span><span class=o >.</span><span class=n >_deferred_cov</span><span class=p >(),</span> <span class=n >columns</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span>
-        <span class=p >)</span></div>
+        <span class=p >)</span>
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >std_errors</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Series</span><span class=p >:</span>
@@ -89,7 +89,7 @@
         <span class=sd >"""Parameter t-statistics"""</span>
         <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >_params</span> <span class=o >/</span> <span class=bp >self</span><span class=o >.</span><span class=n >std_errors</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"tstat"</span><span class=p >)</span>
 
-<div class=viewcode-block  id=PanelResults.pvalues ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.pvalues.html#linearmodels.panel.results.PanelResults.pvalues">[docs]</a>    <span class=nd >@cached_property</span>
+    <span class=nd >@cached_property</span>
     <span class=k >def</span> <span class=nf >pvalues</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Series</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal</span>
@@ -99,7 +99,7 @@
             <span class=n >pv</span> <span class=o >=</span> <span class=mi >2</span> <span class=o >*</span> <span class=p >(</span><span class=mi >1</span> <span class=o >-</span> <span class=n >stats</span><span class=o >.</span><span class=n >t</span><span class=o >.</span><span class=n >cdf</span><span class=p >(</span><span class=n >abs_tstats</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >df_resid</span><span class=p >))</span>
         <span class=k >else</span><span class=p >:</span>
             <span class=n >pv</span> <span class=o >=</span> <span class=mi >2</span> <span class=o >*</span> <span class=p >(</span><span class=mi >1</span> <span class=o >-</span> <span class=n >stats</span><span class=o >.</span><span class=n >norm</span><span class=o >.</span><span class=n >cdf</span><span class=p >(</span><span class=n >abs_tstats</span><span class=p >))</span>
-        <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=n >pv</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"pvalue"</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=n >pv</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"pvalue"</span><span class=p >)</span>
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >df_resid</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=nb >int</span><span class=p >:</span>
@@ -311,7 +311,7 @@
         <span class=sd >"""Statistics on observations per time interval"""</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_time_info</span>
 
-<div class=viewcode-block  id=PanelResults.conf_int ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.conf_int.html#linearmodels.panel.results.PanelResults.conf_int">[docs]</a>    <span class=k >def</span> <span class=nf >conf_int</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >level</span><span class=p >:</span> <span class=nb >float</span> <span class=o >=</span> <span class=mf >0.95</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >DataFrame</span><span class=p >:</span>
+    <span class=k >def</span> <span class=nf >conf_int</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >level</span><span class=p >:</span> <span class=nb >float</span> <span class=o >=</span> <span class=mf >0.95</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >DataFrame</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Confidence interval construction</span>
 
@@ -337,7 +337,7 @@
         <span class=n >q</span> <span class=o >=</span> <span class=n >q</span><span class=p >[</span><span class=kc >None</span><span class=p >,</span> <span class=p >:]</span>
         <span class=n >params</span> <span class=o >=</span> <span class=n >np</span><span class=o >.</span><span class=n >asarray</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >params</span><span class=p >)[:,</span> <span class=kc >None</span><span class=p >]</span>
         <span class=n >ci</span> <span class=o >=</span> <span class=n >params</span> <span class=o >+</span> <span class=n >np</span><span class=o >.</span><span class=n >asarray</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >std_errors</span><span class=p >)[:,</span> <span class=kc >None</span><span class=p >]</span> <span class=o >*</span> <span class=n >q</span>
-        <span class=k >return</span> <span class=n >DataFrame</span><span class=p >(</span><span class=n >ci</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >columns</span><span class=o >=</span><span class=p >[</span><span class=s2 >"lower"</span><span class=p >,</span> <span class=s2 >"upper"</span><span class=p >])</span></div>
+        <span class=k >return</span> <span class=n >DataFrame</span><span class=p >(</span><span class=n >ci</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_var_names</span><span class=p >,</span> <span class=n >columns</span><span class=o >=</span><span class=p >[</span><span class=s2 >"lower"</span><span class=p >,</span> <span class=s2 >"upper"</span><span class=p >])</span>
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >summary</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Summary</span><span class=p >:</span>
@@ -482,7 +482,7 @@
             <span class=n >pred</span> <span class=o >=</span> <span class=n >pred</span><span class=o >.</span><span class=n >loc</span><span class=p >[</span><span class=n >pred</span><span class=o >.</span><span class=n >notnull</span><span class=p >()</span><span class=o >.</span><span class=n >all</span><span class=p >(</span><span class=mi >1</span><span class=p >)]</span>
         <span class=k >return</span> <span class=n >pred</span>
 
-<div class=viewcode-block  id=PanelResults.predict ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.predict.html#linearmodels.panel.results.PanelResults.predict">[docs]</a>    <span class=k >def</span> <span class=nf >predict</span><span class=p >(</span>
+    <span class=k >def</span> <span class=nf >predict</span><span class=p >(</span>
         <span class=bp >self</span><span class=p >,</span>
         <span class=n >exog</span><span class=p >:</span> <span class=n >OptionalArrayLike</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span>
         <span class=o >*</span><span class=p >,</span>
@@ -545,7 +545,7 @@
         <span class=k >if</span> <span class=n >missing</span><span class=p >:</span>
             <span class=n >index</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_original_index</span>
             <span class=n >out_df</span> <span class=o >=</span> <span class=n >out_df</span><span class=o >.</span><span class=n >reindex</span><span class=p >(</span><span class=n >index</span><span class=p >)</span>
-        <span class=k >return</span> <span class=n >out_df</span></div>
+        <span class=k >return</span> <span class=n >out_df</span>
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >fitted_values</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Series</span><span class=p >:</span>
@@ -650,7 +650,7 @@
         <span class=sd >"""Log-likelihood of model"""</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_loglik</span>
 
-<div class=viewcode-block  id=PanelResults.wald_test ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelResults.wald_test.html#linearmodels.panel.results.PanelResults.wald_test">[docs]</a>    <span class=k >def</span> <span class=nf >wald_test</span><span class=p >(</span>
+    <span class=k >def</span> <span class=nf >wald_test</span><span class=p >(</span>
         <span class=bp >self</span><span class=p >,</span>
         <span class=n >restriction</span><span class=p >:</span> <span class=n >Optional</span><span class=p >[</span><span class=n >Union</span><span class=p >[</span><span class=n >NDArray</span><span class=p >,</span> <span class=n >DataFrame</span><span class=p >]]</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span>
         <span class=n >value</span><span class=p >:</span> <span class=n >Optional</span><span class=p >[</span><span class=n >Union</span><span class=p >[</span><span class=n >NDArray</span><span class=p >,</span> <span class=n >Series</span><span class=p >]]</span> <span class=o >=</span> <span class=kc >None</span><span class=p >,</span>
@@ -722,10 +722,10 @@
 <span class=sd >        """</span>
         <span class=k >return</span> <span class=n >quadratic_form_test</span><span class=p >(</span>
             <span class=bp >self</span><span class=o >.</span><span class=n >params</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >cov</span><span class=p >,</span> <span class=n >restriction</span><span class=o >=</span><span class=n >restriction</span><span class=p >,</span> <span class=n >value</span><span class=o >=</span><span class=n >value</span><span class=p >,</span> <span class=n >formula</span><span class=o >=</span><span class=n >formula</span>
-        <span class=p >)</span></div></div>
+        <span class=p >)</span>
 
 
-<div class=viewcode-block  id=PanelEffectsResults ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelEffectsResults.html#linearmodels.panel.results.PanelEffectsResults">[docs]</a><span class=k >class</span> <span class=nc >PanelEffectsResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >PanelEffectsResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Results container for panel data models that include effects</span>
 <span class=sd >    """</span>
@@ -858,10 +858,10 @@
         <span class=sd >"""Decomposition of total variance into effects and residuals"""</span>
         <span class=n >vals</span> <span class=o >=</span> <span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >_sigma2_effects</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >_sigma2_eps</span><span class=p >,</span> <span class=bp >self</span><span class=o >.</span><span class=n >_rho</span><span class=p >]</span>
         <span class=n >index</span> <span class=o >=</span> <span class=p >[</span><span class=s2 >"Effects"</span><span class=p >,</span> <span class=s2 >"Residual"</span><span class=p >,</span> <span class=s2 >"Percent due to Effects"</span><span class=p >]</span>
-        <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=n >vals</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=n >index</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"Variance Decomposition"</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=n >Series</span><span class=p >(</span><span class=n >vals</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=n >index</span><span class=p >,</span> <span class=n >name</span><span class=o >=</span><span class=s2 >"Variance Decomposition"</span><span class=p >)</span>
 
 
-<div class=viewcode-block  id=RandomEffectsResults ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.RandomEffectsResults.html#linearmodels.panel.results.RandomEffectsResults">[docs]</a><span class=k >class</span> <span class=nc >RandomEffectsResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >RandomEffectsResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Results container for random effect panel data models</span>
 <span class=sd >    """</span>
@@ -883,13 +883,13 @@
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >theta</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >DataFrame</span><span class=p >:</span>
         <span class=sd >"""Values used in generalized demeaning"""</span>
-        <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_theta</span></div>
+        <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_theta</span>
 
 
 <span class=n >PanelModelResults</span> <span class=o >=</span> <span class=n >Union</span><span class=p >[</span><span class=n >PanelEffectsResults</span><span class=p >,</span> <span class=n >PanelResults</span><span class=p >,</span> <span class=n >RandomEffectsResults</span><span class=p >]</span>
 
 
-<div class=viewcode-block  id=FamaMacBethResults ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.FamaMacBethResults.html#linearmodels.panel.results.FamaMacBethResults">[docs]</a><span class=k >class</span> <span class=nc >FamaMacBethResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >FamaMacBethResults</span><span class=p >(</span><span class=n >PanelResults</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Results container for Fama MacBeth panel data models</span>
 <span class=sd >    """</span>
@@ -908,10 +908,10 @@
 <span class=sd >        DataFrame</span>
 <span class=sd >            The parameters (nobs, nparam).</span>
 <span class=sd >        """</span>
-        <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_all_params</span></div>
+        <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_all_params</span>
 
 
-<div class=viewcode-block  id=PanelModelComparison ><a class=viewcode-back  href="../../../panel/panel/linearmodels.panel.results.PanelModelComparison.html#linearmodels.panel.results.PanelModelComparison">[docs]</a><span class=k >class</span> <span class=nc >PanelModelComparison</span><span class=p >(</span><span class=n >_ModelComparison</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >PanelModelComparison</span><span class=p >(</span><span class=n >_ModelComparison</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Comparison of multiple models</span>
 
@@ -1081,7 +1081,7 @@
         <span class=n >smry</span><span class=o >.</span><span class=n >tables</span><span class=o >.</span><span class=n >append</span><span class=p >(</span><span class=n >table</span><span class=p >)</span>
         <span class=n >prec_type</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_PRECISION_TYPES</span><span class=p >[</span><span class=bp >self</span><span class=o >.</span><span class=n >_precision</span><span class=p >]</span>
         <span class=n >smry</span><span class=o >.</span><span class=n >add_extra_txt</span><span class=p >([</span><span class=s2 >"</span><span class=si >{0}</span><span class=s2 > reported in parentheses"</span><span class=o >.</span><span class=n >format</span><span class=p >(</span><span class=n >prec_type</span><span class=p >)])</span>
-        <span class=k >return</span> <span class=n >smry</span></div>
+        <span class=k >return</span> <span class=n >smry</span>
 
 
 <span class=k >def</span> <span class=nf >compare</span><span class=p >(</span>

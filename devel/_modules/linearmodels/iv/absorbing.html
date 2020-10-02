@@ -259,7 +259,7 @@
         <span class=k >return</span> <span class=n >contioned</span>
 
 
-<span class=k >class</span> <span class=nc >Interaction</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
+<div class=viewcode-block  id=Interaction ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.Interaction.html#linearmodels.iv.absorbing.Interaction">[docs]</a><span class=k >class</span> <span class=nc >Interaction</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
     <span class=sd >"""</span>
 <span class=sd >    Class that simplifies specifying interactions</span>
 
@@ -365,9 +365,9 @@
     <span class=k >def</span> <span class=nf >isnull</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >Series</span><span class=p >:</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >cat</span><span class=o >.</span><span class=n >isnull</span><span class=p >()</span><span class=o >.</span><span class=n >any</span><span class=p >(</span><span class=mi >1</span><span class=p >)</span> <span class=o >|</span> <span class=bp >self</span><span class=o >.</span><span class=n >cont</span><span class=o >.</span><span class=n >isnull</span><span class=p >()</span><span class=o >.</span><span class=n >any</span><span class=p >(</span><span class=mi >1</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >drop</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >locs</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=kc >None</span><span class=p >:</span>
+<div class=viewcode-block  id=Interaction.drop ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.Interaction.drop.html#linearmodels.iv.absorbing.Interaction.drop">[docs]</a>    <span class=k >def</span> <span class=nf >drop</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >locs</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=kc >None</span><span class=p >:</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_cat_data</span><span class=o >.</span><span class=n >drop</span><span class=p >(</span><span class=n >locs</span><span class=p >)</span>
-        <span class=bp >self</span><span class=o >.</span><span class=n >_cont_data</span><span class=o >.</span><span class=n >drop</span><span class=p >(</span><span class=n >locs</span><span class=p >)</span>
+        <span class=bp >self</span><span class=o >.</span><span class=n >_cont_data</span><span class=o >.</span><span class=n >drop</span><span class=p >(</span><span class=n >locs</span><span class=p >)</span></div>
 
     <span class=nd >@property</span>
     <span class=k >def</span> <span class=nf >sparse</span><span class=p >(</span><span class=bp >self</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >sp</span><span class=o >.</span><span class=n >csc_matrix</span><span class=p >:</span>
@@ -430,7 +430,7 @@
 
         <span class=k >return</span> <span class=nb >sorted</span><span class=p >(</span><span class=n >hashes</span><span class=p >)</span>
 
-    <span class=nd >@staticmethod</span>
+<div class=viewcode-block  id=Interaction.from_frame ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.Interaction.from_frame.html#linearmodels.iv.absorbing.Interaction.from_frame">[docs]</a>    <span class=nd >@staticmethod</span>
     <span class=k >def</span> <span class=nf >from_frame</span><span class=p >(</span><span class=n >frame</span><span class=p >:</span> <span class=n >DataFrame</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=s2 >"Interaction"</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Convenience function the simplifies using a DataFrame</span>
@@ -466,7 +466,7 @@
 <span class=sd >        """</span>
         <span class=n >cat_cols</span> <span class=o >=</span> <span class=p >[</span><span class=n >col</span> <span class=k >for</span> <span class=n >col</span> <span class=ow >in</span> <span class=n >frame</span> <span class=k >if</span> <span class=n >is_categorical_dtype</span><span class=p >(</span><span class=n >frame</span><span class=p >[</span><span class=n >col</span><span class=p >])]</span>
         <span class=n >cont_cols</span> <span class=o >=</span> <span class=p >[</span><span class=n >col</span> <span class=k >for</span> <span class=n >col</span> <span class=ow >in</span> <span class=n >frame</span> <span class=k >if</span> <span class=n >col</span> <span class=ow >not</span> <span class=ow >in</span> <span class=n >cat_cols</span><span class=p >]</span>
-        <span class=k >return</span> <span class=n >Interaction</span><span class=p >(</span><span class=n >frame</span><span class=p >[</span><span class=n >cat_cols</span><span class=p >],</span> <span class=n >frame</span><span class=p >[</span><span class=n >cont_cols</span><span class=p >],</span> <span class=n >nobs</span><span class=o >=</span><span class=n >frame</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >0</span><span class=p >])</span>
+        <span class=k >return</span> <span class=n >Interaction</span><span class=p >(</span><span class=n >frame</span><span class=p >[</span><span class=n >cat_cols</span><span class=p >],</span> <span class=n >frame</span><span class=p >[</span><span class=n >cont_cols</span><span class=p >],</span> <span class=n >nobs</span><span class=o >=</span><span class=n >frame</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >0</span><span class=p >])</span></div></div>
 
 
 <span class=n >InteractionVar</span> <span class=o >=</span> <span class=n >Union</span><span class=p >[</span><span class=n >DataFrame</span><span class=p >,</span> <span class=n >Interaction</span><span class=p >]</span>
@@ -568,7 +568,7 @@
             <span class=k >return</span> <span class=n >sp</span><span class=o >.</span><span class=n >csc_matrix</span><span class=p >(</span><span class=n >empty</span><span class=p >((</span><span class=mi >0</span><span class=p >,</span> <span class=mi >0</span><span class=p >)))</span>
 
 
-<div class=viewcode-block  id=AbsorbingLS ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.html#linearmodels.iv.absorbing.AbsorbingLS">[docs]</a><span class=k >class</span> <span class=nc >AbsorbingLS</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >AbsorbingLS</span><span class=p >(</span><span class=nb >object</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Linear regression with high-dimensional effects</span>
 
@@ -903,7 +903,7 @@
             <span class=n >exog_resid</span><span class=p >,</span> <span class=n >index</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_exog</span><span class=o >.</span><span class=n >pandas</span><span class=o >.</span><span class=n >index</span><span class=p >,</span> <span class=n >columns</span><span class=o >=</span><span class=bp >self</span><span class=o >.</span><span class=n >_columns</span>
         <span class=p >)</span>
 
-<div class=viewcode-block  id=AbsorbingLS.fit ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.fit.html#linearmodels.iv.absorbing.AbsorbingLS.fit">[docs]</a>    <span class=k >def</span> <span class=nf >fit</span><span class=p >(</span>
+    <span class=k >def</span> <span class=nf >fit</span><span class=p >(</span>
         <span class=bp >self</span><span class=p >,</span>
         <span class=o >*</span><span class=p >,</span>
         <span class=n >cov_type</span><span class=p >:</span> <span class=nb >str</span> <span class=o >=</span> <span class=s2 >"robust"</span><span class=p >,</span>
@@ -997,9 +997,9 @@
         <span class=n >results</span><span class=o >.</span><span class=n >update</span><span class=p >(</span><span class=n >pe</span><span class=p >)</span>
         <span class=n >results</span><span class=p >[</span><span class=s2 >"df_model"</span><span class=p >]</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >_num_params</span>
 
-        <span class=k >return</span> <span class=n >AbsorbingLSResults</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=n >AbsorbingLSResults</span><span class=p >(</span><span class=n >results</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span>
 
-    <span class=k >def</span> <span class=nf >resids</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
+<div class=viewcode-block  id=AbsorbingLS.resids ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.resids.html#linearmodels.iv.absorbing.AbsorbingLS.resids">[docs]</a>    <span class=k >def</span> <span class=nf >resids</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Compute model residuals</span>
 
@@ -1014,9 +1014,9 @@
 <span class=sd >            Model residuals</span>
 <span class=sd >        """</span>
         <span class=n >resids</span> <span class=o >=</span> <span class=bp >self</span><span class=o >.</span><span class=n >wresids</span><span class=p >(</span><span class=n >params</span><span class=p >)</span>
-        <span class=k >return</span> <span class=n >resids</span> <span class=o >/</span> <span class=n >sqrt</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >weights</span><span class=o >.</span><span class=n >ndarray</span><span class=p >)</span>
+        <span class=k >return</span> <span class=n >resids</span> <span class=o >/</span> <span class=n >sqrt</span><span class=p >(</span><span class=bp >self</span><span class=o >.</span><span class=n >weights</span><span class=o >.</span><span class=n >ndarray</span><span class=p >)</span></div>
 
-    <span class=k >def</span> <span class=nf >wresids</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
+<div class=viewcode-block  id=AbsorbingLS.wresids ><a class=viewcode-back  href="../../../iv/absorbing/linearmodels.iv.absorbing.AbsorbingLS.wresids.html#linearmodels.iv.absorbing.AbsorbingLS.wresids">[docs]</a>    <span class=k >def</span> <span class=nf >wresids</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >NDArray</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Compute weighted model residuals</span>
 
@@ -1040,7 +1040,7 @@
         <span class=k >return</span> <span class=p >(</span>
             <span class=bp >self</span><span class=o >.</span><span class=n >_absorbed_dependent</span><span class=o >.</span><span class=n >to_numpy</span><span class=p >()</span>
             <span class=o >-</span> <span class=bp >self</span><span class=o >.</span><span class=n >_absorbed_exog</span><span class=o >.</span><span class=n >to_numpy</span><span class=p >()</span> <span class=o >@</span> <span class=n >params</span>
-        <span class=p >)</span>
+        <span class=p >)</span></div>
 
     <span class=k >def</span> <span class=nf >_f_statistic</span><span class=p >(</span>
         <span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >,</span> <span class=n >cov</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >,</span> <span class=n >debiased</span><span class=p >:</span> <span class=nb >bool</span>
@@ -1127,5 +1127,5 @@
             <span class=s2 >"absorbed_r2"</span><span class=p >:</span> <span class=n >r2_absorbed</span><span class=p >,</span>
         <span class=p >}</span>
 
-        <span class=k >return</span> <span class=n >out</span></div>
+        <span class=k >return</span> <span class=n >out</span>
 </pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>

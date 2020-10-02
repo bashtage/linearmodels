@@ -1292,7 +1292,7 @@
         <span class=p >)</span>
 
 
-<span class=k >class</span> <span class=nc >IV3SLS</span><span class=p >(</span><span class=n >_LSSystemModelBase</span><span class=p >):</span>
+<div class=viewcode-block  id=IV3SLS ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IV3SLS.html#linearmodels.system.model.IV3SLS">[docs]</a><span class=k >class</span> <span class=nc >IV3SLS</span><span class=p >(</span><span class=n >_LSSystemModelBase</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Three-stage Least Squares (3SLS) Estimator</span>
 
@@ -1384,7 +1384,7 @@
     <span class=p >)</span> <span class=o >-&gt;</span> <span class=kc >None</span><span class=p >:</span>
         <span class=nb >super</span><span class=p >()</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >equations</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=n >sigma</span><span class=p >)</span>
 
-<div class=viewcode-block  id=IV3SLS.multivariate_iv ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IV3SLS.multivariate_iv.html#linearmodels.system.model.IV3SLS.multivariate_iv">[docs]</a>    <span class=nd >@classmethod</span>
+    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >multivariate_iv</span><span class=p >(</span>
         <span class=bp >cls</span><span class=p >,</span>
         <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span>
@@ -1434,9 +1434,9 @@
                 <span class=n >endog</span><span class=o >.</span><span class=n >pandas</span><span class=p >,</span>
                 <span class=n >instr</span><span class=o >.</span><span class=n >pandas</span><span class=p >,</span>
             <span class=p >)</span>
-        <span class=k >return</span> <span class=bp >cls</span><span class=p >(</span><span class=n >equations</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=bp >cls</span><span class=p >(</span><span class=n >equations</span><span class=p >)</span>
 
-<div class=viewcode-block  id=IV3SLS.multivariate_ls ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IV3SLS.multivariate_ls.html#linearmodels.system.model.IV3SLS.multivariate_ls">[docs]</a>    <span class=nd >@classmethod</span>
+    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >multivariate_ls</span><span class=p >(</span>
         <span class=bp >cls</span><span class=p >,</span>
         <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span>
@@ -1451,9 +1451,9 @@
             <span class=s2 >"multivariate_ls is deprecated and will be removed "</span> <span class=s2 >"after July 24, 2020."</span><span class=p >,</span>
             <span class=ne >FutureWarning</span><span class=p >,</span>
         <span class=p >)</span>
-        <span class=k >return</span> <span class=bp >cls</span><span class=o >.</span><span class=n >multivariate_iv</span><span class=p >(</span><span class=n >dependent</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=n >endog</span><span class=p >,</span> <span class=n >instruments</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=bp >cls</span><span class=o >.</span><span class=n >multivariate_iv</span><span class=p >(</span><span class=n >dependent</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=n >endog</span><span class=p >,</span> <span class=n >instruments</span><span class=p >)</span>
 
-    <span class=nd >@classmethod</span>
+<div class=viewcode-block  id=IV3SLS.from_formula ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IV3SLS.from_formula.html#linearmodels.system.model.IV3SLS.from_formula">[docs]</a>    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >from_formula</span><span class=p >(</span>
         <span class=bp >cls</span><span class=p >,</span>
         <span class=n >formula</span><span class=p >:</span> <span class=n >Union</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=nb >str</span><span class=p >]],</span>
@@ -1521,10 +1521,10 @@
         <span class=n >eqns</span> <span class=o >=</span> <span class=n >parser</span><span class=o >.</span><span class=n >data</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=bp >cls</span><span class=p >(</span><span class=n >eqns</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=n >sigma</span><span class=p >)</span>
         <span class=n >mod</span><span class=o >.</span><span class=n >formula</span> <span class=o >=</span> <span class=n >formula</span>
-        <span class=k >return</span> <span class=n >mod</span>
+        <span class=k >return</span> <span class=n >mod</span></div></div>
 
 
-<div class=viewcode-block  id=SUR ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.SUR.html#linearmodels.system.model.SUR">[docs]</a><span class=k >class</span> <span class=nc >SUR</span><span class=p >(</span><span class=n >_LSSystemModelBase</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >SUR</span><span class=p >(</span><span class=n >_LSSystemModelBase</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    Seemingly unrelated regression estimation (SUR/SURE)</span>
 
@@ -1625,7 +1625,7 @@
         <span class=nb >super</span><span class=p >(</span><span class=n >SUR</span><span class=p >,</span> <span class=bp >self</span><span class=p >)</span><span class=o >.</span><span class=fm >__init__</span><span class=p >(</span><span class=n >reformatted</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=n >sigma</span><span class=p >)</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_model_name</span> <span class=o >=</span> <span class=s2 >"Seemingly Unrelated Regression (SUR)"</span>
 
-<div class=viewcode-block  id=SUR.multivariate_ls ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.SUR.multivariate_ls.html#linearmodels.system.model.SUR.multivariate_ls">[docs]</a>    <span class=nd >@classmethod</span>
+    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >multivariate_ls</span><span class=p >(</span><span class=bp >cls</span><span class=p >,</span> <span class=n >dependent</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >,</span> <span class=n >exog</span><span class=p >:</span> <span class=n >ArrayLike</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=s2 >"SUR"</span><span class=p >:</span>
         <span class=sd >"""</span>
 <span class=sd >        Interface for specification of multivariate regression models</span>
@@ -1666,9 +1666,9 @@
         <span class=n >exog</span> <span class=o >=</span> <span class=n >IVData</span><span class=p >(</span><span class=n >exog</span><span class=p >,</span> <span class=n >var_name</span><span class=o >=</span><span class=s2 >"exog"</span><span class=p >)</span>
         <span class=k >for</span> <span class=n >col</span> <span class=ow >in</span> <span class=n >dependent</span><span class=o >.</span><span class=n >pandas</span><span class=p >:</span>
             <span class=n >equations</span><span class=p >[</span><span class=n >col</span><span class=p >]</span> <span class=o >=</span> <span class=p >(</span><span class=n >dependent</span><span class=o >.</span><span class=n >pandas</span><span class=p >[[</span><span class=n >col</span><span class=p >]],</span> <span class=n >exog</span><span class=o >.</span><span class=n >pandas</span><span class=p >)</span>
-        <span class=k >return</span> <span class=bp >cls</span><span class=p >(</span><span class=n >equations</span><span class=p >)</span></div>
+        <span class=k >return</span> <span class=bp >cls</span><span class=p >(</span><span class=n >equations</span><span class=p >)</span>
 
-<div class=viewcode-block  id=SUR.from_formula ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.SUR.from_formula.html#linearmodels.system.model.SUR.from_formula">[docs]</a>    <span class=nd >@classmethod</span>
+    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >from_formula</span><span class=p >(</span>
         <span class=bp >cls</span><span class=p >,</span>
         <span class=n >formula</span><span class=p >:</span> <span class=n >Union</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=nb >str</span><span class=p >]],</span>
@@ -1734,10 +1734,10 @@
         <span class=n >eqns</span> <span class=o >=</span> <span class=n >parser</span><span class=o >.</span><span class=n >data</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=bp >cls</span><span class=p >(</span><span class=n >eqns</span><span class=p >,</span> <span class=n >sigma</span><span class=o >=</span><span class=n >sigma</span><span class=p >)</span>
         <span class=n >mod</span><span class=o >.</span><span class=n >formula</span> <span class=o >=</span> <span class=n >formula</span>
-        <span class=k >return</span> <span class=n >mod</span></div></div>
+        <span class=k >return</span> <span class=n >mod</span>
 
 
-<div class=viewcode-block  id=IVSystemGMM ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IVSystemGMM.html#linearmodels.system.model.IVSystemGMM">[docs]</a><span class=k >class</span> <span class=nc >IVSystemGMM</span><span class=p >(</span><span class=n >_SystemModelBase</span><span class=p >):</span>
+<span class=k >class</span> <span class=nc >IVSystemGMM</span><span class=p >(</span><span class=n >_SystemModelBase</span><span class=p >):</span>
     <span class=sa >r</span><span class=sd >"""</span>
 <span class=sd >    System Generalized Method of Moments (GMM) estimation of linear IV models</span>
 
@@ -1836,7 +1836,7 @@
         <span class=n >weight_type</span> <span class=o >=</span> <span class=n >COV_TYPES</span><span class=p >[</span><span class=n >weight_type</span><span class=p >]</span>
         <span class=bp >self</span><span class=o >.</span><span class=n >_weight_est</span> <span class=o >=</span> <span class=n >GMM_W_EST</span><span class=p >[</span><span class=n >weight_type</span><span class=p >](</span><span class=o >**</span><span class=n >weight_config</span><span class=p >)</span>
 
-<div class=viewcode-block  id=IVSystemGMM.fit ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IVSystemGMM.fit.html#linearmodels.system.model.IVSystemGMM.fit">[docs]</a>    <span class=k >def</span> <span class=nf >fit</span><span class=p >(</span>
+    <span class=k >def</span> <span class=nf >fit</span><span class=p >(</span>
         <span class=bp >self</span><span class=p >,</span>
         <span class=o >*</span><span class=p >,</span>
         <span class=n >iter_limit</span><span class=p >:</span> <span class=nb >int</span> <span class=o >=</span> <span class=mi >2</span><span class=p >,</span>
@@ -1945,7 +1945,7 @@
         <span class=n >iters</span> <span class=o >+=</span> <span class=mi >1</span>
         <span class=k >return</span> <span class=bp >self</span><span class=o >.</span><span class=n >_finalize_results</span><span class=p >(</span>
             <span class=n >beta</span><span class=p >,</span> <span class=n >cov</span><span class=o >.</span><span class=n >cov</span><span class=p >,</span> <span class=n >weps</span><span class=p >,</span> <span class=n >eps</span><span class=p >,</span> <span class=n >w</span><span class=p >,</span> <span class=n >sigma</span><span class=p >,</span> <span class=n >iters</span> <span class=o >-</span> <span class=mi >1</span><span class=p >,</span> <span class=n >cov_type</span><span class=p >,</span> <span class=n >cov_config</span><span class=p >,</span> <span class=n >cov</span>
-        <span class=p >)</span></div>
+        <span class=p >)</span>
 
     <span class=nd >@staticmethod</span>
     <span class=k >def</span> <span class=nf >_blocked_gmm</span><span class=p >(</span>
@@ -2042,7 +2042,7 @@
 
         <span class=k >return</span> <span class=n >GMMSystemResults</span><span class=p >(</span><span class=n >results</span><span class=p >)</span>
 
-<div class=viewcode-block  id=IVSystemGMM.from_formula ><a class=viewcode-back  href="../../../system/system/linearmodels.system.model.IVSystemGMM.from_formula.html#linearmodels.system.model.IVSystemGMM.from_formula">[docs]</a>    <span class=nd >@classmethod</span>
+    <span class=nd >@classmethod</span>
     <span class=k >def</span> <span class=nf >from_formula</span><span class=p >(</span>
         <span class=bp >cls</span><span class=p >,</span>
         <span class=n >formula</span><span class=p >:</span> <span class=n >Union</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=n >Dict</span><span class=p >[</span><span class=nb >str</span><span class=p >,</span> <span class=nb >str</span><span class=p >]],</span>
@@ -2118,7 +2118,7 @@
         <span class=n >eqns</span> <span class=o >=</span> <span class=n >parser</span><span class=o >.</span><span class=n >data</span>
         <span class=n >mod</span> <span class=o >=</span> <span class=bp >cls</span><span class=p >(</span><span class=n >eqns</span><span class=p >,</span> <span class=n >weight_type</span><span class=o >=</span><span class=n >weight_type</span><span class=p >,</span> <span class=o >**</span><span class=n >weight_config</span><span class=p >)</span>
         <span class=n >mod</span><span class=o >.</span><span class=n >formula</span> <span class=o >=</span> <span class=n >formula</span>
-        <span class=k >return</span> <span class=n >mod</span></div>
+        <span class=k >return</span> <span class=n >mod</span>
 
     <span class=k >def</span> <span class=nf >_j_statistic</span><span class=p >(</span><span class=bp >self</span><span class=p >,</span> <span class=n >params</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >,</span> <span class=n >weight_mat</span><span class=p >:</span> <span class=n >NDArray</span><span class=p >)</span> <span class=o >-&gt;</span> <span class=n >WaldTestStatistic</span><span class=p >:</span>
         <span class=sd >"""</span>
@@ -2160,5 +2160,5 @@
         <span class=n >nvar</span> <span class=o >=</span> <span class=nb >sum</span><span class=p >(</span><span class=nb >map</span><span class=p >(</span><span class=k >lambda</span> <span class=n >a</span><span class=p >:</span> <span class=n >a</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >1</span><span class=p >],</span> <span class=n >x</span><span class=p >))</span>
         <span class=n >ncons</span> <span class=o >=</span> <span class=mi >0</span> <span class=k >if</span> <span class=bp >self</span><span class=o >.</span><span class=n >constraints</span> <span class=ow >is</span> <span class=kc >None</span> <span class=k >else</span> <span class=bp >self</span><span class=o >.</span><span class=n >constraints</span><span class=o >.</span><span class=n >r</span><span class=o >.</span><span class=n >shape</span><span class=p >[</span><span class=mi >0</span><span class=p >]</span>
 
-        <span class=k >return</span> <span class=n >WaldTestStatistic</span><span class=p >(</span><span class=n >stat</span><span class=p >,</span> <span class=n >null</span><span class=p >,</span> <span class=n >ninstr</span> <span class=o >-</span> <span class=p >(</span><span class=n >nvar</span> <span class=o >-</span> <span class=n >ncons</span><span class=p >))</span></div>
+        <span class=k >return</span> <span class=n >WaldTestStatistic</span><span class=p >(</span><span class=n >stat</span><span class=p >,</span> <span class=n >null</span><span class=p >,</span> <span class=n >ninstr</span> <span class=o >-</span> <span class=p >(</span><span class=n >nvar</span> <span class=o >-</span> <span class=n >ncons</span><span class=p >))</span>
 </pre></div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.2.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
