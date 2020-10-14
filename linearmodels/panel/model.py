@@ -309,8 +309,8 @@ class _PanelModelBase(object):
         if weights.ndim == 3 or weights.shape == (nobs, nentity):
             return PanelData(weights)
 
-        if isinstance(weights, NDArray):
-            weights = np.squeeze(weights)
+        if isinstance(weights, np.ndarray):
+            weights = cast(NDArray, np.squeeze(weights))
         if weights.shape[0] == nobs and nobs == nentity:
             raise AmbiguityError(
                 "Unable to distinguish nobs form nentity since they are "
@@ -1566,8 +1566,7 @@ class PanelOLS(_PanelModelBase):
 
         effects = self._collect_effects()
         if num_effects == 1:
-            assert isinstance(clusters, NDArray)
-            return not self._is_effect_nested(effects, clusters)
+            return not self._is_effect_nested(effects, cast(NDArray, clusters))
         return True  # Default case for 2-way -- not completely clear
 
     def fit(
