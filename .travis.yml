@@ -33,7 +33,7 @@ matrix:
     - XARRAY=0.14
     - NUMPY=1.17
     - DOCBUILD=true
-    - PIP_PACKAGES="xxhash"
+    - PIP_PACKAGES="xxhash cython"
   - python: 3.8
     env:
     - PYTHON=3.8
@@ -74,6 +74,7 @@ matrix:
     - PANDAS=0.25.3
     - XARRAY=0.12
     - OPENBLAS=1
+    - PIP_PACKAGES="cython"
   - python: 3.8
     env:
     - PIP_PRE=true
