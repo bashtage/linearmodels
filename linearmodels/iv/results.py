@@ -415,13 +415,13 @@ class _LSModelResultsBase(_SummaryStr):
         value : {ndarray, Series}, optional
             q element array containing the restricted values.
         formula : Union[str, list[str]], optional
-            patsy linear constrains. The simplest formats are one of:
+            patsy linear constraints. The simplest formats are one of:
 
-              * A single comma-separated string such as 'x1=0, x2+x3=1'
-              * A list of strings where each element is a single constraint
-                such as ['x1=0', 'x2+x3=1']
-              * A single string without commas to test simple constraints such
-                as 'x1=x2=x3=0'
+            * A single comma-separated string such as 'x1=0, x2+x3=1'
+            * A list of strings where each element is a single constraint
+              such as ['x1=0', 'x2+x3=1']
+            * A single string without commas to test simple constraints such
+              as 'x1=x2=x3=0'
 
             It is not possible to use both restriction and formula.
 

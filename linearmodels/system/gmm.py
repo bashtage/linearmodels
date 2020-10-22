@@ -238,9 +238,9 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
     kernel : str, optional
         Name of kernel to use.  Supported kernels include:
 
-          * 'bartlett', 'newey-west' : Bartlett's kernel
-          * 'parzen', 'gallant' : Parzen's kernel
-          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+        * 'bartlett', 'newey-west' : Bartlett's kernel
+        * 'parzen', 'gallant' : Parzen's kernel
+        * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
     bandwidth : float, optional
         Bandwidth to use for the kernel.  If not provided the optimal

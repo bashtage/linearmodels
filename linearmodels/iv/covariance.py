@@ -140,9 +140,9 @@ def kernel_optimal_bandwidth(x: NDArray, kernel: str = "bartlett") -> int:
     kernel : str, optional
         Name of kernel to use.  Supported kernels include:
 
-          * 'bartlett', 'newey-west' : Bartlett's kernel
-          * 'parzen', 'gallant' : Parzen's kernel
-          * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+        * 'bartlett', 'newey-west' : Bartlett's kernel
+        * 'parzen', 'gallant' : Parzen's kernel
+        * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
     Returns
     -------
