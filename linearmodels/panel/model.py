@@ -197,6 +197,12 @@ __all__ = [
 # TODO: ML Estimation of RE model
 # TODO: Defer estimation of 3 R2 values -- slow
 
+EXOG_PREDICT_MSG = """\
+exog does not have the correct number of columns. Saw {x_shape}, expected
+{params_shape}. This can happen since exog is converted to a PanelData object
+before computing the fitted value. The best practice is to pass a DataFrame
+with a 2-level MultiIndex containing the entity- and time-ids."""
+
 
 class _PanelModelBase(object):
     r"""
@@ -726,6 +732,13 @@ class _PanelModelBase(object):
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
+        if x.shape[1] != params.shape[0]:
+            raise ValueError(
+                EXOG_PREDICT_MSG.format(
+                    x_shape=x.shape[1], params_shape=params.shape[0]
+                )
+            )
+
         pred = DataFrame(x @ params, index=exog.index, columns=["predictions"])
 
         return pred
@@ -993,6 +1006,12 @@ class PooledOLS(_PanelModelBase):
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
+        if x.shape[1] != params.shape[0]:
+            raise ValueError(
+                EXOG_PREDICT_MSG.format(
+                    x_shape=x.shape[1], params_shape=params.shape[0]
+                )
+            )
         pred = DataFrame(x @ params, index=exog.index, columns=["predictions"])
 
         return pred

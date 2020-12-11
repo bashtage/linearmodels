@@ -19,9 +19,9 @@ def data(request):
     return request.param
 
 
-missing = [0.0, 0.02, 0.20]
+perc_missing = [0.0, 0.02, 0.20]
 has_const = [True, False]
-perms = list(product(missing, datatypes, has_const))
+perms = list(product(perc_missing, datatypes, has_const))
 ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
@@ -136,6 +136,22 @@ def test_predict(generated_data):
     pred = res.predict(effects=True, idiosyncratic=True, missing=True)
     assert list(pred.columns) == ["fitted_values", "estimated_effects", "idiosyncratic"]
     assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
+
+
+def test_predict_exception(generated_data):
+    if np.any(np.isnan(generated_data.x)):
+        pytest.skip("Cannot test with missing values")
+    mod = PanelOLS(generated_data.y, generated_data.x, entity_effects=True)
+    res = mod.fit()
+    pred = res.predict()
+    pred2 = res.predict(generated_data.x)
+    assert_allclose(pred, pred2, atol=1e-3)
+
+    panel_data = PanelData(generated_data.x, copy=True)
+    x = panel_data.dataframe
+    x.index = np.arange(x.shape[0])
+    with pytest.raises(ValueError, match="exog does not have the correct number"):
+        res.predict(x)
 
 
 @pytest.mark.filterwarnings(

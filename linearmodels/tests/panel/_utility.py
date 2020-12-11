@@ -184,23 +184,11 @@ def generate_data(
 def assert_results_equal(res1, res2, test_fit=True, test_df=True, strict=True):
     n = min(res1.params.shape[0], res2.params.shape[0])
 
-    assert_series_equal(
-        res1.params.iloc[:n], res2.params.iloc[:n], check_less_precise=not strict
-    )
-    assert_series_equal(
-        res1.pvalues.iloc[:n], res2.pvalues.iloc[:n], check_less_precise=not strict
-    )
-    assert_series_equal(
-        res1.tstats.iloc[:n], res2.tstats.iloc[:n], check_less_precise=not strict
-    )
-    assert_frame_equal(
-        res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n], check_less_precise=not strict
-    )
-    assert_frame_equal(
-        res1.conf_int().iloc[:n],
-        res2.conf_int().iloc[:n],
-        check_less_precise=not strict,
-    )
+    assert_series_equal(res1.params.iloc[:n], res2.params.iloc[:n])
+    assert_series_equal(res1.pvalues.iloc[:n], res2.pvalues.iloc[:n])
+    assert_series_equal(res1.tstats.iloc[:n], res2.tstats.iloc[:n])
+    assert_frame_equal(res1.cov.iloc[:n, :n], res2.cov.iloc[:n, :n])
+    assert_frame_equal(res1.conf_int().iloc[:n], res2.conf_int().iloc[:n])
 
     assert_allclose(res1.s2, res2.s2)
 
