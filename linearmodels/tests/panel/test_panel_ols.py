@@ -25,9 +25,9 @@ pytestmark = pytest.mark.filterwarnings(
     "ignore:the matrix subclass:PendingDeprecationWarning",
 )
 
-missing = [0.0, 0.02, 0.20]
+perc_missing = [0.0, 0.02, 0.20]
 has_const = [True, False]
-perms = list(product(missing, datatypes, has_const))
+perms = list(product(perc_missing, datatypes, has_const))
 ids = list(map(lambda s: "-".join(map(str, s)), perms))
 
 
@@ -81,7 +81,7 @@ def singleton_data(request):
     )
 
 
-const_perms = list(product(missing, datatypes))
+const_perms = list(product(perc_missing, datatypes))
 const_ids = list(map(lambda s: "-".join(map(str, s)), const_perms))
 
 
