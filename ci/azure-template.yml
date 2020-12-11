@@ -1,64 +1,24 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#passing-parameters
 
-parameters:
-  # defaults for any parameters that are not specified
-  name: ''
-  vmImage: ''
+trigger:
+- master
 
+variables:
+  MKL_NUM_THREADS: 1
+  NUMEXPR_NUM_THREADS: 1
+  OMP_NUM_THREADS: 1
+  VML_NUM_THREADS: 1
+  OPENBLAS_NUM_THREADS: 1
+  PYTHONHASHSEED: 0 # Ensure tests are correctly gathered by xdist
+  SETUPTOOLS_USE_DISTUTILS: "stdlib"
 
 jobs:
+- template: tools/ci/azure_template.yml
+  parameters:
+    name: Linux
+    vmImage: ubuntu-20.04
 
-- job: ${{ parameters.name }}Test
-  pool:
-    vmImage: ${{ parameters.vmImage }}
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-      Python39:
-        python.version: '3.9'
-    maxParallel: 4
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
-
-  - script: |
-      python -m pip install --upgrade pip "setuptools<50.0"
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-    displayName: 'Install dependencies'
-
-  - script: |
-      pip install -e . -v
-    displayName: 'Build Cython Extensions'
-
-  - script: |
-      pytest linearmodels --junitxml=junit/test-results.xml -n 2 --durations=25
-    displayName: 'pytest'
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFiles: '**/test-results.xml'
-      testRunTitle: 'Python $(python.version)'
-    condition: succeededOrFailed()
-
-- job: ${{ parameters.name }}Publish
-  dependsOn: ${{ parameters.name }}Test
-  pool:
-    vmImage: ${{ parameters.vmImage }}
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.x'
-      architecture: 'x64'
+- template: tools/ci/azure_template.yml
+  parameters:
+    name: Windows
+    vmImage: windows-2019

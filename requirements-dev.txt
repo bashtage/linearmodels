@@ -3,6 +3,7 @@ coverage
 flake8
 ipython
 matplotlib
+jupyter
 nbconvert
 nbformat
 nbsphinx
