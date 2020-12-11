@@ -1,4 +1,5 @@
 black==20.08b1
+coverage
 flake8
 ipython
 matplotlib
@@ -7,8 +8,11 @@ nbformat
 nbsphinx
 numpydoc
 pytest>=6.0
+pytest-xdist
+pytest-cov
 seaborn
 sphinx
 sphinx-material
 sphinxcontrib-spelling
 xarray>=0.13
+wheel

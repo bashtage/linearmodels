@@ -34,11 +34,11 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pip install -e . -v
+    pip install -e . -v --no-build-isolation
   displayName: 'Build Cython Extensions'
 
 - script: |
-    pytest linearmodels --junitxml=junit/test-results.xml --skip-examples -n 2 --durations=25
+    pytest linearmodels --junitxml=junit/test-results.xml -n 2 --durations=25
   displayName: 'pytest'
 
 - task: PublishTestResults@2

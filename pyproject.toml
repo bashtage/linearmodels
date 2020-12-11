@@ -5,7 +5,8 @@ requires = [
   "numpy==1.15.4; python_version=='3.6'",
   "numpy==1.15.4; python_version=='3.7'",
   "numpy==1.17.5; python_version>='3.8'",
-  "Cython>=0.29.14"]
+  "numpy==1.19.4; python_version>='3.9'",
+  "Cython>=0.29.21"]
 
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
