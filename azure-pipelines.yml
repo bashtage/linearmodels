@@ -31,14 +31,15 @@ steps:
     python -m pip install --upgrade pip "setuptools<50.0"
     pip install -r requirements.txt
     pip install -r requirements-dev.txt
+    jupyter kernelspec list
   displayName: 'Install dependencies'
 
 - script: |
-    pip install -e . -v
+    pip install -e . -v --no-build-isolation
   displayName: 'Build Cython Extensions'
 
 - script: |
-    pytest linearmodels --junitxml=junit/test-results.xml --skip-examples -n 2 --durations=25
+    pytest linearmodels --junitxml=junit/test-results.xml -n 2 --durations=25
   displayName: 'pytest'
 
 - task: PublishTestResults@2
