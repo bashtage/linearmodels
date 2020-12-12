@@ -1,49 +1,24 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#passing-parameters
 
 trigger:
-- main
+- master
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
-    Python38:
-      python.version: '3.8'
-    Python39:
-      python.version: '3.9'
+variables:
+  MKL_NUM_THREADS: 1
+  NUMEXPR_NUM_THREADS: 1
+  OMP_NUM_THREADS: 1
+  VML_NUM_THREADS: 1
+  OPENBLAS_NUM_THREADS: 1
+  PYTHONHASHSEED: 0 # Ensure tests are correctly gathered by xdist
+  SETUPTOOLS_USE_DISTUTILS: "stdlib"
 
-steps:
+jobs:
+- template: ci/azure_template.yml
+  parameters:
+    name: Linux
+    vmImage: ubuntu-20.04
 
-
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
-
-- script: |
-    python -m pip install --upgrade pip "setuptools<50.0"
-    pip install -r requirements.txt
-    pip install -r requirements-dev.txt
-    jupyter kernelspec list
-  displayName: 'Install dependencies'
-
-- script: |
-    pip install -e . -v --no-build-isolation
-  displayName: 'Build Cython Extensions'
-
-- script: |
-    pytest linearmodels --junitxml=junit/test-results.xml -n 2 --durations=25
-  displayName: 'pytest'
-
-- task: PublishTestResults@2
-  inputs:
-    testResultsFiles: '**/test-results.xml'
-    testRunTitle: 'Python $(python.version)'
-  condition: succeededOrFailed()
+- template: ci/azure_template.yml
+  parameters:
+    name: Windows
+    vmImage: windows-2019
