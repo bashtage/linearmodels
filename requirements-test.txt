@@ -1,0 +1,8 @@
+coverage
+matplotlib
+pytest>=6.0
+pytest-xdist
+pytest-cov
+seaborn
+xarray>=0.13
+wheel

@@ -21,7 +21,7 @@ try:
     kernels = jupyter_client.kernelspec.find_kernel_specs()
     SKIP = False
 except ImportError:  # pragma: no cover
-    SKIP = False
+    SKIP = True
     pytestmark = pytest.mark.skip(reason="Required packages not available")
 
 kernel_name = "python%s" % sys.version_info.major
