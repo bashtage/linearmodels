@@ -118,3 +118,6 @@ gen
 
 # Latex
 *.tex
+
+# Special
+linearmodels/panel/_utility.c
