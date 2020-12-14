@@ -16,15 +16,14 @@ if [[ ${GIT_TAG} == "undefined" ]]; then
 else
   echo "Tag ${GIT_TAG} is defined"
   echo "Copy docs to root"
-  echo cp -R ${PWD}/doc/build/html/ ${PWD}/
-  cp -R ${PWD}/doc/build/html/* ${PWD}
+  echo cp -r ${PWD}/doc/build/html/* ${PWD}/
+  cp -r ${PWD}/doc/build/html/* ${PWD}
 fi
 echo "Copy docs to devel"
-echo cp -R ${PWD}/doc/build/html/ ${PWD}/devel/
-cp cp -R ${PWD}/doc/build/html/ ${PWD}/devel/
+echo cp -r ${PWD}/doc/build/html/* ${PWD}/devel/
+cp -r ${PWD}/doc/build/html/* ${PWD}/devel/
 echo "Add devel"
 git add devel/.
-
 echo "Change remote"
 git remote set-url origin https://bashtage:"${GH_PAGES_TOKEN}"@github.com/bashtage/linearmodels.git
 echo "Github Actions doc build after commit ${GITHUB_SHA::8}"
