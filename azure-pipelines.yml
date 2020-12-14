@@ -9,16 +9,16 @@ variables:
   OMP_NUM_THREADS: 1
   VML_NUM_THREADS: 1
   OPENBLAS_NUM_THREADS: 1
-  PYTHONHASHSEED: 0 # Ensure tests are correctly gathered by xdist
+  PYTHONHASHSEED: 12345678 # Ensure tests are correctly gathered by xdist
   SETUPTOOLS_USE_DISTUTILS: "stdlib"
 
 jobs:
-- template: ci/azure_template.yml
+- template: ci/azure_template_posix.yml
   parameters:
     name: Linux
     vmImage: ubuntu-20.04
 
-- template: ci/azure_template.yml
+- template: ci/azure_template_windows.yml
   parameters:
     name: Windows
     vmImage: windows-2019
