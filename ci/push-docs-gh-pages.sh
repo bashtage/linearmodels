@@ -12,6 +12,8 @@ echo "Add devel"
 git add devel/.
 echo "Change remove"
 git remote set-url origin https://bashtage:"${GH_PAGES_TOKEN}"@github.com/bashtage/linearmodels.git
+git config --global user.email "kevin.k.sheppard@gmail.com"
+git config --global user.name "Kevin Sheppard"
 echo "Github Actions doc build after commit ${GITHUB_REF##*/}"
 git commit -a -m "Github Actions doc build after commit ${GITHUB_REF##*/}"
 echo "Push"
