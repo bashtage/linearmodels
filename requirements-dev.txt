@@ -12,5 +12,6 @@ seaborn
 sphinx
 sphinx-material
 sphinxcontrib-spelling
+sphinx_autodoc_typehints
 xarray>=0.13
 wheel
