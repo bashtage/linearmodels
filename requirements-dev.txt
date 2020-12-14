@@ -1,6 +1,3 @@
-black==20.08b1
-coverage
-flake8
 ipython
 matplotlib
 jupyter

@@ -1,4 +1,7 @@
+black==20.08b1
 coverage
+flake8
+isort
 matplotlib
 pytest>=6.0
 pytest-xdist

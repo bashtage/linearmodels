@@ -16,13 +16,21 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
   strategy:
     matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
+      python37_legacy:
         python.version: '3.7'
-      Python38:
+        NUMPY: 1.17.5
+        SCIPY: 1.3.3
+        PANDAS: 0.25.3
+        STATSMODELS: 0.10.2
+        XARRAY: 0.13
+      python38_mid:
         python.version: '3.8'
-      Python39:
+        NUMPY: 1.18.5
+        SCIPY: 1.4.1
+        PANDAS: 1.0.5
+        STATSMODELS: 0.11.1
+        XARRAY: 0.14.1
+      python39_latest:
         python.version: '3.9'
     maxParallel: 10
 
@@ -34,16 +42,19 @@ jobs:
     displayName: 'Use Python $(python.version)'
 
   - script: |
-      python -m pip install --upgrade pip "setuptools<50.0" wheel
+      python -m pip install --upgrade pip setuptools wheel
+      source ci/install-posix.sh
       python -m pip install -r requirements.txt
       python -m pip install -r requirements-test.txt
+      python -m pip install -r requirements-dev.txt
+      jupyter kernelspec list
     displayName: 'Install dependencies'
 
   - script: |
-      python -m pip install -r requirements-dev.txt
-      jupyter kernelspec list
-    displayName: 'Install complete dependencies'
-    condition: or(ne(variables['python.version'], '3.9'), in(variables['agent.os'], 'Darwin', 'Linux'))
+     flake8 linearmodels
+     black --check linearmodels
+     isort --check linearmodels
+    displayName: 'Check style and formatting'
 
   - script: |
       python -m pip list
@@ -51,10 +62,10 @@ jobs:
 
   - script: |
       python -m pip install -e . -v --no-build-isolation
-    displayName: 'Build Cython Extensions'
+    displayName: 'Install linearmodels'
 
   - script: |
-      pytest linearmodels --junitxml=junit/test-results.xml -n 2 --durations=25
+      pytest linearmodels --junitxml=junit/test-results.xml -n auto --durations=25
     displayName: 'pytest'
 
   - task: PublishTestResults@2
@@ -62,14 +73,3 @@ jobs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
-
-- job: ${{ parameters.name }}Publish
-  dependsOn: ${{ parameters.name }}Test
-  pool:
-    vmImage: ${{ parameters.vmImage }}
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.x'
-      architecture: 'x64'
