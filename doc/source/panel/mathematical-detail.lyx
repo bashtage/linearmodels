@@ -859,7 +859,7 @@ and
 \begin_inset Formula $R^{2}$
 \end_inset
 
- Estimates
+ Calculation
 \end_layout
 
 \begin_layout Standard
@@ -880,7 +880,7 @@ do not
 \series default
  make use of weights.
  They are prefixed as 
-\begin_inset Formula $\texttt{corr\_squared\_}$
+\begin_inset Formula $\texttt{corr\_squared}$
 \end_inset
 
  in estimation results.
@@ -982,7 +982,7 @@ where
 
 \begin_layout Paragraph
 \noindent
-Within
+Between
 \begin_inset Formula $R^{2}$
 \end_inset
 
