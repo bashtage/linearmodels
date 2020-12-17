@@ -242,15 +242,15 @@ where
 and :math:`K\left(i,bw\right)` is a kernel weighting function. Kernel
 supported include the Bartlett, Parzen and Quadratic Spectral.
 
-:math:`R^{2}` Estimates
------------------------
+:math:`R^{2}` Calculation
+-------------------------
 
 There are 3 different :math:`R^{2}` estimates computed for the models
 produced using 2 different methods. When models contain entity effects
 and are not weighted, the two methods agree.
 
 The correlation-based measures **do not** make use of weights. They are
-prefixed as :math:`\texttt{corr\_squared\_}` in estimation results.
+prefixed as :math:`\texttt{corr\_squared}` in estimation results.
 
 Between :math:`R^{2}`
 ~~~~~~~~~~~~~~~~~~~~~
@@ -277,8 +277,8 @@ does. The overall weighted mean is defined
 
 .. math:: \bar{\bar{y}}_{w}=\frac{\sum_{i=1}^{N}w_{i}\bar{y}_{iw}}{\sum_{i=1}^{N}w_{i}}.
 
-Within\ :math:`R^{2}` (correlation method)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Between\ :math:`R^{2}` (correlation method)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This measure matches Stata. It does not reflect weighting.
 
@@ -325,8 +325,6 @@ and the residuals as
 The within\ :math:`R^{2}` is defined as
 
 .. math:: R_{W}^{2}=1-\frac{\sum_{i}\sum_{t}\tilde{\epsilon}_{it,w}}{\sum_{i}\sum_{t}\tilde{y}_{it,w}}
-
-.. _withinr2-correlation-method-1:
 
 Within\ :math:`R^{2}` (correlation method)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
