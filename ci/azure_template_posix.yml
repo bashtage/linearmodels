@@ -30,6 +30,14 @@ jobs:
         PANDAS: 1.0.5
         STATSMODELS: 0.11.1
         XARRAY: 0.14.1
+      python38_recent:
+        python.version: '3.8'
+        NUMPY: 1.19.4
+        SCIPY: 1.5.4
+        PANDAS: 1.1.5
+        STATSMODELS: 0.12.1
+        XARRAY: 0.15.1
+        test.install: true
       python39_latest:
         python.version: '3.9'
     maxParallel: 10
@@ -61,15 +69,49 @@ jobs:
     displayName: 'List Configuration'
 
   - script: |
-      python -m pip install -e . -v --no-build-isolation
-    displayName: 'Install linearmodels'
+      echo "Installing to site packages"
+      python setup.py bdist_wheel
+      WHL=$(ls -t dist)
+      pip install ./dist/${WHL}
+    displayName: 'Install linearmodels (site-packages)'
+    condition: eq(variables['test.install'], 'true')
 
   - script: |
-      pytest linearmodels --junitxml=junit/test-results.xml -n auto --durations=25
-    displayName: 'pytest'
+      python -m pip install -e . -v --no-build-isolation
+    displayName: 'Install linearmodels (editable)'
+    condition: ne(variables['test.install'], 'true')
+
+  - script: |
+      echo "Testing site packages"
+      mkdir test_run_dir
+      pushd test_run_dir
+      python -c "import linearmodels; linearmodels.test(['-n', 'auto', '--junitxml=../junit/test-results.xml'])"
+      popd
+    displayName: 'Run tests (site-packages)'
+    condition: eq(variables['test.install'], 'true')
+
+  - script: |
+      echo "Testing editable install"
+      if [[ ${COVERAGE} == "true" ]]; then
+        export COVERAGE_OPTS="--cov-config .coveragerc --cov=linearmodels --cov-report xml:coverage.xml --cov-report term"
+      fi
+      echo pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
+      pytest -m "${PYTEST_PATTERN}" --junitxml=junit/test-results.xml -n auto --durations=25 ${COVERAGE_OPTS} linearmodels/tests
+    displayName: 'Run tests (editable)'
+    condition: ne(variables['test.install'], 'true')
 
   - task: PublishTestResults@2
     inputs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
     condition: succeededOrFailed()
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    condition: and(eq(variables['coverage'], 'true'), ne(variables['test.install'], 'true'))
+
+  - bash: bash <(curl -s https://codecov.io/bash)
+    displayName: 'CodeCov upload'
+    condition: and(eq(variables['coverage'], 'true'), ne(variables['test.install'], 'true'))
