@@ -4,6 +4,10 @@ Change Log
 
 Since 4.17
 ==========
+* Added support for the method available in `PyHDFE <https://pypi.org/project/pyhdfe>`_  in
+  :class:`~linearmodels.iv.absorbing.AbsorbingLS`. These methods can only be
+  used when the variables absorbed are categorical (i.e., fixed-effects only) and
+  when the model is unweighted.
 * Added alternative measures of :math:`R^2` using the squared correlation. See
   :meth:`~linearmodels.panel.results.PanelResults.corr_squared_overall`,
   :meth:`~linearmodels.panel.results.PanelResults.corr_squared_within`, and
