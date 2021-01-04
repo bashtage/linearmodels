@@ -127,7 +127,8 @@ def lsmr_annihilate(
 
     where :math:`\hat{\beta}` is computed using lsmr.
     """
-
+    if y.shape[1] == 0:
+        return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
     default_opts: Dict[str, Union[float, bool]] = dict(atol=1e-8, btol=1e-8, show=False)
@@ -150,10 +151,7 @@ def lsmr_annihilate(
             resid = y[:, i : i + 1] - (x.dot(sp.csc_matrix(beta[:, None]))).A
             _VARIABLE_CACHE[regressor_hash][variable_digest] = resid
         resids.append(resid)
-    if resids:
-        return column_stack(resids)
-    else:
-        return empty_like(y)
+    return column_stack(resids)
 
 
 def category_product(cats: AnyPandas) -> Series:
@@ -633,7 +631,7 @@ class AbsorbingLS(object):
 
     >>> import numpy as np
     >>> import pandas as pd
-    >>> from lineamodels.iv import AbsorbingLS, Interaction
+    >>> from linearmodels.iv import AbsorbingLS, Interaction
     >>> dep = np.random.standard_normal((20000,1))
     >>> exog = np.random.standard_normal((20000,2))
     >>> cats = pd.DataFrame({i: pd.Categorical(np.random.randint(1000, size=20000))
@@ -826,10 +824,25 @@ class AbsorbingLS(object):
                     )
 
     def _first_time_fit(
-        self, use_cache: bool, lsmr_options: Optional[Dict[str, Union[float, bool]]]
+        self,
+        use_cache: bool,
+        absorb_options: Optional[
+            Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]]
+        ],
+        method,
     ) -> None:
         weights = self.weights.ndarray if self._is_weighted else None
 
+        use_hdfe = weights is None and method in ("auto", "hdfe")
+        use_hdfe = use_hdfe and not self._absorb_inter.cont.shape[1]
+        use_hdfe = use_hdfe and not self._interaction_list
+
+        if not use_hdfe and method == "hdfe":
+            raise RuntimeError(
+                "HDFE has been set as the method but the model cannot be estimated "
+                "using HDFE. HDFE requires that the model is unweighted and that the "
+                "absorbed regressors include only fixed effects (dummy variables)."
+            )
         areg = AbsorbingRegressor(
             cat=self._absorb_inter.cat,
             cont=self._absorb_inter.cont,
@@ -837,7 +850,7 @@ class AbsorbingLS(object):
             weights=weights,
         )
         areg_constant = areg.has_constant
-        self._regressors = preconditioner(areg.regressors)[0]
+        self._regressors = areg.regressors
         self._num_params += areg.approx_rank
         # Do not double count intercept-like terms
         self._has_constant = self._has_constant_exog or areg_constant
@@ -855,15 +868,30 @@ class AbsorbingLS(object):
         mu_dep = (root_w.T @ dep) / denom
         mu_exog = (root_w.T @ exog) / denom
 
-        lsmr_options = {} if lsmr_options is None else lsmr_options
+        absorb_options = {} if absorb_options is None else absorb_options
         assert isinstance(self._regressors, sp.csc_matrix)
         if self._regressors.shape[1] > 0:
-            dep_resid = lsmr_annihilate(
-                self._regressors, dep, use_cache, self._regressors_hash, **lsmr_options
-            )
-            exog_resid = lsmr_annihilate(
-                self._regressors, exog, use_cache, self._regressors_hash, **lsmr_options
-            )
+            if use_hdfe:
+                from pyhdfe import create
+
+                absorb_options["drop_singletons"] = False
+                algo = create(self._absorb_inter.cat, **absorb_options)
+                dep_exog = column_stack((dep, exog))
+                resids = algo.residualize(dep_exog)
+                dep_resid = resids[:, :1]
+                exog_resid = resids[:, 1:]
+            else:
+                self._regressors = preconditioner(self._regressors)[0]
+                dep_exog = column_stack((dep, exog))
+                resid = lsmr_annihilate(
+                    self._regressors,
+                    dep_exog,
+                    use_cache,
+                    self._regressors_hash,
+                    **absorb_options,
+                )
+                dep_resid = resid[:, :1]
+                exog_resid = resid[:, 1:]
         else:
             dep_resid = dep
             exog_resid = exog
@@ -907,8 +935,12 @@ class AbsorbingLS(object):
         *,
         cov_type: str = "robust",
         debiased: bool = False,
-        lsmr_options: Optional[Dict[str, Union[float, bool]]] = None,
+        method: str = "auto",
+        absorb_options: Optional[
+            Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]]
+        ] = None,
         use_cache: bool = True,
+        lsmr_options: Optional[Dict[str, Union[float, bool]]] = None,
         **cov_config: Any,
     ) -> AbsorbingLSResults:
         """
@@ -930,19 +962,38 @@ class AbsorbingLS(object):
         debiased : bool, optional
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        **cov_config
-            Additional parameters to pass to covariance estimator. The list
-            of optional parameters differ according to ``cov_type``. See
-            the documentation of the alternative covariance estimators for
-            the complete list of available commands.
-        lsmr_options : dict
-            Dictionary of options to pass to scipy.sparse.linalg.lsmr
+        method : str, optional
+            One of:
+
+            * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
+            * "lsmr" - Force LSMR.
+            * "hdfe" - Force HDFE. Raises RuntimeError if the model contains
+              continuous variables or continuous-binary interactions to absorb or
+              if the model is weighted.
+
+        absorb_options : dict, optional
+            Dictionary of options to pass to the abrorber. Passed to either
+            scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
+            to absorb the absorbed regressors.
         use_cache : bool
             Flag indicating whether the variables, once purged from the
             absorbed variables and interactions, should be stored in the cache,
             and retrieved if available. Cache can dramatically speed up
             re-fitting large models when the set of absorbed variables and
             interactions are identical.
+        lsmr_options: dict
+            Options to ass to scipy.sparse.linalg.lsmr.
+
+            .. deprecated:: 4.17
+
+               Use absorb_options to pass options
+
+        **cov_config
+            Additional parameters to pass to covariance estimator. The list
+            of optional parameters differ according to ``cov_type``. See
+            the documentation of the alternative covariance estimators for
+            the complete list of available commands.
+
 
         Returns
         -------
@@ -969,9 +1020,15 @@ class AbsorbingLS(object):
         linearmodels.iv.covariance.KernelCovariance
         linearmodels.iv.covariance.ClusteredCovariance
         """
-
+        if lsmr_options is not None:
+            if absorb_options is not None:
+                raise ValueError("absorb_options cannot be used with lsmr_options")
+            warnings.warn(
+                "lsmr_options is deprecated.  Use absorb_options.", FutureWarning
+            )
+            absorb_options = lsmr_options
         if self._absorbed_dependent is None:
-            self._first_time_fit(use_cache, lsmr_options)
+            self._first_time_fit(use_cache, absorb_options, method)
 
         exog_resid = self.absorbed_exog.to_numpy()
         dep_resid = self.absorbed_dependent.to_numpy()

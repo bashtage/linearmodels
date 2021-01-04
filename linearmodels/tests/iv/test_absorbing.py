@@ -61,7 +61,7 @@ hasher = Hasher()
 
 
 @pytest.fixture(scope="function")
-def rs(request):
+def random_gen(request):
     return np.random.RandomState(12345678)
 
 
@@ -75,6 +75,8 @@ def random_cat(ncat, size, frame=False, rs=None):
 
 
 def random_cont(size, rs=None):
+    if rs is None:
+        rs = np.random.RandomState()
     series = pd.Series(rs.standard_normal(size))
     return pd.DataFrame(series)
 
@@ -262,44 +264,46 @@ def test_smoke(data):
     assert isinstance(str(res.summary), str)
 
 
-def test_absorbing_exceptions(rs):
+def test_absorbing_exceptions(random_gen):
     with pytest.raises(TypeError):
-        absorbed = rs.standard_normal((NOBS, 2))
+        absorbed = random_gen.standard_normal((NOBS, 2))
         assert isinstance(absorbed, np.ndarray)
         AbsorbingLS(
-            rs.standard_normal(NOBS),
-            rs.standard_normal((NOBS, 2)),
+            random_gen.standard_normal(NOBS),
+            random_gen.standard_normal((NOBS, 2)),
             absorb=absorbed,
         )
     with pytest.raises(ValueError):
-        AbsorbingLS(rs.standard_normal(NOBS), rs.standard_normal((NOBS - 1, 2)))
-    with pytest.raises(ValueError):
         AbsorbingLS(
-            rs.standard_normal(NOBS),
-            rs.standard_normal((NOBS, 2)),
-            absorb=pd.DataFrame(rs.standard_normal((NOBS - 1, 1))),
+            random_gen.standard_normal(NOBS), random_gen.standard_normal((NOBS - 1, 2))
         )
     with pytest.raises(ValueError):
         AbsorbingLS(
-            rs.standard_normal(NOBS),
-            rs.standard_normal((NOBS, 2)),
-            interactions=random_cat(10, NOBS - 1, frame=True, rs=rs),
+            random_gen.standard_normal(NOBS),
+            random_gen.standard_normal((NOBS, 2)),
+            absorb=pd.DataFrame(random_gen.standard_normal((NOBS - 1, 1))),
+        )
+    with pytest.raises(ValueError):
+        AbsorbingLS(
+            random_gen.standard_normal(NOBS),
+            random_gen.standard_normal((NOBS, 2)),
+            interactions=random_cat(10, NOBS - 1, frame=True, rs=random_gen),
         )
     mod = AbsorbingLS(
-        rs.standard_normal(NOBS),
-        rs.standard_normal((NOBS, 2)),
-        interactions=random_cat(10, NOBS, frame=True, rs=rs),
+        random_gen.standard_normal(NOBS),
+        random_gen.standard_normal((NOBS, 2)),
+        interactions=random_cat(10, NOBS, frame=True, rs=random_gen),
     )
     with pytest.raises(RuntimeError):
         mod.absorbed_dependent
     with pytest.raises(RuntimeError):
         mod.absorbed_exog
     with pytest.raises(TypeError):
-        interactions = rs.randint(0, 10, size=(NOBS, 2))
+        interactions = random_gen.randint(0, 10, size=(NOBS, 2))
         assert isinstance(interactions, np.ndarray)
         AbsorbingLS(
-            rs.standard_normal(NOBS),
-            rs.standard_normal((NOBS, 2)),
+            random_gen.standard_normal(NOBS),
+            random_gen.standard_normal((NOBS, 2)),
             interactions=interactions,
         )
 
@@ -327,7 +331,7 @@ def test_category_product(cat):
         assert (g.nunique() == 1).all()
 
 
-def test_category_product_too_large(rs):
+def test_category_product_too_large(random_gen):
     dfc = {}
     for i in range(20):
         dfc[str(i)] = random_cat(10, 1000)
@@ -336,8 +340,10 @@ def test_category_product_too_large(rs):
         category_product(cat)
 
 
-def test_category_product_not_cat(rs):
-    cat = pd.DataFrame({str(i): pd.Series(rs.randint(0, 10, 1000)) for i in range(3)})
+def test_category_product_not_cat(random_gen):
+    cat = pd.DataFrame(
+        {str(i): pd.Series(random_gen.randint(0, 10, 1000)) for i in range(3)}
+    )
     with pytest.raises(TypeError):
         category_product(cat)
 
@@ -652,11 +658,10 @@ def test_drop_missing():
         AbsorbingLS(gen.y, gen.x, absorb=gen.absorb, interactions=gen.interactions)
 
 
-def test_drop_absorb():
-    rg = np.random.RandomState(0)
-    absorb = rg.randint(0, 10, size=1000)
-    x = rg.standard_normal((1000, 3))
-    y = rg.standard_normal((1000))
+def test_drop_absorb(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal((1000))
     dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
     dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
     df = pd.DataFrame(dfd)
@@ -676,3 +681,54 @@ def test_drop_absorb():
     mod = AbsorbingLS(y, x.iloc[:, -2:], absorb=df[["c"]])
     with pytest.raises(AbsorbingEffectError):
         mod.fit()
+
+
+def test_fully_absorb(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal((1000))
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = pd.get_dummies(df.c, drop_first=False)
+    mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
+    with pytest.raises(ValueError, match="All columns in exog"):
+        mod.fit()
+
+
+def test_lsmr_options(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal((1000))
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
+    with pytest.warns(FutureWarning, match="lsmr_options"):
+        mod.fit(lsmr_options={})
+    with pytest.raises(ValueError, match="absorb_options cannot"):
+        mod.fit(lsmr_options={}, absorb_options={})
+
+
+def test_options(random_gen):
+    absorb = random_gen.randint(0, 10, size=1000)
+    x = random_gen.standard_normal((1000, 3))
+    y = random_gen.standard_normal((1000))
+    dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
+    dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
+    df = pd.DataFrame(dfd)
+
+    y = df.y
+    x = df.iloc[:, :3]
+    mod = AbsorbingLS(y, x, absorb=df[["c"]], drop_absorbed=True)
+    mod.fit(absorb_options={"drop_singletons": False})
+    mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="lsmr")
+
+    mod = AbsorbingLS(y, x[["x0", "x1"]], absorb=df[["x2", "c"]], drop_absorbed=True)
+    with pytest.raises(RuntimeError, match="HDFE has been"):
+        mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
