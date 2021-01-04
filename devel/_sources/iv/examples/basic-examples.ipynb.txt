@@ -34,6 +34,7 @@
     "import numpy as np\n",
     "from statsmodels.api import add_constant\n",
     "from linearmodels.datasets import mroz\n",
+    "\n",
     "print(mroz.DESCR)\n",
     "data = mroz.load()\n",
     "data = data.dropna()\n",
@@ -58,7 +59,10 @@
    "outputs": [],
    "source": [
     "from linearmodels.iv import IV2SLS\n",
-    "res_ols = IV2SLS(np.log(data.wage), data[[\"const\",\"educ\"]], None, None).fit(cov_type=\"unadjusted\")\n",
+    "\n",
+    "res_ols = IV2SLS(np.log(data.wage), data[[\"const\", \"educ\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res_ols)"
    ]
   },
@@ -77,7 +81,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res_first = IV2SLS(data.educ, data[[\"const\",\"fatheduc\"]], None, None).fit(cov_type=\"unadjusted\")\n",
+    "res_first = IV2SLS(data.educ, data[[\"const\", \"fatheduc\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res_first)\n",
     "data[\"educ_hat\"] = data.educ - res_first.resids"
    ]
@@ -95,7 +101,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res_second = IV2SLS(np.log(data.wage), data[[\"const\"]], data.educ, data.fatheduc).fit(cov_type=\"unadjusted\")\n",
+    "res_second = IV2SLS(np.log(data.wage), data[[\"const\"]], data.educ, data.fatheduc).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res_second)"
    ]
   },
@@ -115,8 +123,11 @@
    "outputs": [],
    "source": [
     "from linearmodels.iv import compare\n",
-    "res_direct = IV2SLS(np.log(data.wage), data[[\"const\",\"educ_hat\"]], None, None).fit(cov_type=\"unadjusted\")\n",
-    "print(compare({\"OLS\":res_ols, \"2SLS\":res_second, \"Direct\": res_direct}))"
+    "\n",
+    "res_direct = IV2SLS(np.log(data.wage), data[[\"const\", \"educ_hat\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
+    "print(compare({\"OLS\": res_ols, \"2SLS\": res_second, \"Direct\": res_direct}))"
    ]
   },
   {
@@ -134,9 +145,10 @@
    "outputs": [],
    "source": [
     "from linearmodels.datasets import wage\n",
+    "\n",
     "men = wage.load()\n",
     "print(wage.DESCR)\n",
-    "men = men[[\"educ\",\"wage\",\"sibs\",\"exper\"]]\n",
+    "men = men[[\"educ\", \"wage\", \"sibs\", \"exper\"]]\n",
     "men = add_constant(men)\n",
     "men = men.dropna()"
    ]
@@ -154,7 +166,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res_ols = IV2SLS(np.log(men.wage), men[[\"const\", \"educ\"]], None, None).fit(cov_type=\"unadjusted\")\n",
+    "res_ols = IV2SLS(np.log(men.wage), men[[\"const\", \"educ\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res_ols)"
    ]
   },
@@ -171,7 +185,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res_first = IV2SLS(men.educ, men[[\"const\", \"sibs\"]], None, None).fit(cov_type=\"unadjusted\")\n",
+    "res_first = IV2SLS(men.educ, men[[\"const\", \"sibs\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res_first.summary)"
    ]
   },
@@ -210,7 +226,7 @@
    "outputs": [],
    "source": [
     "res2 = res.resids ** 2\n",
-    "fgls_mod = IV2SLS(np.log(res2), men[[\"const\",\"sibs\",\"exper\"]], None, None)\n",
+    "fgls_mod = IV2SLS(np.log(res2), men[[\"const\", \"sibs\", \"exper\"]], None, None)\n",
     "fgls_res = fgls_mod.fit()\n",
     "sigma2_hat = np.exp(np.log(res2) - fgls_res.resids)\n",
     "print(fgls_res)"
@@ -229,7 +245,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res_gls = IV2SLS(np.log(men.wage), men.const, men.educ, men.sibs, weights=1 / sigma2_hat).fit(cov_type=\"unadjusted\")\n",
+    "res_gls = IV2SLS(\n",
+    "    np.log(men.wage), men.const, men.educ, men.sibs, weights=1 / sigma2_hat\n",
+    ").fit(cov_type=\"unadjusted\")\n",
     "print(res_gls)"
    ]
   },
@@ -248,6 +266,7 @@
    "outputs": [],
    "source": [
     "from linearmodels.datasets import birthweight\n",
+    "\n",
     "data = birthweight.load()\n",
     "print(birthweight.DESCR)\n",
     "data = add_constant(data)"
@@ -266,7 +285,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = IV2SLS(data.packs, data[[\"const\",\"cigprice\"]], None, None).fit(cov_type=\"unadjusted\")\n",
+    "res = IV2SLS(data.packs, data[[\"const\", \"cigprice\"]], None, None).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res)"
    ]
   },
@@ -283,7 +304,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = IV2SLS(np.log(data.bwght), data.const, data.packs, data.cigprice).fit(cov_type=\"unadjusted\")\n",
+    "res = IV2SLS(np.log(data.bwght), data.const, data.packs, data.cigprice).fit(\n",
+    "    cov_type=\"unadjusted\"\n",
+    ")\n",
     "print(res)"
    ]
   },
@@ -303,6 +326,7 @@
    "outputs": [],
    "source": [
     "from linearmodels.datasets import card\n",
+    "\n",
     "data = card.load()\n",
     "print(card.DESCR)\n",
     "data = add_constant(data)"
@@ -323,10 +347,25 @@
    "source": [
     "dep = [\"wage\"]\n",
     "endog = [\"educ\"]\n",
-    "exog = [\"const\",\"exper\",\"expersq\",\"black\",\"smsa\",\"south\",\"smsa66\",\"reg662\",\n",
-    "       \"reg663\",\"reg664\",\"reg665\",\"reg666\",\"reg667\",\"reg668\",\"reg669\"]\n",
+    "exog = [\n",
+    "    \"const\",\n",
+    "    \"exper\",\n",
+    "    \"expersq\",\n",
+    "    \"black\",\n",
+    "    \"smsa\",\n",
+    "    \"south\",\n",
+    "    \"smsa66\",\n",
+    "    \"reg662\",\n",
+    "    \"reg663\",\n",
+    "    \"reg664\",\n",
+    "    \"reg665\",\n",
+    "    \"reg666\",\n",
+    "    \"reg667\",\n",
+    "    \"reg668\",\n",
+    "    \"reg669\",\n",
+    "]\n",
     "instr = [\"nearc4\"]\n",
-    "data = data[dep +exog+endog+ instr].dropna()"
+    "data = data[dep + exog + endog + instr].dropna()"
    ]
   },
   {
@@ -342,7 +381,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = IV2SLS(data.educ, data[instr+exog], None, None).fit()\n",
+    "res = IV2SLS(data.educ, data[instr + exog], None, None).fit()\n",
     "print(res)"
    ]
   },
@@ -359,7 +398,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = IV2SLS(np.log(data.wage), data[exog+endog],None,None).fit()\n",
+    "res = IV2SLS(np.log(data.wage), data[exog + endog], None, None).fit()\n",
     "print(res)"
    ]
   },
@@ -422,8 +461,11 @@
    "outputs": [],
    "source": [
     "import numpy as np\n",
-    "formula = (\"np.log(wage) ~ 1 + exper + expersq + black + smsa + south + smsa66 + reg662 + reg663 + reg664 + \"\n",
-    "           \"reg665 + reg666 + reg667 + reg668 + reg669 + [educ ~ nearc4]\")\n",
+    "\n",
+    "formula = (\n",
+    "    \"np.log(wage) ~ 1 + exper + expersq + black + smsa + south + smsa66 + reg662 + reg663 + reg664 + \"\n",
+    "    \"reg665 + reg666 + reg667 + reg668 + reg669 + [educ ~ nearc4]\"\n",
+    ")\n",
     "mod = IV2SLS.from_formula(formula, data)\n",
     "res_formula = mod.fit(cov_type=\"unadjusted\")\n",
     "print(res_formula.rsquared - res_2sls.rsquared)"
@@ -449,7 +491,12 @@
     "    data.loc[data[region] == 1, \"reg\"] = region[3:]\n",
     "data[\"reg\"] = data[\"reg\"].astype(\"category\")\n",
     "data.describe()\n",
-    "res_cat = IV2SLS(np.log(data.wage), data[[\"const\",\"exper\",\"expersq\",\"black\",\"smsa\",\"south\",\"smsa66\",\"reg\"]], data.educ, data.nearc4).fit()\n",
+    "res_cat = IV2SLS(\n",
+    "    np.log(data.wage),\n",
+    "    data[[\"const\", \"exper\", \"expersq\", \"black\", \"smsa\", \"south\", \"smsa66\", \"reg\"]],\n",
+    "    data.educ,\n",
+    "    data.nearc4,\n",
+    ").fit()\n",
     "print(res_cat)"
    ]
   },
@@ -473,9 +520,9 @@
     "data = add_constant(data, has_constant=\"add\")\n",
     "data[\"lnwage\"] = np.log(data.wage)\n",
     "dep = \"lnwage\"\n",
-    "exog = [\"const\",\"exper\",\"expersq\"]\n",
+    "exog = [\"const\", \"exper\", \"expersq\"]\n",
     "endog = [\"educ\"]\n",
-    "instr = [\"fatheduc\",\"motheduc\"]"
+    "instr = [\"fatheduc\", \"motheduc\"]"
    ]
   },
   {
@@ -491,7 +538,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res = IV2SLS(data[dep],data[exog],data[endog],data[instr]).fit(cov_type=\"unadjusted\")\n",
+    "res = IV2SLS(data[dep], data[exog], data[endog], data[instr]).fit(cov_type=\"unadjusted\")\n",
     "print(res)"
    ]
   },
@@ -526,9 +573,12 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "v = IV2SLS(data[endog],data[exog+instr],None,None).fit().resids\n",
+    "v = IV2SLS(data[endog], data[exog + instr], None, None).fit().resids\n",
     "import pandas as pd\n",
-    "res_direct = IV2SLS(data[dep],pd.concat([v, data[exog]], 1),data[endog],data[instr]).fit(cov_type=\"unadjusted\")\n",
+    "\n",
+    "res_direct = IV2SLS(\n",
+    "    data[dep], pd.concat([v, data[exog]], 1), data[endog], data[instr]\n",
+    ").fit(cov_type=\"unadjusted\")\n",
     "print(res_direct)"
    ]
   },
@@ -562,7 +612,7 @@
    "outputs": [],
    "source": [
     "u = res.resids\n",
-    "res = IV2SLS(u, data[[\"exper\",\"expersq\"] + instr], None, None).fit()"
+    "res = IV2SLS(u, data[[\"exper\", \"expersq\"] + instr], None, None).fit()"
    ]
   },
   {
@@ -594,7 +644,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "instr = [\"fatheduc\",\"motheduc\",\"huseduc\"]\n",
+    "instr = [\"fatheduc\", \"motheduc\", \"huseduc\"]\n",
     "res = IV2SLS(data[dep], data[exog], data[endog], data[instr]).fit(cov_type=\"unadjusted\")"
    ]
   },
@@ -647,14 +697,15 @@
    "outputs": [],
    "source": [
     "from linearmodels.datasets import jobtraining\n",
+    "\n",
     "data = jobtraining.load()\n",
     "print(jobtraining.DESCR)\n",
     "data.head()\n",
-    "data = data.where(data.year.isin((1987,1988)))\n",
-    "data = data.dropna(how=\"all\",axis=0).sort_values([\"fcode\",\"year\"])\n",
+    "data = data.where(data.year.isin((1987, 1988)))\n",
+    "data = data.dropna(how=\"all\", axis=0).sort_values([\"fcode\", \"year\"])\n",
     "print(data.describe())\n",
     "data = data.set_index(\"fcode\")\n",
-    "data = data[[\"year\",\"hrsemp\",\"grant\",\"scrap\",\"lscrap\"]]"
+    "data = data[[\"year\", \"hrsemp\", \"grant\", \"scrap\", \"lscrap\"]]"
    ]
   },
   {
@@ -682,7 +733,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "mod = IV2SLS(deltas.hrsemp, deltas[[\"const\",\"grant\"]], None, None)\n",
+    "mod = IV2SLS(deltas.hrsemp, deltas[[\"const\", \"grant\"]], None, None)\n",
     "print(mod.fit(cov_type=\"unadjusted\"))"
    ]
   },
@@ -718,7 +769,7 @@
    "outputs": [],
    "source": [
     "res_ols = IV2SLS.from_formula(\"lscrap ~ 1 + hrsemp\", deltas).fit(cov_type=\"unadjusted\")\n",
-    "print(compare({\"Panel OLS\":res_ols,\"Panel IV\": res_iv}))"
+    "print(compare({\"Panel OLS\": res_ols, \"Panel IV\": res_iv}))"
    ]
   }
  ],
@@ -738,15 +789,15 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.7.3"
+   "version": "3.8.5"
   },
   "pycharm": {
    "stem_cell": {
     "cell_type": "raw",
-    "source": [],
     "metadata": {
      "collapsed": false
-    }
+    },
+    "source": []
    }
   }
  },

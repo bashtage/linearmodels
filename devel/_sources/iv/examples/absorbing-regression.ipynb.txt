@@ -23,18 +23,21 @@
    "source": [
     "import numpy as np\n",
     "import pandas as pd\n",
+    "\n",
     "rs = np.random.RandomState(0)\n",
-    "nobs = 250000\n",
+    "nobs = 1_000_000\n",
     "state_id = rs.randint(50, size=nobs)\n",
-    "state_effects = rs.standard_normal(state_id.max()+1)\n",
+    "state_effects = rs.standard_normal(state_id.max() + 1)\n",
     "state_effects = state_effects[state_id]\n",
     "# 5 workers/firm, on average\n",
-    "firm_id = rs.randint(nobs//5, size=nobs) \n",
-    "firm_effects = rs.standard_normal(firm_id.max()+1)\n",
+    "firm_id = rs.randint(nobs // 5, size=nobs)\n",
+    "firm_effects = rs.standard_normal(firm_id.max() + 1)\n",
     "firm_effects = firm_effects[firm_id]\n",
-    "cats = pd.DataFrame({\"state\": pd.Categorical(state_id), \"firm\": pd.Categorical(firm_id)})\n",
+    "cats = pd.DataFrame(\n",
+    "    {\"state\": pd.Categorical(state_id), \"firm\": pd.Categorical(firm_id)}\n",
+    ")\n",
     "eps = rs.standard_normal(nobs)\n",
-    "x = rs.standard_normal((nobs,2))\n",
+    "x = rs.standard_normal((nobs, 2))\n",
     "x = np.column_stack([np.ones(nobs), x])\n",
     "y = x.sum(1) + firm_effects + state_effects + eps"
    ]
@@ -75,7 +78,7 @@
    "source": [
     "from linearmodels.iv.absorbing import AbsorbingLS\n",
     "\n",
-    "mod = AbsorbingLS(y, x[:,1:], absorb=cats)\n",
+    "mod = AbsorbingLS(y, x[:, 1:], absorb=cats)\n",
     "print(mod.fit())"
    ]
   },
@@ -84,9 +87,13 @@
    "metadata": {},
    "source": [
     "## Optimization Options\n",
-    "LSMR is iterative and does not have a closed form. The tolerance can be set using `lsmr_options` which is a dictionary.  See [scipy.sparse.linalg.lsmr](https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr) for details on the options.\n",
     "\n",
-    "Below `use_cache` is set to ensure that LSMR is run.  By default, the exogenous variables with the effects purged are cached. LSMR is run once for the dependent and for each column in exog. "
+    "The residuals from the absorbed variables are either estimated using HDFE or LSMR< depending on the variables included in the regression. HDFE is used when:\n",
+    "\n",
+    "* the model is unweighted; and\n",
+    "* the absorbed regressors are all categorical (i.e., fixed effects).\n",
+    "\n",
+    "If these conditions are not satisfied, then LSMR is used. LSMR can be used by setting `method=\"lsmr\"` even when the conditions for HDFE are satisfied."
    ]
   },
   {
@@ -96,9 +103,34 @@
    "outputs": [],
    "source": [
     "from linearmodels.iv.absorbing import AbsorbingLS\n",
+    "import datetime as dt\n",
     "\n",
-    "mod = AbsorbingLS(y, x[:,1:], absorb=cats)\n",
-    "res = mod.fit(use_cache=False, lsmr_options={\"show\": True})"
+    "mod = AbsorbingLS(y, x[:, 1:], absorb=cats)\n",
+    "\n",
+    "start = dt.datetime.now()\n",
+    "res = mod.fit(use_cache=False, method=\"lsmr\")\n",
+    "print(f\"LSMR Second: {(dt.datetime.now() - start).total_seconds()}\")\n",
+    "\n",
+    "start = dt.datetime.now()\n",
+    "res = mod.fit()\n",
+    "print(f\"HDFE Second: {(dt.datetime.now() - start).total_seconds()}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "LSMR is iterative and does not have a closed form. The tolerance can be set using `absorb_options` which is a dictionary.  See [scipy.sparse.linalg.lsmr](https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr) for details on the options."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = AbsorbingLS(y, x[:, 1:], absorb=cats)\n",
+    "res = mod.fit(method=\"lsmr\", absorb_options={\"show\": True})"
    ]
   }
  ],
@@ -118,18 +150,18 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.7.3"
+   "version": "3.8.5"
   },
   "pycharm": {
    "stem_cell": {
     "cell_type": "raw",
-    "source": [],
     "metadata": {
      "collapsed": false
-    }
+    },
+    "source": []
    }
   }
  },
  "nbformat": 4,
- "nbformat_minor": 2
+ "nbformat_minor": 4
 }

@@ -26,6 +26,7 @@
     "import numpy as np\n",
     "import pandas as pd\n",
     "from linearmodels.datasets import fringe\n",
+    "\n",
     "data = fringe.load()"
    ]
   },
@@ -47,8 +48,11 @@
    "outputs": [],
    "source": [
     "from collections import OrderedDict\n",
+    "\n",
     "formula = OrderedDict()\n",
-    "formula[\"benefits\"] = \"hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male\"\n",
+    "formula[\n",
+    "    \"benefits\"\n",
+    "] = \"hrbens ~ educ + exper + expersq + union + south + nrtheast + nrthcen + male\"\n",
     "formula[\"earnings\"] = \"hrearn ~ educ + exper + expersq + nrtheast + married + male\""
    ]
   },
@@ -59,6 +63,7 @@
    "outputs": [],
    "source": [
     "from linearmodels.system import SUR\n",
+    "\n",
     "mod = SUR.from_formula(formula, data)\n",
     "print(mod.fit(cov_type=\"unadjusted\"))"
    ]
@@ -147,7 +152,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "random_weights = np.random.chisquare(5, size=(616,2))\n",
+    "random_weights = np.random.chisquare(5, size=(616, 2))\n",
     "random_weights = pd.DataFrame(random_weights, columns=[\"benefits\", \"earnings\"])\n",
     "weighted_mod = SUR.from_formula(formula, data, weights=random_weights)\n",
     "print(weighted_mod.fit())"
@@ -178,15 +183,15 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.8.5"
   },
   "pycharm": {
    "stem_cell": {
     "cell_type": "raw",
-    "source": [],
     "metadata": {
      "collapsed": false
-    }
+    },
+    "source": []
    }
   }
  },
