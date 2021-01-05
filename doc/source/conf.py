@@ -28,8 +28,9 @@ import hashlib
 import os
 from typing import Dict, List
 
-import linearmodels
 import sphinx_material
+
+import linearmodels
 
 # ...
 

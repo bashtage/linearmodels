@@ -66,7 +66,7 @@ def run_setup(binary: bool = True) -> None:
         name="linearmodels",
         license="NCSA",
         description="Linear Panel, Instrumental Variable, Asset Pricing, and System "
-                    "Regression models for Python",
+        "Regression models for Python",
         version=versioneer.get_version(),
         packages=find_packages(),
         package_dir={"linearmodels": "./linearmodels"},
