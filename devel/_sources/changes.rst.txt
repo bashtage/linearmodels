@@ -2,8 +2,10 @@ Change Log
 ----------
 
 
-Since 4.17
-==========
+Version 4.18
+============
+* Improved performance of :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit` by
+  deferring some operations.
 * Added support for the method available in `PyHDFE <https://pypi.org/project/pyhdfe>`_  in
   :class:`~linearmodels.iv.absorbing.AbsorbingLS`. These methods can only be
   used when the variables absorbed are categorical (i.e., fixed-effects only) and
