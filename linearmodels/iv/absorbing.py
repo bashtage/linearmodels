@@ -975,7 +975,7 @@ class AbsorbingLS(object):
               if the model is weighted.
 
         absorb_options : dict, optional
-            Dictionary of options to pass to the abrorber. Passed to either
+            Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
             to absorb the absorbed regressors.
         use_cache : bool
