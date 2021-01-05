@@ -117,15 +117,15 @@ class _LSModelResultsBase(_SummaryStr):
         """Estimated parameters"""
         return self._params
 
-    @property
+    @cached_property
     def resids(self) -> Series:
         """Estimated residuals"""
-        return self._resid
+        return self._resid()
 
-    @property
+    @cached_property
     def fitted_values(self) -> Series:
         """Fitted values"""
-        return self._fitted
+        return self._fitted()
 
     @property
     def idiosyncratic(self) -> Series:
@@ -142,10 +142,10 @@ class _LSModelResultsBase(_SummaryStr):
         """
         return self.resids
 
-    @property
+    @cached_property
     def wresids(self) -> Series:
         """Weighted estimated residuals"""
-        return self._wresid
+        return self._wresid()
 
     @property
     def nobs(self) -> int:
@@ -628,10 +628,10 @@ class AbsorbingLSResults(_LSModelResultsBase):
         """Coefficient of determination (R**2), ignoring absorbed variables"""
         return self._absorbed_rsquared
 
-    @property
+    @cached_property
     def absorbed_effects(self) -> DataFrame:
         """Fitted values from only absorbed terms"""
-        return self._absorbed_effects
+        return self._absorbed_effects()
 
     @property
     def df_absorbed(self) -> int:

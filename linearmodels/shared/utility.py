@@ -4,6 +4,7 @@ from typing import (
     Any,
     Iterable,
     Iterator,
+    List,
     Mapping,
     Optional,
     Sequence,
@@ -13,7 +14,7 @@ from typing import (
 )
 
 import numpy as np
-from pandas import DataFrame, MultiIndex
+from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import Label, NDArray
 
@@ -171,3 +172,61 @@ def panel_to_frame(
     df.index.set_levels(final_levels, [0, 1], inplace=True)
     df.index.names = ["major", "minor"]
     return df
+
+
+class DataFrameWrapper:
+    """
+    Wrapper around a pandas DataFrame deferring frame's construction.
+
+    Parameters
+    ----------
+    values : ndarray
+        The data to use in the DataFrame's constructor
+    columns : list[str], optional
+        The column names of the frame
+    index : {Index, list[str]}, optional
+        The index to use.
+    """
+
+    def __init__(
+        self,
+        values: NDArray,
+        *,
+        columns: Optional[List[str]] = None,
+        index: Optional[Union[Index, List[str]]] = None,
+    ) -> None:
+        self._values = values
+        self._columns = columns
+        self._index = index
+
+    def __call__(self) -> DataFrame:
+        return DataFrame(self._values, columns=self._columns, index=self._index)
+
+
+class SeriesWrapper:
+    """
+    Wrapper around a pandas Series deferring series' construction.
+
+    Parameters
+    ----------
+    values : ndarray
+        The data to use in the Series' constructor
+    name : str, optional
+        The name of the series
+    index : {Index, list[str]}, optional
+        The index to use.
+    """
+
+    def __init__(
+        self,
+        values: NDArray,
+        *,
+        name: Optional[str] = None,
+        index: Optional[Union[Index, List[str]]] = None,
+    ) -> None:
+        self._values = values
+        self._name = name
+        self._index = index
+
+    def __call__(self) -> Series:
+        return Series(self._values, name=self._name, index=self._index)

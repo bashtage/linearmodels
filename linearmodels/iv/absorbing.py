@@ -61,6 +61,7 @@ from linearmodels.panel.utility import (
 )
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 from linearmodels.typing import AnyPandas, NDArray
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 
@@ -93,7 +94,7 @@ def lsmr_annihilate(
     y: NDArray,
     use_cache: bool = True,
     x_hash: Optional[Hashable] = None,
-    **lsmr_options: Union[float, bool],
+    **lsmr_options: Union[bool, str, ArrayLike, None, Dict[str, Any]],
 ) -> NDArray:
     r"""
     Removes projection of x on y from y
@@ -119,7 +120,7 @@ def lsmr_annihilate(
 
     Notes
     -----
-    Residuals are estiamted column-by-column as
+    Residuals are estimated column-by-column as
 
     .. math::
 
@@ -131,7 +132,9 @@ def lsmr_annihilate(
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts: Dict[str, Union[float, bool]] = dict(atol=1e-8, btol=1e-8, show=False)
+    default_opts: Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]] = dict(
+        atol=1e-8, btol=1e-8, show=False
+    )
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
@@ -829,7 +832,7 @@ class AbsorbingLS(object):
         absorb_options: Optional[
             Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]]
         ],
-        method,
+        method: str,
     ) -> None:
         weights = self.weights.ndarray if self._is_weighted else None
 
@@ -1026,7 +1029,7 @@ class AbsorbingLS(object):
             warnings.warn(
                 "lsmr_options is deprecated.  Use absorb_options.", FutureWarning
             )
-            absorb_options = lsmr_options
+            absorb_options = {k: v for k, v in lsmr_options.items()}
         if self._absorbed_dependent is None:
             self._first_time_fit(use_cache, absorb_options, method)
 
@@ -1120,14 +1123,15 @@ class AbsorbingLS(object):
         columns = self._columns
         index = self._index
         eps = self.resids(params)
-        fitted = DataFrame(
-            self._dependent.ndarray - eps,
+        fitted_values = self._dependent.ndarray - eps
+        fitted = DataFrameWrapper(
+            fitted_values,
             index=self._dependent.rows,
             columns=["fitted_values"],
         )
         assert isinstance(self._absorbed_dependent, DataFrame)
-        absorbed_effects = DataFrame(
-            self._absorbed_dependent.to_numpy() - fitted.to_numpy(),
+        absorbed_effects = DataFrameWrapper(
+            self._absorbed_dependent.to_numpy() - fitted_values,
             columns=["absorbed_effects"],
             index=self._dependent.rows,
         )
@@ -1162,8 +1166,10 @@ class AbsorbingLS(object):
         fstat = self._f_statistic(params, cov, debiased)
         out = {
             "params": Series(params.squeeze(), columns, name="parameter"),
-            "eps": Series(eps.squeeze(), index=index, name="residual"),
-            "weps": Series(weps.squeeze(), index=index, name="weighted residual"),
+            "eps": SeriesWrapper(eps.squeeze(), index=index, name="residual"),
+            "weps": SeriesWrapper(
+                weps.squeeze(), index=index, name="weighted residual"
+            ),
             "cov": DataFrame(cov, columns=columns, index=columns),
             "s2": float(cov_estimator.s2),
             "debiased": debiased,

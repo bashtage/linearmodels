@@ -43,6 +43,7 @@ from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
+from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 from linearmodels.typing import ArrayLike, NDArray, Numeric, OptionalNumeric
 
 IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
@@ -408,7 +409,9 @@ class _IVModelBase(object):
         index = self._index
         eps = self.resids(params)
         y = self.dependent.pandas
-        fitted = DataFrame(asarray(y) - eps, y.index, ["fitted_values"])
+        fitted = DataFrameWrapper(
+            asarray(y) - eps, index=y.index, columns=["fitted_values"]
+        )
         weps = self.wresids(params)
         cov = cov_estimator.cov
         debiased = cov_estimator.debiased
@@ -426,8 +429,10 @@ class _IVModelBase(object):
         fstat = self._f_statistic(params, cov, debiased)
         out = {
             "params": Series(params.squeeze(), columns, name="parameter"),
-            "eps": Series(eps.squeeze(), index=index, name="residual"),
-            "weps": Series(weps.squeeze(), index=index, name="weighted residual"),
+            "eps": SeriesWrapper(eps.squeeze(), index=index, name="residual"),
+            "weps": SeriesWrapper(
+                weps.squeeze(), index=index, name="weighted residual"
+            ),
             "cov": DataFrame(cov, columns=columns, index=columns),
             "s2": float(cov_estimator.s2),
             "debiased": debiased,
