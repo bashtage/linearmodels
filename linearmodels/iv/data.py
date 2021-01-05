@@ -42,7 +42,7 @@ class IVData(object):
     var_name : str, optional
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
-    nobs : int, optiona
+    nobs : int, optional
         Number of observation, used when `x` is None. If `x` is array_like,
         then nobs is used to check the number of observations in `x`.
     convert_dummies : bool, optional

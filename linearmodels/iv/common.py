@@ -45,7 +45,7 @@ def f_statistic(
         sample chi2 distribution
     resid_df : int
         NUmber of observations minus number of model parameters
-    const_loc : int, optiona
+    const_loc : int, optional
         Location of constant column, if any
 
     Returns
