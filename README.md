@@ -136,17 +136,17 @@ regression. Currently only the single variable IV estimators are polished.
 
 ### Running
 
-With the exception of Python 3.6+, which is a hard requirement, the
+With the exception of Python 3 (3.7+ tested), which is a hard requirement, the
 others are the version that are being used in the test environment. It
 is possible that older versions work.
 
-- Python 3.6+
+- Python 3.7+
 - NumPy (1.15+)
-- SciPy (1.0.1+)
-- pandas (0.23+)
-- statsmodels (0.9+)
-- xarray (0.10+, optional)
-- Cython (0.29.14+, optional)
+- SciPy (1.3+)
+- pandas (0.25+)
+- statsmodels (0.11+)
+- xarray (0.13+, optional)
+- Cython (0.29.21+, optional)
 
 ### Testing
 

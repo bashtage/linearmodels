@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+Version 4.19
+============
+* Minor release to fix a wheel-building issue on Python 3.9
 
 Version 4.18
 ============
