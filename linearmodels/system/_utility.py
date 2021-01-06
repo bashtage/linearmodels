@@ -53,8 +53,8 @@ def blocked_diag_product(x: ArraySequence, s: NDArray) -> NDArray:
         row = []
         for j in range(k):
             row.append(s[i, j] * x[j])
-        row = np.hstack(row)
-        out.append(row)
+        row_arr = np.hstack(row)
+        out.append(row_arr)
 
     return np.vstack(out)
 

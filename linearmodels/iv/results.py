@@ -52,8 +52,9 @@ def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[
     col_sizes = []
     for table in lists:
         size = list(map(lambda r: list(map(len, r)), table))
-        col_sizes.append(list(array(size).max(0)))
-    col_size = array(col_sizes).max(axis=0)
+        size_arr = array(size)
+        col_sizes.append(list(asarray(size_arr.max(0))))
+    col_size = asarray(array(col_sizes).max(axis=0))
     sep_cols: List[str] = [sep * (cs + 2) for cs in col_size]
     out: List[List[str]] = []
     for table in lists:

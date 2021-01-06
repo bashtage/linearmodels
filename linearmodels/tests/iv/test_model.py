@@ -6,6 +6,7 @@ from numpy.testing import assert_allclose, assert_equal
 import pandas as pd
 from pandas.testing import assert_series_equal
 import pytest
+import scipy.linalg
 from statsmodels.tools.tools import add_constant
 
 from linearmodels.datasets import card
@@ -18,23 +19,23 @@ from linearmodels.shared.utility import AttrDict
 @pytest.fixture(scope="module")
 def data():
     n, q, k, p = 1000, 2, 5, 3
-    np.random.seed(12345)
-    clusters = np.random.randint(0, 10, n)
+    rs = np.random.RandomState(12345)
+    clusters = rs.randint(0, 10, n)
+
     rho = 0.5
-    r = np.zeros((k + p + 1, k + p + 1))
-    r.fill(rho)
+    r = scipy.linalg.toeplitz([1] + (rho + np.linspace(0.1, -0.1, 8)).tolist())
     r[-1, 2:] = 0
     r[2:, -1] = 0
-    r[-1, -1] = 0.5
-    r += np.eye(9) * 0.5
-    v = np.random.multivariate_normal(np.zeros(r.shape[0]), r, n)
+    r[-1, -1] = 1
+    v = rs.multivariate_normal(np.zeros(r.shape[0]), r, n)
     x = v[:, :k]
     z = v[:, k : k + p]
     e = v[:, [-1]]
     params = np.arange(1, k + 1) / k
     params = params[:, None]
     y = x @ params + e
-    xhat = z @ np.linalg.pinv(z) @ x
+    exog_instr = np.column_stack((x[:, q:], z))
+    xhat = exog_instr @ np.linalg.pinv(exog_instr) @ x
     nobs, nvar = x.shape
     s2 = e.T @ e / nobs
     s2_debiased = e.T @ e / (nobs - nvar)
@@ -413,7 +414,8 @@ def test_weighted_r2():
     instr = ["nearc4"]
     data = data[dep + exog + endog + instr].dropna()
 
-    weights = np.random.random([len(data)]) ** 3
+    rs = np.random.RandomState(12345)
+    weights = rs.random([len(data)]) ** 3
     res = IV2SLS(data.educ, data[instr + exog], None, None, weights=weights).fit()
 
     res_2sls = IV2SLS(

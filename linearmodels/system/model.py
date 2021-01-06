@@ -682,10 +682,12 @@ class _SystemModelBase(object):
     ) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
         """Core estimation routine for iterative GLS"""
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
-        sigma = self._sigma
-        if sigma is None:
+
+        if self._sigma is None:
             sigma = eps.T @ eps / nobs
             sigma *= self._sigma_scale(debiased)
+        else:
+            sigma = self._sigma
         est_sigma = sigma
 
         if not full_cov:
@@ -927,12 +929,12 @@ class _SystemModelBase(object):
         results["debiased"] = debiased
 
         total_ss = resid_ss = 0.0
-        resid = []
+        residuals = []
         for key in individual:
             total_ss += individual[key].total_ss
             resid_ss += individual[key].resid_ss
-            resid.append(individual[key].resid)
-        resid = np.hstack(resid)
+            residuals.append(individual[key].resid)
+        resid = np.hstack(residuals)
 
         results["resid_ss"] = resid_ss
         results["total_ss"] = total_ss
@@ -944,13 +946,13 @@ class _SystemModelBase(object):
         x = self._x
         k = len(x)
         loc = 0
-        fitted = []
+        fitted_vals = []
         for i in range(k):
             nb = x[i].shape[1]
             b = beta[loc : loc + nb]
-            fitted.append(x[i] @ b)
+            fitted_vals.append(x[i] @ b)
             loc += nb
-        fitted = np.hstack(fitted)
+        fitted = np.hstack(fitted_vals)
 
         results["fitted"] = fitted
 
@@ -993,8 +995,8 @@ class _SystemModelBase(object):
         judge = 1 - (eps ** 2).sum() / (eps_const ** 2).sum()
         # Dhrymes
         tot_eps_const_sq = (eps_const ** 2).sum(0)
-        r2s = np.asarray(r2s)
-        dhrymes = (r2s * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
+        r2s_arr = np.asarray(r2s)
+        dhrymes = (r2s_arr * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
 
         # Berndt
         sigma_y = (eps_const.T @ eps_const / nobs) * self._sigma_scale(debiased)
@@ -1092,10 +1094,10 @@ class _SystemModelBase(object):
         )
 
         # wresid is different between GLS and OLS
-        wresid = []
+        wresiduals = []
         for individual_key in individual:
-            wresid.append(individual[individual_key].wresid)
-        wresid = np.hstack(wresid)
+            wresiduals.append(individual[individual_key].wresid)
+        wresid = np.hstack(wresiduals)
         results["wresid"] = wresid
         results["cov_estimator"] = cov_est
         results["cov_config"] = cov_est.cov_config
@@ -1959,10 +1961,10 @@ class IVSystemGMM(_SystemModelBase):
         xpz = blocked_cross_prod(x, z, np.eye(k))
         wi = np.linalg.inv(w)
         xpz_wi_zpx = xpz @ wi @ xpz.T
-        zpy = []
+        zpy_arrs = []
         for i in range(k):
-            zpy.append(z[i].T @ y[i])
-        zpy = np.vstack(zpy)
+            zpy_arrs.append(z[i].T @ y[i])
+        zpy = np.vstack(zpy_arrs)
         xpz_wi_zpy = xpz @ wi @ zpy
         params = _parameters_from_xprod(xpz_wi_zpx, xpz_wi_zpy, constraints=constraints)
 
@@ -2024,10 +2026,10 @@ class IVSystemGMM(_SystemModelBase):
         )
 
         # wresid is different between GLS and OLS
-        wresid = []
+        wresiduals = []
         for individual_key in individual:
-            wresid.append(individual[individual_key].wresid)
-        wresid = np.hstack(wresid)
+            wresiduals.append(individual[individual_key].wresid)
+        wresid = np.hstack(wresiduals)
         results["wresid"] = wresid
         results["wmat"] = wmat
         results["weight_type"] = self._weight_type

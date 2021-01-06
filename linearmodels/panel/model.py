@@ -371,14 +371,14 @@ class _PanelModelBase(object):
             | np.any(np.isnan(w), axis=1)
         )
 
-        missing_warning(all_missing ^ missing)
+        missing_warning(np.asarray(all_missing ^ missing))
         if np.any(missing):
             self.dependent.drop(missing)
             self.exog.drop(missing)
             self.weights.drop(missing)
 
             x = self.exog.values2d
-            self._not_null = ~missing
+            self._not_null = np.asarray(~missing)
 
         w = self.weights.dataframe
         if np.any(np.asarray(w) <= 0):
@@ -453,7 +453,7 @@ class _PanelModelBase(object):
             test_cov = cov_est.cov[sel][:, sel]
             test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
             test_stat = float(test_stat)
-            df = sel.sum()
+            df = int(sel.sum())
             null = "All parameters ex. constant not zero"
 
             if debiased:
@@ -1324,6 +1324,7 @@ class PanelOLS(_PanelModelBase):
         cats = np.concatenate(cats, 1)
 
         wd, cond = dummy_matrix(cats, precondition=True)
+        assert isinstance(wd, csc_matrix)
         if self._is_weighted:
             wd = wd.multiply(root_w_sparse)
 
@@ -1431,7 +1432,7 @@ class PanelOLS(_PanelModelBase):
         """Dummy-variable free estimation without weights"""
         _y = self.dependent.values2d
         _x = self.exog.values2d
-        ybar = _y.mean(0)
+        ybar = np.asarray(_y.mean(0))
 
         if not self._has_effect:
             return _y, _x, ybar
@@ -1472,7 +1473,7 @@ class PanelOLS(_PanelModelBase):
             y_arr = y_arr + y_gm
             x_arr = x_arr + x_gm
         else:
-            ybar = 0
+            ybar = np.asarray(0.0)
 
         return y_arr, x_arr, ybar
 
@@ -2267,16 +2268,16 @@ class FirstDifferenceOLS(_PanelModelBase):
             w = 1.0 / self.weights.values3d
             w = w[:, :-1] + w[:, 1:]
             w = 1.0 / w
-            w = panel_to_frame(
+            w_frame = panel_to_frame(
                 w,
                 self.weights.panel.items,
                 self.weights.panel.major_axis[1:],
                 self.weights.panel.minor_axis,
                 True,
             )
-            w = w.reindex(self.weights.index).dropna(how="any")
-            index = w.index
-            w = w.values
+            w_frame = w_frame.reindex(self.weights.index).dropna(how="any")
+            index = w_frame.index
+            w = w_frame.to_numpy()
 
             w /= w.mean()
             root_w = cast(NDArray, np.sqrt(w))
@@ -2542,8 +2543,12 @@ class RandomEffects(_PanelModelBase):
         """
         w = self.weights.values2d
         root_w = cast(NDArray, np.sqrt(w))
-        y = self.dependent.demean("entity", weights=self.weights).values2d
-        x = self.exog.demean("entity", weights=self.weights).values2d
+        demeaned_dep = self.dependent.demean("entity", weights=self.weights)
+        demeaned_exog = self.exog.demean("entity", weights=self.weights)
+        assert isinstance(demeaned_dep, PanelData)
+        assert isinstance(demeaned_exog, PanelData)
+        y = demeaned_dep.values2d
+        x = demeaned_exog.values2d
         if self.has_constant:
             w_sum = w.sum()
             y_gm = (w * self.dependent.values2d).sum(0) / w_sum

@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Union
 
 import numpy as np
+from pandas.core.series import Series
 from patsy.design_info import DesignInfo
 from scipy.stats import chi2, f
 
@@ -191,6 +192,7 @@ def quadratic_form_test(
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used" "simultaneously.")
     if formula is not None:
+        assert isinstance(params, Series)
         di = DesignInfo(list(params.index))
         lc = di.linear_constraint(formula)
         restriction, value = lc.coefs, lc.constants
