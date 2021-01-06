@@ -344,7 +344,7 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
 
     def min_dtype(*args: NDArray) -> str:
-        bits = max([np.log2(max(arg.max(), 1)) for arg in args])
+        bits = np.amax([np.log2(max(float(arg.max()), 1.0)) for arg in args])
         return "int{0}".format(min([j for j in (8, 16, 32, 64) if bits < (j - 1)]))
 
     dtype = min_dtype(offset, node_id, count, orig_dest)
@@ -395,7 +395,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
         for i in range(ncats):
             ucats, counts = np.unique(cats[:, i], return_counts=True)
             singleton |= np.isin(cats[:, i], ucats[counts == 1])
-        num_singleton = singleton.sum()
+        num_singleton = int(singleton.sum())
         if num_singleton:
             cats = cats[~singleton]
             retain_idx = retain_idx[~singleton]

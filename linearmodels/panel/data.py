@@ -394,6 +394,7 @@ class PanelData(object):
             group = "time"
             dummy = "entity"
         e = self.demean(group, weights=weights)
+        assert isinstance(e, PanelData)
         d = self.dummies(dummy, drop_first=True)
         d.index = e.index
         d = PanelData(d).demean(group, weights=weights)
@@ -654,15 +655,15 @@ class PanelData(object):
         """
         diffs = self.panel.values
         diffs = diffs[:, 1:] - diffs[:, :-1]
-        diffs = panel_to_frame(
+        diffs_frame = panel_to_frame(
             diffs,
             self.panel.items,
             self.panel.major_axis[1:],
             self.panel.minor_axis,
             True,
         )
-        diffs = diffs.reindex(self._frame.index).dropna(how="any")
-        return PanelData(diffs)
+        diffs_frame = diffs_frame.reindex(self._frame.index).dropna(how="any")
+        return PanelData(diffs_frame)
 
     @staticmethod
     def _minimize_multiindex(df: DataFrame) -> DataFrame:

@@ -155,8 +155,8 @@ class TestDataHandler(object):
         assert sorted(dh.cols) == sorted(["cat.b", "cat.c", "num"])
         assert dh.rows == list(index)
         assert_equal(dh.pandas["num"].values, num)
-        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
-        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
 
     def test_categorical_series(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
@@ -167,8 +167,8 @@ class TestDataHandler(object):
         assert dh.shape == (10, 2)
         assert sorted(dh.cols) == sorted(["cat.b", "cat.c"])
         assert dh.rows == list(index)
-        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
-        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
 
     def test_categorical_no_conversion(self) -> None:
         index = pd.date_range("2017-01-01", periods=10)
@@ -193,9 +193,9 @@ class TestDataHandler(object):
         assert sorted(dh.cols) == sorted(["cat.a", "cat.b", "cat.c", "num"])
         assert dh.rows == list(index)
         assert_equal(dh.pandas["num"].values, num)
-        assert_equal(dh.pandas["cat.a"].values, (cat == "a").astype(np.float))
-        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(np.float))
-        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(np.float))
+        assert_equal(dh.pandas["cat.a"].values, (cat == "a").astype(float))
+        assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
+        assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
 
     def test_nobs_missing_error(self) -> None:
         with pytest.raises(ValueError):
