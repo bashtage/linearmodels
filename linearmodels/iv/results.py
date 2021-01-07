@@ -424,7 +424,7 @@ class _LSModelResultsBase(_SummaryStr):
             * A single string without commas to test simple constraints such
               as 'x1=x2=x3=0'
 
-            It is not possible to use both restriction and formula.
+            It is not possible to use both ``restriction`` and ``formula``.
 
         Returns
         -------
