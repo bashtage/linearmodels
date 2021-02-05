@@ -95,3 +95,8 @@ def test_starting_values_options(data):
     sv = np.r_[sv, data.factors.mean()]
     res2 = mod2.fit(starting=sv, opt_options=oo, disp=0)
     assert res_full.iterations == res2.iterations
+    res3 = mod2.fit(starting=sv[:, None], opt_options=oo, disp=0)
+    assert_frame_equal(res2.params, res3.params)
+
+    with pytest.raises(ValueError, match="tarting values"):
+        mod2.fit(starting=sv[:-3], opt_options=oo, disp=0)

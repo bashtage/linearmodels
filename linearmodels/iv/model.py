@@ -1211,16 +1211,14 @@ class IVGMM(_IVGMMBase):
         wy, wx, wz = self._wy, self._wx, self._wz
         nobs = wy.shape[0]
         weight_matrix = self._weight.weight_matrix
+
+        k_wz = wz.shape[1]
+        if initial_weight is not None:
+            initial_weight = asarray(initial_weight)
+            if initial_weight.ndim != 2 or initial_weight.shape != (k_wz, k_wz):
+                raise ValueError(f"initial_weight must be a {k_wz} by {k_wz} array")
         wmat = inv(wz.T @ wz / nobs) if initial_weight is None else initial_weight
-        sv = IV2SLS(
-            self.dependent,
-            self.exog,
-            self.endog,
-            self.instruments,
-            weights=self.weights,
-        )
-        _params = params = asarray(sv.fit().params)[:, None]
-        # _params = params = self.estimate_parameters(wx, wy, wz, wmat)
+        _params = params = self.estimate_parameters(wx, wy, wz, wmat)
 
         iters, norm = 1, 10 * tol + 1
         vinv = eye(params.shape[0])
