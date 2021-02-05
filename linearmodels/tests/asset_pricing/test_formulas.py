@@ -83,3 +83,20 @@ def test_non_traded_risk_free(data, non_traded_model):
     assert_frame_equal(res1.params, res2.params)
     assert mod1.formula == FORMULA_FACTORS
     assert mod2.formula is None
+
+
+def test_starting_values_options(data):
+    mod = LinearFactorModelGMM(data.portfolios, data.factors)
+    res = mod.fit(steps=1, disp=0)
+    res_full = mod.fit(disp=0)
+    mod2 = LinearFactorModelGMM(data.portfolios, data.factors)
+    oo = {"method": "L-BFGS-B"}
+    sv = np.r_[np.asarray(res.betas).ravel(), np.asarray(res.risk_premia)]
+    sv = np.r_[sv, data.factors.mean()]
+    res2 = mod2.fit(starting=sv, opt_options=oo, disp=0)
+    assert res_full.iterations == res2.iterations
+    res3 = mod2.fit(starting=sv[:, None], opt_options=oo, disp=0)
+    assert_frame_equal(res2.params, res3.params)
+
+    with pytest.raises(ValueError, match="tarting values"):
+        mod2.fit(starting=sv[:-3], opt_options=oo, disp=0)

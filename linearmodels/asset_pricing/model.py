@@ -1,7 +1,7 @@
 """
 Linear factor models for applications in asset pricing
 """
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -860,6 +860,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
     def fit(
         self,
+        *,
         center: bool = True,
         use_cue: bool = False,
         steps: int = 2,
@@ -867,6 +868,8 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         max_iter: int = 1000,
         cov_type: str = "robust",
         debiased: bool = True,
+        starting: Optional[ArrayLike] = None,
+        opt_options: Optional[Dict[str, Any]] = None,
         **cov_config: Union[bool, int, str],
     ) -> GMMFactorModelResults:
         """
@@ -893,6 +896,14 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         debiased : bool, optional
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
+        starting : array_like, default None
+            Starting values to use in optimization.  If not provided, 2SLS
+            estimates are used.
+        opt_options : dict, optional
+            Additional options to pass to scipy.optimize.minimize when
+            optimizing the objective function. If not provided, defers to
+            scipy to choose an appropriate optimizer. All minimize inputs
+            except ``fun``, ``x0``, and ``args`` can be overridden.
         **cov_config
             Additional covariance-specific options.  See Notes.
 
@@ -921,6 +932,14 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         lam = np.asarray(res.risk_premia)
         mu = self.factors.ndarray.mean(0)
         sv = np.r_[betas, lam, mu][:, None]
+        if starting is not None:
+            starting = np.asarray(starting)
+            if starting.ndim == 1:
+                starting = starting[:, None]
+            if starting.shape != sv.shape:
+                raise ValueError(f"Starting values must have {sv.shape} elements.")
+            sv = starting
+
         g = self._moments(sv, excess_returns)
         g -= g.mean(0)[None, :] if center else 0
         kernel: Optional[str] = None
@@ -944,12 +963,17 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         # 2. Step 1 using w = inv(s) from SV
         callback = callback_factory(self._j, args, disp=disp)
+        _default_options = {"callback": callback, "options": {}}
+        options = {"disp": bool(disp), "maxiter": max_iter}
+        opt_options = {} if opt_options is None else opt_options
+        options.update(opt_options.get("options", {}))
+        _default_options.update(opt_options)
+        _default_options["options"].update(options)
         opt_res = minimize(
-            self._j,
-            sv,
+            fun=self._j,
+            x0=sv,
             args=args,
-            callback=callback,
-            options={"disp": bool(disp), "maxiter": max_iter},
+            **_default_options,
         )
         params = opt_res.x
         last_obj = opt_res.fun

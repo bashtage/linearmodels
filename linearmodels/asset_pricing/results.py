@@ -332,6 +332,7 @@ class GMMFactorModelResults(LinearFactorModelResults):
         se = se.reshape((nportfolio, nfactor))
         return pd.DataFrame(se, columns=self._cols, index=self._portfolio_names)
 
+    @property
     def iterations(self) -> int:
         """Number of steps in GMM estimation"""
         return self._iter

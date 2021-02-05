@@ -36,5 +36,4 @@ def get_all(res):
         if attr_name.startswith("_"):
             continue
         attr = getattr(res, attr_name)
-        if callable(attr):
-            attr()
+        assert not callable(attr)

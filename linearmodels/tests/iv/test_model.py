@@ -425,3 +425,24 @@ def test_weighted_r2():
     assert_allclose(fs_educ.rsquared, res.rsquared)
     index = res.params.index
     assert_allclose(fs_educ.params[index], res.params[index])
+
+
+def test_initial_weight(data):
+    mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    res = mod.fit(iter_limit=1)
+    z = np.concatenate([data.exog, data.instr], 1)
+    ze = z + np.random.standard_normal(size=z.shape)
+    w0 = ze.T @ ze / ze.shape[0]
+    res0 = mod.fit(initial_weight=w0, iter_limit=1)
+    assert np.any(res0.params != res.params)
+
+
+def test_initial_weight_error(data):
+    mod = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    z = np.concatenate([data.exog, data.instr], 1)
+    ze = z + np.random.standard_normal(size=z.shape)
+    w0 = ze.T @ ze / ze.shape[0]
+    with pytest.raises(ValueError, match="initial_weight must"):
+        mod.fit(initial_weight=w0[:-1, :-1])
+    with pytest.raises(ValueError, match="initial_weight must"):
+        mod.fit(initial_weight=w0[:-1])
