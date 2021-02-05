@@ -1521,7 +1521,8 @@ class IVGMMCUE(_IVGMMBase):
         opt_options : dict, default None
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
-            scipy to choose an appropriate optimizer.
+            scipy to choose an appropriate optimizer. All minimize inputs
+            except ``fun``, ``x0``, and ``args`` can be overridden.
         **cov_config
             Additional parameters to pass to covariance estimator. Supported
             parameters depend on specific covariance structure assumed. See
