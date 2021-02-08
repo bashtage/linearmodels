@@ -963,12 +963,12 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         # 2. Step 1 using w = inv(s) from SV
         callback = callback_factory(self._j, args, disp=disp)
-        _default_options = {"callback": callback, "options": {}}
+        _default_options: Dict[str, Any] = {"callback": callback}
         options = {"disp": bool(disp), "maxiter": max_iter}
         opt_options = {} if opt_options is None else opt_options
         options.update(opt_options.get("options", {}))
         _default_options.update(opt_options)
-        _default_options["options"].update(options)
+        _default_options["options"] = options
         opt_res = minimize(
             fun=self._j,
             x0=sv,
