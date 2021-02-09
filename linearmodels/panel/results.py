@@ -31,6 +31,7 @@ class PanelResults(_SummaryStr):
     """
 
     def __init__(self, res: AttrDict):
+
         self._params = res.params.squeeze()
         self._deferred_cov = res.deferred_cov
         self._debiased = res.debiased
@@ -57,7 +58,7 @@ class PanelResults(_SummaryStr):
         self._resids = res.resids
         self._wresids = res.wresids
         self._index = res.index
-        self._deferred_f = res.deferred_f
+        self._f_info = res.f_info
         self._f_stat = res.f_stat
         self._loglik = res.loglik
         self._fitted = res.fitted
@@ -614,7 +615,11 @@ class PanelResults(_SummaryStr):
         number of restrictions and inference is made using an :math:`F_{k,df}`
         distribution where df is the residual degree of freedom from the model.
         """
-        return self._deferred_f()
+        from linearmodels.panel.model import _deferred_f
+
+        return _deferred_f(
+            self.params, self.cov, self._debiased, self.df_resid, self._f_info
+        )
 
     @property
     def f_statistic(self) -> WaldTestStatistic:

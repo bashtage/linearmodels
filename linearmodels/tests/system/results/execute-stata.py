@@ -76,7 +76,7 @@ for key_base, cmd in zip(key_bases, cmds):
     base = "sureg " + cmd
     ss = base + ", small dfk"
     comp = cmd.replace("(", "").strip().split(")")[:-1]
-    comp = list(map(lambda s: s.strip(), comp))
+    comp = [c.strip() for c in comp]
     deps = [c.split(" ")[0] for c in comp]
     first = [c.split(" ")[1] for c in comp]
     vals = {}

@@ -84,7 +84,7 @@ def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
     where n is the number of observations in the sample
     """
     k = len(x)
-    widths = list(map(lambda m: m.shape[1], x))
+    widths = [m.shape[1] for m in x]
     s_is_diag = np.all(np.asarray((s - np.diag(np.diag(s))) == 0.0))
 
     w0 = widths[0]

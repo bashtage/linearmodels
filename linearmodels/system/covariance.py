@@ -283,7 +283,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def _adjustment(self) -> Union[float, ndarray]:
         if not self._debiased:
             return 1.0
-        ks = list(map(lambda s: s.shape[1], self._x))
+        ks = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
         adj = []
         for k in ks:
@@ -643,7 +643,7 @@ class GMMHomoskedasticCovariance(object):
     def _adjustment(self) -> Union[float, ndarray]:
         if not self._debiased:
             return 1.0
-        k = list(map(lambda s: s.shape[1], self._x))
+        k = [s.shape[1] for s in self._x]
         nobs = self._x[0].shape[0]
         adj = []
         for i in range(len(k)):

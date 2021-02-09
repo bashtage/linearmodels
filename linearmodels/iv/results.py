@@ -51,7 +51,7 @@ def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
 def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[str]]:
     col_sizes = []
     for table in lists:
-        size = list(map(lambda r: list(map(len, r)), table))
+        size = [[len(item) for item in row] for row in table]
         size_arr = array(size)
         col_sizes.append(list(asarray(size_arr.max(0))))
     col_size = asarray(array(col_sizes).max(axis=0))

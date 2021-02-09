@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Optional, Tuple, Type, Union, cast
+from typing import Dict, NamedTuple, Optional, Tuple, Type, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq, matrix_rank
@@ -72,6 +72,35 @@ def panel_structure_stats(ids: NDArray, name: str) -> Series:
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
     return Series(out, index=index, name=name)
+
+
+class FInfo(NamedTuple):
+    sel: NDArray
+    name: str
+    invalid_test_stat: Optional[InvalidTestStatistic]
+    is_invalid: bool
+
+
+def _deferred_f(
+    params: Series, cov: DataFrame, debiased: bool, df_resid: int, f_info: FInfo
+) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    if f_info.is_invalid:
+        assert f_info.invalid_test_stat is not None
+        return f_info.invalid_test_stat
+    sel = f_info.sel
+    name = f_info.name
+    test_params = np.asarray(params)[sel]
+    test_cov = np.asarray(cov)[sel][:, sel]
+    test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
+    test_stat = float(test_stat)
+    df = int(sel.sum())
+    null = "All parameters ex. constant not zero"
+
+    if debiased:
+        wald = WaldTestStatistic(test_stat / df, null, df, df_resid, name=name)
+    else:
+        wald = WaldTestStatistic(test_stat, null, df, name=name)
+    return wald
 
 
 class PanelFormulaParser(object):
@@ -432,37 +461,23 @@ class _PanelModelBase(object):
     def _f_statistic_robust(
         self,
         params: NDArray,
-        cov_est: CovarianceEstimator,
-        debiased: bool,
-        df_resid: int,
-    ) -> Callable[[], Union[WaldTestStatistic, InvalidTestStatistic]]:
+    ) -> FInfo:
         """Compute Wald test that all parameters are 0, ex. constant"""
         sel = np.ones(params.shape[0], dtype=bool)
         name = "Model F-statistic (robust)"
 
-        def invalid_f() -> InvalidTestStatistic:
-            return InvalidTestStatistic("Model contains only a constant", name=name)
-
         if self.has_constant:
             if len(sel) == 1:
-                return invalid_f
+                return FInfo(
+                    sel,
+                    name,
+                    InvalidTestStatistic("Model contains only a constant", name=name),
+                    True,
+                )
+
             sel[self._constant_index] = False
 
-        def deferred_f() -> WaldTestStatistic:
-            test_params = params[sel]
-            test_cov = cov_est.cov[sel][:, sel]
-            test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
-            test_stat = float(test_stat)
-            df = int(sel.sum())
-            null = "All parameters ex. constant not zero"
-
-            if debiased:
-                wald = WaldTestStatistic(test_stat / df, null, df, df_resid, name=name)
-            else:
-                wald = WaldTestStatistic(test_stat, null, df, name=name)
-            return wald
-
-        return deferred_f
+        return FInfo(sel, name, None, False)
 
     def _prepare_between(self) -> Tuple[NDArray, NDArray, NDArray]:
         """Prepare values for between estimation of R2"""
@@ -577,7 +592,7 @@ class _PanelModelBase(object):
         root_w: NDArray,
     ) -> AttrDict:
         """Common post-estimation values"""
-        deferred_f = self._f_statistic_robust(params, cov, debiased, df_resid)
+        f_info = self._f_statistic_robust(params)
         f_stat = self._f_statistic(weps, y, x, root_w, df_resid)
         r2o, r2w, r2b = self._rsquared(params)
         c2o, c2w, c2b = self._rsquared_corr(params)
@@ -595,7 +610,7 @@ class _PanelModelBase(object):
         res = AttrDict(
             params=params,
             deferred_cov=cov.deferred_cov,
-            deferred_f=deferred_f,
+            f_info=f_info,
             f_stat=f_stat,
             debiased=debiased,
             name=self._name,
@@ -1709,7 +1724,7 @@ class PanelOLS(_PanelModelBase):
 
         if self.entity_effects or self.time_effects or self.other_effects:
             if not self._drop_absorbed:
-                check_absorbed(x, list(map(str, self.exog.vars)))
+                check_absorbed(x, [str(var) for var in self.exog.vars])
             else:
                 retain = not_absorbed(x)
                 if not retain:

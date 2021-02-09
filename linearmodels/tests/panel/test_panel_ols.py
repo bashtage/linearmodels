@@ -28,7 +28,7 @@ pytestmark = pytest.mark.filterwarnings(
 perc_missing = [0.0, 0.02, 0.20]
 has_const = [True, False]
 perms = list(product(perc_missing, datatypes, has_const))
-ids = list(map(lambda s: "-".join(map(str, s)), perms))
+ids = ["-".join(str(param) for param in perms) for perm in perms]
 
 
 @pytest.fixture(params=perms, ids=ids)
@@ -82,7 +82,7 @@ def singleton_data(request):
 
 
 const_perms = list(product(perc_missing, datatypes))
-const_ids = list(map(lambda s: "-".join(map(str, s)), const_perms))
+const_ids = ["-".join(str(val) for val in perm) for perm in const_perms]
 
 
 @pytest.fixture(params=const_perms, ids=const_ids)

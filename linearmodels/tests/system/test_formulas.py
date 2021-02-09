@@ -1,4 +1,5 @@
 from itertools import product
+import pickle
 
 import numpy as np
 from pandas import Series, concat
@@ -67,10 +68,15 @@ def test_fromula(config):
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
             return
     mod = model.from_formula(fmla, joined)
+    pmod = pickle.loads(pickle.dumps(mod))
     mod_fmla = interface(fmla, joined)
     res = mod.fit()
+    ppres = pmod.fit()
+    pres = pickle.loads(pickle.dumps(res))
     res_fmla = mod_fmla.fit()
     assert_series_equal(res.params, res_fmla.params)
+    assert_series_equal(res.params, pres.params)
+    assert_series_equal(res.params, ppres.params)
 
 
 def test_predict(config):

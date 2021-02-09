@@ -28,7 +28,7 @@ DATASETS = [
     wage,
     wage_panel,
 ]
-ids = list(map(lambda x: x.__name__.split(".")[-1], DATASETS))
+ids = [ds.__name__.split(".")[-1] for ds in DATASETS]
 
 
 @pytest.fixture(params=DATASETS, ids=ids)

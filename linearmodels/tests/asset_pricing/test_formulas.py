@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 from pandas import concat
 from pandas.testing import assert_frame_equal
@@ -47,6 +49,17 @@ def test_traded_model_formula(data, model):
     assert_frame_equal(mod1.portfolios.pandas, mod2.portfolios.pandas)
     assert_frame_equal(res1.params, res2.params)
     assert mod1.formula == FORMULA
+    assert mod2.formula is None
+
+    pmod = pickle.loads(pickle.dumps(mod1))
+    pres = pickle.loads(pickle.dumps(res1))
+    ppres = pmod.fit()
+    assert_frame_equal(mod1.factors.pandas, pmod.factors.pandas)
+    assert_frame_equal(mod1.portfolios.pandas, pmod.portfolios.pandas)
+    assert_frame_equal(res1.params, pres.params)
+    assert_frame_equal(res1.params, ppres.params)
+    assert mod1.formula == FORMULA
+    assert pmod.formula == FORMULA
     assert mod2.formula is None
 
     mod1 = model.from_formula(FORMULA_FACTORS, data.joined, portfolios=data.portfolios)

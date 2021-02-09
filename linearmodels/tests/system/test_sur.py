@@ -38,7 +38,7 @@ def gen_id(param):
     return idstr
 
 
-ids = list(map(gen_id, params))
+ids = [gen_id(param) for param in params]
 
 
 def check_results(res1, res2):
@@ -104,7 +104,7 @@ def mvreg_gen_id(param):
     return idstr
 
 
-mvreg_ids = list(map(mvreg_gen_id, mvreg_params))
+mvreg_ids = [mvreg_gen_id(param) for param in mvreg_params]
 
 
 @pytest.fixture(scope="module", params=mvreg_params, ids=mvreg_ids)

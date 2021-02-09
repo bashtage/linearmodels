@@ -1,4 +1,5 @@
 from itertools import product
+import pickle
 
 import numpy as np
 from pandas import DataFrame
@@ -86,7 +87,7 @@ def test_basic_formulas(data, models, formula):
 
     parts = formula.split("~")
     variables = parts[1].replace(" 1 ", " const ").split("+")
-    variables = list(map(lambda s: s.strip(), variables))
+    variables = [s.strip() for s in variables]
     x = data.x
     res2 = model(data.y, x[variables]).fit()
     wres2 = model(data.y, x[variables], weights=data.w).fit()
@@ -102,11 +103,16 @@ def test_basic_formulas(data, models, formula):
     formula[1] = " 1 + " + formula[1]
     formula = "~".join(formula)
     mod = model.from_formula(formula, joined)
+    pmod = pickle.loads(pickle.dumps(mod))
     res = mod.fit()
+    pres = pmod.fit()
+    ppres = pickle.loads(pickle.dumps(pres))
 
     mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
     np.testing.assert_allclose(res.params, res2.params)
+    np.testing.assert_allclose(res.params, pres.params)
+    np.testing.assert_allclose(res.params, ppres.params)
 
     x["Intercept"] = 1.0
     variables = ["Intercept"] + variables
@@ -193,7 +199,7 @@ def test_basic_formulas_predict(data, models, formula):
 
     parts = formula.split("~")
     variables = parts[1].replace(" 1 ", " const ").split("+")
-    variables = list(map(lambda s: s.strip(), variables))
+    variables = [s.strip() for s in variables]
     x = data.x
     res2 = model(data.y, x[variables]).fit()
     pred3 = res2.predict(x[variables])
@@ -236,7 +242,7 @@ def test_formulas_predict_error(data, models, formula):
 
     parts = formula.split("~")
     variables = parts[1].replace(" 1 ", " const ").split("+")
-    variables = list(map(lambda s: s.strip(), variables))
+    variables = [s.strip() for s in variables]
     x = data.x
     res = model(data.y, x[variables]).fit()
     with pytest.raises(ValueError):

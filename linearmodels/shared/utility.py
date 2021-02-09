@@ -2,6 +2,7 @@ from collections.abc import MutableMapping
 from typing import (
     AbstractSet,
     Any,
+    Callable,
     Iterable,
     Iterator,
     List,
@@ -17,6 +18,13 @@ import numpy as np
 from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import Label, NDArray
+
+
+def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> "AttrDict":
+    attr_dict = AttrDict()
+    for k, v in args:
+        attr_dict[k] = v
+    return attr_dict
 
 
 class AttrDict(MutableMapping):
@@ -66,12 +74,19 @@ class AttrDict(MutableMapping):
 
         return self.__private_dict__.pop(key, default)
 
+    def __reduce__(
+        self,
+    ) -> Tuple[
+        Callable[[Iterable[Tuple[Any, Any]]], "AttrDict"], Tuple[Tuple[Any, Any], ...]
+    ]:
+        return _new_attr_dict_, tuple((k, v) for k, v in self.items())
+
     def __len__(self) -> int:
         return self.__private_dict__.__len__()
 
     def __repr__(self) -> str:
         out = self.__private_dict__.__str__()
-        return "Attr" + out[7:]
+        return "AttrDict" + out
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -109,7 +124,7 @@ class AttrDict(MutableMapping):
         del self.__private_dict__[key]
 
     def __dir__(self) -> Iterable[str]:
-        out = list(map(str, self.__private_dict__.keys()))
+        out = [str(key) for key in self.__private_dict__.keys()]
         out += list(super(AttrDict, self).__dir__())
         filtered = [key for key in out if key.isidentifier()]
         return sorted(set(filtered))

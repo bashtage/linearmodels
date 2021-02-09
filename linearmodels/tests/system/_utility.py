@@ -56,7 +56,7 @@ def generate_data(
 def atleast_k_elem(x, k):
     x = np.array(x)
     if x.ndim == 0:
-        x = x * np.ones(k, dtype=np.int)
+        x = x * np.ones(k, dtype=int)
     return x
 
 
