@@ -75,7 +75,6 @@ def test_array_like(arr):
 
 
 def test_panel_data_like(panel):
-    print(type(panel))
     assert isinstance(get_panel_data_like({"v": panel}, "v"), PANEL_LIKE)
     assert get_panel_data_like({"v": panel}, "a") is None
     with pytest.raises(TypeError):

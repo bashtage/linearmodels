@@ -1,4 +1,5 @@
 from itertools import product
+import pickle
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
@@ -8,6 +9,7 @@ import pytest
 from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import AmbiguityError, PanelOLS
 from linearmodels.panel.utility import AbsorbingEffectError
+from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.tests.panel._utility import datatypes, generate_data, lsdv
 
 pytestmark = pytest.mark.filterwarnings(
@@ -232,5 +234,19 @@ def test_all_missing(data):
 
     with warnings.catch_warnings(record=True) as w:
         PanelOLS(y.dataframe, x.dataframe).fit()
-    print(w)
     assert len(w) == 0
+
+
+def test_pickle(data):
+    mod = PanelOLS(data.y, data.x, entity_effects=True, time_effects=True)
+    remod = pickle.loads(pickle.dumps(mod))
+    res = mod.fit()
+    reres = remod.fit()
+    rereres = pickle.loads(pickle.dumps(res))
+    assert_allclose(res.params, reres.params)
+    assert_allclose(res.params, rereres.params)
+    assert_allclose(res.cov, reres.cov)
+    assert_allclose(res.cov, rereres.cov)
+    assert isinstance(res.f_statistic_robust, WaldTestStatistic)
+    assert isinstance(reres.f_statistic_robust, WaldTestStatistic)
+    assert isinstance(res.f_statistic_robust, WaldTestStatistic)

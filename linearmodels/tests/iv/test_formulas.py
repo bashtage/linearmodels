@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, concat
@@ -75,6 +77,12 @@ def test_formula(data, model_and_func, formula):
     res = mod.fit()
     assert res.rsquared == res2.rsquared
     assert mod.formula == formula
+
+    pmod = pickle.loads(pickle.dumps(mod))
+    ppres = pmod.fit()
+    pres = pickle.loads(pickle.dumps(res))
+    assert pres.rsquared == res2.rsquared
+    assert ppres.rsquared == res2.rsquared
 
 
 def test_formula_weights(data, model_and_func, formula):

@@ -238,6 +238,5 @@ def test_generate_panel_data(missing, const, other_effects, cat_list):
         assert np.any(np.asarray(np.isnan(dataset.data)))
     if const:
         assert "const" in dataset.data
-        print(dataset.data["const"])
         assert (dataset.data["const"].dropna() == 1.0).all()
     assert dataset.other_effects.shape == (dataset.data.shape[0], other_effects)

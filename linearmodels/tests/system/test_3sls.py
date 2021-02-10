@@ -54,7 +54,7 @@ def gen_id(param):
     return idstr
 
 
-ids = list(map(gen_id, params))
+ids = [gen_id(param) for param in params]
 
 
 @pytest.fixture(params=params, ids=ids)

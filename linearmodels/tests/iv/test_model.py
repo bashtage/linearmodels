@@ -297,7 +297,7 @@ def test_model_missing(data):
     res = mod.fit()
 
     var_names = [data.dep, data.exog, data.endog, data.instr]
-    missing = list(map(lambda x: np.any(np.isnan(x), 1), var_names))
+    missing = [np.any(np.isnan(var_name), 1) for var_name in var_names]
     missing = np.any(np.c_[missing], 0)
     not_missing = missing.shape[0] - missing.sum()
     assert res.nobs == not_missing

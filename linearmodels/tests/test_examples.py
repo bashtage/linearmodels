@@ -31,7 +31,7 @@ NOTEBOOKS_USING_XARRAY = ["panel_data-formats.ipynb"]
 NOTEBOOK_DIR = os.path.abspath(os.path.join(head, "..", "..", "examples"))
 
 nbs = sorted(glob.glob(os.path.join(NOTEBOOK_DIR, "*.ipynb")))
-ids = list(map(lambda s: os.path.split(s)[-1].split(".")[0], nbs))
+ids = [os.path.split(nb)[-1].split(".")[0] for nb in nbs]
 if not nbs:  # pragma: no cover
     pytest.mark.skip(reason="No notebooks found so not tests run")
 

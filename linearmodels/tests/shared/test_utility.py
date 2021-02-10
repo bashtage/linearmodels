@@ -1,3 +1,4 @@
+import pickle
 import random
 import string
 import warnings
@@ -126,6 +127,11 @@ def test_attr_dict():
     ad[("a", 2)] = ("a", 2)
     assert list(ad.keys()) == ["one", 1, ("a", 2)]
     assert len(ad) == 3
+
+    plk = pickle.dumps(ad)
+    pad = pickle.loads(plk)
+    assert list(pad.keys()) == ["one", 1, ("a", 2)]
+    assert len(pad) == 3
 
     ad2 = ad.copy()
     assert list(ad2.keys()) == list(ad.keys())

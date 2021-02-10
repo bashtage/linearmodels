@@ -28,7 +28,7 @@ def gen_id(r):
     return _id
 
 
-ids = list(map(gen_id, params))
+ids = [gen_id(param) for param in params]
 
 
 @pytest.fixture(scope="module", params=params, ids=ids)

@@ -433,7 +433,7 @@ class _SystemModelBase(object):
         for i, comps in enumerate(
             zip(self._dependent, self._exog, self._endog, self._instr, self._weights)
         ):
-            shapes = list(map(lambda a: a.shape[0], comps))
+            shapes = [a.shape[0] for a in comps]
             if min(shapes) != max(shapes):
                 raise ValueError(
                     "Dependent, exogenous, endogenous and "
@@ -807,7 +807,7 @@ class _SystemModelBase(object):
             )
 
         if debiased:
-            total_reg = np.sum(list(map(lambda s: s.shape[1], self._wx)))
+            total_reg = np.sum([s.shape[1] for s in self._wx])
             df_denom = len(self._wx) * nobs - total_reg
             wald = WaldTestStatistic(stat / df, null, df, df_denom=df_denom, name=name)
         else:
@@ -1241,7 +1241,7 @@ class _LSSystemModelBase(_SystemModelBase):
             raise ValueError("Unknown cov_type: {0}".format(cov_type))
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
-        col_sizes = [0] + list(map(lambda v: v.shape[1], self._x))
+        col_sizes = [0] + [v.shape[1] for v in self._x]
         col_idx = [int(i) for i in np.cumsum(col_sizes)]
         total_cols = col_idx[-1]
         self._construct_xhat()

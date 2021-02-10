@@ -83,7 +83,7 @@ class HomoskedasticWeightMatrix(object):
         sigma = eps.T @ eps / nobs
         scale = 1.0
         if self._debiased:
-            k = array(list(map(lambda a: a.shape[1], x)))[:, None]
+            k = array([a.shape[1] for a in x])[:, None]
             k = sqrt(k)
             scale = nobs / (nobs - k @ k.T)
         sigma *= scale
@@ -216,8 +216,8 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     ) -> float:
         if not self._debiased:
             return 1
-        nvar = array(list(map(lambda a: a.shape[1], x)))
-        ninstr = array(list(map(lambda a: a.shape[1], z)))
+        nvar = array([a.shape[1] for a in x])
+        ninstr = array([a.shape[1] for a in z])
         nvar = repeat(nvar, ninstr)
         nvar = cast(NDArray, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
