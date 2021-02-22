@@ -1,7 +1,6 @@
 from typing import Optional, Tuple
 
 import numpy as np
-from numpy.linalg import lstsq
 
 from linearmodels.typing import NDArray
 
@@ -43,9 +42,9 @@ def has_constant(
     has_const = has_const or rank < min(x.shape)
     loc = None
     if has_const:
-        out = lstsq(x, np.ones((n, 1)), rcond=None)
-        beta = out[0].ravel()
-        loc = int(np.argmax(np.abs(beta) * x.var(0)))
+        normed_var = x.var(0) / np.abs(x).max(0)
+        loc = int(np.argmin(normed_var))
+
     return bool(has_const), loc
 
 
