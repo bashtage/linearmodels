@@ -274,6 +274,7 @@ class _PanelModelBase(object):
             ACCovariance,
         )
         self._original_index = self.dependent.index.copy()
+        self._constant_index: Optional[int] = None
         self._validate_data()
         self._singleton_index: Optional[NDArray] = None
 
@@ -474,7 +475,7 @@ class _PanelModelBase(object):
                     InvalidTestStatistic("Model contains only a constant", name=name),
                     True,
                 )
-
+            assert isinstance(self._constant_index, int)
             sel[self._constant_index] = False
 
         return FInfo(sel, name, None, False)
@@ -1726,7 +1727,9 @@ class PanelOLS(_PanelModelBase):
             if not self._drop_absorbed:
                 check_absorbed(x, [str(var) for var in self.exog.vars])
             else:
-                retain = not_absorbed(x)
+                # TODO: Need to special case the constant here when determining which to retain
+                # since we always want to retain the constant if present
+                retain = not_absorbed(x, self._constant, self._constant_index)
                 if not retain:
                     raise ValueError(
                         "All columns in exog have been fully absorbed by the included"
@@ -1742,6 +1745,13 @@ class PanelOLS(_PanelModelBase):
                         AbsorbingEffectWarning,
                     )
                     x = x[:, retain]
+                    # Update constant index loc
+                    if self._constant:
+                        assert isinstance(self._constant_index, int)
+                        self._constant_index = int(
+                            np.argwhere(np.array(retain) == self._constant_index)
+                        )
+
                     # Adjust exog
                     self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
                     x_effects = x_effects[retain]

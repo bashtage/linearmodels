@@ -11,6 +11,7 @@ from linearmodels.panel.data import PanelData
 from linearmodels.panel.model import PanelOLS, PooledOLS
 from linearmodels.panel.utility import AbsorbingEffectWarning
 from linearmodels.shared.exceptions import MemoryWarning
+from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 from linearmodels.tests.panel._utility import (
     access_attributes,
@@ -1419,3 +1420,24 @@ def test_zero_endog():
     x = pd.DataFrame(x, index=mi, columns=["x"])
     y = pd.Series(y, index=mi, name="y")
     PanelOLS(y, x).fit()
+
+
+def test_f_after_drop():
+    rg = np.random.default_rng(918273645)
+    y = pd.Series(rg.standard_normal(1000))
+    a1 = np.arange(1000) % 10
+    a2 = np.arange(1000) // 100
+
+    x = pd.DataFrame(
+        {"x": rg.standard_normal(1000), "a1": a1, "a2": a2, "c": np.ones(1000)}
+    )
+    mi = pd.MultiIndex.from_product([list(range(100)), list(range(10))])
+    y.index = mi
+    x.index = mi
+    mod = PanelOLS(y, x, drop_absorbed=True, entity_effects=True, time_effects=True)
+    with pytest.warns(AbsorbingEffectWarning):
+        res = mod.fit()
+    assert isinstance(res.f_statistic, WaldTestStatistic)
+    assert isinstance(res.f_statistic_robust, WaldTestStatistic)
+    assert res.f_statistic.stat > 0
+    assert res.f_statistic_robust.stat > 0
