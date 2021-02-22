@@ -3,11 +3,11 @@
 | Metric                     |                                                                                                                                                                                                                                                          |
 | :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Latest Release**         | [![PyPI version](https://badge.fury.io/py/linearmodels.svg)](https://badge.fury.io/py/linearmodels)                                                                                                                                                      |
-| **Continuous Integration** | [![Build Status](https://dev.azure.com/kevinksheppard/kevinksheppard/_apis/build/status/bashtage.linearmodels?branchName=master)](https://dev.azure.com/kevinksheppard/kevinksheppard/_build/latest?definitionId=2&branchName=master)                    |
-|                            | [![Build status](https://ci.appveyor.com/api/projects/status/7768doy6wrdunmdt/branch/master?svg=true)](https://ci.appveyor.com/project/bashtage/linearmodels/branch/master)                                                                              |
-| **Coverage**               | [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/master/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)                                                                                                                     |
+| **Continuous Integration** | [![Build Status](https://dev.azure.com/kevinksheppard/kevinksheppard/_apis/build/status/bashtage.linearmodels?branchName=main)](https://dev.azure.com/kevinksheppard/kevinksheppard/_build/latest?definitionId=2&branchName=main)                    |
+|                            | [![Build status](https://ci.appveyor.com/api/projects/status/7768doy6wrdunmdt/branch/main?svg=true)](https://ci.appveyor.com/project/bashtage/linearmodels/branch/main)                                                                              |
+| **Coverage**               | [![codecov](https://codecov.io/gh/bashtage/linearmodels/branch/main/graph/badge.svg)](https://codecov.io/gh/bashtage/linearmodels)                                                                                                                     |
 | **Code Quality**           | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/745a24a69cb2466b95df6a53c83892de)](https://www.codacy.com/manual/bashtage/linearmodels?utm_source=github.com&utm_medium=referral&utm_content=bashtage/linearmodels&utm_campaign=Badge_Grade) |
-|                            | [![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-master)                                                                                               |
+|                            | [![codebeat badge](https://codebeat.co/badges/aaae2fb4-72b5-4a66-97cd-77b93488f243)](https://codebeat.co/projects/github-com-bashtage-linearmodels-main)                                                                                               |
 |                            | [![Code Quality: Python](https://img.shields.io/lgtm/grade/python/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/context:python)                                                                 |
 |                            | [![Total Alerts](https://img.shields.io/lgtm/alerts/g/bashtage/linearmodels.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bashtage/linearmodels/alerts)                                                                                       |
 | **Citation**               | [![DOI](https://zenodo.org/badge/82291672.svg)](https://zenodo.org/badge/latestdoi/82291672)                                                                                                                                                             |
@@ -103,7 +103,7 @@ The latest release can be installed using pip
 pip install linearmodels
 ```
 
-The master branch can be installed by cloning the repo and running setup
+The main branch can be installed by cloning the repo and running setup
 
 ```bash
 git clone https://github.com/bashtage/linearmodels
@@ -117,7 +117,7 @@ python setup.py install
 built on every tagged version using
 [doctr](https://github.com/drdoctr/doctr).
 [Development Documentation](https://bashtage.github.io/linearmodels/devel)
-is automatically built on every successful build of master.
+is automatically built on every successful build of main.
 
 ## Plan and status
 
