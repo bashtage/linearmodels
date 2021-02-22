@@ -93,8 +93,8 @@ max        9.250620      1.000000      1.000000     50.000000
 Dep. Variable:               ldrugexp   R-squared:                      0.1770
 Estimator:                        OLS   Adj. R-squared:                 0.1765
 No. Observations:               10089   F-statistic:                    2262.6
-Date:                Wed, Feb 10 2021   P-value (F-stat)                0.0000
-Time:                        00:05:45   Distribution:                  chi2(6)
+Date:                Mon, Feb 22 2021   P-value (F-stat)                0.0000
+Time:                        16:31:55   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -120,8 +120,8 @@ blhisp         -0.1513     0.0341    -4.4353     0.0000     -0.2182     -0.0844
 Dep. Variable:               ldrugexp   R-squared:                      0.0640
 Estimator:                    IV-2SLS   Adj. R-squared:                 0.0634
 No. Observations:               10089   F-statistic:                    2000.9
-Date:                Wed, Feb 10 2021   P-value (F-stat)                0.0000
-Time:                        00:05:45   Distribution:                  chi2(6)
+Date:                Mon, Feb 22 2021   P-value (F-stat)                0.0000
+Time:                        16:31:55   Distribution:                  chi2(6)
 Cov. Estimator:                robust
 
                               Parameter Estimates
@@ -180,8 +180,8 @@ Debiased: False
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 1.045365
          Iterations: 10
-         Function evaluations: 428
-         Gradient evaluations: 52
+         Function evaluations: 484
+         Gradient evaluations: 59
 </pre></div></div> </div> <h2 id=Comparing-results >Comparing results<a class=headerlink  href="#Comparing-results" title="Permalink to this headline">¶</a></h2> <p>The function <code class="docutils literal notranslate"><span class=pre >compare</span></code> can be used to compare the results of multiple models, possibly with different variables, estimators and/or instruments. Usually a dictionary or <code class="docutils literal notranslate"><span class=pre >OrderedDict</span></code> is used to hold results since the keys are used as model names. The advantage of an <code class="docutils literal notranslate"><span class=pre >OrderedDict</span></code> is that it will preserve the order of the models in the presentation.</p> <p>With the expectation of the OLS estimate, the parameter estimates are fairly consistent. Standard errors vary slightly although the conclusions reached are not sensitive to the choice of covariance estimator either. T-stats are reported in parentheses.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[14]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=kn >from</span> <span class=nn >collections</span> <span class=kn >import</span> <span class=n >OrderedDict</span>
@@ -240,7 +240,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.2819
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fcb89c0c7f0
+WaldTestStatistic, id: 0x7f24a6ab1d30
 </pre></div></div> </div> <p>The Wu-Hausman test is a variant of the Durbin test that uses a slightly different form.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[16]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >res_2sls</span><span class=o >.</span><span class=n >wu_hausman</span><span class=p >()</span>
@@ -251,7 +251,7 @@ H0: All endogenous variables are exogenous
 Statistic: 25.3253
 P-value: 0.0000
 Distributed: F(1,10081)
-WaldTestStatistic, id: 0x7fcb923f5fd0
+WaldTestStatistic, id: 0x7f24a697bc10
 </pre></div></div> </div> <p>The test statistic can be directly replicated using the squared t-stat in a 2-stage approach where the first stage regresses the endogenous variable on the controls and instrument and the second stage regresses the dependent variable on the controls, the endogenous regressor and the residuals. If the regressor was in fact exogenous, the residuals should not be correlated with the dependent variable.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[17]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
@@ -262,7 +262,7 @@ WaldTestStatistic, id: 0x7fcb923f5fd0
 <span class=n >step2</span> <span class=o >=</span> <span class=n >IV2SLS</span><span class=p >(</span><span class=n >data</span><span class=o >.</span><span class=n >ldrugexp</span><span class=p >,</span> <span class=n >exog</span><span class=p >,</span> <span class=kc >None</span><span class=p >,</span> <span class=kc >None</span><span class=p >)</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >cov_type</span><span class=o >=</span><span class=s2 >"unadjusted"</span><span class=p >)</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >step2</span><span class=o >.</span><span class=n >tstats</span><span class=o >.</span><span class=n >residual</span> <span class=o >**</span> <span class=mi >2</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-25.34541049975724
+25.345410499738005
 </pre></div></div> </div> <p>Wooldridge”s regression-based test of exogeneity is robust to heteroskedasticity since it inherits the covariance estimator from the model. Here there is little difference.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[18]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >res_2sls</span><span class=o >.</span><span class=n >wooldridge_regression</span>
@@ -273,7 +273,7 @@ H0: Endogenous variables are exogenous
 Statistic: 26.4542
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fcb89916d00
+WaldTestStatistic, id: 0x7f24a3c62a60
 </pre></div></div> </div> <p>Wooldridge”s score test is an alternative to the regression test, although it usually has slightly less power since it is an LM rather than a Wald type test.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[19]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >res_2sls</span><span class=o >.</span><span class=n >wooldridge_score</span>
@@ -284,7 +284,7 @@ H0: Endogenous variables are exogenous
 Statistic: 24.9350
 P-value: 0.0000
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fcb89916b80
+WaldTestStatistic, id: 0x7f24a3c62df0
 </pre></div></div> </div> <h3 id=Exogeneity-Testing >Exogeneity Testing<a class=headerlink  href="#Exogeneity-Testing" title="Permalink to this headline">¶</a></h3> <p>When there is more than one instrument (the model is overidentified), the J test can be used in GMM models to test whether the model is overidentified – in other words, whether the instruments are actually exogenous (assuming they are relevant). In the case with 2 instruments there is no evidence that against the null.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[20]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >res_gmm</span><span class=o >.</span><span class=n >j_stat</span>
@@ -294,7 +294,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 1.0475
 P-value: 0.3061
 Distributed: chi2(1)
-WaldTestStatistic, id: 0x7fcb8a0d4e80
+WaldTestStatistic, id: 0x7f24a42e05b0
 </pre></div></div> </div> <p>When all instruments are included the story changes, and some of the additional instrument (<code class="docutils literal notranslate"><span class=pre >lowincome</span></code> or <code class="docutils literal notranslate"><span class=pre >firmsz</span></code>) appear to be endogenous.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[21]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >ivmod</span> <span class=o >=</span> <span class=n >IVGMM</span><span class=p >(</span><span class=n >data</span><span class=o >.</span><span class=n >ldrugexp</span><span class=p >,</span> <span class=n >data</span><span class=p >[</span><span class=n >controls</span><span class=p >],</span> <span class=n >data</span><span class=o >.</span><span class=n >hi_empunion</span><span class=p >,</span> <span class=n >data</span><span class=p >[</span><span class=n >instruments</span><span class=p >])</span>
@@ -306,7 +306,7 @@ H0: Expected moment conditions are equal to 0
 Statistic: 11.5903
 P-value: 0.0089
 Distributed: chi2(3)
-WaldTestStatistic, id: 0x7fcb8982c700
+WaldTestStatistic, id: 0x7f24a3af7d30
 </pre></div></div> </div> <h2 id=Single-Instrument-Regressions >Single Instrument Regressions<a class=headerlink  href="#Single-Instrument-Regressions" title="Permalink to this headline">¶</a></h2> <p>It can be useful to run the just identified regressions to see how the IV estimate varies by instrument. The OLS model is included for comparison. The coefficient when using <code class="docutils literal notranslate"><span class=pre >lowincome</span></code> is very similar to the OLS as is the <span class="math notranslate nohighlight">\(R^2\)</span> which indicates this variable may be endogenous. The coefficient using <code class="docutils literal notranslate"><span class=pre >firmsz</span></code> is also very different, but this is probably due to the low correlation between <code class="docutils literal notranslate"><span class=pre >firmsz</span></code> and the endogenous regressor so that this is a weak instrument.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[22]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >od</span> <span class=o >=</span> <span class=n >OrderedDict</span><span class=p >()</span>
@@ -468,7 +468,7 @@ T-stats reported in parentheses
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=nb >print</span><span class=p >(</span><span class=n >res_liml</span><span class=o >.</span><span class=n >kappa</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-1.0001153166806434
+1.000115316680643
 </pre></div></div> </div> <h3 id=IV2SLS-as-OLS >IV2SLS as OLS<a class=headerlink  href="#IV2SLS-as-OLS" title="Permalink to this headline">¶</a></h3> <p>As one final check, the “OLS” version of <code class="docutils literal notranslate"><span class=pre >IV2SLS</span></code> is compared to <code class="docutils literal notranslate"><span class=pre >statsmodels</span></code> <code class="docutils literal notranslate"><span class=pre >OLS</span></code> command. The parameters are identical.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[27]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=kn >import</span> <span class=nn >pandas</span> <span class=k >as</span> <span class=nn >pd</span>
@@ -487,4 +487,4 @@ female        0.057806  0.057806
 age          -0.003529 -0.003529
 linc          0.010482  0.010482
 blhisp       -0.151307 -0.151307
-</pre></div></div> </div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href=basic-examples.html  title="Basic Examples" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> Basic Examples </span> </div> </a> <a href=using-formulas.html  title="Using formulas to specify models" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Using formulas to specify models </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.4.3. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div></div> </div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href=basic-examples.html  title="Basic Examples" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> Basic Examples </span> </div> </a> <a href=using-formulas.html  title="Using formulas to specify models" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Using formulas to specify models </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.5.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
