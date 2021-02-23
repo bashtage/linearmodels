@@ -444,7 +444,7 @@ class _PanelModelBase(object):
                 return InvalidTestStatistic("Model contains only a constant", name=name)
 
             num_df -= 1
-            weps_const = y - float((root_w.T @ y) / (root_w.T @ root_w))
+            weps_const = cast(NDArray, y - float((root_w.T @ y) / (root_w.T @ root_w)))
 
         resid_ss = weps.T @ weps
         num = float(weps_const.T @ weps_const - resid_ss)
@@ -1149,7 +1149,7 @@ class PanelOLS(_PanelModelBase):
             "{0} singleton observations dropped".format(ndropped), SingletonWarning
         )
         drop = ~retain
-        self._singleton_index = drop
+        self._singleton_index = cast(NDArray, drop)
         self.dependent.drop(drop)
         self.exog.drop(drop)
         self.weights.drop(drop)
@@ -2290,9 +2290,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         if np.all(self.weights.values2d == 1.0):
             w = root_w = np.ones_like(y)
         else:
-            w = 1.0 / self.weights.values3d
+            w = cast(NDArray, 1.0 / self.weights.values3d)
             w = w[:, :-1] + w[:, 1:]
-            w = 1.0 / w
+            w = cast(NDArray, 1.0 / w)
             w_frame = panel_to_frame(
                 w,
                 self.weights.panel.items,

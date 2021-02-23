@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
@@ -149,9 +149,9 @@ class HomoskedasticCovariance(object):
         """Parameter covariance"""
         adj = self._adjustment()
         if self._gls:
-            return adj * self._gls_cov()
+            return cast(ndarray, adj * self._gls_cov())
         else:
-            return adj * self._mvreg_cov()
+            return cast(ndarray, adj * self._mvreg_cov())
 
     @property
     def cov_config(self) -> AttrDict:

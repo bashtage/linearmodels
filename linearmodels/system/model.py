@@ -1887,7 +1887,7 @@ class IVSystemGMM(_SystemModelBase):
         else:
             w = initial_weight
         beta_last = beta = self._blocked_gmm(
-            wx, wy, wz, w=w, constraints=self.constraints
+            wx, wy, wz, w=cast(NDArray, w), constraints=self.constraints
         )
         _eps = []
         loc = 0
@@ -1906,12 +1906,14 @@ class IVSystemGMM(_SystemModelBase):
                 self._weight_est.sigma(eps, wx) if self._sigma is None else self._sigma
             )
             w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
-            beta = self._blocked_gmm(wx, wy, wz, w=w, constraints=self.constraints)
+            beta = self._blocked_gmm(
+                wx, wy, wz, w=cast(NDArray, w), constraints=self.constraints
+            )
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
                 xpz = blocked_cross_prod(wx, wz, np.eye(k))
-                xpz = xpz / nobs
+                xpz = cast(NDArray, xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
             norm = delta.T @ vinv @ delta
@@ -1945,7 +1947,16 @@ class IVSystemGMM(_SystemModelBase):
         eps = np.hstack(_eps)
         iters += 1
         return self._finalize_results(
-            beta, cov.cov, weps, eps, w, sigma, iters - 1, cov_type, cov_config, cov
+            beta,
+            cov.cov,
+            weps,
+            eps,
+            cast(np.ndarray, w),
+            sigma,
+            iters - 1,
+            cov_type,
+            cov_config,
+            cov,
         )
 
     @staticmethod

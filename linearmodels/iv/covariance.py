@@ -531,7 +531,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
         s = cov_kernel(xhat_e, w)
 
-        return self._scale * s
+        return cast(ndarray, self._scale * s)
 
     @property
     def config(self) -> Dict[str, Any]:
@@ -634,8 +634,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         """Clustered estimator of score covariance"""
 
         def rescale(s: NDArray, nc: int, nobs: int) -> NDArray:
-            scale = self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs)
-            return s * scale if self.debiased else s
+            scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
+            return cast(ndarray, s * scale) if self.debiased else s
 
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
