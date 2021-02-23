@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 import numpy as np
 from numpy.linalg import inv, matrix_rank
@@ -122,7 +122,7 @@ def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
             if i != j:
                 out[sel_j, sel_i] = prod.T
 
-    return out
+    return cast(np.ndarray, out)
 
 
 def blocked_cross_prod(x: ArraySequence, z: ArraySequence, s: NDArray) -> NDArray:

@@ -15,7 +15,7 @@ y = (beta * x).sum(0) + eps
 y += np.random.randn(1, n)
 w = np.random.chisquare(10, size=(1, n)) / 10.0
 w = np.ones((t, 1)) @ w
-w = w / w.mean()
+w = w / float(w.mean())
 
 items = ["x" + str(i) for i in range(1, k + 1)]
 items = ["intercept"] + items
@@ -26,11 +26,15 @@ x = panel_to_frame(x, items, major, minor, swap=True)
 y = panel_to_frame(y[None, :], ["y"], major, minor, swap=True)
 w = panel_to_frame(w[None, :], ["w"], major, minor, swap=True)
 
-x = PanelData(x)
-y = PanelData(y)
-w = PanelData(w)
+x_panel_data = PanelData(x)
+y_panel_data = PanelData(y)
+w_panel_data = PanelData(w)
 
-z = pd.concat([x.dataframe, y.dataframe, w.dataframe], 1, sort=False)
+z = pd.concat(
+    [x_panel_data.dataframe, y_panel_data.dataframe, w_panel_data.dataframe],
+    1,
+    sort=False,
+)
 final_index = pd.MultiIndex.from_product([minor, major])
 final_index.levels[0].name = "firm"
 z = z.reindex(final_index)

@@ -118,7 +118,7 @@ class HomoskedasticWeightMatrix(object):
             Covariance of GMM moment conditions.
         """
         nobs = z[0].shape[0]
-        w = blocked_inner_prod(z, sigma) / nobs
+        w = cast(ndarray, blocked_inner_prod(z, sigma) / nobs)
         return w
 
     @property

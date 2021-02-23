@@ -48,10 +48,10 @@ y_robust = x @ beta[:, None] + e[:, None]
 
 e = e_orig.copy()
 cluster_size = 5
-r = 0.5 * np.ones((cluster_size, cluster_size))
-r += 0.5 * np.eye(cluster_size)
-rsqrt = np.linalg.cholesky(r)
-for i in range(0, len(r), 5):
+r_cluster = 0.5 * np.ones((cluster_size, cluster_size))
+r_cluster += 0.5 * np.eye(cluster_size)
+rsqrt = np.linalg.cholesky(r_cluster)
+for i in range(0, cluster_size, 5):
     e[i : i + 5] = (rsqrt @ e[i : i + 5][:, None]).squeeze()
 e_cluster = e
 clusters = np.tile(np.arange(n // 5)[None, :], (5, 1)).T.ravel()
