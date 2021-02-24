@@ -1,6 +1,29 @@
 Change Log
 ----------
 
+Version 4.19
+============
+* Minor release to fix a wheel-building issue on Python 3.9
+
+Version 4.18
+============
+* Improved performance of :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit` by
+  deferring some operations.
+* Added support for the method available in `PyHDFE <https://pypi.org/project/pyhdfe>`_  in
+  :class:`~linearmodels.iv.absorbing.AbsorbingLS`. These methods can only be
+  used when the variables absorbed are categorical (i.e., fixed-effects only) and
+  when the model is unweighted.
+* Added alternative measures of :math:`R^2` using the squared correlation. See
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_overall`,
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_within`, and
+  :meth:`~linearmodels.panel.results.PanelResults.corr_squared_between` (:issue:`157`).
+* Added a clustered covariance estimator
+  (:class:`linearmodels.system.covariance.ClusteredCovariance`) for system regressions
+  (:issue:`241`).
+* Fixed a bug in :class:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`
+  which used incorrect values for a tuning parameter in the bandwidth estimation
+  for the Parzen and Quadratic Spectral kernels (:issue:`242`).
+
 Version 4.17
 ============
 * Fixed various typing issues (:issue:`239`, :issue:`240`).

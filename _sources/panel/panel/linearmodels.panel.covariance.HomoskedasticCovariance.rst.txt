@@ -1,4 +1,4 @@
-linearmodels.panel.covariance.HomoskedasticCovariance
+﻿linearmodels.panel.covariance.HomoskedasticCovariance
 =====================================================
 
 .. currentmodule:: linearmodels.panel.covariance

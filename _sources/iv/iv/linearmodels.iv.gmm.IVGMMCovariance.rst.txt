@@ -1,4 +1,4 @@
-linearmodels.iv.gmm.IVGMMCovariance
+﻿linearmodels.iv.gmm.IVGMMCovariance
 ===================================
 
 .. currentmodule:: linearmodels.iv.gmm

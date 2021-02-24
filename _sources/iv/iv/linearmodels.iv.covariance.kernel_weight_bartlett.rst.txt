@@ -1,4 +1,4 @@
-linearmodels.iv.covariance.kernel\_weight\_bartlett
+﻿linearmodels.iv.covariance.kernel\_weight\_bartlett
 ===================================================
 
 .. currentmodule:: linearmodels.iv.covariance

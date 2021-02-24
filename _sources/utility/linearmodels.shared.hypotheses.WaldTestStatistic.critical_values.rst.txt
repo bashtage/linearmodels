@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.WaldTestStatistic.critical\_values
+=================================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: WaldTestStatistic.critical_values

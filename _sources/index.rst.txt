@@ -10,7 +10,8 @@
   Documentation for `recent developments <https://bashtage.github.io/linearmodels/devel/>`_
   is located at `devel <https://bashtage.github.io/linearmodels/devel/>`_.
 
-Estimation and inference in some common linear models:
+Estimation and inference in some common linear models that are missing
+from `statsmodels <https://statsmodels.org>`_:
 
 **Panel Data Models**
 

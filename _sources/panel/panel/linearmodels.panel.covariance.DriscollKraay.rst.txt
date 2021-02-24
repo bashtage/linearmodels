@@ -1,4 +1,4 @@
-linearmodels.panel.covariance.DriscollKraay
+﻿linearmodels.panel.covariance.DriscollKraay
 ===========================================
 
 .. currentmodule:: linearmodels.panel.covariance

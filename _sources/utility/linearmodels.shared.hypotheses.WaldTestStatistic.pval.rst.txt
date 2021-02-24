@@ -1,0 +1,6 @@
+linearmodels.shared.hypotheses.WaldTestStatistic.pval
+=====================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoproperty:: WaldTestStatistic.pval

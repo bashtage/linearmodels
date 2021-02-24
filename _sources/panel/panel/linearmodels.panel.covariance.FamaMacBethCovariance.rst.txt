@@ -1,4 +1,4 @@
-linearmodels.panel.covariance.FamaMacBethCovariance
+﻿linearmodels.panel.covariance.FamaMacBethCovariance
 ===================================================
 
 .. currentmodule:: linearmodels.panel.covariance

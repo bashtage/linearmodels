@@ -1,4 +1,4 @@
-linearmodels.iv.covariance.KernelCovariance
+﻿linearmodels.iv.covariance.KernelCovariance
 ===========================================
 
 .. currentmodule:: linearmodels.iv.covariance

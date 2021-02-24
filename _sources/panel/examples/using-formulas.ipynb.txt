@@ -36,8 +36,9 @@
    "outputs": [],
    "source": [
     "from statsmodels.datasets import grunfeld\n",
+    "\n",
     "data = grunfeld.load_pandas().data\n",
-    "data = data.set_index(['firm','year'])\n",
+    "data = data.set_index([\"firm\", \"year\"])\n",
     "print(data.head())"
    ]
   },
@@ -57,7 +58,8 @@
    "outputs": [],
    "source": [
     "from linearmodels import PanelOLS\n",
-    "mod = PanelOLS.from_formula('invest ~ value + capital + EntityEffects', data=data)\n",
+    "\n",
+    "mod = PanelOLS.from_formula(\"invest ~ value + capital + EntityEffects\", data=data)\n",
     "print(mod.fit())"
    ]
   },
@@ -76,7 +78,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "mod = PanelOLS.from_formula('invest ~ 1 + value + capital + EntityEffects', data=data)\n",
+    "mod = PanelOLS.from_formula(\"invest ~ 1 + value + capital + EntityEffects\", data=data)\n",
     "print(mod.fit())"
    ]
   },
@@ -95,7 +97,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "mod = PanelOLS.from_formula('invest ~ 1 + value + capital + EntityEffects + TimeEffects', data=data)\n",
+    "mod = PanelOLS.from_formula(\n",
+    "    \"invest ~ 1 + value + capital + EntityEffects + TimeEffects\", data=data\n",
+    ")\n",
     "print(mod.fit())"
    ]
   },
@@ -115,7 +119,8 @@
    "outputs": [],
    "source": [
     "from linearmodels import BetweenOLS, FirstDifferenceOLS, PooledOLS\n",
-    "mod = BetweenOLS.from_formula('invest ~ 1 + value + capital', data=data)\n",
+    "\n",
+    "mod = BetweenOLS.from_formula(\"invest ~ 1 + value + capital\", data=data)\n",
     "print(mod.fit())"
    ]
   },
@@ -136,7 +141,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "mod = FirstDifferenceOLS.from_formula('invest ~ value + capital', data=data)\n",
+    "mod = FirstDifferenceOLS.from_formula(\"invest ~ value + capital\", data=data)\n",
     "print(mod.fit())"
    ]
   },
@@ -155,7 +160,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "mod = PooledOLS.from_formula('invest ~ 1 + value + capital', data=data)\n",
+    "mod = PooledOLS.from_formula(\"invest ~ 1 + value + capital\", data=data)\n",
     "print(mod.fit())"
    ]
   }
@@ -176,7 +181,16 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.8.5"
+  },
+  "pycharm": {
+   "stem_cell": {
+    "cell_type": "raw",
+    "metadata": {
+     "collapsed": false
+    },
+    "source": []
+   }
   }
  },
  "nbformat": 4,

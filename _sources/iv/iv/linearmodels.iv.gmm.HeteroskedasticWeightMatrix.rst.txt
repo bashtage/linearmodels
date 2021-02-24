@@ -1,4 +1,4 @@
-linearmodels.iv.gmm.HeteroskedasticWeightMatrix
+﻿linearmodels.iv.gmm.HeteroskedasticWeightMatrix
 ===============================================
 
 .. currentmodule:: linearmodels.iv.gmm

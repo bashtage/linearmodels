@@ -1,4 +1,4 @@
-linearmodels.panel.model.PanelOLS
+﻿linearmodels.panel.model.PanelOLS
 =================================
 
 .. currentmodule:: linearmodels.panel.model

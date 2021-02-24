@@ -1,4 +1,4 @@
-linearmodels.iv.covariance.kernel\_weight\_parzen
+﻿linearmodels.iv.covariance.kernel\_weight\_parzen
 =================================================
 
 .. currentmodule:: linearmodels.iv.covariance

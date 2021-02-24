@@ -8,7 +8,7 @@ are some differenced worth noting.
 
 Clustered Covariance with Fixed Effects
 =======================================
-When suing clustered standard errors and entity effects, it is not necessary
+When using clustered standard errors and entity effects, it is not necessary
 to adjust for estimated effects. ``PanelOLS`` attempts to detect when this is
 the case and automatically adjust the degree of freedom. This can be
 overridden using by setting the fit option ``auto_df=False`` and then

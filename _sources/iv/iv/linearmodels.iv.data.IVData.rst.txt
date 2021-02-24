@@ -1,4 +1,4 @@
-linearmodels.iv.data.IVData
+﻿linearmodels.iv.data.IVData
 ===========================
 
 .. currentmodule:: linearmodels.iv.data

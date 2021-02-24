@@ -1,4 +1,4 @@
-linearmodels.asset\_pricing.model.TradedFactorModel
+﻿linearmodels.asset\_pricing.model.TradedFactorModel
 ===================================================
 
 .. currentmodule:: linearmodels.asset_pricing.model

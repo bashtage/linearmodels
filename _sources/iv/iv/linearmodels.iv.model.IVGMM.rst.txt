@@ -1,4 +1,4 @@
-linearmodels.iv.model.IVGMM
+﻿linearmodels.iv.model.IVGMM
 ===========================
 
 .. currentmodule:: linearmodels.iv.model

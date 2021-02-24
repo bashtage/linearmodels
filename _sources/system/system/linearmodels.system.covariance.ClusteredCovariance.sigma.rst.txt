@@ -1,0 +1,6 @@
+linearmodels.system.covariance.ClusteredCovariance.sigma
+========================================================
+
+.. currentmodule:: linearmodels.system.covariance
+
+.. autoproperty:: ClusteredCovariance.sigma

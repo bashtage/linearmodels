@@ -1,4 +1,4 @@
-linearmodels.iv.results.OLSResults
+﻿linearmodels.iv.results.OLSResults
 ==================================
 
 .. currentmodule:: linearmodels.iv.results

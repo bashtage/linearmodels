@@ -30,10 +30,11 @@
    "source": [
     "from linearmodels.datasets import wage_panel\n",
     "import pandas as pd\n",
+    "\n",
     "data = wage_panel.load()\n",
     "year = pd.Categorical(data.year)\n",
-    "data = data.set_index(['nr', 'year'])\n",
-    "data['year'] = year\n",
+    "data = data.set_index([\"nr\", \"year\"])\n",
+    "data[\"year\"] = year\n",
     "print(wage_panel.DESCR)\n",
     "print(data.head())"
    ]
@@ -54,7 +55,8 @@
    "source": [
     "from linearmodels.panel import PooledOLS\n",
     "import statsmodels.api as sm\n",
-    "exog_vars = ['black','hisp','exper','expersq','married', 'educ', 'union', 'year']\n",
+    "\n",
+    "exog_vars = [\"black\", \"hisp\", \"exper\", \"expersq\", \"married\", \"educ\", \"union\", \"year\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = PooledOLS(data.lwage, exog)\n",
     "pooled_res = mod.fit()\n",
@@ -88,6 +90,7 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import RandomEffects\n",
+    "\n",
     "mod = RandomEffects(data.lwage, exog)\n",
     "re_res = mod.fit()\n",
     "print(re_res)"
@@ -142,7 +145,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import BetweenOLS\n",
-    "exog_vars = ['black','hisp','exper','married', 'educ', 'union']\n",
+    "\n",
+    "exog_vars = [\"black\", \"hisp\", \"exper\", \"married\", \"educ\", \"union\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = BetweenOLS(data.lwage, exog)\n",
     "be_res = mod.fit()\n",
@@ -184,7 +188,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import PanelOLS\n",
-    "exog_vars = ['expersq', 'union', 'married', 'year']\n",
+    "\n",
+    "exog_vars = [\"expersq\", \"union\", \"married\", \"year\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = PanelOLS(data.lwage, exog, entity_effects=True)\n",
     "fe_res = mod.fit()\n",
@@ -209,7 +214,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import PanelOLS\n",
-    "exog_vars = ['expersq','union','married']\n",
+    "\n",
+    "exog_vars = [\"expersq\", \"union\", \"married\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = PanelOLS(data.lwage, exog, entity_effects=True, time_effects=True)\n",
     "fe_te_res = mod.fit()\n",
@@ -239,7 +245,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import FirstDifferenceOLS\n",
-    "exog_vars = ['exper','expersq', 'union', 'married']\n",
+    "\n",
+    "exog_vars = [\"exper\", \"expersq\", \"union\", \"married\"]\n",
     "exog = data[exog_vars]\n",
     "mod = FirstDifferenceOLS(data.lwage, exog)\n",
     "fd_res = mod.fit()\n",
@@ -261,7 +268,8 @@
    "outputs": [],
    "source": [
     "from linearmodels.panel import compare\n",
-    "print(compare({'BE':be_res,'RE':re_res,'Pooled':pooled_res}))"
+    "\n",
+    "print(compare({\"BE\": be_res, \"RE\": re_res, \"Pooled\": pooled_res}))"
    ]
   },
   {
@@ -276,7 +284,7 @@
    "metadata": {},
    "source": [
     "### Heteroskedasticity Robust Covariance\n",
-    "White's robust covariance can be used by setting ``cov_type='robust``. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust.  Instead a clustered covariance is required."
+    "White\"s robust covariance can be used by setting ``cov_type=\"robust``. This estimator adds some robustness against certain types of specification issues but should not be used when using fixed effects (entity effects) since it is no longer robust.  Instead a clustered covariance is required."
    ]
   },
   {
@@ -287,10 +295,10 @@
    },
    "outputs": [],
    "source": [
-    "exog_vars = ['black','hisp','exper','expersq','married', 'educ', 'union']\n",
+    "exog_vars = [\"black\", \"hisp\", \"exper\", \"expersq\", \"married\", \"educ\", \"union\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = PooledOLS(data.lwage, exog)\n",
-    "robust = mod.fit(cov_type='robust')"
+    "robust = mod.fit(cov_type=\"robust\")"
    ]
   },
   {
@@ -298,7 +306,7 @@
    "metadata": {},
    "source": [
     "### Clustered by Entity\n",
-    "The usual variable to cluster are are entity or entity and time.  The can be implemented using ``cov_type='clustered'`` and the additional keyword arguments ``cluster_entity=True`` and/or ``cluster_time=True``. "
+    "The usual variable to cluster are are entity or entity and time.  The can be implemented using ``cov_type=\"clustered\"`` and the additional keyword arguments ``cluster_entity=True`` and/or ``cluster_time=True``. "
    ]
   },
   {
@@ -309,7 +317,7 @@
    },
    "outputs": [],
    "source": [
-    "clust_entity = mod.fit(cov_type='clustered', cluster_entity=True)"
+    "clust_entity = mod.fit(cov_type=\"clustered\", cluster_entity=True)"
    ]
   },
   {
@@ -327,7 +335,9 @@
    },
    "outputs": [],
    "source": [
-    "clust_entity_time = mod.fit(cov_type='clustered', cluster_entity=True, cluster_time=True)"
+    "clust_entity_time = mod.fit(\n",
+    "    cov_type=\"clustered\", cluster_entity=True, cluster_time=True\n",
+    ")"
    ]
   },
   {
@@ -346,10 +356,11 @@
    "outputs": [],
    "source": [
     "from collections import OrderedDict\n",
+    "\n",
     "res = OrderedDict()\n",
-    "res['Robust'] = robust\n",
-    "res['Entity'] = clust_entity\n",
-    "res['Entity-Time'] = clust_entity_time\n",
+    "res[\"Robust\"] = robust\n",
+    "res[\"Entity\"] = clust_entity\n",
+    "res[\"Entity-Time\"] = clust_entity_time\n",
     "print(compare(res))"
    ]
   },
@@ -367,7 +378,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "clust_entity = mod.fit(cov_type='clustered', clusters=data.occupation)\n",
+    "clust_entity = mod.fit(cov_type=\"clustered\", clusters=data.occupation)\n",
     "print(data.occupation.value_counts())\n",
     "print(clust_entity)"
    ]
@@ -389,7 +400,16 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.5.3"
+   "version": "3.8.5"
+  },
+  "pycharm": {
+   "stem_cell": {
+    "cell_type": "raw",
+    "metadata": {
+     "collapsed": false
+    },
+    "source": []
+   }
   }
  },
  "nbformat": 4,

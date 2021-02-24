@@ -1,4 +1,4 @@
-linearmodels.iv.covariance.HeteroskedasticCovariance
+﻿linearmodels.iv.covariance.HeteroskedasticCovariance
 ====================================================
 
 .. currentmodule:: linearmodels.iv.covariance

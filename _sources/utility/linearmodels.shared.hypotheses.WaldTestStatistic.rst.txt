@@ -1,0 +1,32 @@
+﻿linearmodels.shared.hypotheses.WaldTestStatistic
+================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoclass:: WaldTestStatistic
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~WaldTestStatistic.critical_values
+      ~WaldTestStatistic.null
+      ~WaldTestStatistic.pval
+      ~WaldTestStatistic.stat
+   
+   
+   

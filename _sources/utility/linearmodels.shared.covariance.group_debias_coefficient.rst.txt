@@ -1,0 +1,6 @@
+﻿linearmodels.shared.covariance.group\_debias\_coefficient
+=========================================================
+
+.. currentmodule:: linearmodels.shared.covariance
+
+.. autofunction:: group_debias_coefficient

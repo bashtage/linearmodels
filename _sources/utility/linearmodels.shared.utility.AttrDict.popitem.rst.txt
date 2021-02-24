@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.shared.utility.AttrDict.popitem
+============================================
+
+.. currentmodule:: linearmodels.shared.utility
+
+.. automethod:: AttrDict.popitem

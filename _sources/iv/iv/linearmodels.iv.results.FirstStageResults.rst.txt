@@ -1,4 +1,4 @@
-linearmodels.iv.results.FirstStageResults
+﻿linearmodels.iv.results.FirstStageResults
 =========================================
 
 .. currentmodule:: linearmodels.iv.results

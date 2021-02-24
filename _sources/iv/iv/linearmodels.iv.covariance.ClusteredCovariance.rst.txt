@@ -1,4 +1,4 @@
-linearmodels.iv.covariance.ClusteredCovariance
+﻿linearmodels.iv.covariance.ClusteredCovariance
 ==============================================
 
 .. currentmodule:: linearmodels.iv.covariance

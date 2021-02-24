@@ -1,4 +1,4 @@
-linearmodels.iv.results.IVModelComparison
+﻿linearmodels.iv.results.IVModelComparison
 =========================================
 
 .. currentmodule:: linearmodels.iv.results

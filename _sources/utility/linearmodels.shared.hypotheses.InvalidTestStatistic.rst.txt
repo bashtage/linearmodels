@@ -1,0 +1,32 @@
+﻿linearmodels.shared.hypotheses.InvalidTestStatistic
+===================================================
+
+.. currentmodule:: linearmodels.shared.hypotheses
+
+.. autoclass:: InvalidTestStatistic
+   :exclude-members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~InvalidTestStatistic.critical_values
+      ~InvalidTestStatistic.null
+      ~InvalidTestStatistic.pval
+      ~InvalidTestStatistic.stat
+   
+   
+   

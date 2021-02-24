@@ -1,4 +1,4 @@
-linearmodels.system.results.GMMSystemResults
+﻿linearmodels.system.results.GMMSystemResults
 ============================================
 
 .. currentmodule:: linearmodels.system.results

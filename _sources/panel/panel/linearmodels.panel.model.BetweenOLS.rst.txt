@@ -1,4 +1,4 @@
-linearmodels.panel.model.BetweenOLS
+﻿linearmodels.panel.model.BetweenOLS
 ===================================
 
 .. currentmodule:: linearmodels.panel.model

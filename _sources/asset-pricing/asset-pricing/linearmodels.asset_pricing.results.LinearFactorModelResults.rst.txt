@@ -1,4 +1,4 @@
-linearmodels.asset\_pricing.results.LinearFactorModelResults
+﻿linearmodels.asset\_pricing.results.LinearFactorModelResults
 ============================================================
 
 .. currentmodule:: linearmodels.asset_pricing.results

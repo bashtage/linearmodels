@@ -1,4 +1,4 @@
-linearmodels.system.covariance.GMMHomoskedasticCovariance
+﻿linearmodels.system.covariance.GMMHomoskedasticCovariance
 =========================================================
 
 .. currentmodule:: linearmodels.system.covariance

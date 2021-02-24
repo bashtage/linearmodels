@@ -1,4 +1,4 @@
-linearmodels.iv.absorbing.AbsorbingLSResults
+﻿linearmodels.iv.absorbing.AbsorbingLSResults
 ============================================
 
 .. currentmodule:: linearmodels.iv.absorbing
