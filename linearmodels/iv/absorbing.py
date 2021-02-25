@@ -68,7 +68,7 @@ from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 try:
     from xxhash import xxh64 as hash_func
 except ImportError:
-    from hashlib import sha1 as hash_func
+    from hashlib import sha256 as hash_func
 
 Hasher = TypeVar("Hasher", bound=hash_func)
 

@@ -6,20 +6,8 @@ from linearmodels.compat.statsmodels import Summary
 import datetime as dt
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from numpy import (
-    array,
-    asarray,
-    c_,
-    diag,
-    empty,
-    isnan,
-    log,
-    ndarray,
-    ones,
-    sqrt,
-    zeros,
-)
-from numpy.linalg import inv, pinv
+from numpy import array, asarray, c_, diag, empty, isnan, log, ndarray, ones, sqrt
+from numpy.linalg import inv
 from pandas import DataFrame, Series, concat, to_numeric
 from property_cached import cached_property
 import scipy.stats as stats
@@ -699,14 +687,9 @@ class FirstStageResults(_SummaryStr):
         endog, exog, instr, weights = self.endog, self.exog, self.instr, self.weights
         w = sqrt(weights.ndarray)
         z = w * instr.ndarray
+        nz = z.shape[1]
         x = w * exog.ndarray
-        nobs = endog.shape[0]
-        if x.shape[1] == 0:
-            # No exogenous regressors
-            px = zeros((nobs, nobs))
-        else:
-            px = x @ pinv(x)
-        ez = z - px @ z
+        ez = annihilate(z, x)
         individual_results = self.individual
         out_df = DataFrame(
             index=["rsquared", "partial.rsquared", "f.stat", "f.pval", "f.dist"],
@@ -714,17 +697,25 @@ class FirstStageResults(_SummaryStr):
         )
         for col in endog.pandas:
             y = w * endog.pandas[[col]].values
-            ey = y - px @ y
-            mod = _OLS(ey, ez)
-            res = mod.fit(cov_type=self._cov_type, **self._cov_config)
-            params = res.params.values
+            ey = annihilate(y, x)
+            partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
+            full = individual_results[col]
+            params = full.params.values[-nz:]
             params = params[:, None]
-            stat = params.T @ inv(res.cov) @ params
+            c = asarray(full.cov)[-nz:, -nz:]
+            stat = params.T @ inv(c) @ params
             stat = float(stat.squeeze())
-            w_test = WaldTestStatistic(stat, null="", df=params.shape[0])
+            if full.cov_type in ("homoskedastic", "unadjusted"):
+                df_denom = full.df_resid
+                stat /= params.shape[0]
+            else:
+                df_denom = None
+            w_test = WaldTestStatistic(
+                stat, null="", df=params.shape[0], df_denom=df_denom
+            )
             inner = {
-                "rsquared": individual_results[col].rsquared,
-                "partial.rsquared": res.rsquared,
+                "rsquared": full.rsquared,
+                "partial.rsquared": partial.rsquared,
                 "f.stat": w_test.stat,
                 "f.pval": w_test.pval,
                 "f.dist": w_test.dist_name,

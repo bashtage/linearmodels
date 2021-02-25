@@ -446,3 +446,18 @@ def test_initial_weight_error(data):
         mod.fit(initial_weight=w0[:-1, :-1])
     with pytest.raises(ValueError, match="initial_weight must"):
         mod.fit(initial_weight=w0[:-1])
+
+
+def test_first_state_f(data):
+    res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="unadjusted")
+    diag = res.first_stage.diagnostics
+    endog = np.asarray(data.endog)
+    rhs = np.c_[np.asarray(data.exog), np.asarray(data.instr)]
+    nz = data.instr.shape[1]
+    null_rest = np.zeros((nz, rhs.shape[1]))
+    null_rest[:, -nz:] = np.eye(nz)
+    null_value = np.zeros(nz)
+    for i in range(endog.shape[1]):
+        indiv = _OLS(endog[:, i], rhs).fit(cov_type="unadjusted")
+        stat = indiv.wald_test(null_rest, null_value)
+        assert_allclose(diag.iloc[i].loc["f.stat"], stat.stat / nz)
