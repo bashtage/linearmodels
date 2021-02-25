@@ -49,7 +49,7 @@ class Hasher(object):
         except ImportError:
             import hashlib
 
-            return hashlib.sha1()
+            return hashlib.sha256()
 
     def single(self, value):
         h = self.hash_func

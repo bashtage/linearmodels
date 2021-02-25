@@ -1,12 +1,16 @@
 Change Log
-----------
+==========
+
+Version 4.20
+------------
+* Correct calculation of first-stage F-statistic in IV models.
 
 Version 4.19
-============
+------------
 * Minor release to fix a wheel-building issue on Python 3.9
 
 Version 4.18
-============
+------------
 * Improved performance of :meth:`~linearmodels.iv.absorbing.AbsorbingLS.fit` by
   deferring some operations.
 * Added support for the method available in `PyHDFE <https://pypi.org/project/pyhdfe>`_  in
@@ -25,11 +29,11 @@ Version 4.18
   for the Parzen and Quadratic Spectral kernels (:issue:`242`).
 
 Version 4.17
-============
+------------
 * Fixed various typing issues (:issue:`239`, :issue:`240`).
 
 Version 4.16
-============
+------------
 * Verify typing using mypy (:issue:`232`, :issue:`234`, :issue:`235`, :issue:`238`).
 * Added typing to all public-facing classes and methods (:issue:`228`, :issue:`229`).
 * Added :class:`~linearmodels.panel.results.FamaMacBethResults` which has
@@ -38,19 +42,19 @@ Version 4.16
   period (:issue:`230`).
 
 Version 4.15
-============
+------------
 * Blackened the code.
 * Added McElroy's and Berndt's measures of system fit (:issue:`215`).
 * Removed support for Python 3.5 inline with NEP-29 (:issue:`222`).
 
 Version 4.14
-============
+------------
 * Fixed issue where datasets were not installed with wheels (:issue:`217`).
 * Switched to property-cached to inherit cached property from property (:issue:`211`).
 * Removed all use of :class:`pandas.Panel` (:issue:`211`).
 
 Version 4.13
-============
+------------
 * Added :class:`~linearmodels.iv.absorbing.AbsorbingLS` which allows a large number
   of variables to be absorbed. This model can handle very high-dimensional dummy
   variables and has been tested using up to 1,000,000 categories in a data set
@@ -61,15 +65,15 @@ Version 4.13
   which automatically drops variables that are absorbed by fixed effects.
   (:issue:`206`)
 * Added optional Cythonized node selection for dropping singletons
-* Added preconditioning to the dummy variable matrix when ``use_lsmr=True``
+* Added preconditioning to the dummy variable matrix when ``use_lsmr-True``
   in :func:`~linearmodels.panel.model.PanelOLS.fit`. In models with many
   effects, this can reduce run time by a factor of 4 or more.
 
 Version 4.12
-============
+------------
 * Added an option to drop singleton observations in
   :class:`~linearmodels.panel.model.PanelOLS` by setting the keyword argument
-  ``singletons=False``. When ``False``, singelton observations are dropped
+  ``singletons-False``. When ``False``, singelton observations are dropped
   before the model is fit, so the the result is *as-if* the observations were
   never in ``exog`` or ``dependent``.
 * Added a method to construct the 2-core graph for 2-way effects models, which
@@ -93,7 +97,7 @@ Version 4.12
   instead of t-stats. (:issue:`178`)
 
 Version 4.11
-============
+------------
 * Fixed a bug which did not correctly check the rank of the
   cross-section regression in :class:`~linearmodels.panel.model.FamaMacBeth` (:issue:`176`)
 * Fixed a bug which failed to correctly check rank conditions when
@@ -102,12 +106,12 @@ Version 4.11
   custom and less-well-tested solution (:issue:`172`)
 
 Version 4.10
-============
+------------
 * Fixed a bug where weights were incorrectly calculated for HAC covariances
   when the weight function was ``'parzen'`` or ``'gallant'`` (:issue:`170`)
 
 Version 4.9
-===========
+-----------
 * Changed the return type of Wooldridge's over identification test when
   invalid to ``InvalidTestStatistic``
 * Add typing information to IV models
@@ -121,21 +125,21 @@ Version 4.9
 * Improve docstring for ``summary`` properties
 
 Version 4.8
-===========
+-----------
 * Corrected bug that prevented single character names in IV formulas
 * Corrected kappa estimation in LIML when there are no exogenous regressors
 
 Version 4.7
-===========
+-----------
 * Improved performance of Panel estimators by optimizing data structure
   construction
 
 Version 4.6
-===========
+-----------
 * Added a license
 
 Version 4.5
-===========
+-----------
 * Added System GMM estimator
 * Added automatic bandwidth for kernel-based GMM weighting estimators
 * Cleaned up HAC estimation across models
@@ -144,12 +148,12 @@ Version 4.5
 * Fixed small issues with Fama-MacBeth which previously ignored weights
 
 Version 4.0
-===========
+-----------
 * Added Seemingly Unrelated Regression (SUR) Estimator
 * Added Three-stage Least Squares (3SLS) Estimator
 
 Version 3.0
-===========
+-----------
 * Added Fama-MacBeth estimator for panels
 * Added linear factor models for asset pricing applications
 
@@ -158,12 +162,12 @@ Version 3.0
   * GMM Estimation
 
 Version 2.0
-===========
+-----------
 * Added panel models -- fixed effects, random effects, between,
   first difference and pooled OLS.
 * Addition of two-way clustering to some of the IV models (2SLS, LIML)
 
 Version 1.0
-===========
+-----------
 * Added Instrumental Variable estimators -- 2SLS, LIML and
   k-class, GMM and continuously updating GMM.

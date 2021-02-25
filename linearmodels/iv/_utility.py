@@ -37,6 +37,8 @@ def proj(y: NDArray, x: NDArray) -> NDArray:
     ndarray
         Projected values of y (nobs by nseries)
     """
+    if x.shape[1] == 0:
+        return np.zeros_like(y)
     return x @ (np.linalg.pinv(x) @ y)
 
 
