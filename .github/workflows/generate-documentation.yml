@@ -43,3 +43,5 @@ jobs:
         popd
     - name: Deploy documentation
       run: source ci/push-docs-gh-pages.sh
+      with:
+        GIT_TAG: ${{ github.event.release.tag_name }}
