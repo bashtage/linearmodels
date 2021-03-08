@@ -31,8 +31,8 @@
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Thu, Feb 25 2021   P-value (F-stat):                   0.0000
-Time:                        17:16:23   Distribution:                      chi2(2)
+Date:                Mon, Mar 08 2021   P-value (F-stat):                   0.0000
+Time:                        08:58:40   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Varaibles Absorbed:              1.987e+05
                              Parameter Estimates
@@ -55,8 +55,8 @@ exog.2         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 Dep. Variable:              dependent   R-squared:                          0.8377
 Estimator:               Absorbing LS   Adj. R-squared:                     0.7975
 No. Observations:             1000000   F-statistic:                     1.962e+06
-Date:                Thu, Feb 25 2021   P-value (F-stat):                   0.0000
-Time:                        17:16:29   Distribution:                      chi2(2)
+Date:                Mon, Mar 08 2021   P-value (F-stat):                   0.0000
+Time:                        08:58:45   Distribution:                      chi2(2)
 Cov. Estimator:                robust   R-squared (No Effects):             0.6664
                                         Varaibles Absorbed:              1.987e+05
                              Parameter Estimates
@@ -81,8 +81,8 @@ exog.1         1.0008     0.0010     989.09     0.0000      0.9989      1.0028
 <span class=n >res</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >()</span>
 <span class=nb >print</span><span class=p >(</span><span class=sa >f</span><span class=s2 >"HDFE Second: </span><span class=si >{</span><span class=p >(</span><span class=n >dt</span><span class=o >.</span><span class=n >datetime</span><span class=o >.</span><span class=n >now</span><span class=p >()</span> <span class=o >-</span> <span class=n >start</span><span class=p >)</span><span class=o >.</span><span class=n >total_seconds</span><span class=p >()</span><span class=si >}</span><span class=s2 >"</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-LSMR Second: 2.996331
-HDFE Second: 0.459351
+LSMR Second: 3.634302
+HDFE Second: 0.44281
 </pre></div></div> </div> <p>LSMR is iterative and does not have a closed form. The tolerance can be set using <code class="docutils literal notranslate"><span class=pre >absorb_options</span></code> which is a dictionary. See <a class="reference external" href="https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.sparse.linalg.lsmr.html#scipy.sparse.linalg.lsmr">scipy.sparse.linalg.lsmr</a> for details on the options.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[5]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre>
 <span></span><span class=n >mod</span> <span class=o >=</span> <span class=n >AbsorbingLS</span><span class=p >(</span><span class=n >y</span><span class=p >,</span> <span class=n >x</span><span class=p >[:,</span> <span class=mi >1</span><span class=p >:],</span> <span class=n >absorb</span><span class=o >=</span><span class=n >cats</span><span class=p >)</span>
@@ -187,4 +187,4 @@ itn   =      12    condA = 7.9e+01
     normx = 1.3e+03
     12  1.22889e+02   8.946e+02  2.454e-05
    8.9e-01  7.8e-09   3.5e+00  7.9e+01
-</pre></div></div> </div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href=using-formulas.html  title="Using formulas to specify models" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> Using formulas to specify models </span> </div> </a> <a href="../reference.html" title="Module Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Module Reference </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.5.1. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+</pre></div></div> </div> </article> </div> </div> </main> </div> <footer class=md-footer > <div class=md-footer-nav > <nav class="md-footer-nav__inner md-grid"> <a href=using-formulas.html  title="Using formulas to specify models" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel=prev > <div class="md-flex__cell md-flex__cell--shrink"> <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i> </div> <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"> <span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Previous </span> Using formulas to specify models </span> </div> </a> <a href="../reference.html" title="Module Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel=next > <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span class=md-flex__ellipsis > <span class=md-footer-nav__direction > Next </span> Module Reference </span> </div> <div class="md-flex__cell md-flex__cell--shrink"><i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i> </div> </a> </nav> </div> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-footer-copyright > <div class=md-footer-copyright__highlight > &#169; Copyright 2017, Kevin Sheppard. </div> Created using <a href="http://www.sphinx-doc.org/">Sphinx</a> 3.5.2. and <a href="https://github.com/bashtage/sphinx-material/">Material for Sphinx</a> </div> </div> </div> </footer> <script src="../../_static/javascripts/application.js"></script> <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
