@@ -1886,6 +1886,7 @@ class IVSystemGMM(_SystemModelBase):
             w = blocked_inner_prod(wz, np.eye(k_total)) / nobs
         else:
             w = initial_weight
+        assert w is not None
         beta_last = beta = self._blocked_gmm(
             wx, wy, wz, w=cast(NDArray, w), constraints=self.constraints
         )

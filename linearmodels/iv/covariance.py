@@ -265,7 +265,7 @@ class HomoskedasticCovariance(object):
         self._kappa = kappa
         self._pinvz = pinv(z)
         nobs, nvar = x.shape
-        self._scale = nobs / (nobs - nvar) if self._debiased else 1
+        self._scale: float = nobs / (nobs - nvar) if self._debiased else 1.0
         self._name = "Unadjusted Covariance (Homoskedastic)"
 
     def __str__(self) -> str:
