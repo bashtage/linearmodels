@@ -97,7 +97,7 @@ def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
 
     cum_width = np.cumsum([0] + widths)
     total = sum(widths)
-    out = np.zeros((total, total))
+    out: np.ndarray = np.zeros((total, total))
 
     for i in range(k):
         xi = x[i]
