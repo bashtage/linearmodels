@@ -3,9 +3,18 @@ from setuptools.dist import Distribution
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
+import sys
 from typing import Dict
 
 import versioneer
+
+try:
+    from Cython.Build import cythonize
+
+    CYTHON_INSTALLED = True
+except ImportError:
+    CYTHON_INSTALLED = False
+
 
 FAILED_COMPILER_ERROR = """
 ******************************************************************************
@@ -46,7 +55,6 @@ class BinaryDistribution(Distribution):
 def run_setup(binary: bool = True) -> None:
     extensions = []
     if binary:
-        from Cython.Build import cythonize
         import numpy
 
         macros = [("NPY_NO_DEPRECATED_API", "1")]
@@ -60,6 +68,10 @@ def run_setup(binary: bool = True) -> None:
         )
         extensions.append(extension)
         extensions = cythonize(extensions, compiler_directives=directives, force=True)
+    else:
+        import logging
+
+        logging.warning("Building without binary support")
 
     setup(
         cmdclass=versioneer.get_cmdclass(),
@@ -116,7 +128,11 @@ def run_setup(binary: bool = True) -> None:
 
 
 try:
-    run_setup(binary=True)
+    build_binary = "--no-binary" not in sys.argv and CYTHON_INSTALLED
+    if "--no-binary" in sys.argv:
+        sys.argv.remove("--no-binary")
+
+    run_setup(binary=build_binary)
 except (
     CCompilerError,
     DistutilsExecError,
