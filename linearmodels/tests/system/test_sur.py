@@ -375,6 +375,10 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 def test_ols_against_gls(data):
     mod = SUR(data)
     res = mod.fit(method="gls")
+    if isinstance(data[list(data.keys())[0]], dict):
+        predictions = mod.predict(res.params, equations=data)
+        predictions2 = mod.predict(np.asarray(res.params)[:, None], equations=data)
+        assert_allclose(predictions, predictions2)
     sigma = res.sigma
     sigma_m12 = inv_matrix_sqrt(np.asarray(sigma))
     key = list(data.keys())[0]
@@ -688,6 +692,9 @@ def test_fitted(data):
 def test_predict(missing_data):
     mod = SUR(missing_data)
     res = mod.fit()
+    pred_no_missing = res.predict(equations=missing_data, missing=False, dataframe=True)
+    pred_missing = res.predict(equations=missing_data, missing=True, dataframe=True)
+    assert pred_missing.shape[0] <= pred_no_missing.shape[0]
     pred = res.predict()
     for key in pred:
         assert_series_equal(

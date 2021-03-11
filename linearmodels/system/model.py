@@ -595,9 +595,14 @@ class _SystemModelBase(object):
             assert self.formula is not None
             parser = SystemFormulaParser(self.formula, data=data, eval_env=eval_env)
             equations = parser.data
-        params = np.asarray(params)
-        if params.ndim == 1:
-            params = params[:, None]
+        params = np.atleast_2d(np.asarray(params))
+        if params.shape[0] == 1:
+            params = params.T
+        nx = int(sum([_x.shape[1] for _x in self._x]))
+        if params.shape[0] != nx:
+            raise ValueError(
+                f"Parameters must have {nx} elements; found {params.shape[0]}."
+            )
         loc = 0
         out = AttrDict()
         for i, label in enumerate(self._eq_labels):
@@ -1436,23 +1441,6 @@ class IV3SLS(_LSSystemModelBase):
                 instr.pandas,
             )
         return cls(equations)
-
-    @classmethod
-    def multivariate_ls(
-        cls,
-        dependent: ArrayLike,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
-        instruments: OptionalArrayLike = None,
-    ) -> "IV3SLS":
-        """
-        Deprecated. Use multivariate_iv.
-        """
-        warnings.warn(
-            "multivariate_ls is deprecated and will be removed " "after July 24, 2020.",
-            FutureWarning,
-        )
-        return cls.multivariate_iv(dependent, exog, endog, instruments)
 
     @classmethod
     def from_formula(

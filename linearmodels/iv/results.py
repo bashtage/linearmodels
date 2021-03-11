@@ -1493,7 +1493,7 @@ class IVGMMResults(_CommonIVResults):
             elif isinstance(variables, str):
                 variable_lst = [variables]
             else:
-                raise TypeError("variables must be a str of a list of str.")
+                raise TypeError("variables must be a str or a list of str.")
             exog_e = c_[exog.ndarray, endog.pandas[variable_lst].values]
             ex = [c for c in endog.pandas if c not in variable_lst]
             endog_e = endog.pandas[ex].values

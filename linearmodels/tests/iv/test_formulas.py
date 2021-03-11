@@ -8,6 +8,7 @@ import pytest
 
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
+from linearmodels.iv._utility import IVFormulaParser
 
 
 @pytest.fixture(
@@ -298,3 +299,11 @@ def test_ols_formula(data):
     mod = IV2SLS.from_formula(fmla, data)
     res = mod.fit()
     assert "OLS Estimation Summary" in str(res)
+
+
+def test_iv_formula_parser(data, model_and_func, formula):
+    parser = IVFormulaParser(formula, data)
+    assert parser.eval_env == 2
+    parser.eval_env = 3
+    assert parser.eval_env == 3
+    assert isinstance(parser.exog, DataFrame)

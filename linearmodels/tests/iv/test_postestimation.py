@@ -122,6 +122,15 @@ def test_c_stat_smoke(data):
     assert_allclose(c_stat.stat, c_stat2.stat)
 
 
+def test_c_stat_exception(data):
+    res = IVGMM(data.dep, data.exog, data.endog, data.instr).fit(cov_type="robust")
+    match = "variables must be a str or a list of str"
+    with pytest.raises(TypeError, match=match):
+        res.c_stat(variables=1)
+    with pytest.raises(TypeError, match=match):
+        res.c_stat(variables=("x1", "x2"))
+
+
 def test_linear_restriction(data):
     res = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit(cov_type="robust")
     nvar = len(res.params)
