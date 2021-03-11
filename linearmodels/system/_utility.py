@@ -119,8 +119,7 @@ def blocked_inner_prod(x: ArraySequence, s: NDArray) -> NDArray:
             s_ij = s[i, j]
             prod = s_ij * (xi.T @ xj)
             out[sel_i, sel_j] = prod
-            if i != j:
-                out[sel_j, sel_i] = prod.T
+            out[sel_j, sel_i] = prod.T
 
     return cast(np.ndarray, out)
 
@@ -242,7 +241,9 @@ class LinearConstraint(object):
             if require_pandas and not isinstance(q, pd.Series):
                 raise TypeError("q must be a Series")
             elif not isinstance(q, (pd.Series, np.ndarray)):
-                raise TypeError("q must be a Series")
+                raise TypeError("q must be a Series or an array")
+            if r.shape[0] != q.shape[0]:
+                raise ValueError("Constraint inputs are not shape compatible")
             q_pd = pd.Series(q, index=r_pd.index)
         else:
             q_pd = pd.Series(np.zeros(r_pd.shape[0]), index=r_pd.index)
@@ -261,8 +262,6 @@ class LinearConstraint(object):
     def _verify_constraints(self) -> None:
         r = self._ra
         q = self._qa
-        if r.shape[0] != q.shape[0]:
-            raise ValueError("Constraint inputs are not shape compatible")
         if self._num_params is not None:
             if r.shape[1] != self._num_params:
                 raise ValueError(

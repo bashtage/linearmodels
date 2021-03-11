@@ -147,6 +147,12 @@ def test_linear_constraint_errors():
         LinearConstraint(r_df, q)
     with pytest.raises(TypeError):
         LinearConstraint(r_df, [0, 0])
+    with pytest.raises(TypeError, match="q must be a Series or"):
+        LinearConstraint(r=np.eye(2), q=[0, 0], require_pandas=False)
+    with pytest.raises(ValueError, match="r is incompatible"):
+        LinearConstraint(r=np.eye(4), q=np.zeros(4), require_pandas=False, num_params=5)
+    with pytest.raises(ValueError, match="Constraint inputs are"):
+        LinearConstraint(r=np.eye(4), q=np.zeros(2), require_pandas=False)
 
 
 def test_linear_constraint_repr():
