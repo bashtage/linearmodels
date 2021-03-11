@@ -92,7 +92,7 @@ def test(
 
     try:
         import pytest
-    except ImportError:
+    except ImportError:  # pragma: no cover
         raise ImportError("Need pytest to run tests")
 
     cmd = ["--tb=auto"]
@@ -116,7 +116,7 @@ def test(
     cmd = [pkg] + cmd
     print("running: pytest {}".format(" ".join(cmd)))
     status = pytest.main(cmd)
-    if exit:
+    if exit:  # pragma: no cover
         sys.exit(status)
     return status
 

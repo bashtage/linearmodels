@@ -912,8 +912,8 @@ class PooledOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            _extra_df = cov_config.get("extra_df", 0)
-            assert isinstance(_extra_df, (int, str))
+            _extra_df = cov_config.pop("extra_df")
+            assert isinstance(_extra_df, (str, int))
             extra_df = int(_extra_df)
         cov = setup_covariance_estimator(
             self._cov_estimators,
@@ -2021,8 +2021,8 @@ class BetweenOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            _extra_df = cov_config.get("extra_df", 0)
-            assert isinstance(_extra_df, (int, str))
+            _extra_df = cov_config.pop("extra_df")
+            assert isinstance(_extra_df, (str, int))
             extra_df = int(_extra_df)
         cov = setup_covariance_estimator(
             self._cov_estimators,
@@ -2315,10 +2315,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            _extra_df = cov_config.get("extra_df", 0)
-            assert isinstance(_extra_df, (int, str))
+            _extra_df = cov_config.pop("extra_df")
+            assert isinstance(_extra_df, (str, int))
             extra_df = int(_extra_df)
-
         cov = setup_covariance_estimator(
             self._cov_estimators,
             cov_type,
@@ -2626,10 +2625,9 @@ class RandomEffects(_PanelModelBase):
         extra_df = 0
         if "extra_df" in cov_config:
             cov_config = cov_config.copy()
-            _extra_df = cov_config.get("extra_df", 0)
-            assert isinstance(_extra_df, (int, str))
+            _extra_df = cov_config.pop("extra_df")
+            assert isinstance(_extra_df, (str, int))
             extra_df = int(_extra_df)
-
         cov = setup_covariance_estimator(
             self._cov_estimators,
             cov_type,

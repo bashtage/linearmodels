@@ -16,6 +16,13 @@ exclude_lines =
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
     raise NotImplementedError
+    except NotImplementedError
+    raise ImportError
+
+    # Ignore failure messages
+    pytest.xfail
+    # Ignore ImportError protection
+    except ImportError
 
     # Ignore pass
     pass
@@ -23,5 +30,11 @@ exclude_lines =
     # Don't complain if non-runnable code isn't run:
     if 0:
     if __name__ == .__main__.:
+
+    # Ignore type checking code
+    if TYPE_CHECKING
+
+    # Cython function declarations
+    cdef
 
 ignore_errors = True

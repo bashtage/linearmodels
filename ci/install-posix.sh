@@ -8,7 +8,7 @@ CMD="$CMD pandas"
 if [[ -n ${PANDAS} ]]; then CMD="$CMD==${PANDAS}"; fi;
 CMD="$CMD statsmodels"
 if [[ -n ${STATSMODELS} ]]; then CMD="$CMD==${STATSMODELS}"; fi
-CMD="$CMD xarray"
-if [[ -n ${XARRAY} ]]; then CMD="$CMD==${XARRAY}"; fi
+if [[ -n ${XARRAY} ]]; then CMD="$CMD xarray==${XARRAY}"; fi
+if [[ -n ${XXHASH} ]]; then CMD="$CMD xxhash"; fi
 echo $CMD
 eval $CMD

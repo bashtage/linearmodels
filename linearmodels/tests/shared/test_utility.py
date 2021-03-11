@@ -194,6 +194,9 @@ def test_format_wide():
     out = format_wide(inputs, 80)
     assert max(map(lambda v: len(v), out)) <= 80
 
+    out = format_wide(["a"], 80)
+    assert out == [["a"]]
+
 
 def test_panel_to_midf():
     x = np.random.standard_normal((3, 7, 100))

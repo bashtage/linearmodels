@@ -216,3 +216,10 @@ def test_fitted_effects_residuals(data):
     expected.columns = ["estimated_effects"]
     assert_allclose(res.estimated_effects, expected)
     assert_frame_similar(res.estimated_effects, expected)
+
+
+def test_extra_df(data):
+    mod = FirstDifferenceOLS(data.y, data.x)
+    res = mod.fit()
+    res_extra = mod.fit(extra_df=10)
+    assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))

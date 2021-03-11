@@ -30,6 +30,7 @@ jobs:
         PANDAS: 1.0.5
         STATSMODELS: 0.11.1
         XARRAY: 0.14.1
+        XXHASH: true
       python38_recent:
         python.version: '3.8'
         NUMPY: 1.19.4
@@ -38,6 +39,9 @@ jobs:
         STATSMODELS: 0.12.1
         XARRAY: 0.15.1
         test.install: true
+      python39_no_cython:
+        python.version: '3.9'
+        SETUP_OPTIONS: '--no-binary'
       python39_latest:
         python.version: '3.9'
     maxParallel: 10
@@ -70,14 +74,20 @@ jobs:
 
   - script: |
       echo "Installing to site packages"
-      python setup.py bdist_wheel
+      python setup.py bdist_wheel ${SETUP_OPTIONS}
       WHL=$(ls -t dist)
       pip install ./dist/${WHL}
     displayName: 'Install linearmodels (site-packages)'
     condition: eq(variables['test.install'], 'true')
 
   - script: |
-      python -m pip install -e . -v --no-build-isolation
+      if [ -z ${SETUP_OPTIONS} ]; then
+        echo python -m pip install -e . -v --no-build-isolation
+        python -m pip install -e . -v --no-build-isolation
+      else
+        echo python setup.by develop ${SETUP_OPTIONS}
+        python setup.py develop ${SETUP_OPTIONS}
+      fi
     displayName: 'Install linearmodels (editable)'
     condition: ne(variables['test.install'], 'true')
 

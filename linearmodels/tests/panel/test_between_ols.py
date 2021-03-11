@@ -110,6 +110,8 @@ def test_single_entity_weights(data):
     res = mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
     ols_res = ols.fit(cov_type="clustered", clusters=clusters, debiased=False)
     assert_results_equal(res, ols_res)
+    res_no_clust = mod.fit(cov_type="clustered", clusters=None, debiased=False)
+    assert not np.all(np.isclose(res_no_clust.cov, res.cov))
 
 
 def test_multiple_obs_per_entity(data):
@@ -350,3 +352,10 @@ def test_fitted_effects_residuals(both_data_types):
     expected.columns = ["idiosyncratic"]
     assert_allclose(expected, res.idiosyncratic, atol=1e-8)
     assert_frame_similar(res.idiosyncratic, expected)
+
+
+def test_extra_df(data):
+    mod = BetweenOLS(data.y, data.x)
+    res = mod.fit()
+    res_extra = mod.fit(extra_df=10)
+    assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))
