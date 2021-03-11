@@ -1441,3 +1441,17 @@ def test_f_after_drop():
     assert isinstance(res.f_statistic_robust, WaldTestStatistic)
     assert res.f_statistic.stat > 0
     assert res.f_statistic_robust.stat > 0
+
+
+def test_predict_incorrect(data):
+    mod = PanelOLS(data.y, data.x)
+    res = mod.fit()
+    with pytest.raises(ValueError, match="exog does not have the correct"):
+        mod.predict(res.params.iloc[:-1], exog=data.x)
+    exog = np.asarray(data.x)
+    if exog.ndim == 3:
+        exog = exog[:-1]
+    else:
+        exog = exog[:, :-1]
+    with pytest.raises(ValueError, match="exog does not have the correct"):
+        mod.predict(res.params, exog=exog)

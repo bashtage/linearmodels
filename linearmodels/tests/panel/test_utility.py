@@ -10,11 +10,14 @@ import scipy.sparse.csc
 import scipy.sparse.csr
 
 from linearmodels.panel.utility import (
+    AbsorbingEffectError,
     PanelModelData,
+    check_absorbed,
     dummy_matrix,
     generate_panel_data,
     in_2core_graph,
     in_2core_graph_slow,
+    not_absorbed,
     preconditioner,
 )
 
@@ -217,13 +220,18 @@ def test_preconditioner_subclass():
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values ** 2).sum(0)), cond)
     assert type(val_cond) == type(values)
+    # Test in-place
+    val_cond, cond = preconditioner(values, copy=False)
+    assert_allclose(np.sqrt((values ** 2).sum(0)), np.ones(10))
+    assert type(val_cond) == type(values)
 
 
 @pytest.mark.parametrize("missing", [0, 0.2])
 @pytest.mark.parametrize("const", [True, False])
 @pytest.mark.parametrize("other_effects", [0, 1, 2])
 @pytest.mark.parametrize("cat_list", [True, False])
-def test_generate_panel_data(missing, const, other_effects, cat_list):
+@pytest.mark.parametrize("random_state", [None, np.random.RandomState(0)])
+def test_generate_panel_data(missing, const, other_effects, cat_list, random_state):
     if cat_list:
         ncats: Union[List[int], int] = [13] * other_effects
     else:
@@ -240,3 +248,29 @@ def test_generate_panel_data(missing, const, other_effects, cat_list):
         assert "const" in dataset.data
         assert (dataset.data["const"].dropna() == 1.0).all()
     assert dataset.other_effects.shape == (dataset.data.shape[0], other_effects)
+
+
+def test_not_absorbed_const():
+    x = np.random.standard_normal((200, 3))
+    x[:, 0] = 0
+    na = not_absorbed(x, True, 0)
+    assert na == [0, 1, 2]
+    x[:, 0] = x[:, 1]
+    x[:, 1] = 0
+    na = not_absorbed(x, True, 1)
+    assert na == [0, 1, 2]
+
+
+def test_all_absorbed_const():
+    x = np.zeros((200, 3))
+    na = not_absorbed(x, True, 0)
+    assert na == [0]
+    na = not_absorbed(x, True, 1)
+    assert na == [1]
+
+
+def test_all_absorbed_exception():
+    x_orig = np.random.standard_normal((200, 3))
+    x = x_orig * 1e-32
+    with pytest.raises(AbsorbingEffectError, match="All exog variables have been"):
+        check_absorbed(x, ["a", "b", "c"], x_orig)

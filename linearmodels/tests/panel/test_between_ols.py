@@ -350,3 +350,10 @@ def test_fitted_effects_residuals(both_data_types):
     expected.columns = ["idiosyncratic"]
     assert_allclose(expected, res.idiosyncratic, atol=1e-8)
     assert_frame_similar(res.idiosyncratic, expected)
+
+
+def test_extra_df(data):
+    mod = BetweenOLS(data.y, data.x)
+    res = mod.fit()
+    res_extra = mod.fit(extra_df=10)
+    assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))

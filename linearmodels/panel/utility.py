@@ -497,6 +497,7 @@ def not_absorbed(
     retain: Set[int] = set(range(x.shape[1])).difference(drop)
     if has_constant:
         assert isinstance(loc, int)
+        retain = set([idx + (idx >= loc) for idx in retain])
         retain.update({loc})
     return sorted(retain)
 
