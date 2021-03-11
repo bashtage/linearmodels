@@ -37,6 +37,7 @@ jobs:
         PANDAS: 1.1.5
         STATSMODELS: 0.12.1
         XARRAY: 0.15.1
+        XXHASH: true
         test.install: true
       python39_no_cython:
         python.version: '3.9'
