@@ -570,7 +570,7 @@ class ACCovariance(HomoskedasticCovariance):
         xeex = np.zeros((xe.shape[1], xe.shape[1]))
         for entity in entities:
             _xe = xe.loc[entity].values
-            _bw = max(len(_xe) - 1.0, bw)
+            _bw = min(_xe.shape[0] - 1.0, bw)
             xeex += self._single_cov(_xe, _bw)
         xeex /= nentity
         xeex *= self._scale

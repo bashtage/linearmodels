@@ -52,6 +52,7 @@ def test_bool():
 def test_float():
     assert get_float({"v": True}, "v") == 1.0
     assert get_float({"v": True}, "a") is None
+    assert get_string({"v": None}, "v") is None
     with pytest.raises(TypeError, match=r".not a float"):
         get_float({"v": "1.0"}, "v")
 
@@ -63,6 +64,7 @@ def test_string():
         get_string({"v": 1.0}, "v")
     with pytest.raises(TypeError, match=r".not a str"):
         get_string({"v": b"1"}, "v")
+    assert get_string({"v": None}, "v") is None
 
 
 def test_array_like(arr):

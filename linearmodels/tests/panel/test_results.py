@@ -136,6 +136,8 @@ def test_predict(generated_data):
     pred = res.predict(effects=True, idiosyncratic=True, missing=True)
     assert list(pred.columns) == ["fitted_values", "estimated_effects", "idiosyncratic"]
     assert pred.shape == (PanelData(generated_data.y).dataframe.shape[0], 3)
+    pred = res.predict(missing=True)
+    assert pred.shape[0] <= np.prod(generated_data.y.shape)
 
 
 def test_predict_exception(generated_data):

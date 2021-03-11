@@ -257,7 +257,9 @@ def test_const_data_both_weights(const_data):
 
 
 def test_panel_no_effects(data):
-    res = PanelOLS(data.y, data.x).fit()
+    panel = PanelOLS(data.y, data.x)
+    assert panel._collect_effects().shape[1] == 0
+    res = panel.fit()
     res2 = PooledOLS(data.y, data.x).fit()
     assert_results_equal(res, res2)
 

@@ -235,3 +235,18 @@ def test_extra_df(data):
     res = mod.fit()
     res_extra = mod.fit(extra_df=10)
     assert np.all(np.diag(res_extra.cov) > np.diag(res.cov))
+
+
+@pytest.mark.parametrize(
+    "cov_type", ["dk", "driscoll-kraay", "kernel", "ac", "autocorrelated"]
+)
+def test_alt_cov(data, cov_type):
+    mod = PooledOLS(data.y, data.x)
+    res = mod.fit(cov_type=cov_type)
+    res_def = mod.fit()
+    assert not np.all(np.isclose(res.cov, res_def.cov))
+    if cov_type.startswith("a"):
+        cov_name = "Autocorrelation Rob. Cov."
+    else:
+        cov_name = "Driscoll-Kraay"
+    assert cov_name in str(res.summary)
