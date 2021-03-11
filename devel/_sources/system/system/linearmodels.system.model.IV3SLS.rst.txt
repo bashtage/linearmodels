@@ -17,7 +17,6 @@
       ~IV3SLS.fit
       ~IV3SLS.from_formula
       ~IV3SLS.multivariate_iv
-      ~IV3SLS.multivariate_ls
       ~IV3SLS.predict
       ~IV3SLS.reset_constraints
    
