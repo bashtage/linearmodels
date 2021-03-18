@@ -1,0 +1,3 @@
+from linearmodels.typing import NDArray
+
+def _drop_singletons(meta: NDArray, orig_dest: NDArray) -> None:...

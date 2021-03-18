@@ -5,6 +5,7 @@ import numpy as np
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 import pytest
+from scipy.linalg import lstsq as sp_lstsq
 
 from linearmodels.formula import (
     between_ols,
@@ -56,7 +57,7 @@ classes = [PooledOLS, BetweenOLS, FirstDifferenceOLS, RandomEffects, FamaMacBeth
 funcs = [pooled_ols, between_ols, first_difference_ols, random_effects, fama_macbeth]
 
 
-@pytest.fixture(params=list(zip(classes, funcs)))
+@pytest.fixture(params=list(zip(classes, funcs)), ids=[c.__name__ for c in classes])
 def models(request):
     return request.param
 
@@ -274,3 +275,41 @@ def test_parser(data, formula, effects):
     else:
         parser = PanelFormulaParser(formula, joined)
         assert parser.entity_effect
+
+
+def test_formulas_rank_check(data, models, formula):
+    if not isinstance(data.y, DataFrame):
+        return
+    joined = data.x
+    joined["y"] = data.y
+    model, formula_func = models
+    mod = model.from_formula(formula, joined)
+    y = mod.dependent.dataframe.copy()
+    x = mod.exog.dataframe.copy()
+
+    def _mr(z):
+        return sp_lstsq(z, np.ones(z.shape[0]), lapack_driver="gelsy")[2]
+
+    while _mr(x) == x.shape[1]:
+        x.iloc[:, -1] /= 10
+    for col in x:
+        joined[col] = x[col]
+    with pytest.raises(ValueError, match="exog does not have"):
+        model.from_formula(formula, joined)
+    with pytest.raises(ValueError, match="exog does not have"):
+        model.from_formula(formula, joined, check_rank=True)
+    with pytest.raises(ValueError, match="exog does not have"):
+        model(y, x)
+    with pytest.raises(ValueError, match="exog does not have"):
+        model(y, x, check_rank=True)
+
+    if model == FamaMacBeth:
+        # FMB has tighter checks that cannot be disabled
+        return
+
+    mod = model.from_formula(formula, joined, check_rank=False)
+    res = mod.fit()
+    assert isinstance(res.summary.as_text(), str)
+    mod = model(y, x, check_rank=False)
+    res = mod.fit()
+    assert isinstance(res.summary.as_text(), str)

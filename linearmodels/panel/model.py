@@ -1,10 +1,11 @@
 from typing import Dict, NamedTuple, Optional, Tuple, Type, Union, cast
 
 import numpy as np
-from numpy.linalg import lstsq, matrix_rank
+import pandas as pd
 from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
+from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
 
@@ -65,6 +66,17 @@ CovarianceEstimatorType = Union[
     Type[HeteroskedasticCovariance],
     Type[HomoskedasticCovariance],
 ]
+
+
+def _lstsq(
+    x: NDArray, y: NDArray, rcond: Optional[float] = None
+) -> Tuple[NDArray, NDArray, int, NDArray]:
+    if rcond is None:
+        eps = np.finfo(np.float64).eps
+        cond = max(x.shape) * eps
+    else:
+        cond = rcond
+    return sp_lstsq(x, y, cond=cond, lapack_driver="gelsy")
 
 
 def panel_structure_stats(ids: NDArray, name: str) -> Series:
@@ -247,6 +259,12 @@ class _PanelModelBase(object):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically instable if this check is skipped and
+        the matrix is not full rank.
     """
 
     def __init__(
@@ -255,6 +273,7 @@ class _PanelModelBase(object):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> None:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
@@ -275,6 +294,7 @@ class _PanelModelBase(object):
         )
         self._original_index = self.dependent.index.copy()
         self._constant_index: Optional[int] = None
+        self._check_rank = bool(check_rank)
         self._validate_data()
         self._singleton_index: Optional[NDArray] = None
 
@@ -374,10 +394,16 @@ class _PanelModelBase(object):
         return PanelData(frame)
 
     def _check_exog_rank(self) -> int:
+        if not self._check_rank:
+            return self.exog.shape[1]
         x = self.exog.values2d
-        rank_of_x = matrix_rank(x)
+        _, _, rank_of_x, _ = _lstsq(x, np.ones(x.shape[0]))
         if rank_of_x < x.shape[1]:
-            raise ValueError("exog does not have full column rank.")
+            raise ValueError(
+                "exog does not have full column rank. If you wish to proceed with "
+                "model estimation irrespective of the numerical accuracy of "
+                "coefficient estiamtes, you can set rank_check=False."
+            )
         return rank_of_x
 
     def _validate_data(self) -> None:
@@ -774,6 +800,12 @@ class PooledOLS(_PanelModelBase):
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically instable if this check is skipped and
+        the matrix is not full rank.
 
     Notes
     -----
@@ -790,8 +822,9 @@ class PooledOLS(_PanelModelBase):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> None:
-        super().__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 
     @classmethod
     def from_formula(
@@ -800,6 +833,7 @@ class PooledOLS(_PanelModelBase):
         data: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> "PooledOLS":
         """
         Create a model from a formula
@@ -816,6 +850,12 @@ class PooledOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -837,7 +877,7 @@ class PooledOLS(_PanelModelBase):
         """
         parser = PanelFormulaParser(formula, data)
         dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
+        mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod
 
@@ -903,7 +943,7 @@ class PooledOLS(_PanelModelBase):
         wx = root_w * x
         wy = root_w * y
 
-        params = lstsq(wx, wy, rcond=None)[0]
+        params = _lstsq(wx, wy, rcond=None)[0]
 
         nobs = y.shape[0]
         df_model = x.shape[1]
@@ -1058,6 +1098,12 @@ class PanelOLS(_PanelModelBase):
         Flag indicating whether to drop singleton observation
     drop_absorbed : bool, optional
         Flag indicating whether to drop absorbed variables
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically instable if this check is skipped and
+        the matrix is not full rank.
 
     Notes
     -----
@@ -1104,8 +1150,9 @@ class PanelOLS(_PanelModelBase):
         other_effects: Optional[PanelDataLike] = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
+        check_rank: bool = True,
     ) -> None:
-        super(PanelOLS, self).__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 
         self._entity_effects = entity_effects
         self._time_effects = time_effects
@@ -1160,7 +1207,7 @@ class PanelOLS(_PanelModelBase):
         self._check_exog_rank()
 
     def __str__(self) -> str:
-        out = super(PanelOLS, self).__str__()
+        out = super().__str__()
         additional = (
             "\nEntity Effects: {ee}, Time Effects: {te}, Num Other Effects: {oe}"
         )
@@ -1253,6 +1300,7 @@ class PanelOLS(_PanelModelBase):
         other_effects: Optional[PanelDataLike] = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
+        check_rank: bool = True,
     ) -> "PanelOLS":
         """
         Create a model from a formula
@@ -1279,8 +1327,12 @@ class PanelOLS(_PanelModelBase):
             Flag indicating whether to drop singleton observation
         drop_absorbed : bool, optional
             Flag indicating whether to drop absorbed variables
-
-
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -1308,6 +1360,7 @@ class PanelOLS(_PanelModelBase):
             other_effects=other_effects,
             singletons=singletons,
             drop_absorbed=drop_absorbed,
+            check_rank=check_rank,
         )
         mod.formula = formula
         return mod
@@ -1381,7 +1434,7 @@ class PanelOLS(_PanelModelBase):
         y = root_w * self.dependent.values2d
         x = root_w * self.exog.values2d
         if not self._has_effect:
-            ybar = root_w @ lstsq(root_w, y, rcond=None)[0]
+            ybar = root_w @ _lstsq(root_w, y, rcond=None)[0]
             y_effect, x_effect = np.zeros_like(y), np.zeros_like(x)
             return y, x, ybar, y_effect, x_effect
 
@@ -1408,8 +1461,8 @@ class PanelOLS(_PanelModelBase):
             z = np.ones_like(root_w)
             d -= z * (z.T @ d / z.sum())
 
-        x_mean = lstsq(wd, x, rcond=None)[0]
-        y_mean = lstsq(wd, y, rcond=None)[0]
+        x_mean = _lstsq(wd, x, rcond=None)[0]
+        y_mean = _lstsq(wd, y, rcond=None)[0]
 
         # Save fitted unweighted effects to use in eps calculation
         x_effects = d @ x_mean
@@ -1419,7 +1472,7 @@ class PanelOLS(_PanelModelBase):
         x = x - wd @ x_mean
         y = y - wd @ y_mean
 
-        ybar = root_w @ lstsq(root_w, y, rcond=None)[0]
+        ybar = root_w @ _lstsq(root_w, y, rcond=None)[0]
         return y, x, ybar, y_effects, x_effects
 
     def _choose_twoway_algo(self) -> bool:
@@ -1555,7 +1608,7 @@ class PanelOLS(_PanelModelBase):
     def _info(self) -> Tuple[Series, Series, DataFrame]:
         """Information about model effects and panel structure"""
 
-        entity_info, time_info, other_info = super(PanelOLS, self)._info()
+        entity_info, time_info, other_info = super()._info()
 
         if self.other_effects:
             other_info = []
@@ -1756,7 +1809,7 @@ class PanelOLS(_PanelModelBase):
                     self.exog = PanelData(self.exog.dataframe.iloc[:, retain])
                     x_effects = x_effects[retain]
 
-        params = lstsq(x, y, rcond=None)[0]
+        params = _lstsq(x, y, rcond=None)[0]
         nobs = self.dependent.dataframe.shape[0]
         df_model = x.shape[1] + neffects
         df_resid = nobs - df_model
@@ -1830,10 +1883,10 @@ class PanelOLS(_PanelModelBase):
             df_num, df_denom = (df_model - wx.shape[1]), df_resid
             if not self.has_constant:
                 # Correction for when models does not have explicit constant
-                wy -= root_w * lstsq(root_w, wy, rcond=None)[0]
-                wx -= root_w * lstsq(root_w, wx, rcond=None)[0]
+                wy -= root_w * _lstsq(root_w, wy, rcond=None)[0]
+                wx -= root_w * _lstsq(root_w, wx, rcond=None)[0]
                 df_num -= 1
-            weps_pooled = wy - wx @ lstsq(wx, wy, rcond=None)[0]
+            weps_pooled = wy - wx @ _lstsq(wx, wy, rcond=None)[0]
             resid_ss_pooled = float(weps_pooled.T @ weps_pooled)
             num = (resid_ss_pooled - resid_ss) / df_num
 
@@ -1917,8 +1970,9 @@ class BetweenOLS(_PanelModelBase):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> None:
-        super(BetweenOLS, self).__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
         self._cov_estimators = CovarianceManager(
             self.__class__.__name__,
             HomoskedasticCovariance,
@@ -2012,7 +2066,7 @@ class BetweenOLS(_PanelModelBase):
 
         wx = root_w * x
         wy = root_w * y
-        params = lstsq(wx, wy, rcond=None)[0]
+        params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = y.shape[0] - x.shape[1]
         df_model = (x.shape[1],)
@@ -2090,6 +2144,7 @@ class BetweenOLS(_PanelModelBase):
         data: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> "BetweenOLS":
         """
         Create a model from a formula
@@ -2106,6 +2161,12 @@ class BetweenOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -2127,7 +2188,7 @@ class BetweenOLS(_PanelModelBase):
         """
         parser = PanelFormulaParser(formula, data)
         dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
+        mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod
 
@@ -2162,8 +2223,9 @@ class FirstDifferenceOLS(_PanelModelBase):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ):
-        super(FirstDifferenceOLS, self).__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
         if self._constant:
             raise ValueError(
                 "Constants are not allowed in first difference regressions."
@@ -2309,7 +2371,7 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         wx = root_w * x
         wy = root_w * y
-        params = lstsq(wx, wy, rcond=None)[0]
+        params = _lstsq(wx, wy, rcond=None)[0]
         df_resid = y.shape[0] - x.shape[1]
         cov_config = self._setup_clusters(cov_config)
         extra_df = 0
@@ -2380,6 +2442,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         data: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> "FirstDifferenceOLS":
         """
         Create a model from a formula
@@ -2396,6 +2459,12 @@ class FirstDifferenceOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -2417,7 +2486,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         """
         parser = PanelFormulaParser(formula, data)
         dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
+        mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod
 
@@ -2455,8 +2524,9 @@ class RandomEffects(_PanelModelBase):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> None:
-        super().__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 
     @classmethod
     def from_formula(
@@ -2465,6 +2535,7 @@ class RandomEffects(_PanelModelBase):
         data: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> "RandomEffects":
         """
         Create a model from a formula
@@ -2481,6 +2552,12 @@ class RandomEffects(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -2502,7 +2579,7 @@ class RandomEffects(_PanelModelBase):
         """
         parser = PanelFormulaParser(formula, data)
         dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
+        mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod
 
@@ -2579,12 +2656,12 @@ class RandomEffects(_PanelModelBase):
             x_gm = (w * self.exog.values2d).sum(0) / w_sum
             y += root_w * y_gm
             x += root_w * x_gm
-        params = lstsq(x, y, rcond=None)[0]
+        params = _lstsq(x, y, rcond=None)[0]
         weps = y - x @ params
 
         wybar = self.dependent.mean("entity", weights=self.weights)
         wxbar = self.exog.mean("entity", weights=self.weights)
-        params = lstsq(np.asarray(wxbar), np.asarray(wybar), rcond=None)[0]
+        params = _lstsq(np.asarray(wxbar), np.asarray(wybar), rcond=None)[0]
         wu = np.asarray(wybar) - np.asarray(wxbar) @ params
 
         nobs = weps.shape[0]
@@ -2618,7 +2695,7 @@ class RandomEffects(_PanelModelBase):
         wxbar = (theta * wxbar).loc[reindex]
         wy -= wybar.values
         wx -= wxbar.values
-        params = lstsq(wx, wy, rcond=None)[0]
+        params = _lstsq(wx, wy, rcond=None)[0]
 
         df_resid = wy.shape[0] - wx.shape[1]
         cov_config = self._setup_clusters(cov_config)
@@ -2654,7 +2731,7 @@ class RandomEffects(_PanelModelBase):
         residual_ss = float(weps.T @ weps)
         wmu = 0
         if self.has_constant:
-            wmu = root_w * lstsq(root_w, wy, rcond=None)[0]
+            wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
         total_ss = float(wy_demeaned.T @ wy_demeaned)
         r2 = 1 - residual_ss / total_ss
@@ -2733,8 +2810,9 @@ class FamaMacBeth(_PanelModelBase):
         exog: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ):
-        super(FamaMacBeth, self).__init__(dependent, exog, weights=weights)
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
         self._validate_blocks()
 
     def _validate_blocks(self) -> None:
@@ -2748,7 +2826,11 @@ class FamaMacBeth(_PanelModelBase):
         )
 
         def validate_block(ex: NDArray) -> bool:
-            return ex.shape[0] >= ex.shape[1] and matrix_rank(ex) == ex.shape[1]
+            def _mr(ex: pd.DataFrame) -> int:
+                """lstsq based matrix_rank"""
+                return _lstsq(ex, np.ones(ex.shape[0]))[2]
+
+            return ex.shape[0] >= ex.shape[1] and _mr(ex) == ex.shape[1]
 
         valid_blocks = wx.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
@@ -2841,10 +2923,12 @@ class FamaMacBeth(_PanelModelBase):
 
         def single(z: DataFrame) -> Series:
             exog = z.iloc[:, 1:].values
-            if exog.shape[0] < exog.shape[1] or matrix_rank(exog) != exog.shape[1]:
+            if exog.shape[0] < exog.shape[1]:
                 return Series([np.nan] * len(z.columns), index=z.columns)
             dep = z.iloc[:, :1].values
-            params = lstsq(exog, dep, rcond=None)[0]
+            params, _, rank, _ = _lstsq(exog, dep)
+            if rank != exog.shape[1]:
+                return Series([np.nan] * len(z.columns), index=z.columns)
             return Series(np.r_[np.nan, params.ravel()], index=z.columns)
 
         all_params = yx.groupby(level=1).apply(single)
@@ -2923,6 +3007,7 @@ class FamaMacBeth(_PanelModelBase):
         data: PanelDataLike,
         *,
         weights: Optional[PanelDataLike] = None,
+        check_rank: bool = True,
     ) -> "FamaMacBeth":
         """
         Create a model from a formula
@@ -2939,6 +3024,12 @@ class FamaMacBeth(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
+        check_rank : bool, optional
+            Flag indicating whether to perform a rank check on the exogenous
+            variables to ensure that the model is identified. Skipping this
+            check can reduce the time required to validate a model
+            specification. Results may be numerically instable if this check
+            is skipped and the matrix is not full rank.
 
         Returns
         -------
@@ -2960,6 +3051,6 @@ class FamaMacBeth(_PanelModelBase):
         """
         parser = PanelFormulaParser(formula, data)
         dependent, exog = parser.data
-        mod = cls(dependent, exog, weights=weights)
+        mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod

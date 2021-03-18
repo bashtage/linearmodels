@@ -3,6 +3,7 @@ import pytest
 
 def pytest_configure(config):
     # Minimal config to simplify running tests from lm.test()
+    config.addinivalue_line("markers", "example: mark a test as an example")
     config.addinivalue_line("markers", "slow: mark a test as slow")
     config.addinivalue_line(
         "markers", "smoke: mark a test as a coding error (smoke) test"
@@ -17,6 +18,7 @@ def pytest_addoption(parser):
     parser.addoption("--only-slow", action="store_true", help="run only slow tests")
     parser.addoption("--skip-smoke", action="store_true", help="skip smoke tests")
     parser.addoption("--only-smoke", action="store_true", help="run only smoke tests")
+    parser.addoption("--skip-examples", action="store_true", help="skip examples tests")
 
 
 def pytest_runtest_setup(item):
@@ -31,3 +33,6 @@ def pytest_runtest_setup(item):
 
     if "smoke" not in item.keywords and item.config.getoption("--only-smoke"):
         pytest.skip("skipping due to --only-smoke")
+
+    if "example" in item.keywords and item.config.getoption("--skip-examples"):
+        pytest.skip("skipping due to --skip-examples")
