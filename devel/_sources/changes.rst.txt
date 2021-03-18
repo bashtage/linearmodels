@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+Since 4.20
+----------
+* Added ``rank_check`` argument to panel-data models that allows the rank
+  check to be skipped. Estimating a model that is rank deficient may result
+  in unreliable estiamtes and so caution is needed if using this option.
+* Changed the rank check to use :func:`numpy.linalg.lstsq` which is better
+  aligned with parameter estimation than the :func:`numpy.linalg.svd`-based
+  :func:`numpy.linalg.matrix_rank`.
+* Changed the default least squares used to :func:`scipy.linalg.lstsq` so
+  that the ``lapack_driver`` can be changed to use QR factorization.
+
 Version 4.20
 ------------
 * Correct calculation of first-stage F-statistic in IV models.
