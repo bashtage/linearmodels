@@ -135,3 +135,14 @@ def test_block_size_error():
     x = pd.DataFrame(x, index=idx, columns=["x1", "x2"])
     with pytest.raises(ValueError):
         FamaMacBeth(y, x)
+
+
+def test_limited_redundancy():
+    data = generate_data(
+        0, datatype="numpy", const=False, other_effects=1, ntk=(25, 200, 5)
+    )
+    for i in range(0, data.x.shape[1], 7):
+        data.x[1, i, :] = data.x[0, i, :]
+    mod = FamaMacBeth(data.y, data.x)
+    res = mod.fit()
+    assert np.any(np.isnan(res.all_params))

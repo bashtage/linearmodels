@@ -19,6 +19,20 @@ try:
     import seaborn  # noqa: F401
 
     kernels = jupyter_client.kernelspec.find_kernel_specs()
+
+    plat_win = sys.platform.startswith("win")
+    if plat_win and sys.version_info >= (3, 8):  # pragma: no cover
+        import asyncio
+
+        try:
+            from asyncio import WindowsSelectorEventLoopPolicy
+        except ImportError:
+            pass  # Can't assign a policy which doesn't exist.
+        else:
+            pol = asyncio.get_event_loop_policy()
+            if not isinstance(pol, WindowsSelectorEventLoopPolicy):
+                asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
+
     SKIP = False
 except ImportError:  # pragma: no cover
     SKIP = True
@@ -42,6 +56,7 @@ def notebook(request):
 
 
 @pytest.mark.slow
+@pytest.mark.example
 @pytest.mark.skipif(SKIP, reason="Required packages not available")
 def test_notebook(notebook):
     nb_name = os.path.split(notebook)[-1]
