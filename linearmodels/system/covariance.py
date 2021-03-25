@@ -233,8 +233,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
             bigxe = bigx * e
             m = bigx.shape[1]
             xe = zeros((nobs, m))
-            for i in range(nobs):
-                xe[i, :] = bigxe[i::nobs].sum(0)[None, :]
+            for i in range(len(x)):
+                xe += bigxe[i * nobs : (i + 1) * nobs]
         else:
             # Do not require blocking when not using GLS
             k_tot = sum(map(lambda a: a.shape[1], x))

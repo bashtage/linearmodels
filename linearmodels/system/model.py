@@ -1045,7 +1045,7 @@ class _SystemModelBase(object):
         eps = np.reshape(eps, (k, eps.shape[0] // k)).T
         cov_est = cov_estimator(
             self._wxhat,
-            gls_eps,
+            eps,
             sigma,
             full_sigma,
             gls=True,
