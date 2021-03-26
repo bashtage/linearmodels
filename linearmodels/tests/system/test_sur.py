@@ -786,3 +786,68 @@ def test_system_r2_direct():
     assert_allclose(ref, res.system_rsquared.mcelroy)
     ref = reference_berndt(res.resids, y)
     assert_allclose(ref, res.system_rsquared.berndt, atol=1e-3, rtol=1e-3)
+
+
+def direct_gls(eqns, scale):
+    y = []
+    x = []
+    for key in eqns:
+        y.append(eqns[key]["dependent"])
+        x.append(eqns[key]["exog"])
+    y = scale * np.vstack(y)
+    from scipy.sparse import csc_matrix
+
+    n, k = x[0].shape
+    _x = csc_matrix((len(x) * n, len(x) * k))
+    for i, val in enumerate(x):
+        _x[i * n : (i + 1) * n, i * k : (i + 1) * k] = val
+    from scipy.sparse.linalg import inv as spinv
+
+    b = spinv(_x.T @ _x) @ (_x.T @ y)
+    e = y - _x @ b
+    e = e.reshape((-1, n)).T
+    sigma = e.T @ e / n
+    omega_inv = np.kron(np.linalg.inv(sigma), np.eye(n))
+    b_gls = np.linalg.inv(_x.T @ omega_inv @ _x) @ (_x.T @ omega_inv @ y)
+    xpx = _x.T @ omega_inv @ _x / n
+    xpxi = np.linalg.inv(xpx)
+    e = y - _x @ b_gls
+    xe = (_x.T @ omega_inv).T * e
+    _xe = np.zeros((n, len(x) * k))
+    for i in range(len(x)):
+        _xe += xe[i * n : (i + 1) * n]
+    xeex = _xe.T @ _xe / n
+    cov = xpxi @ xeex @ xpxi / n
+    return b_gls, cov, xpx, xeex, _xe
+
+
+@pytest.mark.parametrize("method", ["ols", "gls"])
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "hac", "clustered"])
+def test_tvalues_homogeneity(method, cov_type):
+    eqns = generate_data(k=3)
+    mod = SUR(eqns)
+    kwargs = {}
+
+    base = direct_gls(eqns, 1)
+    base_tstat = np.squeeze(base[0]) / np.sqrt(np.diag(base[1]))
+    base_100 = direct_gls(eqns, 1 / 100)
+    base_100_tstat = np.squeeze(base_100[0]) / np.sqrt(np.diag(base_100[1]))
+    assert_allclose(base_tstat, base_100_tstat)
+
+    if cov_type == "hac":
+        kwargs["bandwidth"] = 1
+    elif cov_type == "clustered":
+        key0 = list(eqns.keys())[0]
+        nobs = eqns[key0]["dependent"].shape[0]
+        rs = np.random.RandomState(231823)
+        kwargs["clusters"] = rs.randint(0, nobs // 5, size=(nobs, 1))
+    res0 = mod.fit(method=method, cov_type=cov_type, **kwargs)
+    for key in eqns:
+        eqns[key]["dependent"] = eqns[key]["dependent"] / 100.0
+
+    mod = SUR(eqns)
+    res1 = mod.fit(method=method, cov_type=cov_type, **kwargs)
+    assert_allclose(res0.tstats, res1.tstats)
+    if cov_type == "robust" and method == "gls":
+        assert_allclose(res0.tstats, base_tstat)
+        assert_allclose(res1.tstats, base_100_tstat)
