@@ -1,8 +1,11 @@
 Change Log
 ==========
 
-Since 4.20
-----------
+Version 4.21
+------------
+* Fixed a bug that affected :class:`~linearmodels.system.model.SUR` when estimating
+  models using ``method="gls"`` and heteroskedasticity-, hac, or cluster-robust
+  inference.
 * Added ``rank_check`` argument to panel-data models that allows the rank
   check to be skipped. Estimating a model that is rank deficient may result
   in unreliable estiamtes and so caution is needed if using this option.
