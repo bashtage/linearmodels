@@ -51,7 +51,7 @@ def test_valid_weight_shape(data):
     missing = PanelData(data.y).isnull | PanelData(data.x).isnull
     expected = weights[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
-    assert_equal(w, expected)
+    assert w == pytest.approx(expected)
 
     # Per time
     if isinstance(data.x, pd.DataFrame):
@@ -72,7 +72,7 @@ def test_valid_weight_shape(data):
     expected = expected.T.ravel()
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
-    assert_equal(w, expected)
+    assert w == pytest.approx(expected)
 
     # Per entity
     if isinstance(data.x, pd.DataFrame):
@@ -92,7 +92,7 @@ def test_valid_weight_shape(data):
     expected = expected.T.ravel()
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
-    assert_equal(w, expected)
+    assert w == pytest.approx(expected)
 
     weights = 1 + np.random.random_sample(data.y.shape)
     mod = PanelOLS(data.y, data.x, weights=weights)
@@ -101,7 +101,7 @@ def test_valid_weight_shape(data):
     expected = weights.T.ravel()
     expected = expected[~missing.squeeze()][:, None]
     expected = expected / expected.mean()
-    assert_equal(w, expected)
+    assert w == pytest.approx(expected)
 
 
 def test_weight_incorrect_shape(data):
