@@ -13,6 +13,7 @@
    .. autosummary::
       :toctree:
 
+      ~SystemResults.breusch_pagan
       ~SystemResults.conf_int
       ~SystemResults.predict
    

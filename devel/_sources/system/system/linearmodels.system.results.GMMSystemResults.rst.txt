@@ -13,6 +13,7 @@
    .. autosummary::
       :toctree:
 
+      ~GMMSystemResults.breusch_pagan
       ~GMMSystemResults.conf_int
       ~GMMSystemResults.predict
    
