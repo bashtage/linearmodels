@@ -7,9 +7,10 @@ from numpy.testing import assert_allclose
 from pandas import DataFrame, Series, concat
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
+import scipy.stats
 
 from linearmodels.iv.model import _OLS as OLS
-from linearmodels.shared.hypotheses import InvalidTestStatistic
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import (
     blocked_column_product,
@@ -851,3 +852,29 @@ def test_tvalues_homogeneity(method, cov_type):
     if cov_type == "robust" and method == "gls":
         assert_allclose(res0.tstats, base_tstat)
         assert_allclose(res1.tstats, base_100_tstat)
+
+
+@pytest.mark.parametrize("k", [1, 3])
+def test_brequsch_pagan(k):
+    eqns = generate_data(k=k)
+    mod = SUR(eqns)
+    res = mod.fit()
+    stat = res.breusch_pagan()
+    if k == 1:
+        assert isinstance(stat, InvalidTestStatistic)
+        assert "Breusch-Pagan" in str(stat)
+        assert np.isnan(stat.stat)
+        return
+    rho = np.asarray(res.resids.corr())
+    nobs = res.resids.shape[0]
+    direct = 0.0
+    for i in range(3):
+        for j in range(i + 1, 3):
+            direct += rho[i, j] ** 2
+    direct *= nobs
+    assert isinstance(stat, WaldTestStatistic)
+    assert_allclose(stat.stat, direct)
+    assert stat.df == 3
+    assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
+    assert "Residuals are uncorrelated" in stat.null
+    assert "Breusch-Pagan" in str(stat)

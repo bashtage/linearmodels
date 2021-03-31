@@ -2,7 +2,7 @@ from itertools import product
 import pickle
 
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose
 import pandas as pd
 import pytest
 

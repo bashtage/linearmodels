@@ -11,7 +11,7 @@ from statsmodels.iolib.summary import SimpleTable, fmt_2cols
 
 import linearmodels
 from linearmodels.shared.base import _SummaryStr
-from linearmodels.shared.hypotheses import WaldTestStatistic
+from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, NDArray
@@ -515,6 +515,51 @@ class SystemResults(_CommonResults):
         smry.add_extra_txt(extra_text)
 
         return smry
+
+    def breusch_pagan(self) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+        r"""
+        Breusch-Pagan LM test for no cross-correlation
+
+        Returns
+        -------
+        WaldTestStatistic
+            Test statistic for null all correlationsare zero.
+
+        Notes
+        -----
+        The null hypothesis is that the shock correlations are all 0, and
+        so there are no gains to using GLS estimation in the system estimator.
+        When the null is rejected, there should be efficiency gains to using
+        GLS as long the regressors are not common to all models.
+
+        The Breusch-Pagan test statistic is defined as
+
+        .. math::
+
+           LM = n \sum_{i=1}^k \sum_{j=i+1}^k \hat{\rho}_{ij}^2
+
+        where :math:`\hat{\rho}_{ij}` is the sample residual correlation
+        between series i and j. n is the sample size. It has an asymptotic
+        :math:`\chi^2_{k(k-1)/2}` distribution.
+        """
+        name = "Breusch-Pagan LM Test"
+        resids = self.resids
+        if resids.shape[1] == 1:
+            return InvalidTestStatistic(
+                "Cannot test correlation when the system contains a single "
+                "dependent variable.",
+                name=name,
+            )
+        r = np.corrcoef(resids.T)
+        k = r.shape[0]
+        distinct_corr = np.tril(r, -1)
+        stat = self.resids.shape[0] * (distinct_corr ** 2).sum()
+        return WaldTestStatistic(
+            stat,
+            "Residuals are uncorrelated",
+            k * (k - 1) // 2,
+            name=name,
+        )
 
 
 class SystemEquationResult(_CommonResults):
