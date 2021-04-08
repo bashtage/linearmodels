@@ -40,3 +40,7 @@ rubin
 basmann
 sargan
 wooldridge
+Breusch
+Pagan
+breusch
+pagan

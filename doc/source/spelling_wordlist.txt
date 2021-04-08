@@ -203,3 +203,4 @@ numpy
 str
 debias
 pyhdfe
+absorber

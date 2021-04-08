@@ -1,5 +1,10 @@
 Change Log
 ==========
+Version 4.24
+------------
+* Added :func:`~linearmodels.system.results.SystemResults.breusch_pagan` and
+  :func:`~linearmodels.system.results.SystemResults.likelihood_ratio` to test
+  whether the shock covariance is diagonal.
 
 Version 4.21
 ------------
@@ -8,7 +13,7 @@ Version 4.21
   inference.
 * Added ``rank_check`` argument to panel-data models that allows the rank
   check to be skipped. Estimating a model that is rank deficient may result
-  in unreliable estiamtes and so caution is needed if using this option.
+  in unreliable estimates and so caution is needed if using this option.
 * Changed the rank check to use :func:`numpy.linalg.lstsq` which is better
   aligned with parameter estimation than the :func:`numpy.linalg.svd`-based
   :func:`numpy.linalg.matrix_rank`.

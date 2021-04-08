@@ -878,3 +878,28 @@ def test_brequsch_pagan(k):
     assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
     assert "Residuals are uncorrelated" in stat.null
     assert "Breusch-Pagan" in str(stat)
+
+
+@pytest.mark.parametrize("k", [1, 3])
+def test_likelihood_ratio(k):
+    eqns = generate_data(k=k)
+    mod = SUR(eqns)
+    res = mod.fit()
+    stat = res.likelihood_ratio()
+    if k == 1:
+        assert isinstance(stat, InvalidTestStatistic)
+        assert "Likelihood Ratio Test" in str(stat)
+        assert np.isnan(stat.stat)
+        return
+    eps = np.asarray(res.resids)
+    sigma = eps.T @ eps / eps.shape[0]
+    nobs = res.resids.shape[0]
+    direct = np.linalg.slogdet(sigma * np.eye(k))[1]
+    direct -= np.linalg.slogdet(sigma)[1]
+    direct *= nobs
+    assert isinstance(stat, WaldTestStatistic)
+    assert_allclose(stat.stat, direct)
+    assert stat.df == 3
+    assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
+    assert "Covariance is diagonal" in stat.null
+    assert "Likelihood Ratio Test" in str(stat)

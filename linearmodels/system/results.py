@@ -523,7 +523,7 @@ class SystemResults(_CommonResults):
         Returns
         -------
         WaldTestStatistic
-            Test statistic for null all correlationsare zero.
+            Test statistic for null all correlations are zero.
 
         Notes
         -----
@@ -540,7 +540,11 @@ class SystemResults(_CommonResults):
 
         where :math:`\hat{\rho}_{ij}` is the sample residual correlation
         between series i and j. n is the sample size. It has an asymptotic
-        :math:`\chi^2_{k(k-1)/2}` distribution.
+        :math:`\chi^2_{k(k-1)/2}` distribution. See [1]_ for details.
+
+        References
+        ----------
+        .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.
         """
         name = "Breusch-Pagan LM Test"
         resids = self.resids
@@ -557,6 +561,60 @@ class SystemResults(_CommonResults):
         return WaldTestStatistic(
             stat,
             "Residuals are uncorrelated",
+            k * (k - 1) // 2,
+            name=name,
+        )
+
+    def likelihood_ratio(self) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+        r"""
+        Likelihood ratio test of no cross-correlation
+
+        Returns
+        -------
+        WaldTestStatistic
+            Test statistic that the covariance is diagonal.
+
+        Notes
+        -----
+        The null hypothesis is that the shock covariance matrix is diagonal,
+        and so all correlations are 0. In this case, there are no gains to
+        using GLS estimation in the system estimator.
+
+        When the null is rejected, there should be efficiency gains to using
+        GLS as long the regressors are not common to all models.
+
+        The LR test statistic is defined as
+
+        .. math::
+
+           LR=n\left[\sum_{i=1}^{k}\log\hat{\sigma}_i^2
+              -\log\left|\hat{\Sigma}\right|\right]
+
+        where :math:`\hat{\sigma}_i^2` is the sample residual variance for
+        series i and :math:`\hat{\Sigma}` is the residual covariance.
+        n is the sample size. It has an asymptotic :math:`\chi^2_{k(k-1)/2}`
+        distribution. The asymptotic distribution of the likelihood ratio
+        test requires homoskedasticity. See [1]_ for details.
+
+        References
+        ----------
+        .. [1] Greene, William H. Econometric analysis. Pearson Education, 2003.
+        """
+        name = "Likelihood Ratio Test for Diagonal Covariance"
+        resids = np.asarray(self.resids)
+        if resids.shape[1] == 1:
+            return InvalidTestStatistic(
+                "Cannot test covariance structure when the system contains a single "
+                "dependent variable.",
+                name=name,
+            )
+        sigma = resids.T @ resids / resids.shape[0]
+        nobs, k = resids.shape
+        _, logdet = np.linalg.slogdet(sigma)
+        stat = nobs * (np.log(np.diag(sigma)).sum() - logdet)
+        return WaldTestStatistic(
+            stat,
+            "Covariance is diagonal",
             k * (k - 1) // 2,
             name=name,
         )

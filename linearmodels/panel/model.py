@@ -263,7 +263,7 @@ class _PanelModelBase(object):
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
-        Results may be numerically instable if this check is skipped and
+        Results may be numerically unstable if this check is skipped and
         the matrix is not full rank.
     """
 
@@ -402,7 +402,7 @@ class _PanelModelBase(object):
             raise ValueError(
                 "exog does not have full column rank. If you wish to proceed with "
                 "model estimation irrespective of the numerical accuracy of "
-                "coefficient estiamtes, you can set rank_check=False."
+                "coefficient estimates, you can set rank_check=False."
             )
         return rank_of_x
 
@@ -804,7 +804,7 @@ class PooledOLS(_PanelModelBase):
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
-        Results may be numerically instable if this check is skipped and
+        Results may be numerically unstable if this check is skipped and
         the matrix is not full rank.
 
     Notes
@@ -854,7 +854,7 @@ class PooledOLS(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
@@ -1102,7 +1102,7 @@ class PanelOLS(_PanelModelBase):
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
-        Results may be numerically instable if this check is skipped and
+        Results may be numerically unstable if this check is skipped and
         the matrix is not full rank.
 
     Notes
@@ -1331,7 +1331,7 @@ class PanelOLS(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
@@ -2165,7 +2165,7 @@ class BetweenOLS(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
@@ -2463,7 +2463,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
@@ -2556,7 +2556,7 @@ class RandomEffects(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
@@ -3028,7 +3028,7 @@ class FamaMacBeth(_PanelModelBase):
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
-            specification. Results may be numerically instable if this check
+            specification. Results may be numerically unstable if this check
             is skipped and the matrix is not full rank.
 
         Returns
