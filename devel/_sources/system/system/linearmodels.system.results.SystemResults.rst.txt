@@ -15,6 +15,7 @@
 
       ~SystemResults.breusch_pagan
       ~SystemResults.conf_int
+      ~SystemResults.likelihood_ratio
       ~SystemResults.predict
    
    

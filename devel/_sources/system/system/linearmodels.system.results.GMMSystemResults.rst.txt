@@ -15,6 +15,7 @@
 
       ~GMMSystemResults.breusch_pagan
       ~GMMSystemResults.conf_int
+      ~GMMSystemResults.likelihood_ratio
       ~GMMSystemResults.predict
    
    
