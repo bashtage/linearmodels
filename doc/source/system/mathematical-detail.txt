@@ -371,6 +371,29 @@ parameters will simplify to
 
 .. math:: \widehat{Var\left(\hat{\beta}\right)}=N^{-1}\left(\frac{X^{\prime}Z}{N}\hat{W}^{-1}\frac{Z^{\prime}X}{N}\right)^{-1}.
 
+Testing Covariance and Correlations
+-----------------------------------
+
+Two tests are available to test whether the residual covariance is
+diagonal. These are useful diagnostics when considering GLS estimation.
+If the tests reject the null, then the data suggest that GLS estimation
+should improve efficiency as long as the regressors are not all common.
+If the null is not rejected, then the covariance is not statistically
+different from a diagonal covariance and there are unlikely to be gains
+to using GLS. The Breusch-Pagan test directly examines the correlations
+of the residuals, and is defined as
+
+.. math:: N\left(\sum_{i=1}^{K}\sum_{j=i+1}^{K}\hat{\rho}\right)\sim\chi_{K\left(K-1\right)/2}^{2}.
+
+The likelihood ratio is defined as the difference between the log
+determinants of a diagonal covariance matrix and the full unrestricted
+covariance matrix,
+
+.. math:: N\left(\sum_{i=1}^{K}\ln\hat{\sigma}_{i}^{2}-\ln\left|\hat{\Sigma}\right|\right)=N\left(\sum_{i=1}^{K}\ln\left|\hat{\Sigma}\odot I_{K}\right|-\ln\left|\hat{\Sigma}\right|\right)\sim\chi_{K\left(K-1\right)/2}^{2}.
+
+The asymptotic distribution of the likelihood ratio test requires
+homoskedasticity.
+
 System Measures of Fit (:math:`R^{2}`)
 --------------------------------------
 
