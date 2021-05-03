@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.ACCovariance.ALLOWED\_KWARGS
+==========================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoattribute:: ACCovariance.ALLOWED_KWARGS

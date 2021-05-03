@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~HomoskedasticCovariance.ALLOWED_KWARGS
       ~HomoskedasticCovariance.DEFAULT_KERNEL
       ~HomoskedasticCovariance.cov
       ~HomoskedasticCovariance.eps

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.FamaMacBethCovariance.ALLOWED\_KWARGS
+===================================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoattribute:: FamaMacBethCovariance.ALLOWED_KWARGS

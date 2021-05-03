@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~DriscollKraay.ALLOWED_KWARGS
       ~DriscollKraay.DEFAULT_KERNEL
       ~DriscollKraay.cov
       ~DriscollKraay.eps

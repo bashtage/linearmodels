@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~ClusteredCovariance.ALLOWED_KWARGS
       ~ClusteredCovariance.DEFAULT_KERNEL
       ~ClusteredCovariance.cov
       ~ClusteredCovariance.eps
