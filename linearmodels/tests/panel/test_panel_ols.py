@@ -1481,4 +1481,4 @@ def test_unknown_covconfig_kwargs(data, cov_config):
     else:
         cov = "HomoskedasticCovariance"
     with pytest.raises(ValueError, match=f"Covariance estimator {cov}"):
-        mod.fit(cov_type=c, **{"fig": 4.3})
+        mod.fit(cov_type=c, **{fig: 4.3})
