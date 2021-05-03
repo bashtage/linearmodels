@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Tuple, Type, Union
 
 import numpy as np
 from numpy.linalg import inv
@@ -77,7 +77,7 @@ class HomoskedasticCovariance(object):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
-
+    ALLOWED_KWARGS: Tuple[str, ...] = tuple()
     DEFAULT_KERNEL = "newey-west"
 
     def __init__(
@@ -268,6 +268,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
     where g is the number of distinct groups and n is the number of
     observations.
     """
+    ALLOWED_KWARGS = ("clusters", "group_debias")
 
     def __init__(
         self,
@@ -397,7 +398,7 @@ class DriscollKraay(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
-
+    ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Test
 
     def __init__(
@@ -515,7 +516,7 @@ class ACCovariance(HomoskedasticCovariance):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
-
+    ALLOWED_KWARGS = ("kernel", "bandwidth")
     # TODO: Docstring
 
     def __init__(
@@ -730,12 +731,28 @@ def setup_covariance_estimator(
     **cov_config: Any,
 ) -> Union[HomoskedasticCovariance]:
     estimator = cov_estimators[cov_type]
+    unknown_kwargs = [
+        str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS
+    ]
+    if unknown_kwargs:
+        if estimator.ALLOWED_KWARGS:
+            allowed = ", ".join(estimator.ALLOWED_KWARGS)
+            kwarg_err = f"only supports the keyword arguments: {allowed}"
+        else:
+            kwarg_err = "does not support any keyword arguments"
+        msg = (
+            f"Covariance estimator {estimator.__name__} {kwarg_err}. Unknown keyword "
+            f"arguments were passed to the estimator. The unknown keyword argument(s) "
+            f"are: {', '.join(unknown_kwargs)} "
+        )
+        raise ValueError(msg)
     kernel = get_string(cov_config, "kernel")
     bandwidth = get_float(cov_config, "bandwidth")
     group_debias = get_bool(cov_config, "group_debias")
     clusters = get_array_like(cov_config, "clusters")
 
     if estimator is HomoskedasticCovariance:
+
         return HomoskedasticCovariance(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )

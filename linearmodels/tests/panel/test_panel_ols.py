@@ -1457,3 +1457,28 @@ def test_predict_incorrect(data):
         exog = exog[:, :-1]
     with pytest.raises(ValueError, match="exog does not have the correct"):
         mod.predict(res.params, exog=exog)
+
+
+@pytest.mark.parametrize(
+    "cov_config",
+    [
+        ("clustered", "cluster"),
+        ("unadjusted", "bandwidth"),
+        ("kernel", "bw"),
+        ("robust", "clusters"),
+    ],
+)
+def test_unknown_covconfig_kwargs(data, cov_config):
+    # GH342
+    c, fig = cov_config
+    mod = PanelOLS(data.y, data.x)
+    if c == "clustered":
+        cov = "ClusteredCovariance"
+    elif c == "kernel":
+        cov = "DriscollKraay"
+    elif c == "robust":
+        cov = "HeteroskedasticCovariance"
+    else:
+        cov = "HomoskedasticCovariance"
+    with pytest.raises(ValueError, match=f"Covariance estimator {cov}"):
+        mod.fit(cov_type=c, **{"fig": 4.3})

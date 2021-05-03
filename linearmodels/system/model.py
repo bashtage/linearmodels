@@ -1240,6 +1240,12 @@ class _LSSystemModelBase(_SystemModelBase):
             method = (
                 "ols" if (self._common_exog and self._constraints is None) else "gls"
             )
+        else:
+            method = method.lower()
+            if method not in ("ols", "gls"):
+                raise ValueError(
+                    f"method must be 'ols' or 'gls' when not None. Got {method}."
+                )
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
