@@ -796,15 +796,15 @@ def direct_gls(eqns, scale):
         y.append(eqns[key]["dependent"])
         x.append(eqns[key]["exog"])
     y = scale * np.vstack(y)
-    from scipy.sparse import csc_matrix
+    from scipy.sparse import csc_matrix, lil_matrix
 
     n, k = x[0].shape
-    _x = csc_matrix((len(x) * n, len(x) * k))
+    _x = lil_matrix((len(x) * n, len(x) * k))
     for i, val in enumerate(x):
         _x[i * n : (i + 1) * n, i * k : (i + 1) * k] = val
     from scipy.sparse.linalg import inv as spinv
 
-    b = spinv(_x.T @ _x) @ (_x.T @ y)
+    b = spinv(csc_matrix(_x.T @ _x)) @ (_x.T @ y)
     e = y - _x @ b
     e = e.reshape((-1, n)).T
     sigma = e.T @ e / n
@@ -903,3 +903,9 @@ def test_likelihood_ratio(k):
     assert_allclose(stat.pval, 1.0 - scipy.stats.chi2(3).cdf(direct))
     assert "Covariance is diagonal" in stat.null
     assert "Likelihood Ratio Test" in str(stat)
+
+
+def test_unknown_method():
+    mod = SUR(generate_data(k=3))
+    with pytest.raises(ValueError, match="method must be 'ols' or 'gls'"):
+        mod.fit(method="other")

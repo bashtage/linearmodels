@@ -50,7 +50,13 @@ from linearmodels.system.gmm import (
     KernelWeightMatrix,
 )
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.typing import ArrayLike, ArraySequence, NDArray, OptionalArrayLike
+from linearmodels.typing import (
+    ArrayLike,
+    ArraySequence,
+    Literal,
+    NDArray,
+    OptionalArrayLike,
+)
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM"]
 
@@ -1183,7 +1189,7 @@ class _LSSystemModelBase(_SystemModelBase):
     def fit(
         self,
         *,
-        method: Optional[str] = None,
+        method: Literal["ols", "gls", None] = None,
         full_cov: bool = True,
         iterate: bool = False,
         iter_limit: int = 100,
@@ -1241,11 +1247,11 @@ class _LSSystemModelBase(_SystemModelBase):
                 "ols" if (self._common_exog and self._constraints is None) else "gls"
             )
         else:
-            method = method.lower()
-            if method not in ("ols", "gls"):
+            if method.lower() not in ("ols", "gls"):
                 raise ValueError(
                     f"method must be 'ols' or 'gls' when not None. Got {method}."
                 )
+            method = cast(Literal["ols", "gls"], method.lower())
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
