@@ -1,4 +1,5 @@
-from typing import Hashable, Optional, Sequence, Union
+import sys
+from typing import TYPE_CHECKING, Hashable, Optional, Sequence, Union
 
 from numpy import ndarray
 from pandas import DataFrame, Series
@@ -25,3 +26,15 @@ OptionalNumeric = Optional[Union[int, float]]
 
 AnyPandas = Union[Series, DataFrame]
 Label = Optional[Hashable]
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+elif TYPE_CHECKING:
+    from typing_extensions import Literal
+else:
+
+    class _Literal:
+        def __getitem__(self, item):
+            pass
+
+    Literal = _Literal()
