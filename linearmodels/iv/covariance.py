@@ -521,7 +521,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))
-            if const:
+            if const and xhat.shape[1] > 1:
                 sel[loc] = 0
             scores = xhat_e @ sel
             bw = kernel_optimal_bandwidth(scores, kernel)
