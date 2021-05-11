@@ -402,7 +402,7 @@ class _PanelModelBase(object):
             raise ValueError(
                 "exog does not have full column rank. If you wish to proceed with "
                 "model estimation irrespective of the numerical accuracy of "
-                "coefficient estimates, you can set rank_check=False."
+                "coefficient estimates, you can set check_rank=False."
             )
         return rank_of_x
 
