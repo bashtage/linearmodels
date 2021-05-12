@@ -44,26 +44,26 @@ class AttrDict(MutableMapping):
         self.__private_dict__.update(*args, **kwargs)
 
     def clear(self) -> None:
-        """Remove all items from AD. """
+        """Remove all items from AD."""
         self.__private_dict__.clear()
 
     def copy(self) -> "AttrDict":
-        """Create a shallow copy of AD """
+        """Create a shallow copy of AD"""
         ad = AttrDict()
         for key in self.__private_dict__.keys():
             ad[key] = self.__private_dict__[key]
         return ad
 
     def keys(self) -> AbstractSet[Any]:
-        """Return an ordered list-like object providing a view on AD's keys """
+        """Return an ordered list-like object providing a view on AD's keys"""
         return self.__private_dict__.keys()
 
     def items(self) -> AbstractSet[Tuple[Any, Any]]:
-        """Return an ordered list-like object providing a view on AD's items """
+        """Return an ordered list-like object providing a view on AD's items"""
         return self.__private_dict__.items()
 
     def values(self) -> ValuesView[Any]:
-        """Return an ordered list-like object object providing a view on AD's values """
+        """Return an ordered list-like object object providing a view on AD's values"""
         return self.__private_dict__.values()
 
     def pop(self, key: Label, default: Any = None) -> Any:

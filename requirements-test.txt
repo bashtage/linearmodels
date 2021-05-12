@@ -1,4 +1,4 @@
-black==20.08b1
+black==21.5b1
 coverage
 flake8
 isort

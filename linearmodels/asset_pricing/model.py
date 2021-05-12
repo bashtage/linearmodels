@@ -795,10 +795,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     """
 
     def __init__(
-        self, factors: IVDataLike, portfolios: IVDataLike, *, risk_free: bool = False
+        self, portfolios: IVDataLike, factors: IVDataLike, *, risk_free: bool = False
     ) -> None:
         super(LinearFactorModelGMM, self).__init__(
-            factors, portfolios, risk_free=risk_free
+            portfolios, factors, risk_free=risk_free
         )
 
     @classmethod
