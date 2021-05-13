@@ -1,10 +1,13 @@
 import sys
-from typing import TYPE_CHECKING, Hashable, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Hashable, Optional, Sequence, Union
 
-from numpy import ndarray
+import numpy as np
 from pandas import DataFrame, Series
 
 from .data import ArrayLike, OptionalArrayLike
+
+NP_GTE_121 = np.lib.NumpyVersion(np.__version__) >= np.lib.NumpyVersion("1.21.0")
+
 
 __all__ = [
     "ArrayLike",
@@ -18,8 +21,8 @@ __all__ = [
 ]
 
 # Workaround for https://github.com/python/mypy/issues/7866
-NDArray = Union[ndarray]
-ArraySequence = Sequence[ndarray]
+NDArray = Union[np.ndarray]
+ArraySequence = Sequence[np.ndarray]
 
 Numeric = Union[int, float]
 OptionalNumeric = Optional[Union[int, float]]
@@ -38,3 +41,13 @@ else:
             pass
 
     Literal = _Literal()
+
+if NP_GTE_121:
+    Float64Array = np.ndarray[Any, np.dtype[np.float64]]
+    Int64Array = np.ndarray[Any, np.dtype[np.int64]]
+    Int32Array = np.ndarray[Any, np.dtype[np.int32]]
+    IntArray = np.ndarray[Any, np.dtype[np.int_]]
+    BoolArray = np.ndarray[Any, np.dtype[np.bool_]]
+    AnyArray = np.ndarray[Any, Any]
+else:
+    IntArray = Float64Array = Int64Array = Int32Array = BoolArray = AnyArray = NDArray

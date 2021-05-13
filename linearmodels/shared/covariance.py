@@ -10,10 +10,10 @@ from numpy import (
     zeros,
 )
 
-from linearmodels.typing import NDArray
+from linearmodels.typing import Float64Array, IntArray
 
 
-def group_debias_coefficient(clusters: NDArray) -> float:
+def group_debias_coefficient(clusters: IntArray) -> float:
     r"""
     Compute the group debiasing scale.
 
@@ -42,7 +42,7 @@ def group_debias_coefficient(clusters: NDArray) -> float:
     return (ngroups / (ngroups - 1)) * ((n - 1) / n)
 
 
-def cluster_union(clusters: NDArray) -> NDArray:
+def cluster_union(clusters: IntArray) -> IntArray:
     """
     Compute a set of clusters that is nested within 2 clusters
 
@@ -66,7 +66,7 @@ def cluster_union(clusters: NDArray) -> NDArray:
     return union[resort_locs]
 
 
-def cov_cluster(z: NDArray, clusters: NDArray) -> NDArray:
+def cov_cluster(z: Float64Array, clusters: IntArray) -> Float64Array:
     """
     Core cluster covariance estimator
 
@@ -101,7 +101,7 @@ def cov_cluster(z: NDArray, clusters: NDArray) -> NDArray:
     return s
 
 
-def cov_kernel(z: NDArray, w: NDArray) -> NDArray:
+def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
     """
     Core kernel covariance estimator
 

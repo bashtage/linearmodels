@@ -1,6 +1,6 @@
 import numpy as np
 
-from linearmodels.typing import NDArray
+from linearmodels.typing import BoolArray
 
 
 class MissingValueWarning(Warning):
@@ -23,7 +23,7 @@ class SingletonWarning(Warning):
     pass
 
 
-def missing_warning(missing: NDArray) -> None:
+def missing_warning(missing: BoolArray) -> None:
     """Utility function to perform missing value check and warning"""
     if not np.any(missing):
         return

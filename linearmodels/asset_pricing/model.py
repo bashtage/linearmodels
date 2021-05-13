@@ -26,21 +26,23 @@ from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_float, get_string
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, NDArray
+from linearmodels.typing import ArrayLike, BoolArray, Float64Array
 
 
 def callback_factory(
     obj: Union[
-        Callable[[NDArray, bool, NDArray], float],
-        Callable[[NDArray, bool, Union[HeteroskedasticWeight, KernelWeight]], float],
+        Callable[[Float64Array, bool, Float64Array], float],
+        Callable[
+            [Float64Array, bool, Union[HeteroskedasticWeight, KernelWeight]], float
+        ],
     ],
     args: Tuple[bool, Any],
     disp: Union[bool, int] = 1,
-) -> Callable[[NDArray], None]:
+) -> Callable[[Float64Array], None]:
     d = {"iter": 0}
     disp = int(disp)
 
-    def callback(params: NDArray) -> None:
+    def callback(params: Float64Array) -> None:
         fval = obj(params, *args)
         if disp > 0 and (d["iter"] % disp == 0):
             print("Iteration: {0}, Objective: {1}".format(d["iter"], fval))
@@ -77,9 +79,9 @@ class _FactorModelBase(object):
     def __repr__(self) -> str:
         return self.__str__() + "\nid: {0}".format(hex(id(self)))
 
-    def _drop_missing(self) -> NDArray:
+    def _drop_missing(self) -> BoolArray:
         data = (self.portfolios, self.factors)
-        missing = cast(NDArray, np.any(np.c_[[dh.isnull for dh in data]], 0))
+        missing = cast(BoolArray, np.any(np.c_[[dh.isnull for dh in data]], 0))
         if any(missing):
             if all(missing):
                 raise ValueError(
@@ -703,7 +705,9 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         return LinearFactorModelResults(res)
 
-    def _jacobian(self, betas: NDArray, lam: NDArray, alphas: NDArray) -> NDArray:
+    def _jacobian(
+        self, betas: Float64Array, lam: Float64Array, alphas: Float64Array
+    ) -> Float64Array:
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
         f = self.factors.ndarray
         fc = np.c_[np.ones((nobs, 1)), f]
@@ -731,8 +735,12 @@ class LinearFactorModel(_LinearFactorModelBase):
         return jac
 
     def _moments(
-        self, eps: NDArray, betas: NDArray, alphas: NDArray, pricing_errors: NDArray
-    ) -> NDArray:
+        self,
+        eps: Float64Array,
+        betas: Float64Array,
+        alphas: Float64Array,
+        pricing_errors: Float64Array,
+    ) -> Float64Array:
         sigma_inv = self._sigma_inv
 
         f = self.factors.ndarray
@@ -1096,7 +1104,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         return GMMFactorModelResults(res_dict)
 
-    def _moments(self, parameters: NDArray, excess_returns: bool) -> NDArray:
+    def _moments(self, parameters: Float64Array, excess_returns: bool) -> Float64Array:
         """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
         p = self.portfolios.ndarray
@@ -1117,7 +1125,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         g = np.c_[eps * f, fe]
         return g
 
-    def _j(self, parameters: NDArray, excess_returns: bool, w: NDArray) -> float:
+    def _j(
+        self, parameters: Float64Array, excess_returns: bool, w: Float64Array
+    ) -> float:
         """Objective function"""
         g = self._moments(parameters, excess_returns)
         nobs = self.portfolios.shape[0]
@@ -1126,7 +1136,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
     def _j_cue(
         self,
-        parameters: NDArray,
+        parameters: Float64Array,
         excess_returns: bool,
         weight_est: Union[HeteroskedasticWeight, KernelWeight],
     ) -> float:
@@ -1137,7 +1147,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         w = weight_est.w(g)
         return nobs * float(gbar.T @ w @ gbar)
 
-    def _jacobian(self, params: NDArray, excess_returns: bool) -> NDArray:
+    def _jacobian(self, params: Float64Array, excess_returns: bool) -> Float64Array:
         """Jacobian matrix for inference"""
         nobs, k = self.factors.shape
         n = self.portfolios.shape[1]

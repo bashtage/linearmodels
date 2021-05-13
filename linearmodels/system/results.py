@@ -14,7 +14,7 @@ from linearmodels.shared.base import _SummaryStr
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import ArrayLike, NDArray
+from linearmodels.typing import ArrayLike, Float64Array
 from linearmodels.typing.data import OptionalDataFrame
 
 __all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
@@ -797,7 +797,7 @@ class GMMSystemResults(SystemResults):
         self._j_stat = results.j_stat
 
     @property
-    def w(self) -> NDArray:
+    def w(self) -> Float64Array:
         """GMM weight matrix used in estimation"""
         return self._wmat
 
