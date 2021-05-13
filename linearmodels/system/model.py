@@ -53,8 +53,8 @@ from linearmodels.system.results import GMMSystemResults, SystemResults
 from linearmodels.typing import (
     ArrayLike,
     ArraySequence,
+    Float64Array,
     Literal,
-    NDArray,
     OptionalArrayLike,
 )
 
@@ -105,8 +105,8 @@ def _missing_weights(weights: Dict[str, Optional[ArrayLike]]) -> None:
 
 
 def _parameters_from_xprod(
-    xpx: NDArray, xpy: NDArray, constraints: Optional[LinearConstraint] = None
-) -> NDArray:
+    xpx: Float64Array, xpy: Float64Array, constraints: Optional[LinearConstraint] = None
+) -> Float64Array:
     r"""
     Estimate regression parameters from cross produces
 
@@ -347,13 +347,13 @@ class _SystemModelBase(object):
         self._instr: List[IVData] = []
         self._endog: List[IVData] = []
 
-        self._y: List[NDArray] = []
-        self._x: List[NDArray] = []
-        self._wy: List[NDArray] = []
-        self._wx: List[NDArray] = []
-        self._w: List[NDArray] = []
-        self._z: List[NDArray] = []
-        self._wz: List[NDArray] = []
+        self._y: List[Float64Array] = []
+        self._x: List[Float64Array] = []
+        self._wy: List[Float64Array] = []
+        self._wx: List[Float64Array] = []
+        self._w: List[Float64Array] = []
+        self._z: List[Float64Array] = []
+        self._wz: List[Float64Array] = []
 
         self._weights: List[IVData] = []
         self._formula: Optional[Union[str, Dict[str, str]]] = None
@@ -643,7 +643,7 @@ class _SystemModelBase(object):
         )
         return out
 
-    def _multivariate_ls_fit(self) -> Tuple[NDArray, NDArray]:
+    def _multivariate_ls_fit(self) -> Tuple[Float64Array, Float64Array]:
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
 
@@ -684,13 +684,13 @@ class _SystemModelBase(object):
 
     def _gls_estimate(
         self,
-        eps: NDArray,
+        eps: Float64Array,
         nobs: int,
         total_cols: int,
         ci: Sequence[int],
         full_cov: bool,
         debiased: bool,
-    ) -> Tuple[NDArray, NDArray, NDArray, NDArray]:
+    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array]:
         """Core estimation routine for iterative GLS"""
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
 
@@ -729,9 +729,9 @@ class _SystemModelBase(object):
 
     def _multivariate_ls_finalize(
         self,
-        beta: NDArray,
-        eps: NDArray,
-        sigma: NDArray,
+        beta: Float64Array,
+        eps: Float64Array,
+        sigma: Float64Array,
         cov_type: str,
         **cov_config: bool,
     ) -> SystemResults:
@@ -829,10 +829,10 @@ class _SystemModelBase(object):
     def _common_indiv_results(
         self,
         index: int,
-        beta: NDArray,
-        cov: NDArray,
-        wresid: NDArray,
-        resid: NDArray,
+        beta: Float64Array,
+        cov: Float64Array,
+        wresid: Float64Array,
+        resid: Float64Array,
         method: str,
         cov_type: str,
         cov_est: Union[
@@ -913,13 +913,13 @@ class _SystemModelBase(object):
 
     def _common_results(
         self,
-        beta: NDArray,
-        cov: NDArray,
+        beta: Float64Array,
+        cov: Float64Array,
         method: str,
         iter_count: int,
         nobs: int,
         cov_type: str,
-        sigma: NDArray,
+        sigma: Float64Array,
         individual: AttrDict,
         debiased: bool,
     ) -> AttrDict:
@@ -971,8 +971,8 @@ class _SystemModelBase(object):
 
     def _system_r2(
         self,
-        eps: NDArray,
-        sigma: NDArray,
+        eps: Float64Array,
+        sigma: Float64Array,
         method: str,
         full_cov: bool,
         debiased: bool,
@@ -982,7 +982,7 @@ class _SystemModelBase(object):
 
         # System regression on a constant using weights if provided
         wy, w = self._wy, self._w
-        wi = [cast(NDArray, np.sqrt(weights)) for weights in w]
+        wi = [cast(Float64Array, np.sqrt(weights)) for weights in w]
         if method == "ols":
             est_sigma = np.eye(len(wy))
         else:  # gls
@@ -1031,12 +1031,12 @@ class _SystemModelBase(object):
 
     def _gls_finalize(
         self,
-        beta: NDArray,
-        sigma: NDArray,
-        full_sigma: NDArray,
-        est_sigma: NDArray,
-        gls_eps: NDArray,
-        eps: NDArray,
+        beta: Float64Array,
+        sigma: Float64Array,
+        full_sigma: Float64Array,
+        est_sigma: Float64Array,
+        gls_eps: Float64Array,
+        eps: Float64Array,
         full_cov: bool,
         cov_type: str,
         iter_count: int,
@@ -1120,12 +1120,12 @@ class _SystemModelBase(object):
 
         return SystemResults(results)
 
-    def _sigma_scale(self, debiased: bool) -> Union[float, NDArray]:
+    def _sigma_scale(self, debiased: bool) -> Union[float, Float64Array]:
         if not debiased:
             return 1.0
         nobs = float(self._wx[0].shape[0])
         scales = np.array([nobs - x.shape[1] for x in self._wx], dtype=np.float64)
-        scales = cast(NDArray, np.sqrt(nobs / scales))
+        scales = cast(Float64Array, np.sqrt(nobs / scales))
         return scales[:, None] @ scales[None, :]
 
     @property
@@ -1283,8 +1283,8 @@ class _LSSystemModelBase(_SystemModelBase):
                 eps, nobs, total_cols, col_idx, full_cov, debiased
             )
             beta_hist.append(beta)
-            delta = beta_hist[-1] - beta_hist[-2]
-            delta = float(np.sqrt(np.mean(delta ** 2)))
+            diff = beta_hist[-1] - beta_hist[-2]
+            delta = float(np.sqrt(np.mean(diff ** 2)))
             iter_count += 1
 
         sigma_m12 = inv_matrix_sqrt(sigma)
@@ -1842,7 +1842,7 @@ class IVSystemGMM(_SystemModelBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-6,
-        initial_weight: Optional[NDArray] = None,
+        initial_weight: Optional[Float64Array] = None,
         cov_type: str = "robust",
         **cov_config: Union[bool, float],
     ) -> GMMSystemResults:
@@ -1888,7 +1888,7 @@ class IVSystemGMM(_SystemModelBase):
             w = initial_weight
         assert w is not None
         beta_last = beta = self._blocked_gmm(
-            wx, wy, wz, w=cast(NDArray, w), constraints=self.constraints
+            wx, wy, wz, w=cast(Float64Array, w), constraints=self.constraints
         )
         _eps = []
         loc = 0
@@ -1908,13 +1908,13 @@ class IVSystemGMM(_SystemModelBase):
             )
             w = self._weight_est.weight_matrix(wx, wz, eps, sigma=sigma)
             beta = self._blocked_gmm(
-                wx, wy, wz, w=cast(NDArray, w), constraints=self.constraints
+                wx, wy, wz, w=cast(Float64Array, w), constraints=self.constraints
             )
             delta = beta_last - beta
             if vinv is None:
                 winv = np.linalg.inv(w)
                 xpz = blocked_cross_prod(wx, wz, np.eye(k))
-                xpz = cast(NDArray, xpz / nobs)
+                xpz = cast(Float64Array, xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
             norm = delta.T @ vinv @ delta
@@ -1966,9 +1966,9 @@ class IVSystemGMM(_SystemModelBase):
         y: ArraySequence,
         z: ArraySequence,
         *,
-        w: Optional[NDArray] = None,
+        w: Optional[Float64Array] = None,
         constraints: Optional[LinearConstraint] = None,
-    ) -> NDArray:
+    ) -> Float64Array:
         k = len(x)
         xpz = blocked_cross_prod(x, z, np.eye(k))
         wi = np.linalg.inv(w)
@@ -1984,12 +1984,12 @@ class IVSystemGMM(_SystemModelBase):
 
     def _finalize_results(
         self,
-        beta: NDArray,
-        cov: NDArray,
-        weps: NDArray,
-        eps: NDArray,
-        wmat: NDArray,
-        sigma: NDArray,
+        beta: Float64Array,
+        cov: Float64Array,
+        weps: Float64Array,
+        eps: Float64Array,
+        wmat: Float64Array,
+        sigma: Float64Array,
         iter_count: int,
         cov_type: str,
         cov_config: Dict[str, Union[bool, float]],
@@ -2133,7 +2133,9 @@ class IVSystemGMM(_SystemModelBase):
         mod.formula = formula
         return mod
 
-    def _j_statistic(self, params: NDArray, weight_mat: NDArray) -> WaldTestStatistic:
+    def _j_statistic(
+        self, params: Float64Array, weight_mat: Float64Array
+    ) -> WaldTestStatistic:
         """
         J stat and test
 

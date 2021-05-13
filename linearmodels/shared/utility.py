@@ -17,7 +17,7 @@ from typing import (
 import numpy as np
 from pandas import DataFrame, Index, MultiIndex, Series
 
-from linearmodels.typing import Label, NDArray
+from linearmodels.typing import AnyArray, Label
 
 
 def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> "AttrDict":
@@ -140,7 +140,7 @@ def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> s
 
 
 def panel_to_frame(
-    x: Optional[NDArray],
+    x: Optional[AnyArray],
     items: Sequence[Label],
     major_axis: Sequence[Label],
     minor_axis: Sequence[Label],
@@ -205,7 +205,7 @@ class DataFrameWrapper:
 
     def __init__(
         self,
-        values: NDArray,
+        values: AnyArray,
         *,
         columns: Optional[List[str]] = None,
         index: Optional[Union[Index, List[str]]] = None,
@@ -234,7 +234,7 @@ class SeriesWrapper:
 
     def __init__(
         self,
-        values: NDArray,
+        values: AnyArray,
         *,
         name: Optional[str] = None,
         index: Optional[Union[Index, List[str]]] = None,

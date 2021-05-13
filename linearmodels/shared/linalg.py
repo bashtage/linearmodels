@@ -2,11 +2,11 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from linearmodels.typing import NDArray
+from linearmodels.typing import Float64Array
 
 
 def has_constant(
-    x: NDArray, x_rank: Optional[int] = None
+    x: Float64Array, x_rank: Optional[int] = None
 ) -> Tuple[bool, Optional[int]]:
     """
     Parameters
@@ -48,7 +48,7 @@ def has_constant(
     return bool(has_const), loc
 
 
-def inv_sqrth(x: NDArray) -> NDArray:
+def inv_sqrth(x: Float64Array) -> Float64Array:
     """
     Matrix inverse square root
 

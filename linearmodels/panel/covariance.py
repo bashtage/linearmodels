@@ -19,7 +19,7 @@ from linearmodels.shared.typed_getters import (
     get_float,
     get_string,
 )
-from linearmodels.typing import ArrayLike, NDArray
+from linearmodels.typing import ArrayLike, Float64Array, NDArray
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -82,9 +82,9 @@ class HomoskedasticCovariance(object):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         entity_ids: Optional[NDArray],
         time_ids: Optional[NDArray],
         *,
@@ -111,7 +111,7 @@ class HomoskedasticCovariance(object):
         return self._name
 
     @property
-    def eps(self) -> NDArray:
+    def eps(self) -> Float64Array:
         """Model residuals"""
         return self._y - self._x @ self._params
 
@@ -122,13 +122,13 @@ class HomoskedasticCovariance(object):
         return self._scale * float(eps.T @ eps) / self._nobs
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         x = self._x
         out = self.s2 * inv(x.T @ x)
         return (out + out.T) / 2
 
-    def deferred_cov(self) -> NDArray:
+    def deferred_cov(self) -> Float64Array:
         """Covariance calculation deferred until executed"""
         return self.cov
 
@@ -182,9 +182,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         entity_ids: NDArray,
         time_ids: NDArray,
         *,
@@ -197,7 +197,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         self._name = "Robust"
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -272,9 +272,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         entity_ids: NDArray,
         time_ids: NDArray,
         *,
@@ -301,7 +301,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._name = "Clustered"
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -403,9 +403,9 @@ class DriscollKraay(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         entity_ids: NDArray,
         time_ids: NDArray,
         *,
@@ -423,7 +423,7 @@ class DriscollKraay(HomoskedasticCovariance):
         self._bandwidth = bandwidth
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -432,16 +432,16 @@ class DriscollKraay(HomoskedasticCovariance):
 
         xe = x * eps
         assert self._time_ids is not None
-        xe = DataFrame(xe, index=self._time_ids.squeeze())
-        xe = xe.groupby(level=0).sum()
-        xe.sort_index(inplace=True)
-        xe_nobs = xe.shape[0]
+        xe_df = DataFrame(xe, index=self._time_ids.squeeze())
+        xe_df = xe_df.groupby(level=0).sum()
+        xe_df.sort_index(inplace=True)
+        xe_nobs = xe_df.shape[0]
         bw = self._bandwidth
         if self._bandwidth is None:
             bw = float(np.floor(4 * (xe_nobs / 100) ** (2 / 9)))
         assert bw is not None
         w = KERNEL_LOOKUP[self._kernel](bw, xe_nobs - 1)
-        xeex = cov_kernel(xe.values, w) * (xe_nobs / nobs)
+        xeex = cov_kernel(np.asarray(xe_df), w) * (xe_nobs / nobs)
         xeex *= self._scale
 
         out = (xpxi @ xeex @ xpxi) / nobs
@@ -521,9 +521,9 @@ class ACCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         entity_ids: NDArray,
         time_ids: NDArray,
         *,
@@ -539,13 +539,13 @@ class ACCovariance(HomoskedasticCovariance):
         self._kernel = kernel if kernel is not None else self.DEFAULT_KERNEL
         self._bandwidth = bandwidth
 
-    def _single_cov(self, xe: NDArray, bw: float) -> NDArray:
+    def _single_cov(self, xe: Float64Array, bw: float) -> Float64Array:
         nobs = xe.shape[0]
         w = KERNEL_LOOKUP[self._kernel](bw, nobs - 1)
         return cov_kernel(xe, w)
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         x = self._x
         nobs = x.shape[0]
@@ -562,15 +562,15 @@ class ACCovariance(HomoskedasticCovariance):
         xe = x * eps
         assert self._entity_ids is not None
         index = [self._entity_ids.squeeze(), self._time_ids.squeeze()]
-        xe = DataFrame(xe, index=index)
-        xe = xe.sort_index(level=[0, 1])
-        xe_index = xe.index
+        xe_df = DataFrame(xe, index=index)
+        xe_df = xe_df.sort_index(level=[0, 1])
+        xe_index = xe_df.index
         assert isinstance(xe_index, MultiIndex)
         entities = xe_index.levels[0]
         nentity = len(entities)
-        xeex = np.zeros((xe.shape[1], xe.shape[1]))
+        xeex = np.zeros((xe_df.shape[1], xe_df.shape[1]))
         for entity in entities:
-            _xe = xe.loc[entity].values
+            _xe = np.asarray(xe_df.loc[entity])
             _bw = min(_xe.shape[0] - 1.0, bw)
             xeex += self._single_cov(_xe, _bw)
         xeex /= nentity
@@ -661,9 +661,9 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        y: NDArray,
-        x: NDArray,
-        params: NDArray,
+        y: Float64Array,
+        x: Float64Array,
+        params: Float64Array,
         all_params: DataFrame,
         *,
         debiased: bool = False,
@@ -692,7 +692,7 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         return self._bandwidth
 
     @cached_property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Estimated covariance"""
         e = np.asarray(self._all_params) - self._params.T
         e = e[np.all(np.isfinite(e), 1)]
@@ -720,9 +720,9 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
 def setup_covariance_estimator(
     cov_estimators: CovarianceManager,
     cov_type: str,
-    y: NDArray,
-    x: NDArray,
-    params: NDArray,
+    y: Float64Array,
+    x: Float64Array,
+    params: Float64Array,
     entity_ids: NDArray,
     time_ids: NDArray,
     *,

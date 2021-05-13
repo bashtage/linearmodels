@@ -9,7 +9,7 @@ from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
 from linearmodels.shared.utility import AttrDict
 from linearmodels.system._utility import blocked_inner_prod
-from linearmodels.typing import NDArray
+from linearmodels.typing import Float64Array
 
 
 class HomoskedasticWeightMatrix(object):
@@ -62,7 +62,7 @@ class HomoskedasticWeightMatrix(object):
     def _str_extra(self) -> AttrDict:
         return AttrDict(Debiased=self._debiased, Center=self._center)
 
-    def sigma(self, eps: NDArray, x: Sequence[NDArray]) -> NDArray:
+    def sigma(self, eps: Float64Array, x: Sequence[Float64Array]) -> Float64Array:
         """
         Estimate residual covariance.
 
@@ -92,12 +92,12 @@ class HomoskedasticWeightMatrix(object):
 
     def weight_matrix(
         self,
-        x: Sequence[NDArray],
-        z: Sequence[NDArray],
-        eps: NDArray,
+        x: Sequence[Float64Array],
+        z: Sequence[Float64Array],
+        eps: Float64Array,
         *,
         sigma: ndarray,
-    ) -> NDArray:
+    ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -168,12 +168,12 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def weight_matrix(
         self,
-        x: Sequence[NDArray],
-        z: Sequence[NDArray],
-        eps: NDArray,
+        x: Sequence[Float64Array],
+        z: Sequence[Float64Array],
+        eps: Float64Array,
         *,
         sigma: Optional[ndarray] = None,
-    ) -> NDArray:
+    ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -212,14 +212,14 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         return w
 
     def _debias_scale(
-        self, nobs: int, x: Sequence[NDArray], z: Sequence[NDArray]
+        self, nobs: int, x: Sequence[Float64Array], z: Sequence[Float64Array]
     ) -> float:
         if not self._debiased:
             return 1
         nvar = array([a.shape[1] for a in x])
         ninstr = array([a.shape[1] for a in z])
         nvar = repeat(nvar, ninstr)
-        nvar = cast(NDArray, sqrt(nvar))[:, None]
+        nvar = cast(Float64Array, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale
 
@@ -286,12 +286,12 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     def weight_matrix(
         self,
-        x: Sequence[NDArray],
-        z: Sequence[NDArray],
-        eps: NDArray,
+        x: Sequence[Float64Array],
+        z: Sequence[Float64Array],
+        eps: Float64Array,
         *,
         sigma: Optional[ndarray] = None,
-    ) -> NDArray:
+    ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
@@ -330,7 +330,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
         return w
 
-    def _optimal_bandwidth(self, moments: NDArray) -> float:
+    def _optimal_bandwidth(self, moments: Float64Array) -> float:
         """Compute optimal bandwidth used in estimation if needed"""
         if self._predefined_bw is not None:
             return self._predefined_bw

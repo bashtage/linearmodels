@@ -14,7 +14,7 @@ from linearmodels.system._utility import (
     blocked_diag_product,
     blocked_inner_prod,
 )
-from linearmodels.typing import NDArray
+from linearmodels.typing import Float64Array, IntArray
 
 CLUSTERS_FORMAT = """\
 clusters must be an ndarray with as shape (nobs, ncluster) where ncluster is the \
@@ -61,9 +61,9 @@ class HomoskedasticCovariance(object):
     def __init__(
         self,
         x: List[ndarray],
-        eps: NDArray,
-        sigma: NDArray,
-        full_sigma: NDArray,
+        eps: Float64Array,
+        sigma: Float64Array,
+        full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -96,7 +96,7 @@ class HomoskedasticCovariance(object):
         return out + ", id: {0}".format(hex(id(self)))
 
     @property
-    def sigma(self) -> NDArray:
+    def sigma(self) -> Float64Array:
         """Error covariance"""
         return self._sigma
 
@@ -104,7 +104,7 @@ class HomoskedasticCovariance(object):
         # Sigma is pre-debiased
         return 1.0
 
-    def _mvreg_cov(self) -> NDArray:
+    def _mvreg_cov(self) -> Float64Array:
         x = self._x
 
         xeex = blocked_inner_prod(x, self._sigma)
@@ -123,7 +123,7 @@ class HomoskedasticCovariance(object):
         cov = (cov + cov.T) / 2
         return cov
 
-    def _gls_cov(self) -> NDArray:
+    def _gls_cov(self) -> Float64Array:
         x = self._x
         sigma = self._sigma
         sigma_inv = inv(sigma)
@@ -145,7 +145,7 @@ class HomoskedasticCovariance(object):
         return cov
 
     @property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Parameter covariance"""
         adj = self._adjustment()
         if self._gls:
@@ -203,9 +203,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def __init__(
         self,
         x: List[ndarray],
-        eps: NDArray,
-        sigma: NDArray,
-        full_sigma: NDArray,
+        eps: Float64Array,
+        sigma: Float64Array,
+        full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -247,11 +247,11 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
         self._moments = xe
 
-    def _xeex(self) -> NDArray:
+    def _xeex(self) -> Float64Array:
         nobs = self._moments.shape[0]
         return self._moments.T @ self._moments / nobs
 
-    def _cov(self, gls: bool) -> NDArray:
+    def _cov(self, gls: bool) -> Float64Array:
         x = self._x
         nobs = x[0].shape[0]
         k = len(x)
@@ -274,10 +274,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         cov = (cov + cov.T) / 2
         return cov / nobs
 
-    def _mvreg_cov(self) -> NDArray:
+    def _mvreg_cov(self) -> Float64Array:
         return self._cov(False)
 
-    def _gls_cov(self) -> NDArray:
+    def _gls_cov(self) -> Float64Array:
         return self._cov(True)
 
     def _adjustment(self) -> Union[float, ndarray]:
@@ -352,9 +352,9 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     def __init__(
         self,
         x: List[ndarray],
-        eps: NDArray,
-        sigma: NDArray,
-        full_sigma: NDArray,
+        eps: Float64Array,
+        sigma: Float64Array,
+        full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
@@ -379,7 +379,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self._str_extra["Kernel"] = kernel
         self._cov_config["kernel"] = kernel
 
-    def _xeex(self) -> NDArray:
+    def _xeex(self) -> Float64Array:
         return self._kernel_cov(self._moments)
 
     @property
@@ -446,14 +446,14 @@ class ClusteredCovariance(HeteroskedasticCovariance):
     def __init__(
         self,
         x: List[ndarray],
-        eps: NDArray,
-        sigma: NDArray,
-        full_sigma: NDArray,
+        eps: Float64Array,
+        sigma: Float64Array,
+        full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
         constraints: Optional[LinearConstraint] = None,
-        clusters: Optional[NDArray] = None,
+        clusters: Optional[IntArray] = None,
         group_debias: bool = False,
     ) -> None:
         super().__init__(
@@ -474,7 +474,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
             self._str_extra["Number of Groups"] = " and ".join(num_cl)
         self._str_extra["Group Debias"] = self._group_debias
 
-    def _check_clusters(self, clusters: Optional[NDArray]) -> NDArray:
+    def _check_clusters(self, clusters: Optional[IntArray]) -> IntArray:
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
             return empty((self._eps.size, 0))
@@ -502,7 +502,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         self._nclusters = list(nunique)
         return _clusters
 
-    def _xeex(self) -> NDArray:
+    def _xeex(self) -> Float64Array:
         if self._clusters.shape[1] == 0:
             # Heteroskedastic but not clustered
             return super()._xeex()
@@ -571,8 +571,8 @@ class GMMHomoskedasticCovariance(object):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: NDArray,
-        w: NDArray,
+        eps: Float64Array,
+        w: Float64Array,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
@@ -597,7 +597,7 @@ class GMMHomoskedasticCovariance(object):
         return out + ", id: {0}".format(hex(id(self)))
 
     @property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         """Parameter covariance"""
         x, z = self._x, self._z
         k = len(x)
@@ -630,7 +630,7 @@ class GMMHomoskedasticCovariance(object):
         cov = (cov + cov.T) / 2
         return adj * cov
 
-    def _omega(self) -> NDArray:
+    def _omega(self) -> Float64Array:
         z = self._z
         nobs = z[0].shape[0]
         sigma = self._sigma
@@ -693,8 +693,8 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: NDArray,
-        w: NDArray,
+        eps: Float64Array,
+        w: Float64Array,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
@@ -716,7 +716,7 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
             loc += kz
         self._moments = ze
 
-    def _omega(self) -> NDArray:
+    def _omega(self) -> Float64Array:
         z = self._z
         nobs = z[0].shape[0]
         omega = self._moments.T @ self._moments / nobs
@@ -769,8 +769,8 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self,
         x: List[ndarray],
         z: List[ndarray],
-        eps: NDArray,
-        w: NDArray,
+        eps: Float64Array,
+        w: Float64Array,
         *,
         sigma: Optional[ndarray] = None,
         debiased: bool = False,
@@ -787,7 +787,7 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         self._check_kernel(kernel)
         self._cov_config["kernel"] = kernel
 
-    def _omega(self) -> NDArray:
+    def _omega(self) -> Float64Array:
         return self._kernel_cov(self._moments)
 
     @property
