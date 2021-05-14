@@ -477,7 +477,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
     def _check_clusters(self, clusters: Optional[IntArray]) -> IntArray:
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
-            return empty((self._eps.size, 0))
+            return empty((self._eps.size, 0), dtype=int)
         _clusters = asarray(clusters)
 
         if _clusters.ndim not in (1, 2):

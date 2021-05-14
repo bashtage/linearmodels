@@ -14,7 +14,7 @@ from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import NDArray, OptionalArrayLike
+from linearmodels.typing import Float64Array, OptionalArrayLike
 
 __all__ = [
     "PanelResults",
@@ -656,8 +656,8 @@ class PanelResults(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: Optional[Union[NDArray, DataFrame]] = None,
-        value: Optional[Union[NDArray, Series]] = None,
+        restriction: Optional[Union[Float64Array, DataFrame]] = None,
+        value: Optional[Union[Float64Array, Series]] = None,
         *,
         formula: Optional[Union[str, List[str]]] = None,
     ) -> WaldTestStatistic:

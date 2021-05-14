@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import MutableMapping
 from typing import (
     AbstractSet,
@@ -20,7 +22,7 @@ from pandas import DataFrame, Index, MultiIndex, Series
 from linearmodels.typing import AnyArray, Label
 
 
-def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> "AttrDict":
+def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> AttrDict:
     attr_dict = AttrDict()
     for k, v in args:
         attr_dict[k] = v
@@ -47,7 +49,7 @@ class AttrDict(MutableMapping):
         """Remove all items from AD."""
         self.__private_dict__.clear()
 
-    def copy(self) -> "AttrDict":
+    def copy(self) -> AttrDict:
         """Create a shallow copy of AD"""
         ad = AttrDict()
         for key in self.__private_dict__.keys():

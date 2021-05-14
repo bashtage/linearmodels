@@ -1,6 +1,8 @@
 """
 Instrumental variable estimators
 """
+from __future__ import annotations
+
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
 
 from numpy import (
@@ -44,7 +46,13 @@ from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import ArrayLike, NDArray, Numeric, OptionalNumeric
+from linearmodels.typing import (
+    ArrayLike,
+    BoolArray,
+    Float64Array,
+    Numeric,
+    OptionalNumeric,
+)
 
 IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
 
@@ -325,9 +333,9 @@ class _IVModelBase(object):
             )
         self._has_constant, self._const_loc = has_constant(x)
 
-    def _drop_missing(self) -> NDArray:
+    def _drop_missing(self) -> BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing = cast(NDArray, any(column_stack([dh.isnull for dh in data]), axis=1))
+        missing = cast(BoolArray, any(column_stack([dh.isnull for dh in data]), axis=1))
         if any(missing):
             if npall(missing):
                 raise ValueError(
@@ -343,7 +351,7 @@ class _IVModelBase(object):
         missing_warning(missing)
         return missing
 
-    def wresids(self, params: NDArray) -> NDArray:
+    def wresids(self, params: Float64Array) -> Float64Array:
         """
         Compute weighted model residuals
 
@@ -364,7 +372,7 @@ class _IVModelBase(object):
         """
         return self._wy - self._wx @ params
 
-    def resids(self, params: NDArray) -> NDArray:
+    def resids(self, params: Float64Array) -> Float64Array:
         """
         Compute model residuals
 
@@ -386,24 +394,24 @@ class _IVModelBase(object):
         return self._has_constant
 
     @property
-    def isnull(self) -> NDArray:
+    def isnull(self) -> BoolArray:
         """Locations of observations with missing values"""
         return self._drop_locs
 
     @property
-    def notnull(self) -> NDArray:
+    def notnull(self) -> BoolArray:
         """Locations of observations included in estimation"""
-        return cast(NDArray, logical_not(self._drop_locs))
+        return cast(BoolArray, logical_not(self._drop_locs))
 
     def _f_statistic(
-        self, params: NDArray, cov: NDArray, debiased: bool
+        self, params: Float64Array, cov: Float64Array, debiased: bool
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _post_estimation(
-        self, params: NDArray, cov_estimator: CovarianceEstimator, cov_type: str
+        self, params: Float64Array, cov_estimator: CovarianceEstimator, cov_type: str
     ) -> Dict[str, Any]:
         columns = self._columns
         index = self._index
@@ -533,8 +541,8 @@ class _IVLSModelBase(_IVModelBase):
 
     @staticmethod
     def estimate_parameters(
-        x: NDArray, y: NDArray, z: NDArray, kappa: Numeric
-    ) -> NDArray:
+        x: Float64Array, y: Float64Array, z: Float64Array, kappa: Numeric
+    ) -> Float64Array:
         """
         Parameter estimation without error checking
 
@@ -745,7 +753,7 @@ class IVLIML(_IVLSModelBase):
         weights: Optional[IVDataLike] = None,
         fuller: float = 0,
         kappa: OptionalNumeric = None,
-    ) -> "IVLIML":
+    ) -> IVLIML:
         """
         Parameters
         ----------
@@ -791,7 +799,7 @@ class IVLIML(_IVLSModelBase):
         """
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
-        mod: "IVLIML" = IVLIML(
+        mod: IVLIML = IVLIML(
             dep, exog, endog, instr, weights=weights, fuller=fuller, kappa=kappa
         )
         mod.formula = formula
@@ -854,7 +862,7 @@ class IV2SLS(_IVLSModelBase):
     @staticmethod
     def from_formula(
         formula: str, data: DataFrame, *, weights: Optional[IVDataLike] = None
-    ) -> "IV2SLS":
+    ) -> IV2SLS:
         """
         Parameters
         ----------
@@ -970,7 +978,7 @@ class _IVGMMBase(_IVModelBase):
         self._weight_config = self._weight.config
 
     def _gmm_post_estimation(
-        self, params: NDArray, weight_mat: NDArray, iters: int
+        self, params: Float64Array, weight_mat: Float64Array, iters: int
     ) -> Dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -984,7 +992,9 @@ class _IVGMMBase(_IVModelBase):
 
         return gmm_specific
 
-    def _j_statistic(self, params: NDArray, weight_mat: NDArray) -> WaldTestStatistic:
+    def _j_statistic(
+        self, params: Float64Array, weight_mat: Float64Array
+    ) -> WaldTestStatistic:
         """J stat and test"""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
@@ -1073,7 +1083,7 @@ class IVGMM(_IVGMMBase):
         weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
-    ) -> "IVGMM":
+    ) -> IVGMM:
         """
         Parameters
         ----------
@@ -1123,7 +1133,9 @@ class IVGMM(_IVGMMBase):
         return mod
 
     @staticmethod
-    def estimate_parameters(x: NDArray, y: NDArray, z: NDArray, w: NDArray) -> NDArray:
+    def estimate_parameters(
+        x: Float64Array, y: Float64Array, z: Float64Array, w: Float64Array
+    ) -> Float64Array:
         """
         Parameters
         ----------
@@ -1155,7 +1167,7 @@ class IVGMM(_IVGMMBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-4,
-        initial_weight: Optional[NDArray] = None,
+        initial_weight: Optional[Float64Array] = None,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Any,
@@ -1248,7 +1260,7 @@ class IVGMM(_IVGMMBase):
         return IVGMMResults(results, self)
 
     def _gmm_post_estimation(
-        self, params: NDArray, weight_mat: NDArray, iters: int
+        self, params: Float64Array, weight_mat: Float64Array, iters: int
     ) -> Dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
@@ -1344,7 +1356,7 @@ class IVGMMCUE(_IVGMMBase):
         weights: Optional[IVDataLike] = None,
         weight_type: str = "robust",
         **weight_config: Any,
-    ) -> "IVGMMCUE":
+    ) -> IVGMMCUE:
         """
         Parameters
         ----------
@@ -1393,7 +1405,9 @@ class IVGMMCUE(_IVGMMBase):
         assert isinstance(mod, IVGMMCUE)
         return mod
 
-    def j(self, params: NDArray, x: NDArray, y: NDArray, z: NDArray) -> float:
+    def j(
+        self, params: Float64Array, x: Float64Array, y: Float64Array, z: Float64Array
+    ) -> float:
         r"""
         Optimization target
 
@@ -1440,13 +1454,13 @@ class IVGMMCUE(_IVGMMBase):
 
     def estimate_parameters(
         self,
-        starting: NDArray,
-        x: NDArray,
-        y: NDArray,
-        z: NDArray,
+        starting: Float64Array,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
         display: bool = False,
         opt_options: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[NDArray, int]:
+    ) -> Tuple[Float64Array, int]:
         r"""
         Parameters
         ----------
@@ -1494,7 +1508,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: Union[NDArray, Series] = None,
+        starting: Union[Float64Array, Series] = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_categorical_dtype, is_numeric_dtype, is_string_dtype
 
-from linearmodels.typing import AnyPandas, ArrayLike, NDArray
+from linearmodels.typing import AnyPandas, ArrayLike, NumericArray
 
 dim_err = "{0} has too many dims.  Maximum is 2, actual is {1}"
 type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
@@ -166,7 +166,7 @@ class IVData(object):
         return self._pandas
 
     @property
-    def ndarray(self) -> NDArray:
+    def ndarray(self) -> NumericArray:
         """ndarray view of data, always 2d"""
         return self._ndarray
 

@@ -4,10 +4,10 @@ from numpy import ix_, ptp, where
 from numpy.linalg import inv
 
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
-from linearmodels.typing import NDArray
+from linearmodels.typing import Float64Array
 
 
-def find_constant(x: NDArray) -> Optional[int]:
+def find_constant(x: Float64Array) -> Optional[int]:
     """
     Parameters
     ----------
@@ -27,8 +27,8 @@ def find_constant(x: NDArray) -> Optional[int]:
 
 
 def f_statistic(
-    params: NDArray,
-    cov: NDArray,
+    params: Float64Array,
+    cov: Float64Array,
     debiased: bool,
     resid_df: int,
     const_loc: Optional[int] = None,

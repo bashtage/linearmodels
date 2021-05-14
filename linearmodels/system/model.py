@@ -11,6 +11,8 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
     Systems of Simultaneous Equations in R. Journal of Statistical Software,
     23(4), 1 - 40. doi:http://dx.doi.org/10.18637/jss.v023.i04
 """
+from __future__ import annotations
+
 from collections import abc
 from functools import reduce
 import textwrap
@@ -466,10 +468,10 @@ class _SystemModelBase(object):
             self._weights,
             self._eq_labels,
         ):
-            y = dep.ndarray
+            y = cast(Float64Array, dep.ndarray)
             x = np.concatenate([exog.ndarray, endog.ndarray], 1)
             z = np.concatenate([exog.ndarray, instr.ndarray], 1)
-            w_arr = w.ndarray
+            w_arr = cast(Float64Array, w.ndarray)
             w_arr = w_arr / np.nanmean(w_arr)
             w_sqrt = np.sqrt(w_arr)
             self._w.append(w_arr)
@@ -525,7 +527,7 @@ class _SystemModelBase(object):
             for value in values:
                 nulls = value[i].isnull
                 if nulls.any():
-                    missing |= nulls
+                    missing |= np.asarray(nulls)
 
         missing_warning(missing)
         if np.any(missing):
@@ -1409,7 +1411,7 @@ class IV3SLS(_LSSystemModelBase):
         exog: OptionalArrayLike = None,
         endog: OptionalArrayLike = None,
         instruments: OptionalArrayLike = None,
-    ) -> "IV3SLS":
+    ) -> IV3SLS:
         """
         Interface for specification of multivariate IV models
 
@@ -1462,7 +1464,7 @@ class IV3SLS(_LSSystemModelBase):
         *,
         sigma: Optional[ArrayLike] = None,
         weights: Optional[Mapping[str, ArrayLike]] = None,
-    ) -> "IV3SLS":
+    ) -> IV3SLS:
         """
         Specify a 3SLS using the formula interface
 
@@ -1627,7 +1629,7 @@ class SUR(_LSSystemModelBase):
         self._model_name = "Seemingly Unrelated Regression (SUR)"
 
     @classmethod
-    def multivariate_ls(cls, dependent: ArrayLike, exog: ArrayLike) -> "SUR":
+    def multivariate_ls(cls, dependent: ArrayLike, exog: ArrayLike) -> SUR:
         """
         Interface for specification of multivariate regression models
 
@@ -1677,7 +1679,7 @@ class SUR(_LSSystemModelBase):
         *,
         sigma: Optional[ArrayLike] = None,
         weights: Optional[Mapping[str, ArrayLike]] = None,
-    ) -> "SUR":
+    ) -> SUR:
         """
         Specify a SUR using the formula interface
 
@@ -2064,7 +2066,7 @@ class IVSystemGMM(_SystemModelBase):
         weights: Optional[Dict[str, ArrayLike]] = None,
         weight_type: str = "robust",
         **weight_config: Union[bool, str, float],
-    ) -> "IVSystemGMM":
+    ) -> IVSystemGMM:
         """
         Specify a 3SLS using the formula interface
 

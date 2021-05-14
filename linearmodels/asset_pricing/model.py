@@ -1,6 +1,8 @@
 """
 Linear factor models for applications in asset pricing
 """
+from __future__ import annotations
+
 from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
 
 import numpy as np
@@ -91,7 +93,6 @@ class _FactorModelBase(object):
             self.portfolios.drop(missing)
             self.factors.drop(missing)
         missing_warning(missing)
-
         return missing
 
     def _validate_data(self) -> None:
@@ -104,8 +105,8 @@ class _FactorModelBase(object):
             )
         self._drop_missing()
 
-        p = self.portfolios.ndarray
-        f = self.factors.ndarray
+        p = cast(Float64Array, self.portfolios.ndarray)
+        f = cast(Float64Array, self.factors.ndarray)
         if has_constant(p)[0]:
             raise ValueError(
                 "portfolios must not contains a constant or "
@@ -195,7 +196,7 @@ class TradedFactorModel(_FactorModelBase):
     @classmethod
     def from_formula(
         cls, formula: str, data: DataFrame, *, portfolios: Optional[DataFrame] = None
-    ) -> "TradedFactorModel":
+    ) -> TradedFactorModel:
         """
         Parameters
         ----------
@@ -515,7 +516,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         portfolios: Optional[DataFrame] = None,
         risk_free: bool = False,
         sigma: Optional[ArrayLike] = None,
-    ) -> "LinearFactorModel":
+    ) -> LinearFactorModel:
         """
         Parameters
         ----------
@@ -817,7 +818,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         *,
         portfolios: Optional[DataFrame] = None,
         risk_free: bool = False,
-    ) -> "LinearFactorModelGMM":
+    ) -> LinearFactorModelGMM:
         """
         Parameters
         ----------
