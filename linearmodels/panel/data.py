@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import product
 from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union, cast
 
@@ -20,7 +22,16 @@ from pandas.api.types import (
 )
 
 from linearmodels.shared.utility import ensure_unique_column, panel_to_frame
-from linearmodels.typing import AnyPandas, ArrayLike, Label, NDArray
+from linearmodels.typing import (
+    AnyArray,
+    AnyPandas,
+    ArrayLike,
+    BoolArray,
+    Float64Array,
+    IntArray,
+    Label,
+    NumericArray,
+)
 
 __all__ = ["PanelData", "PanelDataLike"]
 
@@ -52,18 +63,17 @@ class _Panel(object):
         self._frame = new_df
         i, j, k = len(self._items), len(self._major_axis), len(self.minor_axis)
         self._shape = (i, j, k)
-        self._values = np.swapaxes(
-            np.reshape(np.asarray(new_df).copy().T, (i, k, j)), 1, 2
-        )
+        arr = np.asarray(new_df).copy().T.astype(np.float64)
+        self._values = np.swapaxes(np.reshape(arr, (i, k, j)), 1, 2)
 
     @classmethod
     def from_array(
         cls,
-        values: NDArray,
+        values: NumericArray,
         items: Sequence[Label],
         major_axis: Sequence[Label],
         minor_axis: Sequence[Label],
-    ) -> "_Panel":
+    ) -> _Panel:
         index = list(product(minor_axis, major_axis))
         index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
@@ -90,7 +100,7 @@ class _Panel(object):
         return self._minor_axis
 
     @property
-    def values(self) -> NDArray:
+    def values(self) -> Float64Array:
         return self._values
 
     def to_frame(self) -> DataFrame:
@@ -133,6 +143,8 @@ class PanelData(object):
     copy: bool, optional
         Flag indicating whether to copy the input. Only has an effect when
         x is a DataFrame
+    cast: bool, optional
+        Flag indicating to case the data to double precision.
 
     Notes
     -----
@@ -162,7 +174,7 @@ class PanelData(object):
 
     def __init__(
         self,
-        x: "PanelDataLike",
+        x: PanelDataLike,
         var_name: str = "x",
         convert_dummies: bool = True,
         drop_first: bool = True,
@@ -266,16 +278,16 @@ class PanelData(object):
         return self._frame
 
     @property
-    def values2d(self) -> NDArray:
+    def values2d(self) -> AnyArray:
         """NumPy ndarray view of dataframe"""
         return np.asarray(self._frame)
 
     @property
-    def values3d(self) -> NDArray:
+    def values3d(self) -> AnyArray:
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: Union[Series, NDArray]) -> None:
+    def drop(self, locs: Union[Series, BoolArray]) -> None:
         """
         Drop observations from the panel.
 
@@ -345,7 +357,7 @@ class PanelData(object):
         return list(index.levels[0][index.codes[0]].unique())
 
     @property
-    def entity_ids(self) -> NDArray:
+    def entity_ids(self) -> IntArray:
         """
         Get array containing entity group membership information
 
@@ -358,7 +370,7 @@ class PanelData(object):
         return np.asarray(index.codes[0])[:, None]
 
     @property
-    def time_ids(self) -> NDArray:
+    def time_ids(self) -> IntArray:
         """
         Get array containing time membership information
 
@@ -370,7 +382,7 @@ class PanelData(object):
         index = self.index
         return np.asarray(index.codes[1])[:, None]
 
-    def _demean_both_low_mem(self, weights: Optional["PanelData"]) -> "PanelData":
+    def _demean_both_low_mem(self, weights: Optional[PanelData]) -> PanelData:
         groups = PanelData(
             DataFrame(np.c_[self.entity_ids, self.time_ids], index=self._frame.index),
             convert_dummies=False,
@@ -378,7 +390,7 @@ class PanelData(object):
         )
         return self.general_demean(groups, weights=weights)
 
-    def _demean_both(self, weights: Optional["PanelData"]) -> "PanelData":
+    def _demean_both(self, weights: Optional[PanelData]) -> PanelData:
         """
         Entity and time demean
 
@@ -406,8 +418,8 @@ class PanelData(object):
         return PanelData(resid)
 
     def general_demean(
-        self, groups: "PanelDataLike", weights: Optional["PanelData"] = None
-    ) -> "PanelData":
+        self, groups: PanelDataLike, weights: Optional[PanelData] = None
+    ) -> PanelData:
         """
         Multi-way demeaning using only groupby
 
@@ -442,8 +454,8 @@ class PanelData(object):
         weight_sum: Dict[int, Series] = {}
 
         def weighted_group_mean(
-            df: DataFrame, weights: DataFrame, root_w: NDArray, level: int
-        ) -> NDArray:
+            df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
+        ) -> Float64Array:
             num = (root_w * df).groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
@@ -453,7 +465,7 @@ class PanelData(object):
             return np.asarray(num) / np.asarray(denom)
 
         def demean_pass(
-            frame: DataFrame, weights: DataFrame, root_w: NDArray
+            frame: DataFrame, weights: DataFrame, root_w: Float64Array
         ) -> DataFrame:
             levels = groups.shape[1]
             for level in range(levels):
@@ -469,7 +481,7 @@ class PanelData(object):
         init_index = DataFrame(groups)
         init_index.set_index(list(init_index.columns), inplace=True)
 
-        root_w = cast(NDArray, np.sqrt(weights.values2d))
+        root_w = cast(Float64Array, np.sqrt(weights.values2d))
         weights_df = DataFrame(weights.values2d, index=init_index.index)
         wframe = root_w * self._frame
         wframe.index = init_index.index
@@ -484,7 +496,7 @@ class PanelData(object):
         max_rmse = np.sqrt(np.asarray(self._frame).var(0).max())
         scale = np.asarray(self._frame.std())
         exclude = exclude | (scale < 1e-14 * max_rmse)
-        replacement = cast(NDArray, np.maximum(scale, 1))
+        replacement = cast(Float64Array, np.maximum(scale, 1))
         scale[exclude] = replacement[exclude]
         scale = scale[None, :]
 
@@ -498,10 +510,10 @@ class PanelData(object):
     def demean(
         self,
         group: str = "entity",
-        weights: Optional["PanelData"] = None,
+        weights: Optional[PanelData] = None,
         return_panel: bool = True,
         low_memory: bool = False,
-    ) -> Union["PanelData", np.ndarray]:
+    ) -> Union[PanelData, Float64Array]:
         """
         Demeans data by either entity or time group
 
@@ -600,7 +612,7 @@ class PanelData(object):
         assert isinstance(index, MultiIndex)
         return index
 
-    def copy(self) -> "PanelData":
+    def copy(self) -> PanelData:
         """Return a deep copy"""
         return PanelData(
             self._frame.copy(),
@@ -610,7 +622,7 @@ class PanelData(object):
         )
 
     def mean(
-        self, group: str = "entity", weights: Optional["PanelData"] = None
+        self, group: str = "entity", weights: Optional[PanelData] = None
     ) -> DataFrame:
         """
         Compute data mean by either entity or time group
@@ -644,7 +656,7 @@ class PanelData(object):
 
         return out
 
-    def first_difference(self) -> "PanelData":
+    def first_difference(self) -> PanelData:
         """
         Compute first differences of variables
 

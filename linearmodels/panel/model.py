@@ -1,4 +1,6 @@
-from typing import Dict, NamedTuple, Optional, Tuple, Type, Union, cast
+from __future__ import annotations
+
+from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -49,7 +51,13 @@ from linearmodels.shared.hypotheses import (
 from linearmodels.shared.linalg import has_constant
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
-from linearmodels.typing import ArrayLike, NDArray
+from linearmodels.typing import (
+    ArrayLike,
+    BoolArray,
+    Float64Array,
+    IntArray,
+    NumericArray,
+)
 
 CovarianceEstimator = Union[
     ACCovariance,
@@ -69,8 +77,8 @@ CovarianceEstimatorType = Union[
 
 
 def _lstsq(
-    x: NDArray, y: NDArray, rcond: Optional[float] = None
-) -> Tuple[NDArray, NDArray, int, NDArray]:
+    x: Float64Array, y: Float64Array, rcond: Optional[float] = None
+) -> Tuple[Float64Array, Float64Array, int, Float64Array]:
     if rcond is None:
         eps = np.finfo(np.float64).eps
         cond = max(x.shape) * eps
@@ -79,7 +87,7 @@ def _lstsq(
     return sp_lstsq(x, y, cond=cond, lapack_driver="gelsy")
 
 
-def panel_structure_stats(ids: NDArray, name: str) -> Series:
+def panel_structure_stats(ids: IntArray, name: str) -> Series:
     bc = np.bincount(ids)
     index = ["mean", "median", "max", "min", "total"]
     out = [bc.mean(), np.median(bc), bc.max(), bc.min(), bc.shape[0]]
@@ -87,7 +95,7 @@ def panel_structure_stats(ids: NDArray, name: str) -> Series:
 
 
 class FInfo(NamedTuple):
-    sel: NDArray
+    sel: BoolArray
     name: str
     invalid_test_stat: Optional[InvalidTestStatistic]
     is_invalid: bool
@@ -296,7 +304,7 @@ class _PanelModelBase(object):
         self._constant_index: Optional[int] = None
         self._check_rank = bool(check_rank)
         self._validate_data()
-        self._singleton_index: Optional[NDArray] = None
+        self._singleton_index: Optional[BoolArray] = None
 
     def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
@@ -366,7 +374,7 @@ class _PanelModelBase(object):
             return PanelData(weights)
 
         if isinstance(weights, np.ndarray):
-            weights = cast(NDArray, np.squeeze(weights))
+            weights = cast(Float64Array, np.squeeze(weights))
         if weights.shape[0] == nobs and nobs == nentity:
             raise AmbiguityError(
                 "Unable to distinguish nobs form nentity since they are "
@@ -396,7 +404,7 @@ class _PanelModelBase(object):
     def _check_exog_rank(self) -> int:
         if not self._check_rank:
             return self.exog.shape[1]
-        x = self.exog.values2d
+        x = cast(Float64Array, self.exog.values2d)
         _, _, rank_of_x, _ = _lstsq(x, np.ones(x.shape[0]))
         if rank_of_x < x.shape[1]:
             raise ValueError(
@@ -409,7 +417,7 @@ class _PanelModelBase(object):
     def _validate_data(self) -> None:
         """Check input shape and remove missing"""
         y = self._y = self.dependent.values2d
-        x = self._x = self.exog.values2d
+        x = self._x = cast(Float64Array, self.exog.values2d)
         w = self._w = self.weights.values2d
         if y.shape[0] != x.shape[0]:
             raise ValueError(
@@ -433,7 +441,7 @@ class _PanelModelBase(object):
             self.exog.drop(missing)
             self.weights.drop(missing)
 
-            x = self.exog.values2d
+            x = cast(Float64Array, self.exog.values2d)
             self._not_null = np.asarray(~missing)
 
         w = self.weights.dataframe
@@ -459,7 +467,12 @@ class _PanelModelBase(object):
         return self._constant
 
     def _f_statistic(
-        self, weps: NDArray, y: NDArray, x: NDArray, root_w: NDArray, df_resid: int
+        self,
+        weps: Float64Array,
+        y: Float64Array,
+        x: Float64Array,
+        root_w: Float64Array,
+        df_resid: int,
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
         """Compute model F-statistic"""
         weps_const = y
@@ -470,7 +483,9 @@ class _PanelModelBase(object):
                 return InvalidTestStatistic("Model contains only a constant", name=name)
 
             num_df -= 1
-            weps_const = cast(NDArray, y - float((root_w.T @ y) / (root_w.T @ root_w)))
+            weps_const = cast(
+                Float64Array, y - float((root_w.T @ y) / (root_w.T @ root_w))
+            )
 
         resid_ss = weps.T @ weps
         num = float(weps_const.T @ weps_const - resid_ss)
@@ -487,7 +502,7 @@ class _PanelModelBase(object):
 
     def _f_statistic_robust(
         self,
-        params: NDArray,
+        params: Float64Array,
     ) -> FInfo:
         """Compute Wald test that all parameters are 0, ex. constant"""
         sel = np.ones(params.shape[0], dtype=bool)
@@ -506,7 +521,7 @@ class _PanelModelBase(object):
 
         return FInfo(sel, name, None, False)
 
-    def _prepare_between(self) -> Tuple[NDArray, NDArray, NDArray]:
+    def _prepare_between(self) -> Tuple[Float64Array, Float64Array, Float64Array]:
         """Prepare values for between estimation of R2"""
         weights = self.weights if self._is_weighted else None
         y = np.asarray(self.dependent.mean("entity", weights=weights))
@@ -519,7 +534,7 @@ class _PanelModelBase(object):
 
         return y, x, w
 
-    def _rsquared_corr(self, params: NDArray) -> Tuple[float, float, float]:
+    def _rsquared_corr(self, params: Float64Array) -> Tuple[float, float, float]:
         """Correlation-based measures of R2"""
         # Overall
         y = self.dependent.values2d
@@ -537,8 +552,8 @@ class _PanelModelBase(object):
             r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
 
         # Within
-        y = cast(NDArray, self.dependent.demean("entity", return_panel=False))
-        x = cast(NDArray, self.exog.demean("entity", return_panel=False))
+        y = cast(Float64Array, self.dependent.demean("entity", return_panel=False))
+        x = cast(Float64Array, self.exog.demean("entity", return_panel=False))
         xb = x @ params
         r2w = 0.0
         if y.std() > 0 and xb.std() > 0:
@@ -547,7 +562,7 @@ class _PanelModelBase(object):
         return r2o, r2w, r2b
 
     def _rsquared(
-        self, params: NDArray, reweight: bool = False
+        self, params: Float64Array, reweight: bool = False
     ) -> Tuple[float, float, float]:
         """Compute alternative measures of R2"""
         if self.has_constant and self.exog.nvar == 1:
@@ -561,7 +576,7 @@ class _PanelModelBase(object):
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(w)
         else:
-            root_w = cast(NDArray, np.sqrt(w))
+            root_w = cast(Float64Array, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
@@ -579,7 +594,7 @@ class _PanelModelBase(object):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
-        root_w = cast(NDArray, np.sqrt(w))
+        root_w = cast(Float64Array, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
         weps = wy - wx @ params
@@ -593,8 +608,14 @@ class _PanelModelBase(object):
         # R2 - Within
         #############################################
         weights = self.weights if self._is_weighted else None
-        wy = self.dependent.demean("entity", weights=weights, return_panel=False)
-        wx = self.exog.demean("entity", weights=weights, return_panel=False)
+        wy = cast(
+            Float64Array,
+            self.dependent.demean("entity", weights=weights, return_panel=False),
+        )
+        wx = cast(
+            Float64Array,
+            self.exog.demean("entity", weights=weights, return_panel=False),
+        )
         assert isinstance(wy, np.ndarray)
         assert isinstance(wx, np.ndarray)
         weps = wy - wx @ params
@@ -609,14 +630,14 @@ class _PanelModelBase(object):
 
     def _postestimation(
         self,
-        params: NDArray,
+        params: Float64Array,
         cov: CovarianceEstimator,
         debiased: bool,
         df_resid: int,
-        weps: NDArray,
-        y: NDArray,
-        x: NDArray,
-        root_w: NDArray,
+        weps: Float64Array,
+        y: Float64Array,
+        x: Float64Array,
+        root_w: Float64Array,
     ) -> AttrDict:
         """Common post-estimation values"""
         f_info = self._f_statistic_robust(params)
@@ -664,13 +685,13 @@ class _PanelModelBase(object):
         return res
 
     @property
-    def not_null(self) -> NDArray:
+    def not_null(self) -> Float64Array:
         """Locations of non-missing observations"""
         return self._not_null
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, NDArray, DataFrame, PanelData]]:
+    ) -> Dict[str, Union[bool, float, str, Float64Array, DataFrame, PanelData]]:
 
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
@@ -834,7 +855,7 @@ class PooledOLS(_PanelModelBase):
         *,
         weights: Optional[PanelDataLike] = None,
         check_rank: bool = True,
-    ) -> "PooledOLS":
+    ) -> PooledOLS:
         """
         Create a model from a formula
 
@@ -886,7 +907,7 @@ class PooledOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, Float64Array, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -939,7 +960,7 @@ class PooledOLS(_PanelModelBase):
         y = self.dependent.values2d
         x = self.exog.values2d
         w = self.weights.values2d
-        root_w = cast(NDArray, np.sqrt(w))
+        root_w = cast(Float64Array, np.sqrt(w))
         wx = root_w * x
         wy = root_w * y
 
@@ -1164,7 +1185,7 @@ class PanelOLS(_PanelModelBase):
         self._singleton_index = None
         self._drop_singletons()
 
-    def _collect_effects(self) -> NDArray:
+    def _collect_effects(self) -> NumericArray:
         if not self._has_effect:
             return np.empty((self.dependent.shape[0], 0))
         effects = []
@@ -1196,7 +1217,7 @@ class PanelOLS(_PanelModelBase):
             "{0} singleton observations dropped".format(ndropped), SingletonWarning
         )
         drop = ~retain
-        self._singleton_index = cast(NDArray, drop)
+        self._singleton_index = cast(BoolArray, drop)
         self.dependent.drop(drop)
         self.exog.drop(drop)
         self.weights.drop(drop)
@@ -1301,7 +1322,7 @@ class PanelOLS(_PanelModelBase):
         singletons: bool = True,
         drop_absorbed: bool = False,
         check_rank: bool = True,
-    ) -> "PanelOLS":
+    ) -> PanelOLS:
         """
         Create a model from a formula
 
@@ -1365,7 +1386,9 @@ class PanelOLS(_PanelModelBase):
         mod.formula = formula
         return mod
 
-    def _lsmr_path(self) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
+    def _lsmr_path(
+        self,
+    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Sparse implementation, works for all scenarios"""
         y = self.dependent.values2d
         x = self.exog.values2d
@@ -1382,7 +1405,7 @@ class PanelOLS(_PanelModelBase):
         wx_gm = root_w * (w.T @ x / w.sum())
         root_w_sparse = csc_matrix(root_w)
 
-        cats = []
+        cats: List[Union[IntArray, Float64Array]] = []
         if self.entity_effects:
             cats.append(self.dependent.entity_ids)
         if self.time_effects:
@@ -1426,7 +1449,9 @@ class PanelOLS(_PanelModelBase):
 
         return wy, wx, wybar, y_effects, x_effects
 
-    def _slow_path(self) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
+    def _slow_path(
+        self,
+    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Frisch-Waugh-Lovell implementation, works for all scenarios"""
         w = self.weights.values2d
         root_w = np.sqrt(w)
@@ -1497,7 +1522,9 @@ class PanelOLS(_PanelModelBase):
             )
         return low_memory
 
-    def _fast_path(self, low_memory: bool) -> Tuple[NDArray, NDArray, NDArray]:
+    def _fast_path(
+        self, low_memory: bool
+    ) -> Tuple[Float64Array, Float64Array, Float64Array]:
         """Dummy-variable free estimation without weights"""
         _y = self.dependent.values2d
         _x = self.exog.values2d
@@ -1548,19 +1575,19 @@ class PanelOLS(_PanelModelBase):
 
     def _weighted_fast_path(
         self, low_memory: bool
-    ) -> Tuple[NDArray, NDArray, NDArray, NDArray, NDArray]:
+    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Dummy-variable free estimation with weights"""
         y_arr = self.dependent.values2d
         x_arr = self.exog.values2d
         w = self.weights.values2d
-        root_w = cast(NDArray, np.sqrt(w))
+        root_w = cast(Float64Array, np.sqrt(w))
         wybar = root_w * (w.T @ y_arr / w.sum())
 
         if not self._has_effect:
-            wy = root_w * self.dependent.values2d
-            wx = root_w * self.exog.values2d
-            y_effect, x_effect = np.zeros_like(wy), np.zeros_like(wx)
-            return wy, wx, wybar, y_effect, x_effect
+            wy_arr = root_w * self.dependent.values2d
+            wx_arr = root_w * self.exog.values2d
+            y_effect, x_effect = np.zeros_like(wy_arr), np.zeros_like(wx_arr)
+            return wy_arr, wx_arr, wybar, y_effect, x_effect
 
         wy_gm = wybar
         wx_gm = root_w * (w.T @ x_arr / w.sum())
@@ -1582,28 +1609,32 @@ class PanelOLS(_PanelModelBase):
             wy = y.general_demean(groups, weights=self.weights)
             wx = x.general_demean(groups, weights=self.weights)
         elif self.entity_effects and self.time_effects:
-            wy = y.demean("both", weights=self.weights, low_memory=low_memory)
-            wx = x.demean("both", weights=self.weights, low_memory=low_memory)
+            wy = cast(
+                PanelData, y.demean("both", weights=self.weights, low_memory=low_memory)
+            )
+            wx = cast(
+                PanelData, x.demean("both", weights=self.weights, low_memory=low_memory)
+            )
         elif self.entity_effects:
-            wy = y.demean("entity", weights=self.weights)
-            wx = x.demean("entity", weights=self.weights)
+            wy = cast(PanelData, y.demean("entity", weights=self.weights))
+            wx = cast(PanelData, x.demean("entity", weights=self.weights))
         else:  # self.time_effects
-            wy = y.demean("time", weights=self.weights)
-            wx = x.demean("time", weights=self.weights)
+            wy = cast(PanelData, y.demean("time", weights=self.weights))
+            wx = cast(PanelData, x.demean("time", weights=self.weights))
 
-        wy = wy.values2d
-        wx = wx.values2d
+        wy_arr = wy.values2d
+        wx_arr = wx.values2d
 
         if self.has_constant:
-            wy += wy_gm
-            wx += wx_gm
+            wy_arr += wy_gm
+            wx_arr += wx_gm
         else:
             wybar = 0
 
-        wy_effects = y.values2d - wy / root_w
-        wx_effects = x.values2d - wx / root_w
+        wy_effects = y.values2d - wy_arr / root_w
+        wx_effects = x.values2d - wx_arr / root_w
 
-        return wy, wx, wybar, wy_effects, wx_effects
+        return wy_arr, wx_arr, wybar, wy_effects, wx_effects
 
     def _info(self) -> Tuple[Series, Series, DataFrame]:
         """Information about model effects and panel structure"""
@@ -1624,7 +1655,7 @@ class PanelOLS(_PanelModelBase):
         return entity_info, time_info, other_info
 
     @staticmethod
-    def _is_effect_nested(effects: NDArray, clusters: NDArray) -> bool:
+    def _is_effect_nested(effects: NumericArray, clusters: NumericArray) -> bool:
         """Determine whether an effect is nested by the covariance clusters"""
         is_nested = np.zeros(effects.shape[1], dtype=bool)
         for i, e in enumerate(effects.T):
@@ -1640,7 +1671,7 @@ class PanelOLS(_PanelModelBase):
     def _determine_df_adjustment(
         self,
         cov_type: str,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
     ) -> bool:
         if cov_type != "clustered" or not self._has_effect:
             return True
@@ -1655,7 +1686,7 @@ class PanelOLS(_PanelModelBase):
 
         effects = self._collect_effects()
         if num_effects == 1:
-            return not self._is_effect_nested(effects, cast(NDArray, clusters))
+            return not self._is_effect_nested(effects, cast(IntArray, clusters))
         return True  # Default case for 2-way -- not completely clear
 
     def fit(
@@ -1668,7 +1699,7 @@ class PanelOLS(_PanelModelBase):
         debiased: bool = True,
         auto_df: bool = True,
         count_effects: bool = True,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
     ) -> PanelEffectsResults:
         """
         Estimate model parameters
@@ -1859,7 +1890,7 @@ class PanelOLS(_PanelModelBase):
         total_ss = float((y - mu).T @ (y - mu))
         r2 = 1 - resid_ss / total_ss if total_ss > 0.0 else 0.0
 
-        root_w = cast(NDArray, np.sqrt(self.weights.values2d))
+        root_w = cast(Float64Array, np.sqrt(self.weights.values2d))
         y_ex = root_w * self.dependent.values2d
         mu_ex = 0
         if (
@@ -1982,7 +2013,7 @@ class BetweenOLS(_PanelModelBase):
 
     def _setup_clusters(
         self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, NDArray, DataFrame, PanelData]]:
+    ) -> Dict[str, Union[bool, float, str, IntArray, DataFrame, PanelData]]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = cov_config.copy()
         if "clusters" not in cov_config:
@@ -2012,7 +2043,7 @@ class BetweenOLS(_PanelModelBase):
         reweight: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2062,7 +2093,7 @@ class BetweenOLS(_PanelModelBase):
         if np.all(self.weights.values2d == 1.0) and not reweight:
             w = root_w = np.ones_like(y)
         else:
-            root_w = cast(NDArray, np.sqrt(w))
+            root_w = cast(Float64Array, np.sqrt(w))
 
         wx = root_w * x
         wy = root_w * y
@@ -2145,7 +2176,7 @@ class BetweenOLS(_PanelModelBase):
         *,
         weights: Optional[PanelDataLike] = None,
         check_rank: bool = True,
-    ) -> "BetweenOLS":
+    ) -> BetweenOLS:
         """
         Create a model from a formula
 
@@ -2288,7 +2319,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2346,15 +2377,15 @@ class FirstDifferenceOLS(_PanelModelBase):
         time_ids = y_fd.time_ids
         entity_ids = y_fd.entity_ids
         index = y_fd.index
-        y = y_fd.values2d
-        x = self.exog.first_difference().values2d
+        y = cast(Float64Array, y_fd.values2d)
+        x = cast(Float64Array, self.exog.first_difference().values2d)
 
         if np.all(self.weights.values2d == 1.0):
             w = root_w = np.ones_like(y)
         else:
-            w = cast(NDArray, 1.0 / self.weights.values3d)
+            w = cast(Float64Array, 1.0 / self.weights.values3d)
             w = w[:, :-1] + w[:, 1:]
-            w = cast(NDArray, 1.0 / w)
+            w = cast(Float64Array, 1.0 / w)
             w_frame = panel_to_frame(
                 w,
                 self.weights.panel.items,
@@ -2367,7 +2398,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             w = w_frame.to_numpy()
 
             w /= w.mean()
-            root_w = cast(NDArray, np.sqrt(w))
+            root_w = cast(Float64Array, np.sqrt(w))
 
         wx = root_w * x
         wy = root_w * y
@@ -2443,7 +2474,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         *,
         weights: Optional[PanelDataLike] = None,
         check_rank: bool = True,
-    ) -> "FirstDifferenceOLS":
+    ) -> FirstDifferenceOLS:
         """
         Create a model from a formula
 
@@ -2536,7 +2567,7 @@ class RandomEffects(_PanelModelBase):
         *,
         weights: Optional[PanelDataLike] = None,
         check_rank: bool = True,
-    ) -> "RandomEffects":
+    ) -> RandomEffects:
         """
         Create a model from a formula
 
@@ -2589,7 +2620,7 @@ class RandomEffects(_PanelModelBase):
         small_sample: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, NDArray, DataFrame, PanelData],
+        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
     ) -> RandomEffectsResults:
         """
         Estimate model parameters
@@ -2643,7 +2674,7 @@ class RandomEffects(_PanelModelBase):
             not provided, a naive default is used.
         """
         w = self.weights.values2d
-        root_w = cast(NDArray, np.sqrt(w))
+        root_w = cast(Float64Array, np.sqrt(w))
         demeaned_dep = self.dependent.demean("entity", weights=self.weights)
         demeaned_exog = self.exog.demean("entity", weights=self.weights)
         assert isinstance(demeaned_dep, PanelData)
@@ -2729,7 +2760,7 @@ class RandomEffects(_PanelModelBase):
         )
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         residual_ss = float(weps.T @ weps)
-        wmu = 0
+        wmu: Union[float, Float64Array] = 0.0
         if self.has_constant:
             wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
@@ -2825,7 +2856,7 @@ class FamaMacBeth(_PanelModelBase):
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
-        def validate_block(ex: NDArray) -> bool:
+        def validate_block(ex: Float64Array) -> bool:
             def _mr(ex: pd.DataFrame) -> int:
                 """lstsq based matrix_rank"""
                 return _lstsq(ex, np.ones(ex.shape[0]))[2]
@@ -2947,7 +2978,7 @@ class FamaMacBeth(_PanelModelBase):
         eps = self.dependent.values2d - fitted.values
         weps = wy - wx @ params
         w = self.weights.values2d
-        root_w = cast(NDArray, np.sqrt(w))
+        root_w = cast(Float64Array, np.sqrt(w))
         #
         residual_ss = float(weps.T @ weps)
         y = e = self.dependent.values2d
@@ -3008,7 +3039,7 @@ class FamaMacBeth(_PanelModelBase):
         *,
         weights: Optional[PanelDataLike] = None,
         check_rank: bool = True,
-    ) -> "FamaMacBeth":
+    ) -> FamaMacBeth:
         """
         Create a model from a formula
 

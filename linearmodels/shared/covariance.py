@@ -10,7 +10,7 @@ from numpy import (
     zeros,
 )
 
-from linearmodels.typing import Float64Array, IntArray
+from linearmodels.typing import AnyArray, Float64Array, IntArray
 
 
 def group_debias_coefficient(clusters: IntArray) -> float:
@@ -66,7 +66,7 @@ def cluster_union(clusters: IntArray) -> IntArray:
     return union[resort_locs]
 
 
-def cov_cluster(z: Float64Array, clusters: IntArray) -> Float64Array:
+def cov_cluster(z: Float64Array, clusters: AnyArray) -> Float64Array:
     """
     Core cluster covariance estimator
 
@@ -82,7 +82,6 @@ def cov_cluster(z: Float64Array, clusters: IntArray) -> Float64Array:
     ndarray
        k by k cluster asymptotic covariance
     """
-
     num_clusters = len(unique(clusters))
 
     sort_args = argsort(clusters)

@@ -12,7 +12,7 @@ from linearmodels.iv.covariance import (
     kernel_optimal_bandwidth,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.typing import NDArray
+from linearmodels.typing import AnyArray, Float64Array
 
 
 class HomoskedasticWeightMatrix(object):
@@ -46,7 +46,9 @@ class HomoskedasticWeightMatrix(object):
         self._debiased = debiased
         self._bandwidth: Optional[int] = 0
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
+    def weight_matrix(
+        self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
         """
         Parameters
         ----------
@@ -109,7 +111,9 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
+    def weight_matrix(
+        self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
         """
         Parameters
         ----------
@@ -193,7 +197,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._kernels = KERNEL_LOOKUP
         self._optimal_bw = optimal_bw
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
+    def weight_matrix(
+        self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
         """
         Parameters
         ----------
@@ -268,12 +274,14 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: NDArray, center: bool = False, debiased: bool = False
+        self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
-    def weight_matrix(self, x: NDArray, z: NDArray, eps: NDArray) -> NDArray:
+    def weight_matrix(
+        self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
         """
         Parameters
         ----------
@@ -388,11 +396,11 @@ class IVGMMCovariance(HomoskedasticCovariance):
     # TODO: 2-way clustering
     def __init__(
         self,
-        x: NDArray,
-        y: NDArray,
-        z: NDArray,
-        params: NDArray,
-        w: NDArray,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        w: Float64Array,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Union[str, bool],
@@ -438,7 +446,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return out
 
     @property
-    def cov(self) -> NDArray:
+    def cov(self) -> Float64Array:
         x, z, eps, w = self.x, self.z, self.eps, self.w
         nobs = x.shape[0]
         xpz = x.T @ z / nobs

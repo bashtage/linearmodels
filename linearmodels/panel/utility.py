@@ -17,7 +17,7 @@ from pandas import DataFrame, concat, date_range
 import scipy.sparse as sp
 
 from linearmodels.shared.utility import panel_to_frame
-from linearmodels.typing import NDArray
+from linearmodels.typing import BoolArray, Float64Array, IntArray
 from linearmodels.typing.data import ArrayLike
 
 try:
@@ -58,13 +58,13 @@ Variables have been fully absorbed and have removed from the regression:
 
 SparseArray = TypeVar("SparseArray", sp.csc_matrix, sp.csr_matrix, sp.coo_matrix)
 SparseOrDense = TypeVar(
-    "SparseOrDense", NDArray, sp.csc_matrix, sp.csr_matrix, sp.coo_matrix
+    "SparseOrDense", Float64Array, sp.csc_matrix, sp.csr_matrix, sp.coo_matrix
 )
 
 
 def preconditioner(
     d: SparseOrDense, *, copy: bool = False
-) -> Tuple[SparseOrDense, NDArray]:
+) -> Tuple[SparseOrDense, Float64Array]:
     """
     Parameters
     ----------
@@ -90,7 +90,7 @@ def preconditioner(
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = cast(NDArray, np.sqrt((d ** 2).sum(0)))
+        cond = cast(Float64Array, np.sqrt((d ** 2).sum(0)))
         d /= cond
         if klass is not None:
             d = d.view(klass)
@@ -103,7 +103,7 @@ def preconditioner(
     elif copy:
         d = d.copy()
 
-    cond = cast(NDArray, np.sqrt(d.multiply(d).sum(0)).A1)
+    cond = cast(Float64Array, np.sqrt(d.multiply(d).sum(0)).A1)
     locs = np.zeros_like(d.indices)
     locs[d.indptr[1:-1]] = 1
     locs = np.cumsum(locs)
@@ -121,7 +121,9 @@ def dummy_matrix(
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
-) -> Tuple[Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, NDArray], NDArray]:
+) -> Tuple[
+    Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, Float64Array], Float64Array
+]:
     """
     Parameters
     ----------
@@ -213,7 +215,7 @@ def dummy_matrix(
     return out, cond
 
 
-def _remove_node(node: int, meta: NDArray, orig_dest: NDArray) -> Tuple[int, int]:
+def _remove_node(node: int, meta: IntArray, orig_dest: IntArray) -> Tuple[int, int]:
     """
     Parameters
     ----------
@@ -268,7 +270,7 @@ def _remove_node(node: int, meta: NDArray, orig_dest: NDArray) -> Tuple[int, int
     return next_node, next_count
 
 
-def _py_drop_singletons(meta: NDArray, orig_dest: NDArray) -> None:
+def _py_drop_singletons(meta: IntArray, orig_dest: IntArray) -> None:
     """
     Loop through the nodes and recursively drop singleton chains
 
@@ -293,7 +295,7 @@ if not HAS_CYTHON:
     _drop_singletons = _py_drop_singletons  # noqa: F811
 
 
-def in_2core_graph(cats: ArrayLike) -> NDArray:
+def in_2core_graph(cats: ArrayLike) -> BoolArray:
     """
     Parameters
     ----------
@@ -344,7 +346,7 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
     node_id, count = np.unique(orig_dest[:, 0], return_counts=True)
     offset = np.r_[0, np.where(np.diff(orig_dest[:, 0]) != 0)[0] + 1]
 
-    def min_dtype(*args: NDArray) -> str:
+    def min_dtype(*args: IntArray) -> str:
         bits = np.amax([np.log2(max(float(arg.max()), 1.0)) for arg in args])
         return "int{0}".format(min([j for j in (8, 16, 32, 64) if bits < (j - 1)]))
 
@@ -362,11 +364,10 @@ def in_2core_graph(cats: ArrayLike) -> NDArray:
     sorted_cats = orig_dest[:nobs]
     unsorted_cats = sorted_cats[inverter]
     retain = unsorted_cats[:, 1] > 0
-
     return retain
 
 
-def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
+def in_2core_graph_slow(cats: ArrayLike) -> BoolArray:
     """
     Parameters
     ----------
@@ -406,7 +407,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> NDArray:
 
 
 def check_absorbed(
-    x: NDArray, variables: Sequence[str], x_orig: Optional[NDArray] = None
+    x: Float64Array, variables: Sequence[str], x_orig: Optional[Float64Array] = None
 ) -> None:
     """
     Check a regressor matrix for variables absorbed
@@ -453,7 +454,7 @@ def check_absorbed(
 
 
 def not_absorbed(
-    x: NDArray, has_constant: bool = False, loc: Optional[int] = None
+    x: Float64Array, has_constant: bool = False, loc: Optional[int] = None
 ) -> List[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
@@ -576,14 +577,14 @@ def generate_panel_data(
     k += int(const)
     x = rng.standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y: NDArray = (
+    y: Float64Array = (
         (x * beta).sum(0)
         + rng.standard_normal((t, n))
         + 2 * rng.standard_normal((1, n))
     )
 
     w = rng.chisquare(5, (t, n)) / 5
-    c: Optional[NDArray] = None
+    c: Optional[IntArray] = None
     cats = [f"cat.{i}" for i in range(other_effects)]
     if other_effects:
         if not isinstance(ncats, list):

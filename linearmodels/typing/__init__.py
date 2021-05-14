@@ -16,12 +16,16 @@ __all__ = [
     "OptionalNumeric",
     "AnyPandas",
     "Label",
-    "NDArray",
     "ArraySequence",
+    "IntArray",
+    "Int32Array",
+    "Int64Array",
+    "AnyArray",
+    "Float64Array",
+    "BoolArray",
+    "NumericArray",
 ]
 
-# Workaround for https://github.com/python/mypy/issues/7866
-NDArray = Union[np.ndarray]
 ArraySequence = Sequence[np.ndarray]
 
 Numeric = Union[int, float]
@@ -49,5 +53,12 @@ if NP_GTE_121:
     IntArray = np.ndarray[Any, np.dtype[np.int_]]
     BoolArray = np.ndarray[Any, np.dtype[np.bool_]]
     AnyArray = np.ndarray[Any, Any]
+    NumericArray = Union[
+        np.ndarray[Any, np.dtype[np.signedinteger[Any]]],
+        np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]],
+        np.ndarray[Any, np.dtype[np.floating[Any]]],
+    ]
 else:
-    IntArray = Float64Array = Int64Array = Int32Array = BoolArray = AnyArray = NDArray
+    IntArray = (
+        Float64Array
+    ) = Int64Array = Int32Array = BoolArray = AnyArray = NumericArray = np.ndarray

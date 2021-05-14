@@ -274,7 +274,7 @@ def test_clustered_smoke(cov_data, debias, clusters, group_debias):
 def test_clustered_error(cov_data, debias):
     x, _, eps, sigma = cov_data
     nobs = eps.shape[0]
-    clusters = np.zeros((nobs, 2))
+    clusters = np.zeros((nobs, 2), dtype=int)
     clusters[:, 0] = np.arange(nobs) % 20
     clusters[:, 1] = np.arange(nobs) % 40
     with pytest.raises(ValueError, match="clusters must be non-nested"):
@@ -287,7 +287,7 @@ def test_clustered_error(cov_data, debias):
             debiased=debias,
             clusters=clusters,
         )
-    clusters = np.ones((nobs, 3))
+    clusters = np.ones((nobs, 3), dtype=int)
     with pytest.raises(ValueError, match="clusters must be an ndarray"):
         ClusteredCovariance(
             x,
@@ -298,7 +298,7 @@ def test_clustered_error(cov_data, debias):
             debiased=debias,
             clusters=clusters,
         )
-    clusters = np.ones((nobs, 2, 2))
+    clusters = np.ones((nobs, 2, 2), dtype=int)
     with pytest.raises(ValueError, match="clusters must be an ndarray"):
         ClusteredCovariance(
             x,

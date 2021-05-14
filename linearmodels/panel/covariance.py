@@ -19,7 +19,7 @@ from linearmodels.shared.typed_getters import (
     get_float,
     get_string,
 )
-from linearmodels.typing import ArrayLike, Float64Array, NDArray
+from linearmodels.typing import ArrayLike, Float64Array, IntArray
 
 __all__ = [
     "HomoskedasticCovariance",
@@ -85,8 +85,8 @@ class HomoskedasticCovariance(object):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: Optional[NDArray],
-        time_ids: Optional[NDArray],
+        entity_ids: Optional[IntArray],
+        time_ids: Optional[IntArray],
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -185,8 +185,8 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: NDArray,
-        time_ids: NDArray,
+        entity_ids: IntArray,
+        time_ids: IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -275,8 +275,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: NDArray,
-        time_ids: NDArray,
+        entity_ids: IntArray,
+        time_ids: IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -406,15 +406,14 @@ class DriscollKraay(HomoskedasticCovariance):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: NDArray,
-        time_ids: NDArray,
+        entity_ids: IntArray,
+        time_ids: IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
         kernel: Optional[str] = None,
         bandwidth: Optional[float] = None,
     ) -> None:
-
         super(DriscollKraay, self).__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
@@ -524,8 +523,8 @@ class ACCovariance(HomoskedasticCovariance):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: NDArray,
-        time_ids: NDArray,
+        entity_ids: IntArray,
+        time_ids: IntArray,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -723,8 +722,8 @@ def setup_covariance_estimator(
     y: Float64Array,
     x: Float64Array,
     params: Float64Array,
-    entity_ids: NDArray,
-    time_ids: NDArray,
+    entity_ids: IntArray,
+    time_ids: IntArray,
     *,
     debiased: bool = False,
     extra_df: int = 0,

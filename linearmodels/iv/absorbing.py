@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from typing import (
     Any,
@@ -10,6 +12,7 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
+    cast,
 )
 import warnings
 
@@ -62,7 +65,7 @@ from linearmodels.panel.utility import (
 from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import AnyPandas, NDArray
+from linearmodels.typing import AnyPandas, BoolArray, Float64Array
 from linearmodels.typing.data import ArrayLike, OptionalArrayLike
 
 try:
@@ -91,11 +94,11 @@ def clear_cache() -> None:
 
 def lsmr_annihilate(
     x: sp.csc_matrix,
-    y: NDArray,
+    y: Float64Array,
     use_cache: bool = True,
     x_hash: Optional[Hashable] = None,
     **lsmr_options: Union[bool, str, ArrayLike, None, Dict[str, Any]],
-) -> NDArray:
+) -> Float64Array:
     r"""
     Removes projection of x on y from y
 
@@ -365,7 +368,7 @@ class Interaction(object):
     def isnull(self) -> Series:
         return self.cat.isnull().any(1) | self.cont.isnull().any(1)
 
-    def drop(self, locs: NDArray) -> None:
+    def drop(self, locs: BoolArray) -> None:
         self._cat_data.drop(locs)
         self._cont_data.drop(locs)
 
@@ -431,7 +434,7 @@ class Interaction(object):
         return sorted(hashes)
 
     @staticmethod
-    def from_frame(frame: DataFrame) -> "Interaction":
+    def from_frame(frame: DataFrame) -> Interaction:
         """
         Convenience function the simplifies using a DataFrame
 
@@ -494,7 +497,7 @@ class AbsorbingRegressor(object):
         cat: DataFrame = None,
         cont: DataFrame = None,
         interactions: Optional[List[Interaction]] = None,
-        weights: Optional[NDArray] = None,
+        weights: Optional[Float64Array] = None,
     ):
         self._cat = cat
         self._cont = cont
@@ -701,7 +704,7 @@ class AbsorbingLS(object):
         self._regressors: Optional[sp.csc_matrix] = None
         self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
 
-    def _drop_missing(self) -> NDArray:
+    def _drop_missing(self) -> BoolArray:
         missing = self.dependent.isnull.to_numpy()
         missing |= self.exog.isnull.to_numpy()
         missing |= self._absorb_inter.cat.isnull().any(1).to_numpy()
@@ -834,7 +837,9 @@ class AbsorbingLS(object):
         ],
         method: str,
     ) -> None:
-        weights = self.weights.ndarray if self._is_weighted else None
+        weights = (
+            cast(Float64Array, self.weights.ndarray) if self._is_weighted else None
+        )
 
         use_hdfe = weights is None and method in ("auto", "hdfe")
         use_hdfe = use_hdfe and not self._absorb_inter.cont.shape[1]
@@ -862,7 +867,7 @@ class AbsorbingLS(object):
         self._constant_absorbed = self._has_constant_exog and areg_constant
 
         dep = self._dependent.ndarray
-        exog = self._exog.ndarray
+        exog = cast(Float64Array, self._exog.ndarray)
 
         root_w = sqrt(self._weight_data.ndarray)
         dep = root_w * dep
@@ -1058,7 +1063,7 @@ class AbsorbingLS(object):
 
         return AbsorbingLSResults(results, self)
 
-    def resids(self, params: NDArray) -> NDArray:
+    def resids(self, params: Float64Array) -> Float64Array:
         """
         Compute model residuals
 
@@ -1075,7 +1080,7 @@ class AbsorbingLS(object):
         resids = self.wresids(params)
         return resids / sqrt(self.weights.ndarray)
 
-    def wresids(self, params: NDArray) -> NDArray:
+    def wresids(self, params: Float64Array) -> Float64Array:
         """
         Compute weighted model residuals
 
@@ -1102,16 +1107,16 @@ class AbsorbingLS(object):
         )
 
     def _f_statistic(
-        self, params: NDArray, cov: NDArray, debiased: bool
+        self, params: Float64Array, cov: Float64Array, debiased: bool
     ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
-        const_loc = find_constant(self._exog.ndarray)
+        const_loc = find_constant(cast(Float64Array, self._exog.ndarray))
         resid_df = self._nobs - self._num_params
 
         return f_statistic(params, cov, debiased, resid_df, const_loc)
 
     def _post_estimation(
         self,
-        params: NDArray,
+        params: Float64Array,
         cov_estimator: Union[
             HomoskedasticCovariance,
             HeteroskedasticCovariance,

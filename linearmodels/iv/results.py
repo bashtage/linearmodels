@@ -1,6 +1,8 @@
 """
 Results containers and post-estimation diagnostics for IV models
 """
+from __future__ import annotations
+
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
@@ -24,7 +26,7 @@ from linearmodels.shared.hypotheses import (
     quadratic_form_test,
 )
 from linearmodels.shared.io import _str, add_star, pval_format
-from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
+from linearmodels.typing import ArrayLike, Float64Array, OptionalArrayLike
 
 
 def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
@@ -474,7 +476,7 @@ class OLSResults(_LSModelResultsBase):
     def __init__(
         self,
         results: Dict[str, Any],
-        model: "linearmodels.iv.model._IVModelBase",
+        model: linearmodels.iv.model._IVModelBase,
     ) -> None:
         super().__init__(results, model)
 
@@ -591,7 +593,7 @@ class AbsorbingLSResults(_LSModelResultsBase):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.absorbing.AbsorbingLS"
+        self, results: Dict[str, Any], model: linearmodels.iv.absorbing.AbsorbingLS
     ) -> None:
         super(AbsorbingLSResults, self).__init__(results, model)
         self._absorbed_rsquared = results["absorbed_r2"]
@@ -853,7 +855,7 @@ class _CommonIVResults(OLSResults):
     def __init__(
         self,
         results: Dict[str, Any],
-        model: "linearmodels.iv.model._IVModelBase",
+        model: linearmodels.iv.model._IVModelBase,
     ) -> None:
         super().__init__(results, model)
         self._liml_kappa = results.get("liml_kappa", None)
@@ -892,7 +894,7 @@ class IVResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVLSModelBase"
+        self, results: Dict[str, Any], model: linearmodels.iv.model._IVLSModelBase
     ) -> None:
         super(IVResults, self).__init__(results, model)
         self._kappa = results.get("kappa", 1)
@@ -1375,7 +1377,7 @@ class IVGMMResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: "linearmodels.iv.model._IVGMMBase"
+        self, results: Dict[str, Any], model: linearmodels.iv.model._IVGMMBase
     ):
         super(IVGMMResults, self).__init__(results, model)
         self._weight_mat = results["weight_mat"]
@@ -1385,7 +1387,7 @@ class IVGMMResults(_CommonIVResults):
         self._j_stat = results["j_stat"]
 
     @property
-    def weight_matrix(self) -> NDArray:
+    def weight_matrix(self) -> Float64Array:
         """Weight matrix used in the final-step GMM estimation"""
         return self._weight_mat
 

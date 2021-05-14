@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
@@ -215,7 +217,7 @@ class SystemResults(_CommonResults):
         self._weight_estimtor = results.get("weight_estimator", None)
 
     @property
-    def model(self) -> "linearmodels.system.model.IV3SLS":
+    def model(self) -> linearmodels.system.model.IV3SLS:
         """Model used in estimation"""
         return self._model
 
