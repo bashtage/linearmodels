@@ -839,8 +839,9 @@ class PanelEffectsResults(PanelResults):
             extra_text.append("Included effects: " + effects)
 
         if self.other_info is not None:
-            ncol = self.other_info.shape[1]
-            extra_text.append("Model includes {0} other effects".format(ncol))
+            nrow = self.other_info.shape[0]
+            plural = "s" if nrow > 1 else ""
+            extra_text.append(f"Model includes {nrow} other effect{plural}")
             for c in self.other_info.T:
                 col = self.other_info.T[c]
                 extra_text.append("Other Effect {0}:".format(c))

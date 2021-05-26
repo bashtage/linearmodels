@@ -832,6 +832,7 @@ def test_panel_entity_other_equivalence(data):
     mod2 = PanelOLS(y, x, other_effects=cats)
     res2 = mod2.fit()
     assert_results_equal(res, res2)
+    assert "Model includes 1 other effect" in res2.summary.as_text()
 
 
 def test_panel_time_other_equivalence(data):
@@ -844,6 +845,7 @@ def test_panel_time_other_equivalence(data):
     mod2 = PanelOLS(y, x, other_effects=cats)
     res2 = mod2.fit()
     assert_results_equal(res, res2)
+    assert "Model includes 1 other effect" in res2.summary.as_text()
 
 
 def test_panel_entity_time_other_equivalence(data):
@@ -859,6 +861,7 @@ def test_panel_entity_time_other_equivalence(data):
     mod2 = PanelOLS(y, x, other_effects=cats)
     res2 = mod2.fit()
     assert_results_equal(res, res2)
+    assert "Model includes 2 other effects" in res2.summary.as_text()
 
 
 def test_panel_other_lsdv(data):
