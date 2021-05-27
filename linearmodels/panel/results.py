@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt

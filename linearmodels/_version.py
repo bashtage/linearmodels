@@ -9,6 +9,8 @@
 
 """Git implementation of _version.py."""
 
+from __future__ import annotations
+
 import errno
 import os
 import re

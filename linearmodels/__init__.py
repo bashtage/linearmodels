@@ -31,6 +31,9 @@ instrumental variable estimators and system estimators:
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 """
+
+from __future__ import annotations
+
 import os
 from typing import List, Optional, Union
 

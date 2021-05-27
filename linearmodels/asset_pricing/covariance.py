@@ -1,6 +1,8 @@
 """
 Covariance estimators for linear factor models
 """
+from __future__ import annotations
+
 from typing import Dict, Optional, Union
 
 from numpy import empty, ndarray
