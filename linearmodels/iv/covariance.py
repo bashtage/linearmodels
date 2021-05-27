@@ -1,6 +1,9 @@
 """
 Covariance estimation for 2SLS and LIML IV estimators
 """
+
+from __future__ import annotations
+
 from typing import Any, Callable, Dict, Optional, Union, cast
 
 from mypy_extensions import VarArg

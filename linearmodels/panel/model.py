@@ -416,9 +416,9 @@ class _PanelModelBase(object):
 
     def _validate_data(self) -> None:
         """Check input shape and remove missing"""
-        y = self._y = self.dependent.values2d
+        y = self._y = cast(Float64Array, self.dependent.values2d)
         x = self._x = cast(Float64Array, self.exog.values2d)
-        w = self._w = self.weights.values2d
+        w = self._w = cast(Float64Array, self.weights.values2d)
         if y.shape[0] != x.shape[0]:
             raise ValueError(
                 "dependent and exog must have the same number of " "observations."
@@ -1390,9 +1390,9 @@ class PanelOLS(_PanelModelBase):
         self,
     ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Sparse implementation, works for all scenarios"""
-        y = self.dependent.values2d
-        x = self.exog.values2d
-        w = self.weights.values2d
+        y = cast(Float64Array, self.dependent.values2d)
+        x = cast(Float64Array, self.exog.values2d)
+        w = cast(Float64Array, self.weights.values2d)
         root_w = np.sqrt(w)
         wybar = root_w * (w.T @ y / w.sum())
         wy = root_w * y
@@ -1453,11 +1453,11 @@ class PanelOLS(_PanelModelBase):
         self,
     ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Frisch-Waugh-Lovell implementation, works for all scenarios"""
-        w = self.weights.values2d
+        w = cast(Float64Array, self.weights.values2d)
         root_w = np.sqrt(w)
 
-        y = root_w * self.dependent.values2d
-        x = root_w * self.exog.values2d
+        y = root_w * cast(Float64Array, self.dependent.values2d)
+        x = root_w * cast(Float64Array, self.exog.values2d)
         if not self._has_effect:
             ybar = root_w @ _lstsq(root_w, y, rcond=None)[0]
             y_effect, x_effect = np.zeros_like(y), np.zeros_like(x)
@@ -2852,7 +2852,7 @@ class FamaMacBeth(_PanelModelBase):
         wx = root_w * x
 
         exog = self.exog.dataframe
-        wx = DataFrame(
+        wx_df = DataFrame(
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
@@ -2863,7 +2863,7 @@ class FamaMacBeth(_PanelModelBase):
 
             return ex.shape[0] >= ex.shape[1] and _mr(ex) == ex.shape[1]
 
-        valid_blocks = wx.groupby(level=1).apply(validate_block)
+        valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():
             err = (
                 "Model cannot be estimated. All blocks of time-series observations are rank\n"
@@ -2941,15 +2941,15 @@ class FamaMacBeth(_PanelModelBase):
         dep = self.dependent.dataframe
         exog = self.exog.dataframe
         index = self.dependent.index
-        wy = DataFrame(wy[self._not_null], index=index, columns=dep.columns)
-        wx = DataFrame(
+        wy_df = DataFrame(wy[self._not_null], index=index, columns=dep.columns)
+        wx_df = DataFrame(
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
         yx = DataFrame(
-            np.c_[wy.values, wx.values],
-            columns=list(wy.columns) + list(wx.columns),
-            index=wy.index,
+            np.c_[wy_df.values, wx_df.values],
+            columns=list(wy_df.columns) + list(wx_df.columns),
+            index=wy_df.index,
         )
 
         def single(z: DataFrame) -> Series:
@@ -2966,8 +2966,8 @@ class FamaMacBeth(_PanelModelBase):
         all_params = all_params.iloc[:, 1:]
         params = all_params.mean(0).values[:, None]
 
-        wy = np.asarray(wy)
-        wx = np.asarray(wx)
+        wy = np.asarray(wy_df)
+        wx = np.asarray(wx_df)
         index = self.dependent.index
         fitted = DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
         effects = DataFrame(np.full(fitted.shape, np.nan), index, ["estimated_effects"])

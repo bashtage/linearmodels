@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from linearmodels.asset_pricing import (
     LinearFactorModel,
     LinearFactorModelGMM,

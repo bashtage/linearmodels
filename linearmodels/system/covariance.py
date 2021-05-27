@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Optional, Union, cast
 
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros

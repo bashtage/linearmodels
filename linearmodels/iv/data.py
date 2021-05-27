@@ -1,6 +1,9 @@
 """
 A data abstraction that allow multiple input data formats
 """
+
+from __future__ import annotations
+
 import copy
 from typing import Any, Dict, List, Optional, Tuple, Union
 

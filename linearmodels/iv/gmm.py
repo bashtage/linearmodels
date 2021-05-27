@@ -1,6 +1,9 @@
 """
 Covariance and weight estimation for GMM IV estimators
 """
+
+from __future__ import annotations
+
 from typing import Any, Dict, Optional, Union
 
 from numpy import asarray, ndarray, unique
