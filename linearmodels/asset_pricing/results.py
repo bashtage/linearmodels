@@ -119,7 +119,7 @@ class LinearFactorModelResults(_SummaryStr):
         rp = np.asarray(self.risk_premia)[:, None]
         se = np.asarray(self.risk_premia_se)[:, None]
         tstats = np.asarray(self.risk_premia / self.risk_premia_se)
-        pvalues = 2 - 2 * stats.norm.cdf(np.abs(tstats))
+        pvalues = 2 * (1 - stats.norm.cdf(np.abs(tstats)))
         ci = rp + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[rp, se, tstats[:, None], pvalues[:, None], ci]
         data = []
@@ -157,7 +157,7 @@ class LinearFactorModelResults(_SummaryStr):
         first: bool = False,
     ) -> SimpleTable:
         tstats = params / se
-        pvalues = 2 - 2 * stats.norm.cdf(tstats)
+        pvalues = 2 * (1 - stats.norm.cdf(np.abs(tstats)))
         ci = params + se * stats.norm.ppf([[0.025, 0.975]])
         param_data = np.c_[params, se, tstats, pvalues, ci]
 
@@ -254,6 +254,15 @@ class LinearFactorModelResults(_SummaryStr):
     def tstats(self) -> pd.DataFrame:
         """Parameter t-statistics"""
         return self.params / self.std_errors
+
+    @cached_property
+    def pvalues(self) -> pd.DataFrame:
+        """
+        Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
+        """
+        pvals = self.tstats.copy()
+        pvals.loc[:, :] = 2 * (1.0 - stats.norm.cdf(np.abs(pvals)))
+        return pvals
 
     @property
     def cov_estimator(self) -> str:

@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import lstsq
 from numpy.testing import assert_allclose
+import pandas as pd
 import pytest
 from scipy import stats
 
@@ -123,6 +124,7 @@ def test_linear_model_parameters(data):
     cov = cov[order][:, order]
     cov = (cov + cov.T) / 2
     assert_allclose(cov, res.cov)
+    assert np.all(res.pvalues <= 1.0)
 
 
 def test_linear_model_parameters_risk_free(data):
@@ -211,6 +213,7 @@ def test_linear_model_parameters_risk_free(data):
     cov = cov[order][:, order]
     cov = (cov + cov.T) / 2
     assert_allclose(cov, res.cov)
+    assert np.all(res.pvalues <= 1.0)
 
     acov = cov[: block1 : (nf + 1), : block1 : (nf + 1)]
     jstat = float(alphas.T @ np.linalg.pinv(acov) @ alphas)
@@ -327,7 +330,8 @@ def test_linear_model_parameters_risk_free_gls(data):
     assert_allclose(
         res.j_statistic.pval, 1 - stats.chi2(nport - nf - 1).cdf(jstat), rtol=1e-2
     )
-
+    assert isinstance(res.pvalues, pd.DataFrame)
+    assert np.all(res.pvalues <= 1.0)
     get_all(res)
 
 

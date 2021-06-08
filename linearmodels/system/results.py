@@ -100,9 +100,9 @@ class _CommonResults(_SummaryStr):
         Parameter p-vals. Uses t(df_resid) if ``debiased`` is True, else normal
         """
         if self.debiased:
-            pvals = 2 - 2 * stats.t.cdf(np.abs(self.tstats), self._df_resid)
+            pvals = 2 * (1 - stats.t.cdf(np.abs(self.tstats), self._df_resid))
         else:
-            pvals = 2 - 2 * stats.norm.cdf(np.abs(self.tstats))
+            pvals = 2 * (1 - stats.norm.cdf(np.abs(self.tstats)))
 
         return Series(pvals, index=self._param_names, name="pvalue")
 
