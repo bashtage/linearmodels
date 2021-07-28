@@ -349,7 +349,7 @@ class SystemResults(_CommonResults):
                     vals.append(self.fitted_values[[key]])
                 if idiosyncratic:
                     vals.append(self.resids[[key]])
-                out[key] = concat(vals, 1)
+                out[key] = concat(vals, axis=1)
         if missing:
             if isinstance(out, DataFrame):
                 out = out.reindex(self._original_index)

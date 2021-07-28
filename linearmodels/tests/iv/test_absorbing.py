@@ -153,7 +153,7 @@ def generate_data(
         factors.append(pd.Series(cont))
 
     if factors:
-        factors = pd.concat(factors, 1)
+        factors = pd.concat(factors, axis=1)
         if factor_format == "interaction":
             if nfactors and ncont:
                 factors = Interaction(
@@ -179,7 +179,7 @@ def generate_data(
         interactions.append(Interaction(df, df_eff))
     if factor_format == "pandas":
         for i, interact in enumerate(interactions):
-            interactions[i] = pd.concat([interact.cat, interact.cont], 1)
+            interactions[i] = pd.concat([interact.cat, interact.cont], axis=1)
     interactions = interactions if interactions else None
     if interactions and singleton_interaction:
         interactions = interactions[0]
@@ -427,7 +427,7 @@ def test_interaction_cat_cont(cat, cont):
 
 def test_interaction_from_frame(cat, cont):
     base = Interaction(cat=cat, cont=cont)
-    interact = Interaction.from_frame(pd.concat([cat, cont], 1))
+    interact = Interaction.from_frame(pd.concat([cat, cont], axis=1))
     assert_allclose(base.sparse.A, interact.sparse.A)
 
 

@@ -1485,3 +1485,12 @@ def test_unknown_covconfig_kwargs(data, cov_config):
         cov = "HomoskedasticCovariance"
     with pytest.raises(ValueError, match=f"Covariance estimator {cov}"):
         mod.fit(cov_type=c, **{fig: data.vc1})
+
+
+# Reported by email
+def test_corr_squared(data):
+    mod = PanelOLS(data.y, data.x)
+    res = mod.fit()
+    has_const = np.any(np.all(mod._x == 1.0, 0))
+    if has_const:
+        assert_allclose(res.rsquared_overall, res.corr_squared_overall)

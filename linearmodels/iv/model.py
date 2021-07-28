@@ -296,7 +296,7 @@ class _IVModelBase(object):
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
-        exog_endog = concat([exog, endog], 1)
+        exog_endog = concat([exog, endog], axis=1)
         x = asarray(exog_endog)
         params = atleast_2d(asarray(params))
         if params.shape[0] == 1:

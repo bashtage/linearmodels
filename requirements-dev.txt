@@ -15,3 +15,6 @@ sphinxcontrib-spelling
 sphinx_autodoc_typehints
 xarray>=0.13
 wheel
+mypy>=0.910
+black==21.7b0
+isort>=5.9

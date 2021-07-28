@@ -559,7 +559,7 @@ class _PanelModelBase(object):
         if y.std() > 0 and xb.std() > 0:
             r2w = np.corrcoef(y.T, xb.T)[0, 1]
 
-        return r2o, r2w, r2b
+        return r2o ** 2, r2w ** 2, r2b ** 2
 
     def _rsquared(
         self, params: Float64Array, reweight: bool = False

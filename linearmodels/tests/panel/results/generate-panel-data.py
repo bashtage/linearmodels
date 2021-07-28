@@ -32,7 +32,7 @@ w_panel_data = PanelData(w)
 
 z = pd.concat(
     [x_panel_data.dataframe, y_panel_data.dataframe, w_panel_data.dataframe],
-    1,
+    axis=1,
     sort=False,
 )
 final_index = pd.MultiIndex.from_product([minor, major])

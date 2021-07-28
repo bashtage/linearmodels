@@ -186,7 +186,7 @@ def panel_to_frame(
         df.index = mi.swaplevel()
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
-    df.index = df.index.set_levels(final_levels, [0, 1])
+    df.index = df.index.set_levels(levels=final_levels, level=[0, 1])
     df.index.names = ["major", "minor"]
     return df
 

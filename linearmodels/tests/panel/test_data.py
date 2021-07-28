@@ -819,7 +819,7 @@ def test_incorrect_time_axis():
     p = panel_to_frame(
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
-    p.index = p.index.set_levels([1, datetime(1960, 1, 1), "a"], 1)
+    p.index = p.index.set_levels(levels=[1, datetime(1960, 1, 1), "a"], level=1)
     with pytest.raises(ValueError):
         PanelData(p)
 
