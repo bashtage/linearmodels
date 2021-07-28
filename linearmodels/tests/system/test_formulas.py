@@ -24,7 +24,7 @@ for i, key in enumerate(data):
         joined.append(Series(col, name="x{0}{1}".format(i + 1, j + k + 1)))
     for j, col in enumerate(eq.instruments.T):
         joined.append(Series(col, name="z{0}{1}".format(i + 1, j + 1)))
-joined = concat(joined, 1)
+joined = concat(joined, axis=1)
 
 fmlas = [
     {"eq1": "y1 ~ x11 + x12", "eq2": "y2 ~ x21 + x22"},

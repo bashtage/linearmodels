@@ -217,7 +217,7 @@ def test_formula_function(data, model_and_func):
         data[["x4"]],
         np.exp(data[["x5"]]),
     ]
-    exog = concat(exog, 1, sort=False)
+    exog = concat(exog, axis=1, sort=False)
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
     mod = model(dep, exog, endog, instr)
@@ -243,7 +243,7 @@ def test_predict_formula_function(data, model_and_func):
         data[["x4"]],
         np.exp(data[["x5"]]),
     ]
-    exog = concat(exog, 1, sort=False)
+    exog = concat(exog, axis=1, sort=False)
     endog = data[["x1", "x2"]]
     pred = res.predict(exog, endog)
     pred2 = res.predict(data=data)

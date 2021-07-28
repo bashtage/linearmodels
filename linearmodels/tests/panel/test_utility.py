@@ -76,7 +76,7 @@ def test_invalid_format():
 def test_dummy_pandas():
     c1 = pd.Series(pd.Categorical(["a"] * 5 + ["b"] * 5 + ["c"] * 5))
     c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
-    cats = pd.concat([c1, c2], 1)
+    cats = pd.concat([c1, c2], axis=1)
     out, _ = dummy_matrix(cats, drop="last", precondition=False)
     assert isinstance(out, scipy.sparse.csc.csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
@@ -87,7 +87,7 @@ def test_dummy_pandas():
 def test_dummy_precondition():
     c1 = pd.Series(pd.Categorical(["a"] * 5 + ["b"] * 5 + ["c"] * 5))
     c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
-    cats = pd.concat([c1, c2], 1)
+    cats = pd.concat([c1, c2], axis=1)
     out_arr, cond_arr = dummy_matrix(
         cats, output_format="array", drop="last", precondition=True
     )
@@ -182,7 +182,7 @@ def test_drop_singletons_pandas():
         pd.Series(["{0}{1}".format(let, c) for c in cat.ravel()], dtype="category")
         for let, cat in zip("AB", (c1, c2))
     ]
-    df = pd.concat(df, 1)
+    df = pd.concat(df, axis=1)
     df.columns = ["cat1", "cat2"]
     cats = df
     remain = in_2core_graph(cats)

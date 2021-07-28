@@ -15,7 +15,7 @@ def fit(request):
         mod = SUR
         for key in data:
             temp = data[key]
-            temp["exog"] = concat([temp["exog"], temp["endog"]], 1, sort=False)
+            temp["exog"] = concat([temp["exog"], temp["endog"]], axis=1, sort=False)
             del temp["endog"]
             del temp["instruments"]
     else:

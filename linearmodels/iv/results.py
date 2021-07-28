@@ -556,7 +556,7 @@ class OLSResults(_LSModelResultsBase):
             out.append(self.idiosyncratic)
         if len(out) == 0:
             raise ValueError("At least one output must be selected")
-        out_df: DataFrame = concat(out, 1)
+        out_df: DataFrame = concat(out, axis=1)
         if missing:
             index = self._original_index
             out_df = out_df.reindex(index)
@@ -1612,7 +1612,7 @@ class IVModelComparison(_ModelComparison):
                 self.rsquared_adj,
                 self.f_statistic,
             ],
-            1,
+            axis=1,
         )
         vals = [[i for i in v] for v in vals.T.values]
         vals[2] = [str(v) for v in vals[2]]

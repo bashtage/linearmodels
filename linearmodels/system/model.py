@@ -629,7 +629,7 @@ class _SystemModelBase(object):
                     exog_endog = IVData(exog).pandas
                     if endog is not None:
                         endog = IVData(endog)
-                        exog_endog = concat([exog_endog, endog.pandas], 1)
+                        exog_endog = concat([exog_endog, endog.pandas], axis=1)
                 else:
                     exog_endog = IVData(endog).pandas
 

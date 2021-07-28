@@ -417,7 +417,7 @@ def test_constraint_setting(data):
     c1.iloc[::7] = 1
     c2 = c.copy()
     c2.iloc[::11] = 1
-    r = concat([c1, c2], 1).T
+    r = concat([c1, c2], axis=1).T
     q = Series([0, 1], index=r.index)
 
     mod.add_constraints(r)
@@ -444,7 +444,7 @@ def test_invalid_constraints(data):
     c1.iloc[::7] = 1
     c2 = c.copy()
     c2.iloc[::11] = 1
-    r = concat([c1, c2], 1).T
+    r = concat([c1, c2], axis=1).T
     q = Series([0, 1], index=r.index)
     with pytest.raises(TypeError):
         mod.add_constraints(r.values)
@@ -458,7 +458,7 @@ def test_invalid_constraints(data):
         mod.add_constraints(r, q.iloc[:-1])
 
     # 3. Redundant constraint
-    r = concat([c1, c1], 1).T
+    r = concat([c1, c1], axis=1).T
     with pytest.raises(ValueError):
         mod.add_constraints(r)
 
@@ -475,7 +475,7 @@ def test_contrains_reset(data):
     c1.iloc[::7] = 1
     c2 = c.copy()
     c2.iloc[::11] = 1
-    r = concat([c1, c2], 1).T
+    r = concat([c1, c2], axis=1).T
     q = Series([0, 1], index=r.index)
     mod.add_constraints(r, q)
     cons = mod.constraints

@@ -1,5 +1,12 @@
 Change Log
 ==========
+Version 4.25
+------------
+* Fixed a bug in :func:`linearmodels.panel.results.PanelResults.corr_squared_between`,
+  :func:`linearmodels.panel.results.PanelResults.corr_squared_overall`, and
+  :func:`linearmodels.panel.results.PanelResults.corr_squared_within` where the correlation
+  was not squared.
+
 Version 4.24
 ------------
 * Added :func:`~linearmodels.system.results.SystemResults.breusch_pagan` and
