@@ -554,10 +554,10 @@ class ACCovariance(HomoskedasticCovariance):
         eps = self.eps
         assert self._time_ids is not None
         time_ids = np.unique(self._time_ids.squeeze())
-        nobs = len(time_ids)
+        nperiods = len(time_ids)
         bw = self._bandwidth
         if self._bandwidth is None:
-            bw = float(np.floor(4 * (nobs / 100) ** (2 / 9)))
+            bw = float(np.floor(4 * (nperiods / 100) ** (2 / 9)))
         assert bw is not None
 
         xe = x * eps
