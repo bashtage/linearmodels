@@ -1,7 +1,7 @@
 ipython
 matplotlib
 jupyter
-nbconvert<6
+nbconvert
 nbformat
 nbsphinx
 numpydoc
