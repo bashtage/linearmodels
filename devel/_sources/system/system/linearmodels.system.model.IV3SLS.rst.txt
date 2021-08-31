@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.system.model
 
 .. autoclass:: IV3SLS
-   :exclude-members:
+   :exclude-members: add_constraints,fit,from_formula,multivariate_iv,predict,reset_constraints,
 
    
    

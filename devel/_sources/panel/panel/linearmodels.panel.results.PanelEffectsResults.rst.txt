@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.results
 
 .. autoclass:: PanelEffectsResults
-   :exclude-members:
+   :exclude-members: conf_int,predict,wald_test,
 
    
    

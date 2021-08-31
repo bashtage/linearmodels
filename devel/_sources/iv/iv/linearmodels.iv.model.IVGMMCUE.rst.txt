@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.model
 
 .. autoclass:: IVGMMCUE
-   :exclude-members:
+   :exclude-members: estimate_parameters,fit,from_formula,j,predict,resids,wresids,
 
    
    

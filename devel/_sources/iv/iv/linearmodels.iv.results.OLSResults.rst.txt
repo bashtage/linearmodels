@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.results
 
 .. autoclass:: OLSResults
-   :exclude-members:
+   :exclude-members: conf_int,predict,wald_test,
 
    
    

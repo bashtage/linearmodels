@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.shared.utility
 
 .. autoclass:: AttrDict
-   :exclude-members:
+   :exclude-members: clear,copy,get,items,keys,pop,popitem,setdefault,update,values,
 
    
    

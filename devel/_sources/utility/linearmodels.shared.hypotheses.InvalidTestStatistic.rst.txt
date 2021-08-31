@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.shared.hypotheses
 
 .. autoclass:: InvalidTestStatistic
-   :exclude-members:
+   :exclude-members: 
 
    
    

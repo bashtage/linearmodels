@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.covariance
 
 .. autoclass:: DriscollKraay
-   :exclude-members:
+   :exclude-members: deferred_cov,
 
    
    

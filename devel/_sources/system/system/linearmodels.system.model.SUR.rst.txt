@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.system.model
 
 .. autoclass:: SUR
-   :exclude-members:
+   :exclude-members: add_constraints,fit,from_formula,multivariate_ls,predict,reset_constraints,
 
    
    

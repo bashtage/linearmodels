@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.covariance
 
 .. autoclass:: KernelCovariance
-   :exclude-members:
+   :exclude-members: 
 
    
    
