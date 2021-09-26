@@ -19,7 +19,6 @@ from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.io import _str, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import Float64Array
-from linearmodels.typing import NDArray
 
 
 class LinearFactorModelResults(_SummaryStr):

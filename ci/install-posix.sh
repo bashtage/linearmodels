@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CMD="python -m pip install numpy"
+CMD="python -m pip install formulaic numpy"
 if [[ -n ${NUMPY} ]]; then CMD="$CMD==${NUMPY}"; fi;
 CMD="$CMD scipy"
 if [[ -n ${SCIPY} ]]; then CMD="$CMD==${SCIPY}"; fi;

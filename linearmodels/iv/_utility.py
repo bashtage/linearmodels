@@ -171,7 +171,7 @@ class IVFormulaParser(object):
             exog_fmla,
             self._data,
             context=self._eval_env,
-            ensure_full_rank=False,
+            ensure_full_rank=True,
             na_action=fNAAction("raise"),
         )
         return self._empty_check(DataFrame(exog))

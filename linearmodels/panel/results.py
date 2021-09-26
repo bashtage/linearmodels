@@ -17,7 +17,6 @@ from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_tes
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import Float64Array, OptionalArrayLike
-from linearmodels.typing import NDArray, OptionalArrayLike
 
 __all__ = [
     "PanelResults",

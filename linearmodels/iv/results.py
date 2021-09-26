@@ -13,7 +13,6 @@ from numpy.linalg import inv
 from pandas import DataFrame, Series, concat, to_numeric
 from property_cached import cached_property
 import scipy.stats as stats
-from scipy import stats as stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 from statsmodels.iolib.table import default_txt_fmt
 
@@ -28,7 +27,6 @@ from linearmodels.shared.hypotheses import (
 )
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.typing import ArrayLike, Float64Array, OptionalArrayLike
-from linearmodels.typing import ArrayLike, NDArray, OptionalArrayLike
 
 
 def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
