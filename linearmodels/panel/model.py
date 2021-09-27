@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
 
 import numpy as np
-import pandas as pd
 from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
 from patsy.highlevel import ModelDesc, dmatrix
 from patsy.missing import NAAction
@@ -2857,7 +2856,7 @@ class FamaMacBeth(_PanelModelBase):
         )
 
         def validate_block(ex: Float64Array) -> bool:
-            def _mr(ex: pd.DataFrame) -> int:
+            def _mr(ex: DataFrame) -> int:
                 """lstsq based matrix_rank"""
                 return _lstsq(ex, np.ones(ex.shape[0]))[2]
 

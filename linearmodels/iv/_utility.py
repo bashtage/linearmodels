@@ -6,7 +6,6 @@ from formulaic import model_matrix
 from formulaic.materializers.types import NAAction as fNAAction
 import numpy as np
 from pandas import DataFrame
-from patsy.missing import NAAction
 
 from linearmodels.typing import Float64Array
 from linearmodels.typing.data import OptionalDataFrame
@@ -75,7 +74,7 @@ class IVFormulaParser(object):
     data : DataFrame
         Frame containing values for variables used in formula
     eval_env : int
-        Stack depth to use when evaluating Patsy formulas
+        Stack depth to use when evaluating formulas
 
     Notes
     -----
@@ -85,7 +84,6 @@ class IVFormulaParser(object):
     def __init__(self, formula: str, data: DataFrame, eval_env: int = 2):
         self._formula = formula
         self._data = data
-        self._na_action = NAAction(on_NA="raise", NA_types=[])
         self._eval_env = eval_env
         self._components: Dict[str, str] = {}
         self._parse()

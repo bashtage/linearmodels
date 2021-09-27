@@ -1,11 +1,11 @@
 import pickle
 
+from formulaic.errors import FormulaSyntaxError
 import numpy as np
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, concat
 from pandas.testing import assert_frame_equal
 import pytest
-from formulaic.errors import FormulaSyntaxError
 
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML

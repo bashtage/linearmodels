@@ -258,7 +258,7 @@ class _IVModelBase(object):
             Values to use when making predictions from a model constructed
             from a formula
         eval_env : int
-            Depth of use when evaluating formulas using Patsy.
+            Depth of use when evaluating formulas.
 
         Returns
         -------
@@ -758,7 +758,7 @@ class IVLIML(_IVLSModelBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the IV syntax described in the notes
+            Formula modified for the IV syntax described in the notes
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
@@ -778,13 +778,13 @@ class IVLIML(_IVLSModelBase):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a
+        The IV formula modifies the standard formula syntax to include a
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure is `dependent ~ exog [endog ~ instruments]` and it must
         be the case that the formula expressions constructed from blocks
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
-        valid Patsy formulas.
+        valid formulas.
 
         A constant must be explicitly included using '1 +' if required.
 
@@ -867,7 +867,7 @@ class IV2SLS(_IVLSModelBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the IV syntax described in the notes
+            Formula modified for the IV syntax described in the notes
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
@@ -881,13 +881,13 @@ class IV2SLS(_IVLSModelBase):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a
+        The IV formula modifies the standard formula syntax to include a
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure is `dependent ~ exog [endog ~ instruments]` and it must
         be the case that the formula expressions constructed from blocks
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
-        valid Patsy formulas.
+        valid formulas.
 
         A constant must be explicitly included using '1 +' if required.
 
@@ -1088,7 +1088,7 @@ class IVGMM(_IVGMMBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the IV syntax described in the notes
+            Formula modified for the IV syntax described in the notes
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
@@ -1102,13 +1102,13 @@ class IVGMM(_IVGMMBase):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a
+        The IV formula modifies the standard formula syntax to include a
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure is `dependent ~ exog [endog ~ instruments]` and it must
         be the case that the formula expressions constructed from blocks
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
-        valid Patsy formulas.
+        valid formulas.
 
         A constant must be explicitly included using '1 +' if required.
 
@@ -1361,7 +1361,7 @@ class IVGMMCUE(_IVGMMBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the IV syntax described in the notes
+            Formula modified for the IV syntax described in the notes
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
@@ -1380,13 +1380,13 @@ class IVGMMCUE(_IVGMMBase):
 
         Notes
         -----
-        The IV formula modifies the standard Patsy formula to include a
+        The IV formula modifies the standard formula syntax to include a
         block of the form [endog ~ instruments] which is used to indicate
         the list of endogenous variables and instruments.  The general
         structure is `dependent ~ exog [endog ~ instruments]` and it must
         be the case that the formula expressions constructed from blocks
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
-        valid Patsy formulas.
+        valid formulas.
 
         A constant must be explicitly included using '1 +' if required.
 
@@ -1644,7 +1644,7 @@ def _gmm_model_from_formula(
     Parameters
     ----------
     formula : str
-        Patsy formula modified for the IV syntax described in the notes
+        Formula modified for the IV syntax described in the notes
         section
     data : DataFrame
         DataFrame containing the variables used in the formula
