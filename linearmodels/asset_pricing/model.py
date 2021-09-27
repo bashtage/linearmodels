@@ -5,11 +5,11 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
 
+from formulaic import model_matrix
+from formulaic.materializers.types import NAAction
 import numpy as np
 from numpy.linalg import lstsq
 from pandas import DataFrame
-from patsy.highlevel import dmatrix
-from patsy.missing import NAAction
 from scipy.optimize import minimize
 
 from linearmodels.asset_pricing.covariance import (
@@ -137,26 +137,35 @@ class _FactorModelBase(object):
     def _prepare_data_from_formula(
         formula: str, data: DataFrame, portfolios: DataFrame
     ) -> Tuple[DataFrame, DataFrame, str]:
-        na_action = NAAction(on_NA="raise", NA_types=[])
         orig_formula = formula
+        na_action = NAAction("raise")
         if portfolios is not None:
-            factors = dmatrix(
-                formula + " + 0", data, return_type="dataframe", NA_action=na_action
+            factors_mm = model_matrix(
+                formula + " + 0",
+                data,
+                context=0,  # TODO: self._eval_env,
+                ensure_full_rank=True,
+                na_action=na_action,
             )
+            factors = DataFrame(factors_mm)
         else:
             formula_components = formula.split("~")
-            portfolios = dmatrix(
+            portfolios_mm = model_matrix(
                 formula_components[0].strip() + " + 0",
                 data,
-                return_type="dataframe",
-                NA_action=na_action,
+                context=0,  # TODO: self._eval_env,
+                ensure_full_rank=False,
+                na_action=na_action,
             )
-            factors = dmatrix(
+            portfolios = DataFrame(portfolios_mm)
+            factors_mm = model_matrix(
                 formula_components[1].strip() + " + 0",
                 data,
-                return_type="dataframe",
-                NA_action=na_action,
+                context=0,  # TODO: self._eval_env,
+                ensure_full_rank=False,
+                na_action=na_action,
             )
+            factors = DataFrame(factors_mm)
 
         return factors, portfolios, orig_formula
 
@@ -201,7 +210,7 @@ class TradedFactorModel(_FactorModelBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
         portfolios : array_like, optional
@@ -521,7 +530,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
         portfolios : array_like, optional
@@ -823,7 +832,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         Parameters
         ----------
         formula : str
-            Patsy formula modified for the syntax described in the notes
+            Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
         portfolios : array_like, optional

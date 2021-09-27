@@ -11,7 +11,7 @@ from linearmodels.typing import Float64Array
 from linearmodels.typing.data import OptionalDataFrame
 
 PARSING_ERROR = """
-Conversion of formula blocks to DataFrames using patsy failed.
+Conversion of formula blocks to DataFrames failed.
 The formula blocks used for conversion were:
 
 dependent: {0}
@@ -19,7 +19,7 @@ exogenous: {1}
 endogenous: {2}
 instruments: {3}
 
-The original Patsy error was:
+The original error was:
 """
 
 

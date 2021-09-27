@@ -22,9 +22,9 @@ def generate_data(
         portfolios += np.arange(nportfolio)[None, :] / nportfolio / 100
     index = pd.date_range("1930-1-1", periods=nobs, freq="D")
     if output == "pandas":
-        cols = ["factor_{0}".format(i) for i in range(1, nfactor + 1)]
+        cols = [f"factor_{i:0>2}" for i in range(1, nfactor + 1)]
         factors = pd.DataFrame(factors, columns=cols, index=index)
-        cols = ["port_{0}".format(i) for i in range(1, nportfolio + 1)]
+        cols = [f"port_{i:0>2}" for i in range(1, nportfolio + 1)]
         portfolios = pd.DataFrame(portfolios, columns=cols, index=index)
 
     return AttrDict(factors=factors, portfolios=portfolios)
