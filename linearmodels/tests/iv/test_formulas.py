@@ -1,5 +1,6 @@
 import pickle
 
+from formulaic.errors import FormulaSyntaxError
 import numpy as np
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, concat
@@ -169,7 +170,7 @@ def test_invalid_formula(data, model_and_func):
     with pytest.raises(ValueError):
         model.from_formula(formula, data).fit()
     formula = "y y2 ~ 1 + x1 + x2 + x3 + [x4 + x5 ~ z1 + z2]"
-    with pytest.raises(SyntaxError):
+    with pytest.raises(FormulaSyntaxError):
         model.from_formula(formula, data).fit()
 
 
@@ -207,28 +208,28 @@ def test_predict_formula(data, model_and_func, formula):
 def test_formula_function(data, model_and_func):
     model, func = model_and_func
     fmla = "y ~ 1 + sigmoid(x3) + x4 + [x1 + x2 ~ z1 + z2 + z3] + np.exp(x5)"
-    mod = model.from_formula(fmla, data)
-    res = mod.fit()
+    fmla_mod = model.from_formula(fmla, data)
+    fmla_res = fmla_mod.fit()
 
     dep = data.y
     exog = [
         data[["Intercept"]],
+        np.exp(data[["x5"]]),
         sigmoid(data[["x3"]]),
         data[["x4"]],
-        np.exp(data[["x5"]]),
     ]
     exog = concat(exog, axis=1, sort=False)
     endog = data[["x1", "x2"]]
     instr = data[["z1", "z2", "z3"]]
     mod = model(dep, exog, endog, instr)
-    res2 = mod.fit()
+    array_res = mod.fit()
+    func_res = func(fmla, data).fit()
 
-    assert_allclose(res.params.values, res2.params.values, rtol=1e-5)
-    res3 = func(fmla, data).fit()
-    assert_allclose(res.params.values, res3.params.values, rtol=1e-5)
+    assert_allclose(fmla_res.params.values, array_res.params.values, rtol=1e-5)
+    assert_allclose(fmla_res.params.values, func_res.params.values, rtol=1e-5)
 
     with pytest.raises(ValueError):
-        res2.predict(data=data)
+        array_res.predict(data=data)
 
 
 def test_predict_formula_function(data, model_and_func):
@@ -239,9 +240,9 @@ def test_predict_formula_function(data, model_and_func):
 
     exog = [
         data[["Intercept"]],
+        np.exp(data[["x5"]]),
         sigmoid(data[["x3"]]),
         data[["x4"]],
-        np.exp(data[["x5"]]),
     ]
     exog = concat(exog, axis=1, sort=False)
     endog = data[["x1", "x2"]]
