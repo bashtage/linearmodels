@@ -12,10 +12,10 @@ from linearmodels.asset_pricing.model import (
 )
 from linearmodels.tests.asset_pricing._utility import generate_data
 
-FORMULA_FACTORS = "factor_1 + factor_2 + factor_3"
+FORMULA_FACTORS = "factor_01 + factor_02 + factor_03"
 FORMULA_PORT = (
-    "port_1 + port_2 + port_3 + port_4 + port_5 + port_6 + port_7 + "
-    "port_8 + port_9 + port_10"
+    "port_01 + port_02 + port_03 + port_04 + port_05 + port_06 + port_07 + "
+    "port_08 + port_09 + port_10"
 )
 FORMULA = " ~ ".join((FORMULA_PORT, FORMULA_FACTORS))
 

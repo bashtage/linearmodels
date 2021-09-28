@@ -52,8 +52,7 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 ### Panel models
 
 Like [statsmodels](http://www.statsmodels.org) to include, supports
-[patsy](https://patsy.readthedocs.io/en/latest/) formulas for
-specifying models. For example, the classic Grunfeld regression can be
+formulas for specifying models. For example, the classic Grunfeld regression can be
 specified
 
 ```python
@@ -79,6 +78,9 @@ res = mod.fit(cov_type='clustered', cluster_entity=True)
 The formula interface for `PanelOLS` supports the special values
 `EntityEffects` and `TimeEffects` which add entity (fixed) and time
 effects, respectively.
+
+Formula support comes from the [formulaic](https://github.com/matthewwardrop/formulaic/)
+package which is a replacement for [patsy](https://patsy.readthedocs.io/en/latest/).
 
 ### Instrumental Variable Models
 

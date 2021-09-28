@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
 
+from formulaic import model_matrix
+from formulaic.formula import Formula
+from formulaic.model_spec import NAAction
 import numpy as np
 from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
-from patsy.highlevel import ModelDesc, dmatrix
-from patsy.missing import NAAction
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
@@ -132,19 +133,19 @@ class PanelFormulaParser(object):
         String formula object.
     data : DataFrame
         Frame containing values for variables used in formula
-    eval_env : int
-        Stack depth to use when evaluating Patsy formulas
+    context : int
+        Stack depth to use when evaluating formulas
 
     Notes
     -----
     The general structure of a formula is `dep ~ exog`
     """
 
-    def __init__(self, formula: str, data: PanelDataLike, eval_env: int = 2) -> None:
+    def __init__(self, formula: str, data: PanelDataLike, context: int = 2) -> None:
         self._formula = formula
         self._data = PanelData(data, convert_dummies=False, copy=False)
-        self._na_action = NAAction(on_NA="raise", NA_types=[])
-        self._eval_env = eval_env
+        self._na_action = NAAction("ignore")
+        self._context = context
         self._dependent = self._exog = None
         self._parse()
 
@@ -152,24 +153,22 @@ class PanelFormulaParser(object):
         parts = self._formula.split("~")
         parts[1] = " 0 + " + parts[1]
         cln_formula = "~".join(parts)
-
-        mod_descr = ModelDesc.from_formula(cln_formula)
+        formula = Formula(cln_formula)
         rm_list = []
         effects = {"EntityEffects": False, "FixedEffects": False, "TimeEffects": False}
-        for term in mod_descr.rhs_termlist:
-            if term.name() in effects:
-                effects[term.name()] = True
+        for term in formula.terms[1]:
+            if str(term) in effects:
+                effects[str(term)] = True
                 rm_list.append(term)
         for term in rm_list:
-            mod_descr.rhs_termlist.remove(term)
+            formula.terms[1].remove(term)
 
         if effects["EntityEffects"] and effects["FixedEffects"]:
             raise ValueError("Cannot use both FixedEffects and EntityEffects")
         self._entity_effect = effects["EntityEffects"] or effects["FixedEffects"]
         self._time_effect = effects["TimeEffects"]
-        cln_formula = mod_descr.describe()
-        self._lhs, self._rhs = map(lambda s: s.strip(), cln_formula.split("~"))
-        self._lhs = "0 + " + self._lhs
+        cln_formula = str(formula)
+        self._lhs, self._rhs = map(lambda s: "0 + " + s.strip(), cln_formula.split("~"))
 
     @property
     def entity_effect(self) -> bool:
@@ -182,44 +181,45 @@ class PanelFormulaParser(object):
         return self._time_effect
 
     @property
-    def eval_env(self) -> int:
+    def context(self) -> int:
         """Set or get the eval env depth"""
-        return self._eval_env
+        return self._context
 
-    @eval_env.setter
-    def eval_env(self, value: int) -> None:
-        self._eval_env = value
+    @context.setter
+    def context(self, value: int) -> None:
+        self._context = value
 
     @property
     def data(self) -> Tuple[DataFrame, DataFrame]:
         """Returns a tuple containing the dependent, exog, endog"""
-        self._eval_env += 1
+        self._context += 1
         out = self.dependent, self.exog
-        self._eval_env -= 1
+        self._context -= 1
         return out
 
     @property
     def dependent(self) -> DataFrame:
         """DataFrame containing the dependent variable"""
-        return dmatrix(
-            self._lhs,
-            self._data.dataframe,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+        return DataFrame(
+            model_matrix(
+                self._lhs,
+                self._data.dataframe,
+                context=self._context,
+                na_action=self._na_action,
+            )
         )
 
     @property
     def exog(self) -> DataFrame:
         """DataFrame containing the exogenous variables"""
-        out = dmatrix(
-            self._rhs,
-            self._data.dataframe,
-            eval_env=self._eval_env,
-            return_type="dataframe",
-            NA_action=self._na_action,
+        return DataFrame(
+            model_matrix(
+                self._rhs,
+                self._data.dataframe,
+                context=self._context,
+                na_action=self._na_action,
+            )
         )
-        return out
 
 
 class AmbiguityError(Exception):
@@ -743,7 +743,7 @@ class _PanelModelBase(object):
         *,
         exog: Optional[PanelDataLike] = None,
         data: Optional[PanelDataLike] = None,
-        eval_env: int = 4,
+        context: int = 4,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -757,8 +757,8 @@ class _PanelModelBase(object):
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
-        eval_env : int
-            Depth of use when evaluating formulas using Patsy.
+        context : int
+            Depth of use when evaluating formulas.
 
         Returns
         -------
@@ -788,7 +788,7 @@ class _PanelModelBase(object):
         else:
             assert self._formula is not None
             assert data is not None
-            parser = PanelFormulaParser(self._formula, data, eval_env=eval_env)
+            parser = PanelFormulaParser(self._formula, data, context=context)
             exog = parser.exog
         x = exog.values
         params = np.atleast_2d(np.asarray(params))
@@ -861,7 +861,8 @@ class PooledOLS(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
+            Formula to transform into model. Conforms to formulaic formula
+            rules.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -884,8 +885,8 @@ class PooledOLS(_PanelModelBase):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
+        Unlike standard  formula syntax, it is necessary to explicitly include
+        a constant using the constant indicator (1)
 
         Examples
         --------
@@ -1031,7 +1032,7 @@ class PooledOLS(_PanelModelBase):
         *,
         exog: Optional[PanelDataLike] = None,
         data: Optional[DataFrame] = None,
-        eval_env: int = 4,
+        context: int = 4,
     ) -> DataFrame:
         """
         Predict values for additional data
@@ -1045,8 +1046,8 @@ class PooledOLS(_PanelModelBase):
         data : DataFrame
             Values to use when making predictions from a model constructed
             from a formula
-        eval_env : int
-            Depth of use when evaluating formulas using Patsy.
+        context : int
+            Depth to use when evaluating formulas.
 
         Returns
         -------
@@ -1076,7 +1077,7 @@ class PooledOLS(_PanelModelBase):
         else:
             assert self._formula is not None
             assert data is not None
-            parser = PanelFormulaParser(self._formula, data, eval_env=eval_env)
+            parser = PanelFormulaParser(self._formula, data, context=context)
             exog = parser.exog
         x = exog.values
         params = np.atleast_2d(np.asarray(params))
@@ -1328,10 +1329,11 @@ class PanelOLS(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules
-            with two special variable names, EntityEffects and TimeEffects
-            which can be used to specify that the model should contain an
-            entity effect or a time effect, respectively. See Examples.
+            Formula to transform into model. Conforms to formulaic formula
+            rules with two special variable names, EntityEffects and
+            TimeEffects which can be used to specify that the model should
+            contain an entity effect or a time effect, respectively. See
+            Examples.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -2182,7 +2184,8 @@ class BetweenOLS(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
+            Formula to transform into model. Conforms to formulaic formula
+            rules.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -2205,8 +2208,8 @@ class BetweenOLS(_PanelModelBase):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
+        Unlike standard  formula syntax, it is necessary to explicitly include
+        a constant using the constant indicator (1)
 
         Examples
         --------
@@ -2480,7 +2483,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
+            Formula to transform into model. Conforms to formulaic formula
+            rules.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -2503,8 +2507,8 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
+        Unlike standard  formula syntax, it is necessary to explicitly include
+        a constant using the constant indicator (1)
 
         Examples
         --------
@@ -2573,7 +2577,8 @@ class RandomEffects(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
+            Formula to transform into model. Conforms to formulaic formula
+            rules.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -2596,8 +2601,8 @@ class RandomEffects(_PanelModelBase):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
+        Unlike standard  formula syntax, it is necessary to explicitly include
+        a constant using the constant indicator (1)
 
         Examples
         --------
@@ -3045,7 +3050,8 @@ class FamaMacBeth(_PanelModelBase):
         Parameters
         ----------
         formula : str
-            Formula to transform into model. Conforms to patsy formula rules.
+            Formula to transform into model. Conforms to formulaic formula
+            rules.
         data : array_like
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
@@ -3068,8 +3074,8 @@ class FamaMacBeth(_PanelModelBase):
 
         Notes
         -----
-        Unlike standard patsy, it is necessary to explicitly include a
-        constant using the constant indicator (1)
+        Unlike standard  formula syntax, it is necessary to explicitly include
+        a constant using the constant indicator (1)
 
         Examples
         --------

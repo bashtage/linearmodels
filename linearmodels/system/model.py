@@ -576,7 +576,7 @@ class _SystemModelBase(object):
             Values to use when making predictions from a model constructed
             from a formula
         eval_env : int
-            Depth of use when evaluating formulas using Patsy.
+            Depth to  use when evaluating formulas.
 
         Returns
         -------
@@ -1498,7 +1498,7 @@ class IV3SLS(_LSSystemModelBase):
 
         Examples
         --------
-        The simplest format uses standard Patsy formulas for each equation
+        The simplest format uses standard formulas for each equation
         in a dictionary.  Best practice is to use an Ordered Dictionary
 
         >>> import pandas as pd
@@ -1713,7 +1713,7 @@ class SUR(_LSSystemModelBase):
 
         Examples
         --------
-        The simplest format uses standard Patsy formulas for each equation
+        The simplest format uses standard formulas for each equation
         in a dictionary.  Best practice is to use an Ordered Dictionary
 
         >>> import pandas as pd
@@ -2107,7 +2107,7 @@ class IVSystemGMM(_SystemModelBase):
 
         Examples
         --------
-        The simplest format uses standard Patsy formulas for each equation
+        The simplest format uses standard formulas for each equation
         in a dictionary.  Best practice is to use an Ordered Dictionary
 
         >>> import pandas as pd
