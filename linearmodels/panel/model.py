@@ -114,7 +114,7 @@ def _deferred_f(
     test_stat = test_params.T @ np.linalg.inv(test_cov) @ test_params
     test_stat = float(test_stat)
     df = int(sel.sum())
-    null = "All parameters ex. constant not zero"
+    null = "All parameters ex. constant are zero"
 
     if debiased:
         wald = WaldTestStatistic(test_stat / df, null, df, df_resid, name=name)
@@ -493,7 +493,7 @@ class _PanelModelBase(object):
         stat = float((num / num_df) / (denom / denom_df)) if denom > 0.0 else 0.0
         return WaldTestStatistic(
             stat,
-            null="All parameters ex. constant not zero",
+            null="All parameters ex. constant are zero",
             df=num_df,
             df_denom=denom_df,
             name=name,
