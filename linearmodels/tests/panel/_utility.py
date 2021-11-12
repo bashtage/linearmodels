@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import numpy as np
 from numpy.linalg import lstsq
-from numpy.random import standard_normal
+from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
+from linearmodels.typing import Literal
 
 try:
     import xarray  # noqa: F401
@@ -64,13 +67,13 @@ def lsdv(
 
 
 def generate_data(
-    missing,
-    datatype,
-    const=False,
-    ntk=(971, 7, 5),
-    other_effects=0,
-    rng=None,
-    num_cats=4,
+    missing: bool,
+    datatype: Literal["pandas", "xarray", "numpy"],
+    const: bool = False,
+    ntk: tuple[int, int, int] = (971, 7, 5),
+    other_effects: int = 0,
+    rng: RandomState | None = None,
+    num_cats: int = 4,
 ):
     if rng is None:
         np.random.seed(12345)
