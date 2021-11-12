@@ -123,7 +123,7 @@ class TestKernelWeight(object):
         for name in kernel.alt_names:
             wm = KernelWeightMatrix(name, bandwidth, center=True, optimal_bw=True)
             weight2 = wm.weight_matrix(data.x, data.z, data.e)
-            assert_equal(weight, weight2)
+            assert_allclose(weight, weight2, rtol=1e-12)
 
     def test_debiased(self, kernel, data, bandwidth):
         wm = KernelWeightMatrix(
@@ -162,7 +162,7 @@ class TestKernelWeight(object):
         for name in kernel.alt_names:
             wm = KernelWeightMatrix(kernel=name, bandwidth=bandwidth)
             weight2 = wm.weight_matrix(data.x, data.z, data.e)
-            assert_equal(weight, weight2)
+            assert_allclose(weight, weight2, rtol=1e-12)
 
 
 class TestClusterWeight(object):
