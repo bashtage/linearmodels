@@ -420,7 +420,10 @@ class _PanelModelBase(object):
         w = self._w = cast(Float64Array, self.weights.values2d)
         if y.shape[0] != x.shape[0]:
             raise ValueError(
-                "dependent and exog must have the same number of " "observations."
+                "dependent and exog must have the same number of "
+                "observations. The number of observations in dependent "
+                f"is {y.shape[0]}, and the number of observations in exog "
+                f"is {x.shape[0]}."
             )
         if y.shape[0] != w.shape[0]:
             raise ValueError(

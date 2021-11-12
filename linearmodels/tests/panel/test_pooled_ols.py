@@ -250,3 +250,9 @@ def test_alt_cov(data, cov_type):
     else:
         cov_name = "Driscoll-Kraay"
     assert cov_name in str(res.summary)
+
+
+def test_uneuqal_samples():
+    data = generate_data(False, "pandas")
+    with pytest.raises(ValueError, match="dependent and exog must have"):
+        PooledOLS(data.y.iloc[::2], data.x)
