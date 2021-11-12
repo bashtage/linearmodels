@@ -1,7 +1,14 @@
 Change Log
 ==========
+
 Version 4.25
 ------------
+* Clarified the null in the F-statistic
+* Improved the error message when dependent and exog have different numbers
+  of observations
+* Added formulaic as the preferred formula parser
+* Fixed a bug in :class:`~linearmodels.panel.covariance.ACCovariance` estimator where the number of observations
+  was incorrectly overwritten
 * Fixed a bug in :func:`linearmodels.panel.results.PanelResults.corr_squared_between`,
   :func:`linearmodels.panel.results.PanelResults.corr_squared_overall`, and
   :func:`linearmodels.panel.results.PanelResults.corr_squared_within` where the correlation
