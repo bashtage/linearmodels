@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.covariance
 
 .. autoclass:: ACCovariance
-   :exclude-members:
+   :exclude-members: deferred_cov,
 
    
    
@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~ACCovariance.ALLOWED_KWARGS
       ~ACCovariance.DEFAULT_KERNEL
       ~ACCovariance.cov
       ~ACCovariance.eps

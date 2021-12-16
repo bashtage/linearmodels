@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.system.gmm
 
 .. autoclass:: HomoskedasticWeightMatrix
-   :exclude-members:
+   :exclude-members: sigma,weight_matrix,
 
    
    

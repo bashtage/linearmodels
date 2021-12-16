@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.model
 
 .. autoclass:: IVLIML
-   :exclude-members:
+   :exclude-members: estimate_parameters,fit,from_formula,predict,resids,wresids,
 
    
    

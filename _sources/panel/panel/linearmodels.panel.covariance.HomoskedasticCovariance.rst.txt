@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.covariance
 
 .. autoclass:: HomoskedasticCovariance
-   :exclude-members:
+   :exclude-members: deferred_cov,
 
    
    
@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~HomoskedasticCovariance.ALLOWED_KWARGS
       ~HomoskedasticCovariance.DEFAULT_KERNEL
       ~HomoskedasticCovariance.cov
       ~HomoskedasticCovariance.eps

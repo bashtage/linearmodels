@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.model
 
 .. autoclass:: RandomEffects
-   :exclude-members:
+   :exclude-members: fit,from_formula,predict,reformat_clusters,
 
    
    

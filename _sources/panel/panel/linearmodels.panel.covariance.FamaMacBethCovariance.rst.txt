@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.covariance
 
 .. autoclass:: FamaMacBethCovariance
-   :exclude-members:
+   :exclude-members: deferred_cov,
 
    
    
@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~FamaMacBethCovariance.ALLOWED_KWARGS
       ~FamaMacBethCovariance.DEFAULT_KERNEL
       ~FamaMacBethCovariance.all_params
       ~FamaMacBethCovariance.bandwidth

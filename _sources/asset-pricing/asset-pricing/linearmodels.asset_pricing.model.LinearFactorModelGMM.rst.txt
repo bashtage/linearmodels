@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.asset_pricing.model
 
 .. autoclass:: LinearFactorModelGMM
-   :exclude-members:
+   :exclude-members: fit,from_formula,
 
    
    

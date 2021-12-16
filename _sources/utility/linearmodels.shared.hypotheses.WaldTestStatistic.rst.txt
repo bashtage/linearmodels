@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.shared.hypotheses
 
 .. autoclass:: WaldTestStatistic
-   :exclude-members:
+   :exclude-members: 
 
    
    

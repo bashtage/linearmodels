@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.system.model
 
 .. autoclass:: IVSystemGMM
-   :exclude-members:
+   :exclude-members: add_constraints,fit,from_formula,predict,reset_constraints,
 
    
    

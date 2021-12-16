@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.asset_pricing.results
 
 .. autoclass:: LinearFactorModelResults
-   :exclude-members:
+   :exclude-members: 
 
    
    
@@ -32,6 +32,7 @@
       ~LinearFactorModelResults.name
       ~LinearFactorModelResults.nobs
       ~LinearFactorModelResults.params
+      ~LinearFactorModelResults.pvalues
       ~LinearFactorModelResults.residual_ss
       ~LinearFactorModelResults.risk_premia
       ~LinearFactorModelResults.risk_premia_se

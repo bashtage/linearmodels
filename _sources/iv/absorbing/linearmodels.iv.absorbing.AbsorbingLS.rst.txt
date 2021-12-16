@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.absorbing
 
 .. autoclass:: AbsorbingLS
-   :exclude-members:
+   :exclude-members: fit,resids,wresids,
 
    
    

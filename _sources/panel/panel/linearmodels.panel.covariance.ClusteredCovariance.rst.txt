@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.panel.covariance
 
 .. autoclass:: ClusteredCovariance
-   :exclude-members:
+   :exclude-members: deferred_cov,
 
    
    
@@ -24,6 +24,7 @@
    .. autosummary::
       :toctree:
 
+      ~ClusteredCovariance.ALLOWED_KWARGS
       ~ClusteredCovariance.DEFAULT_KERNEL
       ~ClusteredCovariance.cov
       ~ClusteredCovariance.eps

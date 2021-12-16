@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.results
 
 .. autoclass:: IVGMMResults
-   :exclude-members:
+   :exclude-members: c_stat,conf_int,predict,wald_test,
 
    
    

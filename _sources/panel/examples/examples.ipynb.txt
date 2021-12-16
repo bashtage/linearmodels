@@ -28,8 +28,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from linearmodels.datasets import wage_panel\n",
     "import pandas as pd\n",
+    "from linearmodels.datasets import wage_panel\n",
     "\n",
     "data = wage_panel.load()\n",
     "year = pd.Categorical(data.year)\n",
@@ -53,8 +53,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from linearmodels.panel import PooledOLS\n",
     "import statsmodels.api as sm\n",
+    "from linearmodels.panel import PooledOLS\n",
     "\n",
     "exog_vars = [\"black\", \"hisp\", \"exper\", \"expersq\", \"married\", \"educ\", \"union\", \"year\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
@@ -213,8 +213,6 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from linearmodels.panel import PanelOLS\n",
-    "\n",
     "exog_vars = [\"expersq\", \"union\", \"married\"]\n",
     "exog = sm.add_constant(data[exog_vars])\n",
     "mod = PanelOLS(data.lwage, exog, entity_effects=True, time_effects=True)\n",
@@ -228,6 +226,41 @@
    "source": [
     "#### Other Options\n",
     "Some additional options are available when using ``PanelOLS`` and effects.  The ``use_lsdv`` can be used to force the model to be estimated using dummy variables.  This is not necessary and will be slower in most circumstances.  This options is primarily included for testing.  ``auto_df`` instructs ``PanelOLS`` to determine the degree of freedom adjustment to make.  Unlike most other estimators, the treatment of effects depends on the covariance estimator.  For example, when using a classic covariance estimator, effects count as lost degrees of freedom.  When using entity effects and clustering by entity, they do not.  Setting ``auto_df=False`` will allow the entities to be counted or not, depending on the value of ``count_effects``."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Other Effects\n",
+    "\n",
+    "`PanelOLS` can be used to estimated models with up to 2-effects fixed effects. These can include any combination of\n",
+    "\n",
+    "* Entity effects\n",
+    "* Time effects\n",
+    "* Other effects\n",
+    "\n",
+    "Other effects are specified using the `other_effects` input of `PanelOLS`. The input should have the same number of observations as the `engog` and can have 1 or two columns.  Below we reproduce the model fitted with time effects only using `other_effects` to set the effect."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from linearmodels.panel.data import PanelData\n",
+    "\n",
+    "exog_vars = [\"expersq\", \"union\", \"married\"]\n",
+    "exog = sm.add_constant(data[exog_vars])\n",
+    "# Use the `PanelData` structure to simplify constructing the time IDs\n",
+    "time_ids = pd.DataFrame(\n",
+    "    PanelData(data.lwage).time_ids, index=data.index, columns=[\"Other Effect\"]\n",
+    ")\n",
+    "\n",
+    "mod = PanelOLS(data.lwage, exog, entity_effects=True, other_effects=time_ids)\n",
+    "fe_oe_res = mod.fit()\n",
+    "print(fe_oe_res)"
    ]
   },
   {
@@ -290,9 +323,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "exog_vars = [\"black\", \"hisp\", \"exper\", \"expersq\", \"married\", \"educ\", \"union\"]\n",
@@ -312,9 +343,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "clust_entity = mod.fit(cov_type=\"clustered\", cluster_entity=True)"
@@ -330,9 +359,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
     "clust_entity_time = mod.fit(\n",
@@ -400,7 +427,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.5"
+   "version": "3.8.10"
   },
   "pycharm": {
    "stem_cell": {
@@ -413,5 +440,5 @@
   }
  },
  "nbformat": 4,
- "nbformat_minor": 2
+ "nbformat_minor": 4
 }

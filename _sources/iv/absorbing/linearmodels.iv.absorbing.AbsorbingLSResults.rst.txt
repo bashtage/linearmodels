@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.iv.absorbing
 
 .. autoclass:: AbsorbingLSResults
-   :exclude-members:
+   :exclude-members: conf_int,wald_test,
 
    
    

@@ -4,7 +4,7 @@
 .. currentmodule:: linearmodels.asset_pricing.covariance
 
 .. autoclass:: KernelCovariance
-   :exclude-members:
+   :exclude-members: 
 
    
    
