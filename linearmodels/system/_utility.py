@@ -253,7 +253,10 @@ class LinearConstraint(object):
             q_pd = pd.Series(np.zeros(r_pd.shape[0]), index=r_pd.index)
         self._q_pd = q_pd
         self._qa = np.asarray(q_pd)
-        self._t = self._l = self._a = None
+        self._computed = False
+        self._t = np.empty((0, 0))
+        self._l = np.empty((0, 0))
+        self._a = np.empty((0, 0))
         self._num_params = num_params
         self._verify_constraints()
 
@@ -291,6 +294,7 @@ class LinearConstraint(object):
         q = self._qa[:, None]
         a = q.T @ inv(left.T @ r.T) @ left.T
         self._t, self._l, self._a = t, left, a
+        self._computed = True
 
     @property
     def r(self) -> pd.DataFrame:
@@ -311,7 +315,7 @@ class LinearConstraint(object):
         -----
         Constrained regressors are constructed as x @ t
         """
-        if self._t is None:
+        if not self._computed:
             self._compute_transform()
         assert isinstance(self._t, np.ndarray)
         return self._t
@@ -342,7 +346,7 @@ class LinearConstraint(object):
 
             \tilde{y} = y - x  a^\prime
         """
-        if self._a is None:
+        if not self._computed:
             self._compute_transform()
         assert isinstance(self._a, np.ndarray)
         return self._a
