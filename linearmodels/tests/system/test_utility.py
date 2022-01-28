@@ -30,7 +30,7 @@ def data(request):
 
 
 def test_inner_product(data):
-    y, x, sigma = data
+    _, x, sigma = data
     efficient = blocked_inner_prod(x, sigma)
     nobs = x[0].shape[0]
     omega = np.kron(sigma, np.eye(nobs))

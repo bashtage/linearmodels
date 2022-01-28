@@ -80,7 +80,7 @@ def test_fromula(config):
 
 
 def test_predict(config):
-    fmla, model, interface = config
+    fmla, model, _ = config
     for key in fmla:
         if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
             return

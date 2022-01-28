@@ -133,7 +133,7 @@ def test_drop_singletons_slow():
     idx = np.arange(40000)
 
     cols = {"c1": c1.copy(), "c2": c2.copy()}
-    for i in range(40000):
+    for _ in range(40000):
         last = cols["c1"].shape[0]
         for col in cols:
             keep = in_2core_graph_slow(cols[col])

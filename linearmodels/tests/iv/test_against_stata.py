@@ -61,42 +61,48 @@ def housing(request):
     return model_result, result
 
 
-class TestHousingResults(object):
-    def test_rsquared(self, housing):
-        res, stata = housing
-        assert_allclose(res.rsquared, stata.rsquared)
+def test_housing_rsquared(housing):
+    res, stata = housing
+    assert_allclose(res.rsquared, stata.rsquared)
 
-    def test_rsquared_adj(self, housing):
-        res, stata = housing
-        assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
-    def test_model_ss(self, housing):
-        res, stata = housing
-        assert_allclose(res.model_ss, stata.model_ss)
+def test_housing_rsquared_adj(housing):
+    res, stata = housing
+    assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
-    def test_residual_ss(self, housing):
-        res, stata = housing
-        assert_allclose(res.resid_ss, stata.resid_ss)
 
-    def test_fstat(self, housing):
-        res, stata = housing
-        assert_allclose(res.f_statistic.stat, stata.f_statistic)
+def test_housing_model_ss(housing):
+    res, stata = housing
+    assert_allclose(res.model_ss, stata.model_ss)
 
-    def test_params(self, housing):
-        res, stata = housing
-        stata_params = stata.params.reindex_like(res.params)
-        assert_allclose(res.params, stata_params)
 
-    def test_tstats(self, housing):
-        res, stata = housing
-        stata_tstats = stata.tstats.reindex_like(res.params)
-        assert_allclose(res.tstats, stata_tstats)
+def test_housing_residual_ss(housing):
+    res, stata = housing
+    assert_allclose(res.resid_ss, stata.resid_ss)
 
-    def test_cov(self, housing):
-        res, stata = housing
-        stata_cov = stata.cov.reindex_like(res.cov)
-        stata_cov = stata_cov[res.cov.columns]
-        assert_allclose(res.cov, stata_cov, rtol=1e-4)
+
+def test_housing_fstat(housing):
+    res, stata = housing
+    assert_allclose(res.f_statistic.stat, stata.f_statistic)
+
+
+def test_housing_params(housing):
+    res, stata = housing
+    stata_params = stata.params.reindex_like(res.params)
+    assert_allclose(res.params, stata_params)
+
+
+def test_housing_tstats(housing):
+    res, stata = housing
+    stata_tstats = stata.tstats.reindex_like(res.params)
+    assert_allclose(res.tstats, stata_tstats)
+
+
+def test_housing_cov(housing):
+    res, stata = housing
+    stata_cov = stata.cov.reindex_like(res.cov)
+    stata_cov = stata_cov[res.cov.columns]
+    assert_allclose(res.cov, stata_cov, rtol=1e-4)
 
 
 SIMULATED_COV_OPTIONS = {
@@ -159,67 +165,76 @@ def simulated(request):
     return model_result, result
 
 
-class TestSimulatedResults(object):
-    def test_rsquared(self, simulated):
-        res, stata = simulated
-        if stata.rsquared is None:
-            return
-        assert_allclose(res.rsquared, stata.rsquared)
+def test_simulated_rsquared(simulated):
+    res, stata = simulated
+    if stata.rsquared is None:
+        return
+    assert_allclose(res.rsquared, stata.rsquared)
 
-    def test_rsquared_adj(self, simulated):
-        res, stata = simulated
-        if stata.rsquared_adj is None:
-            return
-        assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
-    def test_model_ss(self, simulated):
-        res, stata = simulated
-        assert_allclose(res.model_ss, stata.model_ss)
+def test_simulated_rsquared_adj(simulated):
+    res, stata = simulated
+    if stata.rsquared_adj is None:
+        return
+    assert_allclose(res.rsquared_adj, stata.rsquared_adj)
 
-    def test_residual_ss(self, simulated):
-        res, stata = simulated
-        assert_allclose(res.resid_ss, stata.resid_ss)
 
-    def test_fstat(self, simulated):
-        res, stata = simulated
-        if stata.f_statistic is None:
-            pytest.skip("Comparison result not available")
-        assert_allclose(res.f_statistic.stat, stata.f_statistic)
+def test_simulated_model_ss(simulated):
+    res, stata = simulated
+    assert_allclose(res.model_ss, stata.model_ss)
 
-    def test_params(self, simulated):
-        res, stata = simulated
-        stata_params = stata.params.reindex_like(res.params)
-        assert_allclose(res.params, stata_params)
 
-    def test_tstats(self, simulated):
-        res, stata = simulated
-        stata_tstats = stata.tstats.reindex_like(res.params)
-        assert_allclose(res.tstats, stata_tstats)
+def test_simulated_residual_ss(simulated):
+    res, stata = simulated
+    assert_allclose(res.resid_ss, stata.resid_ss)
 
-    def test_cov(self, simulated):
-        res, stata = simulated
-        stata_cov = stata.cov.reindex_like(res.cov)
-        stata_cov = stata_cov[res.cov.columns]
-        assert_allclose(res.cov, stata_cov, rtol=1e-4)
 
-    def test_weight_mat(self, simulated):
-        res, stata = simulated
-        if not hasattr(stata, "weight_mat") or not isinstance(
-            stata.weight_mat, pd.DataFrame
-        ):
-            return
-        stata_weight_mat = stata.weight_mat.reindex_like(res.weight_matrix)
-        stata_weight_mat = stata_weight_mat[res.weight_matrix.columns]
-        assert_allclose(res.weight_matrix, stata_weight_mat, rtol=1e-4)
+def test_simulated_fstat(simulated):
+    res, stata = simulated
+    if stata.f_statistic is None:
+        pytest.skip("Comparison result not available")
+    assert_allclose(res.f_statistic.stat, stata.f_statistic)
 
-    def test_j_stat(self, simulated):
-        res, stata = simulated
-        if not hasattr(stata, "J") or stata.J is None:
-            return
-        assert_allclose(res.j_stat.stat, stata.J, atol=1e-6, rtol=1e-4)
 
-    def test_kappa(self, simulated):
-        res, stata = simulated
-        if not hasattr(stata, "kappa") or stata.kappa is None:
-            return
-        assert_allclose(res.kappa, stata.kappa, rtol=1e-4)
+def test_simulated_params(simulated):
+    res, stata = simulated
+    stata_params = stata.params.reindex_like(res.params)
+    assert_allclose(res.params, stata_params)
+
+
+def test_simulated_tstats(simulated):
+    res, stata = simulated
+    stata_tstats = stata.tstats.reindex_like(res.params)
+    assert_allclose(res.tstats, stata_tstats)
+
+
+def test_simulated_cov(simulated):
+    res, stata = simulated
+    stata_cov = stata.cov.reindex_like(res.cov)
+    stata_cov = stata_cov[res.cov.columns]
+    assert_allclose(res.cov, stata_cov, rtol=1e-4)
+
+
+def test_simulated_weight_mat(simulated):
+    res, stata = simulated
+    if not hasattr(stata, "weight_mat") or not isinstance(
+        stata.weight_mat, pd.DataFrame
+    ):
+        return
+    stata_weight_mat = stata.weight_mat.reindex_like(res.weight_matrix)
+    stata_weight_mat = stata_weight_mat[res.weight_matrix.columns]
+    assert_allclose(res.weight_matrix, stata_weight_mat, rtol=1e-4)
+
+
+def test_simulated_j_stat(simulated):
+    res, stata = simulated
+    if not hasattr(stata, "J") or stata.J is None:
+        return
+    assert_allclose(res.j_stat.stat, stata.J, atol=1e-6, rtol=1e-4)
+
+
+def test_simulated_kappa(simulated):
+    res, stata = simulated
+    if not hasattr(stata, "kappa") or stata.kappa is None:
+        return
+    assert_allclose(res.kappa, stata.kappa, rtol=1e-4)
