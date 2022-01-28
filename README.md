@@ -45,7 +45,7 @@ estimating asset prices:
 
 Designed to work equally well with NumPy, Pandas or xarray data.
 
-### Panel models
+## Panel models
 
 Like [statsmodels](http://www.statsmodels.org) to include, supports
 formulas for specifying models. For example, the classic Grunfeld regression can be
@@ -78,7 +78,7 @@ effects, respectively.
 Formula support comes from the [formulaic](https://github.com/matthewwardrop/formulaic/)
 package which is a replacement for [patsy](https://patsy.readthedocs.io/en/latest/).
 
-### Instrumental Variable Models
+## Instrumental Variable Models
 
 IV regression models can be similarly specified.
 
@@ -134,17 +134,17 @@ regression. Currently only the single variable IV estimators are polished.
 
 ### Running
 
-With the exception of Python 3 (3.7+ tested), which is a hard requirement, the
+With the exception of Python 3 (3.8+ tested), which is a hard requirement, the
 others are the version that are being used in the test environment. It
 is possible that older versions work.
 
--   Python 3.7+
--   NumPy (1.15+)
+-   Python 3.8+
+-   NumPy (1.18+)
 -   SciPy (1.3+)
--   pandas (0.25+)
--   statsmodels (0.11+)
--   xarray (0.13+, optional)
--   Cython (0.29.21+, optional)
+-   pandas (1.0+)
+-   statsmodels (0.12+)
+-   xarray (0.16+, optional)
+-   Cython (0.29.24+, optional)
 
 ### Testing
 

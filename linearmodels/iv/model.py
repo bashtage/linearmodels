@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
 
 from numpy import (
     all as npall,
-    any,
+    any as npany,
     array,
     asarray,
     atleast_2d,
@@ -179,7 +179,7 @@ class _IVModelBase(object):
         if weights is None:
             weights = ones(self.dependent.shape)
         weights = IVData(weights).ndarray
-        if any(weights <= 0):
+        if npany(weights <= 0):
             raise ValueError("weights must be strictly positive.")
         weights = weights / nanmean(weights)
         self.weights = IVData(weights, var_name="weights", nobs=nobs)
@@ -335,8 +335,10 @@ class _IVModelBase(object):
 
     def _drop_missing(self) -> BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
-        missing = cast(BoolArray, any(column_stack([dh.isnull for dh in data]), axis=1))
-        if any(missing):
+        missing = cast(
+            BoolArray, npany(column_stack([dh.isnull for dh in data]), axis=1)
+        )
+        if npany(missing):
             if npall(missing):
                 raise ValueError(
                     "All observations contain missing data. "

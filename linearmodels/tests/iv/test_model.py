@@ -362,7 +362,7 @@ def test_compare_single_single_parameter(data):
     res1 = IV2SLS(data.dep, data.exog[:, :1], None, None).fit()
     c = compare([res1])
     assert len(c.rsquared) == 1
-    c.summary
+    assert isinstance(c.summary, Summary)
 
 
 def test_first_stage_summary(data):

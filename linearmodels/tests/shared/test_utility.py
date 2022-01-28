@@ -192,7 +192,7 @@ def test_format_wide():
     k = 26
     inputs = [chr(65 + i) * (20 + i) for i in range(k)]
     out = format_wide(inputs, 80)
-    assert max(map(lambda v: len(v), out)) <= 80
+    assert max([len(v) for v in out]) <= 80
 
     out = format_wide(["a"], 80)
     assert out == [["a"]]

@@ -50,7 +50,7 @@ def test_inner_product(data):
 
 
 def test_inner_product_short_circuit(data):
-    y, x, sigma = data
+    _, x, sigma = data
     sigma = np.eye(len(x))
     efficient = blocked_inner_prod(x, sigma)
     nobs = x[0].shape[0]

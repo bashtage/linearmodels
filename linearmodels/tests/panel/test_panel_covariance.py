@@ -280,10 +280,10 @@ def test_covariance_manager() -> None:
         "made-up-class", HomoskedasticCovariance, HeteroskedasticCovariance
     )
     with pytest.raises(ValueError):
-        cm["clustered"]
+        assert cm["clustered"] is not None
 
     with pytest.raises(KeyError):
-        cm["unknown"]
+        assert cm["unknown"] is not None
 
     assert cm["unadjusted"] is HomoskedasticCovariance
     assert cm["homoskedastic"] is HomoskedasticCovariance

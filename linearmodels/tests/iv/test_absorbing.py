@@ -295,9 +295,9 @@ def test_absorbing_exceptions(random_gen):
         interactions=random_cat(10, NOBS, frame=True, rs=random_gen),
     )
     with pytest.raises(RuntimeError):
-        mod.absorbed_dependent
+        assert isinstance(mod.absorbed_dependent, pd.DataFrame)
     with pytest.raises(RuntimeError):
-        mod.absorbed_exog
+        assert isinstance(mod.absorbed_exog, pd.DataFrame)
     with pytest.raises(TypeError):
         interactions = random_gen.randint(0, 10, size=(NOBS, 2))
         assert isinstance(interactions, np.ndarray)

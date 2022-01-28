@@ -1,8 +1,8 @@
 **Copyright (c) 2017 Kevin Sheppard. All rights reserved.**
 
-Developed by: Kevin Sheppard (<kevin.sheppard@economics.ox.ac.uk>,
-<kevin.k.sheppard@gmail.com>)
-[http://www.kevinsheppard.com](http://www.kevinsheppard.com)
+Developed by: Kevin Sheppard ([kevin.sheppard@economics.ox.ac.uk](mailto:kevin.sheppard@economics.ox.ac.uk),
+[kevin.k.sheppard@gmail.com](mailto:kevin.k.sheppard@gmail.com))
+<http://www.kevinsheppard.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
@@ -12,16 +12,16 @@ distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
 the following conditions:
 
-*  Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimers.
+-   Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimers.
 
-*  Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimers in the
-   documentation and/or other materials provided with the distribution.
+-   Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimers in the
+    documentation and/or other materials provided with the distribution.
 
-*  Neither the name of Kevin Sheppard, nor the names of other
-   contributors may be used to endorse or promote products derived from
-   this Software without specific prior written permission.
+-   Neither the name of Kevin Sheppard, nor the names of other
+    contributors may be used to endorse or promote products derived from
+    this Software without specific prior written permission.
 
 **THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF

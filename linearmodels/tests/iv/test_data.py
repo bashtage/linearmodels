@@ -117,9 +117,11 @@ def test_invalid_types() -> None:
     with pytest.raises(TypeError):
 
         class AnotherClass(object):
+            _ndim = 2
+
             @property
-            def ndim() -> int:
-                return 2
+            def ndim(self) -> int:
+                return self._ndim
 
         IVData(AnotherClass())
 

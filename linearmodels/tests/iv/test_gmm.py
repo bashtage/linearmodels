@@ -284,4 +284,7 @@ def test_gmm_covariance_kernel(data, kernel, bandwidth):
 
 def test_gmm_covariance_unknown(data):
     with pytest.raises(ValueError):
-        IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, "unknown").cov
+        assert isinstance(
+            IVGMMCovariance(data.x, data.y, data.z, data.params, data.i, "unknown").cov,
+            np.ndarray,
+        )
