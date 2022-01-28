@@ -161,7 +161,7 @@ def dummy_matrix(
     if isinstance(cats, DataFrame):
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     else:
-        codes = cats
+        codes = np.asarray(cats)
 
     data: Dict[str, List[np.ndarray]] = defaultdict(list)
     total_dummies = 0
@@ -484,7 +484,7 @@ def not_absorbed(
         sub = x[:, check]
         x = sub - const @ np.linalg.lstsq(const, sub, rcond=None)[0]
     xpx = x.T @ x
-    vals, vecs = np.linalg.eigh(xpx)
+    vals, _ = np.linalg.eigh(xpx)
     if vals.max() == 0.0:
         if has_constant:
             assert isinstance(loc, int)
@@ -494,7 +494,7 @@ def not_absorbed(
     tol = vals.max() * x.shape[1] * np.finfo(np.float64).eps
     absorbed = vals < tol
     nabsorbed = absorbed.sum()
-    q, r = np.linalg.qr(x)
+    _, r = np.linalg.qr(x)
     threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
     drop = np.where(np.abs(np.diag(r)) < threshold)[0]
     retain: Set[int] = set(range(x.shape[1])).difference(drop)

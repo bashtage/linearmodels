@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Optional, Sequence, cast
 
-from numpy import array, empty, ndarray, repeat, sqrt
+from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
 from linearmodels.asset_pricing.covariance import _HACMixin
 from linearmodels.iv.covariance import kernel_optimal_bandwidth
@@ -215,12 +215,12 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     def _debias_scale(
         self, nobs: int, x: Sequence[Float64Array], z: Sequence[Float64Array]
-    ) -> float:
-        if not self._debiased:
-            return 1
+    ) -> Float64Array:
         nvar = array([a.shape[1] for a in x])
         ninstr = array([a.shape[1] for a in z])
         nvar = repeat(nvar, ninstr)
+        if not self._debiased:
+            nvar = zeros_like(nvar)
         nvar = cast(Float64Array, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
         return scale

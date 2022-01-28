@@ -1919,7 +1919,7 @@ class IVSystemGMM(_SystemModelBase):
                 xpz = cast(Float64Array, xpz / nobs)
                 v = (xpz @ winv @ xpz.T) / nobs
                 vinv = inv(v)
-            norm = delta.T @ vinv @ delta
+            norm = float(delta.T @ vinv @ delta)
             beta_last = beta
 
             _eps = []
@@ -1968,7 +1968,7 @@ class IVSystemGMM(_SystemModelBase):
         y: ArraySequence,
         z: ArraySequence,
         *,
-        w: Optional[Float64Array] = None,
+        w: Float64Array,
         constraints: Optional[LinearConstraint] = None,
     ) -> Float64Array:
         k = len(x)

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from collections.abc import MutableMapping
 from typing import (
-    AbstractSet,
     Any,
     Callable,
+    ItemsView,
     Iterable,
     Iterator,
+    KeysView,
     List,
     Mapping,
     Optional,
@@ -56,11 +57,11 @@ class AttrDict(MutableMapping):
             ad[key] = self.__private_dict__[key]
         return ad
 
-    def keys(self) -> AbstractSet[Any]:
+    def keys(self) -> KeysView[Any]:
         """Return an ordered list-like object providing a view on AD's keys"""
         return self.__private_dict__.keys()
 
-    def items(self) -> AbstractSet[Tuple[Any, Any]]:
+    def items(self) -> ItemsView[Any, Any]:
         """Return an ordered list-like object providing a view on AD's items"""
         return self.__private_dict__.items()
 

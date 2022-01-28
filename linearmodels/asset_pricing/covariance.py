@@ -153,6 +153,7 @@ class HeteroskedasticCovariance(object):
     def jacobian(self) -> Float64Array:
         """The Jacobian"""
         if self._jac is None:
+            assert self._inv_jac is not None
             self._jac = inv(self._inv_jac)
         assert self._jac is not None
         return self._jac
@@ -161,6 +162,7 @@ class HeteroskedasticCovariance(object):
     def inv_jacobian(self) -> Float64Array:
         """Inverse Jacobian"""
         if self._inv_jac is None:
+            assert self._jac is not None
             self._inv_jac = inv(self._jac)
         assert self._inv_jac is not None
         return self._inv_jac
