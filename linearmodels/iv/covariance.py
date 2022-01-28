@@ -306,7 +306,7 @@ class HomoskedasticCovariance(object):
         """Covariance of estimated parameters"""
 
         x, z = self.x, self.z
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
 
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
@@ -402,7 +402,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def s(self) -> Float64Array:
         """Heteroskedasticity-robust score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e / nobs
@@ -510,7 +510,7 @@ class KernelCovariance(HomoskedasticCovariance):
     def s(self) -> Float64Array:
         """HAC score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
 
         pinvz = self._pinvz
         xhat = z @ (pinvz @ x)
@@ -645,7 +645,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         pinvz = self._pinvz
         xhat_e = asarray(z @ (pinvz @ x) * eps, dtype=float)
 
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
         clusters = self._clusters
         if self._clusters.ndim == 1:
             s = cov_cluster(xhat_e, clusters)

@@ -130,7 +130,7 @@ def test_basic_formulas_math_op(data, models, formula):
     joined["y"] = data.y
     formula = formula.replace("x0", "np.exp(x0)")
     formula = formula.replace("x1", "sigmoid(x1)")
-    model, formula_func = models
+    model, _ = models
     res = model.from_formula(formula, joined).fit()
     pred = res.predict(data=joined)
     pred = pred.reindex(res.fitted_values.index)
@@ -233,7 +233,7 @@ def test_formulas_predict_error(data, models, formula):
         return
     joined = data.x
     joined["y"] = data.y
-    model, formula_func = models
+    model, _ = models
     mod = model.from_formula(formula, joined)
     res = mod.fit()
     with pytest.raises(ValueError):
@@ -282,7 +282,7 @@ def test_formulas_rank_check(data, models, formula):
         return
     joined = data.x
     joined["y"] = data.y
-    model, formula_func = models
+    model, _ = models
     mod = model.from_formula(formula, joined)
     y = mod.dependent.dataframe.copy()
     x = mod.exog.dataframe.copy()

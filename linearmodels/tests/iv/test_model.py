@@ -1,3 +1,5 @@
+from linearmodels.compat.statsmodels import Summary
+
 import warnings
 
 import numpy as np
@@ -157,7 +159,7 @@ def test_2sls_direct_small(data):
     assert np.all(res.tstats != res2.tstats)
     get_all(res2)
     fs = res.first_stage
-    fs.diagnostics
+    assert isinstance(fs.diagnostics, pd.DataFrame)
     # Fetch again to test cache
     get_all(res2)
 
@@ -221,7 +223,7 @@ def test_2sls_just_identified(data):
     res = mod.fit()
     get_all(res)
     fs = res.first_stage
-    fs.diagnostics
+    assert isinstance(fs.diagnostics, pd.DataFrame)
     # Fetch again to test cache
     get_all(fs)
     get_all(res)
@@ -230,14 +232,14 @@ def test_2sls_just_identified(data):
     res = mod.fit()
     get_all(res)
     fs = res.first_stage
-    fs.diagnostics
+    assert isinstance(fs.diagnostics, pd.DataFrame)
     get_all(fs)
 
     mod = IV2SLS(data.dep, None, data.endog[:, :1], data.instr[:, :1])
     res = mod.fit()
     get_all(res)
     fs = res.first_stage
-    fs.diagnostics
+    assert isinstance(fs.diagnostics, pd.DataFrame)
     get_all(fs)
 
 
@@ -261,8 +263,8 @@ def test_wu_hausman_smoke(data):
 def test_wooldridge_smoke(data):
     mod = IV2SLS(data.dep, data.exog, data.endog, data.instr)
     res = mod.fit()
-    res.wooldridge_regression
-    res.wooldridge_score
+    assert isinstance(res.wooldridge_regression, WaldTestStatistic)
+    assert isinstance(res.wooldridge_score, WaldTestStatistic)
 
 
 @pytest.mark.smoke
@@ -340,13 +342,13 @@ def test_compare_single(data):
     res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
     c = compare([res1])
     assert len(c.rsquared) == 1
-    c.summary
+    assert isinstance(c.summary, Summary)
     c = compare({"Model A": res1})
-    c.summary
+    assert isinstance(c.summary, Summary)
     res = {"Model A": res1}
     c = compare(res)
-    c.summary
-    c.pvalues
+    assert isinstance(c.summary, Summary)
+    assert isinstance(c.pvalues, pd.DataFrame)
 
 
 def test_compare_single_single_parameter(data):
@@ -358,7 +360,7 @@ def test_compare_single_single_parameter(data):
 
 def test_first_stage_summary(data):
     res1 = IV2SLS(data.dep, data.exog, data.endog, data.instr).fit()
-    res1.first_stage.summary
+    assert isinstance(res1.first_stage.summary, Summary)
 
 
 def test_gmm_str(data):
