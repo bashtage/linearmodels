@@ -15,6 +15,7 @@ from linearmodels.datasets import card
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import compare
+from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 
 

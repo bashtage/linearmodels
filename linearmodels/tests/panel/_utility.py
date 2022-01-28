@@ -4,8 +4,10 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas import Categorical, DataFrame, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
+from xarray.core.dtypes import NA
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
@@ -87,7 +89,7 @@ def generate_data(
     y = np.empty((t, n), dtype=np.float64)
     y[:, :] = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
     w = np.random.chisquare(5, (t, n)) / 5
-    c = np.empty(0, dtype=int)
+    c = np.empty((y.size, 0), dtype=int)
     if other_effects == 1:
         cats = ["Industries"]
     else:
@@ -133,9 +135,12 @@ def generate_data(
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
     x_df = x_df.reindex(y_df.index)
-    c_df = panel_to_frame(
-        c, items=cats, major_axis=time, minor_axis=entities, swap=True
-    )
+    if c.shape[1]:
+        c_df = panel_to_frame(
+            c, items=cats, major_axis=time, minor_axis=entities, swap=True
+        )
+    else:
+        c_df = DataFrame(index=y_df.index)
     c_df = c_df.reindex(y_df.index)
     vc1_df = panel_to_frame(
         vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True
@@ -148,7 +153,7 @@ def generate_data(
     if datatype == "pandas":
         return AttrDict(y=y_df, x=x_df, w=w_df, c=c_df, vc1=vc1_df, vc2=vc2_df)
 
-    # TODO: This is broken now, need to transform MultiIndex to xarray 3d
+    assert datatype == "xarray"
     import xarray as xr
 
     x_xr = xr.DataArray(
@@ -166,19 +171,20 @@ def generate_data(
         coords={"entities": entities, "time": time, "vars": ["w"]},
         dims=["vars", "time", "entities"],
     )
+    c_vals = PanelData(c_df).values3d if c.shape[1] else NA
     c_xr = xr.DataArray(
-        PanelData(c_df).values3d,
+        c_vals,
         coords={"entities": entities, "time": time, "vars": c_df.columns},
         dims=["vars", "time", "entities"],
     )
     vc1_xr = xr.DataArray(
         PanelData(vc1_df).values3d,
-        coords={"entities": entities, "time": time, "vars": c_df.columns},
+        coords={"entities": entities, "time": time, "vars": vc1_df.columns},
         dims=["vars", "time", "entities"],
     )
     vc2_xr = xr.DataArray(
         PanelData(vc2_df).values3d,
-        coords={"entities": entities, "time": time, "vars": c_df.columns},
+        coords={"entities": entities, "time": time, "vars": vc2_df.columns},
         dims=["vars", "time", "entities"],
     )
     return AttrDict(y=y_xr, x=x_xr, w=w_xr, c=c_xr, vc1=vc1_xr, vc2=vc2_xr)

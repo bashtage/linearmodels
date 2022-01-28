@@ -14,7 +14,7 @@ from linearmodels.panel.covariance import (
 from linearmodels.typing import Float64Array, Int64Array
 
 
-class TestData(NamedTuple):
+class PanelData(NamedTuple):
     n: int
     t: int
     k: int
@@ -33,7 +33,7 @@ class TestData(NamedTuple):
 
 
 @pytest.fixture
-def test_data() -> TestData:
+def panel_data() -> PanelData:
     n, t, k = 100, 50, 10
     x = np.random.random_sample((n * t, k))
     epsilon = np.random.random_sample((n * t, 1))
@@ -47,7 +47,7 @@ def test_data() -> TestData:
     cluster3 = np.random.randint(0, 10, (n * t, 1), dtype=np.int64)
     cluster4 = np.random.randint(0, 10, (n * t, 2), dtype=np.int64)
     cluster5 = np.random.randint(0, 10, (n * t, 3), dtype=np.int64)
-    return TestData(
+    return PanelData(
         n=n,
         t=t,
         k=k,
@@ -67,212 +67,212 @@ def test_data() -> TestData:
 
 
 @pytest.mark.smoke
-def test_heteroskedastic_smoke(test_data) -> None:
+def test_heteroskedastic_smoke(panel_data) -> None:
     cov = HeteroskedasticCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = HeteroskedasticCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
 
 @pytest.mark.smoke
-def test_homoskedastic_smoke(test_data) -> None:
+def test_homoskedastic_smoke(panel_data) -> None:
     cov = HomoskedasticCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = HomoskedasticCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
 
 @pytest.mark.smoke
-def test_clustered_covariance_smoke(test_data) -> None:
+def test_clustered_covariance_smoke(panel_data) -> None:
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster1,
+        clusters=panel_data.cluster1,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster2,
+        clusters=panel_data.cluster2,
         group_debias=True,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster3,
+        clusters=panel_data.cluster3,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster3,
+        clusters=panel_data.cluster3,
         group_debias=True,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster4,
+        clusters=panel_data.cluster4,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
     cov = ClusteredCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         extra_df=0,
-        clusters=test_data.cluster4,
+        clusters=panel_data.cluster4,
         group_debias=True,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
 
-def test_clustered_covariance_error(test_data) -> None:
+def test_clustered_covariance_error(panel_data) -> None:
     with pytest.raises(ValueError):
         ClusteredCovariance(
-            test_data.y,
-            test_data.x,
-            test_data.params,
-            test_data.entity_ids,
-            test_data.time_ids,
+            panel_data.y,
+            panel_data.x,
+            panel_data.params,
+            panel_data.entity_ids,
+            panel_data.time_ids,
             extra_df=0,
-            clusters=test_data.cluster5,
+            clusters=panel_data.cluster5,
         )
 
     with pytest.raises(ValueError):
         ClusteredCovariance(
-            test_data.y,
-            test_data.x,
-            test_data.params,
-            test_data.entity_ids,
-            test_data.time_ids,
+            panel_data.y,
+            panel_data.x,
+            panel_data.params,
+            panel_data.entity_ids,
+            panel_data.time_ids,
             extra_df=0,
-            clusters=test_data.cluster4[::2],
+            clusters=panel_data.cluster4[::2],
         )
 
 
 @pytest.mark.smoke
-def test_driscoll_kraay_smoke(test_data) -> None:
+def test_driscoll_kraay_smoke(panel_data) -> None:
     cov = DriscollKraay(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = DriscollKraay(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         kernel="parzen",
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = DriscollKraay(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         bandwidth=12,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
 
 @pytest.mark.smoke
-def test_ac_covariance_smoke(test_data) -> None:
+def test_ac_covariance_smoke(panel_data) -> None:
     cov = ACCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = ACCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         kernel="parzen",
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
     cov = ACCovariance(
-        test_data.y,
-        test_data.x,
-        test_data.params,
-        test_data.entity_ids,
-        test_data.time_ids,
+        panel_data.y,
+        panel_data.x,
+        panel_data.params,
+        panel_data.entity_ids,
+        panel_data.time_ids,
         bandwidth=12,
     ).cov
-    assert cov.shape == (test_data.k, test_data.k)
+    assert cov.shape == (panel_data.k, panel_data.k)
 
 
 def test_covariance_manager() -> None:

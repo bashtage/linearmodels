@@ -38,7 +38,7 @@ def missing_data(request):
 
 @pytest.fixture(params=list(product(datatypes, [True, False])))
 def both_data_types(request):
-    return data_gen(request.param[1], request.param)
+    return data_gen(request.param[1], request.param[0])
 
 
 def test_single_entity(data):
