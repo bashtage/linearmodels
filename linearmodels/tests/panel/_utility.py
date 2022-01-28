@@ -73,7 +73,7 @@ def generate_data(
     ntk: tuple[int, int, int] = (971, 7, 5),
     other_effects: int = 0,
     rng: RandomState | None = None,
-    num_cats: int = 4,
+    num_cats: int | list[int] = 4,
 ):
     if rng is None:
         np.random.seed(12345)
@@ -84,21 +84,22 @@ def generate_data(
     k += const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
+    y = np.empty((t, n), dtype=np.float64)
+    y[:, :] = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
     w = np.random.chisquare(5, (t, n)) / 5
-    c = None
+    c = np.empty(0, dtype=int)
     if other_effects == 1:
         cats = ["Industries"]
     else:
         cats = ["cat." + str(i) for i in range(other_effects)]
     if other_effects:
-        if not isinstance(num_cats, list):
+        if isinstance(num_cats, int):
             num_cats = [num_cats] * other_effects
-        c = []
+        oe = []
         for i in range(other_effects):
             nc = num_cats[i]
-            c.append(np.random.randint(0, nc, (1, t, n)))
-        c = np.concatenate(c, 0)
+            oe.append(np.random.randint(0, nc, (1, t, n)))
+        c = np.concatenate(oe, 0)
 
     vcats = ["varcat." + str(i) for i in range(2)]
     vc2 = np.ones((2, t, 1)) @ np.random.randint(0, n // 2, (2, 1, n))
@@ -112,76 +113,75 @@ def generate_data(
         y.flat[locs] = np.nan
         locs = np.random.choice(n * t * k, int(n * t * k * missing))
         x.flat[locs] = np.nan
-
-    if datatype in ("pandas", "xarray"):
-        entities = ["firm" + str(i) for i in range(n)]
-        time = date_range("1-1-1900", periods=t, freq="A-DEC")
-        var_names = ["x" + str(i) for i in range(k)]
-        # y = DataFrame(y, index=time, columns=entities)
-        y = panel_to_frame(
-            y[None], items=["y"], major_axis=time, minor_axis=entities, swap=True
-        )
-        w = panel_to_frame(
-            w[None], items=["w"], major_axis=time, minor_axis=entities, swap=True
-        )
-        w = w.reindex(y.index)
-        x = panel_to_frame(
-            x, items=var_names, major_axis=time, minor_axis=entities, swap=True
-        )
-        x = x.reindex(y.index)
-        c = panel_to_frame(
-            c, items=cats, major_axis=time, minor_axis=entities, swap=True
-        )
-        c = c.reindex(y.index)
-        vc1 = panel_to_frame(
-            vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True
-        )
-        vc1 = vc1.reindex(y.index)
-        vc2 = panel_to_frame(
-            vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True
-        )
-        vc2 = vc2.reindex(y.index)
-
-    if datatype == "xarray":
-        # TODO: This is broken now, need to transform MultiIndex to xarray 3d
-        import xarray as xr
-
-        x = xr.DataArray(
-            PanelData(x).values3d,
-            coords={"entities": entities, "time": time, "vars": var_names},
-            dims=["vars", "time", "entities"],
-        )
-        y = xr.DataArray(
-            PanelData(y).values3d,
-            coords={"entities": entities, "time": time, "vars": ["y"]},
-            dims=["vars", "time", "entities"],
-        )
-        w = xr.DataArray(
-            PanelData(w).values3d,
-            coords={"entities": entities, "time": time, "vars": ["w"]},
-            dims=["vars", "time", "entities"],
-        )
-        if c.shape[1] > 0:
-            c = xr.DataArray(
-                PanelData(c).values3d,
-                coords={"entities": entities, "time": time, "vars": c.columns},
-                dims=["vars", "time", "entities"],
-            )
-        vc1 = xr.DataArray(
-            PanelData(vc1).values3d,
-            coords={"entities": entities, "time": time, "vars": vc1.columns},
-            dims=["vars", "time", "entities"],
-        )
-        vc2 = xr.DataArray(
-            PanelData(vc2).values3d,
-            coords={"entities": entities, "time": time, "vars": vc2.columns},
-            dims=["vars", "time", "entities"],
-        )
-
     if rng is not None:
         rng.set_state(np.random.get_state())
+    if datatype == "numpy":
+        return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
 
-    return AttrDict(y=y, x=x, w=w, c=c, vc1=vc1, vc2=vc2)
+    entities = ["firm" + str(i) for i in range(n)]
+    time = date_range("1-1-1900", periods=t, freq="A-DEC")
+    var_names = ["x" + str(i) for i in range(k)]
+    # y = DataFrame(y, index=time, columns=entities)
+    y_df = panel_to_frame(
+        y[None], items=["y"], major_axis=time, minor_axis=entities, swap=True
+    )
+    w_df = panel_to_frame(
+        w[None], items=["w"], major_axis=time, minor_axis=entities, swap=True
+    )
+    w_df = w_df.reindex(y_df.index)
+    x_df = panel_to_frame(
+        x, items=var_names, major_axis=time, minor_axis=entities, swap=True
+    )
+    x_df = x_df.reindex(y_df.index)
+    c_df = panel_to_frame(
+        c, items=cats, major_axis=time, minor_axis=entities, swap=True
+    )
+    c_df = c_df.reindex(y_df.index)
+    vc1_df = panel_to_frame(
+        vc1, items=vcats[:1], major_axis=time, minor_axis=entities, swap=True
+    )
+    vc1_df = vc1_df.reindex(y_df.index)
+    vc2_df = panel_to_frame(
+        vc2, items=vcats, major_axis=time, minor_axis=entities, swap=True
+    )
+    vc2_df = vc2_df.reindex(y_df.index)
+    if datatype == "pandas":
+        return AttrDict(y=y_df, x=x_df, w=w_df, c=c_df, vc1=vc1_df, vc2=vc2_df)
+
+    # TODO: This is broken now, need to transform MultiIndex to xarray 3d
+    import xarray as xr
+
+    x_xr = xr.DataArray(
+        PanelData(x_df).values3d,
+        coords={"entities": entities, "time": time, "vars": var_names},
+        dims=["vars", "time", "entities"],
+    )
+    y_xr = xr.DataArray(
+        PanelData(y_df).values3d,
+        coords={"entities": entities, "time": time, "vars": ["y"]},
+        dims=["vars", "time", "entities"],
+    )
+    w_xr = xr.DataArray(
+        PanelData(w_df).values3d,
+        coords={"entities": entities, "time": time, "vars": ["w"]},
+        dims=["vars", "time", "entities"],
+    )
+    c_xr = xr.DataArray(
+        PanelData(c_df).values3d,
+        coords={"entities": entities, "time": time, "vars": c_df.columns},
+        dims=["vars", "time", "entities"],
+    )
+    vc1_xr = xr.DataArray(
+        PanelData(vc1_df).values3d,
+        coords={"entities": entities, "time": time, "vars": c_df.columns},
+        dims=["vars", "time", "entities"],
+    )
+    vc2_xr = xr.DataArray(
+        PanelData(vc2_df).values3d,
+        coords={"entities": entities, "time": time, "vars": c_df.columns},
+        dims=["vars", "time", "entities"],
+    )
+    return AttrDict(y=y_xr, x=x_xr, w=w_xr, c=c_xr, vc1=vc1_xr, vc2=vc2_xr)
 
 
 def assert_results_equal(res1, res2, test_fit=True, test_df=True, strict=True):

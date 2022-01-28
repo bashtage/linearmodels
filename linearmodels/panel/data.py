@@ -77,10 +77,10 @@ class _Panel(object):
         index = list(product(minor_axis, major_axis))
         index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
-        values = np.swapaxes(values.copy(), 0, 2).ravel()
-        values = np.reshape(values, ((j * k), i))
+        values_flat = np.swapaxes(values.copy(), 0, 2).ravel()
+        values_flat = np.reshape(values_flat, ((j * k), i))
 
-        df = DataFrame(values, index=index, columns=items)
+        df = DataFrame(values_flat, index=index, columns=items)
         return cls(df)
 
     @property

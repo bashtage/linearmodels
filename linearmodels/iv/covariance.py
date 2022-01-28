@@ -514,7 +514,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
         pinvz = self._pinvz
         xhat = z @ (pinvz @ x)
-        xhat_e = xhat * eps
+        xhat_e = asarray(xhat * eps, dtype=float)
 
         kernel = self.config["kernel"]
         bw = self.config["bandwidth"]
@@ -531,7 +531,6 @@ class KernelCovariance(HomoskedasticCovariance):
 
         self._bandwidth = bw
         w = self._kernels[kernel](bw, nobs - 1)
-
         s = cov_kernel(xhat_e, w)
 
         return cast(ndarray, self._scale * s)
@@ -644,7 +643,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
+        xhat_e = asarray(z @ (pinvz @ x) * eps, dtype=float)
 
         nobs, nvar = x.shape
         clusters = self._clusters

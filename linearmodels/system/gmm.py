@@ -223,7 +223,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         nvar = repeat(nvar, ninstr)
         nvar = cast(Float64Array, sqrt(nvar))[:, None]
         scale = nobs / (nobs - nvar @ nvar.T)
-        return scale
+        return float(scale)
 
 
 class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):

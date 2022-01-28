@@ -1117,9 +1117,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     def _moments(self, parameters: Float64Array, excess_returns: bool) -> Float64Array:
         """Calculate nobs by nmoments moment conditions"""
         nrf = int(not excess_returns)
-        p = self.portfolios.ndarray
+        p = np.asarray(self.portfolios.ndarray, dtype=float)
         nobs, n = p.shape
-        f = self.factors.ndarray
+        f = np.asarray(self.factors.ndarray, dtype=float)
         k = f.shape[1]
         s1, s2 = n * k, n * k + k + nrf
         betas = parameters[:s1]
@@ -1129,7 +1129,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         expected = np.c_[np.ones((n, nrf)), betas] @ lam
         fe = f - mu.T
         eps = p - expected.T - fe @ betas.T
-        f = np.c_[np.ones((nobs, 1)), f]
+        f = np.column_stack((np.ones((nobs, 1)), f))
         f = np.tile(f, (1, n))
         eps = np.reshape(np.tile(eps, (k + 1, 1)).T, (n * (k + 1), nobs)).T
         g = np.c_[eps * f, fe]

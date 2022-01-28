@@ -1244,7 +1244,7 @@ class IVGMM(_IVGMMBase):
                 v = (xpz @ wmat @ xpz.T) / nobs
                 vinv = inv(v)
             _params = params
-            norm = delta.T @ vinv @ delta
+            norm = float(delta.T @ vinv @ delta)
             iters += 1
 
         cov_config["debiased"] = debiased

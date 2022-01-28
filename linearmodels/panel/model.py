@@ -81,7 +81,7 @@ def _lstsq(
 ) -> Tuple[Float64Array, Float64Array, int, Float64Array]:
     if rcond is None:
         eps = np.finfo(np.float64).eps
-        cond = max(x.shape) * eps
+        cond = float(max(x.shape) * eps)
     else:
         cond = rcond
     return sp_lstsq(x, y, cond=cond, lapack_driver="gelsy")
@@ -1409,27 +1409,27 @@ class PanelOLS(_PanelModelBase):
         wx_gm = root_w * (w.T @ x / w.sum())
         root_w_sparse = csc_matrix(root_w)
 
-        cats: List[Union[IntArray, Float64Array]] = []
+        cats_l: List[Union[IntArray, Float64Array]] = []
         if self.entity_effects:
-            cats.append(self.dependent.entity_ids)
+            cats_l.append(self.dependent.entity_ids)
         if self.time_effects:
-            cats.append(self.dependent.time_ids)
+            cats_l.append(self.dependent.time_ids)
         if self.other_effects:
             assert self._other_effect_cats is not None
-            cats.append(self._other_effect_cats.values2d)
-        cats = np.concatenate(cats, 1)
+            cats_l.append(self._other_effect_cats.values2d)
+        cats = np.concatenate(cats_l, 1)
 
         wd, cond = dummy_matrix(cats, precondition=True)
         assert isinstance(wd, csc_matrix)
         if self._is_weighted:
             wd = wd.multiply(root_w_sparse)
 
-        wx_mean = []
+        wx_mean_l = []
         for i in range(x.shape[1]):
             cond_mean = lsmr(wd, wx[:, i], atol=1e-8, btol=1e-8)[0]
             cond_mean /= cond
-            wx_mean.append(cond_mean)
-        wx_mean = np.column_stack(wx_mean)
+            wx_mean_l.append(cond_mean)
+        wx_mean = np.column_stack(wx_mean_l)
         wy_mean = lsmr(wd, wy, atol=1e-8, btol=1e-8)[0]
         wy_mean /= cond
         wy_mean = wy_mean[:, None]
@@ -1468,22 +1468,22 @@ class PanelOLS(_PanelModelBase):
             return y, x, ybar, y_effect, x_effect
 
         drop_first = self._constant
-        d = []
+        d_l = []
         if self.entity_effects:
-            d.append(self.dependent.dummies("entity", drop_first=drop_first).values)
+            d_l.append(self.dependent.dummies("entity", drop_first=drop_first).values)
             drop_first = True
         if self.time_effects:
-            d.append(self.dependent.dummies("time", drop_first=drop_first).values)
+            d_l.append(self.dependent.dummies("time", drop_first=drop_first).values)
             drop_first = True
         if self.other_effects:
             assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 dummies = get_dummies(oe[c], drop_first=drop_first).astype(np.float64)
-                d.append(dummies.values)
+                d_l.append(dummies.values)
                 drop_first = True
 
-        d = np.column_stack(d)
+        d = np.column_stack(d_l)
         wd = root_w * d
         if self.has_constant:
             wd -= root_w * (w.T @ d / w.sum())

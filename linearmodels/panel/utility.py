@@ -161,7 +161,7 @@ def dummy_matrix(
     if isinstance(cats, DataFrame):
         codes = np.column_stack([np.asarray(cats[c].cat.codes) for c in cats])
     else:
-        codes = cats
+        codes = np.asarray(cats)
 
     data: Dict[str, List[np.ndarray]] = defaultdict(list)
     total_dummies = 0
