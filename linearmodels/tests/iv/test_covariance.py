@@ -82,245 +82,244 @@ def test_kernel_qs():
     assert_equal(w(2.5, 200), kernel_weight_quadratic_spectral(2.5, 200))
 
 
-class TestHomoskedasticCovariance(object):
-    def test_asymptotic(self, data):
-        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params)
-        nobs = data.nobs
-        xhat = data.xhat
-        s2 = data.s2
-        assert c.debiased is False
-        assert c.config == {"debiased": False, "kappa": 1}
-        assert_allclose(c.s2, data.s2)
-        assert_allclose(c.cov, data.s2 * inv(xhat.T @ xhat / nobs) / nobs)
-        assert_allclose(c.s, s2 * data.v)
-        assert_allclose(c.s, s2 * (xhat.T @ xhat / nobs))
+def test_homoskedastic_cov_asymptotic(data):
+    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params)
+    nobs = data.nobs
+    xhat = data.xhat
+    s2 = data.s2
+    assert c.debiased is False
+    assert c.config == {"debiased": False, "kappa": 1}
+    assert_allclose(c.s2, data.s2)
+    assert_allclose(c.cov, data.s2 * inv(xhat.T @ xhat / nobs) / nobs)
+    assert_allclose(c.s, s2 * data.v)
+    assert_allclose(c.s, s2 * (xhat.T @ xhat / nobs))
 
-    def test_debiased(self, data):
-        c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
-        assert c.debiased is True
-        assert c.config == {"debiased": True, "kappa": 1}
-        assert_allclose(c.s2, data.s2_debiased)
-        assert_allclose(c.s, data.s2_debiased * data.v)
-        assert_allclose(c.cov, data.s2_debiased * data.vinv / data.nobs)
-        s = str(c)
-        assert "Kappa" not in s
-        assert "Debiased: True" in s
-        assert "id" in c.__repr__()
 
-    def test_kappa(self, data):
-        c = HomoskedasticCovariance(
-            data.x, data.y, data.z, data.params, kappa=data.kappa
+def test_homoskedastic_cov_debiased(data):
+    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    assert c.debiased is True
+    assert c.config == {"debiased": True, "kappa": 1}
+    assert_allclose(c.s2, data.s2_debiased)
+    assert_allclose(c.s, data.s2_debiased * data.v)
+    assert_allclose(c.cov, data.s2_debiased * data.vinv / data.nobs)
+    s = str(c)
+    assert "Kappa" not in s
+    assert "Debiased: True" in s
+    assert "id" in c.__repr__()
+
+
+def test_homoskedastic_cov_kappa(data):
+    c = HomoskedasticCovariance(data.x, data.y, data.z, data.params, kappa=data.kappa)
+    assert c.debiased is False
+    assert c.config == {"debiased": False, "kappa": 0.99}
+    assert_allclose(c.s, data.s2 * data.vk)
+    assert_allclose(c.cov, data.s2 * inv(data.vk) / data.nobs)
+    s = str(c)
+    assert "Debiased: False" in s
+    assert "Kappa" in s
+
+
+def test_homoskedastic_cov_kappa_debiased(data):
+    c = HomoskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, kappa=data.kappa
+    )
+    assert c.debiased is True
+    assert c.config == {"debiased": True, "kappa": data.kappa}
+    assert_allclose(c.s, data.s2_debiased * data.vk)
+    assert_allclose(c.cov, data.s2_debiased * inv(data.vk) / data.nobs)
+    s = str(c)
+    assert "Debiased: True" in s
+
+
+def test_homoskedastic_cov_errors(data):
+    with pytest.raises(ValueError):
+        HomoskedasticCovariance(data.x[:10], data.y, data.z, data.params)
+    with pytest.raises(ValueError):
+        HomoskedasticCovariance(data.x, data.y, data.z, data.params[1:])
+
+
+def test_heteroskedastic_cov_asymptotic(data):
+    c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
+    assert c.debiased is False
+    assert c.config == {"debiased": False, "kappa": 1}
+    assert_allclose(c.s2, data.s2)
+    xhat, eps, nobs = data.xhat, data.e, data.nobs
+    assert_allclose(c.s, (xhat * eps).T @ (xhat * eps) / nobs)
+
+
+def test_heteroskedastic_cov_debiased(data):
+    c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    xhat, eps, nobs, nvar = data.xhat, data.e, data.nobs, data.nvar
+    assert c.debiased is True
+    assert c.config == {"debiased": True, "kappa": 1}
+    s = (xhat * eps).T @ (xhat * eps) / (nobs - nvar)
+    assert_allclose(c.s, s)
+    assert_allclose(c.cov, data.vinv @ s @ data.vinv / nobs)
+
+
+def test_heteroskedastic_cov_kappa_debiased(data):
+    c = HeteroskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, kappa=0.99
+    )
+    assert c.debiased is True
+    assert c.config == {"debiased": True, "kappa": 0.99}
+    c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params, debiased=True)
+    assert_allclose(c.s, c2.s)
+    assert c.s2 == c2.s2
+    vk_inv = inv(data.vk)
+    assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
+
+
+def test_heteroskedastic_cov_kappa(data):
+    c = HeteroskedasticCovariance(
+        data.x, data.y, data.z, data.params, debiased=False, kappa=0.99
+    )
+    assert c.debiased is False
+    assert c.config == {"debiased": False, "kappa": 0.99}
+    c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
+    assert_allclose(c.s, c2.s)
+    assert c.s2 == c2.s2
+    vk_inv = inv(data.vk)
+    assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
+
+
+def test_clustered_cov_asymptotic(data):
+    c = ClusteredCovariance(data.x, data.y, data.z, data.params, clusters=data.clusters)
+    assert c._kappa == 1
+    assert c.debiased is False
+    assert c.config["debiased"] is False
+    assert_equal(c.config["clusters"], data.clusters)
+    assert_allclose(c.s2, data.s2)
+    sums = np.zeros((len(np.unique(data.clusters)), data.nvar))
+    xe = data.xhat * data.e
+    for i in range(len(data.clusters)):
+        sums[data.clusters[i]] += xe[i]
+    op = np.zeros((data.nvar, data.nvar))
+    for j in range(len(sums)):
+        op += sums[[j]].T @ sums[[j]]
+    s = op / data.nobs
+    assert_allclose(c.s, s)
+    assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
+    cs = str(c)
+    assert "Debiased: False" in cs
+    assert "Num Clusters: {0}".format(len(sums)) in cs
+
+
+def test_clustered_cov_debiased(data):
+    c = ClusteredCovariance(
+        data.x, data.y, data.z, data.params, debiased=True, clusters=data.clusters
+    )
+    assert c.debiased is True
+    assert c.config["debiased"] is True
+    assert_equal(c.config["clusters"], data.clusters)
+
+    ngroups = len(np.unique(data.clusters))
+    sums = np.zeros((ngroups, data.nvar))
+    xe = data.xhat * data.e
+    for i in range(len(data.clusters)):
+        sums[data.clusters[i]] += xe[i]
+    op = np.zeros((data.nvar, data.nvar))
+    for j in range(len(sums)):
+        op += sums[[j]].T @ sums[[j]]
+    # This is a strange choice
+    s = (
+        op
+        / data.nobs
+        * ((data.nobs - 1) / (data.nobs - data.nvar))
+        * ngroups
+        / (ngroups - 1)
+    )
+    assert_allclose(c.s, s)
+    assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
+
+    cs = str(c)
+    assert "Debiased: True" in cs
+    assert "Num Clusters: {0}".format(len(sums)) in cs
+    assert "id" in c.__repr__()
+
+
+def test_clustered_cov_errors(data):
+    with pytest.raises(ValueError):
+        ClusteredCovariance(
+            data.x, data.y, data.z, data.params, clusters=data.clusters[:10]
         )
-        assert c.debiased is False
-        assert c.config == {"debiased": False, "kappa": 0.99}
-        assert_allclose(c.s, data.s2 * data.vk)
-        assert_allclose(c.cov, data.s2 * inv(data.vk) / data.nobs)
-        s = str(c)
-        assert "Debiased: False" in s
-        assert "Kappa" in s
-
-    def test_kappa_debiased(self, data):
-        c = HomoskedasticCovariance(
-            data.x, data.y, data.z, data.params, debiased=True, kappa=data.kappa
-        )
-        assert c.debiased is True
-        assert c.config == {"debiased": True, "kappa": data.kappa}
-        assert_allclose(c.s, data.s2_debiased * data.vk)
-        assert_allclose(c.cov, data.s2_debiased * inv(data.vk) / data.nobs)
-        s = str(c)
-        assert "Debiased: True" in s
-
-    def test_errors(self, data):
-        with pytest.raises(ValueError):
-            HomoskedasticCovariance(data.x[:10], data.y, data.z, data.params)
-        with pytest.raises(ValueError):
-            HomoskedasticCovariance(data.x, data.y, data.z, data.params[1:])
 
 
-class TestHeteroskedasticCovariance(object):
-    def test_asymptotic(self, data):
-        c = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
-        assert c.debiased is False
-        assert c.config == {"debiased": False, "kappa": 1}
-        assert_allclose(c.s2, data.s2)
-        xhat, eps, nobs = data.xhat, data.e, data.nobs
-        assert_allclose(c.s, (xhat * eps).T @ (xhat * eps) / nobs)
+def test_kernel_covariance_asymptotic(data, kernel):
+    c = KernelCovariance(data.x, data.y, data.z, data.params, kernel=kernel.kernel)
+    cs = str(c)
+    assert "\nBandwidth" not in cs
 
-    def test_debiased(self, data):
-        c = HeteroskedasticCovariance(
-            data.x, data.y, data.z, data.params, debiased=True
-        )
-        xhat, eps, nobs, nvar = data.xhat, data.e, data.nobs, data.nvar
-        assert c.debiased is True
-        assert c.config == {"debiased": True, "kappa": 1}
-        s = (xhat * eps).T @ (xhat * eps) / (nobs - nvar)
-        assert_allclose(c.s, s)
-        assert_allclose(c.cov, data.vinv @ s @ data.vinv / nobs)
+    for name in kernel.alt_names:
+        c2 = KernelCovariance(data.x, data.y, data.z, data.params, kernel=name)
+        assert_equal(c.cov, c2.cov)
 
-    def test_kappa_debiased(self, data):
-        c = HeteroskedasticCovariance(
-            data.x, data.y, data.z, data.params, debiased=True, kappa=0.99
-        )
-        assert c.debiased is True
-        assert c.config == {"debiased": True, "kappa": 0.99}
-        c2 = HeteroskedasticCovariance(
-            data.x, data.y, data.z, data.params, debiased=True
-        )
-        assert_allclose(c.s, c2.s)
-        assert c.s2 == c2.s2
-        vk_inv = inv(data.vk)
-        assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
+    assert c.debiased is False
+    assert c.config["debiased"] is False
+    assert_equal(c.config["kernel"], kernel.kernel)
+    assert_allclose(c.s2, data.s2)
+    bw = c.config["bandwidth"]
+    xe = data.xhat * data.e
+    s = xe.T @ xe
+    w = kernel.weight(bw, xe.shape[0] - 1)
+    for i in range(1, len(w)):
+        s += w[i] * (xe[i:].T @ xe[:-i] + xe[:-i].T @ xe[i:])
+    s /= data.nobs
+    assert_allclose(c.s, s)
+    assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
 
-    def test_kappa(self, data):
-        c = HeteroskedasticCovariance(
-            data.x, data.y, data.z, data.params, debiased=False, kappa=0.99
-        )
-        assert c.debiased is False
-        assert c.config == {"debiased": False, "kappa": 0.99}
-        c2 = HeteroskedasticCovariance(data.x, data.y, data.z, data.params)
-        assert_allclose(c.s, c2.s)
-        assert c.s2 == c2.s2
-        vk_inv = inv(data.vk)
-        assert_allclose(c.cov, vk_inv @ c.s @ vk_inv / data.nobs)
+    cs = str(c)
+    assert "Kappa" not in cs
+    assert "Kernel: {0}".format(kernel.kernel) in cs
+    assert "Bandwidth: {0}".format(bw) in cs
 
 
-class TestClusteredCovariance(object):
-    def test_asymptotic(self, data):
-        c = ClusteredCovariance(
-            data.x, data.y, data.z, data.params, clusters=data.clusters
-        )
-        assert c._kappa == 1
-        assert c.debiased is False
-        assert c.config["debiased"] is False
-        assert_equal(c.config["clusters"], data.clusters)
-        assert_allclose(c.s2, data.s2)
-        sums = np.zeros((len(np.unique(data.clusters)), data.nvar))
-        xe = data.xhat * data.e
-        for i in range(len(data.clusters)):
-            sums[data.clusters[i]] += xe[i]
-        op = np.zeros((data.nvar, data.nvar))
-        for j in range(len(sums)):
-            op += sums[[j]].T @ sums[[j]]
-        s = op / data.nobs
-        assert_allclose(c.s, s)
-        assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
-        cs = str(c)
-        assert "Debiased: False" in cs
-        assert "Num Clusters: {0}".format(len(sums)) in cs
-
-    def test_debiased(self, data):
-        c = ClusteredCovariance(
-            data.x, data.y, data.z, data.params, debiased=True, clusters=data.clusters
-        )
-        assert c.debiased is True
-        assert c.config["debiased"] is True
-        assert_equal(c.config["clusters"], data.clusters)
-
-        ngroups = len(np.unique(data.clusters))
-        sums = np.zeros((ngroups, data.nvar))
-        xe = data.xhat * data.e
-        for i in range(len(data.clusters)):
-            sums[data.clusters[i]] += xe[i]
-        op = np.zeros((data.nvar, data.nvar))
-        for j in range(len(sums)):
-            op += sums[[j]].T @ sums[[j]]
-        # This is a strange choice
-        s = (
-            op
-            / data.nobs
-            * ((data.nobs - 1) / (data.nobs - data.nvar))
-            * ngroups
-            / (ngroups - 1)
-        )
-        assert_allclose(c.s, s)
-        assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
-
-        cs = str(c)
-        assert "Debiased: True" in cs
-        assert "Num Clusters: {0}".format(len(sums)) in cs
-        assert "id" in c.__repr__()
-
-    def test_errors(self, data):
-        with pytest.raises(ValueError):
-            ClusteredCovariance(
-                data.x, data.y, data.z, data.params, clusters=data.clusters[:10]
-            )
-
-
-class TestKernelCovariance(object):
-    def test_asymptotic(self, data, kernel):
-        c = KernelCovariance(data.x, data.y, data.z, data.params, kernel=kernel.kernel)
-        cs = str(c)
-        assert "\nBandwidth" not in cs
-
-        for name in kernel.alt_names:
-            c2 = KernelCovariance(data.x, data.y, data.z, data.params, kernel=name)
-            assert_equal(c.cov, c2.cov)
-
-        assert c.debiased is False
-        assert c.config["debiased"] is False
-        assert_equal(c.config["kernel"], kernel.kernel)
-        assert_allclose(c.s2, data.s2)
-        bw = c.config["bandwidth"]
-        xe = data.xhat * data.e
-        s = xe.T @ xe
-        w = kernel.weight(bw, xe.shape[0] - 1)
-        for i in range(1, len(w)):
-            s += w[i] * (xe[i:].T @ xe[:-i] + xe[:-i].T @ xe[i:])
-        s /= data.nobs
-        assert_allclose(c.s, s)
-        assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
-
-        cs = str(c)
-        assert "Kappa" not in cs
-        assert "Kernel: {0}".format(kernel.kernel) in cs
-        assert "Bandwidth: {0}".format(bw) in cs
-
-    def test_debiased(self, data, kernel):
-        c = KernelCovariance(
-            data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=True
-        )
-        for name in kernel.alt_names:
-            c2 = KernelCovariance(
-                data.x, data.y, data.z, data.params, kernel=name, debiased=True
-            )
-            assert_equal(c.cov, c2.cov)
-
-        assert c._kappa == 1
-        assert c.debiased is True
-        assert c.config["debiased"] is True
-        assert_equal(c.config["kernel"], kernel.kernel)
-        assert_allclose(c.s2, data.s2_debiased)
-
+def test_kernel_covariance_debiased(data, kernel):
+    c = KernelCovariance(
+        data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=True
+    )
+    for name in kernel.alt_names:
         c2 = KernelCovariance(
-            data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=False
+            data.x, data.y, data.z, data.params, kernel=name, debiased=True
         )
-        scale = data.nobs / (data.nobs - data.nvar)
-        assert_allclose(c.s, scale * c2.s)
-        assert_allclose(c.cov, scale * c2.cov)
-        cs = str(c)
-        assert "Debiased: True" in cs
-        assert "Kernel: {0}".format(kernel.kernel) in cs
-        assert "Bandwidth: {0}".format(c.config["bandwidth"]) in cs
-        assert "id" in c.__repr__()
+        assert_equal(c.cov, c2.cov)
 
-    def test_unknown_kernel(self, data, kernel):
-        with pytest.raises(ValueError):
-            KernelCovariance(
-                data.x, data.y, data.z, data.params, kernel=kernel.kernel + "_unknown"
-            )
+    assert c._kappa == 1
+    assert c.debiased is True
+    assert c.config["debiased"] is True
+    assert_equal(c.config["kernel"], kernel.kernel)
+    assert_allclose(c.s2, data.s2_debiased)
+
+    c2 = KernelCovariance(
+        data.x, data.y, data.z, data.params, kernel=kernel.kernel, debiased=False
+    )
+    scale = data.nobs / (data.nobs - data.nvar)
+    assert_allclose(c.s, scale * c2.s)
+    assert_allclose(c.cov, scale * c2.cov)
+    cs = str(c)
+    assert "Debiased: True" in cs
+    assert "Kernel: {0}".format(kernel.kernel) in cs
+    assert "Bandwidth: {0}".format(c.config["bandwidth"]) in cs
+    assert "id" in c.__repr__()
 
 
-class TestAutomaticBandwidth(object):
-    @pytest.mark.smoke
-    def test_smoke(self, data, kernel):
-        # TODO: This should be improved from a smoke test
-        u = data.e.copy()
-        for i in range(1, u.shape[0]):
-            u[i] = 0.8 * u[i - 1] + data.e[i]
-        res = kernel_optimal_bandwidth(u, kernel.kernel)
-        assert res > 0
+def test_kernel_covariance_unknown_kernel(data, kernel):
+    with pytest.raises(ValueError):
+        KernelCovariance(
+            data.x, data.y, data.z, data.params, kernel=kernel.kernel + "_unknown"
+        )
 
-    def test_unknown_kernel(self, data, kernel):
-        with pytest.raises(ValueError):
-            kernel_optimal_bandwidth(data.e, kernel.kernel + "_unknown")
+
+@pytest.mark.smoke
+def test_auto_bandwidth_smoke(data, kernel):
+    # TODO: This should be improved from a smoke test
+    u = data.e.copy()
+    for i in range(1, u.shape[0]):
+        u[i] = 0.8 * u[i - 1] + data.e[i]
+    res = kernel_optimal_bandwidth(u, kernel.kernel)
+    assert res > 0
+
+
+def test_auto_bandwidth_unknown_kernel(data, kernel):
+    with pytest.raises(ValueError):
+        kernel_optimal_bandwidth(data.e, kernel.kernel + "_unknown")

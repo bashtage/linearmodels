@@ -114,7 +114,7 @@ def interact(request):
         return None
     rs = np.random.RandomState(0)
     interactions = []
-    for i in range(request.param):
+    for _ in range(request.param):
         cat = random_cat(4, 100, frame=True, rs=rs)
         cont = random_cont(100, rs=rs)
         interactions.append(Interaction(cat, cont))

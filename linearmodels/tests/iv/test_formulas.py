@@ -194,7 +194,7 @@ def test_categorical(model_and_func):
 
 
 def test_predict_formula(data, model_and_func, formula):
-    model, func = model_and_func
+    model, _ = model_and_func
     mod = model.from_formula(formula, data)
     res = mod.fit()
     exog = data[["Intercept", "x3", "x4", "x5"]]

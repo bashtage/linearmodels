@@ -13,14 +13,14 @@ echo "Checking for tag"
 if [[ -n "${GIT_TAG}" ]]; then
   echo "Tag ${GIT_TAG} is defined"
   echo "Copy docs to root"
-  echo cp -r ${PWD}/doc/build/html/* ${PWD}/
-  cp -r ${PWD}/doc/build/html/* ${PWD}
+  echo "cp -r ${PWD}/doc/build/html/* ${PWD}/"
+  cp -r "${PWD}/doc/build/html/*" "${PWD}"
 else
   echo "Tag is ${GIT_TAG}. Not updating main documents"
 fi
 echo "Copy docs to devel"
-echo cp -r ${PWD}/doc/build/html/* ${PWD}/devel/
-cp -r ${PWD}/doc/build/html/* ${PWD}/devel/
+echo "cp -r ${PWD}/doc/build/html/* ${PWD}/devel/"
+cp -r "${PWD}/doc/build/html/*" "${PWD}/devel/"
 echo "Add devel"
 git add devel/.
 echo "Change remote"

@@ -10,5 +10,5 @@ CMD="$CMD statsmodels"
 if [[ -n ${STATSMODELS} ]]; then CMD="$CMD~=${STATSMODELS}"; fi
 if [[ -n ${XARRAY} ]]; then CMD="$CMD xarray~=${XARRAY}"; fi
 if [[ -n ${XXHASH} ]]; then CMD="$CMD xxhash"; fi
-echo $CMD
-eval $CMD
+echo "$CMD"
+eval "$CMD"

@@ -6,7 +6,6 @@ from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
 from pandas import Categorical, DataFrame, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
-from xarray.core.dtypes import NA
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
@@ -154,6 +153,7 @@ def generate_data(
 
     assert datatype == "xarray"
     import xarray as xr
+    from xarray.core.dtypes import NA
 
     x_xr = xr.DataArray(
         PanelData(x_df).values3d,

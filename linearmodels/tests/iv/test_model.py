@@ -77,67 +77,73 @@ def get_all(v):
             val()
 
 
-class TestErrors(object):
-    def test_rank_deficient_exog(self, data):
-        exog = data.exog.copy()
-        exog[:, :2] = 1
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, exog, data.endog, data.instr)
+def test_rank_deficient_exog_exception(data):
+    exog = data.exog.copy()
+    exog[:, :2] = 1
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, exog, data.endog, data.instr)
 
-    def test_rank_deficient_endog(self, data):
-        endog = data.endog.copy()
-        endog[:, :2] = 1
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, endog, data.instr)
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
-    def test_invalid_weights(self, data):
-        weights = np.zeros_like(data.dep)
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
+def test_rank_deficient_endog_exception(data):
+    endog = data.endog.copy()
+    endog[:, :2] = 1
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, endog, data.instr)
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, data.exog, data.instr)
 
-    def test_rank_deficient_instr(self, data):
-        instr = data.instr.copy()
-        instr[:, :2] = 1
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.endog, instr)
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
-    def test_kappa_error(self, data):
-        with pytest.raises(ValueError):
-            IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
+def test_invalid_weights_exception(data):
+    weights = np.zeros_like(data.dep)
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, data.endog, data.instr, weights=weights)
 
-    def test_fuller_error(self, data):
-        with pytest.raises(ValueError):
-            IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=np.array([1]))
 
-    def test_kappa_fuller_warning(self, data):
-        with warnings.catch_warnings(record=True) as w:
-            IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=0.99, fuller=1)
-        assert len(w) == 1
+def test_rank_deficient_instr_exception(data):
+    instr = data.instr.copy()
+    instr[:, :2] = 1
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, data.endog, instr)
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, data.endog, data.exog)
 
-    def test_string_cat(self, data):
-        instr = data.instr.copy()
-        n = data.instr.shape[0]
-        cat = pd.Series(["a"] * (n // 2) + ["b"] * (n // 2))
-        instr = pd.DataFrame(instr)
-        instr["cat"] = cat
-        res = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type="unadjusted")
-        instr["cat"] = cat.astype("category")
-        res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit(
-            cov_type="unadjusted"
-        )
-        assert_series_equal(res.params, res_cat.params)
 
-    def test_no_regressors(self, data):
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, None, None, None)
+def test_kappa_error_exception(data):
+    with pytest.raises(ValueError):
+        IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=np.array([1]))
 
-    def test_too_few_instruments(self, data):
-        with pytest.raises(ValueError):
-            IV2SLS(data.dep, data.exog, data.endog, None)
+
+def test_fuller_error_exception(data):
+    with pytest.raises(ValueError):
+        IVLIML(data.dep, data.exog, data.endog, data.instr, fuller=np.array([1]))
+
+
+def test_kappa_fuller_warning_exception(data):
+    with warnings.catch_warnings(record=True) as w:
+        IVLIML(data.dep, data.exog, data.endog, data.instr, kappa=0.99, fuller=1)
+    assert len(w) == 1
+
+
+def test_string_cat_exception(data):
+    instr = data.instr.copy()
+    n = data.instr.shape[0]
+    cat = pd.Series(["a"] * (n // 2) + ["b"] * (n // 2))
+    instr = pd.DataFrame(instr)
+    instr["cat"] = cat
+    res = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type="unadjusted")
+    instr["cat"] = cat.astype("category")
+    res_cat = IV2SLS(data.dep, data.exog, data.endog, instr).fit(cov_type="unadjusted")
+    assert_series_equal(res.params, res_cat.params)
+
+
+def test_no_regressors_exception(data):
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, None, None, None)
+
+
+def test_too_few_instruments_exception(data):
+    with pytest.raises(ValueError):
+        IV2SLS(data.dep, data.exog, data.endog, None)
 
 
 def test_2sls_direct(data):
