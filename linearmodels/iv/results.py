@@ -1500,7 +1500,7 @@ class IVGMMResults(_CommonIVResults):
             ex = [c for c in endog.pandas if c not in variable_lst]
             endog_e = endog.pandas[ex].values
             null = "Variables {0} are exogenous".format(", ".join(variable_lst))
-        from linearmodels.iv import IVGMM
+        from linearmodels.iv.model import IVGMM, IVGMMCUE
 
         mod = IVGMM(dependent, exog_e, endog_e, instruments)
         res_e = mod.fit(cov_type=self.cov_type, **self.cov_config)
@@ -1513,7 +1513,6 @@ class IVGMMResults(_CommonIVResults):
         nz = z.shape[1]
         weight_mat_c = asarray(res_e.weight_matrix)[:nz, :nz]
         params_c = mod.estimate_parameters(x, y, z, weight_mat_c)
-        from linearmodels.iv.model import IVGMM, IVGMMCUE
 
         assert isinstance(self.model, (IVGMM, IVGMMCUE))
         j_c = self.model._j_statistic(params_c, weight_mat_c).stat
