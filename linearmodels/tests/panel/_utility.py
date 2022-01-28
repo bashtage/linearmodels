@@ -4,7 +4,6 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
-import pandas as pd
 from pandas import Categorical, DataFrame, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 from xarray.core.dtypes import NA

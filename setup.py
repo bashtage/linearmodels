@@ -111,9 +111,9 @@ def run_setup(binary: bool = True) -> None:
             "Intended Audience :: End Users/Desktop",
             "Intended Audience :: Financial and Insurance Industry",
             "Intended Audience :: Science/Research",
-            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
             "License :: OSI Approved",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",
@@ -122,7 +122,7 @@ def run_setup(binary: bool = True) -> None:
             "Topic :: Scientific/Engineering",
         ],
         ext_modules=extensions,
-        python_requires=">=3.7",
+        python_requires=">=3.8",
         distclass=BinaryDistribution,
     )
 
