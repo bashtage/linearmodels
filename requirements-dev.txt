@@ -19,3 +19,4 @@ mypy>=0.910
 black==21.7b0
 isort>=5.9
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
