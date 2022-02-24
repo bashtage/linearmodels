@@ -20,17 +20,11 @@ else
 fi
 echo "Show information about directories"
 echo "PWD: ${PWD}"
-echo ls ${PWD}
-ls ${PWD}
-echo ls ${PWD}/doc
-ls ${PWD}/doc
-echo ls ${PWD}/doc
-ls ${PWD}/doc/build
-echo ls ${PWD}/doc
+echo ls ${PWD}/doc/build/html
 ls ${PWD}/doc/build/html
 echo "Copy docs to devel"
-echo "cp -r ${PWD}/doc/build/html/* ${PWD}/devel/"
-cp -r "${PWD}/doc/build/html/*" "${PWD}/devel/"
+echo "cp -r ${PWD}/doc/build/html/. ${PWD}/devel/"
+cp -r "${PWD}/doc/build/html/." "${PWD}/devel/"
 echo "Add devel"
 git add devel/.
 echo "Change remote"
