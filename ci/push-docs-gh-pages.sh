@@ -19,12 +19,16 @@ else
   echo "Tag is ${GIT_TAG}. Not updating main documents"
 fi
 echo "Show information about directories"
+export OLD_WD=${PWD}
 echo "PWD: ${PWD}"
 echo ls ${PWD}/doc/build/html
 ls ${PWD}/doc/build/html
 echo "Copy docs to devel"
-echo "cp -r ${PWD}/doc/build/html/. ${PWD}/devel/"
-cp -r "${PWD}/doc/build/html/." "${PWD}/devel/"
+cd "${PWD}/doc/build/html/"
+echo "cp -r . ${OLD_WD}/devel/"
+cp -r . ${OLD_WD}/devel/
+echo "cd ${OLD_WD}"
+cd ${OLD_WD}
 echo "Add devel"
 git add devel/.
 echo "Change remote"
