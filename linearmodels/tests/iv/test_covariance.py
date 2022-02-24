@@ -59,7 +59,7 @@ def test_kernel_parzen():
             if z > 0.5:
                 w[i] = 2 * (1 - z) ** 3
             else:
-                w[i] = 1 - 6 * z ** 2 + 6 * z ** 3
+                w[i] = 1 - 6 * z**2 + 6 * z**3
         return w
 
     assert_equal(w(0), kernel_weight_parzen(0))
@@ -73,7 +73,7 @@ def test_kernel_qs():
         w[0] = 1
         for i in range(1, n + 1):
             q = 6 * pi * (i / k) / 5
-            w[i] = 3 / q ** 2 * (sin(q) / q - cos(q))
+            w[i] = 3 / q**2 * (sin(q) / q - cos(q))
         return w
 
     assert_equal(w(10, 0), kernel_weight_quadratic_spectral(10, 0))

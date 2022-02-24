@@ -39,7 +39,7 @@ e_homo = e
 y_unadjusted = x @ beta[:, None] + e[:, None]
 
 e_orig = e.copy()
-scale = (x ** 2).sum(1)
+scale = (x**2).sum(1)
 scale = n * scale / scale.sum()
 e *= scale
 e /= e.std()

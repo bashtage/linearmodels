@@ -12,10 +12,10 @@ def generate_data(
         premia = np.arange(1, nfactor + 1) / (10 * nfactor)
     rho = 0.2
     e = np.random.randn(nobs, nfactor)
-    factors = rho * np.random.randn(nobs, 1) + np.sqrt(1 - rho ** 2) * e
-    factors = np.sqrt(0.20 ** 2 / 12) * factors
+    factors = rho * np.random.randn(nobs, 1) + np.sqrt(1 - rho**2) * e
+    factors = np.sqrt(0.20**2 / 12) * factors
     factors += premia[None, :] / 12
-    idio = np.sqrt(0.10 ** 2 / 12) * np.random.randn(nobs, nportfolio)
+    idio = np.sqrt(0.10**2 / 12) * np.random.randn(nobs, nportfolio)
     betas = np.random.chisquare(2, (nfactor, nportfolio)) / 2.0
     portfolios = factors @ betas + idio
     if alpha:

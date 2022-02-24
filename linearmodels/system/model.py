@@ -529,7 +529,7 @@ class _SystemModelBase(object):
                 if nulls.any():
                     missing |= np.asarray(nulls)
 
-        missing_warning(missing)
+        missing_warning(missing, stacklevel=4)
         if np.any(missing):
             for i in range(k):
                 self._dependent[i].drop(missing)
@@ -1005,9 +1005,9 @@ class _SystemModelBase(object):
         mu = _parameters_from_xprod(xpx, xpy)
         eps_const = np.hstack([self._y[j] - mu[j] for j in range(k)])
         # Judge
-        judge = 1 - (eps ** 2).sum() / (eps_const ** 2).sum()
+        judge = 1 - (eps**2).sum() / (eps_const**2).sum()
         # Dhrymes
-        tot_eps_const_sq = (eps_const ** 2).sum(0)
+        tot_eps_const_sq = (eps_const**2).sum(0)
         r2s_arr = np.asarray(r2s)
         dhrymes = (r2s_arr * tot_eps_const_sq).sum() / tot_eps_const_sq.sum()
 
@@ -1024,9 +1024,9 @@ class _SystemModelBase(object):
             # McElroy
             sigma_m12 = inv_matrix_sqrt(sigma)
             std_eps = eps @ sigma_m12
-            numerator = (std_eps ** 2).sum()
+            numerator = (std_eps**2).sum()
             std_eps_const = eps_const @ sigma_m12
-            denom = (std_eps_const ** 2).sum()
+            denom = (std_eps_const**2).sum()
             mcelroy = 1.0 - numerator / denom
         r2 = dict(mcelroy=mcelroy, berndt=berndt, judge=judge, dhrymes=dhrymes)
         return Series(r2)
@@ -1286,7 +1286,7 @@ class _LSSystemModelBase(_SystemModelBase):
             )
             beta_hist.append(beta)
             diff = beta_hist[-1] - beta_hist[-2]
-            delta = float(np.sqrt(np.mean(diff ** 2)))
+            delta = float(np.sqrt(np.mean(diff**2)))
             iter_count += 1
 
         sigma_m12 = inv_matrix_sqrt(sigma)

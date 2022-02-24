@@ -357,7 +357,7 @@ def test_category_interaction():
     assert_allclose(actual, expected)
 
     actual = category_interaction(c, precondition=True).A
-    cond = np.sqrt((expected ** 2).sum(0))
+    cond = np.sqrt((expected**2).sum(0))
     expected /= cond
     assert_allclose(actual, expected)
 
@@ -373,7 +373,7 @@ def test_category_continuous_interaction():
     assert_allclose(actual.A, expected)
 
     actual = category_continuous_interaction(c, v, precondition=True)
-    cond = np.sqrt((expected ** 2).sum(0))
+    cond = np.sqrt((expected**2).sum(0))
     expected /= cond
     assert_allclose(actual.A, expected)
 

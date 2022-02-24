@@ -359,9 +359,9 @@ class TradedFactorModel(_FactorModelBase):
         )
         params = b.T
         betas = b[1:].T
-        residual_ss = (eps ** 2).sum()
+        residual_ss = (eps**2).sum()
         e = p - p.mean(0)[None, :]
-        total_ss = (e ** 2).sum()
+        total_ss = (e**2).sum()
         r2 = 1 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:
@@ -664,7 +664,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         )
 
         total_ss = ((p - p.mean(0)[None, :]) ** 2).sum()
-        residual_ss = (eps ** 2).sum()
+        residual_ss = (eps**2).sum()
         r2 = 1 - residual_ss / total_ss
         rp = lam
         rp_cov = full_vcv[s1:s2, s1:s2]
@@ -1070,10 +1070,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         betas = np.reshape(params[: (n * k)], (n, k))
         resids = self.portfolios.ndarray - self.factors.ndarray @ betas.T
         resids -= resids.mean(0)[None, :]
-        residual_ss = (resids ** 2).sum()
+        residual_ss = (resids**2).sum()
         total = self.portfolios.ndarray
         total = total - total.mean(0)[None, :]
-        total_ss = (total ** 2).sum()
+        total_ss = (total**2).sum()
         r2 = 1.0 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:

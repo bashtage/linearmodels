@@ -4,6 +4,7 @@ Instrumental variable estimators
 from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
+import warnings
 
 from numpy import (
     all as npall,
@@ -42,7 +43,7 @@ from linearmodels.iv.gmm import (
     OneWayClusteredWeightMatrix,
 )
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
-from linearmodels.shared.exceptions import missing_warning
+from linearmodels.shared.exceptions import IndexWarning, missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
@@ -229,6 +230,7 @@ class _IVModelBase(object):
                 "simultaneously.  Identical results can be computed "
                 "using kappa only",
                 UserWarning,
+                stacklevel=2,
             )
         if endog is None and instruments is None:
             self._method = "OLS"
@@ -280,7 +282,7 @@ class _IVModelBase(object):
         `data` which will be processed using the formula used to construct the
         values corresponding to the original model specification.
         """
-        if data is not None and self.formula is None:
+        if data is not None and not self.formula:
             raise ValueError(
                 "Unable to use data when the model was not " "created using a formula."
             )
@@ -296,6 +298,15 @@ class _IVModelBase(object):
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
+        if exog.shape[0] != endog.shape[0]:
+            raise ValueError("exog and endog must have the same number of rows.")
+        if (exog.index != endog.index).any():
+            warnings.warn(
+                "The indices of exog and endog do not match.  Predictions created "
+                "using the index of exog.",
+                IndexWarning,
+                stacklevel=2,
+            )
         exog_endog = concat([exog, endog], axis=1)
         x = asarray(exog_endog)
         params = atleast_2d(asarray(params))
@@ -350,7 +361,7 @@ class _IVModelBase(object):
             self.instruments.drop(missing)
             self.weights.drop(missing)
 
-        missing_warning(missing)
+        missing_warning(missing, stacklevel=4)
         return missing
 
     def wresids(self, params: Float64Array) -> Float64Array:

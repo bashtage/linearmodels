@@ -10,6 +10,7 @@ import pytest
 from linearmodels.formula import iv_2sls, iv_gmm, iv_gmm_cue, iv_liml
 from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.shared.exceptions import IndexWarning
 
 
 @pytest.fixture(
@@ -308,3 +309,36 @@ def test_iv_formula_parser(data, model_and_func, formula):
     parser.eval_env = 3
     assert parser.eval_env == 3
     assert isinstance(parser.exog, DataFrame)
+
+
+def test_predict_exception(data, model_and_func, formula):
+    model, _ = model_and_func
+    data = data.copy()
+    data.index = np.arange(100000, 100000 + data.shape[0])
+    mod = model.from_formula(formula, data)
+    res = mod.fit()
+    exog = data[["Intercept", "x3", "x4", "x5"]]
+    endog = data[["x1", "x2"]]
+    pred = res.predict(exog, endog)
+    pred2 = res.predict(data=data)
+    pred3 = res.predict(np.asarray(exog), np.asarray(endog))
+    with pytest.warns(IndexWarning):
+        res.predict(exog, np.asarray(endog))
+    with pytest.warns(IndexWarning):
+        res.predict(np.asarray(exog), endog)
+    assert_frame_equal(pred, pred2)
+    assert_allclose(pred, pred3)
+
+
+def test_predict_no_formula_predict_data(data, model_and_func, formula):
+    model, _ = model_and_func
+    mod_fmla: IV2SLS = model.from_formula(formula, data)
+    mod = model(mod_fmla.dependent, mod_fmla.exog, mod_fmla.endog, mod_fmla.instruments)
+    res = mod.fit()
+    with pytest.raises(ValueError, match="exog and endog must have"):
+        x = np.asarray(mod_fmla.exog.pandas)
+        w = np.asarray(mod_fmla.endog.pandas)
+        w = w[: mod_fmla.endog.shape[0] // 2]
+        res.predict(exog=x, endog=w)
+    with pytest.raises(ValueError, match="Unable to"):
+        res.predict(data=data)

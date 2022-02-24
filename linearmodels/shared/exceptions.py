@@ -25,7 +25,11 @@ class SingletonWarning(Warning):
     pass
 
 
-def missing_warning(missing: BoolArray) -> None:
+class IndexWarning(Warning):
+    pass
+
+
+def missing_warning(missing: BoolArray, stacklevel: int = 4) -> None:
     """Utility function to perform missing value check and warning"""
     if not np.any(missing):
         return
@@ -34,4 +38,17 @@ def missing_warning(missing: BoolArray) -> None:
     if linearmodels.WARN_ON_MISSING:
         import warnings
 
-        warnings.warn(missing_value_warning_msg, MissingValueWarning)
+        warnings.warn(
+            missing_value_warning_msg, MissingValueWarning, stacklevel=stacklevel
+        )
+
+
+__all__ = [
+    "IndexWarning",
+    "InferenceUnavailableWarning",
+    "MemoryWarning",
+    "MissingValueWarning",
+    "SingletonWarning",
+    "missing_warning",
+    "missing_value_warning_msg",
+]
