@@ -2,6 +2,7 @@ from itertools import product
 
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
@@ -334,3 +335,65 @@ def test_uneven_shapes():
     eq["weights"] = np.ones(eq.dependent.shape[0] // 2)
     with pytest.raises(ValueError):
         IV3SLS(data)
+
+
+def test_predict_simultaneous_equations():
+    rs = np.random.RandomState(1234)
+    e = rs.standard_normal((40000, 2))
+    x = rs.standard_normal((40000, 2))
+    y2 = x[:, 1] / 2 - x[:, 0] / 2 + e[:, 1] / 2 - e[:, 0] / 2
+    y1 = x[:, 1] / 2 + x[:, 0] / 2 + e[:, 1] / 2 + e[:, 0] / 2
+    df = pd.DataFrame(np.column_stack([y1, y2, x]), columns=["y1", "y2", "x1", "x2"])
+    data = {
+        "y1": {
+            "dependent": df.y1,
+            "exog": df.x1,
+            "endog": df.y2,
+            "instruments": df.x2,
+        },
+        "y2": {
+            "dependent": df.y2,
+            "exog": df.x2,
+            "endog": df.y1,
+            "instruments": df.x1,
+        },
+    }
+    res = IV3SLS(data).fit()
+    base_pred = res.predict(dataframe=True)
+    pred_data = {
+        "y1": {
+            "exog": df.x1,
+            "endog": df.y2,
+        },
+        "y2": {
+            "exog": df.x2,
+            "endog": df.y1,
+        },
+    }
+    exog_pred_data = res.predict(pred_data, dataframe=True)
+    assert_frame_equal(base_pred, exog_pred_data)
+
+    rs = np.random.RandomState(12345)
+    e = rs.standard_normal((1000, 2))
+    x = rs.standard_normal((1000, 2))
+    y2 = x[:, 1] / 2 - x[:, 0] / 2 + e[:, 1] / 2 - e[:, 0] / 2
+    y1 = x[:, 1] / 2 + x[:, 0] / 2 + e[:, 1] / 2 + e[:, 0] / 2
+    df = pd.DataFrame(np.column_stack([y1, y2, x]), columns=["y1", "y2", "x1", "x2"])
+    pred_data = {
+        "y1": {
+            "exog": df.x1,
+            "endog": df.y2,
+        },
+        "y2": {
+            "exog": df.x2,
+            "endog": df.y1,
+        },
+    }
+    exog_pred_data = res.predict(pred_data, dataframe=True)
+    assert exog_pred_data.shape == (1000, 2)
+    assert_allclose(
+        res.params.y1_x1 * df.x1 + res.params.y1_y2 * df.y2, exog_pred_data.iloc[:, 0]
+    )
+    assert_allclose(
+        res.params.y2_x2 * df.x2 + res.params.y2_y1 * df.y1, exog_pred_data.iloc[:, 1]
+    )
