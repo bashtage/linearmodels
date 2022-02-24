@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Since 4.25
+----------
+* Fixed a bug in :class:`~linearmodels.iv.model.IV2SLS` and related models
+  where :func:`~linearmodels.iv.model.IV2SLS.predict` would produce ``NaN``
+  values when ``exog`` and ``endog`` had different indices. An
+  ``IndexWarning`` is not shown.
+* Added ``stacklevel`` to all warnings to improve accuracy of warning
+  location.
+
 Version 4.25
 ------------
 * Clarified the null in the F-statistic

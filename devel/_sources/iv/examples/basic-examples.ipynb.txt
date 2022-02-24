@@ -32,8 +32,8 @@
    "outputs": [],
    "source": [
     "import numpy as np\n",
-    "from statsmodels.api import add_constant\n",
     "from linearmodels.datasets import mroz\n",
+    "from statsmodels.api import add_constant\n",
     "\n",
     "print(mroz.DESCR)\n",
     "data = mroz.load()\n",
@@ -225,7 +225,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "res2 = res.resids ** 2\n",
+    "res2 = res.resids**2\n",
     "fgls_mod = IV2SLS(np.log(res2), men[[\"const\", \"sibs\", \"exper\"]], None, None)\n",
     "fgls_res = fgls_mod.fit()\n",
     "sigma2_hat = np.exp(np.log(res2) - fgls_res.resids)\n",
@@ -771,11 +771,23 @@
     "res_ols = IV2SLS.from_formula(\"lscrap ~ 1 + hrsemp\", deltas).fit(cov_type=\"unadjusted\")\n",
     "print(compare({\"Panel OLS\": res_ols, \"Panel IV\": res_iv}))"
    ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mod = IV2SLS.from_formula(\"lscrap ~ 1 + [hrsemp ~ grant]\", deltas)\n",
+    "res_iv = mod.fit(cov_type=\"unadjusted\")\n",
+    "n = deltas.shape[0]\n",
+    "res_iv.predict(exog=np.ones((n, 1)), endog=deltas[[\"hrsemp\"]])"
+   ]
   }
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": "Python 3 (ipykernel)",
    "language": "python",
    "name": "python3"
   },
@@ -789,7 +801,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.5"
+   "version": "3.8.12"
   },
   "pycharm": {
    "stem_cell": {
@@ -802,5 +814,5 @@
   }
  },
  "nbformat": 4,
- "nbformat_minor": 1
+ "nbformat_minor": 4
 }
