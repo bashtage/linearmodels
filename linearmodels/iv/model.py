@@ -223,8 +223,6 @@ class _IVModelBase(object):
         if not isscalar(fuller):
             raise ValueError("fuller must be None or a scalar")
         if kappa is not None and fuller != 0:
-            import warnings
-
             warnings.warn(
                 "kappa and fuller should not normally be used "
                 "simultaneously.  Identical results can be computed "
