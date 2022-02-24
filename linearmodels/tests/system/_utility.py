@@ -23,7 +23,7 @@ def generate_data(
     assert len(p) == k
 
     eps = np.random.standard_normal((n, k))
-    eps *= np.sqrt(1 - rho ** 2)
+    eps *= np.sqrt(1 - rho**2)
     eps += rho * np.random.standard_normal((n, 1))
 
     data = AttrDict()
@@ -86,7 +86,7 @@ def generate_3sls_data(
         _en = en[i]
         params.append(np.random.chisquare(1, (const + _p + _en, 1)))
     eps = np.random.standard_normal((n, k))
-    eps *= np.sqrt(1 - rho ** 2)
+    eps *= np.sqrt(1 - rho**2)
     eps += rho * np.random.standard_normal((n, 1))
 
     data = AttrDict()
@@ -100,12 +100,12 @@ def generate_3sls_data(
         total = _p + _en + _instr
         corr = np.eye(_p + _en + _instr + 1)
         corr[_p : _p + _en, _p : _p + _en] = kappa * np.eye(_en)
-        corr[_p : _p + _en, -1] = np.sqrt(1 - kappa ** 2) * np.ones(_en)
+        corr[_p : _p + _en, -1] = np.sqrt(1 - kappa**2) * np.ones(_en)
         corr[_p + _en : _p + _en + _instr, _p : _p + _en] = beta * np.ones(
             (_instr, _en)
         )
         if _instr > 0:
-            val = np.sqrt(1 - beta ** 2) / _instr * np.eye(_instr)
+            val = np.sqrt(1 - beta**2) / _instr * np.eye(_instr)
             corr[_p + _en : _p + _en + _instr, _p + _en : _p + _en + _instr] = val
         if common_exog:
             shocks = np.random.standard_normal((n, total))
@@ -266,7 +266,7 @@ def generate_simultaneous_data(
         x = np.concatenate([np.ones((n, 1)), x], 1)
         beta = np.concatenate([np.arange(1, nsystem + 1)[None, :], beta], 0)
     eps = np.random.standard_normal((n, nsystem))
-    eps = 0.5 * np.random.standard_normal((n, 1)) + np.sqrt(1 - 0.5 ** 2) * eps
+    eps = 0.5 * np.random.standard_normal((n, 1)) + np.sqrt(1 - 0.5**2) * eps
     gaminv = np.linalg.inv(gam)
     y = x @ beta @ gaminv + eps @ gaminv
     eqns = {}

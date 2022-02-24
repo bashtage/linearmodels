@@ -79,12 +79,13 @@ def generate_data(
         np.random.seed(12345)
     else:
         np.random.set_state(rng.get_state())
+    from linearmodels.typing import Float64Array
 
     n, t, k = ntk
     k += const
     x = standard_normal((k, t, n))
     beta = np.arange(1, k + 1)[:, None, None] / k
-    y = np.empty((t, n), dtype=np.float64)
+    y: Float64Array = np.empty((t, n), dtype=np.float64)
     y[:, :] = (x * beta).sum(0) + standard_normal((t, n)) + 2 * standard_normal((1, n))
     w = np.random.chisquare(5, (t, n)) / 5
     c = np.empty((y.size, 0), dtype=int)
@@ -110,9 +111,9 @@ def generate_data(
 
     if missing > 0:
         locs = np.random.choice(n * t, int(n * t * missing))
-        y.flat[locs] = np.nan
+        y.flat[locs] = float(np.nan)
         locs = np.random.choice(n * t * k, int(n * t * k * missing))
-        x.flat[locs] = np.nan
+        x.flat[locs] = float(np.nan)
     if rng is not None:
         rng.set_state(np.random.get_state())
     if datatype == "numpy":

@@ -437,7 +437,7 @@ class _PanelModelBase(object):
             | np.any(np.isnan(w), axis=1)
         )
 
-        missing_warning(np.asarray(all_missing ^ missing))
+        missing_warning(np.asarray(all_missing ^ missing), stacklevel=4)
         if np.any(missing):
             self.dependent.drop(missing)
             self.exog.drop(missing)
@@ -561,7 +561,7 @@ class _PanelModelBase(object):
         if y.std() > 0 and xb.std() > 0:
             r2w = np.corrcoef(y.T, xb.T)[0, 1]
 
-        return r2o ** 2, r2w ** 2, r2b ** 2
+        return r2o**2, r2w**2, r2b**2
 
     def _rsquared(
         self, params: Float64Array, reweight: bool = False
@@ -587,7 +587,7 @@ class _PanelModelBase(object):
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e ** 2))
+        total_ss = float(w.T @ (e**2))
         r2b = 1 - residual_ss / total_ss if total_ss > 0.0 else 0.0
 
         #############################################
@@ -1004,7 +1004,7 @@ class PooledOLS(_PanelModelBase):
         if self._constant:
             e = e - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e ** 2))
+        total_ss = float(w.T @ (e**2))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -1217,7 +1217,9 @@ class PanelOLS(_PanelModelBase):
         nobs = retain.shape[0]
         ndropped = nobs - retain.sum()
         warn.warn(
-            "{0} singleton observations dropped".format(ndropped), SingletonWarning
+            "{0} singleton observations dropped".format(ndropped),
+            SingletonWarning,
+            stacklevel=3,
         )
         drop = ~retain
         self._singleton_index = cast(BoolArray, drop)
@@ -1512,8 +1514,8 @@ class PanelOLS(_PanelModelBase):
         if nreg < self.exog.shape[1]:
             return False
         # MiB
-        reg_size = 8 * nentity * nobs * nreg // 2 ** 20
-        low_memory = reg_size > 2 ** 10
+        reg_size = 8 * nentity * nobs * nreg // 2**20
+        low_memory = reg_size > 2**10
         if low_memory:
             import warnings
 
@@ -1523,6 +1525,7 @@ class PanelOLS(_PanelModelBase):
                 "the standard algorithm that creates dummy variables for the smaller of "
                 "the number of entities or number of time periods.",
                 MemoryWarning,
+                stacklevel=3,
             )
         return low_memory
 
@@ -1831,6 +1834,7 @@ class PanelOLS(_PanelModelBase):
                     warnings.warn(
                         absorbing_warn_msg.format(absorbed_variables=dropped),
                         AbsorbingEffectWarning,
+                        stacklevel=2,
                     )
                     x = x[:, retain]
                     # Update constant index loc
@@ -2147,7 +2151,7 @@ class BetweenOLS(_PanelModelBase):
         if self._constant:
             e = y - (w * y).sum() / w.sum()
 
-        total_ss = float(w.T @ (e ** 2))
+        total_ss = float(w.T @ (e**2))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -2446,7 +2450,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         eps = y - x @ params
 
         residual_ss = float(weps.T @ weps)
-        total_ss = float(w.T @ (y ** 2))
+        total_ss = float(w.T @ (y**2))
         r2 = 1 - residual_ss / total_ss
 
         res = self._postestimation(
@@ -2887,6 +2891,7 @@ class FamaMacBeth(_PanelModelBase):
                 "parameters in the model. Parameter\ninference is not "
                 "available.".format(valid_blocks.sum()),
                 InferenceUnavailableWarning,
+                stacklevel=3,
             )
         elif valid_blocks.sum() < valid_blocks.shape[0]:
             import warnings
@@ -2895,6 +2900,7 @@ class FamaMacBeth(_PanelModelBase):
                 "{0} of the time-series regressions cannot be estimated due to "
                 "deficient rank.".format(valid_blocks.shape[0] - valid_blocks.sum()),
                 MissingValueWarning,
+                stacklevel=3,
             )
 
     def fit(
@@ -2991,7 +2997,7 @@ class FamaMacBeth(_PanelModelBase):
         y = e = self.dependent.values2d
         if self.has_constant:
             e = y - (w * y).sum() / w.sum()
-        total_ss = float(w.T @ (e ** 2))
+        total_ss = float(w.T @ (e**2))
         r2 = 1 - residual_ss / total_ss
 
         if cov_type not in (

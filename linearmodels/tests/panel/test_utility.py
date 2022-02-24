@@ -97,7 +97,7 @@ def test_dummy_precondition():
     csr = dummy_matrix(cats, output_format="csr", drop="last", precondition=True)
     out_csr: csr_matrix = csr[0]
     cond_csr: np.ndarray = csr[1]
-    assert_allclose((out_arr ** 2).sum(0), np.ones(out_arr.shape[1]))
+    assert_allclose((out_arr**2).sum(0), np.ones(out_arr.shape[1]))
     assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_arr.shape[1]))
     assert_allclose(cond_arr, cond_csc)
     assert_allclose(cond_csr, cond_csc)
@@ -195,7 +195,7 @@ def test_preconditioner_copy():
     values = rs.standard_normal((100, 10))
     orig = values.copy()
     val_cond, cond = preconditioner(values, copy=True)
-    assert_allclose(np.sqrt((orig ** 2).sum(0)), cond)
+    assert_allclose(np.sqrt((orig**2).sum(0)), cond)
     assert id(val_cond) != id(values)
     assert_array_equal(orig, values)
 
@@ -218,11 +218,11 @@ def test_preconditioner_subclass():
     values = rs.standard_normal((100, 10))
     values = values.view(SubArray)
     val_cond, cond = preconditioner(values, copy=True)
-    assert_allclose(np.sqrt((values ** 2).sum(0)), cond)
+    assert_allclose(np.sqrt((values**2).sum(0)), cond)
     assert type(val_cond) == type(values)
     # Test in-place
     val_cond, cond = preconditioner(values, copy=False)
-    assert_allclose(np.sqrt((values ** 2).sum(0)), np.ones(10))
+    assert_allclose(np.sqrt((values**2).sum(0)), np.ones(10))
     assert type(val_cond) == type(values)
 
 

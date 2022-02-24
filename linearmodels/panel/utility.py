@@ -92,7 +92,7 @@ def preconditioner(
         d = np.asarray(d)
         if id(d) == d_id or copy:
             d = d.copy()
-        cond = cast(Float64Array, np.sqrt((d ** 2).sum(0)))
+        cond = cast(Float64Array, np.sqrt((d**2).sum(0)))
         d /= cond
         if klass is not None:
             d = d.view(klass)

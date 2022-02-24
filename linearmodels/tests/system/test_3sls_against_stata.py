@@ -30,7 +30,7 @@ def fit(request):
     debiased = method in ("ols", "2sls")
     kwargs = {}
     decimal = 3 if "ireg3" in method else 5
-    rtol = 10 ** -decimal
+    rtol = 10**-decimal
     res = mod.fit(
         cov_type="unadjusted",
         method=fit_method,

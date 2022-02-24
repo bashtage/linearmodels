@@ -186,7 +186,7 @@ def category_product(cats: AnyPandas) -> Series:
         col = cats[c]
         max_code = col.cat.codes.max()
         size = 1
-        while max_code >= 2 ** size:
+        while max_code >= 2**size:
             size += 1
         sizes.append(size)
     nobs = cats.shape[0]
@@ -717,7 +717,7 @@ class AbsorbingLS(object):
             self._absorb_inter.drop(missing)
             for interact in self._interaction_list:
                 interact.drop(missing)
-        missing_warning(missing)
+        missing_warning(missing, stacklevel=4)
         return missing
 
     def _check_constant(self) -> bool:
@@ -924,6 +924,7 @@ class AbsorbingLS(object):
                 warnings.warn(
                     absorbing_warn_msg.format(absorbed_variables=dropped),
                     AbsorbingEffectWarning,
+                    stacklevel=3,
                 )
 
             exog_resid = exog_resid[:, retain]
@@ -1032,7 +1033,9 @@ class AbsorbingLS(object):
             if absorb_options is not None:
                 raise ValueError("absorb_options cannot be used with lsmr_options")
             warnings.warn(
-                "lsmr_options is deprecated.  Use absorb_options.", FutureWarning
+                "lsmr_options is deprecated.  Use absorb_options.",
+                FutureWarning,
+                stacklevel=2,
             )
             absorb_options = {k: v for k, v in lsmr_options.items()}
         if self._absorbed_dependent is None:

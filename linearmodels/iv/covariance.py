@@ -130,7 +130,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
     z = arange(int(bw) + 1) / (int(bw) + 1)
-    w = 1 - 6 * z ** 2 + 6 * z ** 3
+    w = 1 - 6 * z**2 + 6 * z**3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
@@ -187,7 +187,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
     rate = 1 / (2 * q + 1)
     gamma = c * ((sq / s0) ** 2) ** rate
-    m = gamma * t ** rate
+    m = gamma * t**rate
     return min(int(ceil(m)), t - 1)
 
 

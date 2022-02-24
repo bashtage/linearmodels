@@ -559,7 +559,7 @@ class SystemResults(_CommonResults):
         r = np.corrcoef(resids.T)
         k = r.shape[0]
         distinct_corr = np.tril(r, -1)
-        stat = self.resids.shape[0] * (distinct_corr ** 2).sum()
+        stat = self.resids.shape[0] * (distinct_corr**2).sum()
         return WaldTestStatistic(
             stat,
             "Residuals are uncorrelated",
