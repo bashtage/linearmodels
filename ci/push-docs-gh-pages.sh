@@ -19,6 +19,10 @@ else
   echo "Tag is ${GIT_TAG}. Not updating main documents"
 fi
 echo "Copy docs to devel"
+echo ls ${PWD}
+ls ${PWD}
+echo ls ${PWD}/doc
+ls ${PWD}/doc
 echo "cp -r ${PWD}/doc/build/html/* ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/*" "${PWD}/devel/"
 echo "Add devel"
