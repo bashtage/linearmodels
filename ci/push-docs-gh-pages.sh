@@ -18,11 +18,13 @@ if [[ -n "${GIT_TAG}" ]]; then
 else
   echo "Tag is ${GIT_TAG}. Not updating main documents"
 fi
-echo "Copy docs to devel"
+echo "Show information about directories"
+echo "PWD: ${PWD}"
 echo ls ${PWD}
 ls ${PWD}
 echo ls ${PWD}/doc
 ls ${PWD}/doc
+echo "Copy docs to devel"
 echo "cp -r ${PWD}/doc/build/html/* ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/*" "${PWD}/devel/"
 echo "Add devel"

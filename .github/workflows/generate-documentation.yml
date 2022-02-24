@@ -38,9 +38,11 @@ jobs:
       run: python -m pip install -e . --no-build-isolation -v
     - name: Build documentation
       run: |
+        echo "PWD: ${PWD}"
         pushd doc
         make html
         popd
+        echo "PWD: ${PWD}"
     - name: Deploy documentation
       env:
         GIT_TAG: ${{ github.event.release.tag_name }}
