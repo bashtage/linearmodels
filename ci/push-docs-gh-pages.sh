@@ -24,6 +24,10 @@ echo ls ${PWD}
 ls ${PWD}
 echo ls ${PWD}/doc
 ls ${PWD}/doc
+echo ls ${PWD}/doc
+ls ${PWD}/doc/build
+echo ls ${PWD}/doc
+ls ${PWD}/doc/build/html
 echo "Copy docs to devel"
 echo "cp -r ${PWD}/doc/build/html/* ${PWD}/devel/"
 cp -r "${PWD}/doc/build/html/*" "${PWD}/devel/"
