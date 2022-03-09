@@ -3099,3 +3099,162 @@ class FamaMacBeth(_PanelModelBase):
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
         return mod
+
+
+class PanelLaggedDep(_PanelModelBase):
+    """
+    Arrelano Bond model for lagged panel data.
+
+    Parameters
+    ----------
+    dependent : array_like
+        Dependent (left-hand-side) variable (time by entity)
+    exog : array_like
+        Exogenous or right-hand-side variables (variable by time by entity).
+    weights : array_like, optional
+        Weights to use in estimation.  Assumes residual variance is
+        proportional to inverse of weight to that the residual time
+        the weight should be homoskedastic.
+    check_rank : bool, optional
+        Flag indicating whether to perform a rank check on the exogenous
+        variables to ensure that the model is identified. Skipping this
+        check can reduce the time required to validate a model specification.
+        Results may be numerically unstable if this check is skipped and
+        the matrix is not full rank.
+    lags : int, optional
+        The number of lags of the dependent series. Default value is 1
+    system_gmm : bool, optional
+        Flag that if set to true we have additional instruments of lagged
+        differences.
+
+    Notes
+    -----
+    Fixed effects OLS will usually result in biased estimates of rho because of
+    the correlation between y(i,t) and e(i,t) stemming from u(i).
+    The Arrelano-Bond procedure first differences the observables and then uses
+    lags of y as instruments.
+
+    The model is given by:
+
+    .. math::
+
+        y_{it} = \rho * y_{it-1} + \beta*x_{it} + u_i + \epsilon_{it}
+    """
+
+    def __init__(
+        self,
+        dependent: PanelDataLike,
+        exog: PanelDataLike,
+        *,
+        weights: Optional[PanelDataLike] = None,
+        check_rank: Optional[bool] = True,
+        lags: Optional[int] = 1,
+        system_gmm: Optional[bool] = False,
+    ) -> None:
+        super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
+
+        min_t = min(dependent.index.get_level_values(1))  # starting period
+        T = (
+            max(dependent.index.get_level_values(1)) + 1 - min_t
+        )  # total number of periods
+
+        # Names for the original and differenced endog and exog vars
+        ename = dependent.name
+        Dename = "D" + ename
+        xnames = exog.columns.tolist()
+        Dxnames = ["D" + x for x in xnames]
+
+        # We'll store all of the data in a dataframe
+        self.data = DataFrame()
+        self.data[ename] = dependent
+        self.data[Dename] = dependent.groupby(level=0).diff()
+
+        # Generate and store the lags of the differenced endog variable
+        Lenames = []
+        LDenames = []
+        for k in range(1, lags + 1):
+            col = "L%s%s" % (k, ename)
+            colD = "L%s%s" % (k, Dename)
+            Lenames.append(col)
+            LDenames.append(colD)
+            self.data[col] = self.data[ename].shift(k)
+            self.data[colD] = self.data[Dename].shift(k)
+
+        # Store the original and the diffs of the exog variables
+        for x in xnames:
+            self.data[x] = exog[x]
+            self.data["D" + x] = exog[x].groupby(level=0).diff()
+
+        # Set up the instruments -- lags of the endog levels for different time periods
+        instrnames = []
+        for t in range(
+            lags + 1, T
+        ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
+            for k in range(lags + 1, t + 1):
+                col = "ILVL_t%iL%i" % (t + min_t, k)
+                instrnames.append(col)
+                self.data[col] = dependent.groupby(level=0).shift(k)
+                self.data.loc[dependent.index.get_level_values(1) != t + min_t, col] = 0
+
+        if system_gmm:
+            # With the systems GMM estimator we have additional instruments of lagged differences
+            instrnamessys = []
+            for t in range(
+                lags, T
+            ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
+                col = "IDIFF_t%iL" % t
+                instrnamessys.append(col)
+                self.data[col] = self.data[LDenames[0]].groupby(level=0).shift(lags)
+                self.data.loc[dependent.index.get_level_values(1) != t + min_t, col] = 0
+
+            # Then to estimate the system GMM we stack differenced and undifferenced data and their corresponding instruments
+            cols1 = (
+                [Dename] + LDenames + Dxnames + instrnames
+            )  # variables used for the differences part of the regression
+            cols2 = (
+                [ename] + Lenames + xnames + instrnamessys
+            )  # variable used for the levels part of the regression
+            cols2R = (
+                [Dename] + LDenames + Dxnames + instrnamessys
+            )  # used to rename the variables that we want to overlap in the system reg.
+
+            # The differenced data set
+            data1 = self.data[cols1].copy()
+            for c in instrnamessys:
+                data1[
+                    c
+                ] = 0  # zero out the instruments that apply to undifferenced data
+
+            # The undifferenced data set
+            data2 = self.data[cols2].copy()
+            data2.columns = cols2R
+            for c in instrnames:
+                data2[c] = 0  # zero out the instruments that apply to differenced data
+
+            # Add an index level to each data series so we can join without creating duplicate index values
+            a1 = data1.index.get_level_values(0)
+            a2 = data1.index.get_level_values(1)
+            n = len(a1)
+            data1.index = MultiIndex.from_arrays([[1] * n, a1, a2])
+            data2.index = MultiIndex.from_arrays([[2] * n, a1, a2])
+
+            # Now append the series together
+            self.data = data1.append(data2)
+
+        dropped = self.data.dropna()
+        dropped["CLUSTER_VAR"] = dropped.index.get_level_values(0)
+        self.model: IVGMM = IVGMM(
+            dependent=dropped[Dename],
+            exog=dropped[Dxnames],
+            endog=dropped[LDenames],
+            instruments=dropped[instrnames],
+            weight_type="clustered",
+            clusters=dropped["CLUSTER_VAR"],
+        )
+
+    def fit(self):
+        return self.model.fit()
+
+    @property
+    def instruments(self):
+        return self.model.instruments
