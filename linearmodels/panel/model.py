@@ -59,6 +59,8 @@ from linearmodels.typing import (
     NumericArray,
 )
 
+from linearmodels.iv.model import IVGMM
+
 CovarianceEstimator = Union[
     ACCovariance,
     ClusteredCovariance,
@@ -3101,9 +3103,9 @@ class FamaMacBeth(_PanelModelBase):
         return mod
 
 
-class PanelLaggedDep(_PanelModelBase):
+class ArellanoBond(_PanelModelBase):
     """
-    Arrelano Bond model for lagged panel data.
+    Arellano-Bond estimator model for lagged panel data.
 
     Parameters
     ----------
@@ -3150,107 +3152,134 @@ class PanelLaggedDep(_PanelModelBase):
         check_rank: Optional[bool] = True,
         lags: Optional[int] = 1,
         system_gmm: Optional[bool] = False,
+        weight_type: str='clustered',
+        iv_max_lags: int=1000
     ) -> None:
+
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
 
-        min_t = min(dependent.index.get_level_values(1))  # starting period
-        T = (
-            max(dependent.index.get_level_values(1)) + 1 - min_t
-        )  # total number of periods
+        self.dependent = dependent
+        self.exog = exog
+        self.lags = lags
+        self.iv_max_lags = iv_max_lags
 
-        # Names for the original and differenced endog and exog vars
-        ename = dependent.name
-        Dename = "D" + ename
-        xnames = exog.columns.tolist()
-        Dxnames = ["D" + x for x in xnames]
+        self.starting_period = min(dependent.index.get_level_values(1))
+        self.total_number_of_periods = (
+            max(dependent.index.get_level_values(1)) + 1 - self.starting_period
+        )
 
-        # We'll store all of the data in a dataframe
+        self.y_var = dependent.name
+        self.diff_y_var = "diff_" + self.y_var
+        self.x_vars = exog.columns.tolist()
+        self.diff_x_vars = ["diff_" + x for x in self.x_vars]
+
         self.data = DataFrame()
-        self.data[ename] = dependent
-        self.data[Dename] = dependent.groupby(level=0).diff()
+        self.data[self.y_var] = dependent
 
-        # Generate and store the lags of the differenced endog variable
-        Lenames = []
-        LDenames = []
-        for k in range(1, lags + 1):
-            col = "L%s%s" % (k, ename)
-            colD = "L%s%s" % (k, Dename)
-            Lenames.append(col)
-            LDenames.append(colD)
-            self.data[col] = self.data[ename].shift(k)
-            self.data[colD] = self.data[Dename].shift(k)
+        self._calculate_diffs_and_lags()
 
-        # Store the original and the diffs of the exog variables
-        for x in xnames:
-            self.data[x] = exog[x]
-            self.data["D" + x] = exog[x].groupby(level=0).diff()
-
-        # Set up the instruments -- lags of the endog levels for different time periods
-        instrnames = []
-        for t in range(
-            lags + 1, T
-        ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
-            for k in range(lags + 1, t + 1):
-                col = "ILVL_t%iL%i" % (t + min_t, k)
-                instrnames.append(col)
-                self.data[col] = dependent.groupby(level=0).shift(k)
-                self.data.loc[dependent.index.get_level_values(1) != t + min_t, col] = 0
+        self._calculate_arellano_bond_instruments()
 
         if system_gmm:
-            # With the systems GMM estimator we have additional instruments of lagged differences
-            instrnamessys = []
-            for t in range(
-                lags, T
-            ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
-                col = "IDIFF_t%iL" % t
-                instrnamessys.append(col)
-                self.data[col] = self.data[LDenames[0]].groupby(level=0).shift(lags)
-                self.data.loc[dependent.index.get_level_values(1) != t + min_t, col] = 0
-
-            # Then to estimate the system GMM we stack differenced and undifferenced data and their corresponding instruments
-            cols1 = (
-                [Dename] + LDenames + Dxnames + instrnames
-            )  # variables used for the differences part of the regression
-            cols2 = (
-                [ename] + Lenames + xnames + instrnamessys
-            )  # variable used for the levels part of the regression
-            cols2R = (
-                [Dename] + LDenames + Dxnames + instrnamessys
-            )  # used to rename the variables that we want to overlap in the system reg.
-
-            # The differenced data set
-            data1 = self.data[cols1].copy()
-            for c in instrnamessys:
-                data1[
-                    c
-                ] = 0  # zero out the instruments that apply to undifferenced data
-
-            # The undifferenced data set
-            data2 = self.data[cols2].copy()
-            data2.columns = cols2R
-            for c in instrnames:
-                data2[c] = 0  # zero out the instruments that apply to differenced data
-
-            # Add an index level to each data series so we can join without creating duplicate index values
-            a1 = data1.index.get_level_values(0)
-            a2 = data1.index.get_level_values(1)
-            n = len(a1)
-            data1.index = MultiIndex.from_arrays([[1] * n, a1, a2])
-            data2.index = MultiIndex.from_arrays([[2] * n, a1, a2])
-
-            # Now append the series together
-            self.data = data1.append(data2)
+            self._calculate_system_gmm_instruments()
 
         dropped = self.data.dropna()
         dropped["CLUSTER_VAR"] = dropped.index.get_level_values(0)
+
         self.model: IVGMM = IVGMM(
-            dependent=dropped[Dename],
-            exog=dropped[Dxnames],
-            endog=dropped[LDenames],
-            instruments=dropped[instrnames],
-            weight_type="clustered",
-            clusters=dropped["CLUSTER_VAR"],
+            dependent=dropped[self.diff_y_var],
+            exog=dropped[self.diff_x_vars],
+            endog=dropped[self.lag_diff_y_vars],
+            instruments=dropped[self.instrument_vars],
+            weight_type=weight_type,
+            clusters=dropped["CLUSTER_VAR"] if weight_type == 'clustered' else None,
         )
+
+    def _calculate_diffs_and_lags(self) -> None:
+        """
+        Generate and store the lags of the differenced endog and exog variables
+        """
+
+        self.data[self.diff_y_var] = self.dependent.groupby(level=0).diff()
+
+        self.lag_y_vars = []
+        self.lag_diff_y_vars = []
+        for k in range(1, self.lags + 1):
+            col = f"lag_{k}_{self.y_var}" 
+            col_diff = f"lag_{k}_{self.diff_y_var}" 
+
+            self.data[col] = self.data[self.y_var].shift(k)
+            self.lag_y_vars.append(col)
+
+            self.data[col_diff] = self.data[self.diff_y_var].shift(k)
+            self.lag_diff_y_vars.append(col_diff)
+
+        for x in self.x_vars:
+            self.data[x] = self.exog[x]
+            self.data["diff_" + x] = self.exog[x].groupby(level=0).diff()
+
+    def _calculate_arellano_bond_instruments(self) -> None:
+        '''
+        Calculate the instruments for the Arrelano Bond procedure i.e. lags of the endog levels for different time periods
+        '''
+        self.instrument_vars = []
+        for lag_number in range(self.lags+1, min(self.total_number_of_periods, self.lags+1+self.iv_max_lags)): #TODO: Check this -- works for lags == 1, not sure if for anything else
+            for current_period in range(lag_number, self.total_number_of_periods):
+
+                col = f"instrument_period_{current_period + self.starting_period}_lag_{lag_number}"
+
+                data_pos = self.dependent.index.get_level_values(1) == current_period + self.starting_period
+                instrument = Series(0, index=self.dependent.index)
+                instrument.loc[data_pos] = self.dependent.groupby(level=0).shift(lag_number)[data_pos]
+                self.data[col] = instrument
+
+                self.instrument_vars.append(col)
+
+    def _calculate_system_gmm_instruments(self) -> None:
+        '''
+        The systems GMM estimator adds additional instruments of lagged differences
+        '''
+
+        system_gmm_instrument_vars = []
+        for t in range(
+            self.lags, self.total_number_of_periods
+        ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
+            col = f"instrument_diff_period{t}_lag"
+            system_gmm_instrument_vars.append(col)
+            self.data[col] = self.data[self.lag_diff_y_vars[0]].groupby(level=0).shift(self.lags)
+            self.data.loc[self.dependent.index.get_level_values(1) != t + self.starting_period, col] = 0
+
+        # Then to estimate the system GMM we stack differenced and undifferenced data and their corresponding instruments
+        cols1 = (
+            [self.diff_y_var] + self.lag_diff_y_vars + self.diff_x_vars + self.instrument_vars
+        )  # variables used for the differences part of the regression
+        cols2 = (
+            [self.y_var] + self.lag_y_vars + self.x_vars + system_gmm_instrument_vars
+        )  # variable used for the levels part of the regression
+        cols2R = (
+            [self.diff_y_var] + self.lag_diff_y_vars + self.diff_x_vars + system_gmm_instrument_vars
+        )  # used to rename the variables that we want to overlap in the system reg.
+
+        # The differenced data set
+        data1 = self.data[cols1].copy()
+        for c in system_gmm_instrument_vars:
+            data1[c] = 0  # zero out the instruments that apply to undifferenced data
+
+        # The undifferenced data set
+        data2 = self.data[cols2].copy()
+        data2.columns = cols2R
+        for c in self.instrument_vars:
+            data2[c] = 0  # zero out the instruments that apply to differenced data
+
+        # Add an index level to each data series so we can join without creating duplicate index values
+        a1 = data1.index.get_level_values(0)
+        a2 = data1.index.get_level_values(1)
+        n = len(a1)
+        data1.index = MultiIndex.from_arrays([[1] * n, a1, a2])
+        data2.index = MultiIndex.from_arrays([[2] * n, a1, a2])
+
+        # Now append the series together
+        self.data = data1.append(data2)
 
     def fit(self):
         return self.model.fit()
