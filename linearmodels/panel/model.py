@@ -5,6 +5,7 @@ from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
 from formulaic import model_matrix
 from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
+from formulaic.parser.types import Structured
 import numpy as np
 from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
@@ -150,24 +151,28 @@ class PanelFormulaParser(object):
         self._parse()
 
     def _parse(self) -> None:
+
         parts = self._formula.split("~")
         parts[1] = " 0 + " + parts[1]
         cln_formula = "~".join(parts)
         formula = Formula(cln_formula)
         rm_list = []
         effects = {"EntityEffects": False, "FixedEffects": False, "TimeEffects": False}
-        for term in formula.terms[1]:
+        for term in formula.rhs.terms:
             if str(term) in effects:
                 effects[str(term)] = True
                 rm_list.append(term)
+        rhs_terms = formula.rhs.terms[:]
         for term in rm_list:
-            formula.terms[1].remove(term)
+            rhs_terms.remove(term)
+        formula.terms = Structured(lhs=formula.lhs.terms, rhs=rhs_terms)
 
         if effects["EntityEffects"] and effects["FixedEffects"]:
             raise ValueError("Cannot use both FixedEffects and EntityEffects")
         self._entity_effect = effects["EntityEffects"] or effects["FixedEffects"]
         self._time_effect = effects["TimeEffects"]
-        cln_formula = str(formula)
+
+        cln_formula = str(formula.lhs) + " ~ " + str(formula.rhs)
         self._lhs, self._rhs = map(lambda s: "0 + " + s.strip(), cln_formula.split("~"))
 
     @property
