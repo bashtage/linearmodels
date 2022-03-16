@@ -4,10 +4,7 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 import pytest
-from scipy.sparse import csc_matrix, csr_matrix
-import scipy.sparse.coo
-import scipy.sparse.csc
-import scipy.sparse.csr
+from scipy.sparse import coo_matrix, csc_matrix, csr_matrix
 
 from linearmodels.panel.utility import (
     AbsorbingEffectError,
@@ -22,9 +19,9 @@ from linearmodels.panel.utility import (
 )
 
 formats = {
-    "csc": scipy.sparse.csc.csc_matrix,
-    "csr": scipy.sparse.csr.csr_matrix,
-    "coo": scipy.sparse.coo.coo_matrix,
+    "csc": csc_matrix,
+    "csr": csr_matrix,
+    "coo": coo_matrix,
     "array": np.ndarray,
 }
 
@@ -59,7 +56,7 @@ def test_dummy_last():
     cats[:, 1] = np.arange(15) % 5
     cats[-1, 1] = 0
     out, _ = dummy_matrix(cats, drop="last", precondition=False)
-    assert isinstance(out, scipy.sparse.csc.csc_matrix)
+    assert isinstance(out, csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 4, 3, 3, 3], dtype=np.int32)
     assert out.shape == (15, 3 + 5 - 1)
@@ -78,7 +75,7 @@ def test_dummy_pandas():
     c2 = pd.Series(pd.Categorical(["A", "B", "C", "D", "E"] * 3))
     cats = pd.concat([c1, c2], axis=1)
     out, _ = dummy_matrix(cats, drop="last", precondition=False)
-    assert isinstance(out, scipy.sparse.csc.csc_matrix)
+    assert isinstance(out, csc_matrix)
     assert out.shape == (15, 3 + 5 - 1)
     expected = np.array([5, 5, 5, 3, 3, 3, 3], dtype=np.int32)
     assert_array_equal(np.squeeze(np.asarray(out.sum(0), dtype=np.int32)), expected)
@@ -101,7 +98,7 @@ def test_dummy_precondition():
     assert_allclose((out_csc.multiply(out_csc)).sum(0).A1, np.ones(out_arr.shape[1]))
     assert_allclose(cond_arr, cond_csc)
     assert_allclose(cond_csr, cond_csc)
-    assert isinstance(out_csr, scipy.sparse.csr_matrix)
+    assert isinstance(out_csr, csr_matrix)
 
 
 def test_drop_singletons_single():
@@ -202,7 +199,7 @@ def test_preconditioner_copy():
 
 def test_preconditioner_sparse():
     rs = np.random.RandomState(0)
-    values = scipy.sparse.csc_matrix(rs.standard_normal((100, 10)))
+    values = csc_matrix(rs.standard_normal((100, 10)))
     orig = values.copy()
     val_cond, cond = preconditioner(values, copy=True)
     assert_allclose(np.sqrt((values.multiply(values)).sum(0).A1), cond)
