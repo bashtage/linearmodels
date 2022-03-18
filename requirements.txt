@@ -7,4 +7,4 @@ property_cached>=1.6.3
 mypy_extensions>=0.4
 Cython>=0.29.21
 pyhdfe>=0.1
-formulaic~=0.3.1
+formulaic~=0.3.2

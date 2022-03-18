@@ -11,8 +11,10 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Protocol,
     Sequence,
     Tuple,
+    TypeVar,
     Union,
     ValuesView,
 )
@@ -21,6 +23,18 @@ import numpy as np
 from pandas import DataFrame, Index, MultiIndex, Series
 
 from linearmodels.typing import AnyArray, Label
+
+_KT = TypeVar("_KT")
+_VT = TypeVar("_VT")
+_VT_co = TypeVar("_VT_co", covariant=True)
+
+
+class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
+    def keys(self) -> Iterable[_KT]:
+        ...
+
+    def __getitem__(self, __k: _KT) -> _VT_co:
+        ...
 
 
 def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> AttrDict:
@@ -36,7 +50,9 @@ class AttrDict(MutableMapping):
     """
 
     def update(
-        self, *args: Union[Mapping[Any, Any], Iterable[Tuple[Any, Any]]], **kwargs: Any
+        self,
+        *args: Union[SupportsKeysAndGetItem[Any, Any], Iterable[Tuple[Any, Any]]],
+        **kwargs: Any,
     ) -> None:
         """
         Update AD from dictionary or iterable E and F.

@@ -35,7 +35,7 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 from __future__ import annotations
 
 import os
-from typing import List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from ._version import get_versions
 from .asset_pricing.model import (
@@ -83,6 +83,23 @@ __all__ = [
     "WARN_ON_MISSING",
     "DROP_MISSING",
 ]
+
+
+# Workaround for bug inf formulaic. Remove after formulaic 0.3.3 is out
+try:
+    import numpy.typing
+except ModuleNotFoundError:
+    if TYPE_CHECKING:
+        raise RuntimeError("You must use a modern NumPy to type check")
+
+    import numpy
+
+    class _dummy:
+        @property
+        def ArrayLike(self):
+            return Any
+
+    numpy.typing = _dummy()
 
 
 def test(
