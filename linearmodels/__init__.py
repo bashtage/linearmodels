@@ -37,7 +37,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-from ._version import get_versions
+from ._version import version as __version__, version_tuple
 from .asset_pricing.model import (
     LinearFactorModel,
     LinearFactorModelGMM,
@@ -82,6 +82,8 @@ __all__ = [
     "TradedFactorModel",
     "WARN_ON_MISSING",
     "DROP_MISSING",
+    "version_tuple",
+    "__version__",
 ]
 
 
@@ -139,7 +141,3 @@ def test(
     if exit:  # pragma: no cover
         sys.exit(status)
     return status
-
-
-__version__ = get_versions()["version"]
-del get_versions

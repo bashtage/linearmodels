@@ -41,7 +41,7 @@ build_script:
     # Install build requirements
     - pip install -r requirements.txt
     - pip install -r requirements-test.txt
-    - python setup.py bdist_wheel
+    - python -m pip wheel --wheel-dir dist .
     - ls dist/*
 
 test_script:

@@ -3,10 +3,7 @@ from setuptools.dist import Distribution
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
-import sys
 from typing import Dict
-
-import versioneer
 
 try:
     from Cython.Build import cythonize
@@ -74,12 +71,10 @@ def run_setup(binary: bool = True) -> None:
         logging.warning("Building without binary support")
 
     setup(
-        cmdclass=versioneer.get_cmdclass(),
         name="linearmodels",
         license="NCSA",
         description="Linear Panel, Instrumental Variable, Asset Pricing, and System "
         "Regression models for Python",
-        version=versioneer.get_version(),
         packages=find_packages(),
         package_dir={"linearmodels": "./linearmodels"},
         author="Kevin Sheppard",
@@ -128,10 +123,7 @@ def run_setup(binary: bool = True) -> None:
 
 
 try:
-    build_binary = "--no-binary" not in sys.argv and CYTHON_INSTALLED
-    if "--no-binary" in sys.argv:
-        sys.argv.remove("--no-binary")
-
+    build_binary = CYTHON_INSTALLED
     run_setup(binary=build_binary)
 except (
     CCompilerError,

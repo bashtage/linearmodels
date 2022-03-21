@@ -43,7 +43,7 @@ jobs:
         test.install: true
       python310_no_cython:
         python.version: '3.10'
-        SETUP_OPTIONS: '--no-binary'
+        LM_NO_BINARY: 1
       python310_recent:
         python.version: '3.10'
         NUMPY: 1.21.0
@@ -84,20 +84,15 @@ jobs:
 
   - script: |
       echo "Installing to site packages"
-      python setup.py bdist_wheel ${SETUP_OPTIONS}
-      WHL=$(ls -t dist)
-      pip install ./dist/${WHL}
+      python -m pip wheel . --wheel-dir ./dist/ --no-build-isolation
+      WHL=$(ls -t ./dist/linearmodels-*.whl | head -1)
+      pip install ${WHL}
     displayName: 'Install linearmodels (site-packages)'
     condition: eq(variables['test.install'], 'true')
 
   - script: |
-      if [ -z ${SETUP_OPTIONS} ]; then
-        echo python -m pip install -e . -v --no-build-isolation
-        python -m pip install -e . -v --no-build-isolation
-      else
-        echo python setup.by develop ${SETUP_OPTIONS}
-        python setup.py develop ${SETUP_OPTIONS}
-      fi
+      echo python -m pip install -e . -v --no-build-isolation
+      python -m pip install -e . -v --no-build-isolation
     displayName: 'Install linearmodels (editable)'
     condition: ne(variables['test.install'], 'true')
 
