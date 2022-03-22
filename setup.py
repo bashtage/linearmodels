@@ -3,6 +3,7 @@ from setuptools.dist import Distribution
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 import glob
+import os
 from typing import Dict
 
 try:
@@ -124,6 +125,7 @@ def run_setup(binary: bool = True) -> None:
 
 try:
     build_binary = CYTHON_INSTALLED
+    build_binary &= os.environ.get("LM_NO_BINARY", None) not in ("1", "True", "true")
     run_setup(binary=build_binary)
 except (
     CCompilerError,
