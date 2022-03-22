@@ -5,7 +5,6 @@ recursive-include linearmodels *.pyx
 recursive-include linearmodels/tests *.txt *.csv *.dta
 recursive-include linearmodels/datasets *
 recursive-include examples *
-include versioneer.py
 include linearmodels/_version.py
 include LICENSE.md
 include README.md

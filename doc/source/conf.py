@@ -18,12 +18,12 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 
-from distutils.version import LooseVersion
 import glob
 import hashlib
 import os
 from typing import Dict, List
 
+from packaging.version import parse
 import sphinx_material
 
 import linearmodels
@@ -118,17 +118,11 @@ author = "Kevin Sheppard"
 #
 # The short X.Y version.
 # The short X.Y version.
-loose_version = LooseVersion(linearmodels.__version__)
+# The short X.Y version
+full_version = parse(linearmodels.__version__)
 short_version = version = linearmodels.__version__
-if "+" in loose_version.version:
-    version = version.replace(".dirty", "")
-    version = version.split("+")
-    commits, tag = version[1].split(".")
-    version = version[0]
-    short_tag = " (+{0})".format(commits)
-    tag = " (+" + commits + ", " + tag + ")"
-    short_version = version + short_tag
-    version = version + tag
+if full_version.is_devrelease:
+    short_version = f"v{full_version.base_version} (+{full_version.dev})"
 
 # The full version, including alpha/beta/rc tags.
 release = linearmodels.__version__

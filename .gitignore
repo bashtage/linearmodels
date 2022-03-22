@@ -1,6 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
-
+linearmodels/_version.py
 doc/source/**/generated/
 
 # Byte-compiled / optimized / DLL files

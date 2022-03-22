@@ -106,7 +106,7 @@ The main branch can be installed by cloning the repo and running setup
 ```bash
 git clone https://github.com/bashtage/linearmodels
 cd linearmodels
-python setup.py install
+pip install .
 ```
 
 ## Documentation

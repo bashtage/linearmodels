@@ -2,6 +2,5 @@ extraction:
   python:
     index:
       exclude:
-        - versioneer.py
         - linearmodels/_version.py
 
