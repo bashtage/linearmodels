@@ -11,6 +11,7 @@ from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
 
+from linearmodels.iv.model import IVGMM
 from linearmodels.panel.covariance import (
     ACCovariance,
     ClusteredCovariance,
@@ -58,8 +59,6 @@ from linearmodels.typing import (
     IntArray,
     NumericArray,
 )
-
-from linearmodels.iv.model import IVGMM
 
 CovarianceEstimator = Union[
     ACCovariance,
@@ -3152,8 +3151,8 @@ class ArellanoBond(_PanelModelBase):
         check_rank: Optional[bool] = True,
         lags: Optional[int] = 1,
         system_gmm: Optional[bool] = False,
-        weight_type: str='clustered',
-        iv_max_lags: int=1000
+        weight_type: Optional[str] = "clustered",
+        iv_max_lags: Optional[int] = 1000,
     ) -> None:
 
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -3192,7 +3191,7 @@ class ArellanoBond(_PanelModelBase):
             endog=dropped[self.lag_diff_y_vars],
             instruments=dropped[self.instrument_vars],
             weight_type=weight_type,
-            clusters=dropped["CLUSTER_VAR"] if weight_type == 'clustered' else None,
+            clusters=dropped["CLUSTER_VAR"] if weight_type == "clustered" else None,
         )
 
     def _calculate_diffs_and_lags(self) -> None:
@@ -3205,8 +3204,8 @@ class ArellanoBond(_PanelModelBase):
         self.lag_y_vars = []
         self.lag_diff_y_vars = []
         for k in range(1, self.lags + 1):
-            col = f"lag_{k}_{self.y_var}" 
-            col_diff = f"lag_{k}_{self.diff_y_var}" 
+            col = f"lag_{k}_{self.y_var}"
+            col_diff = f"lag_{k}_{self.diff_y_var}"
 
             self.data[col] = self.data[self.y_var].shift(k)
             self.lag_y_vars.append(col)
@@ -3219,26 +3218,34 @@ class ArellanoBond(_PanelModelBase):
             self.data["diff_" + x] = self.exog[x].groupby(level=0).diff()
 
     def _calculate_arellano_bond_instruments(self) -> None:
-        '''
+        """
         Calculate the instruments for the Arrelano Bond procedure i.e. lags of the endog levels for different time periods
-        '''
+        """
         self.instrument_vars = []
-        for lag_number in range(self.lags+1, min(self.total_number_of_periods, self.lags+1+self.iv_max_lags)): #TODO: Check this -- works for lags == 1, not sure if for anything else
+        for lag_number in range(
+            self.lags + 1,
+            min(self.total_number_of_periods, self.lags + 1 + self.iv_max_lags),
+        ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
             for current_period in range(lag_number, self.total_number_of_periods):
 
                 col = f"instrument_period_{current_period + self.starting_period}_lag_{lag_number}"
 
-                data_pos = self.dependent.index.get_level_values(1) == current_period + self.starting_period
+                data_pos = (
+                    self.dependent.index.get_level_values(1)
+                    == current_period + self.starting_period
+                )
                 instrument = Series(0, index=self.dependent.index)
-                instrument.loc[data_pos] = self.dependent.groupby(level=0).shift(lag_number)[data_pos]
+                instrument.loc[data_pos] = self.dependent.groupby(level=0).shift(
+                    lag_number
+                )[data_pos]
                 self.data[col] = instrument
 
                 self.instrument_vars.append(col)
 
     def _calculate_system_gmm_instruments(self) -> None:
-        '''
+        """
         The systems GMM estimator adds additional instruments of lagged differences
-        '''
+        """
 
         system_gmm_instrument_vars = []
         for t in range(
@@ -3246,18 +3253,29 @@ class ArellanoBond(_PanelModelBase):
         ):  # TODO: Check this -- works for lags == 1, not sure if for anything else
             col = f"instrument_diff_period{t}_lag"
             system_gmm_instrument_vars.append(col)
-            self.data[col] = self.data[self.lag_diff_y_vars[0]].groupby(level=0).shift(self.lags)
-            self.data.loc[self.dependent.index.get_level_values(1) != t + self.starting_period, col] = 0
+            self.data[col] = (
+                self.data[self.lag_diff_y_vars[0]].groupby(level=0).shift(self.lags)
+            )
+            self.data.loc[
+                self.dependent.index.get_level_values(1) != t + self.starting_period,
+                col,
+            ] = 0
 
         # Then to estimate the system GMM we stack differenced and undifferenced data and their corresponding instruments
         cols1 = (
-            [self.diff_y_var] + self.lag_diff_y_vars + self.diff_x_vars + self.instrument_vars
+            [self.diff_y_var]
+            + self.lag_diff_y_vars
+            + self.diff_x_vars
+            + self.instrument_vars
         )  # variables used for the differences part of the regression
         cols2 = (
             [self.y_var] + self.lag_y_vars + self.x_vars + system_gmm_instrument_vars
         )  # variable used for the levels part of the regression
         cols2R = (
-            [self.diff_y_var] + self.lag_diff_y_vars + self.diff_x_vars + system_gmm_instrument_vars
+            [self.diff_y_var]
+            + self.lag_diff_y_vars
+            + self.diff_x_vars
+            + system_gmm_instrument_vars
         )  # used to rename the variables that we want to overlap in the system reg.
 
         # The differenced data set
