@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-Since 4.25
-----------
+Version 4.26
+------------
 * Fixed a bug in :class:`~linearmodels.iv.model.IV2SLS` and related models
   where :func:`~linearmodels.iv.model.IV2SLS.predict` would produce ``NaN``
   values when ``exog`` and ``endog`` had different indices. An
