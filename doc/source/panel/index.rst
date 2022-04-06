@@ -9,7 +9,7 @@ estimators are presented in :ref:`panel-module-reference-covariance`.
 
 `Basic Examples`_ shows basic usage of the models using examples from
 Wooldridge's text books. `Using Formulas`_ shows how models can be specified
-using R-like formulas using patsy. `Data Formats`_ described the
+using R-like formulas using `formulaic <https://github.com/matthewwardrop/formulaic/>`_. `Data Formats`_ described the
 alternative formats that can be used when specifying models.
 
 :ref:`panel-mathematical-notation` contains a concise explanation of the formulas
