@@ -2,11 +2,15 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%% md\n"
+    }
+   },
    "source": [
     "# Using Formulas\n",
     "\n",
-    "The asset pricing model estimators all all formulas.  Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard Patsy syntax needs to be modified. There are two methods to use formulas.  The first specified both the test portfolio and the factors.  The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.\n",
+    "The asset pricing model estimators all all formulas.  Since the models have multiple dependent variables (test portfolios) as well as multiple independent variables (factors), the standard [formulaic](https://github.com/matthewwardrop/formulaic/) syntax needs to be modified. There are two methods to use formulas.  The first specified both the test portfolio and the factors.  The second specifies only the factors and the test portfolios are passed using an optional keyword argument. The second syntax exists since in many models the number of test portfolios might be large and interest is usually in modifying the factors.\n",
     "\n",
     "## Available Syntax \n",
     "\n",
@@ -32,7 +36,11 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%% md\n"
+    }
+   },
    "source": [
     "## Import data and transform to be excess returns\n",
     "\n",
@@ -42,7 +50,11 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%%\n"
+    }
+   },
    "outputs": [],
    "source": [
     "from linearmodels.datasets import french\n",
@@ -54,7 +66,11 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%% md\n"
+    }
+   },
    "source": [
     "## First Syntax\n",
     "\n",
@@ -64,7 +80,11 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%%\n"
+    }
+   },
    "outputs": [],
    "source": [
     "from linearmodels.asset_pricing import LinearFactorModel, TradedFactorModel\n",
@@ -77,7 +97,11 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%% md\n"
+    }
+   },
    "source": [
     "## Second Syntax\n",
     "\n",
@@ -87,7 +111,11 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%%\n"
+    }
+   },
    "outputs": [],
    "source": [
     "ports = [\"S{0}V{1}\".format(i, j) for i in (1, 3, 5) for j in (1, 3, 5)]\n",
@@ -103,7 +131,11 @@
   },
   {
    "cell_type": "markdown",
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%% md\n"
+    }
+   },
    "source": [
     "## Comparing results\n",
     "\n",
@@ -113,7 +145,11 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "metadata": {},
+   "metadata": {
+    "pycharm": {
+     "name": "#%%\n"
+    }
+   },
    "outputs": [],
    "source": [
     "portfolios = data[ports]\n",
