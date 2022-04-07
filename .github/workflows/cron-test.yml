@@ -18,16 +18,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: [cp38, cp39, cp310]
+        python: [cp310]
         os: [ubuntu-20.04, windows-2019]
     env:
       BUILD_COMMIT: "main"
       CIBW_BUILD: ${{ matrix.python }}-*
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_ARCHS_MACOS: "x86_64"
-      # No support for pypy, musl, Win32 for 3.10+
-      CIBW_SKIP: "pp* *-musllinux_* cp310-win32"
-      CIBW_TEST_REQUIRES: pytest pytest-xdist
+      CIBW_SKIP: "pp* *-musllinux_* *-win32"
+      CIBW_TEST_REQUIRES: pytest pytest-xdist xarray matplotlib
       CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow','-n','2'])"
       # Avoid testing on emulated architectures
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'auditwheel repair --strip -w {dest_dir} {wheel}'
@@ -51,4 +50,3 @@ jobs:
       - name: Build wheels
         run: |
           python -m cibuildwheel --output-dir wheelhouse .
-
