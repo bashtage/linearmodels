@@ -1,6 +1,4 @@
-"""
-Instrumental variable estimators
-"""
+"""Instrumental variable estimators."""
 from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast

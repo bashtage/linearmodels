@@ -1,4 +1,4 @@
-"""Covariance and weight estimation for GMM IV estimators"""
+"""Covariance and weight estimation for GMM IV estimators."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from numpy.linalg import inv
 
 
 class HomoskedasticWeightMatrix(object):
-
     r"""
+
     Homoskedastic (unadjusted) weight estimation
 
     Parameters
@@ -52,7 +52,7 @@ class HomoskedasticWeightMatrix(object):
     def weight_matrix(
             self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
-        """
+        r"""
         Parameters
         ----------
         x : ndarray

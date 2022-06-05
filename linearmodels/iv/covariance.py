@@ -1,4 +1,4 @@
-"""Covariance estimation for 2SLS and LIML IV estimators"""
+"""Covariance estimation for 2SLS and LIML IV estimators."""
 
 from __future__ import annotations
 
@@ -135,7 +135,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
 
 
 def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
-    """
+    r"""
     Parameters
     x : ndarray
         Array of data to use when computing optimal bandwidth
@@ -164,6 +164,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     linearmodels.iv.covariance.kernel_weight_bartlett,
     linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
+
     """
     t = x.shape[0]
     x = x.squeeze()
@@ -289,7 +290,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def s(self) -> Float64Array:
-        """Score covariance estimate"""
+        """Score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
         s2 = eps.T @ eps / nobs
@@ -304,7 +305,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def cov(self) -> Float64Array:
-        """Covariance of estimated parameters"""
+        """Covariance of estimated parameters."""
 
         x, z = self.x, self.z
         nobs = x.shape[0]
@@ -332,7 +333,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def debiased(self) -> bool:
-        """Flag indicating if covariance is debiased"""
+        """Flag indicating if covariance is debiased."""
         return self._debiased
 
     @property
@@ -401,9 +402,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """Heteroskedasticity-robust score covariance estimate"""
+        """Heteroskedasticity-robust score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
+        nobs = x.shape[1]
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e / nobs
@@ -509,7 +510,7 @@ class KernelCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """HAC score covariance estimate"""
+        """HAC score covariance estimate."""
         x, z, eps = self.x, self.z, self.eps
         nobs, nvar = x.shape
 
