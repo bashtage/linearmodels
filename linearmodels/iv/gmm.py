@@ -6,9 +6,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Union
 
-from numpy import asarray, ndarray, unique, zeros, sum, ones, diagflat, kron
-from numpy.linalg import inv
-
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
@@ -18,6 +15,8 @@ from linearmodels.iv.covariance import (
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import AnyArray, Float64Array
+from numpy import asarray, ndarray, unique, zeros, sum as npsum, ones, diagflat, kron,dot
+from numpy.linalg import inv
 
 
 class HomoskedasticWeightMatrix(object):
@@ -259,7 +258,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     @property
     def bandwidth(self) -> Optional[int]:
-        """Actual bandwidth used in estimating the weight matrix"""
+        """Actual bandwidth used in estimating the weight matrix."""
         return self._bandwidth
 
 
@@ -269,13 +268,13 @@ def conutnum(x: Float64Array, binranges: Float64Array) -> Float64Array:
     """
     temp = zeros((len(binranges), 2))
     temp[:, 0] = binranges
-    for i in range(len(binranges)):
+    for i, element in enumerate(binranges):
         if i == 0:
-            temp[i, 1] = sum((x <= binranges[0]))
+            temp[i, 1] = npsum((x <= binranges[0]))
         elif i == len(binranges) - 1:
-            temp[i, 1] = sum((x >= binranges[i]))
+            temp[i, 1] = npsum((x >= element))
         else:
-            temp[i, 1] = sum((x > binranges[i - 1]) & (x <= binranges[i]))
+            temp[i, 1] = npsum((x > binranges[i - 1]) & (x <= element))
     return temp
 
 
@@ -326,20 +325,20 @@ class OneStepMisspecificationWeightMatrix(HomoskedasticWeightMatrix):
                 "got {1}".format(nobs, clusters.shape[0])
             )
         clusters = asarray(clusters).copy().squeeze()
-        cc, mem = unique(clusters, return_inverse=True)
+        cc = unique(clusters)
         G = int(len(cc))
         g_ng = self.conutnum(clusters[:], cc)
         ng = g_ng[:, 1]
         wmat = zeros((z_num, z_num))
         W0i = zeros((z_num, z_num, G))
         for i in range(G):
-            Zi = z[int(sum(ng[0:i + 1]) - ng[i]): int(sum(ng[0:i + 1])), :]
+            Zi = z[int(npsum(ng[0:i + 1]) - ng[i]): int(npsum(ng[0:i + 1])), :]
 
             h0 = 2 * ones((int(ng[i]), 1))
             h1 = -1 * ones((int(ng[i]) - 1, 1))
             Hm = diagflat(h0) + diagflat(h1, 1) + diagflat(h1, -1)
 
-            W0i[:, :, i] = Zi.T @ Hm @ Zi;
+            W0i[:, :, i] = Zi.T @ Hm @ Zi
             wmat = wmat + W0i[:, :, i]
         wmat = wmat / nobs
         return wmat
@@ -417,11 +416,8 @@ class MisspecificationWeightMatrix(HomoskedasticWeightMatrix):
         ndarray
             Covariance of GMM moment conditions.
         """
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
 
-        ze = z * eps
-        mu = ze.mean(axis=0) if self._center else 0
-        ze -= mu
         z_num = z.shape[1]
         clusters = self._clusters
         if clusters.shape[0] != nobs:
@@ -679,7 +675,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
                                                   self.config['debiased']).s
         elif self._cov_type == 'Misspecification':
             c = MisspecificationCovariance(self.x, self.y, self.z, self.params, self.config['clusters'],
-                                           self.config['debiased'],w=self.w).s
+                                           self.config['debiased'], w=self.w).s
         else:
             nobs = x.shape[0]
             xpz = x.T @ z / nobs
