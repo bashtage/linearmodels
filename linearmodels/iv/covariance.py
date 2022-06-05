@@ -285,10 +285,7 @@ class HomoskedasticCovariance(object):
 
     def __repr__(self) -> str:
         return (
-                self.__str__()
-                + "\n"
-                + self.__class__.__name__
-                + ", id: {0}".format(hex(id(self)))
+                self.__str__() + "\n" + self.__class__.__name__ + ", id: {0}".format(hex(id(self)))
         )
 
     @property
