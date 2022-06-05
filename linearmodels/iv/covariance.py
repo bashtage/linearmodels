@@ -1,11 +1,11 @@
-"""Covariance estimation for 2SLS and LIML IV estimators."""
+"""
+Covariance estimation for 2SLS and LIML IV estimators
+"""
 
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Optional, Union, cast
 
-from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.typing import AnyArray, Float64Array, Numeric, OptionalNumeric
 from mypy_extensions import VarArg
 from numpy import (
     arange,
@@ -25,6 +25,9 @@ from numpy import (
     kron
 )
 from numpy.linalg import inv, pinv
+
+from linearmodels.shared.covariance import cov_cluster, cov_kernel
+from linearmodels.typing import AnyArray, Float64Array, Numeric, OptionalNumeric
 
 KernelWeight = Union[
     Callable[[float, float], ndarray],
@@ -129,13 +132,13 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
     z = arange(int(bw) + 1) / (int(bw) + 1)
-    w = 1 - 6 * z ** 2 + 6 * z ** 3
+    w = 1 - 6 * z**2 + 6 * z**3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
 
 def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
-    r"""
+    """
     Parameters
     x : ndarray
         Array of data to use when computing optimal bandwidth
@@ -164,7 +167,6 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     linearmodels.iv.covariance.kernel_weight_bartlett,
     linearmodels.iv.covariance.kernel_weight_parzen,
     linearmodels.iv.covariance.kernel_weight_quadratic_spectral
-
     """
     t = x.shape[0]
     x = x.squeeze()
@@ -187,7 +189,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
     rate = 1 / (2 * q + 1)
     gamma = c * ((sq / s0) ** 2) ** rate
-    m = gamma * t ** rate
+    m = gamma * t**rate
     return min(int(ceil(m)), t - 1)
 
 
@@ -220,7 +222,8 @@ class HomoskedasticCovariance(object):
         Flag indicating whether to use a small-sample adjustment
     kappa : float, optional
         Value of kappa in k-class estimator
-
+    w : ndarray
+        the iter GMM weight matrix
     Notes
     -----
     Covariance is estimated using
@@ -246,14 +249,14 @@ class HomoskedasticCovariance(object):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            debiased: bool = False,
-            kappa: Numeric = 1,
-            w: Float64Array = zeros(1)
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        debiased: bool = False,
+        kappa: Numeric = 1,
+        w: Float64Array = zeros(1)
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -282,15 +285,15 @@ class HomoskedasticCovariance(object):
 
     def __repr__(self) -> str:
         return (
-                self.__str__()
-                + "\n"
-                + self.__class__.__name__
-                + ", id: {0}".format(hex(id(self)))
+            self.__str__()
+            + "\n"
+            + self.__class__.__name__
+            + ", id: {0}".format(hex(id(self)))
         )
 
     @property
     def s(self) -> Float64Array:
-        """Score covariance estimate."""
+        """Score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
         nobs = x.shape[0]
         s2 = eps.T @ eps / nobs
@@ -305,7 +308,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def cov(self) -> Float64Array:
-        """Covariance of estimated parameters."""
+        """Covariance of estimated parameters"""
 
         x, z = self.x, self.z
         nobs = x.shape[0]
@@ -333,7 +336,7 @@ class HomoskedasticCovariance(object):
 
     @property
     def debiased(self) -> bool:
-        """Flag indicating if covariance is debiased."""
+        """Flag indicating if covariance is debiased"""
         return self._debiased
 
     @property
@@ -387,13 +390,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(HeteroskedasticCovariance, self).__init__(
             x, y, z, params, debiased, kappa
@@ -402,9 +405,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """Heteroskedasticity-robust score covariance estimate."""
+        """Heteroskedasticity-robust score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
-        nobs = x.shape[1]
+        nobs = x.shape[0]
         pinvz = self._pinvz
         xhat_e = z @ (pinvz @ x) * eps
         s = xhat_e.T @ xhat_e / nobs
@@ -480,15 +483,15 @@ class KernelCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            kernel: str = "bartlett",
-            bandwidth: OptionalNumeric = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        kernel: str = "bartlett",
+        bandwidth: OptionalNumeric = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
@@ -510,13 +513,13 @@ class KernelCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """HAC score covariance estimate."""
+        """HAC score covariance estimate"""
         x, z, eps = self.x, self.z, self.eps
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
 
         pinvz = self._pinvz
         xhat = z @ (pinvz @ x)
-        xhat_e = xhat * eps
+        xhat_e = asarray(xhat * eps, dtype=float)
 
         kernel = self.config["kernel"]
         bw = self.config["bandwidth"]
@@ -533,7 +536,6 @@ class KernelCovariance(HomoskedasticCovariance):
 
         self._bandwidth = bw
         w = self._kernels[kernel](bw, nobs - 1)
-
         s = cov_kernel(xhat_e, w)
 
         return cast(ndarray, self._scale * s)
@@ -601,14 +603,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            clusters: Optional[AnyArray] = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        clusters: Optional[AnyArray] = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(ClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
 
@@ -638,7 +640,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """Clustered estimator of score covariance."""
+        """Clustered estimator of score covariance"""
 
         def rescale(s: Float64Array, nc: int, nobs: int) -> Float64Array:
             scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
@@ -646,9 +648,9 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         x, z, eps = self.x, self.z, self.eps
         pinvz = self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
+        xhat_e = asarray(z @ (pinvz @ x) * eps, dtype=float)
 
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
         clusters = self._clusters
         if self._clusters.ndim == 1:
             s = cov_cluster(xhat_e, clusters)
@@ -720,14 +722,15 @@ class MisspecificationCovariance(HomoskedasticCovariance):
     where
 
     .. math::
-    \hat{\psi_{i}}=\hat{Q}^{'}\hat{W}m(X_{i},\hat{\theta})+Q(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}-\hat{Q}^{'}
-    \hat{W}^{-1}v(X_{i},\hat{\theta})v(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}
+    \hat{\psi_{i}}=\hat{Q}^{'}\hat{W}m(X_{i},\hat{\theta})+
+    Q(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}-
+    \hat{Q}^{'}\hat{W}^{-1}v(X_{i},\hat{\theta})v(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}
 
     and
 
     .. math::
-    \hat{H}=\hat{Q}^{'}\hat{W}^{-1}\hat{Q}+(\hat{\mu}^{'}\hat{W}^{-1}\otimes I_{k})\hat{R}-(\hat{\mu}^{'}\hat{W}^{-1}
-    \otimes\hat{Q}^{'}\hat{W}^{-1})\hat{S}
+    \hat{H}=\hat{Q}^{'}\hat{W}^{-1}\hat{Q}+(\hat{\mu}^{'}\hat{W}^{-1}\otimes I_{k})\hat{R}-
+    (\hat{\mu}^{'}\hat{W}^{-1}\otimes\hat{Q}^{'}\hat{W}^{-1})\hat{S}
 
     """
 
@@ -857,32 +860,6 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
     kappa : float, optional
         None
 
-
-    Notes
-    -----
-    Covariance is estimated using
-
-    .. math::
-    \hat{V}=\hat{H}\hat{\Omega}\hat{H}^{-1'}
-
-
-    where
-
-    .. math::
-    \hat{\Omega}=\frac{1}{n}\sum_{i=1}^{n}\hat{\psi_{i}}\hat{\psi_{i}^{'}}
-
-    where
-
-    .. math::
-    \hat{\psi_{i}}=\hat{Q}^{'}\hat{W}m(X_{i},\hat{\theta})+Q(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}-\hat{Q}^{'}
-    \hat{W}^{-1}v(X_{i},\hat{\theta})v(X_{i},\hat{\theta})^{'}\hat{W}^{-1}\hat{\mu}
-
-    and
-
-    .. math::
-    \hat{H}=\hat{Q}^{'}\hat{W}^{-1}\hat{Q}+(\hat{\mu}^{'}\hat{W}^{-1}\otimes I_{k})\hat{R}-(\hat{\mu}^{'}\hat{W}^{-1}
-    \otimes\hat{Q}^{'}\hat{W}^{-1})\hat{S}
-
     """
 
     def __init__(
@@ -970,9 +947,8 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
             Zi = self.z[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
             e1i = eps[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1]))]
             DXi = self.x[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
-            psi1 = Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - Q.T @ inv(wmat) @ W0i[:, :,
-                                                                                                   i] @ inv(
-                wmat) @ mu1
+            psi1 = Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - \
+                   Q.T @ inv(wmat) @ W0i[:, :, i] @ inv(wmat) @ mu1
             Om1 += psi1 @ psi1.T
         Om1 /= nobs
         H0 = Q.T @ inv(wmat) @ Q
