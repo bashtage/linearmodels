@@ -53,7 +53,6 @@ from numpy import (
     ones,
     sqrt,
     zeros,
-    sum,
     unique,
     diagflat,
 )
@@ -116,6 +115,7 @@ WEIGHT_MATRICES = {
 
 
 class _IVModelBase(object):
+
     r"""
     Limited information ML and k-class estimation of IV models
 
@@ -321,12 +321,12 @@ class _IVModelBase(object):
 
     @property
     def formula(self) -> str:
-        """Formula used to create the model"""
+        """Formula used to create the model."""
         return self._formula
 
     @formula.setter
     def formula(self, value: str) -> None:
-        """Formula used to create the model"""
+        """Formula used to create the model."""
         self._formula = value
 
     def _validate_inputs(self) -> None:
@@ -404,17 +404,17 @@ class _IVModelBase(object):
 
     @property
     def has_constant(self) -> bool:
-        """Flag indicating the model includes a constant or equivalent"""
+        """Flag indicating the model includes a constant or equivalent."""
         return self._has_constant
 
     @property
     def isnull(self) -> BoolArray:
-        """Locations of observations with missing values"""
+        """Locations of observations with missing values."""
         return self._drop_locs
 
     @property
     def notnull(self) -> BoolArray:
-        """Locations of observations included in estimation"""
+        """Locations of observations included in estimation."""
         return cast(BoolArray, logical_not(self._drop_locs))
 
     def _f_statistic(
@@ -998,7 +998,7 @@ class _IVGMMBase(_IVModelBase):
     def _gmm_post_estimation(
             self, params: Float64Array, weight_mat: Float64Array, iters: int
     ) -> Dict[str, Any]:
-        """GMM-specific post-estimation results"""
+        """GMM-specific post-estimation results."""
         instr = self._instr_columns
         gmm_specific = {
             "weight_mat": DataFrame(weight_mat, columns=instr, index=instr),
@@ -1013,7 +1013,7 @@ class _IVGMMBase(_IVModelBase):
     def _j_statistic(
             self, params: Float64Array, weight_mat: Float64Array
     ) -> WaldTestStatistic:
-        """J stat and test"""
+        """J stat and test."""
         y, x, z = self._wy, self._wx, self._wz
         nobs, nvar, ninstr = y.shape[0], x.shape[1], z.shape[1]
         eps = y - x @ params

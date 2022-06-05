@@ -1,6 +1,4 @@
-"""
-Covariance and weight estimation for GMM IV estimators
-"""
+"""Covariance and weight estimation for GMM IV estimators"""
 
 from __future__ import annotations
 
@@ -20,6 +18,7 @@ from numpy.linalg import inv
 
 
 class HomoskedasticWeightMatrix(object):
+
     r"""
     Homoskedastic (unadjusted) weight estimation
 
@@ -428,7 +427,7 @@ class MisspecificationWeightMatrix(HomoskedasticWeightMatrix):
         clusters = asarray(clusters).copy().squeeze()
 
         wmat = zeros((z_num, z_num))
-        cc, mem = unique(clusters, return_inverse=True)
+        cc = unique(clusters)
         G = int(len(cc))
         idx = self.repmat(clusters, 1, G).T == kron(ones((nobs, 1)), unique(clusters).reshape(1, -1))
         if nobs == G:

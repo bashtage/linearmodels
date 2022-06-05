@@ -1,6 +1,4 @@
-"""
-Covariance estimation for 2SLS and LIML IV estimators
-"""
+"""Covariance estimation for 2SLS and LIML IV estimators"""
 
 from __future__ import annotations
 
@@ -309,7 +307,7 @@ class HomoskedasticCovariance(object):
         """Covariance of estimated parameters"""
 
         x, z = self.x, self.z
-        nobs, nvar = x.shape
+        nobs = x.shape[0]
 
         pinvz = self._pinvz
         v = (x.T @ z) @ (pinvz @ x) / nobs
@@ -639,7 +637,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-        """Clustered estimator of score covariance"""
+        """Clustered estimator of score covariance."""
 
         def rescale(s: Float64Array, nc: int, nobs: int) -> Float64Array:
             scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
@@ -926,18 +924,16 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
     def s(self) -> Float64Array:
 
         def conutnum(x: Float64Array, binranges: Float64Array) -> Float64Array:
-            '''
-            Bin counting for histograms, equal to MATLAB fun:histc
-            '''
+            """Bin counting for histograms, equal to MATLAB fun:histc."""
             temp = zeros((len(binranges), 2))
             temp[:, 0] = binranges
-            for i in range(len(binranges)):
+            for i, element in enumerate(binranges):
                 if i == 0:
                     temp[i, 1] = npsum((x <= binranges[0]))
                 elif i == len(binranges) - 1:
-                    temp[i, 1] = npsum((x >= binranges[i]))
+                    temp[i, 1] = npsum((x >= element))
                 else:
-                    temp[i, 1] = npsum((x > binranges[i - 1]) & (x <= binranges[i]))
+                    temp[i, 1] = npsum((x > binranges[i - 1]) & (x <= element))
             return temp
 
         nobs, nvar = self.x.shape
@@ -949,7 +945,7 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
                 "got {1}".format(nobs, clusters.shape[0])
             )
 
-        cc, mem = unique(clusters, return_inverse=True)
+        cc = unique(clusters)
         G = int(len(cc))
         g_ng = conutnum(clusters[:], cc)
         ng = g_ng[:, 1]
@@ -963,7 +959,7 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
             h1 = -1 * ones((int(ng[i]) - 1, 1))
             Hm = diagflat(h0) + diagflat(h1, 1) + diagflat(h1, -1)
 
-            W0i[:, :, i] = Zi.T @ Hm @ Zi;
+            W0i[:, :, i] = Zi.T @ Hm @ Zi
             wmat = wmat + W0i[:, :, i]
         wmat = wmat / nobs
         Om1 = zeros((nvar, nvar))
