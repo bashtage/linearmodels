@@ -22,7 +22,7 @@ from numpy import (
     unique,
     zeros,
     diagflat,
-    kron
+    kron,
 )
 from numpy.linalg import inv, pinv
 
@@ -132,7 +132,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
     z = arange(int(bw) + 1) / (int(bw) + 1)
-    w = 1 - 6 * z**2 + 6 * z**3
+    w = 1 - 6 * z ** 2 + 6 * z ** 3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
@@ -189,7 +189,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
     rate = 1 / (2 * q + 1)
     gamma = c * ((sq / s0) ** 2) ** rate
-    m = gamma * t**rate
+    m = gamma * t ** rate
     return min(int(ceil(m)), t - 1)
 
 
@@ -249,14 +249,14 @@ class HomoskedasticCovariance(object):
     """
 
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        debiased: bool = False,
-        kappa: Numeric = 1,
-        w: Float64Array = zeros(1)
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            debiased: bool = False,
+            kappa: Numeric = 1,
+            w: Float64Array = zeros(1)
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -285,10 +285,10 @@ class HomoskedasticCovariance(object):
 
     def __repr__(self) -> str:
         return (
-            self.__str__()
-            + "\n"
-            + self.__class__.__name__
-            + ", id: {0}".format(hex(id(self)))
+                self.__str__()
+                + "\n"
+                + self.__class__.__name__
+                + ", id: {0}".format(hex(id(self)))
         )
 
     @property
@@ -390,13 +390,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        debiased: bool = False,
-        kappa: Numeric = 1,
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            debiased: bool = False,
+            kappa: Numeric = 1,
     ):
         super(HeteroskedasticCovariance, self).__init__(
             x, y, z, params, debiased, kappa
@@ -483,15 +483,15 @@ class KernelCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        kernel: str = "bartlett",
-        bandwidth: OptionalNumeric = None,
-        debiased: bool = False,
-        kappa: Numeric = 1,
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            kernel: str = "bartlett",
+            bandwidth: OptionalNumeric = None,
+            debiased: bool = False,
+            kappa: Numeric = 1,
     ):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
@@ -603,14 +603,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        clusters: Optional[AnyArray] = None,
-        debiased: bool = False,
-        kappa: Numeric = 1,
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            clusters: Optional[AnyArray] = None,
+            debiased: bool = False,
+            kappa: Numeric = 1,
     ):
         super(ClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
 
@@ -947,8 +947,8 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
             Zi = self.z[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
             e1i = eps[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1]))]
             DXi = self.x[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
-            psi1 = Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - \
-                   Q.T @ inv(wmat) @ W0i[:, :, i] @ inv(wmat) @ mu1
+            psi_temp = Q.T @ inv(wmat) @ W0i[:, :, i] @ inv(wmat) @ mu1
+            psi1 = Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - psi_temp
             Om1 += psi1 @ psi1.T
         Om1 /= nobs
         H0 = Q.T @ inv(wmat) @ Q
