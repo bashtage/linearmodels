@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Union
 
-from numpy import asarray, ndarray, unique, zeros, sum as npsum, ones, diagflat, kron, dot
+from numpy import sum as npsum, asarray, ndarray, unique, zeros, ones, diagflat, kron, dot
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (

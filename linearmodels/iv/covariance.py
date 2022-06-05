@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, Optional, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (
+    sum as npsum,
     arange,
     asarray,
     ceil,
@@ -18,7 +19,6 @@ from numpy import (
     ones,
     pi,
     sin,
-    sum as npsum,
     unique,
     zeros,
     diagflat,
@@ -284,9 +284,8 @@ class HomoskedasticCovariance(object):
         return out
 
     def __repr__(self) -> str:
-        return (
-                self.__str__() + "\n" + self.__class__.__name__ + ", id: {0}".format(hex(id(self)))
-        )
+        return (self.__str__() + "\n" + self.__class__.__name__ + ", id: {0}".
+                format(hex(id(self))))
 
     @property
     def s(self) -> Float64Array:

@@ -1253,9 +1253,9 @@ class IVGMM(_IVGMMBase):
                 raise ValueError(f"initial_weight must be a {k_wz} by {k_wz} array")
 
         if (self._weight_type == 'OneStepMisspecification') and (iter_limit != 1):
-            raise ValueError(f" weight_type: OneStepMisspecification must set iter_limit=1")
+            raise ValueError(" weight_type: OneStepMisspecification must set iter_limit=1")
         elif (cov_type == 'OneStepMisspecification') and (iter_limit != 1):
-            raise ValueError(f" cov_type: OneStepMisspecification must set iter_limit=1")
+            raise ValueError(" cov_type: OneStepMisspecification must set iter_limit=1")
         if (iter_limit != 1) and (initial_weight is None) and \
                 (self._weight_type == 'OneStepMisspecification'):
             wmat = inv(weight_matrix(wx, wz, zeros((nobs, 1))))
