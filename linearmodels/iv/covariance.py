@@ -7,27 +7,13 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, Optional, Union, cast
 
 from mypy_extensions import VarArg
-from numpy import (
-    sum as npsum,
-    arange,
-    asarray,
-    ceil,
-    cos,
-    empty,
-    int64,
-    ndarray,
-    ones,
-    pi,
-    sin,
-    unique,
-    zeros,
-    diagflat,
-    kron,
-)
+from numpy import (arange, asarray, ceil, cos, diagflat, empty, int64, kron,
+                   ndarray, ones, pi, sin, sum as npsum, unique, zeros)
 from numpy.linalg import inv, pinv
 
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
-from linearmodels.typing import AnyArray, Float64Array, Numeric, OptionalNumeric
+from linearmodels.typing import (AnyArray, Float64Array, Numeric,
+                                 OptionalNumeric)
 
 KernelWeight = Union[
     Callable[[float, float], ndarray],
@@ -132,7 +118,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
        w_i &  = 2(1-z_i)^3, z > 0.5
     """
     z = arange(int(bw) + 1) / (int(bw) + 1)
-    w = 1 - 6 * z ** 2 + 6 * z ** 3
+    w = 1 - 6 * z**2 + 6 * z**3
     w[z > 0.5] = 2 * (1 - z[z > 0.5]) ** 3
     return w
 
@@ -189,7 +175,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     sq = 2 * npsum(sigma[1:] * arange(1, m_star + 1) ** q)
     rate = 1 / (2 * q + 1)
     gamma = c * ((sq / s0) ** 2) ** rate
-    m = gamma * t ** rate
+    m = gamma * t**rate
     return min(int(ceil(m)), t - 1)
 
 
@@ -249,14 +235,14 @@ class HomoskedasticCovariance(object):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            debiased: bool = False,
-            kappa: Numeric = 1,
-            w: Float64Array = zeros(1)
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        debiased: bool = False,
+        kappa: Numeric = 1,
+        w: Float64Array = zeros(1),
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -284,8 +270,12 @@ class HomoskedasticCovariance(object):
         return out
 
     def __repr__(self) -> str:
-        return (self.__str__() + "\n" + self.__class__.__name__ + ", id: {0}".
-                format(hex(id(self))))
+        return (
+            self.__str__()
+            + "\n"
+            + self.__class__.__name__
+            + ", id: {0}".format(hex(id(self)))
+        )
 
     @property
     def s(self) -> Float64Array:
@@ -386,13 +376,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(HeteroskedasticCovariance, self).__init__(
             x, y, z, params, debiased, kappa
@@ -479,15 +469,15 @@ class KernelCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            kernel: str = "bartlett",
-            bandwidth: OptionalNumeric = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        kernel: str = "bartlett",
+        bandwidth: OptionalNumeric = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
@@ -599,14 +589,14 @@ class ClusteredCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            clusters: Optional[AnyArray] = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        clusters: Optional[AnyArray] = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
         super(ClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
 
@@ -731,17 +721,19 @@ class MisspecificationCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            clusters: Optional[AnyArray] = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
-            w: Float64Array = zeros(1),
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        clusters: Optional[AnyArray] = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
+        w: Float64Array = zeros(1),
     ):
-        super(MisspecificationCovariance, self).__init__(x, y, z, params, debiased, kappa, w)
+        super(MisspecificationCovariance, self).__init__(
+            x, y, z, params, debiased, kappa, w
+        )
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
@@ -769,10 +761,7 @@ class MisspecificationCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-
-        def repmat(
-                self, a: Float64Array, b: int, c: int
-        ) -> Float64Array:
+        def repmat(self, a: Float64Array, b: int, c: int) -> Float64Array:
             """
             Parameters
             ----------
@@ -789,7 +778,7 @@ class MisspecificationCovariance(HomoskedasticCovariance):
 
         nobs, nvar = self.x.shape
         eps = self.y - self.x @ self.params
-        clusters = self.config['clusters']
+        clusters = self.config["clusters"]
         if clusters.shape[0] != nobs:
             raise ValueError(
                 "clusters has the wrong nobs. Expected {0}, "
@@ -806,7 +795,9 @@ class MisspecificationCovariance(HomoskedasticCovariance):
         eTz = eps.T @ self.z
         zTx = self.z.T @ self.x
         xTz = self.x.T @ self.z
-        idx = repmat(self, mem, 1, G).T == kron(ones((nobs, 1)), unique(mem).reshape(1, -1))
+        idx = repmat(self, mem, 1, G).T == kron(
+            ones((nobs, 1)), unique(mem).reshape(1, -1)
+        )
         for g in range(G):
             zg = self.z[idx[:, g], :]
             eg = eps[idx[:, g]]
@@ -814,12 +805,16 @@ class MisspecificationCovariance(HomoskedasticCovariance):
             zgTeg = zg.T @ eg
             zgTxg = zg.T @ xg
 
-            Hpart = Hpart + zgTeg @ eTz @ invw @ zgTxg + zgTxg * (eTz @ invw @ zgTeg)[0][0]
-            Psi[g, :] = (-(1 / nobs) * xTz @ invw @ zgTeg
-                         - (1 / nobs) * (xg.T @ zg) @ invw @ zTe
-                         + (1 / nobs ** 2) * xTz @ invw @ zgTeg @ (eg.T @ zg) @ invw @ zTe).T
+            Hpart = (
+                Hpart + zgTeg @ eTz @ invw @ zgTxg + zgTxg * (eTz @ invw @ zgTeg)[0][0]
+            )
+            Psi[g, :] = (
+                -(1 / nobs) * xTz @ invw @ zgTeg
+                - (1 / nobs) * (xg.T @ zg) @ invw @ zTe
+                + (1 / nobs**2) * xTz @ invw @ zgTeg @ (eg.T @ zg) @ invw @ zTe
+            ).T
 
-        H = (1 / nobs ** 2) * xTz @ invw @ zTx - (1 / nobs ** 3) * xTz @ invw @ Hpart
+        H = (1 / nobs**2) * xTz @ invw @ zTx - (1 / nobs**3) * xTz @ invw @ Hpart
 
         Om = (Psi.T @ Psi) / nobs
 
@@ -859,16 +854,18 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
     """
 
     def __init__(
-            self,
-            x: Float64Array,
-            y: Float64Array,
-            z: Float64Array,
-            params: Float64Array,
-            clusters: Optional[AnyArray] = None,
-            debiased: bool = False,
-            kappa: Numeric = 1,
+        self,
+        x: Float64Array,
+        y: Float64Array,
+        z: Float64Array,
+        params: Float64Array,
+        clusters: Optional[AnyArray] = None,
+        debiased: bool = False,
+        kappa: Numeric = 1,
     ):
-        super(OneStepMisspecificationCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        super(OneStepMisspecificationCovariance, self).__init__(
+            x, y, z, params, debiased, kappa
+        )
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
@@ -896,7 +893,6 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
 
     @property
     def s(self) -> Float64Array:
-
         def conutnum(x: Float64Array, binranges: Float64Array) -> Float64Array:
             """Bin counting for histograms, equal to MATLAB fun:histc."""
             temp = zeros((len(binranges), 2))
@@ -912,7 +908,7 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
 
         nobs, nvar = self.x.shape
         eps = self.y - self.x @ self.params
-        clusters = self.config['clusters']
+        clusters = self.config["clusters"]
         if clusters.shape[0] != nobs:
             raise ValueError(
                 "clusters has the wrong nobs. Expected {0}, "
@@ -927,7 +923,7 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
         wmat = zeros((z_num, z_num))
         W0i = zeros((z_num, z_num, G))
         for i in range(G):
-            Zi = self.z[int(sum(ng[0:i + 1]) - ng[i]): int(sum(ng[0:i + 1])), :]
+            Zi = self.z[int(sum(ng[0 : i + 1]) - ng[i]) : int(sum(ng[0 : i + 1])), :]
 
             h0 = 2 * ones((int(ng[i]), 1))
             h1 = -1 * ones((int(ng[i]) - 1, 1))
@@ -940,11 +936,13 @@ class OneStepMisspecificationCovariance(HomoskedasticCovariance):
         mu1 = (self.z.T @ eps) / nobs
         Q = -(self.z.T @ self.x) / nobs
         for i in range(G):
-            Zi = self.z[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
-            e1i = eps[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1]))]
-            DXi = self.x[int(sum(ng[:i + 1]) - ng[i]): int(sum(ng[:i + 1])), :]
+            Zi = self.z[int(sum(ng[: i + 1]) - ng[i]) : int(sum(ng[: i + 1])), :]
+            e1i = eps[int(sum(ng[: i + 1]) - ng[i]) : int(sum(ng[: i + 1]))]
+            DXi = self.x[int(sum(ng[: i + 1]) - ng[i]) : int(sum(ng[: i + 1])), :]
             psi_temp = Q.T @ inv(wmat) @ W0i[:, :, i] @ inv(wmat) @ mu1
-            psi1 = Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - psi_temp
+            psi1 = (
+                Q.T @ inv(wmat) @ Zi.T @ e1i - DXi.T @ Zi @ inv(wmat) @ mu1 - psi_temp
+            )
             Om1 += psi1 @ psi1.T
         Om1 /= nobs
         H0 = Q.T @ inv(wmat) @ Q

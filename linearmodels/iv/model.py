@@ -6,59 +6,36 @@ from __future__ import annotations
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
 import warnings
 
-from numpy import (
-    all as npall,
-    any as npany,
-    array,
-    asarray,
-    atleast_2d,
-    average,
-    c_,
-    column_stack,
-    eye,
-    isscalar,
-    logical_not,
-    nanmean,
-    ones,
-    sqrt,
-    zeros,
-)
+from numpy import (all as npall, any as npany, array, asarray, atleast_2d,
+                   average, c_, column_stack, eye, isscalar, logical_not,
+                   nanmean, ones, sqrt, zeros)
 from numpy.linalg import eigvalsh, inv, matrix_rank, pinv
 from pandas import DataFrame, Series, concat
 from scipy.optimize import minimize
 
 from linearmodels.iv._utility import IVFormulaParser
 from linearmodels.iv.common import f_statistic, find_constant
-from linearmodels.iv.covariance import (
-    ClusteredCovariance,
-    HeteroskedasticCovariance,
-    HomoskedasticCovariance,
-    KernelCovariance,
-    MisspecificationCovariance,
-    OneStepMisspecificationCovariance,
-)
+from linearmodels.iv.covariance import (ClusteredCovariance,
+                                        HeteroskedasticCovariance,
+                                        HomoskedasticCovariance,
+                                        KernelCovariance,
+                                        MisspecificationCovariance,
+                                        OneStepMisspecificationCovariance)
 from linearmodels.iv.data import IVData, IVDataLike
-from linearmodels.iv.gmm import (
-    HeteroskedasticWeightMatrix,
-    HomoskedasticWeightMatrix,
-    IVGMMCovariance,
-    KernelWeightMatrix,
-    OneWayClusteredWeightMatrix,
-    MisspecificationWeightMatrix,
-    OneStepMisspecificationWeightMatrix,
-)
+from linearmodels.iv.gmm import (HeteroskedasticWeightMatrix,
+                                 HomoskedasticWeightMatrix, IVGMMCovariance,
+                                 KernelWeightMatrix,
+                                 MisspecificationWeightMatrix,
+                                 OneStepMisspecificationWeightMatrix,
+                                 OneWayClusteredWeightMatrix)
 from linearmodels.iv.results import IVGMMResults, IVResults, OLSResults
 from linearmodels.shared.exceptions import IndexWarning, missing_warning
-from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
+from linearmodels.shared.hypotheses import (InvalidTestStatistic,
+                                            WaldTestStatistic)
 from linearmodels.shared.linalg import has_constant, inv_sqrth
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
-from linearmodels.typing import (
-    ArrayLike,
-    BoolArray,
-    Float64Array,
-    Numeric,
-    OptionalNumeric,
-)
+from linearmodels.typing import (ArrayLike, BoolArray, Float64Array, Numeric,
+                                 OptionalNumeric)
 
 IVResultType = Type[Union[IVResults, IVGMMResults, OLSResults]]
 
@@ -97,7 +74,7 @@ CovarianceEstimator = TypeVar(
     KernelCovariance,
     ClusteredCovariance,
     MisspecificationCovariance,
-    OneStepMisspecificationCovariance
+    OneStepMisspecificationCovariance,
 )
 
 WEIGHT_MATRICES = {
@@ -1252,14 +1229,19 @@ class IVGMM(_IVGMMBase):
             if initial_weight.ndim != 2 or initial_weight.shape != (k_wz, k_wz):
                 raise ValueError(f"initial_weight must be a {k_wz} by {k_wz} array")
 
-        if (self._weight_type == 'OneStepMisspecification') and (iter_limit != 1):
-            raise ValueError(" weight_type: OneStepMisspecification must set iter_limit=1")
-        elif (cov_type == 'OneStepMisspecification') and (iter_limit != 1):
+        if (self._weight_type == "OneStepMisspecification") and (iter_limit != 1):
+            raise ValueError(
+                " weight_type: OneStepMisspecification must set iter_limit=1"
+            )
+        elif (cov_type == "OneStepMisspecification") and (iter_limit != 1):
             raise ValueError(" cov_type: OneStepMisspecification must set iter_limit=1")
-        if (iter_limit != 1) and (initial_weight is None) and \
-                (self._weight_type == 'OneStepMisspecification'):
+        if (
+            (iter_limit != 1)
+            and (initial_weight is None)
+            and (self._weight_type == "OneStepMisspecification")
+        ):
             wmat = inv(weight_matrix(wx, wz, zeros((nobs, 1))))
-        elif (initial_weight is None) and (self._weight_type == 'Misspecification'):
+        elif (initial_weight is None) and (self._weight_type == "Misspecification"):
             wmat = inv(wz.T @ wz)
         else:
             wmat = inv(wz.T @ wz / nobs) if initial_weight is None else initial_weight
@@ -1281,7 +1263,7 @@ class IVGMM(_IVGMMBase):
             iters += 1
 
         cov_config["debiased"] = debiased
-        if cov_type == 'Misspecification':
+        if cov_type == "Misspecification":
             cov_estimator = IVGMMCovariance(
                 wx, wy, wz, params, inv(wmat), cov_type, **cov_config
             )
