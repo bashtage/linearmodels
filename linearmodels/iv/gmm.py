@@ -6,13 +6,15 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Union
 
-from numpy import asarray, ndarray, unique
+from numpy import asarray, ndarray, unique, zeros, sum, ones, diagflat, kron
 from numpy.linalg import inv
 
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
     kernel_optimal_bandwidth,
+    MisspecificationCovariance,
+    OneStepMisspecificationCovariance,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import AnyArray, Float64Array
@@ -50,7 +52,7 @@ class HomoskedasticWeightMatrix(object):
         self._bandwidth: Optional[int] = 0
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -115,7 +117,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -186,12 +188,12 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self,
-        kernel: str = "bartlett",
-        bandwidth: Optional[int] = None,
-        center: bool = False,
-        debiased: bool = False,
-        optimal_bw: bool = False,
+            self,
+            kernel: str = "bartlett",
+            bandwidth: Optional[int] = None,
+            center: bool = False,
+            debiased: bool = False,
+            optimal_bw: bool = False,
     ) -> None:
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
@@ -201,7 +203,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._optimal_bw = optimal_bw
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -261,6 +263,207 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         return self._bandwidth
 
 
+def conutnum(x: Float64Array, binranges: Float64Array) -> Float64Array:
+    """
+    Bin counting for histograms, equal to MATLAB fun:histc
+    """
+    temp = zeros((len(binranges), 2))
+    temp[:, 0] = binranges
+    for i in range(len(binranges)):
+        if i == 0:
+            temp[i, 1] = sum((x <= binranges[0]))
+        elif i == len(binranges) - 1:
+            temp[i, 1] = sum((x >= binranges[i]))
+        else:
+            temp[i, 1] = sum((x > binranges[i - 1]) & (x <= binranges[i]))
+    return temp
+
+
+class OneStepMisspecificationWeightMatrix(HomoskedasticWeightMatrix):
+    """
+    One-Step Misspecification  (one-way) weight estimation
+
+    Parameters
+    ----------
+    clusters : ndarray
+        Array indicating cluster membership
+    center : bool, optional
+        None
+    debiased : bool, optional
+        None
+    """
+
+    def __init__(
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
+    ) -> None:
+        super(OneStepMisspecificationWeightMatrix, self).__init__(center, debiased)
+        self._clusters = clusters
+
+    def weight_matrix(
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        ndarray
+            Covariance of GMM moment conditions.
+        """
+        nobs = x.shape[0]
+        z_num = z.shape[1]
+        clusters = self._clusters
+        if clusters.shape[0] != nobs:
+            raise ValueError(
+                "clusters has the wrong nobs. Expected {0}, "
+                "got {1}".format(nobs, clusters.shape[0])
+            )
+        clusters = asarray(clusters).copy().squeeze()
+        cc, mem = unique(clusters, return_inverse=True)
+        G = int(len(cc))
+        g_ng = self.conutnum(clusters[:], cc)
+        ng = g_ng[:, 1]
+        wmat = zeros((z_num, z_num))
+        W0i = zeros((z_num, z_num, G))
+        for i in range(G):
+            Zi = z[int(sum(ng[0:i + 1]) - ng[i]): int(sum(ng[0:i + 1])), :]
+
+            h0 = 2 * ones((int(ng[i]), 1))
+            h1 = -1 * ones((int(ng[i]) - 1, 1))
+            Hm = diagflat(h0) + diagflat(h1, 1) + diagflat(h1, -1)
+
+            W0i[:, :, i] = Zi.T @ Hm @ Zi;
+            wmat = wmat + W0i[:, :, i]
+        wmat = wmat / nobs
+        return wmat
+
+    @property
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+        """
+        Weight estimator configuration
+
+        Returns
+        -------
+        dict
+            Dictionary containing weight estimator configuration information
+        """
+        return {
+            "center": self._center,
+            "clusters": self._clusters,
+            "debiased": self._debiased,
+        }
+
+
+def repmat(
+        a: Float64Array, b: int, c: int
+) -> Float64Array:
+    """
+    Parameters
+    ----------
+    a : ndarray
+    b : int
+    c : int
+
+    Returns
+    -------
+    ndarray
+        repmat for MATLAB
+    """
+    return kron(ones((c, b)), a)
+
+
+class MisspecificationWeightMatrix(HomoskedasticWeightMatrix):
+    """
+    Misspecification (one-way)  Iter GMM weight estimation
+
+    Parameters
+    ----------
+    clusters : ndarray
+        Array indicating cluster membership
+    center : bool, optional
+        none
+    debiased : bool, optional
+        none
+    """
+
+    def __init__(
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
+    ) -> None:
+        super(MisspecificationWeightMatrix, self).__init__(center, debiased)
+        self._clusters = clusters
+
+    def weight_matrix(
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
+    ) -> Float64Array:
+        """
+        Parameters
+        ----------
+        x : ndarray
+            Model regressors (exog and endog), (nobs by nvar)
+        z : ndarray
+            Model instruments (exog and instruments), (nobs by ninstr)
+        eps : ndarray
+            Model errors (nobs by 1)
+
+        Returns
+        -------
+        ndarray
+            Covariance of GMM moment conditions.
+        """
+        nobs, nvar = x.shape
+
+        ze = z * eps
+        mu = ze.mean(axis=0) if self._center else 0
+        ze -= mu
+        z_num = z.shape[1]
+        clusters = self._clusters
+        if clusters.shape[0] != nobs:
+            raise ValueError(
+                "clusters has the wrong nobs. Expected {0}, "
+                "got {1}".format(nobs, clusters.shape[0])
+            )
+        clusters = asarray(clusters).copy().squeeze()
+
+        wmat = zeros((z_num, z_num))
+        cc, mem = unique(clusters, return_inverse=True)
+        G = int(len(cc))
+        idx = self.repmat(clusters, 1, G).T == kron(ones((nobs, 1)), unique(clusters).reshape(1, -1))
+        if nobs == G:
+            ze = dot(z, repmat(eps, 1, z_num).T)
+            wmat = (ze.T @ ze)
+        else:
+            for g in range(G):
+                zg = z[idx[:, g], :]
+                eg = eps[idx[:, g]]
+                zeg = zg.T @ eg
+                wmat = wmat + zeg @ zeg.T
+        wmat = wmat / nobs
+        return wmat
+
+    @property
+    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+        """
+        Weight estimator configuration
+
+        Returns
+        -------
+        dict
+            Dictionary containing weight estimator configuration information
+        """
+        return {
+            "center": self._center,
+            "clusters": self._clusters,
+            "debiased": self._debiased,
+        }
+
+
 class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
     Clustered (one-way) weight estimation
@@ -277,13 +480,13 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: AnyArray, center: bool = False, debiased: bool = False
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -398,15 +601,15 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     # TODO: 2-way clustering
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        w: Float64Array,
-        cov_type: str = "robust",
-        debiased: bool = False,
-        **cov_config: Union[str, bool],
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            w: Float64Array,
+            cov_type: str = "robust",
+            debiased: bool = False,
+            **cov_config: Union[str, bool],
     ) -> None:
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type
@@ -423,6 +626,10 @@ class IVGMMCovariance(HomoskedasticCovariance):
             score_cov_estimator = OneWayClusteredWeightMatrix
         elif cov_type == "kernel":
             score_cov_estimator = KernelWeightMatrix
+        elif cov_type == "Misspecification":
+            score_cov_estimator = MisspecificationWeightMatrix
+        elif cov_type == "OneStepMisspecification":
+            score_cov_estimator = OneStepMisspecificationWeightMatrix
         else:
             raise ValueError("Unknown cov_type")
         self._score_cov_estimator = score_cov_estimator
@@ -440,6 +647,18 @@ class IVGMMCovariance(HomoskedasticCovariance):
             if clusters is not None:
                 nclusters = len(unique(asarray(clusters)))
                 out += "\nNum Clusters: {0}".format(nclusters)
+        elif cov_type == "Misspecification":
+            out += "\nmisspecification (One-way)"
+            clusters = self._cov_config.get("clusters", None)
+            if clusters is not None:
+                nclusters = len(unique(asarray(clusters)))
+                out += "\nNum Clusters: {0}".format(nclusters)
+        elif cov_type == "OneStepMisspecification":
+            out += "\nOneStepMisspecification (One-way)"
+            clusters = self._cov_config.get("clusters", None)
+            if clusters is not None:
+                nclusters = len(unique(asarray(clusters)))
+                out += "\nNum Clusters: {0}".format(nclusters)
         else:  # kernel
             out += "\nKernel (HAC)"
             if self._cov_config.get("kernel", False):
@@ -451,19 +670,25 @@ class IVGMMCovariance(HomoskedasticCovariance):
     @property
     def cov(self) -> Float64Array:
         x, z, eps, w = self.x, self.z, self.eps, self.w
-        nobs = x.shape[0]
-        xpz = x.T @ z / nobs
-        xpzw = xpz @ w
-        xpzwzpx_inv = inv(xpzw @ xpz.T)
-
         score_cov = self._score_cov_estimator(
             debiased=self.debiased, **self._cov_config
         )
-        s = score_cov.weight_matrix(x, z, eps)
         self._cov_config = score_cov.config
-
-        c = xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
-        return (c + c.T) / 2
+        if self._cov_type == 'OneStepMisspecification':
+            c = OneStepMisspecificationCovariance(self.x, self.y, self.z, self.params, self.config['clusters'],
+                                                  self.config['debiased']).s
+        elif self._cov_type == 'Misspecification':
+            c = MisspecificationCovariance(self.x, self.y, self.z, self.params, self.config['clusters'],
+                                           self.config['debiased'],w=self.w).s
+        else:
+            nobs = x.shape[0]
+            xpz = x.T @ z / nobs
+            xpzw = xpz @ w
+            xpzwzpx_inv = inv(xpzw @ xpz.T)
+            s = score_cov.weight_matrix(x, z, eps)
+            c = xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
+            c = (c + c.T) / 2
+        return c
 
     @property
     def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
