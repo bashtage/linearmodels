@@ -766,8 +766,8 @@ class MisspecificationCovariance(HomoskedasticCovariance):
             Parameters
             ----------
             a : ndarray
-            b : ndarray
-            c : ndarray
+            b : int
+            c : int
 
             Returns
             -------
