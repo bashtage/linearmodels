@@ -213,7 +213,7 @@ class TradedFactorModel(_FactorModelBase):
             Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array_like, optional
+        portfolios : array_like
             Portfolios to be used in the model
 
         Returns
@@ -260,9 +260,9 @@ class TradedFactorModel(_FactorModelBase):
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
         **cov_config : dict
@@ -464,11 +464,11 @@ class LinearFactorModel(_LinearFactorModelBase):
         Test portfolio returns (nobs by nportfolio)
     factors : array_like
         Priced factor returns (nobs by nfactor)
-    risk_free : bool, optional
+    risk_free : bool
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
         assumed to be excess returns using the correct risk-free rate.
-    sigma : array_like, optional
+    sigma : array_like
         Positive definite residual covariance (nportfolio by nportfolio)
 
     Notes
@@ -533,14 +533,14 @@ class LinearFactorModel(_LinearFactorModelBase):
             Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array_like, optional
+        portfolios : array_like
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
-        risk_free : bool, optional
+        risk_free : bool
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
-        sigma : array_like, optional
+        sigma : array_like
             Positive definite residual covariance (nportfolio by nportfolio)
 
         Returns
@@ -587,9 +587,9 @@ class LinearFactorModel(_LinearFactorModelBase):
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
         **cov_config
@@ -778,7 +778,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         Test portfolio returns (nobs by nportfolio)
     factors : array_like
         Priced factors values (nobs by nfactor)
-    risk_free : bool, optional
+    risk_free : bool
         Flag indicating whether the risk-free rate should be estimated
         from returns along other risk premia.  If False, the returns are
         assumed to be excess returns using the correct risk-free rate.
@@ -835,10 +835,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
             Formula modified for the syntax described in the notes
         data : DataFrame
             DataFrame containing the variables used in the formula
-        portfolios : array_like, optional
+        portfolios : array_like
             Portfolios to be used in the model. If provided, must use formula
             syntax containing only factors.
-        risk_free : bool, optional
+        risk_free : bool
             Flag indicating whether the risk-free rate should be estimated
             from returns along other risk premia.  If False, the returns are
             assumed to be excess returns using the correct risk-free rate.
@@ -895,29 +895,29 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         Parameters
         ----------
-        center : bool, optional
+        center : bool
             Flag indicating to center the moment conditions before computing
             the weighting matrix.
-        use_cue : bool, optional
+        use_cue : bool
             Flag indicating to use continuously updating estimator
-        steps : int, optional
+        steps : int
             Number of steps to use when estimating parameters.  2 corresponds
             to the standard efficient GMM estimator. Higher values will
             iterate until convergence or up to the number of steps given
-        disp : int, optional
+        disp : int
             Number of iterations between printed update. 0 or negative values
             suppresses output
-        max_iter : int, positive, optional
-            Maximum number of iterations when minimizing objective
-        cov_type : str, optional
+        max_iter : int
+            Maximum number of iterations when minimizing objective. Must be positive.
+        cov_type : str
             Name of covariance estimator
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debias the covariance estimator using
             a degree of freedom adjustment
-        starting : array_like, default None
+        starting : array_like
             Starting values to use in optimization.  If not provided, 2SLS
             estimates are used.
-        opt_options : dict, optional
+        opt_options : dict
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs

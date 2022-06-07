@@ -51,9 +51,9 @@ class HomoskedasticCovariance(object):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator
-    extra_df : int, default 0
+    extra_df : int
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
@@ -151,9 +151,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator
-    extra_df : int, default 0
+    extra_df : int
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
@@ -228,15 +228,15 @@ class ClusteredCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator
-    extra_df : int, default 0
+    extra_df : int
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
-    clusters : ndarray, default None
+    clusters : ndarray
         nobs by 1 or nobs by 2 array of cluster group ids
-    group_debias : bool, default None
+    group_debias : bool
         Flag indicating whether to apply small-number of groups adjustment.
 
     Notes
@@ -353,16 +353,16 @@ class DriscollKraay(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator
-    extra_df : int, default 0
+    extra_df : int
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased.
-    kernel : str, default None
+    kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
-    bandwidth : int, default None
+    bandwidth : int
         Non-negative integer to use as bandwidth.  If not provided a rule-of-
         thumb value is used.
 
@@ -465,16 +465,16 @@ class ACCovariance(HomoskedasticCovariance):
         (entity x time) by 1 stacked array of entity ids
     time_ids : ndarray
         (entity x time) by 1 stacked array of time ids
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator
-    extra_df : int, default 0
+    extra_df : int
         Additional degrees of freedom consumed by models beyond the number of
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
-    kernel : str, default None
+    kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
-    bandwidth : int, default None
+    bandwidth : int
         Non-negative integer to use as bandwidth.  If not provided a rule-of-
         thumb value is used.
 
@@ -644,13 +644,13 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         (variables by 1) array of estimated model parameters
     all_params : ndarray
         (nobs by variables) array of all estimated model parameters
-    debiased : bool, default False
+    debiased : bool
         Flag indicating whether to debias the estimator.
-    bandwidth : int, default None
+    bandwidth : int
         Non-negative integer to use as bandwidth.  Set to 0 to disable
         autocorrelation robustness. If not provided a rule-of- thumb
         value is used.
-    kernel : str, default None
+    kernel : str
         Name of one of the supported kernels. If None, uses the Newey-West
         kernel.
 

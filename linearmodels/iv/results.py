@@ -302,6 +302,8 @@ class _LSModelResultsBase(_SummaryStr):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
@@ -399,13 +401,13 @@ class _LSModelResultsBase(_SummaryStr):
 
         Parameters
         ----------
-        restriction : {ndarray, DataFrame}, optional
+        restriction : {ndarray, DataFrame}
             q by nvar array containing linear weights to apply to parameters
             when forming the restrictions. It is not possible to use both
             restriction and formula.
-        value : {ndarray, Series}, optional
+        value : {ndarray, Series}
             q element array containing the restricted values.
-        formula : Union[str, list[str]], optional
+        formula : Union[str, list[str]]
             formulaic linear constraints. The simplest formats are one of:
 
             * A single comma-separated string such as 'x1=0, x2+x3=1'
@@ -517,14 +519,14 @@ class OLSResults(_LSModelResultsBase):
             Exogenous values to use in out-of-sample prediction (nobs by nexog)
         endog : array_like
             Endogenous values to use in out-of-sample prediction (nobs by nendog)
-        data : DataFrame, optional
+        data : DataFrame
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
-        fitted : bool, optional
+        fitted : bool
             Flag indicating whether to include the fitted values
-        idiosyncratic : bool, optional
+        idiosyncratic : bool
             Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool, optional
+        missing : bool
             Flag indicating to adjust for dropped observations.  If True, the
             values returned will have the same size as the original input data
             before filtering missing values.  If False, then missing
@@ -782,6 +784,8 @@ class FirstStageResults(_SummaryStr):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
@@ -1039,7 +1043,7 @@ class IVResults(_CommonIVResults):
 
         Parameters
         ----------
-        variables : {str, List[str]}, default None
+        variables : {str, List[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1096,7 +1100,7 @@ class IVResults(_CommonIVResults):
 
         Parameters
         ----------
-        variables : {str, List[str]}, default None
+        variables : {str, List[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1442,7 +1446,7 @@ class IVGMMResults(_CommonIVResults):
 
         Parameters
         ----------
-        variables : {str, List[str]}, default None
+        variables : {str, List[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1580,6 +1584,8 @@ class IVModelComparison(_ModelComparison):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """

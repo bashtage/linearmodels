@@ -63,6 +63,8 @@ class LinearFactorModelResults(_SummaryStr):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """

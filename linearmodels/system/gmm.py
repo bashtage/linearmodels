@@ -20,10 +20,10 @@ class HomoskedasticWeightMatrix(object):
 
     Parameters
     ----------
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
 
     Notes
@@ -111,7 +111,7 @@ class HomoskedasticWeightMatrix(object):
             List of containing instruments for each equation in the system
         eps : ndarray
             Model errors (nobs by neqn)
-        sigma : ndarray, default None
+        sigma : ndarray
             Fixed covariance of model errors. If None, estimated from eps.
 
         Returns
@@ -142,10 +142,10 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     Parameters
     ----------
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
 
     Notes
@@ -187,7 +187,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
             Model instruments (exog and instruments), (nobs by ninstr)
         eps : ndarray
             Model errors (nobs by 1)
-        sigma : ndarray, default None
+        sigma : ndarray
             Fixed covariance of model errors. If None, estimated from eps.
 
         Returns
@@ -232,22 +232,22 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
 
     Parameters
     ----------
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
-    kernel : str, optional
+    kernel : str
         Name of kernel to use.  Supported kernels include:
 
         * 'bartlett', 'newey-west' : Bartlett's kernel
         * 'parzen', 'gallant' : Parzen's kernel
         * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
-    bandwidth : float, optional
+    bandwidth : float
         Bandwidth to use for the kernel.  If not provided the optimal
         bandwidth will be estimated.
-    optimal_bw : bool, optional
+    optimal_bw : bool
         Flag indicating whether to estimate the optimal bandwidth, when
         bandwidth is None.  If False, nobs - 2 is used
 
@@ -305,7 +305,7 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
             Model instruments (exog and instruments)
         eps : ndarray
             Model errors (nobs by nequation)
-        sigma : ndarray, default None
+        sigma : ndarray
             Fixed covariance of model errors. If None, estimated from eps.
 
         Returns

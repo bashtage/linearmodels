@@ -22,10 +22,10 @@ class WaldTestStatistic(object):
         A statement of the test's null hypothesis
     df : int
         Degree of freedom.
-    df_denom : int, optional
+    df_denom : int
         Numerator degree of freedom.  If provided, uses an
         F(df, df_denom) distribution.
-    name : str, optional
+    name : str
         Name of test
 
     See Also
@@ -110,7 +110,7 @@ class InvalidTestStatistic(WaldTestStatistic):
     ----------
     reason : str
         Explanation why test is invalid
-    name : str, optional
+    name : str
         Name of test
 
     See Also
@@ -150,7 +150,7 @@ class InapplicableTestStatistic(WaldTestStatistic):
     ----------
     reason : str
         Explanation why test is invalid
-    name : str, optional
+    name : str
         Name of test
 
     See Also

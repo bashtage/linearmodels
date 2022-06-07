@@ -24,10 +24,10 @@ class HomoskedasticWeightMatrix(object):
 
     Parameters
     ----------
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
 
     Notes
@@ -93,10 +93,10 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
 
     Parameters
     ----------
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
 
     Notes
@@ -148,16 +148,16 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
 
     Parameters
     ----------
-    kernel : str, optional
+    kernel : str
         Name of kernel weighting function to use
-    bandwidth : {int, None}, optional
+    bandwidth : {int, None}
         Bandwidth to use when computing kernel weights
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
-    optimal_bw : bool, optional
+    optimal_bw : bool
         Flag indicating whether to estimate the optimal bandwidth, when
         bandwidth is None.  If False, nobs - 2 is used
 
@@ -269,10 +269,10 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     ----------
     clusters : ndarray
         Array indicating cluster membership
-    center : bool, optional
+    center : bool
         Flag indicating whether to center the moment conditions by subtracting
         the mean before computing the weight matrix.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use small-sample adjustments
     """
 
@@ -356,7 +356,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         Estimated model parameters (nvar by 1)
     w : ndarray
         Weighting matrix used in GMM estimation
-    cov_type : str, optional
+    cov_type : str
         Covariance estimator to use  Valid choices are
 
         * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
@@ -366,7 +366,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         * 'kernel' - Allows for heteroskedasticity and autocorrelation
         * 'cluster' - Allows for one-way cluster dependence
 
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to debias the covariance estimator
     cov_config
         Optional keyword arguments that are specific to a particular cov_type
@@ -378,7 +378,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
     **kernel**
 
     * ``kernel``: Name of kernel to use.  See
-      :class:`~linearmodels.covariance.KernelCovariance` for details on
+      :class:`~linearmodels.iv.covariance.KernelCovariance` for details on
       available kernels
     * ``bandwidth``: Bandwidth to use when computing the weight.  If not
       provided, nobs - 2 is used.
@@ -386,14 +386,14 @@ class IVGMMCovariance(HomoskedasticCovariance):
     **cluster**
 
     * ``clusters``: Array containing the cluster indices.  See
-      :class:`~linearmodels.covariance.OneWayClusteredCovariance`
+      :class:`~linearmodels.iv.covariance.ClusteredCovariance`
 
     See Also
     --------
     linearmodels.iv.covariance.HomoskedasticCovariance,
     linearmodels.iv.covariance.HeteroskedasticCovariance,
     linearmodels.iv.covariance.KernelCovariance,
-    linearmodels.iv.covariance.OneWayClusteredCovariance
+    linearmodels.iv.covariance.ClusteredCovariance
     """
 
     # TODO: 2-way clustering

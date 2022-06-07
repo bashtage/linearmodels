@@ -21,6 +21,7 @@ Instrumental Variable Estimation
    IVLIML
    IVGMM
    IVGMMCUE
+   _OLS
 
 Absorbing Least Squares
 -----------------------
@@ -80,7 +81,6 @@ Instrumental Variable Covariance Estimation
    ClusteredCovariance
    KernelCovariance
 
-
 Kernel Weight Generators
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -90,7 +90,7 @@ Kernel Weight Generators
    kernel_weight_bartlett
    kernel_weight_parzen
    kernel_weight_quadratic_spectral
-
+   kernel_optimal_bandwidth
 
 GMM Weight and Covariance Estimation
 ------------------------------------

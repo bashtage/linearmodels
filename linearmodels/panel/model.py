@@ -267,11 +267,11 @@ class _PanelModelBase(object):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
-    check_rank : bool, optional
+    check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
@@ -824,11 +824,11 @@ class PooledOLS(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
-    check_rank : bool, optional
+    check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
@@ -875,11 +875,11 @@ class PooledOLS(_PanelModelBase):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
@@ -922,9 +922,9 @@ class PooledOLS(_PanelModelBase):
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -1112,22 +1112,22 @@ class PanelOLS(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity).
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
-    entity_effects : bool, optional
+    entity_effects : bool
         Flag whether to include entity (fixed) effects in the model
-    time_effects : bool, optional
+    time_effects : bool
         Flag whether to include time effects in the model
-    other_effects : array_like, optional
+    other_effects : array_like
         Category codes to use for any effects that are not entity or time
         effects. Each variable is treated as an effect.
-    singletons : bool, optional
+    singletons : bool
         Flag indicating whether to drop singleton observation
-    drop_absorbed : bool, optional
+    drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
-    check_rank : bool, optional
+    check_rank : bool
         Flag indicating whether to perform a rank check on the exogenous
         variables to ensure that the model is identified. Skipping this
         check can reduce the time required to validate a model specification.
@@ -1352,14 +1352,14 @@ class PanelOLS(_PanelModelBase):
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual time
             the weight should be homoskedastic.
-        other_effects : array_like, optional
+        other_effects : array_like
             Category codes to use for any effects that are not entity or time
             effects. Each variable is treated as an effect.
-        singletons : bool, optional
+        singletons : bool
             Flag indicating whether to drop singleton observation
-        drop_absorbed : bool, optional
+        drop_absorbed : bool
             Flag indicating whether to drop absorbed variables
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
@@ -1718,11 +1718,11 @@ class PanelOLS(_PanelModelBase):
 
         Parameters
         ----------
-        use_lsdv : bool, optional
+        use_lsdv : bool
             Flag indicating to use the Least Squares Dummy Variable estimator
             to eliminate effects.  The default value uses only means and does
             note require constructing dummy variables for each effect.
-        use_lsmr : bool, optional
+        use_lsmr : bool
             Flag indicating to use LSDV with the Sparse Equations and Least
             Squares estimator to eliminate the fixed effects.
         low_memory : {bool, None}
@@ -1731,18 +1731,18 @@ class PanelOLS(_PanelModelBase):
             automatically, and the low memory algorithm is used if the
             required dummy variable array is both larger than then array of
             regressors in the model and requires more than 1 GiB .
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        auto_df : bool, optional
+        auto_df : bool
             Flag indicating that the treatment of estimated effects in degree
             of freedom adjustment is automatically handled. This is useful
             since clustered standard errors that are clustered using the same
             variable as an effect do not require degree of freedom correction
             while other estimators such as the unadjusted covariance do.
-        count_effects : bool, optional
+        count_effects : bool
             Flag indicating that the covariance estimator should be adjusted
             to account for the estimation of effects in the model. Only used
             if ``auto_df=False``.
@@ -1992,7 +1992,7 @@ class BetweenOLS(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -2067,9 +2067,9 @@ class BetweenOLS(_PanelModelBase):
             Flag indicating to reweight observations if the input data is
             unbalanced using a WLS estimator.  If weights are provided, these
             are accounted for when reweighting. Has no effect on balanced data.
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -2202,11 +2202,11 @@ class BetweenOLS(_PanelModelBase):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
@@ -2248,7 +2248,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -2340,9 +2340,9 @@ class FirstDifferenceOLS(_PanelModelBase):
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator. See Notes.
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -2501,11 +2501,11 @@ class FirstDifferenceOLS(_PanelModelBase):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
@@ -2547,7 +2547,7 @@ class RandomEffects(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -2595,11 +2595,11 @@ class RandomEffects(_PanelModelBase):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
@@ -2643,12 +2643,12 @@ class RandomEffects(_PanelModelBase):
 
         Parameters
         ----------
-        small_sample : bool, default False
+        small_sample : bool
             Apply a small-sample correction to the estimate of the variance of
             the random effect.
-        cov_type : str, default "unadjusted"
-            Name of covariance estimator. See Notes.
-        debiased : bool, default True
+        cov_type : str
+            Name of covariance estimator (see notes). Default is "unadjusted".
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -2820,7 +2820,7 @@ class FamaMacBeth(_PanelModelBase):
         Dependent (left-hand-side) variable (time by entity)
     exog : array_like
         Exogenous or right-hand-side variables (variable by time by entity).
-    weights : array_like, optional
+    weights : array_like
         Weights to use in estimation.  Assumes residual variance is
         proportional to inverse of weight to that the residual time
         the weight should be homoskedastic.
@@ -2920,15 +2920,15 @@ class FamaMacBeth(_PanelModelBase):
 
         Parameters
         ----------
-        cov_type : str, default "unadjusted"
-            Name of covariance estimator. See Notes.
-        debiased : bool, default True
+        cov_type : str
+            Name of covariance estimator (see notes). Default is "unadjusted".
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        bandwidth : float, default None
+        bandwidth : float
             The bandwidth to use when cov_type is "kernel". If None, it is
             automatically computed.
-        kernel : str, default None
+        kernel : str
             The kernel to use.  None chooses the default kernel.
 
         Returns
@@ -3070,11 +3070,11 @@ class FamaMacBeth(_PanelModelBase):
             Data structure that can be coerced into a PanelData.  In most
             cases, this should be a multi-index DataFrame where the level 0
             index contains the entities and the level 1 contains the time.
-        weights: array_like, optional
+        weights: array_like
             Weights to use in estimation.  Assumes residual variance is
             proportional to inverse of weight to that the residual times
             the weight should be homoskedastic.
-        check_rank : bool, optional
+        check_rank : bool
             Flag indicating whether to perform a rank check on the exogenous
             variables to ensure that the model is identified. Skipping this
             check can reduce the time required to validate a model
