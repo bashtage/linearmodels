@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.\_Panel.from\_array
+===========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: _Panel.from_array

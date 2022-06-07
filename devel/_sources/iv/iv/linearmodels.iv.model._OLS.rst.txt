@@ -1,0 +1,38 @@
+﻿linearmodels.iv.model.\_OLS
+===========================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoclass:: _OLS
+   :exclude-members: estimate_parameters,fit,from_formula,predict,resids,wresids,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~_OLS.estimate_parameters
+      ~_OLS.fit
+      ~_OLS.from_formula
+      ~_OLS.predict
+      ~_OLS.resids
+      ~_OLS.wresids
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~_OLS.formula
+      ~_OLS.has_constant
+      ~_OLS.isnull
+      ~_OLS.notnull
+   
+   
+   

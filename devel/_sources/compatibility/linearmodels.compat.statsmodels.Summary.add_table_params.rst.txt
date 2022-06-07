@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.compat.statsmodels.Summary.add\_table\_params
+==========================================================
+
+.. currentmodule:: linearmodels.compat.statsmodels
+
+.. automethod:: Summary.add_table_params

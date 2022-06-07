@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.compat.statsmodels.Summary.as\_text
+================================================
+
+.. currentmodule:: linearmodels.compat.statsmodels
+
+.. automethod:: Summary.as_text

@@ -1,0 +1,6 @@
+linearmodels.panel.data.\_Panel.minor\_axis
+===========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: _Panel.minor_axis

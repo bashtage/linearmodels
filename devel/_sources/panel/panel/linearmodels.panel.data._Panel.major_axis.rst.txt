@@ -1,0 +1,6 @@
+linearmodels.panel.data.\_Panel.major\_axis
+===========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: _Panel.major_axis

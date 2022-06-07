@@ -36,6 +36,7 @@ Estimation Results
    :toctree: asset-pricing/
 
    LinearFactorModelResults
+   GMMFactorModelResults
 
 .. _asset_pricing-module-reference-covariance:
 

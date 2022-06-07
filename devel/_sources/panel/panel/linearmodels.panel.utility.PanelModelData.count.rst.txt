@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.utility.PanelModelData.count
+===============================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. automethod:: PanelModelData.count

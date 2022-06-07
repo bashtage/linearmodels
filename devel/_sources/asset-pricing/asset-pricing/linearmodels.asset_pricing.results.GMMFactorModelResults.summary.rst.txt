@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.GMMFactorModelResults.summary
+=================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: GMMFactorModelResults.summary

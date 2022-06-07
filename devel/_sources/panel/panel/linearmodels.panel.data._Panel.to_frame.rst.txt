@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.data.\_Panel.to\_frame
+=========================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. automethod:: _Panel.to_frame

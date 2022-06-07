@@ -1,0 +1,6 @@
+﻿linearmodels.iv.covariance.kernel\_optimal\_bandwidth
+=====================================================
+
+.. currentmodule:: linearmodels.iv.covariance
+
+.. autofunction:: kernel_optimal_bandwidth

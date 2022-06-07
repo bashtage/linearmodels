@@ -1,0 +1,6 @@
+linearmodels.iv.model.\_OLS.isnull
+==================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: _OLS.isnull

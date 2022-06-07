@@ -1,0 +1,6 @@
+linearmodels.panel.data.\_Panel.values
+======================================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoproperty:: _Panel.values

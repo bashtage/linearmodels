@@ -1,0 +1,48 @@
+﻿linearmodels.asset\_pricing.results.GMMFactorModelResults
+=========================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoclass:: GMMFactorModelResults
+   :exclude-members: 
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~GMMFactorModelResults.alphas
+      ~GMMFactorModelResults.betas
+      ~GMMFactorModelResults.cov
+      ~GMMFactorModelResults.cov_estimator
+      ~GMMFactorModelResults.full_summary
+      ~GMMFactorModelResults.iterations
+      ~GMMFactorModelResults.j_statistic
+      ~GMMFactorModelResults.name
+      ~GMMFactorModelResults.nobs
+      ~GMMFactorModelResults.params
+      ~GMMFactorModelResults.pvalues
+      ~GMMFactorModelResults.residual_ss
+      ~GMMFactorModelResults.risk_premia
+      ~GMMFactorModelResults.risk_premia_se
+      ~GMMFactorModelResults.risk_premia_tstats
+      ~GMMFactorModelResults.rsquared
+      ~GMMFactorModelResults.std_errors
+      ~GMMFactorModelResults.summary
+      ~GMMFactorModelResults.total_ss
+      ~GMMFactorModelResults.tstats
+   
+   
+   

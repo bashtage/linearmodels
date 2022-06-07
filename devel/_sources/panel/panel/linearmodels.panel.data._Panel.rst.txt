@@ -1,0 +1,35 @@
+﻿linearmodels.panel.data.\_Panel
+===============================
+
+.. currentmodule:: linearmodels.panel.data
+
+.. autoclass:: _Panel
+   :exclude-members: from_array,to_frame,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~_Panel.from_array
+      ~_Panel.to_frame
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~_Panel.items
+      ~_Panel.major_axis
+      ~_Panel.minor_axis
+      ~_Panel.shape
+      ~_Panel.values
+   
+   
+   

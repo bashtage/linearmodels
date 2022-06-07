@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.\_OLS.resids
+==================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: _OLS.resids
