@@ -131,7 +131,6 @@ nportfolio
 ntime
 nvar
 OLSResults
-OneWayClusteredCovariance
 OneWayClusteredWeightMatrix
 org
 orthogonalization

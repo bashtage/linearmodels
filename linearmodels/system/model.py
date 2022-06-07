@@ -60,7 +60,7 @@ from linearmodels.typing import (
     OptionalArrayLike,
 )
 
-__all__ = ["SUR", "IV3SLS", "IVSystemGMM"]
+__all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
 
 UNKNOWN_EQ_TYPE = """
 Contents of each equation must be either a dictionary with keys 'dependent'
@@ -118,7 +118,7 @@ def _parameters_from_xprod(
         Cross product measuring variation in x (nvar by nvar)
     xpy : ndarray
         Cross produce measuring covariation between x and y (nvar by 1)
-    constraints : LinearConstraint, optional
+    constraints : LinearConstraint
         Constraints to use in estimation
 
     Returns
@@ -1150,7 +1150,7 @@ class _SystemModelBase(object):
         ----------
         r : DataFrame
             Constraint matrix. nconstraints by nparameters
-        q : Series, optional
+        q : Series
             Constraint values (nconstraints).  If not set, set to 0
 
         Notes
@@ -1419,11 +1419,11 @@ class IV3SLS(_LSSystemModelBase):
         ----------
         dependent : array_like
             nobs by ndep array of dependent variables
-        exog : array_like, optional
+        exog : array_like
             nobs by nexog array of exogenous regressors common to all models
-        endog : array_like, optional
+        endog : array_like
             nobs by nendog array of endogenous regressors common to all models
-        instruments : array_like, optional
+        instruments : array_like
             nobs by ninstr array of instruments to use in all equations
 
         Returns
@@ -1694,7 +1694,7 @@ class SUR(_LSSystemModelBase):
         sigma : array_like
             Prespecified residual covariance to use in GLS estimation. If
             not provided, FGLS is implemented based on an estimate of sigma.
-        weights : dict[str, array_like], default None
+        weights : dict[str, array_like]
             Dictionary like object (e.g. a DataFrame) containing variable
             weights.  Each entry must have the same number of observations as
             data.  If an equation label is not a key weights, the weights will
@@ -1857,7 +1857,7 @@ class IVSystemGMM(_SystemModelBase):
             Maximum number of iterations for iterative GLS
         tol : float
             Tolerance to use when checking for convergence in iterative GLS
-        initial_weight : ndarray, optional
+        initial_weight : ndarray
             Initial weighting matrix to use in the first step. If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.

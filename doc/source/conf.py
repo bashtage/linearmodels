@@ -30,6 +30,9 @@ import linearmodels
 
 # ...
 
+# More warnings
+nitpicky = True
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -111,6 +114,7 @@ master_doc = "index"
 project = "linearmodels"
 copyright = "2017, Kevin Sheppard"
 author = "Kevin Sheppard"
+language = "en"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -254,10 +258,10 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "statsmodels": ("https://www.statsmodels.org/dev/", None),
-    "matplotlib": ("https://matplotlib.org/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "xarray": ("https://xarray.pydata.org/en/stable/", None),
 }
@@ -318,7 +322,8 @@ numpydoc_xref_aliases = {
     "IVResults": "linearmodels.iv.results.IVResults",
     "InvalidTestStatistic": "linearmodels.shared.InvalidTestStatistic",
     "OLSResults": "linearmodels.iv.results.OLSResults",
-    "WaldTestStatistic": "linearmodels.shared.WaldTestStatistic",
+    "WaldTestStatistic": "linearmodels.shared.hypotheses.WaldTestStatistic",
+    "LinearConstraint": "linearmodels.system.model.LinearConstraint",
     "PanelEffectsResults": "linearmodels.panel.results.PanelEffectsResults",
     "PanelModelComparison": "linearmodels.panel.results.PanelModelComparison",
     "PanelResults": "linearmodels.panel.results.PanelResults",
@@ -331,5 +336,8 @@ numpydoc_xref_aliases = {
     "LinearFactorModelResults": "linearmodels.asset_pricing.results.LinearFactorModelResults",
     "PanelData": "linearmodels.panel.data.PanelData",
     "IVData": "linearmodels.iv.data.IVData",
-    "AttrDict": "linearmodels.shared.AttrDict",
+    "AttrDict": "linearmodels.shared.utility.AttrDict",
+    "csc_matrix": "scipy.sparse.csc_matrix",
+    "DataArray": "xarray.DataArray",
+    "PanelModelData": "linearmodels.panel.utility.PanelModelData",
 }

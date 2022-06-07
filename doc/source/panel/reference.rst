@@ -42,6 +42,7 @@ Estimation Results
    PanelEffectsResults
    RandomEffectsResults
    PanelModelComparison
+   compare
 
 .. _panel-module-reference-covariance:
 
@@ -75,13 +76,16 @@ Panel Data Structures
    :toctree: panel/
 
    PanelData
+   _Panel
 
-Helper Functions
-----------------
+Test Data Generation
+--------------------
+
 .. module:: linearmodels.panel.utility
-   :synopsis: Utilities for working with panel data
+   :synopsis: Utilities for testing panel data models
 
 .. autosummary::
    :toctree: panel/
 
    generate_panel_data
+   PanelModelData
