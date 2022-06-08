@@ -22,6 +22,8 @@ from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
     HomoskedasticCovariance,
     kernel_optimal_bandwidth,
+    MisspecificationCovariance,
+    OneStepMisspecificationCovariance,
 )
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import AnyArray, Float64Array
