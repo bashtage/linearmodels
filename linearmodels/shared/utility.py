@@ -216,9 +216,9 @@ class DataFrameWrapper:
     ----------
     values : ndarray
         The data to use in the DataFrame's constructor
-    columns : list[str], optional
+    columns : list[str]
         The column names of the frame
-    index : {Index, list[str]}, optional
+    index : {Index, list[str]}
         The index to use.
     """
 
@@ -245,9 +245,9 @@ class SeriesWrapper:
     ----------
     values : ndarray
         The data to use in the Series' constructor
-    name : str, optional
+    name : str
         The name of the series
-    index : {Index, list[str]}, optional
+    index : {Index, list[str]}
         The index to use.
     """
 

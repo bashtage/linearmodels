@@ -420,7 +420,7 @@ def check_absorbed(
         Regressor matrix to check
     variables : List[str]
         List of variable names
-    x_orig : ndarray, optional
+    x_orig : ndarray
         Original data. If provided uses a norm check to ascertain if all
         variables have been absorbed.
     """
@@ -530,23 +530,23 @@ def generate_panel_data(
 
     Parameters
     ----------
-    nentity : int, default 971
+    nentity : int
         The number of entities in the panel.
-    ntime : int, default 7
+    ntime : int
         The number of time periods in the panel.
-    nexog : int, default 5
+    nexog : int
         The number of explanatory variables in the dataset.
-    const : bool, default False
+    const : bool
         Flag indicating that the model should include a constant.
-    missing : float, default 0
+    missing : float
         The percentage of values that are missing. Should be between 0 and 100.
-    other_effects : int, default 2
+    other_effects : int
         The number of other effects generated.
-    ncats : Union[int, Sequence[int]], default 4
+    ncats : Union[int, Sequence[int]]
         The number of categories to use in other_effects and variance
         clusters. If list-like, then it must have as many elements
         as other_effects.
-    rng : RandomState, default None
+    rng : RandomState
         A NumPy RandomState instance. If not provided, one is initialized
         using a fixed seed.
 

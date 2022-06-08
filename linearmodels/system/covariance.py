@@ -36,12 +36,12 @@ class HomoskedasticCovariance(object):
         Model residuals, ndependent by nobs
     sigma : ndarray
         Covariance matrix estimator of eps
-    gls : bool, optional
+    gls : bool
         Flag indicating to compute the GLS covariance estimator.  If False,
         assume OLS was used
-    debiased : bool, optional
+    debiased : bool
         Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
 
     Notes
@@ -178,7 +178,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         assume OLS was used
     debiased : bool
         Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
 
     Notes
@@ -313,14 +313,14 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         assume OLS was used
     debiased : bool
         Flag indicating to apply a small sample adjustment
-    kernel : str, optional
+    kernel : str
         Name of kernel to use.  Supported kernels include:
 
         * 'bartlett', 'newey-west' : Bartlett's kernel
         * 'parzen', 'gallant' : Parzen's kernel
         * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
-    bandwidth : float, optional
+    bandwidth : float
         Bandwidth to use for the kernel.  If not provided the optimal
         bandwidth will be estimated.
 
@@ -409,12 +409,12 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         assume OLS was used
     debiased : bool
         Flag indicating to apply a small sample adjustment
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
-    clusters : ndarray, default None
+    clusters : ndarray
         Optional array of cluster id.  Must be integer valued, and have shape
         (nobs, ncluster) where ncluster is 1 or 2.
-    group_debias : bool, default False
+    group_debias : bool
         Flag indicating whether to debias by the number of groups.
 
     Notes
@@ -552,9 +552,9 @@ class GMMHomoskedasticCovariance(object):
         equation in the system
     w : ndarray
         Weighting matrix used in estimation
-    sigma : ndarray, optional
+    sigma : ndarray
         Residual covariance used in estimation
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
 
     Notes
@@ -675,9 +675,9 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
         equation in the system
     w : ndarray
         Weighting matrix used in estimation
-    sigma : ndarray, optional
+    sigma : ndarray
         Residual covariance used in estimation
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
 
     Notes
@@ -741,18 +741,18 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
         equation in the system
     w : ndarray
         Weighting matrix used in estimation
-    sigma : ndarray, optional
+    sigma : ndarray
         Residual covariance used in estimation
-    constraints : {None, LinearConstraint}, optional
+    constraints : {None, LinearConstraint}
         Constraints used in estimation, if any
-    kernel : str, optional
+    kernel : str
         Name of kernel to use.  Supported kernels include:
 
         * 'bartlett', 'newey-west' : Bartlett's kernel
         * 'parzen', 'gallant' : Parzen's kernel
         * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
 
-    bandwidth : float, optional
+    bandwidth : float
         Bandwidth to use for the kernel.  If not provided the optimal
         bandwidth will be estimated.
 

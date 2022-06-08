@@ -38,7 +38,10 @@ __all__ = ["PanelData", "PanelDataLike"]
 
 class _Panel(object):
     """
-    Convert a MI DataFrame to a 3-d structure where columns are items
+    Convert a MI DataFrame to a 3-d structure where columns are items.
+
+    This class is for internal use only and is a legacy shim related to the removed
+    pandas Panel class.
 
     Parameters
     ----------
@@ -132,18 +135,18 @@ class PanelData(object):
     ----------
     x : {ndarray, Series, DataFrame, DataArray}
        Input data
-    var_name : str, optional
+    var_name : str
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
-    convert_dummies : bool, optional
+    convert_dummies : bool
         Flat indicating whether pandas categoricals or string input data
         should be converted to dummy variables
-    drop_first : bool, optional
+    drop_first : bool
         Flag indicating to drop first dummy category when converting
-    copy: bool, optional
+    copy: bool
         Flag indicating whether to copy the input. Only has an effect when
         x is a DataFrame
-    cast: bool, optional
+    cast: bool
         Flag indicating to case the data to double precision.
 
     Notes
@@ -396,7 +399,7 @@ class PanelData(object):
 
         Parameters
         ----------
-        weights : PanelData, optional
+        weights : PanelData
              Weights to use in demeaning
         """
         if self.nentity > self.nobs:
@@ -427,7 +430,7 @@ class PanelData(object):
         ----------
         groups : PanelData
             Arrays with the same size containing group identifiers
-        weights : PanelData, optional
+        weights : PanelData
             Weights to use in the weighted demeaning
 
         Returns
@@ -521,7 +524,7 @@ class PanelData(object):
         ----------
         group : {'entity', 'time', 'both'}
             Group to use in demeaning
-        weights : PanelData, optional
+        weights : PanelData
             Weights to implement weighted averaging
         return_panel : bool
             Flag indicating to return a PanelData object. If False, a 2-d
@@ -631,7 +634,7 @@ class PanelData(object):
         ----------
         group : {'entity', 'time'}
             Group to use in demeaning
-        weights : PanelData, optional
+        weights : PanelData
             Weights to implement weighted averaging
 
         Returns
@@ -696,9 +699,9 @@ class PanelData(object):
 
         Parameters
         ----------
-        group : {'entity', 'time'}, optional
+        group : {'entity', 'time'}
             Type of dummies to generate
-        drop_first : bool, optional
+        drop_first : bool
             Flag indicating that the dummy column corresponding to the first
             entity or time period should be dropped
 

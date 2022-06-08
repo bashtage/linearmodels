@@ -128,12 +128,12 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     Parameters
     x : ndarray
         Array of data to use when computing optimal bandwidth
-    kernel : str, optional
+    kernel : str
         Name of kernel to use.  Supported kernels include:
 
-        * 'bartlett', 'newey-west' : Bartlett's kernel
-        * 'parzen', 'gallant' : Parzen's kernel
-        * 'qs', 'quadratic-spectral', 'andrews' : Quadratic spectral kernel
+        * 'bartlett', 'newey-west' - Bartlett's kernel
+        * 'parzen', 'gallant' - Parzen's kernel
+        * 'qs', 'quadratic-spectral', 'andrews' - Quadratic spectral kernel
 
     Returns
     -------
@@ -204,9 +204,9 @@ class HomoskedasticCovariance(object):
         Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    kappa : float, optional
+    kappa : float
         Value of kappa in k-class estimator
     w : ndarray
         the iter GMM weight matrix
@@ -344,9 +344,9 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    kappa : float, optional
+    kappa : float
         Value of kappa in k-class estimator
 
     Notes
@@ -425,9 +425,9 @@ class KernelCovariance(HomoskedasticCovariance):
     bandwidth : {int, None}
         Non-negative bandwidth to use with kernel. If None, automatic
         bandwidth selection is used.
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    kappa : float, optional
+    kappa : float
         Value of kappa in k-class estimator
 
     Notes
@@ -550,12 +550,12 @@ class ClusteredCovariance(HomoskedasticCovariance):
         Instruments used for endogenous regressors (nobs by ninstr)
     params : ndarray
         Estimated model parameters (nvar by 1)
-    debiased : bool, optional
+    debiased : bool
         Flag indicating whether to use a small-sample adjustment
-    clusters : ndarray, optional
+    clusters : ndarray
         Cluster group assignment.  If not provided, uses clusters of 1.
         Either nobs by ncluster where ncluster is 1 or 2.
-    kappa : float, optional
+    kappa : float
         Value of kappa in k-class estimator
 
 

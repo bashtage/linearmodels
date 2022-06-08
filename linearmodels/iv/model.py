@@ -104,12 +104,12 @@ class _IVModelBase(object):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    fuller : float, default 0
+    fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
-    kappa : float, default None
+    kappa : float
         Parameter value for k-class estimation.  If None, computed to
         produce LIML parameter estimate.
 
@@ -474,12 +474,12 @@ class _IVLSModelBase(_IVModelBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    fuller : float, default 0
+    fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
-    kappa : float, default None
+    kappa : float
         Parameter value for k-class estimation.  If None, computed to
         produce LIML parameter estimate.
 
@@ -595,7 +595,7 @@ class _IVLSModelBase(_IVModelBase):
 
         Parameters
         ----------
-        cov_type : str, default "robust"
+        cov_type : str
             Name of covariance estimator to use. Supported covariance
             estimators are:
 
@@ -606,7 +606,7 @@ class _IVLSModelBase(_IVModelBase):
             * 'cluster' - One-way cluster dependent inference.
               Heteroskedasticity robust
 
-        debiased : bool, default False
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -680,12 +680,12 @@ class IVLIML(_IVLSModelBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    fuller : float, default 0
+    fuller : float
         Fuller's alpha to modify LIML estimator. Default returns unmodified
         LIML estimator.
-    kappa : float, default None
+    kappa : float
         Parameter value for k-class estimation.  If None, computed to
         produce LIML parameter estimate.
 
@@ -761,12 +761,12 @@ class IVLIML(_IVLSModelBase):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array_like, default None
+        weights : array_like
             Observation weights used in estimation
-        fuller : float, default 0
+        fuller : float
             Fuller's alpha to modify LIML estimator. Default returns unmodified
             LIML estimator.
-        kappa : float, default None
+        kappa : float
             Parameter value for k-class estimation.  If not provided, computed to
             produce LIML parameter estimate.
 
@@ -819,7 +819,7 @@ class IV2SLS(_IVLSModelBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
 
     Notes
@@ -870,7 +870,7 @@ class IV2SLS(_IVLSModelBase):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array_like, default None
+        weights : array_like
             Observation weights used in estimation
 
         Returns
@@ -920,9 +920,9 @@ class _IVGMMBase(_IVModelBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    weight_type : str, default "robust"
+    weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
         Additional keyword arguments to pass to the moment condition weight
@@ -1018,9 +1018,9 @@ class IVGMM(_IVGMMBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    weight_type : str, default "robust"
+    weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
         Additional keyword arguments to pass to the moment condition weight
@@ -1091,9 +1091,9 @@ class IVGMM(_IVGMMBase):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array_like, default None
+        weights : array_like
             Observation weights used in estimation
-        weight_type : str, default "robust"
+        weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         **weight_config
             Additional keyword arguments to pass to the moment condition weight
@@ -1176,20 +1176,20 @@ class IVGMM(_IVGMMBase):
 
         Parameters
         ----------
-        iter_limit : int, default 2
+        iter_limit : int
             Maximum number of iterations.  Default is 2, which produces
             two-step efficient GMM estimates.  Larger values can be used
             to iterate between parameter estimation and optimal weight
             matrix estimation until convergence.
-        tol : float, default 1e-4
+        tol : float
             Convergence criteria.  Measured as covariance normalized change in
             parameters across iterations where the covariance estimator is
             based on the first step parameter estimates.
-        initial_weight : ndarray, default None
+        initial_weight : ndarray
             Initial weighting matrix to use in the first step.  If not
             specified, uses the average outer-product of the set containing
             the exogenous variables and instruments.
-        cov_type : str, default "robust"
+        cov_type : str
             Name of covariance estimator to use. Available covariance
             functions are:
 
@@ -1200,7 +1200,7 @@ class IVGMM(_IVGMMBase):
             * 'kernel' - Allows for heteroskedasticity and autocorrelation
             * 'cluster' - Allows for one-way cluster dependence
 
-        debiased : bool, default False
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
         **cov_config
@@ -1308,9 +1308,9 @@ class IVGMMCUE(_IVGMMBase):
         Endogenous regressors (nobs by nendog)
     instruments : array_like
         Instrumental variables (nobs by ninstr)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
-    weight_type : str, default "robust"
+    weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
         Additional keyword arguments to pass to the moment condition weight
@@ -1384,9 +1384,9 @@ class IVGMMCUE(_IVGMMBase):
             section
         data : DataFrame
             DataFrame containing the variables used in the formula
-        weights : array_like, default None
+        weights : array_like
             Observation weights used in estimation
-        weight_type : str, default "robust"
+        weight_type : str
             Name of moment condition weight function to use in the GMM estimation
         **weight_config
             Additional keyword arguments to pass to the moment condition weight
@@ -1491,9 +1491,9 @@ class IVGMMCUE(_IVGMMBase):
             Regressand matrix (nobs by 1)
         z : ndarray
             Instrument matrix (nobs by ninstr)
-        display : bool, default False
+        display : bool
             Flag indicating whether to display iterative optimizer output
-        opt_options : dict, default None
+        opt_options : dict
             Dictionary containing additional keyword arguments to pass to
             scipy.optimize.minimize.
 
@@ -1539,17 +1539,17 @@ class IVGMMCUE(_IVGMMBase):
 
         Parameters
         ----------
-        starting : ndarray, default None
+        starting : ndarray
             Starting values to use in optimization.  If not provided, 2SLS
             estimates are used.
-        display : bool, default False
+        display : bool
             Flag indicating whether to display optimization output
-        cov_type : str, default "robust"
+        cov_type : str
             Name of covariance estimator to use
-        debiased : bool, default False
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        opt_options : dict, default None
+        opt_options : dict
             Additional options to pass to scipy.optimize.minimize when
             optimizing the objective function. If not provided, defers to
             scipy to choose an appropriate optimizer. All minimize inputs
@@ -1618,13 +1618,16 @@ class _OLS(IVLIML):
     """
     Computes OLS estimates when required
 
+    Private class used when model reduces to OLS. Should use the statsmodels
+    version when neeeding a supported public API.
+
     Parameters
     ----------
     dependent : array_like
         Endogenous variables (nobs by 1)
     exog : array_like
         Exogenous regressors  (nobs by nexog)
-    weights : array_like, default None
+    weights : array_like
         Observation weights used in estimation
 
     Notes

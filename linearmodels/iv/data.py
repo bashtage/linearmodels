@@ -39,19 +39,19 @@ class IVData(object):
 
     Parameters
     ----------
-    x : {ndarray, Series, DataFrame, DataArray}, optional
+    x : {ndarray, Series, DataFrame, DataArray}
         Data to wrap and standardize.  If None, then nobs must be provided to
         produce an IVData instance with shape (nobs, 0).
-    var_name : str, optional
+    var_name : str
         Variable name to use when naming variables in NumPy arrays or
         xarray DataArrays
-    nobs : int, optional
+    nobs : int
         Number of observation, used when `x` is None. If `x` is array_like,
         then nobs is used to check the number of observations in `x`.
-    convert_dummies : bool, optional
+    convert_dummies : bool
         Flat indicating whether pandas categoricals or string input data
         should be converted to dummy variables
-    drop_first : bool, optional
+    drop_first : bool
         Flag indicating to drop first dummy category
     """
 

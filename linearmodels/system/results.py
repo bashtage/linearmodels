@@ -292,15 +292,15 @@ class SystemResults(_CommonResults):
         data : DataFrame
             DataFrame to use for out-of-sample predictions when model was
             constructed using a formula.
-        fitted : bool, optional
+        fitted : bool
             Flag indicating whether to include the fitted values
-        idiosyncratic : bool, optional
+        idiosyncratic : bool
             Flag indicating whether to include the estimated idiosyncratic shock
-        missing : bool, optional
+        missing : bool
             Flag indicating to adjust for dropped observations.  if True, the
             values returns will have the same size as the original input data
             before filtering missing values
-        dataframe : bool, optional
+        dataframe : bool
             Flag indicating to return output as a dataframe. If False, a
             dictionary is returned using the equation labels as keys.
 
@@ -446,6 +446,8 @@ class SystemResults(_CommonResults):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
@@ -667,6 +669,8 @@ class SystemEquationResult(_CommonResults):
         Summary
             Summary table of model estimation results
 
+        Notes
+        -----
         Supports export to csv, html and latex  using the methods ``summary.as_csv()``,
         ``summary.as_html()`` and ``summary.as_latex()``.
         """

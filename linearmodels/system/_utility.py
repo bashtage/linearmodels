@@ -210,9 +210,9 @@ class LinearConstraint(object):
         Restriction loading matrix
     q : {ndarray, Series}
         Restriction value
-    num_params : int, optional
+    num_params : int
         Number of model parameter.  Used to test for correctness
-    require_pandas : bool, optional
+    require_pandas : bool
         Flag indicating whether r and q must be pandas
 
     Notes

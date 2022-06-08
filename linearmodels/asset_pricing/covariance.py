@@ -80,18 +80,19 @@ class HeteroskedasticCovariance(object):
     ----------
     xe : ndarray
         Scores/moment conditions
-    jacobian : ndarray, default None
+    jacobian : ndarray
         Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided
-    inv_jacobian : ndarray, default None
+    inv_jacobian : {ndarray, None}
         Inverse jacobian.  One and only one of jacobian and inv_jacobian must
-        be provided
-    center : bool, default True
-        Flag indicating to center the scores when computing the covariance
-    debiased : bool, default False
-        Flag indicating to use a debiased estimator
-    df : int, default 0
-        Degree of freedom value ot use if debiasing
+        be provided. Default is None.
+    center : bool
+        Flag indicating to center the scores when computing the covariance. Default
+        is true.
+    debiased : bool
+        Flag indicating to use a debiased estimator. Default is False.
+    df : int
+        Degree of freedom value ot use if debiasing. Default is 0.
     """
 
     def __init__(
@@ -203,22 +204,22 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
     ----------
     xe : ndarray
         The scores (moment) conditions.
-    jacobian : ndarray, default None
+    jacobian : ndarray
         Jacobian.  One and only one of jacobian and inv_jacobian must
         be provided.
-    inv_jacobian : ndarray, default None
+    inv_jacobian : ndarray
         Inverse jacobian.  One and only one of jacobian and inv_jacobian must
         be provided.
-    kernel : str, default None
+    kernel : str
         Kernel name. See notes for available kernels. The default is "bartlett".
-    bandwidth : int, default None
+    bandwidth : int
         Non-negative integer bandwidth. If None, the optimal bandwidth is
         estimated.
-    center : bool, default True
+    center : bool
         Flag indicating to center the scores when computing the covariance.
-    debiased : bool, default False
+    debiased : bool
         Flag indicating to use a debiased estimator.
-    df : int, default 0
+    df : int
         Degree of freedom value ot use if debiasing.
 
     See Also
@@ -286,7 +287,7 @@ class HeteroskedasticWeight(object):
     ----------
     moments : ndarray
         Moment conditions (nobs by nmoments)
-    center : bool, default True
+    center : bool
         Flag indicating to center the moments when computing the weights
     """
 
@@ -324,12 +325,12 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
     ----------
     moments : ndarray
         Moment conditions (nobs by nmoments)
-    center : bool, default True
+    center : bool
         Flag indicating to center the moments when computing the weights
-    kernel : str, default None
+    kernel : str
         Kernel name. See notes for available kernels. If None, the kernel
         is set to "bartlett".
-    bandwidth : int, default None.
+    bandwidth : int.
         Non-negative integer bandwidth. If None, the optimal bandwidth is
         estimated.
     """

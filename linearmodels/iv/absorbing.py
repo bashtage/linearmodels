@@ -268,12 +268,12 @@ class Interaction(object):
 
     Parameters
     ----------
-    cat : {ndarray, Series, DataFrame, DataArray}, optional
+    cat : {ndarray, Series, DataFrame, DataArray}
         Variables to treat as categoricals. Best format is a Categorical
         Series or DataFrame containing Categorical Series. Other formats
         are converted to Categorical Series, column-by-column. cats has
         shape (nobs, ncat).
-    cont : {ndarray, Series, DataFrame, DataArray}, optional
+    cont : {ndarray, Series, DataFrame, DataArray}
         Variables to treat as continuous, (nobs, ncont).
 
     Notes
@@ -577,9 +577,9 @@ class AbsorbingLS(object):
 
     Parameters
     ----------
-    dependent : ArrayLike
+    dependent : array_like
         Endogenous variables (nobs by 1)
-    exog : ArrayLike, optional
+    exog : array_like
         Exogenous regressors  (nobs by nexog)
     absorb: {DataFrame, Interaction}
         The effects or continuous variables to absorb. When using a DataFrame,
@@ -587,14 +587,14 @@ class AbsorbingLS(object):
         as continuous variables that should be absorbed. When using an
         Interaction, variables in the `cat` argument are treated as effects
         and variables in the `cont` argument are treated as continuous.
-    interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}, optional
+    interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}
         Interactions containing both categorical and continuous variables.  Each
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
         each continuous variable.
-    weights : ArrayLike, optional
+    weights : array_like
         Observation weights used in estimation
-    drop_absorbed : bool, optional
+    drop_absorbed : bool
         Flag indicating whether to drop absorbed variables
 
     Notes
@@ -957,7 +957,7 @@ class AbsorbingLS(object):
 
         Parameters
         ----------
-        cov_type : str, optional
+        cov_type : str
             Name of covariance estimator to use. Supported covariance
             estimators are:
 
@@ -968,10 +968,10 @@ class AbsorbingLS(object):
             * 'cluster' - One-way cluster dependent inference.
               Heteroskedasticity robust
 
-        debiased : bool, optional
+        debiased : bool
             Flag indicating whether to debiased the covariance estimator using
             a degree of freedom adjustment.
-        method : str, optional
+        method : str
             One of:
 
             * "auto" - (Default). Use HDFE when applicable and fallback to LSMR.
@@ -980,7 +980,7 @@ class AbsorbingLS(object):
               continuous variables or continuous-binary interactions to absorb or
               if the model is weighted.
 
-        absorb_options : dict, optional
+        absorb_options : dict
             Dictionary of options to pass to the absorber. Passed to either
             scipy.sparse.linalg.lsmr or pyhdfe.create depending on the method used
             to absorb the absorbed regressors.
