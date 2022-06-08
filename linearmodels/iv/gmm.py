@@ -6,14 +6,23 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Union
 
-from numpy import (asarray, diagflat, dot, kron, ndarray, ones, sum as npsum,
-                   unique, zeros)
+from numpy import (
+    asarray,
+    diagflat,
+    dot,
+    kron,
+    ndarray,
+    ones,
+    sum as npsum,
+    unique,
+    zeros)
 from numpy.linalg import inv
 
-from linearmodels.iv.covariance import (KERNEL_LOOKUP, HomoskedasticCovariance,
-                                        MisspecificationCovariance,
-                                        OneStepMisspecificationCovariance,
-                                        kernel_optimal_bandwidth)
+from linearmodels.iv.covariance import (
+    KERNEL_LOOKUP,
+    HomoskedasticCovariance,
+    kernel_optimal_bandwidth,
+)
 from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import AnyArray, Float64Array
 
@@ -50,7 +59,7 @@ class HomoskedasticWeightMatrix(object):
         self._bandwidth: Optional[int] = 0
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -115,7 +124,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -186,12 +195,12 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self,
-        kernel: str = "bartlett",
-        bandwidth: Optional[int] = None,
-        center: bool = False,
-        debiased: bool = False,
-        optimal_bw: bool = False,
+            self,
+            kernel: str = "bartlett",
+            bandwidth: Optional[int] = None,
+            center: bool = False,
+            debiased: bool = False,
+            optimal_bw: bool = False,
     ) -> None:
         super(KernelWeightMatrix, self).__init__(center, debiased)
         self._bandwidth = bandwidth
@@ -201,7 +210,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         self._optimal_bw = optimal_bw
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -277,13 +286,13 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: AnyArray, center: bool = False, debiased: bool = False
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -343,6 +352,10 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
 def conutnum(x: Float64Array, binranges: Float64Array) -> Float64Array:
     """
     Bin counting for histograms, equal to MATLAB fun:histc
+    Returns
+    -------
+    ndarray
+        Ndarray of bin counting for histograms
     """
     temp = zeros((len(binranges), 2))
     temp[:, 0] = binranges
@@ -371,13 +384,13 @@ class OneStepMisspecificationWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: AnyArray, center: bool = False, debiased: bool = False
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(OneStepMisspecificationWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -410,7 +423,7 @@ class OneStepMisspecificationWeightMatrix(HomoskedasticWeightMatrix):
         wmat = zeros((z_num, z_num))
         W0i = zeros((z_num, z_num, G))
         for i in range(G):
-            Zi = z[int(npsum(ng[0 : i + 1]) - ng[i]) : int(npsum(ng[0 : i + 1])), :]
+            Zi = z[int(npsum(ng[0: i + 1]) - ng[i]): int(npsum(ng[0: i + 1])), :]
 
             h0 = 2 * ones((int(ng[i]), 1))
             h1 = -1 * ones((int(ng[i]) - 1, 1))
@@ -469,13 +482,13 @@ class MisspecificationWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(
-        self, clusters: AnyArray, center: bool = False, debiased: bool = False
+            self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
         super(MisspecificationWeightMatrix, self).__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
-        self, x: Float64Array, z: Float64Array, eps: Float64Array
+            self, x: Float64Array, z: Float64Array, eps: Float64Array
     ) -> Float64Array:
         """
         Parameters
@@ -596,15 +609,15 @@ class IVGMMCovariance(HomoskedasticCovariance):
 
     # TODO: 2-way clustering
     def __init__(
-        self,
-        x: Float64Array,
-        y: Float64Array,
-        z: Float64Array,
-        params: Float64Array,
-        w: Float64Array,
-        cov_type: str = "robust",
-        debiased: bool = False,
-        **cov_config: Union[str, bool],
+            self,
+            x: Float64Array,
+            y: Float64Array,
+            z: Float64Array,
+            params: Float64Array,
+            w: Float64Array,
+            cov_type: str = "robust",
+            debiased: bool = False,
+            **cov_config: Union[str, bool],
     ) -> None:
         super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
         self._cov_type = cov_type
@@ -689,6 +702,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
                 w=self.w,
             ).s
         else:
+
             nobs = x.shape[0]
             xpz = x.T @ z / nobs
             xpzw = xpz @ w
@@ -696,6 +710,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
             s = score_cov.weight_matrix(x, z, eps)
             c = xpzwzpx_inv @ (xpzw @ s @ xpzw.T) @ xpzwzpx_inv / nobs
             c = (c + c.T) / 2
+
         return c
 
     @property
