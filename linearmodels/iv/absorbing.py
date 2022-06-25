@@ -296,7 +296,7 @@ class Interaction(object):
     >>> rs = np.random.RandomState(0)
     >>> import pandas as pd
     >>> cats_df = pd.concat([pd.Series(pd.Categorical(rs.randint(5,size=n)))
-    ...                     for _ in range(4)],1)
+    ...                     for _ in range(4)], axis=1)
     >>> cats_df.describe()
                  0       1       2       3
     count   100000  100000  100000  100000
@@ -304,7 +304,7 @@ class Interaction(object):
     top          3       3       0       4
     freq     20251   20195   20331   20158
 
-    >>> interact = Interaction(cats, cont)
+    >>> interact = Interaction(cats_df, cont)
     >>> interact.sparse.shape # Cart product of all cats, 5**4, times ncont, 3
     (100000, 1875)
     """
@@ -458,11 +458,11 @@ class Interaction(object):
         >>> rs = np.random.RandomState(0)
         >>> n = 100000
         >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(i+2,size=n)))
-        ...                  for i in range(4)],1)
+        ...                  for i in range(4)], axis=1)
         >>> cats.columns = ['cat{0}'.format(i) for i in range(4)]
         >>> columns = ['cont{0}'.format(i) for i in range(6)]
         >>> cont = pd.DataFrame(rs.standard_normal((n, 6)), columns=columns)
-        >>> frame = pd.concat([cats, cont], 1)
+        >>> frame = pd.concat([cats, cont], axis=1)
         >>> interact = Interaction.from_frame(frame)
         >>> interact.sparse.shape # Cart product of all cats, 5!, times ncont, 6
         (100000, 720)
@@ -643,7 +643,7 @@ class AbsorbingLS(object):
     >>> cats = pd.DataFrame({i: pd.Categorical(np.random.randint(1000, size=20000))
     ...                      for i in range(2)})
     >>> cont = pd.DataFrame({i+2: np.random.standard_normal(20000) for i in range(2)})
-    >>> absorb = pd.concat([cats, cont], 1)
+    >>> absorb = pd.concat([cats, cont], axis=1)
     >>> mod = AbsorbingLS(dep, exog, absorb=absorb)
     >>> res = mod.fit()
 

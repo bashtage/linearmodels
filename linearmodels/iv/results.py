@@ -441,18 +441,18 @@ class _LSModelResultsBase(_SummaryStr):
         Testing the experience is not needed in the model
 
         >>> restriction = np.array([[0, 1, 0, 0, 0],
-                                    [0, 0, 1, 0, 0]])
+        ...                         [0, 0, 1, 0, 0]])
         >>> value = np.array([0, 0])
-        >>> res.wald_test(restriction, value)
+        >>> wald_res = res.wald_test(restriction, value)
 
         Using the formula interface to test the same restrictions
 
-        >>> formula = 'exper = I(exper ** 2) = 0'
-        >>> res.wald_test(formula=formula)
+        >>> formula = 'exper = I(exper**2) = 0'
+        >>> wald_res = res.wald_test(formula=formula)
 
         Using the formula interface with a list
 
-        >>> res.wald_test(formula=['exper = 0', 'I(exper ** 2) = 0'])
+        >>> wald_res = res.wald_test(formula=['exper = 0', 'I(exper**2) = 0'])
         """
         return quadratic_form_test(
             self._params,

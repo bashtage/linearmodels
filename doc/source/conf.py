@@ -28,7 +28,11 @@ import sphinx_material
 
 import linearmodels
 
-# ...
+# General information about the project.
+project = "linearmodels"
+copyright = "2017, Kevin Sheppard"
+author = "Kevin Sheppard"
+language = "en"
 
 # More warnings
 nitpicky = True
@@ -109,12 +113,6 @@ source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
-
-# General information about the project.
-project = "linearmodels"
-copyright = "2017, Kevin Sheppard"
-author = "Kevin Sheppard"
-language = "en"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -721,12 +721,12 @@ class PanelResults(_SummaryStr):
         >>> restriction[0, 2] = 1
         >>> restriction[1, 3] = 1
         >>> value = np.array([0, 0])
-        >>> fe_res.wald_test(restriction, value)
+        >>> wald_res = fe_res.wald_test(restriction, value)
 
         The same test using formulas
 
         >>> formula = 'union = married = 0'
-        >>> fe_res.wald_test(formula=formula)
+        >>> wald_res = fe_res.wald_test(formula=formula)
         """
         return quadratic_form_test(
             self.params, self.cov, restriction=restriction, value=value, formula=formula
