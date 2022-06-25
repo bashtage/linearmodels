@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Since Version 4.26
+------------------
+* Fixed a bug that affected creating IV models using formulas with migging data.
+* Fixed examples in documnetation
+
 Version 4.26
 ------------
 * Fixed a bug in :class:`~linearmodels.iv.model.IV2SLS` and related models

@@ -64,6 +64,7 @@ linearmodels
    asset-pricing/index
    system/index
    utility
+   compatibility
    plan
    contributing
    changes
