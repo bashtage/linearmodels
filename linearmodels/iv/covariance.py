@@ -138,6 +138,7 @@ def kernel_weight_parzen(bw: float, *args: int) -> Float64Array:
 def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     """
     Parameters
+    ----------
     x : ndarray
         Array of data to use when computing optimal bandwidth
     kernel : str

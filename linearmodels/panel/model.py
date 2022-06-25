@@ -3093,7 +3093,7 @@ class FamaMacBeth(_PanelModelBase):
 
         Examples
         --------
-        >>> from linearmodels import BetweenOLS
+        >>> from linearmodels import FamaMacBeth
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
         >>> mod = FamaMacBeth.from_formula('y ~ 1 + x1', panel_data.data)

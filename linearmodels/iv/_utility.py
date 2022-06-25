@@ -170,7 +170,7 @@ class IVFormulaParser(object):
             self._data,
             context=self._eval_env,
             ensure_full_rank=True,
-            na_action=fNAAction("raise"),
+            na_action=fNAAction("ignore"),
         )
         return self._empty_check(DataFrame(exog))
 
