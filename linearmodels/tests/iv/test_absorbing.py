@@ -148,9 +148,8 @@ def generate_data(
         effects = rs.standard_normal(ncat)
         y += effects[fact]
         factors.append(pd.Series(pd.Categorical(fact)))
-    for i in range(ncont):
-        cont = rs.standard_normal(size=nobs)
-        factors.append(pd.Series(cont))
+    conts = [pd.Series(rs.standard_normal(size=nobs)) for _ in range(ncont)]
+    factors.extend(conts)
 
     if factors:
         factors = pd.concat(factors, axis=1)

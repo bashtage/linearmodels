@@ -394,7 +394,7 @@ class _LSModelResultsBase(_SummaryStr):
         restriction: Optional[Union[DataFrame, ndarray]] = None,
         value: Optional[Union[Series, ndarray]] = None,
         *,
-        formula: Optional[Union[str, List[str]]] = None,
+        formula: Optional[Union[str, List[str], Dict[str, float]]] = None,
     ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
