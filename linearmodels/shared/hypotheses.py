@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Union
 
+from formulaic.utils.constraints import LinearConstraints
 import numpy as np
-from pandas.core.series import Series
-from patsy.design_info import DesignInfo
+from pandas import Series
 from scipy.stats import chi2, f
 
 from linearmodels.typing import ArrayLike, OptionalArrayLike
@@ -192,12 +192,12 @@ def quadratic_form_test(
     formula: Optional[Union[str, List[str]]] = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:
-        raise ValueError("restriction and formula cannot be used" "simultaneously.")
+        raise ValueError("restriction and formula cannot be used simultaneously.")
     if formula is not None:
         assert isinstance(params, Series)
-        di = DesignInfo(list(params.index))
-        lc = di.linear_constraint(formula)
-        restriction, value = lc.coefs, lc.constants
+        param_names = [str(p) for p in params.index]
+        lc = LinearConstraints.from_spec(formula, param_names)
+        restriction, value = lc.constraint_matrix, lc.constraint_values
     restriction = np.asarray(restriction)
     if value is None:
         value = np.zeros(restriction.shape[0])

@@ -178,7 +178,7 @@ def test_wald_test(data):
     restriction[1, 3] = 1
     t1 = res.wald_test(restriction)
     t2 = res.wald_test(restriction, np.zeros(2))
-    formula = "married = union = 0"
+    formula = "married = 0, union = 0"
     t3 = res.wald_test(formula=formula)
     p = res.params.values[:, None]
     c = np.asarray(res.cov)
