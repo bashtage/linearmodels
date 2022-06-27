@@ -63,8 +63,8 @@ from linearmodels.typing import (
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
 
 UNKNOWN_EQ_TYPE = """
-Contents of each equation must be either a dictionary with keys 'dependent'
-and 'exog' or a 2-element tuple of he form (dependent, exog).
+Contents of each equation must be either a dictionary with keys "dependent"
+and "exog" or a 2-element tuple of he form (dependent, exog).
 equations[{key}] was {type}
 """
 
@@ -304,16 +304,16 @@ class _SystemModelBase(object):
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
-        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
-        and at least one of 'exog' or 'endog' and 'instruments'.  When using a
+        exog, endog, instrument[, weights]) or a dictionary with keys "dependent",
+        and at least one of "exog" or "endog" and "instruments".  When using a
         tuple, values must be provided for all 4 variables, although either
         empty arrays or `None` can be passed if a category of variable is not
         included in a model. The dictionary may contain optional keys for
-        'exog', 'endog', 'instruments', and 'weights'. 'exog' can be omitted
-        if all variables in an equation are endogenous. Alternatively, 'exog'
+        "exog", "endog", "instruments", and "weights". "exog" can be omitted
+        if all variables in an equation are endogenous. Alternatively, "exog"
         can contain either an empty array or `None` to indicate that an
-        equation contains no exogenous regressors. Similarly 'endog' and
-        'instruments' can either be omitted or may contain an empty array (or
+        equation contains no exogenous regressors. Similarly "endog" and
+        "instruments" can either be omitted or may contain an empty array (or
         `None`) if all variables in an equation are exogenous.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
@@ -569,7 +569,7 @@ class _SystemModelBase(object):
             Dictionary-like structure containing exogenous and endogenous
             variables.  Each key is an equations label and must
             match the labels used to fir the model. Each value must be a
-            dictionary with keys 'exog' and 'endog'. If predictions are not
+            dictionary with keys "exog" and "endog". If predictions are not
             required for one of more of the model equations, these keys can
             be omitted.
         data : DataFrame
@@ -594,7 +594,7 @@ class _SystemModelBase(object):
 
         When using `exog` and `endog`, the regressor array for a particular
         equation is assembled as
-        `[equations[eqn]['exog'], equations[eqn]['endog']]` where `eqn` is
+        `[equations[eqn]["exog"], equations[eqn]["endog"]]` where `eqn` is
         an equation label. These must correspond to the columns in the
         estimated model.
         """
@@ -1204,7 +1204,7 @@ class _LSSystemModelBase(_SystemModelBase):
 
         Parameters
         ----------
-        method : {None, 'gls', 'ols'}
+        method : {None, "gls", "ols"}
             Estimation method.  Default auto selects based on regressors,
             using OLS only if all regressors are identical. The other two
             arguments force the use of GLS or OLS.
@@ -1221,11 +1221,11 @@ class _LSSystemModelBase(_SystemModelBase):
         cov_type : str
             Name of covariance estimator. Valid options are
 
-            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
-            * 'robust', 'heteroskedastic' - Heteroskedasticity robust
+            * "unadjusted", "homoskedastic" - Classic covariance estimator
+            * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
-            * 'kernel' - Allows for heteroskedasticity and autocorrelation
-            * 'clustered' - Allows for 1 and 2-way clustering of errors
+            * "kernel" - Allows for heteroskedasticity and autocorrelation
+            * "clustered" - Allows for 1 and 2-way clustering of errors
               (Rogers).
 
         **cov_config
@@ -1322,16 +1322,16 @@ class IV3SLS(_LSSystemModelBase):
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
-        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
-        and at least one of 'exog' or 'endog' and 'instruments'.  When using a
+        exog, endog, instrument[, weights]) or a dictionary with keys "dependent",
+        and at least one of "exog" or "endog" and "instruments".  When using a
         tuple, values must be provided for all 4 variables, although either
         empty arrays or `None` can be passed if a category of variable is not
         included in a model. The dictionary may contain optional keys for
-        'exog', 'endog', 'instruments', and 'weights'. 'exog' can be omitted
-        if all variables in an equation are endogenous. Alternatively, 'exog'
+        "exog", "endog", "instruments", and "weights". "exog" can be omitted
+        if all variables in an equation are endogenous. Alternatively, "exog"
         can contain either an empty array or `None` to indicate that an
-        equation contains no exogenous regressors. Similarly 'endog' and
-        'instruments' can either be omitted or may contain an empty array (or
+        equation contains no exogenous regressors. Similarly "endog" and
+        "instruments" can either be omitted or may contain an empty array (or
         `None`) if all variables in an equation are exogenous.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
@@ -1503,21 +1503,21 @@ class IV3SLS(_LSSystemModelBase):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
+        >>> cols = ["y1", "x1_1", "x1_2", "z1", "y2", "x2_1", "x2_2", "z2"]
         >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
         >>> from linearmodels.system import IV3SLS
-        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
-        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
+        >>> formula = {"eq1": "y1 ~ 1 + x1_1 + [x1_2 ~ z1]",
+        ...            "eq2": "y2 ~ 1 + x2_1 + [x2_2 ~ z2]"}
         >>> mod = IV3SLS.from_formula(formula, data)
 
         The second format uses curly braces {} to surround distinct equations
 
-        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> formula = "{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IV3SLS.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IV3SLS.from_formula(formula, data)
         """
         parser = SystemFormulaParser(formula, data, weights)
@@ -1537,8 +1537,8 @@ class SUR(_LSSystemModelBase):
         Dictionary-like structure containing dependent and exogenous variable
         values.  Each key is an equations label and must be a string. Each
         value must be either a tuple of the form (dependent,
-        exog, [weights]) or a dictionary with keys 'dependent' and 'exog' and
-        the optional key 'weights'.
+        exog, [weights]) or a dictionary with keys "dependent" and "exog" and
+        the optional key "weights".
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma.
@@ -1659,9 +1659,9 @@ class SUR(_LSSystemModelBase):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.system import SUR
         >>> data = french.load()
-        >>> portfolios = data[['S1V1','S1V5','S5V1','S5V5']]
-        >>> factors = data[['MktRF']].copy()
-        >>> factors['alpha'] = 1
+        >>> portfolios = data[["S1V1","S1V5","S5V1","S5V5"]]
+        >>> factors = data[["MktRF"]].copy()
+        >>> factors["alpha"] = 1
         >>> mod = SUR.multivariate_ls(portfolios, factors)
         """
         equations = {}
@@ -1718,19 +1718,19 @@ class SUR(_LSSystemModelBase):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=['y1', 'x1_1', 'y2', 'x2_1'])
+        >>> data = pd.DataFrame(np.random.randn(500, 4), columns=["y1", "x1_1", "y2", "x2_1"])
         >>> from linearmodels.system import SUR
-        >>> formula = {'eq1': 'y1 ~ 1 + x1_1', 'eq2': 'y2 ~ 1 + x2_1'}
+        >>> formula = {"eq1": "y1 ~ 1 + x1_1", "eq2": "y2 ~ 1 + x2_1"}
         >>> mod = SUR.from_formula(formula, data)
 
         The second format uses curly braces {} to surround distinct equations
 
-        >>> formula = '{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}'
+        >>> formula = "{y1 ~ 1 + x1_1} {y2 ~ 1 + x2_1}"
         >>> mod = SUR.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = '{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}'
+        >>> formula = "{eq1: y1 ~ 1 + x1_1} {eq2: y2 ~ 1 + x2_1}"
         >>> mod = SUR.from_formula(formula, data)
         """
         parser = SystemFormulaParser(formula, data, weights)
@@ -1750,14 +1750,14 @@ class IVSystemGMM(_SystemModelBase):
         Dictionary-like structure containing dependent, exogenous, endogenous
         and instrumental variables.  Each key is an equations label and must
         be a string. Each value must be either a tuple of the form (dependent,
-        exog, endog, instrument[, weights]) or a dictionary with keys 'dependent',
-        'exog'.  The dictionary may contain optional keys for 'endog',
-        'instruments', and 'weights'. Endogenous and/or Instrument can be empty
+        exog, endog, instrument[, weights]) or a dictionary with keys "dependent",
+        "exog".  The dictionary may contain optional keys for "endog",
+        "instruments", and "weights". Endogenous and/or Instrument can be empty
         if all variables in an equation are exogenous.
     sigma : array_like
         Prespecified residual covariance to use in GLS estimation. If not
         provided, FGLS is implemented based on an estimate of sigma. Only used
-        if weight_type is 'unadjusted'
+        if weight_type is "unadjusted"
     weight_type : str
         Name of moment condition weight function to use in the GMM estimation
     **weight_config
@@ -1864,8 +1864,8 @@ class IVSystemGMM(_SystemModelBase):
         cov_type : str
             Name of covariance estimator. Valid options are
 
-            * 'unadjusted', 'homoskedastic' - Classic covariance estimator
-            * 'robust', 'heteroskedastic' - Heteroskedasticity robust
+            * "unadjusted", "homoskedastic" - Classic covariance estimator
+            * "robust", "heteroskedastic" - Heteroskedasticity robust
               covariance estimator
 
         **cov_config
@@ -2087,8 +2087,8 @@ class IVSystemGMM(_SystemModelBase):
             Name of moment condition weight function to use in the GMM
             estimation. Valid options are:
 
-            * 'unadjusted', 'homoskedastic' - Assume moments are homoskedastic
-            * 'robust', 'heteroskedastic' - Allow for heteroskedasticity
+            * "unadjusted", "homoskedastic" - Assume moments are homoskedastic
+            * "robust", "heteroskedastic" - Allow for heteroskedasticity
 
         **weight_config
             Additional keyword arguments to pass to the moment condition weight
@@ -2112,21 +2112,21 @@ class IVSystemGMM(_SystemModelBase):
 
         >>> import pandas as pd
         >>> import numpy as np
-        >>> cols = ['y1', 'x1_1', 'x1_2', 'z1', 'y2', 'x2_1', 'x2_2', 'z2']
+        >>> cols = ["y1", "x1_1", "x1_2", "z1", "y2", "x2_1", "x2_2", "z2"]
         >>> data = pd.DataFrame(np.random.randn(500, 8), columns=cols)
         >>> from linearmodels.system import IVSystemGMM
-        >>> formula = {'eq1': 'y1 ~ 1 + x1_1 + [x1_2 ~ z1]',
-        ...            'eq2': 'y2 ~ 1 + x2_1 + [x2_2 ~ z2]'}
+        >>> formula = {"eq1": "y1 ~ 1 + x1_1 + [x1_2 ~ z1]",
+        ...            "eq2": "y2 ~ 1 + x2_1 + [x2_2 ~ z2]"}
         >>> mod = IVSystemGMM.from_formula(formula, data)
 
         The second format uses curly braces {} to surround distinct equations
 
-        >>> formula = '{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> formula = "{y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IVSystemGMM.from_formula(formula, data)
 
         It is also possible to include equation labels when using curly braces
 
-        >>> formula = '{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}'
+        >>> formula = "{eq1: y1 ~ 1 + x1_1 + [x1_2 ~ z1]} {eq2: y2 ~ 1 + x2_1 + [x2_2 ~ z2]}"
         >>> mod = IVSystemGMM.from_formula(formula, data)
         """
         parser = SystemFormulaParser(formula, data, weights)

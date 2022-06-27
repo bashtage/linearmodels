@@ -132,16 +132,16 @@ def dummy_matrix(
     cats: {DataFrame, ndarray}
         Array containing the category codes of pandas categoricals
         (nobs, ncats)
-    output_format: {'csc', 'csr', 'coo', 'array'}
+    output_format: {"csc", "csr", "coo", "array"}
         Output format. Default is csc (csc_matrix). Supported output
         formats are:
 
-        * 'csc' - sparse matrix in compressed column form
-        * 'csr' - sparse matrix in compressed row form
-        * 'coo' - sparse matrix in coordinate form
-        * 'array' - dense numpy ndarray
+        * "csc" - sparse matrix in compressed column form
+        * "csr" - sparse matrix in compressed row form
+        * "coo" - sparse matrix in coordinate form
+        * "array" - dense numpy ndarray
 
-    drop: {'first', 'last'}
+    drop: {"first", "last"}
         Exclude either the first or last category. This only applies when
         cats contains more than one column, unless `drop_all` is True.
     drop_all : bool
@@ -180,7 +180,7 @@ def dummy_matrix(
         elif drop == "first":
             # remove first
             retain = cols != 0
-        else:  # drop == 'last'
+        else:  # drop == "last"
             # remove last
             retain = cols != (ncategories - 1)
         rows = rows[retain]

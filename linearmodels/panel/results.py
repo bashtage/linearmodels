@@ -679,11 +679,14 @@ class PanelResults(_SummaryStr):
         formula : Union[str, list[str]]
             formulaic linear constraints. The simplest formats are one of:
 
-            * A single comma-separated string such as 'x1=0, x2+x3=1'
+            * A single comma-separated string such as "x1=0, x2+x3=1"
             * A list of strings where each element is a single constraint
-              such as ['x1=0', 'x2+x3=1']
+              such as ["x1=0", "x2+x3=1"]
             * A single string without commas to test simple constraints such
-              as 'x1=x2=x3=0'
+              as "x1=x2=x3=0"
+            * A dictionary where each key is a parameter restriction and
+              the corresponding value is the restriction value, e.g.,
+              {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
 
@@ -706,10 +709,10 @@ class PanelResults(_SummaryStr):
         >>> import pandas as pd
         >>> data = wage_panel.load()
         >>> year = pd.Categorical(data.year)
-        >>> data = data.set_index(['nr', 'year'])
-        >>> data['year'] = year
+        >>> data = data.set_index(["nr", "year"])
+        >>> data["year"] = year
         >>> from linearmodels.panel import PanelOLS
-        >>> exog_vars = ['expersq', 'union', 'married', 'year']
+        >>> exog_vars = ["expersq", "union", "married", "year"]
         >>> exog = sm.add_constant(data[exog_vars])
 
         >>> mod = PanelOLS(data.lwage, exog, entity_effects=True)
@@ -725,7 +728,7 @@ class PanelResults(_SummaryStr):
 
         The same test using formulas
 
-        >>> formula = 'union = married = 0'
+        >>> formula = "union = married = 0"
         >>> wald_res = fe_res.wald_test(formula=formula)
         """
         return quadratic_form_test(
@@ -931,9 +934,9 @@ class PanelModelComparison(_ModelComparison):
     results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.
-    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+    precision : {"tstats","std_errors", "std-errors", "pvalues"}
         Estimator precision estimator to include in the comparison output.
-        Default is 'tstats'.
+        Default is "tstats".
     stars : bool
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively.
@@ -1111,9 +1114,9 @@ def compare(
     results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.
-    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+    precision : {"tstats","std_errors", "std-errors", "pvalues"}
         Estimator precision estimator to include in the comparison output.
-        Default is 'tstats'.
+        Default is "tstats".
     stars : bool
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively.

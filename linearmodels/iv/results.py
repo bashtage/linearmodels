@@ -410,11 +410,14 @@ class _LSModelResultsBase(_SummaryStr):
         formula : Union[str, list[str]]
             formulaic linear constraints. The simplest formats are one of:
 
-            * A single comma-separated string such as 'x1=0, x2+x3=1'
+            * A single comma-separated string such as "x1=0, x2+x3=1"
             * A list of strings where each element is a single constraint
-              such as ['x1=0', 'x2+x3=1']
+              such as ["x1=0", "x2+x3=1"]
             * A single string without commas to test simple constraints such
-              as 'x1=x2=x3=0'
+              as "x1=x2=x3=0"
+            * A dictionary where each key is a parameter restriction and
+              the corresponding value is the restriction value, e.g.,
+              {"x1": 0, "x2+x3": 1}.
 
             It is not possible to use both ``restriction`` and ``formula``.
 
@@ -435,7 +438,7 @@ class _LSModelResultsBase(_SummaryStr):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IV2SLS
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]'
+        >>> formula = "np.log(wage) ~ 1 + exper + I(exper**2) + brthord + [educ ~ sibs]"
         >>> res = IV2SLS.from_formula(formula, data).fit()
 
         Testing the experience is not needed in the model
@@ -447,12 +450,12 @@ class _LSModelResultsBase(_SummaryStr):
 
         Using the formula interface to test the same restrictions
 
-        >>> formula = 'exper = I(exper**2) = 0'
+        >>> formula = "exper = I(exper**2) = 0"
         >>> wald_res = res.wald_test(formula=formula)
 
         Using the formula interface with a list
 
-        >>> wald_res = res.wald_test(formula=['exper = 0', 'I(exper**2) = 0'])
+        >>> wald_res = res.wald_test(formula=["exper = 0", "I(exper**2) = 0"])
         """
         return quadratic_form_test(
             self._params,
@@ -940,7 +943,7 @@ class IVResults(_CommonIVResults):
         name = "Sargan's test of overidentification"
         if ninstr - nendog == 0:
             return InvalidTestStatistic(
-                "Test requires more instruments than " "endogenous variables.",
+                "Test requires more instruments than endogenous variables.",
                 name=name,
             )
 
@@ -1538,9 +1541,9 @@ class IVModelComparison(_ModelComparison):
     results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.
-    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+    precision : {"tstats","std_errors", "std-errors", "pvalues"}
         Estimator precision estimator to include in the comparison output.
-        Default is 'tstats'.
+        Default is "tstats".
     stars : bool
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively.
@@ -1695,9 +1698,9 @@ def compare(
     results : {list, dict}
         Set of results to compare.  If a dict, the keys will be used as model
         names.
-    precision : {'tstats','std_errors', 'std-errors', 'pvalues'}
+    precision : {"tstats","std_errors", "std-errors", "pvalues"}
         Estimator precision estimator to include in the comparison output.
-        Default is 'tstats'.
+        Default is "tstats".
     stars : bool
         Add stars based on the p-value of the coefficient where 1, 2 and
         3-stars correspond to p-values of 10%, 5% and 1%, respectively.

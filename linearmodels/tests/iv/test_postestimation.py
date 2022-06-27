@@ -145,3 +145,14 @@ def test_linear_restriction(data):
     formula_dict: Dict[str, float] = {f"{p}": 0 for p in res.params.index}
     ts2 = res.wald_test(formula=formula_dict)
     assert_allclose(ts.stat, ts2.stat)
+
+    formula_list = [f"{k} = {v} " for k, v in formula_dict.items()]
+    ts2 = res.wald_test(formula=formula_list)
+    assert_allclose(ts.stat, ts2.stat)
+
+    formula_str = ",".join([f"{k} = {v} " for k, v in formula_dict.items()])
+    ts2 = res.wald_test(formula=formula_str)
+    assert_allclose(ts.stat, ts2.stat)
+    formula_str = " = ".join(formula_dict.keys()) + " = 0"
+    ts2 = res.wald_test(formula=formula_str)
+    assert_allclose(ts.stat, ts2.stat)

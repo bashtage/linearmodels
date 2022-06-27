@@ -611,11 +611,11 @@ class _IVLSModelBase(_IVModelBase):
             Name of covariance estimator to use. Supported covariance
             estimators are:
 
-            * 'unadjusted', 'homoskedastic' - Classic homoskedastic inference
-            * 'robust', 'heteroskedastic' - Heteroskedasticity robust inference
-            * 'kernel' - Heteroskedasticity and autocorrelation robust
+            * "unadjusted", "homoskedastic" - Classic homoskedastic inference
+            * "robust", "heteroskedastic" - Heteroskedasticity robust inference
+            * "kernel" - Heteroskedasticity and autocorrelation robust
               inference
-            * 'cluster' - One-way cluster dependent inference.
+            * "cluster" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
         debiased : bool
@@ -805,7 +805,7 @@ class IVLIML(_IVLSModelBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVLIML
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
         >>> mod = IVLIML.from_formula(formula, data)
         """
         parser = IVFormulaParser(formula, data)
@@ -900,7 +900,7 @@ class IV2SLS(_IVLSModelBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using '1 +' if required.
+        A constant must be explicitly included using "1 +" if required.
 
         Examples
         --------
@@ -944,12 +944,12 @@ class _IVGMMBase(_IVModelBase):
     -----
     Available GMM weight functions are:
 
-    * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+    * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
-    * 'kernel' - Allows for heteroskedasticity and autocorrelation
-    * 'cluster' - Allows for one-way cluster dependence
+    * "kernel" - Allows for heteroskedasticity and autocorrelation
+    * "cluster" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1042,12 +1042,12 @@ class IVGMM(_IVGMMBase):
     -----
     Available GMM weight functions are:
 
-    * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+    * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
-    * 'kernel' - Allows for heteroskedasticity and autocorrelation
-    * 'cluster' - Allows for one-way cluster dependence
+    * "kernel" - Allows for heteroskedasticity and autocorrelation
+    * "cluster" - Allows for one-way cluster dependence
 
     The estimator is defined as
 
@@ -1121,7 +1121,7 @@ class IVGMM(_IVGMMBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using '1 +' if required.
+        A constant must be explicitly included using "1 +" if required.
 
         Returns
         -------
@@ -1134,7 +1134,7 @@ class IVGMM(_IVGMMBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVGMM
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
         >>> mod = IVGMM.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(
@@ -1205,12 +1205,12 @@ class IVGMM(_IVGMMBase):
             Name of covariance estimator to use. Available covariance
             functions are:
 
-            * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+            * "unadjusted", "homoskedastic" - Assumes moment conditions are
               homoskedastic
-            * 'robust', 'heteroskedastic' - Allows for heteroskedasticity but
+            * "robust", "heteroskedastic" - Allows for heteroskedasticity but
               not autocorrelation
-            * 'kernel' - Allows for heteroskedasticity and autocorrelation
-            * 'cluster' - Allows for one-way cluster dependence
+            * "kernel" - Allows for heteroskedasticity and autocorrelation
+            * "cluster" - Allows for one-way cluster dependence
 
         debiased : bool
             Flag indicating whether to debiased the covariance estimator using
@@ -1312,12 +1312,12 @@ class IVGMMCUE(_IVGMMBase):
     -----
     Available weight functions are:
 
-    * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+    * "unadjusted", "homoskedastic" - Assumes moment conditions are
       homoskedastic
-    * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+    * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
       autocorrelation
-    * 'kernel' - Allows for heteroskedasticity and autocorrelation
-    * 'cluster' - Allows for one-way cluster dependence
+    * "kernel" - Allows for heteroskedasticity and autocorrelation
+    * "cluster" - Allows for one-way cluster dependence
 
     In most circumstances, the ``center`` weight option should be ``True`` to
     avoid starting value dependence.
@@ -1399,7 +1399,7 @@ class IVGMMCUE(_IVGMMBase):
         `dependent ~ exog endog` and `dependent ~ exog instruments` are both
         valid formulas.
 
-        A constant must be explicitly included using '1 +' if required.
+        A constant must be explicitly included using "1 +" if required.
 
         Examples
         --------
@@ -1407,7 +1407,7 @@ class IVGMMCUE(_IVGMMBase):
         >>> from linearmodels.datasets import wage
         >>> from linearmodels.iv import IVGMMCUE
         >>> data = wage.load()
-        >>> formula = 'np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]'
+        >>> formula = "np.log(wage) ~ 1 + exper + exper ** 2 + brthord + [educ ~ sibs]"
         >>> mod = IVGMMCUE.from_formula(formula, data)
         """
         mod = _gmm_model_from_formula(

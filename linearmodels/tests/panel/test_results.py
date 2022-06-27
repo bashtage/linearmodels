@@ -168,7 +168,37 @@ def test_predict_no_selection(generated_data):
         res.predict(fitted=False, effects=False, idiosyncratic=False, missing=True)
 
 
-def test_wald_test(data):
+@pytest.mark.parametrize(
+    "constraint_formula",
+    [
+        "married = 0",
+        {"married": 0},
+        ["married = 0"],
+    ],
+)
+def test_wald_single(data, constraint_formula):
+    dependent = data.set_index(["nr", "year"]).lwage
+    exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
+    res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
+    restriction = np.zeros((1, 4))
+    restriction[0, 2] = 1
+    t1 = res.wald_test(restriction)
+    t2 = res.wald_test(restriction, np.zeros(1))
+    t3 = res.wald_test(formula=constraint_formula)
+    assert_allclose(t1.stat, t2.stat)
+    assert_allclose(t1.stat, t3.stat)
+
+
+@pytest.mark.parametrize(
+    "constraint_formula",
+    [
+        "married = 0, union = 0",
+        "married = union = 0",
+        {"married": 0, "union": 0},
+        ["married = 0", "union = 0"],
+    ],
+)
+def test_wald_test(data, constraint_formula):
     dependent = data.set_index(["nr", "year"]).lwage
     exog = add_constant(data.set_index(["nr", "year"])[["expersq", "married", "union"]])
     res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit()
@@ -178,8 +208,7 @@ def test_wald_test(data):
     restriction[1, 3] = 1
     t1 = res.wald_test(restriction)
     t2 = res.wald_test(restriction, np.zeros(2))
-    formula = "married = 0, union = 0"
-    t3 = res.wald_test(formula=formula)
+    t3 = res.wald_test(formula=constraint_formula)
     p = res.params.values[:, None]
     c = np.asarray(res.cov)
     c = c[-2:, -2:]
@@ -190,4 +219,4 @@ def test_wald_test(data):
     assert_allclose(direct, t3.stat)
 
     with pytest.raises(ValueError):
-        res.wald_test(restriction, np.zeros(2), formula=formula)
+        res.wald_test(restriction, np.zeros(2), formula=constraint_formula)

@@ -459,8 +459,8 @@ class Interaction(object):
         >>> n = 100000
         >>> cats = pd.concat([pd.Series(pd.Categorical(rs.randint(i+2,size=n)))
         ...                  for i in range(4)], axis=1)
-        >>> cats.columns = ['cat{0}'.format(i) for i in range(4)]
-        >>> columns = ['cont{0}'.format(i) for i in range(6)]
+        >>> cats.columns = ["cat{0}".format(i) for i in range(4)]
+        >>> columns = ["cont{0}".format(i) for i in range(6)]
         >>> cont = pd.DataFrame(rs.standard_normal((n, 6)), columns=columns)
         >>> frame = pd.concat([cats, cont], axis=1)
         >>> interact = Interaction.from_frame(frame)
@@ -961,11 +961,11 @@ class AbsorbingLS(object):
             Name of covariance estimator to use. Supported covariance
             estimators are:
 
-            * 'unadjusted', 'homoskedastic' - Classic homoskedastic inference
-            * 'robust', 'heteroskedastic' - Heteroskedasticity robust inference
-            * 'kernel' - Heteroskedasticity and autocorrelation robust
+            * "unadjusted", "homoskedastic" - Classic homoskedastic inference
+            * "robust", "heteroskedastic" - Heteroskedasticity robust inference
+            * "kernel" - Heteroskedasticity and autocorrelation robust
               inference
-            * 'cluster' - One-way cluster dependent inference.
+            * "cluster" - One-way cluster dependent inference.
               Heteroskedasticity robust
 
         debiased : bool
