@@ -233,13 +233,13 @@ class TradedFactorModel(_FactorModelBase):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import TradedFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
+        >>> formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"
         >>> mod = TradedFactorModel.from_formula(formula, data)
 
         Using only factors
 
-        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
-        >>> formula = 'MktRF + SMB + HML'
+        >>> portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]
+        >>> formula = "MktRF + SMB + HML"
         >>> mod = TradedFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         factors, portfolios, formula = cls._prepare_data_from_formula(
@@ -277,12 +277,12 @@ class TradedFactorModel(_FactorModelBase):
         -----
         Supported covariance estimators are:
 
-        * 'robust' - Heteroskedasticity-robust covariance estimator
-        * 'kernel' - Heteroskedasticity and Autocorrelation consistent (HAC)
+        * "robust" - Heteroskedasticity-robust covariance estimator
+        * "kernel" - Heteroskedasticity and Autocorrelation consistent (HAC)
           covariance estimator
 
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
+        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
         p = self.portfolios.ndarray
@@ -560,13 +560,13 @@ class LinearFactorModel(_LinearFactorModelBase):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import LinearFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
+        >>> formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data)
 
         Using only factors
 
-        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
-        >>> formula = 'MktRF + SMB + HML'
+        >>> portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]
+        >>> formula = "MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         factors, portfolios, formula = cls._prepare_data_from_formula(
@@ -603,7 +603,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
+        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
         nobs, nf, nport, nrf, s1, s2, s3 = self._boundaries()
@@ -642,7 +642,7 @@ class LinearFactorModel(_LinearFactorModelBase):
                 debiased=debiased,
                 df=fc.shape[1],
             )
-        else:  # 'kernel':
+        else:  # "kernel":
             bandwidth = get_float(cov_config, "bandwidth")
             kernel = get_string(cov_config, "kernel")
             cov_est_inst = KernelCovariance(
@@ -860,13 +860,13 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         >>> from linearmodels.datasets import french
         >>> from linearmodels.asset_pricing import LinearFactorModel
         >>> data = french.load()
-        >>> formula = 'S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML'
+        >>> formula = "S1M1 + S1M5 + S3M3 + S5M1 + S5M5 ~ MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data)
 
         Using only factors
 
-        >>> portfolios = data[['S1M1', 'S1M5', 'S3M1', 'S3M5', 'S5M1', 'S5M5']]
-        >>> formula = 'MktRF + SMB + HML'
+        >>> portfolios = data[["S1M1", "S1M5", "S3M1", "S3M5", "S5M1", "S5M5"]]
+        >>> formula = "MktRF + SMB + HML"
         >>> mod = LinearFactorModel.from_formula(formula, data, portfolios=portfolios)
         """
         factors, portfolios, formula = cls._prepare_data_from_formula(
@@ -933,7 +933,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         Notes
         -----
         The kernel covariance estimator takes the optional arguments
-        ``kernel``, one of 'bartlett', 'parzen' or 'qs' (quadratic spectral)
+        ``kernel``, one of "bartlett", "parzen" or "qs" (quadratic spectral)
         and ``bandwidth`` (a positive integer).
         """
 
@@ -967,7 +967,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         if cov_type in ("robust", "heteroskedastic"):
             weight_est_instance = HeteroskedasticWeight(g, center=center)
             cov_est = HeteroskedasticCovariance
-        else:  # 'kernel':
+        else:  # "kernel":
             kernel = get_string(cov_config, "kernel")
             bandwidth = get_float(cov_config, "bandwidth")
             weight_est_instance = KernelWeight(

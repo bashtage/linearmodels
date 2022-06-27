@@ -144,9 +144,9 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     kernel : str
         Name of kernel to use.  Supported kernels include:
 
-        * 'bartlett', 'newey-west' - Bartlett's kernel
-        * 'parzen', 'gallant' - Parzen's kernel
-        * 'qs', 'quadratic-spectral', 'andrews' - Quadratic spectral kernel
+        * "bartlett", "newey-west" - Bartlett's kernel
+        * "parzen", "gallant" - Parzen's kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
 
     Returns
     -------
@@ -428,9 +428,9 @@ class KernelCovariance(HomoskedasticCovariance):
     kernel : str
         Kernel name. Supported kernels are:
 
-        * 'bartlett', 'newey-west' - Triangular kernel
-        * 'qs', 'quadratic-spectral', 'andrews' - Quadratic spectral kernel
-        * 'parzen', 'gallant' - Parzen's kernel;
+        * "bartlett", "newey-west" - Triangular kernel
+        * "qs", "quadratic-spectral", "andrews" - Quadratic spectral kernel
+        * "parzen", "gallant" - Parzen's kernel;
 
     bandwidth : {int, None}
         Non-negative bandwidth to use with kernel. If None, automatic

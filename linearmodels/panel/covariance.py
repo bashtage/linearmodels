@@ -370,9 +370,9 @@ class DriscollKraay(HomoskedasticCovariance):
     -----
     Supported kernels:
 
-    * 'bartlett', 'newey-west' - Bartlett's kernel
-    * 'quadratic-spectral', 'qs', 'andrews' - Quadratic-Spectral Kernel
-    * 'parzen', 'gallant' - Parzen kernel
+    * "bartlett", "newey-west" - Bartlett's kernel
+    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel
+    * "parzen", "gallant" - Parzen kernel
 
     Bandwidth is set to the common value for the Bartlett kernel if not
     provided.
@@ -484,9 +484,9 @@ class ACCovariance(HomoskedasticCovariance):
 
     Supported kernels:
 
-    * 'bartlett', 'newey-west' - Bartlett's kernel
-    * 'quadratic-spectral', 'qs', 'andrews' - Quadratic-Spectral Kernel
-    * 'parzen', 'gallant' - Parzen kernel
+    * "bartlett", "newey-west" - Bartlett's kernel
+    * "quadratic-spectral", "qs", "andrews" - Quadratic-Spectral Kernel
+    * "parzen", "gallant" - Parzen kernel
 
     Bandwidth is set to the common value for the Bartlett kernel if not
     provided.

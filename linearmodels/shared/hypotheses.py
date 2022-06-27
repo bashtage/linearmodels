@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Mapping, Optional, Tuple, Union
 
 from formulaic.utils.constraints import LinearConstraints
 import numpy as np
@@ -184,6 +184,44 @@ class InapplicableTestStatistic(WaldTestStatistic):
         return msg.format(name=name, reason=self._reason)
 
 
+_constraint_error = """
+The constraint does not appear to have the required syntax.  Constraints
+should have the syntax FORMULA = VALUE where FORMULA is a valid formulaic
+formula, e.g., x1 or x1+x2+x3, and VALUE should be a single value
+convertible to a float. The constraint seen is {cons}.
+"""
+
+
+def _parse_single(constraint: str) -> Tuple[str, float]:
+    if "=" not in constraint:
+        raise ValueError(_constraint_error.format(cons=constraint))
+    parts = constraint.split("=")
+    try:
+        value = float(parts[-1])
+    except Exception:
+        raise TypeError(_constraint_error.format(cons=constraint))
+    expr = "=".join(parts[:-1])
+    return expr, value
+
+
+def _reparse_constraint_formula(
+    formula: Optional[Union[str, List[str], Dict[str, float]]]
+) -> Union[str, Dict[str, float]]:
+    # TODO: Test against variable names constaining , or =
+    if isinstance(formula, Mapping):
+        return dict(formula)
+    if isinstance(formula, str):
+        if formula.count("=") == 1:
+            return formula
+        if "," not in formula:
+            parts = formula.split("=")
+            tail = parts[-1]
+            formula = [f"{part} = {tail}" for part in parts[:-1]]
+        else:
+            formula = list(formula.split(","))
+    return dict([_parse_single(cons) for cons in formula])
+
+
 def quadratic_form_test(
     params: ArrayLike,
     cov: ArrayLike,
@@ -196,7 +234,8 @@ def quadratic_form_test(
     if formula is not None:
         assert isinstance(params, Series)
         param_names = [str(p) for p in params.index]
-        lc = LinearConstraints.from_spec(formula, param_names)
+        rewritten_constraints = _reparse_constraint_formula(formula)
+        lc = LinearConstraints.from_spec(rewritten_constraints, param_names)
         restriction, value = lc.constraint_matrix, lc.constraint_values
     restriction = np.asarray(restriction)
     if value is None:

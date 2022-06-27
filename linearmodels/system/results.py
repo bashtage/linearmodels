@@ -286,7 +286,7 @@ class SystemResults(_CommonResults):
             Dictionary-like structure containing exogenous and endogenous
             variables.  Each key is an equations label and must
             match the labels used to fit the model. Each value must be either a tuple
-            of the form (exog, endog) or a dictionary with keys 'exog' and 'endog'.
+            of the form (exog, endog) or a dictionary with keys "exog" and "endog".
             If predictions are not required for one of more of the model equations,
             these keys can be omitted.
         data : DataFrame
@@ -323,7 +323,7 @@ class SystemResults(_CommonResults):
 
         When using `exog` and `endog`, the regressor array for a particular
         equation is assembled as
-        `[equations[eqn]['exog'], equations[eqn]['endog']]` where `eqn` is
+        `[equations[eqn]["exog"], equations[eqn]["endog"]]` where `eqn` is
         an equation label. These must correspond to the columns in the
         estimated model.
         """

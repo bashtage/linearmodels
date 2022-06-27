@@ -165,9 +165,9 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     -----
     Supported kernels:
 
-    * 'bartlett', 'newey-west' - Bartlett's kernel
-    * 'parzen', 'gallant' - Parzen's kernel
-    * 'qs', 'quadratic-spectral', 'andrews' - The quadratic spectral kernel
+    * "bartlett", "newey-west" - Bartlett's kernel
+    * "parzen", "gallant" - Parzen's kernel
+    * "qs", "quadratic-spectral", "andrews" - The quadratic spectral kernel
 
     .. math::
 
@@ -359,12 +359,12 @@ class IVGMMCovariance(HomoskedasticCovariance):
     cov_type : str
         Covariance estimator to use  Valid choices are
 
-        * 'unadjusted', 'homoskedastic' - Assumes moment conditions are
+        * "unadjusted", "homoskedastic" - Assumes moment conditions are
           homoskedastic
-        * 'robust', 'heteroskedastic' - Allows for heteroskedasticity by not
+        * "robust", "heteroskedastic" - Allows for heteroskedasticity by not
           autocorrelation
-        * 'kernel' - Allows for heteroskedasticity and autocorrelation
-        * 'cluster' - Allows for one-way cluster dependence
+        * "kernel" - Allows for heteroskedasticity and autocorrelation
+        * "cluster" - Allows for one-way cluster dependence
 
     debiased : bool
         Flag indicating whether to debias the covariance estimator

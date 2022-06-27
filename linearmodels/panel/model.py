@@ -901,7 +901,7 @@ class PooledOLS(_PanelModelBase):
         >>> from linearmodels import PooledOLS
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = PooledOLS.from_formula('y ~ 1 + x1', panel_data.data)
+        >>> mod = PooledOLS.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -939,25 +939,25 @@ class PooledOLS(_PanelModelBase):
         --------
         >>> from linearmodels import PooledOLS
         >>> mod = PooledOLS(y, x)
-        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
 
         Notes
         -----
         Four covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * 'clustered` - One or two way clustering.  Configuration options are:
+        * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
 
-        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
           * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
             Default is Bartlett's kernel, which is produces a covariance
@@ -1376,8 +1376,8 @@ class PanelOLS(_PanelModelBase):
         >>> from linearmodels import PanelOLS
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = PanelOLS.from_formula('y ~ 1 + x1 + EntityEffects', panel_data.data)
-        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> mod = PanelOLS.from_formula("y ~ 1 + x1 + EntityEffects", panel_data.data)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
         """
         parser = PanelFormulaParser(formula, data)
         entity_effect = parser.entity_effect
@@ -1758,25 +1758,25 @@ class PanelOLS(_PanelModelBase):
         --------
         >>> from linearmodels import PanelOLS
         >>> mod = PanelOLS(y, x, entity_effects=True)
-        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
 
         Notes
         -----
         Three covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * 'clustered` - One or two way clustering.  Configuration options are:
+        * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer valued, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
 
-        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
           * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
             Default is Bartlett's kernel, which is produces a covariance
@@ -2090,12 +2090,12 @@ class BetweenOLS(_PanelModelBase):
         -----
         Three covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * 'clustered` - One or two way clustering.  Configuration options are:
+        * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
 
@@ -2228,7 +2228,7 @@ class BetweenOLS(_PanelModelBase):
         >>> from linearmodels import BetweenOLS
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = BetweenOLS.from_formula('y ~ 1 + x1', panel_data.data)
+        >>> mod = BetweenOLS.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -2357,25 +2357,25 @@ class FirstDifferenceOLS(_PanelModelBase):
         --------
         >>> from linearmodels import FirstDifferenceOLS
         >>> mod = FirstDifferenceOLS(y, x)
-        >>> robust = mod.fit(cov_type='robust')
-        >>> clustered = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> robust = mod.fit(cov_type="robust")
+        >>> clustered = mod.fit(cov_type="clustered", cluster_entity=True)
 
         Notes
         -----
         Three covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * 'clustered` - One or two way clustering.  Configuration options are:
+        * "clustered` - White's.  Configuration options are:
 
-          * ``clusters`` - Input containing containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
 
-        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
           * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
             Default is Bartlett's kernel, which is produces a covariance
@@ -2527,7 +2527,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         >>> from linearmodels import FirstDifferenceOLS
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = FirstDifferenceOLS.from_formula('y ~ x1', panel_data.data)
+        >>> mod = FirstDifferenceOLS.from_formula("y ~ x1", panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -2621,7 +2621,7 @@ class RandomEffects(_PanelModelBase):
         >>> from linearmodels import RandomEffects
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = RandomEffects.from_formula('y ~ 1 + x1', panel_data.data)
+        >>> mod = RandomEffects.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)
@@ -2663,25 +2663,25 @@ class RandomEffects(_PanelModelBase):
         --------
         >>> from linearmodels import RandomEffects
         >>> mod = RandomEffects(y, x)
-        >>> res = mod.fit(cov_type='clustered', cluster_entity=True)
+        >>> res = mod.fit(cov_type="clustered", cluster_entity=True)
 
         Notes
         -----
         Four covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic' - Assume residual are homoskedastic
-        * 'robust', 'heteroskedastic' - Control for heteroskedasticity using
+        * "unadjusted", "homoskedastic" - Assume residual are homoskedastic
+        * "robust", "heteroskedastic" - Control for heteroskedasticity using
           White's estimator
-        * 'clustered` - One or two way clustering.  Configuration options are:
+        * "clustered` - One- or two-way clustering.  Configuration options are:
 
-          * ``clusters`` - Input containing containing 1 or 2 variables.
+          * ``clusters`` - Input containing 1 or 2 variables.
             Clusters should be integer values, although other types will
             be coerced to integer values by treating as categorical variables
           * ``cluster_entity`` - Boolean flag indicating to use entity
             clusters
           * ``cluster_time`` - Boolean indicating to use time clusters
 
-        * 'kernel' - Driscoll-Kraay HAC estimator. Configurations options are:
+        * "kernel" - Driscoll-Kraay HAC estimator. Configurations options are:
 
           * ``kernel`` - One of the supported kernels (bartlett, parzen, qs).
             Default is Bartlett's kernel, which is produces a covariance
@@ -2940,15 +2940,15 @@ class FamaMacBeth(_PanelModelBase):
         --------
         >>> from linearmodels import FamaMacBeth
         >>> mod = FamaMacBeth(y, x)
-        >>> res = mod.fit(cov_type='kernel', kernel='Parzen')
+        >>> res = mod.fit(cov_type="kernel", kernel="Parzen")
 
         Notes
         -----
         Two covariance estimators are supported:
 
-        * 'unadjusted', 'homoskedastic', 'robust', 'heteroskedastic' use the
+        * "unadjusted", "homoskedastic", "robust", "heteroskedastic" use the
           standard covariance estimator of the T parameter estimates.
-        * 'kernel' is a HAC estimator. Configurations options are:
+        * "kernel" is a HAC estimator. Configurations options are:
         """
         y = self._y
         x = self._x
@@ -3096,7 +3096,7 @@ class FamaMacBeth(_PanelModelBase):
         >>> from linearmodels import FamaMacBeth
         >>> from linearmodels.panel import generate_panel_data
         >>> panel_data = generate_panel_data()
-        >>> mod = FamaMacBeth.from_formula('y ~ 1 + x1', panel_data.data)
+        >>> mod = FamaMacBeth.from_formula("y ~ 1 + x1", panel_data.data)
         >>> res = mod.fit()
         """
         parser = PanelFormulaParser(formula, data)

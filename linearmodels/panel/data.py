@@ -522,7 +522,7 @@ class PanelData(object):
 
         Parameters
         ----------
-        group : {'entity', 'time', 'both'}
+        group : {"entity", "time", "both"}
             Group to use in demeaning
         weights : PanelData
             Weights to implement weighted averaging
@@ -532,7 +532,7 @@ class PanelData(object):
         low_memory : bool
             Flag indicating whether to use a low memory implementation
             that avoids constructing dummy variables. Only relevant when
-            group is 'both'
+            group is "both"
 
         Returns
         -------
@@ -594,7 +594,7 @@ class PanelData(object):
 
         Parameters
         ----------
-        group : {'entity', 'time'}
+        group : {"entity", "time"}
             Group to count
 
         Returns
@@ -632,7 +632,7 @@ class PanelData(object):
 
         Parameters
         ----------
-        group : {'entity', 'time'}
+        group : {"entity", "time"}
             Group to use in demeaning
         weights : PanelData
             Weights to implement weighted averaging
@@ -699,7 +699,7 @@ class PanelData(object):
 
         Parameters
         ----------
-        group : {'entity', 'time'}
+        group : {"entity", "time"}
             Type of dummies to generate
         drop_first : bool
             Flag indicating that the dummy column corresponding to the first
