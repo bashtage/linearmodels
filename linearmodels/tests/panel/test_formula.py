@@ -2,7 +2,8 @@ from itertools import product
 import pickle
 
 import numpy as np
-from pandas import DataFrame
+from numpy.testing import assert_allclose
+from pandas import DataFrame, MultiIndex
 from pandas.testing import assert_frame_equal
 import pytest
 from scipy.linalg import lstsq as sp_lstsq
@@ -84,7 +85,7 @@ def test_basic_formulas(data, models, formula):
 
     mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
-    np.testing.assert_allclose(res.params, res2.params)
+    assert_allclose(res.params, res2.params)
 
     parts = formula.split("~")
     variables = parts[1].replace(" 1 ", " const ").split("+")
@@ -92,8 +93,8 @@ def test_basic_formulas(data, models, formula):
     x = data.x
     res2 = model(data.y, x[variables]).fit()
     wres2 = model(data.y, x[variables], weights=data.w).fit()
-    np.testing.assert_allclose(res.params, res2.params)
-    np.testing.assert_allclose(wres.params, wres2.params)
+    assert_allclose(res.params, res2.params)
+    assert_allclose(wres.params, wres2.params)
     assert isinstance(mod, model)
     assert mod.formula == formula
 
@@ -111,15 +112,15 @@ def test_basic_formulas(data, models, formula):
 
     mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
-    np.testing.assert_allclose(res.params, res2.params)
-    np.testing.assert_allclose(res.params, pres.params)
-    np.testing.assert_allclose(res.params, ppres.params)
+    assert_allclose(res.params, res2.params)
+    assert_allclose(res.params, pres.params)
+    assert_allclose(res.params, ppres.params)
 
     x["Intercept"] = 1.0
     variables = ["Intercept"] + variables
     mod2 = model(data.y, x[variables])
     res2 = mod2.fit()
-    np.testing.assert_allclose(res.params, res2.params)
+    assert_allclose(res.params, res2.params)
     assert mod.formula == formula
 
 
@@ -134,7 +135,7 @@ def test_basic_formulas_math_op(data, models, formula):
     res = model.from_formula(formula, joined).fit()
     pred = res.predict(data=joined)
     pred = pred.reindex(res.fitted_values.index)
-    np.testing.assert_allclose(pred.values, res.fitted_values.values)
+    assert_allclose(pred.values, res.fitted_values.values)
 
 
 def test_panel_ols_formulas_math_op(data):
@@ -176,7 +177,7 @@ def test_panel_ols_formula(data):
     mod2 = panel_ols(formula, joined)
     res = mod.fit()
     res2 = mod2.fit()
-    np.testing.assert_allclose(res.params, res2.params)
+    assert_allclose(res.params, res2.params)
 
     formula = "y ~ x1 + EntityEffects + FixedEffects + x2 "
     with pytest.raises(ValueError):
@@ -196,7 +197,7 @@ def test_basic_formulas_predict(data, models, formula):
     mod2 = formula_func(formula, joined)
     res2 = mod2.fit()
     pred2 = res2.predict(data=joined)
-    np.testing.assert_allclose(pred.values, pred2.values, atol=1e-8)
+    assert_allclose(pred.values, pred2.values, atol=1e-8)
 
     parts = formula.split("~")
     variables = parts[1].replace(" 1 ", " const ").split("+")
@@ -205,8 +206,8 @@ def test_basic_formulas_predict(data, models, formula):
     res2 = model(data.y, x[variables]).fit()
     pred3 = res2.predict(x[variables])
     pred4 = res.predict(x[variables])
-    np.testing.assert_allclose(pred.values, pred3.values, atol=1e-8)
-    np.testing.assert_allclose(pred.values, pred4.values, atol=1e-8)
+    assert_allclose(pred.values, pred3.values, atol=1e-8)
+    assert_allclose(pred.values, pred4.values, atol=1e-8)
 
     if model is FirstDifferenceOLS:
         return
@@ -224,8 +225,8 @@ def test_basic_formulas_predict(data, models, formula):
     res2 = mod2.fit()
     pred2 = res.predict(x[variables])
     pred3 = res2.predict(x[variables])
-    np.testing.assert_allclose(pred, pred2, atol=1e-8)
-    np.testing.assert_allclose(pred, pred3, atol=1e-8)
+    assert_allclose(pred, pred2, atol=1e-8)
+    assert_allclose(pred, pred3, atol=1e-8)
 
 
 def test_formulas_predict_error(data, models, formula):
@@ -313,3 +314,13 @@ def test_formulas_rank_check(data, models, formula):
     mod = model(y, x, check_rank=False)
     res = mod.fit()
     assert isinstance(res.summary.as_text(), str)
+
+
+def test_escaped_variable_name():
+    data = DataFrame({"var a": np.arange(20 * 5)})
+    data.index = MultiIndex.from_product(
+        [np.arange(20), np.arange(5)], names=["entity", "time"]
+    )
+    mod = PanelOLS.from_formula("`var a` ~ 1", data=data)
+    res = mod.fit()
+    assert_allclose(res.params, data.mean(0))
