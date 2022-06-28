@@ -3,8 +3,14 @@ Change Log
 
 Since Version 4.26
 ------------------
-* Fixed a bug that affected creating IV models using formulas with migging data.
-* Fixed examples in documnetation
+* Switched from patsy for formulaic for linear constraint translation when using
+  the formula interface. This allows formulas to be specified using a dictionary
+  of constraints in addition to the standard single string of list of strings
+  (:issue:`439`, :issue:`440`).
+* Fixed a bug when using escaped variable names, e.g., ``y ~ 1 + `x 3```, in panel
+  data models (:issue:`435`).
+* Fixed a bug that affected creating IV models using formulas with missing data (:issue:`438`).
+* Fixed examples in documentation (:issue:`434 `).
 
 Version 4.26
 ------------
