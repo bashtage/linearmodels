@@ -179,3 +179,38 @@ def test_parser(config):
         for key in eq1:
             if eq1[key] is not None:
                 assert_frame_equal(eq1[key], eq2[key])
+
+
+def test_formula_escaped(config):
+    fmla, model, interface = config
+    for key in fmla:
+        if "[" in fmla[key] and model not in (IVSystemGMM, IV3SLS):
+            return
+    replacements = {}
+    cols = []
+    for val in joined.columns:
+        replacements[val] = f"`{val[0]} {val[1:]}`"
+        cols.append(f"{val[0]} {val[1:]}")
+
+    def fix_formula(fmla):
+        mod_fmla = {}
+        for key, eq in fmla.items():
+            for orig in replacements:
+                eq = eq.replace(orig, replacements[orig])
+            mod_fmla[key] = eq
+
+        return mod_fmla
+
+    escaped_fmla = fix_formula(fmla)
+    data = joined.copy()
+    data.columns = cols
+    mod = model.from_formula(escaped_fmla, data)
+    pmod = pickle.loads(pickle.dumps(mod))
+    mod_fmla = interface(escaped_fmla, data)
+    res = mod.fit()
+    ppres = pmod.fit()
+    pres = pickle.loads(pickle.dumps(res))
+    res_fmla = mod_fmla.fit()
+    assert_series_equal(res.params, res_fmla.params)
+    assert_series_equal(res.params, pres.params)
+    assert_series_equal(res.params, ppres.params)

@@ -345,7 +345,22 @@ def test_predict_no_formula_predict_data(data, model_and_func, formula):
         res.predict(data=data)
 
 
-def test_formula_escaped():
+def test_formula_escaped_simple():
     rs = np.random.RandomState(1232)
     data = pd.DataFrame({"y": np.arange(100), "var x": rs.standard_normal(100)})
     IV2SLS.from_formula("y ~ 1 + `var x`", data)
+
+
+def test_formula_escape():
+    data = DataFrame(
+        np.random.standard_normal((250, 3)), columns=["y space", "x 1", "z 0"]
+    )
+    data.loc[:, "x 1"] *= data.loc[:, "z 0"]
+    formula = "`y space` ~ 1 + [`x 1` ~ `z 0`]"
+    mod = IV2SLS.from_formula(formula, data=data)
+    res = mod.fit()
+    summ = res.summary
+    assert len(res.params) == 2
+    assert "x 1" in res.params.index
+    assert "y space" in str(summ)
+    assert "Instruments: z 0" in str(summ)

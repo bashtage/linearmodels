@@ -113,3 +113,27 @@ def test_starting_values_options(data):
 
     with pytest.raises(ValueError, match="tarting values"):
         mod2.fit(starting=sv[:-3], opt_options=oo, disp=0)
+
+
+def test_escaped_formula(data, model):
+    def transform(fmla):
+        names = [f"`{factor.strip().replace('_',' ')}`" for factor in fmla.split("+")]
+        return " + ".join(names)
+
+    formula_factors = transform(FORMULA_FACTORS)
+    formula_port = transform(FORMULA_PORT)
+    formula = " ~ ".join((formula_port, formula_factors))
+    data_rename = data.joined.copy()
+    data_rename.columns = [col.replace("_", " ") for col in data_rename]
+    mod = model.from_formula(formula, data_rename)
+    res = mod.fit()
+    ports = [
+        val.strip().replace("`", "").strip() for val in formula.split("~")[0].split("+")
+    ]
+    factors = [
+        val.strip().replace("`", "").strip() for val in formula.split("~")[1].split("+")
+    ]
+    for port in ports:
+        assert port in res.params.index
+    for factor in factors:
+        assert factor in res.params.columns
