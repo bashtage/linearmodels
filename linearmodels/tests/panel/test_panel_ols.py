@@ -1494,3 +1494,10 @@ def test_corr_squared(data):
     has_const = np.any(np.all(mod._x == 1.0, 0))
     if has_const:
         assert_allclose(res.rsquared_overall, res.corr_squared_overall)
+
+
+def test_quoted_var_names():
+    mi = pd.MultiIndex.from_product([np.arange(20), np.arange(5)])
+    d = pd.DataFrame({"var a": np.arange(100.0)}, index=mi)
+    res = PanelOLS.from_formula("`var a` ~ 1", data=d).fit()
+    assert_allclose(res.params, d.mean().iloc[0])

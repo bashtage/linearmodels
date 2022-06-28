@@ -3,6 +3,7 @@ import pickle
 from formulaic.errors import FormulaSyntaxError
 import numpy as np
 from numpy.testing import assert_allclose
+import pandas as pd
 from pandas import Categorical, DataFrame, concat
 from pandas.testing import assert_frame_equal
 import pytest
@@ -342,3 +343,9 @@ def test_predict_no_formula_predict_data(data, model_and_func, formula):
         res.predict(exog=x, endog=w)
     with pytest.raises(ValueError, match="Unable to"):
         res.predict(data=data)
+
+
+def test_formula_escaped():
+    rs = np.random.RandomState(1232)
+    data = pd.DataFrame({"y": np.arange(100), "var x": rs.standard_normal(100)})
+    IV2SLS.from_formula("y ~ 1 + `var x`", data)
