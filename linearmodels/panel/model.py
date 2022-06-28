@@ -3,10 +3,8 @@ from __future__ import annotations
 from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
 
 from formulaic import model_matrix
-from formulaic.formula import Formula
 from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
-from formulaic.parser.types import Structured
 import numpy as np
 from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
