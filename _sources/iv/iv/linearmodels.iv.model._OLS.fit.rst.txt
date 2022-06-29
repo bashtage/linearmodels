@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.\_OLS.fit
+===============================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: _OLS.fit

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.compat.statsmodels.Summary.add\_extra\_txt
+=======================================================
+
+.. currentmodule:: linearmodels.compat.statsmodels
+
+.. automethod:: Summary.add_extra_txt

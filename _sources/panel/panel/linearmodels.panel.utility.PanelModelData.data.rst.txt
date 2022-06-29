@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.utility.PanelModelData.data
+==============================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. autoattribute:: PanelModelData.data

@@ -1,0 +1,32 @@
+﻿linearmodels.system.model.LinearConstraint
+==========================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoclass:: LinearConstraint
+   :exclude-members: 
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~LinearConstraint.a
+      ~LinearConstraint.q
+      ~LinearConstraint.r
+      ~LinearConstraint.t
+   
+   
+   

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.utility.PanelModelData.other\_effects
+========================================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. autoattribute:: PanelModelData.other_effects

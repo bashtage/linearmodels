@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.results.GMMSystemResults.breusch\_pagan
+===========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. automethod:: GMMSystemResults.breusch_pagan

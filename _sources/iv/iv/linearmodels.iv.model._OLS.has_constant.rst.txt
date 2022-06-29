@@ -1,0 +1,6 @@
+linearmodels.iv.model.\_OLS.has\_constant
+=========================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. autoproperty:: _OLS.has_constant

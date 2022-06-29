@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.utility.PanelModelData.clusters
+==================================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. autoattribute:: PanelModelData.clusters

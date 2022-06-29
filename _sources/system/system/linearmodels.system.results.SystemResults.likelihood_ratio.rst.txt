@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.system.results.SystemResults.likelihood\_ratio
+===========================================================
+
+.. currentmodule:: linearmodels.system.results
+
+.. automethod:: SystemResults.likelihood_ratio

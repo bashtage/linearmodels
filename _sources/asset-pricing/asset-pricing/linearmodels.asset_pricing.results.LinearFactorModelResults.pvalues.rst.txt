@@ -1,0 +1,6 @@
+linearmodels.asset\_pricing.results.LinearFactorModelResults.pvalues
+====================================================================
+
+.. currentmodule:: linearmodels.asset_pricing.results
+
+.. autoproperty:: LinearFactorModelResults.pvalues

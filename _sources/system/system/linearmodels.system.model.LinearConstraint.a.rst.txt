@@ -1,0 +1,6 @@
+linearmodels.system.model.LinearConstraint.a
+============================================
+
+.. currentmodule:: linearmodels.system.model
+
+.. autoproperty:: LinearConstraint.a

@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.DriscollKraay.ALLOWED\_KWARGS
+===========================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoattribute:: DriscollKraay.ALLOWED_KWARGS

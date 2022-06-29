@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.covariance.HeteroskedasticCovariance.ALLOWED\_KWARGS
+=======================================================================
+
+.. currentmodule:: linearmodels.panel.covariance
+
+.. autoattribute:: HeteroskedasticCovariance.ALLOWED_KWARGS

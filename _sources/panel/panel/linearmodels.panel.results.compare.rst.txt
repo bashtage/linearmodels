@@ -1,0 +1,6 @@
+﻿linearmodels.panel.results.compare
+==================================
+
+.. currentmodule:: linearmodels.panel.results
+
+.. autofunction:: compare

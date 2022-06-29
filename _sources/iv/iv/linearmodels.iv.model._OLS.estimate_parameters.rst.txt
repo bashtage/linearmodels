@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.\_OLS.estimate\_parameters
+================================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: _OLS.estimate_parameters

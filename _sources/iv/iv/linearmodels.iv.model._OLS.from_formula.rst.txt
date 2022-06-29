@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.iv.model.\_OLS.from\_formula
+=========================================
+
+.. currentmodule:: linearmodels.iv.model
+
+.. automethod:: _OLS.from_formula

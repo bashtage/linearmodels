@@ -1,0 +1,8 @@
+:orphan:
+
+linearmodels.panel.utility.PanelModelData.index
+===============================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. automethod:: PanelModelData.index

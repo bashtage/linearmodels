@@ -1,6 +1,26 @@
 Change Log
 ==========
 
+Version 4.27
+------------
+* Switched from patsy for formulaic for linear constraint translation when using
+  the formula interface. This allows formulas to be specified using a dictionary
+  of constraints in addition to the standard single string of list of strings
+  (:issue:`439`, :issue:`440`).
+* Fixed a bug when using escaped variable names, e.g., ``y ~ 1 + `x 3```, in panel
+  data models (:issue:`435`).
+* Fixed a bug that affected creating IV models using formulas with missing data (:issue:`438`).
+* Fixed examples in documentation (:issue:`434`).
+
+Version 4.26
+------------
+* Fixed a bug in :class:`~linearmodels.iv.model.IV2SLS` and related models
+  where :func:`~linearmodels.iv.model.IV2SLS.predict` would produce ``NaN``
+  values when ``exog`` and ``endog`` had different indices. An
+  ``IndexWarning`` is now shown.
+* Added ``stacklevel`` to all warnings to improve accuracy of warning
+  location.
+
 Version 4.25
 ------------
 * Clarified the null in the F-statistic
@@ -84,7 +104,7 @@ Version 4.14
 ------------
 * Fixed issue where datasets were not installed with wheels (:issue:`217`).
 * Switched to property-cached to inherit cached property from property (:issue:`211`).
-* Removed all use of :class:`pandas.Panel` (:issue:`211`).
+* Removed all use of ``pandas.Panel`` (:issue:`211`).
 
 Version 4.13
 ------------

@@ -1,0 +1,28 @@
+﻿linearmodels.compat.statsmodels.Summary
+=======================================
+
+.. currentmodule:: linearmodels.compat.statsmodels
+
+.. autoclass:: Summary
+   :exclude-members: add_extra_txt,add_table_2cols,add_table_params,as_csv,as_html,as_latex,as_text,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~Summary.add_extra_txt
+      ~Summary.add_table_2cols
+      ~Summary.add_table_params
+      ~Summary.as_csv
+      ~Summary.as_html
+      ~Summary.as_latex
+      ~Summary.as_text
+   
+   
+   
+   
+   
+   

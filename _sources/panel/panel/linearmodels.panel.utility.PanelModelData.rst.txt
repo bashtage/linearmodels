@@ -1,0 +1,34 @@
+﻿linearmodels.panel.utility.PanelModelData
+=========================================
+
+.. currentmodule:: linearmodels.panel.utility
+
+.. autoclass:: PanelModelData
+   :exclude-members: count,index,
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+      ~PanelModelData.count
+      ~PanelModelData.index
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~PanelModelData.clusters
+      ~PanelModelData.data
+      ~PanelModelData.other_effects
+      ~PanelModelData.weights
+   
+   
+   

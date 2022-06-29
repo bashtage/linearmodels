@@ -20,6 +20,7 @@ System Regression Estimators
    SUR
    IV3SLS
    IVSystemGMM
+   LinearConstraint
 
 .. _system_models-module-reference-results:
 
@@ -82,4 +83,3 @@ GMM Moment Weighting
    HomoskedasticWeightMatrix
    HeteroskedasticWeightMatrix
    KernelWeightMatrix
-
