@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, NamedTuple, Optional, Tuple, Type, Union, cast
+from typing import NamedTuple, Type, Union, cast
 
 from formulaic import model_matrix
 from formulaic.model_spec import NAAction
@@ -77,8 +77,8 @@ CovarianceEstimatorType = Union[
 
 
 def _lstsq(
-    x: Float64Array, y: Float64Array, rcond: Optional[float] = None
-) -> Tuple[Float64Array, Float64Array, int, Float64Array]:
+    x: Float64Array, y: Float64Array, rcond: float | None = None
+) -> tuple[Float64Array, Float64Array, int, Float64Array]:
     if rcond is None:
         eps = np.finfo(np.float64).eps
         cond = float(max(x.shape) * eps)
@@ -97,13 +97,13 @@ def panel_structure_stats(ids: IntArray, name: str) -> Series:
 class FInfo(NamedTuple):
     sel: BoolArray
     name: str
-    invalid_test_stat: Optional[InvalidTestStatistic]
+    invalid_test_stat: InvalidTestStatistic | None
     is_invalid: bool
 
 
 def _deferred_f(
     params: Series, cov: DataFrame, debiased: bool, df_resid: int, f_info: FInfo
-) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+) -> InvalidTestStatistic | WaldTestStatistic:
     if f_info.is_invalid:
         assert f_info.invalid_test_stat is not None
         return f_info.invalid_test_stat
@@ -123,7 +123,7 @@ def _deferred_f(
     return wald
 
 
-class PanelFormulaParser(object):
+class PanelFormulaParser:
     """
     Parse formulas for OLS and IV models
 
@@ -194,7 +194,7 @@ class PanelFormulaParser(object):
         self._context = value
 
     @property
-    def data(self) -> Tuple[DataFrame, DataFrame]:
+    def data(self) -> tuple[DataFrame, DataFrame]:
         """Returns a tuple containing the dependent, exog, endog"""
         self._context += 1
         out = self.dependent, self.exog
@@ -256,7 +256,7 @@ before computing the fitted value. The best practice is to pass a DataFrame
 with a 2-level MultiIndex containing the entity- and time-ids."""
 
 
-class _PanelModelBase(object):
+class _PanelModelBase:
     r"""
     Base class for all panel models
 
@@ -283,14 +283,14 @@ class _PanelModelBase(object):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
         self.dependent = PanelData(dependent, "Dep")
         self.exog = PanelData(exog, "Exog")
         self._original_shape = self.dependent.shape
         self._constant = False
-        self._formula: Optional[str] = None
+        self._formula: str | None = None
         self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
@@ -304,10 +304,10 @@ class _PanelModelBase(object):
             ACCovariance,
         )
         self._original_index = self.dependent.index.copy()
-        self._constant_index: Optional[int] = None
+        self._constant_index: int | None = None
         self._check_rank = bool(check_rank)
         self._validate_data()
-        self._singleton_index: Optional[BoolArray] = None
+        self._singleton_index: BoolArray | None = None
 
     def __str__(self) -> str:
         out = "{name} \nNum exog: {num_exog}, Constant: {has_constant}"
@@ -348,7 +348,7 @@ class _PanelModelBase(object):
         clusters.drop(~self.not_null)
         return clusters.copy()
 
-    def _info(self) -> Tuple[Series, Series, None]:
+    def _info(self) -> tuple[Series, Series, None]:
         """Information about panel structure"""
 
         entity_info = panel_structure_stats(
@@ -361,7 +361,7 @@ class _PanelModelBase(object):
 
         return entity_info, time_info, other_info
 
-    def _adapt_weights(self, weights: Optional[PanelDataLike]) -> PanelData:
+    def _adapt_weights(self, weights: PanelDataLike | None) -> PanelData:
         """Check and transform weights depending on size"""
         if weights is None:
             self._is_weighted = False
@@ -459,12 +459,12 @@ class _PanelModelBase(object):
         self._constant, self._constant_index = has_constant(x, rank_of_x)
 
     @property
-    def formula(self) -> Optional[str]:
+    def formula(self) -> str | None:
         """Formula used to construct the model"""
         return self._formula
 
     @formula.setter
-    def formula(self, value: Optional[str]) -> None:
+    def formula(self, value: str | None) -> None:
         self._formula = value
 
     @property
@@ -479,7 +479,7 @@ class _PanelModelBase(object):
         x: Float64Array,
         root_w: Float64Array,
         df_resid: int,
-    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    ) -> WaldTestStatistic | InvalidTestStatistic:
         """Compute model F-statistic"""
         weps_const = y
         num_df = x.shape[1]
@@ -527,7 +527,7 @@ class _PanelModelBase(object):
 
         return FInfo(sel, name, None, False)
 
-    def _prepare_between(self) -> Tuple[Float64Array, Float64Array, Float64Array]:
+    def _prepare_between(self) -> tuple[Float64Array, Float64Array, Float64Array]:
         """Prepare values for between estimation of R2"""
         weights = self.weights if self._is_weighted else None
         y = np.asarray(self.dependent.mean("entity", weights=weights))
@@ -540,7 +540,7 @@ class _PanelModelBase(object):
 
         return y, x, w
 
-    def _rsquared_corr(self, params: Float64Array) -> Tuple[float, float, float]:
+    def _rsquared_corr(self, params: Float64Array) -> tuple[float, float, float]:
         """Correlation-based measures of R2"""
         # Overall
         y = self.dependent.values2d
@@ -569,7 +569,7 @@ class _PanelModelBase(object):
 
     def _rsquared(
         self, params: Float64Array, reweight: bool = False
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """Compute alternative measures of R2"""
         if self.has_constant and self.exog.nvar == 1:
             # Constant only fast track
@@ -696,8 +696,8 @@ class _PanelModelBase(object):
         return self._not_null
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, Float64Array, DataFrame, PanelData]]:
+        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+    ) -> dict[str, bool | float | str | Float64Array | DataFrame | PanelData]:
 
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
@@ -708,7 +708,7 @@ class _PanelModelBase(object):
         cov_config_upd = {k: v for k, v in cov_config.items()}
 
         clusters = get_panel_data_like(cov_config, "clusters")
-        clusters_frame: Optional[DataFrame] = None
+        clusters_frame: DataFrame | None = None
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
@@ -748,8 +748,8 @@ class _PanelModelBase(object):
         self,
         params: ArrayLike,
         *,
-        exog: Optional[PanelDataLike] = None,
-        data: Optional[PanelDataLike] = None,
+        exog: PanelDataLike | None = None,
+        data: PanelDataLike | None = None,
         context: int = 4,
     ) -> DataFrame:
         """
@@ -848,7 +848,7 @@ class PooledOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -859,7 +859,7 @@ class PooledOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> PooledOLS:
         """
@@ -914,7 +914,7 @@ class PooledOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, Float64Array, DataFrame, PanelData],
+        **cov_config: bool | float | str | Float64Array | DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -1037,8 +1037,8 @@ class PooledOLS(_PanelModelBase):
         self,
         params: ArrayLike,
         *,
-        exog: Optional[PanelDataLike] = None,
-        data: Optional[DataFrame] = None,
+        exog: PanelDataLike | None = None,
+        data: DataFrame | None = None,
         context: int = 4,
     ) -> DataFrame:
         """
@@ -1172,10 +1172,10 @@ class PanelOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         entity_effects: bool = False,
         time_effects: bool = False,
-        other_effects: Optional[PanelDataLike] = None,
+        other_effects: PanelDataLike | None = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
         check_rank: bool = True,
@@ -1184,7 +1184,7 @@ class PanelOLS(_PanelModelBase):
 
         self._entity_effects = entity_effects
         self._time_effects = time_effects
-        self._other_effect_cats: Optional[PanelData] = None
+        self._other_effect_cats: PanelData | None = None
         self._singletons = singletons
         self._other_effects = self._validate_effects(other_effects)
         self._has_effect = entity_effects or time_effects or self.other_effects
@@ -1221,7 +1221,7 @@ class PanelOLS(_PanelModelBase):
         nobs = retain.shape[0]
         ndropped = nobs - retain.sum()
         warn.warn(
-            "{0} singleton observations dropped".format(ndropped),
+            f"{ndropped} singleton observations dropped",
             SingletonWarning,
             stacklevel=3,
         )
@@ -1251,7 +1251,7 @@ class PanelOLS(_PanelModelBase):
         out += additional
         return out
 
-    def _validate_effects(self, effects: Optional[PanelDataLike]) -> bool:
+    def _validate_effects(self, effects: PanelDataLike | None) -> bool:
         """Check model effects"""
         if effects is None:
             return False
@@ -1326,8 +1326,8 @@ class PanelOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
-        other_effects: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
+        other_effects: PanelDataLike | None = None,
         singletons: bool = True,
         drop_absorbed: bool = False,
         check_rank: bool = True,
@@ -1398,7 +1398,7 @@ class PanelOLS(_PanelModelBase):
 
     def _lsmr_path(
         self,
-    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Sparse implementation, works for all scenarios"""
         y = cast(Float64Array, self.dependent.values2d)
         x = cast(Float64Array, self.exog.values2d)
@@ -1415,7 +1415,7 @@ class PanelOLS(_PanelModelBase):
         wx_gm = root_w * (w.T @ x / w.sum())
         root_w_sparse = csc_matrix(root_w)
 
-        cats_l: List[Union[IntArray, Float64Array]] = []
+        cats_l: list[IntArray | Float64Array] = []
         if self.entity_effects:
             cats_l.append(self.dependent.entity_ids)
         if self.time_effects:
@@ -1461,7 +1461,7 @@ class PanelOLS(_PanelModelBase):
 
     def _slow_path(
         self,
-    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Frisch-Waugh-Lovell implementation, works for all scenarios"""
         w = cast(Float64Array, self.weights.values2d)
         root_w = np.sqrt(w)
@@ -1535,7 +1535,7 @@ class PanelOLS(_PanelModelBase):
 
     def _fast_path(
         self, low_memory: bool
-    ) -> Tuple[Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[Float64Array, Float64Array, Float64Array]:
         """Dummy-variable free estimation without weights"""
         _y = self.dependent.values2d
         _x = self.exog.values2d
@@ -1586,7 +1586,7 @@ class PanelOLS(_PanelModelBase):
 
     def _weighted_fast_path(
         self, low_memory: bool
-    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[Float64Array, Float64Array, Float64Array, Float64Array, Float64Array]:
         """Dummy-variable free estimation with weights"""
         y_arr = self.dependent.values2d
         x_arr = self.exog.values2d
@@ -1647,7 +1647,7 @@ class PanelOLS(_PanelModelBase):
 
         return wy_arr, wx_arr, wybar, wy_effects, wx_effects
 
-    def _info(self) -> Tuple[Series, Series, DataFrame]:
+    def _info(self) -> tuple[Series, Series, DataFrame]:
         """Information about model effects and panel structure"""
 
         entity_info, time_info, other_info = super()._info()
@@ -1682,7 +1682,7 @@ class PanelOLS(_PanelModelBase):
     def _determine_df_adjustment(
         self,
         cov_type: str,
-        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> bool:
         if cov_type != "clustered" or not self._has_effect:
             return True
@@ -1705,12 +1705,12 @@ class PanelOLS(_PanelModelBase):
         *,
         use_lsdv: bool = False,
         use_lsmr: bool = False,
-        low_memory: Optional[bool] = None,
+        low_memory: bool | None = None,
         cov_type: str = "unadjusted",
         debiased: bool = True,
         auto_df: bool = True,
         count_effects: bool = True,
-        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> PanelEffectsResults:
         """
         Estimate model parameters
@@ -2012,7 +2012,7 @@ class BetweenOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -2024,8 +2024,8 @@ class BetweenOLS(_PanelModelBase):
         )
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, IntArray, DataFrame, PanelData]]:
+        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
         """Return covariance estimator reformat clusters"""
         cov_config_upd = cov_config.copy()
         if "clusters" not in cov_config:
@@ -2055,7 +2055,7 @@ class BetweenOLS(_PanelModelBase):
         reweight: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2186,7 +2186,7 @@ class BetweenOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> BetweenOLS:
         """
@@ -2266,7 +2266,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ):
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -2278,8 +2278,8 @@ class FirstDifferenceOLS(_PanelModelBase):
             raise ValueError("Panel must have at least 2 time periods")
 
     def _setup_clusters(
-        self, cov_config: Dict[str, Union[bool, float, str, PanelDataLike]]
-    ) -> Dict[str, Union[bool, float, str, DataFrame]]:
+        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+    ) -> dict[str, bool | float | str | DataFrame]:
         cov_config_upd = cov_config.copy()
         cluster_types = ("clusters", "cluster_entity")
         common = set(cov_config.keys()).intersection(cluster_types)
@@ -2287,7 +2287,7 @@ class FirstDifferenceOLS(_PanelModelBase):
             return cov_config_upd
 
         clusters = cov_config.get("clusters", None)
-        clusters_frame: Optional[DataFrame] = None
+        clusters_frame: DataFrame | None = None
         if clusters is not None:
             clusters_panel = self.reformat_clusters(clusters)
             fd = clusters_panel.first_difference()
@@ -2332,7 +2332,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -2485,7 +2485,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> FirstDifferenceOLS:
         """
@@ -2568,7 +2568,7 @@ class RandomEffects(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> None:
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -2579,7 +2579,7 @@ class RandomEffects(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> RandomEffects:
         """
@@ -2635,7 +2635,7 @@ class RandomEffects(_PanelModelBase):
         small_sample: bool = False,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: Union[bool, float, str, IntArray, DataFrame, PanelData],
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> RandomEffectsResults:
         """
         Estimate model parameters
@@ -2775,7 +2775,7 @@ class RandomEffects(_PanelModelBase):
         )
         idiosyncratic = DataFrame(eps, index, ["idiosyncratic"])
         residual_ss = float(weps.T @ weps)
-        wmu: Union[float, Float64Array] = 0.0
+        wmu: float | Float64Array = 0.0
         if self.has_constant:
             wmu = root_w * _lstsq(root_w, wy, rcond=None)[0]
         wy_demeaned = wy - wmu
@@ -2855,7 +2855,7 @@ class FamaMacBeth(_PanelModelBase):
         dependent: PanelDataLike,
         exog: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ):
         super().__init__(dependent, exog, weights=weights, check_rank=check_rank)
@@ -2891,7 +2891,7 @@ class FamaMacBeth(_PanelModelBase):
 
             warnings.warn(
                 "The number of time-series observation available to estimate "
-                "cross-sectional\nregressions, {0}, is less than the number of "
+                "cross-sectional\nregressions, {}, is less than the number of "
                 "parameters in the model. Parameter\ninference is not "
                 "available.".format(valid_blocks.sum()),
                 InferenceUnavailableWarning,
@@ -2901,7 +2901,7 @@ class FamaMacBeth(_PanelModelBase):
             import warnings
 
             warnings.warn(
-                "{0} of the time-series regressions cannot be estimated due to "
+                "{} of the time-series regressions cannot be estimated due to "
                 "deficient rank.".format(valid_blocks.shape[0] - valid_blocks.sum()),
                 MissingValueWarning,
                 stacklevel=3,
@@ -2911,8 +2911,8 @@ class FamaMacBeth(_PanelModelBase):
         self,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        bandwidth: Optional[float] = None,
-        kernel: Optional[str] = None,
+        bandwidth: float | None = None,
+        kernel: str | None = None,
     ) -> FamaMacBethResults:
         """
         Estimate model parameters
@@ -3054,7 +3054,7 @@ class FamaMacBeth(_PanelModelBase):
         formula: str,
         data: PanelDataLike,
         *,
-        weights: Optional[PanelDataLike] = None,
+        weights: PanelDataLike | None = None,
         check_rank: bool = True,
     ) -> FamaMacBeth:
         """

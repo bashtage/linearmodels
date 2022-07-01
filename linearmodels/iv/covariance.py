@@ -4,7 +4,7 @@ Covariance estimation for 2SLS and LIML IV estimators
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Optional, Union, cast
+from typing import Any, Callable, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (
@@ -179,7 +179,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
         q, c = 2, 2.6614
         m_star = int(ceil(4 * (t / 100) ** (4 / 25)))
     else:
-        raise ValueError("Unknown kernel: {0}".format(kernel))
+        raise ValueError(f"Unknown kernel: {kernel}")
     sigma = empty(m_star + 1)
     sigma[0] = x.T @ x / t
     for i in range(1, m_star + 1):
@@ -192,7 +192,7 @@ def kernel_optimal_bandwidth(x: Float64Array, kernel: str = "bartlett") -> int:
     return min(int(ceil(m)), t - 1)
 
 
-KERNEL_LOOKUP: Dict[str, KernelWeight] = {
+KERNEL_LOOKUP: dict[str, KernelWeight] = {
     "bartlett": kernel_weight_bartlett,
     "newey-west": kernel_weight_bartlett,
     "quadratic-spectral": kernel_weight_quadratic_spectral,
@@ -203,7 +203,7 @@ KERNEL_LOOKUP: Dict[str, KernelWeight] = {
 }
 
 
-class HomoskedasticCovariance(object):
+class HomoskedasticCovariance:
     r"""
     Covariance estimation for homoskedastic data
 
@@ -274,17 +274,14 @@ class HomoskedasticCovariance(object):
 
     def __str__(self) -> str:
         out = self._name
-        out += "\nDebiased: {0}".format(self._debiased)
+        out += f"\nDebiased: {self._debiased}"
         if self._kappa != 1:
-            out += "\nKappa: {0:0.3f}".format(self._kappa)
+            out += f"\nKappa: {self._kappa:0.3f}"
         return out
 
     def __repr__(self) -> str:
         return (
-            self.__str__()
-            + "\n"
-            + self.__class__.__name__
-            + ", id: {0}".format(hex(id(self)))
+            self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
     @property
@@ -336,7 +333,7 @@ class HomoskedasticCovariance(object):
         return self._debiased
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return {"debiased": self.debiased, "kappa": self._kappa}
 
 
@@ -394,9 +391,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
-        super(HeteroskedasticCovariance, self).__init__(
-            x, y, z, params, debiased, kappa
-        )
+        super().__init__(x, y, z, params, debiased, kappa)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
@@ -489,7 +484,7 @@ class KernelCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
-        super(KernelCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa)
         self._kernels = KERNEL_LOOKUP
         self._kernel = kernel
         self._bandwidth = bandwidth
@@ -497,14 +492,14 @@ class KernelCovariance(HomoskedasticCovariance):
         self._name = "Kernel Covariance (HAC)"
 
         if kernel not in KERNEL_LOOKUP:
-            raise ValueError("Unknown kernel: {0}".format(kernel))
+            raise ValueError(f"Unknown kernel: {kernel}")
 
     def __str__(self) -> str:
-        out = super(KernelCovariance, self).__str__()
-        out += "\nKernel: {0}".format(self._kernel)
-        out += "\nAutomatic Bandwidth: {0}".format(self._auto_bandwidth)
+        out = super().__str__()
+        out += f"\nKernel: {self._kernel}"
+        out += f"\nAutomatic Bandwidth: {self._auto_bandwidth}"
         if self._bandwidth:
-            out += "\nBandwidth: {0}".format(self._bandwidth)
+            out += f"\nBandwidth: {self._bandwidth}"
         return out
 
     @property
@@ -537,7 +532,7 @@ class KernelCovariance(HomoskedasticCovariance):
         return cast(ndarray, self._scale * s)
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return {
             "debiased": self.debiased,
             "bandwidth": self._bandwidth,
@@ -604,11 +599,11 @@ class ClusteredCovariance(HomoskedasticCovariance):
         y: Float64Array,
         z: Float64Array,
         params: Float64Array,
-        clusters: Optional[AnyArray] = None,
+        clusters: AnyArray | None = None,
         debiased: bool = False,
         kappa: Numeric = 1,
     ):
-        super(ClusteredCovariance, self).__init__(x, y, z, params, debiased, kappa)
+        super().__init__(x, y, z, params, debiased, kappa)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
@@ -630,8 +625,8 @@ class ClusteredCovariance(HomoskedasticCovariance):
         self._name = "Clustered Covariance (One-Way)"
 
     def __str__(self) -> str:
-        out = super(ClusteredCovariance, self).__str__()
-        out += "\nNum Clusters: {0}".format(self._num_clusters_str)
+        out = super().__str__()
+        out += f"\nNum Clusters: {self._num_clusters_str}"
         return out
 
     @property
@@ -670,7 +665,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         return s
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         return {
             "debiased": self.debiased,
             "clusters": self._clusters,

@@ -303,7 +303,7 @@ def test_gls_eye_mv_ols_equiv(mvreg_data):
 
     ad = AttrDict()
     for i in range(dependent.shape[1]):
-        key = "dependent.{0}".format(i)
+        key = f"dependent.{i}"
         df = DataFrame(dependent[:, [i]], columns=[key])
         ad[key] = {"dependent": df, "exog": exog.copy()}
     gls_mod = SUR(ad, sigma=np.eye(len(ad)))
@@ -342,7 +342,7 @@ def test_gls_without_mv_ols_equiv(mvreg_data):
 
     ad = AttrDict()
     for i in range(dependent.shape[1]):
-        key = "dependent.{0}".format(i)
+        key = f"dependent.{i}"
         df = DataFrame(dependent[:, [i]], columns=[key])
         ad[key] = {"dependent": df, "exog": exog.copy()}
     gls_mod = SUR(ad)
@@ -639,7 +639,7 @@ def test_mv_ols_hac_smoke(kernel_options):
     mod = SUR(data)
     res = mod.fit(cov_type="kernel", **kernel_options)
     assert "Kernel (HAC) " in str(res)
-    assert "Kernel: {0}".format(kernel_options["kernel"]) in str(res)
+    assert "Kernel: {}".format(kernel_options["kernel"]) in str(res)
     if kernel_options["bandwidth"] == 0:
         res_base = mod.fit(cov_type="robust", debiased=kernel_options["debiased"])
         assert_allclose(res.tstats, res_base.tstats)

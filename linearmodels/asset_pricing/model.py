@@ -3,7 +3,7 @@ Linear factor models for applications in asset pricing
 """
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
+from typing import Any, Callable, cast
 
 from formulaic import model_matrix
 from formulaic.materializers.types import NAAction
@@ -32,14 +32,12 @@ from linearmodels.typing import ArrayLike, BoolArray, Float64Array
 
 
 def callback_factory(
-    obj: Union[
-        Callable[[Float64Array, bool, Float64Array], float],
-        Callable[
-            [Float64Array, bool, Union[HeteroskedasticWeight, KernelWeight]], float
-        ],
-    ],
-    args: Tuple[bool, Any],
-    disp: Union[bool, int] = 1,
+    obj: (
+        Callable[[Float64Array, bool, Float64Array], float]
+        | Callable[[Float64Array, bool, HeteroskedasticWeight | KernelWeight], float]
+    ),
+    args: tuple[bool, Any],
+    disp: bool | int = 1,
 ) -> Callable[[Float64Array], None]:
     d = {"iter": 0}
     disp = int(disp)
@@ -47,13 +45,13 @@ def callback_factory(
     def callback(params: Float64Array) -> None:
         fval = obj(params, *args)
         if disp > 0 and (d["iter"] % disp == 0):
-            print("Iteration: {0}, Objective: {1}".format(d["iter"], fval))
+            print("Iteration: {}, Objective: {}".format(d["iter"], fval))
         d["iter"] += 1
 
     return callback
 
 
-class _FactorModelBase(object):
+class _FactorModelBase:
     r"""
     Base class for all factor models.
 
@@ -69,17 +67,17 @@ class _FactorModelBase(object):
         self.portfolios = IVData(portfolios, var_name="portfolio")
         self.factors = IVData(factors, var_name="factor")
         self._name = self.__class__.__name__
-        self._formula: Optional[str] = None
+        self._formula: str | None = None
         self._validate_data()
 
     def __str__(self) -> str:
         out = self.__class__.__name__
         f, p = self.factors.shape[1], self.portfolios.shape[1]
-        out += " with {0} factors, {1} test portfolios".format(f, p)
+        out += f" with {f} factors, {p} test portfolios"
         return out
 
     def __repr__(self) -> str:
-        return self.__str__() + "\nid: {0}".format(hex(id(self)))
+        return self.__str__() + f"\nid: {hex(id(self))}"
 
     def _drop_missing(self) -> BoolArray:
         data = (self.portfolios, self.factors)
@@ -126,17 +124,17 @@ class _FactorModelBase(object):
             )
 
     @property
-    def formula(self) -> Optional[str]:
+    def formula(self) -> str | None:
         return self._formula
 
     @formula.setter
-    def formula(self, value: Optional[str]) -> None:
+    def formula(self, value: str | None) -> None:
         self._formula = value
 
     @staticmethod
     def _prepare_data_from_formula(
         formula: str, data: DataFrame, portfolios: DataFrame
-    ) -> Tuple[DataFrame, DataFrame, str]:
+    ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         na_action = NAAction("raise")
         if portfolios is not None:
@@ -204,7 +202,7 @@ class TradedFactorModel(_FactorModelBase):
 
     @classmethod
     def from_formula(
-        cls, formula: str, data: DataFrame, *, portfolios: Optional[DataFrame] = None
+        cls, formula: str, data: DataFrame, *, portfolios: DataFrame | None = None
     ) -> TradedFactorModel:
         """
         Parameters
@@ -253,7 +251,7 @@ class TradedFactorModel(_FactorModelBase):
         self,
         cov_type: str = "robust",
         debiased: bool = True,
-        **cov_config: Union[str, float],
+        **cov_config: str | float,
     ) -> LinearFactorModelResults:
         """
         Estimate model parameters
@@ -339,7 +337,7 @@ class TradedFactorModel(_FactorModelBase):
                 kernel=kernel,
             )
         else:
-            raise ValueError("Unknown cov_type: {0}".format(cov_type))
+            raise ValueError(f"Unknown cov_type: {cov_type}")
         full_vcv = cov_est.cov
         rp_cov = rp_cov_est.cov
         vcv = full_vcv[:nloading, :nloading]
@@ -365,11 +363,11 @@ class TradedFactorModel(_FactorModelBase):
         r2 = 1 - residual_ss / total_ss
         param_names = []
         for portfolio in self.portfolios.cols:
-            param_names.append("alpha-{0}".format(portfolio))
+            param_names.append(f"alpha-{portfolio}")
             for factor in self.factors.cols:
-                param_names.append("beta-{0}-{1}".format(portfolio, factor))
+                param_names.append(f"beta-{portfolio}-{factor}")
         for factor in self.factors.cols:
-            param_names.append("lambda-{0}".format(factor))
+            param_names.append(f"lambda-{factor}")
 
         res = AttrDict(
             params=params,
@@ -408,10 +406,10 @@ class _LinearFactorModelBase(_FactorModelBase):
         factors: IVDataLike,
         *,
         risk_free: bool = False,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> None:
         self._risk_free = bool(risk_free)
-        super(_LinearFactorModelBase, self).__init__(portfolios, factors)
+        super().__init__(portfolios, factors)
         self._validate_additional_data()
         if sigma is None:
             self._sigma_m12 = self._sigma_inv = self._sigma = np.eye(
@@ -424,10 +422,10 @@ class _LinearFactorModelBase(_FactorModelBase):
             self._sigma_inv = np.linalg.inv(self._sigma)
 
     def __str__(self) -> str:
-        out = super(_LinearFactorModelBase, self).__str__()
+        out = super().__str__()
         if np.any(self._sigma != np.eye(self.portfolios.shape[1])):
             out += " using GLS"
-        out += "\nEstimated risk-free rate: {0}".format(self._risk_free)
+        out += f"\nEstimated risk-free rate: {self._risk_free}"
 
         return out
 
@@ -442,7 +440,7 @@ class _LinearFactorModelBase(_FactorModelBase):
                 "risk free rate if estimated."
             )
 
-    def _boundaries(self) -> Tuple[int, int, int, int, int, int, int]:
+    def _boundaries(self) -> tuple[int, int, int, int, int, int, int]:
         nobs, nf = self.factors.ndarray.shape
         nport = self.portfolios.ndarray.shape[1]
         nrf = int(bool(self._risk_free))
@@ -510,11 +508,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         factors: IVDataLike,
         *,
         risk_free: bool = False,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> None:
-        super(LinearFactorModel, self).__init__(
-            portfolios, factors, risk_free=risk_free, sigma=sigma
-        )
+        super().__init__(portfolios, factors, risk_free=risk_free, sigma=sigma)
 
     @classmethod
     def from_formula(
@@ -522,9 +518,9 @@ class LinearFactorModel(_LinearFactorModelBase):
         formula: str,
         data: DataFrame,
         *,
-        portfolios: Optional[DataFrame] = None,
+        portfolios: DataFrame | None = None,
         risk_free: bool = False,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> LinearFactorModel:
         """
         Parameters
@@ -580,7 +576,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         self,
         cov_type: str = "robust",
         debiased: bool = True,
-        **cov_config: Union[bool, int, str],
+        **cov_config: bool | int | str,
     ) -> LinearFactorModelResults:
         """
         Estimate model parameters
@@ -633,7 +629,7 @@ class LinearFactorModel(_LinearFactorModelBase):
         jacobian = self._jacobian(betas, lam, alphas)
 
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
-            raise ValueError("Unknown weight: {0}".format(cov_type))
+            raise ValueError(f"Unknown weight: {cov_type}")
         if cov_type in ("robust", "heteroskedastic"):
             cov_est_inst = HeteroskedasticCovariance(
                 moments,
@@ -672,13 +668,13 @@ class LinearFactorModel(_LinearFactorModelBase):
         params = np.c_[alphas, betas]
         param_names = []
         for portfolio in self.portfolios.cols:
-            param_names.append("alpha-{0}".format(portfolio))
+            param_names.append(f"alpha-{portfolio}")
             for factor in self.factors.cols:
-                param_names.append("beta-{0}-{1}".format(portfolio, factor))
+                param_names.append(f"beta-{portfolio}-{factor}")
         if not excess_returns:
             param_names.append("lambda-risk_free")
         for factor in self.factors.cols:
-            param_names.append("lambda-{0}".format(factor))
+            param_names.append(f"lambda-{factor}")
 
         # Pivot vcv to remove unnecessary and have correct order
         order = np.reshape(np.arange(s1), (nport, nf + 1))
@@ -815,9 +811,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
     def __init__(
         self, portfolios: IVDataLike, factors: IVDataLike, *, risk_free: bool = False
     ) -> None:
-        super(LinearFactorModelGMM, self).__init__(
-            portfolios, factors, risk_free=risk_free
-        )
+        super().__init__(portfolios, factors, risk_free=risk_free)
 
     @classmethod
     def from_formula(
@@ -825,7 +819,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         formula: str,
         data: DataFrame,
         *,
-        portfolios: Optional[DataFrame] = None,
+        portfolios: DataFrame | None = None,
         risk_free: bool = False,
     ) -> LinearFactorModelGMM:
         """
@@ -886,9 +880,9 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         max_iter: int = 1000,
         cov_type: str = "robust",
         debiased: bool = True,
-        starting: Optional[ArrayLike] = None,
-        opt_options: Optional[Dict[str, Any]] = None,
-        **cov_config: Union[bool, int, str],
+        starting: ArrayLike | None = None,
+        opt_options: dict[str, Any] | None = None,
+        **cov_config: bool | int | str,
     ) -> GMMFactorModelResults:
         """
         Estimate model parameters
@@ -960,10 +954,10 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         g = self._moments(sv, excess_returns)
         g -= g.mean(0)[None, :] if center else 0
-        kernel: Optional[str] = None
-        bandwidth: Optional[float] = None
+        kernel: str | None = None
+        bandwidth: float | None = None
         if cov_type not in ("robust", "heteroskedastic", "kernel"):
-            raise ValueError("Unknown weight: {0}".format(cov_type))
+            raise ValueError(f"Unknown weight: {cov_type}")
         if cov_type in ("robust", "heteroskedastic"):
             weight_est_instance = HeteroskedasticWeight(g, center=center)
             cov_est = HeteroskedasticCovariance
@@ -981,7 +975,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
 
         # 2. Step 1 using w = inv(s) from SV
         callback = callback_factory(self._j, args, disp=disp)
-        _default_options: Dict[str, Any] = {"callback": callback}
+        _default_options: dict[str, Any] = {"callback": callback}
         options = {"disp": bool(disp), "maxiter": max_iter}
         opt_options = {} if opt_options is None else opt_options
         options.update(opt_options.get("options", {}))
@@ -1078,11 +1072,11 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         param_names = []
         for portfolio in self.portfolios.cols:
             for factor in self.factors.cols:
-                param_names.append("beta-{0}-{1}".format(portfolio, factor))
+                param_names.append(f"beta-{portfolio}-{factor}")
         if not excess_returns:
             param_names.append("lambda-risk_free")
-        param_names.extend(["lambda-{0}".format(f) for f in self.factors.cols])
-        param_names.extend(["mu-{0}".format(f) for f in self.factors.cols])
+        param_names.extend([f"lambda-{f}" for f in self.factors.cols])
+        param_names.extend([f"mu-{f}" for f in self.factors.cols])
         rp_names = list(self.factors.cols)[:]
         if not excess_returns:
             rp_names.insert(0, "risk_free")
@@ -1148,7 +1142,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         self,
         parameters: Float64Array,
         excess_returns: bool,
-        weight_est: Union[HeteroskedasticWeight, KernelWeight],
+        weight_est: HeteroskedasticWeight | KernelWeight,
     ) -> float:
         """CUE Objective function"""
         g = self._moments(parameters, excess_returns)

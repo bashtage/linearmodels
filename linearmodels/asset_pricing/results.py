@@ -6,7 +6,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import List, Optional, Sequence, cast
+from typing import Sequence, cast
 
 import numpy as np
 import pandas as pd
@@ -48,7 +48,7 @@ class LinearFactorModelResults(_SummaryStr):
         self.model = results.model
         self._nobs = results.nobs
         self._datetime = dt.datetime.now()
-        self._cols = ["alpha"] + ["{0}".format(f) for f in self._factor_names]
+        self._cols = ["alpha"] + [f"{f}" for f in self._factor_names]
         self._rp_names = results.rp_names
         self._alpha_vcv = results.alpha_vcv
         self._cov_est = results.cov_est
@@ -172,10 +172,10 @@ class LinearFactorModelResults(_SummaryStr):
                     f = pval_format
                 txt_row.append(f(v))
             data.append(txt_row)
-        title = "{0} Coefficients".format(name)
+        title = f"{name} Coefficients"
         table_stubs = list(param_names)
         if first:
-            header: Optional[List[str]] = [
+            header: list[str] | None = [
                 "Parameter",
                 "Std. Err.",
                 "T-stat",
@@ -331,7 +331,7 @@ class LinearFactorModelResults(_SummaryStr):
 
 class GMMFactorModelResults(LinearFactorModelResults):
     def __init__(self, results: AttrDict):
-        super(GMMFactorModelResults, self).__init__(results)
+        super().__init__(results)
         self._iter = results.iter
 
     @property

@@ -23,7 +23,7 @@ def repl_const(df):
 def parse_file(name: str) -> Dict[str, List[str]]:
     blocks: Dict[str, List[str]] = defaultdict(list)
     current_key = ""
-    with open(name, "r") as stata:
+    with open(name) as stata:
         for line in stata:
             if line.strip() == "":
                 continue

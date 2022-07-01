@@ -39,7 +39,7 @@ pytestmark = pytest.mark.filterwarnings(
 )
 
 
-class Hasher(object):
+class Hasher:
     @property
     def hash_func(self):
         try:
@@ -171,10 +171,8 @@ def generate_data(
         fact = rs.randint(ncat, size=nobs)
         effects = rs.standard_normal(nobs)
         y += effects
-        df = pd.DataFrame(
-            pd.Series(pd.Categorical(fact)), columns=["fact{0}".format(i)]
-        )
-        df_eff = pd.DataFrame(effects[:, None], columns=["effect_{0}".format(i)])
+        df = pd.DataFrame(pd.Series(pd.Categorical(fact)), columns=[f"fact{i}"])
+        df_eff = pd.DataFrame(effects[:, None], columns=[f"effect_{i}"])
         interactions.append(Interaction(df, df_eff))
     if factor_format == "pandas":
         for i, interact in enumerate(interactions):
@@ -660,7 +658,7 @@ def test_drop_missing():
 def test_drop_absorb(random_gen):
     absorb = random_gen.randint(0, 10, size=1000)
     x = random_gen.standard_normal((1000, 3))
-    y = random_gen.standard_normal((1000))
+    y = random_gen.standard_normal(1000)
     dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
     dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
     df = pd.DataFrame(dfd)
@@ -685,7 +683,7 @@ def test_drop_absorb(random_gen):
 def test_fully_absorb(random_gen):
     absorb = random_gen.randint(0, 10, size=1000)
     x = random_gen.standard_normal((1000, 3))
-    y = random_gen.standard_normal((1000))
+    y = random_gen.standard_normal(1000)
     dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
     dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
     df = pd.DataFrame(dfd)
@@ -700,7 +698,7 @@ def test_fully_absorb(random_gen):
 def test_lsmr_options(random_gen):
     absorb = random_gen.randint(0, 10, size=1000)
     x = random_gen.standard_normal((1000, 3))
-    y = random_gen.standard_normal((1000))
+    y = random_gen.standard_normal(1000)
     dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
     dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
     df = pd.DataFrame(dfd)
@@ -717,7 +715,7 @@ def test_lsmr_options(random_gen):
 def test_options(random_gen):
     absorb = random_gen.randint(0, 10, size=1000)
     x = random_gen.standard_normal((1000, 3))
-    y = random_gen.standard_normal((1000))
+    y = random_gen.standard_normal(1000)
     dfd = {f"x{i}": pd.Series(x[:, i]) for i in range(3)}
     dfd.update({"c": pd.Series(absorb, dtype="category"), "y": pd.Series(y)})
     df = pd.DataFrame(dfd)

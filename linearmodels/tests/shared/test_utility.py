@@ -192,7 +192,7 @@ def test_format_wide():
     k = 26
     inputs = [chr(65 + i) * (20 + i) for i in range(k)]
     out = format_wide(inputs, 80)
-    assert max([len(v) for v in out]) <= 80
+    assert max(len(v) for v in out) <= 80
 
     out = format_wide(["a"], 80)
     assert out == [["a"]]
@@ -225,12 +225,12 @@ def test_panel_to_midf():
         )
     )
     times = pd.date_range("1999-12-31", freq="A-DEC", periods=7)
-    var_names = ["x.{0}".format(i) for i in range(1, 4)]
+    var_names = [f"x.{i}" for i in range(1, 4)]
     df3 = panel_to_frame(x, var_names, times, entities, True)
     mi = pd.MultiIndex.from_product([times, entities])
     expected3 = pd.DataFrame(index=mi, columns=var_names)
     for i in range(1, 4):
-        expected3["x.{0}".format(i)] = x[i - 1].ravel()
+        expected3[f"x.{i}"] = x[i - 1].ravel()
     expected3.index = expected3.index.swaplevel(0, 1)
     mi = pd.MultiIndex.from_product([entities, times])
     expected3 = expected3.loc[mi]

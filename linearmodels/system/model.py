@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections import abc
 from functools import reduce
 import textwrap
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import Mapping, Sequence, cast
 import warnings
 
 import numpy as np
@@ -98,16 +98,16 @@ GMM_COV_EST = {
 }
 
 
-def _missing_weights(weights: Dict[str, Optional[ArrayLike]]) -> None:
+def _missing_weights(weights: dict[str, ArrayLike | None]) -> None:
     """Raise warning if missing weighs found"""
     missing = [key for key in weights if weights[key] is None]
     if missing:
-        msg = "Weights not found for equation labels:\n{0}".format(", ".join(missing))
+        msg = "Weights not found for equation labels:\n{}".format(", ".join(missing))
         warnings.warn(msg, UserWarning)
 
 
 def _parameters_from_xprod(
-    xpx: Float64Array, xpy: Float64Array, constraints: Optional[LinearConstraint] = None
+    xpx: Float64Array, xpy: Float64Array, constraints: LinearConstraint | None = None
 ) -> Float64Array:
     r"""
     Estimate regression parameters from cross produces
@@ -149,23 +149,23 @@ def _parameters_from_xprod(
     return params
 
 
-class SystemFormulaParser(object):
+class SystemFormulaParser:
     def __init__(
         self,
-        formula: Union[Mapping[str, str], str],
+        formula: Mapping[str, str] | str,
         data: DataFrame,
-        weights: Optional[Mapping[str, ArrayLike]] = None,
+        weights: Mapping[str, ArrayLike] | None = None,
         eval_env: int = 6,
     ) -> None:
         if not isinstance(formula, (Mapping, str)):
             raise TypeError("formula must be a string or dictionary-like")
-        self._formula: Union[Mapping[str, str], str] = formula
+        self._formula: Mapping[str, str] | str = formula
         self._data = data
         self._weights = weights
-        self._parsers: Dict[str, IVFormulaParser] = {}
-        self._weight_dict: Dict[str, Optional[Series]] = {}
+        self._parsers: dict[str, IVFormulaParser] = {}
+        self._weight_dict: dict[str, Series | None] = {}
         self._eval_env = eval_env
-        self._clean_formula: Dict[str, str] = {}
+        self._clean_formula: dict[str, str] = {}
         self._parse()
 
     @staticmethod
@@ -212,7 +212,7 @@ class SystemFormulaParser(object):
                     base_key = key = f.split("~")[0].strip()
                 count = 0
                 while key in parsers:
-                    key = base_key + ".{0}".format(count)
+                    key = base_key + f".{count}"
                     count += 1
                 assert isinstance(key, str)
                 parsers[key] = IVFormulaParser(f, data, eval_env=self._eval_env)
@@ -225,13 +225,11 @@ class SystemFormulaParser(object):
         _missing_weights(weight_dict)
         self._weight_dict = weight_dict
 
-    def _get_variable(self, variable: str) -> Dict[str, Optional[DataFrame]]:
-        return dict(
-            [(key, getattr(self._parsers[key], variable)) for key in self._parsers]
-        )
+    def _get_variable(self, variable: str) -> dict[str, DataFrame | None]:
+        return {key: getattr(self._parsers[key], variable) for key in self._parsers}
 
     @property
-    def formula(self) -> Dict[str, str]:
+    def formula(self) -> dict[str, str]:
         """Cleaned version of formula"""
         return self._clean_formula
 
@@ -254,11 +252,11 @@ class SystemFormulaParser(object):
         self._parsers = new_parsers
 
     @property
-    def equation_labels(self) -> List[str]:
+    def equation_labels(self) -> list[str]:
         return list(self._parsers.keys())
 
     @property
-    def data(self) -> Dict[str, Dict[str, ArrayLike]]:
+    def data(self) -> dict[str, dict[str, ArrayLike]]:
         out = {}
         dep = self.dependent
         for key in dep:
@@ -278,23 +276,23 @@ class SystemFormulaParser(object):
         return out
 
     @property
-    def dependent(self) -> Dict[str, Optional[DataFrame]]:
+    def dependent(self) -> dict[str, DataFrame | None]:
         return self._get_variable("dependent")
 
     @property
-    def exog(self) -> Dict[str, Optional[DataFrame]]:
+    def exog(self) -> dict[str, DataFrame | None]:
         return self._get_variable("exog")
 
     @property
-    def endog(self) -> Dict[str, Optional[DataFrame]]:
+    def endog(self) -> dict[str, DataFrame | None]:
         return self._get_variable("endog")
 
     @property
-    def instruments(self) -> Dict[str, Optional[DataFrame]]:
+    def instruments(self) -> dict[str, DataFrame | None]:
         return self._get_variable("instruments")
 
 
-class _SystemModelBase(object):
+class _SystemModelBase:
     r"""
     Base class for system estimators
 
@@ -322,9 +320,9 @@ class _SystemModelBase(object):
 
     def __init__(
         self,
-        equations: Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]],
+        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
         *,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> None:
         if not isinstance(equations, Mapping):
             raise TypeError("equations must be a dictionary-like")
@@ -342,39 +340,39 @@ class _SystemModelBase(object):
                     "sigma must be a square matrix with dimensions "
                     "equal to the number of equations"
                 )
-        self._param_names: List[str] = []
-        self._eq_labels: List[str] = []
-        self._dependent: List[IVData] = []
-        self._exog: List[IVData] = []
-        self._instr: List[IVData] = []
-        self._endog: List[IVData] = []
+        self._param_names: list[str] = []
+        self._eq_labels: list[str] = []
+        self._dependent: list[IVData] = []
+        self._exog: list[IVData] = []
+        self._instr: list[IVData] = []
+        self._endog: list[IVData] = []
 
-        self._y: List[Float64Array] = []
-        self._x: List[Float64Array] = []
-        self._wy: List[Float64Array] = []
-        self._wx: List[Float64Array] = []
-        self._w: List[Float64Array] = []
-        self._z: List[Float64Array] = []
-        self._wz: List[Float64Array] = []
+        self._y: list[Float64Array] = []
+        self._x: list[Float64Array] = []
+        self._wy: list[Float64Array] = []
+        self._wx: list[Float64Array] = []
+        self._w: list[Float64Array] = []
+        self._z: list[Float64Array] = []
+        self._wz: list[Float64Array] = []
 
-        self._weights: List[IVData] = []
-        self._formula: Optional[Union[str, Dict[str, str]]] = None
-        self._constraints: Optional[LinearConstraint] = None
-        self._constant_loc: Optional[Series] = None
+        self._weights: list[IVData] = []
+        self._formula: str | dict[str, str] | None = None
+        self._constraints: LinearConstraint | None = None
+        self._constant_loc: Series | None = None
         self._has_constant = None
         self._common_exog = False
-        self._original_index: Optional[Index] = None
+        self._original_index: Index | None = None
         self._model_name = "Three Stage Least Squares (3SLS)"
 
         self._validate_data()
 
     @property
-    def formula(self) -> Optional[Union[str, Dict[str, str]]]:
+    def formula(self) -> str | dict[str, str] | None:
         """Set or get the formula used to construct the model"""
         return self._formula
 
     @formula.setter
-    def formula(self, value: Optional[Union[str, Dict[str, str]]]) -> None:
+    def formula(self, value: str | dict[str, str] | None) -> None:
         self._formula = value
 
     def _validate_data(self) -> None:
@@ -389,7 +387,7 @@ class _SystemModelBase(object):
             if isinstance(eq_data, (tuple, list)):
                 dep = IVData(eq_data[0], var_name=dep_name)
                 self._dependent.append(dep)
-                current_id: Tuple[int, ...] = (id(eq_data[1]),)
+                current_id: tuple[int, ...] = (id(eq_data[1]),)
                 self._exog.append(
                     IVData(eq_data[1], var_name=exog_name, nobs=dep.shape[0])
                 )
@@ -539,11 +537,11 @@ class _SystemModelBase(object):
                 self._weights[i].drop(missing)
 
     def __repr__(self) -> str:
-        return self.__str__() + "\nid: {0}".format(hex(id(self)))
+        return self.__str__() + f"\nid: {hex(id(self))}"
 
     def __str__(self) -> str:
         out = self._model_name + ", "
-        out += "{0} Equations:\n".format(len(self._y))
+        out += f"{len(self._y)} Equations:\n"
         eqns = ", ".join(self._equations.keys())
         out += "\n".join(textwrap.wrap(eqns, 70))
         if self._common_exog:
@@ -554,8 +552,8 @@ class _SystemModelBase(object):
         self,
         params: ArrayLike,
         *,
-        equations: Optional[Mapping[str, Mapping[str, ArrayLike]]] = None,
-        data: Optional[DataFrame] = None,
+        equations: Mapping[str, Mapping[str, ArrayLike]] | None = None,
+        data: DataFrame | None = None,
         eval_env: int = 8,
     ) -> DataFrame:
         """
@@ -606,7 +604,7 @@ class _SystemModelBase(object):
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
-        nx = int(sum([_x.shape[1] for _x in self._x]))
+        nx = int(sum(_x.shape[1] for _x in self._x))
         if params.shape[0] != nx:
             raise ValueError(
                 f"Parameters must have {nx} elements; found {params.shape[0]}."
@@ -645,7 +643,7 @@ class _SystemModelBase(object):
         )
         return out
 
-    def _multivariate_ls_fit(self) -> Tuple[Float64Array, Float64Array]:
+    def _multivariate_ls_fit(self) -> tuple[Float64Array, Float64Array]:
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
         k = len(wxhat)
 
@@ -692,7 +690,7 @@ class _SystemModelBase(object):
         ci: Sequence[int],
         full_cov: bool,
         debiased: bool,
-    ) -> Tuple[Float64Array, Float64Array, Float64Array, Float64Array]:
+    ) -> tuple[Float64Array, Float64Array, Float64Array, Float64Array]:
         """Core estimation routine for iterative GLS"""
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
 
@@ -799,7 +797,7 @@ class _SystemModelBase(object):
 
     def _f_stat(
         self, stats: AttrDict, debiased: bool
-    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    ) -> WaldTestStatistic | InvalidTestStatistic:
         cov = stats.cov
         k = cov.shape[0]
         sel = list(range(k))
@@ -837,26 +835,23 @@ class _SystemModelBase(object):
         resid: Float64Array,
         method: str,
         cov_type: str,
-        cov_est: Union[
-            HomoskedasticCovariance,
-            HeteroskedasticCovariance,
-            KernelCovariance,
-            ClusteredCovariance,
-            GMMHeteroskedasticCovariance,
-            GMMHomoskedasticCovariance,
-        ],
+        cov_est: (
+            HomoskedasticCovariance
+            | HeteroskedasticCovariance
+            | KernelCovariance
+            | ClusteredCovariance
+            | GMMHeteroskedasticCovariance
+            | GMMHomoskedasticCovariance
+        ),
         iter_count: int,
         debiased: bool,
         constant: bool,
         total_ss: float,
         *,
-        weight_est: Optional[
-            Union[
-                HomoskedasticWeightMatrix,
-                HeteroskedasticWeightMatrix,
-                KernelWeightMatrix,
-            ]
-        ] = None,
+        weight_est: None
+        | (
+            HomoskedasticWeightMatrix | HeteroskedasticWeightMatrix | KernelWeightMatrix
+        ) = None,
     ) -> AttrDict:
         loc = 0
         for i in range(index):
@@ -1122,7 +1117,7 @@ class _SystemModelBase(object):
 
         return SystemResults(results)
 
-    def _sigma_scale(self, debiased: bool) -> Union[float, Float64Array]:
+    def _sigma_scale(self, debiased: bool) -> float | Float64Array:
         if not debiased:
             return 1.0
         nobs = float(self._wx[0].shape[0])
@@ -1131,7 +1126,7 @@ class _SystemModelBase(object):
         return scales[:, None] @ scales[None, :]
 
     @property
-    def constraints(self) -> Optional[LinearConstraint]:
+    def constraints(self) -> LinearConstraint | None:
         """
         Model constraints
 
@@ -1142,7 +1137,7 @@ class _SystemModelBase(object):
         """
         return self._constraints
 
-    def add_constraints(self, r: DataFrame, q: Optional[Series] = None) -> None:
+    def add_constraints(self, r: DataFrame, q: Series | None = None) -> None:
         r"""
         Add parameter constraints to a model.
 
@@ -1173,7 +1168,7 @@ class _SystemModelBase(object):
         self._constraints = None
 
     @property
-    def param_names(self) -> List[str]:
+    def param_names(self) -> list[str]:
         """
         Model parameter names
 
@@ -1257,7 +1252,7 @@ class _LSSystemModelBase(_SystemModelBase):
 
         cov_type = cov_type.lower()
         if cov_type not in COV_TYPES:
-            raise ValueError("Unknown cov_type: {0}".format(cov_type))
+            raise ValueError(f"Unknown cov_type: {cov_type}")
         cov_type = COV_TYPES[cov_type]
         k = len(self._dependent)
         col_sizes = [0] + [v.shape[1] for v in self._x]
@@ -1398,9 +1393,9 @@ class IV3SLS(_LSSystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]],
+        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
         *,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> None:
         super().__init__(equations, sigma=sigma)
 
@@ -1459,11 +1454,11 @@ class IV3SLS(_LSSystemModelBase):
     @classmethod
     def from_formula(
         cls,
-        formula: Union[str, Dict[str, str]],
+        formula: str | dict[str, str],
         data: DataFrame,
         *,
-        sigma: Optional[ArrayLike] = None,
-        weights: Optional[Mapping[str, ArrayLike]] = None,
+        sigma: ArrayLike | None = None,
+        weights: Mapping[str, ArrayLike] | None = None,
     ) -> IV3SLS:
         """
         Specify a 3SLS using the formula interface
@@ -1605,9 +1600,9 @@ class SUR(_LSSystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]],
+        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
         *,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
     ) -> None:
         if not isinstance(equations, Mapping):
             raise TypeError("equations must be a dictionary-like")
@@ -1625,7 +1620,7 @@ class SUR(_LSSystemModelBase):
                 else:
                     eqn = eqn + (None, None)
             reformatted[key] = eqn
-        super(SUR, self).__init__(reformatted, sigma=sigma)
+        super().__init__(reformatted, sigma=sigma)
         self._model_name = "Seemingly Unrelated Regression (SUR)"
 
     @classmethod
@@ -1674,11 +1669,11 @@ class SUR(_LSSystemModelBase):
     @classmethod
     def from_formula(
         cls,
-        formula: Union[str, Dict[str, str]],
+        formula: str | dict[str, str],
         data: DataFrame,
         *,
-        sigma: Optional[ArrayLike] = None,
-        weights: Optional[Mapping[str, ArrayLike]] = None,
+        sigma: ArrayLike | None = None,
+        weights: Mapping[str, ArrayLike] | None = None,
     ) -> SUR:
         """
         Specify a SUR using the formula interface
@@ -1816,11 +1811,11 @@ class IVSystemGMM(_SystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Union[Mapping[str, ArrayLike], Sequence[ArrayLike]]],
+        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
         *,
-        sigma: Optional[ArrayLike] = None,
+        sigma: ArrayLike | None = None,
         weight_type: str = "robust",
-        **weight_config: Union[bool, str, float],
+        **weight_config: bool | str | float,
     ) -> None:
         super().__init__(equations, sigma=sigma)
         self._weight_type = weight_type
@@ -1844,9 +1839,9 @@ class IVSystemGMM(_SystemModelBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-6,
-        initial_weight: Optional[Float64Array] = None,
+        initial_weight: Float64Array | None = None,
         cov_type: str = "robust",
-        **cov_config: Union[bool, float],
+        **cov_config: bool | float,
     ) -> GMMSystemResults:
         """
         Estimate model parameters
@@ -1878,7 +1873,7 @@ class IVSystemGMM(_SystemModelBase):
             Estimation results
         """
         if cov_type not in COV_TYPES:
-            raise ValueError("Unknown cov_type: {0}".format(cov_type))
+            raise ValueError(f"Unknown cov_type: {cov_type}")
         # Parameter estimation
         wx, wy, wz = self._wx, self._wy, self._wz
         k = len(wx)
@@ -1969,7 +1964,7 @@ class IVSystemGMM(_SystemModelBase):
         z: ArraySequence,
         *,
         w: Float64Array,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
     ) -> Float64Array:
         k = len(x)
         xpz = blocked_cross_prod(x, z, np.eye(k))
@@ -1994,15 +1989,15 @@ class IVSystemGMM(_SystemModelBase):
         sigma: Float64Array,
         iter_count: int,
         cov_type: str,
-        cov_config: Dict[str, Union[bool, float]],
-        cov_est: Union[GMMHeteroskedasticCovariance, GMMHomoskedasticCovariance],
+        cov_config: dict[str, bool | float],
+        cov_est: GMMHeteroskedasticCovariance | GMMHomoskedasticCovariance,
     ) -> GMMSystemResults:
         """Collect results to return after GLS estimation"""
         k = len(self._wy)
         # Repackage results for individual equations
         individual = AttrDict()
         debiased = bool(cov_config.get("debiased", False))
-        method = "{0}-Step System GMM".format(iter_count)
+        method = f"{iter_count}-Step System GMM"
         if iter_count > 2:
             method = "Iterative System GMM"
         for i in range(k):
@@ -2060,12 +2055,12 @@ class IVSystemGMM(_SystemModelBase):
     @classmethod
     def from_formula(
         cls,
-        formula: Union[str, Dict[str, str]],
+        formula: str | dict[str, str],
         data: DataFrame,
         *,
-        weights: Optional[Dict[str, ArrayLike]] = None,
+        weights: dict[str, ArrayLike] | None = None,
         weight_type: str = "robust",
-        **weight_config: Union[bool, str, float],
+        **weight_config: bool | str | float,
     ) -> IVSystemGMM:
         """
         Specify a 3SLS using the formula interface

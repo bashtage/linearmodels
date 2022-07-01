@@ -48,8 +48,8 @@ def mi_df():
     n, t, k = 11, 7, 3
     x = np.random.standard_normal((k, t, n))
     major = date_range("12-31-1999", periods=7)
-    items = ["var.{0}".format(i) for i in range(1, k + 1)]
-    minor = ["entities.{0}".format(i) for i in range(1, n + 1)]
+    items = [f"var.{i}" for i in range(1, k + 1)]
+    minor = [f"entities.{i}" for i in range(1, n + 1)]
     return panel_to_frame(x, items, major, minor, swap=True)
 
 
@@ -62,9 +62,9 @@ def test_numpy_3d():
     assert dh.nobs == t
     assert dh.nvar == k
     assert_equal(np.reshape(x.T, (n * t, k)), dh.values2d)
-    items = ["entity.{0}".format(i) for i in range(n)]
+    items = [f"entity.{i}" for i in range(n)]
     obs = [i for i in range(t)]
-    var_names = ["x.{0}".format(i) for i in range(k)]
+    var_names = [f"x.{i}" for i in range(k)]
     expected_frame = panel_to_frame(
         np.reshape(x, (k, t, n)),
         items=var_names,
@@ -98,8 +98,8 @@ def test_pandas_multiindex_dataframe():
     n, t, k = 11, 7, 3
     x = np.random.random((n, t, k))
     major = date_range("12-31-1999", periods=7)
-    minor = ["var.{0}".format(i) for i in range(1, k + 1)]
-    items = ["item.{0}".format(i) for i in range(1, n + 1)]
+    minor = [f"var.{i}" for i in range(1, k + 1)]
+    items = [f"item.{i}" for i in range(1, n + 1)]
     x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
     PanelData(x)
 
@@ -108,7 +108,7 @@ def test_pandas_dataframe():
     t, n = 11, 7
     x = np.random.random((t, n))
     index = date_range("12-31-1999", periods=t)
-    cols = ["entity.{0}".format(i) for i in range(1, n + 1)]
+    cols = [f"entity.{i}" for i in range(1, n + 1)]
     x = DataFrame(x, columns=cols, index=index)
     PanelData(x)
 
@@ -117,8 +117,8 @@ def test_existing_panel_data():
     n, t, k = 11, 7, 3
     x = np.random.random((k, t, n))
     major = date_range("12-31-1999", periods=7)
-    items = ["var.{0}".format(i) for i in range(1, k + 1)]
-    minor = ["entities.{0}".format(i) for i in range(1, n + 1)]
+    items = [f"var.{i}" for i in range(1, k + 1)]
+    minor = [f"entities.{i}" for i in range(1, n + 1)]
     x = panel_to_frame(x, items=items, major_axis=major, minor_axis=minor, swap=True)
     dh = PanelData(x)
     dh2 = PanelData(dh)
@@ -372,7 +372,7 @@ def test_demean_many_missing_dropped(mi_df):
 def test_demean_both_large_t():
     x = np.random.standard_normal((1, 100, 10))
     time = date_range("1-1-2000", periods=100)
-    entities = ["entity.{0}".format(i) for i in range(10)]
+    entities = [f"entity.{i}" for i in range(10)]
     data = panel_to_frame(x, ["x"], time, entities, swap=True)
     data = PanelData(data)
     demeaned = data.demean("both")
@@ -572,7 +572,7 @@ def test_categorical_conversion():
     string = np.random.choice(["a", "b", "c"], (t, n))
     num = np.random.randn(t, n)
     time = date_range("1-1-2000", periods=t)
-    entities = ["entity.{0}".format(i) for i in range(n)]
+    entities = [f"entity.{i}" for i in range(n)]
     p = panel_to_frame(
         None, items=["a", "b"], major_axis=time, minor_axis=entities, swap=True
     )
@@ -604,7 +604,7 @@ def test_string_conversion():
     string = np.random.choice(["a", "b", "c"], (t, n))
     num = np.random.randn(t, n)
     time = date_range("1-1-2000", periods=t)
-    entities = ["entity.{0}".format(i) for i in range(n)]
+    entities = [f"entity.{i}" for i in range(n)]
     p = panel_to_frame(
         None, items=["a", "b"], major_axis=time, minor_axis=entities, swap=True
     )
@@ -632,7 +632,7 @@ def test_string_nonconversion():
     string = np.random.choice(["a", "b", "c"], (t, n))
     num = np.random.randn(t, n)
     time = date_range("1-1-2000", periods=t)
-    entities = ["entity.{0}".format(i) for i in range(n)]
+    entities = [f"entity.{i}" for i in range(n)]
     p = panel_to_frame(
         None, items=["a", "b"], major_axis=time, minor_axis=entities, swap=True
     )
@@ -805,9 +805,9 @@ def test_original_unmodified(data):
 
 def test_incorrect_time_axis():
     x = np.random.randn(3, 3, 1000)
-    entities = ["entity.{0}".format(i) for i in range(1000)]
-    time = ["time.{0}".format(i) for i in range(3)]
-    var_names = ["var.{0}".format(i) for i in range(3)]
+    entities = [f"entity.{i}" for i in range(1000)]
+    time = [f"time.{i}" for i in range(3)]
+    var_names = [f"var.{i}" for i in range(3)]
     p = panel_to_frame(
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
@@ -815,7 +815,7 @@ def test_incorrect_time_axis():
         PanelData(p)
 
     time = [1, 2, 3]
-    var_names = ["var.{0}".format(i) for i in range(3)]
+    var_names = [f"var.{i}" for i in range(3)]
     p = panel_to_frame(
         x, items=var_names, major_axis=time, minor_axis=entities, swap=True
     )
@@ -827,9 +827,9 @@ def test_incorrect_time_axis():
 @pytest.mark.skipif(MISSING_XARRAY, reason="xarray is not installed")
 def test_incorrect_time_axis_xarray():
     x = np.random.randn(3, 3, 1000)
-    entities = ["entity.{0}".format(i) for i in range(1000)]
-    time = ["time.{0}".format(i) for i in range(3)]
-    variables = ["x.{0}".format(i) for i in range(3)]
+    entities = [f"entity.{i}" for i in range(1000)]
+    time = [f"time.{i}" for i in range(3)]
+    variables = [f"x.{i}" for i in range(3)]
     da = xr.DataArray(
         x,
         coords={"entities": entities, "time": time, "vars": variables},
@@ -862,7 +862,7 @@ def test_named_index(data):
 
 def test_fake_panel_properties(mi_df):
     panel = _Panel(mi_df)
-    nentity, ntime = [len(lvl) for lvl in mi_df.index.levels]
+    nentity, ntime = (len(lvl) for lvl in mi_df.index.levels)
     nvar = mi_df.shape[1]
     assert panel.shape == (nvar, ntime, nentity)
     assert_index_equal(panel.items, mi_df.columns)

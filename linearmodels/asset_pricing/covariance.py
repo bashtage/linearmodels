@@ -3,8 +3,6 @@ Covariance estimators for linear factor models
 """
 from __future__ import annotations
 
-from typing import Dict, Optional, Union
-
 from numpy import empty, ndarray
 from numpy.linalg import inv
 
@@ -16,10 +14,10 @@ from linearmodels.iv.covariance import (
 from linearmodels.typing import Float64Array
 
 
-class _HACMixin(object):
-    def __init__(self, kernel: str, bandwidth: Optional[float]) -> None:
-        self._kernel: Optional[str] = None
-        self._bandwidth: Optional[float] = None  # pragma: no cover
+class _HACMixin:
+    def __init__(self, kernel: str, bandwidth: float | None) -> None:
+        self._kernel: str | None = None
+        self._bandwidth: float | None = None  # pragma: no cover
         self._moments: ndarray = empty((0,))  # pragma: no cover
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
@@ -50,7 +48,7 @@ class _HACMixin(object):
         if self._kernel not in KERNEL_LOOKUP:
             raise ValueError("Unknown kernel")
 
-    def _check_bandwidth(self, bandwidth: Optional[float]) -> None:
+    def _check_bandwidth(self, bandwidth: float | None) -> None:
         self._bandwidth = bandwidth
         if bandwidth is not None:
             try:
@@ -72,7 +70,7 @@ class _HACMixin(object):
         return (out + out.T) / 2
 
 
-class HeteroskedasticCovariance(object):
+class HeteroskedasticCovariance:
     """
     Heteroskedasticity robust covariance estimator
 
@@ -99,8 +97,8 @@ class HeteroskedasticCovariance(object):
         self,
         xe: Float64Array,
         *,
-        jacobian: Optional[ndarray] = None,
-        inv_jacobian: Optional[ndarray] = None,
+        jacobian: ndarray | None = None,
+        inv_jacobian: ndarray | None = None,
         center: bool = True,
         debiased: bool = False,
         df: int = 0,
@@ -126,10 +124,10 @@ class HeteroskedasticCovariance(object):
         return self.__class__.__name__
 
     def __repr__(self) -> str:
-        return self.__str__() + ", id: {0}".format(hex(id(self)))
+        return self.__str__() + f", id: {hex(id(self))}"
 
     @property
-    def config(self) -> Dict[str, Union[str, float]]:
+    def config(self) -> dict[str, str | float]:
         return {"type": self.__class__.__name__}
 
     @property
@@ -233,17 +231,17 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         self,
         xe: Float64Array,
         *,
-        jacobian: Optional[ndarray] = None,
-        inv_jacobian: Optional[ndarray] = None,
-        kernel: Optional[str] = None,
-        bandwidth: Optional[float] = None,
+        jacobian: ndarray | None = None,
+        inv_jacobian: ndarray | None = None,
+        kernel: str | None = None,
+        bandwidth: float | None = None,
         center: bool = True,
         debiased: bool = False,
         df: int = 0,
     ) -> None:
         kernel = "bartlett" if kernel is None else kernel
         _HACMixin.__init__(self, kernel, bandwidth)
-        super(KernelCovariance, self).__init__(
+        super().__init__(
             xe,
             jacobian=jacobian,
             inv_jacobian=inv_jacobian,
@@ -253,12 +251,12 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         )
 
     def __str__(self) -> str:
-        descr = ", Kernel: {0}, Bandwidth: {1}".format(self._kernel, self.bandwidth)
+        descr = f", Kernel: {self._kernel}, Bandwidth: {self.bandwidth}"
         return self.__class__.__name__ + descr
 
     @property
-    def config(self) -> Dict[str, Union[str, float]]:
-        out = super(KernelCovariance, self).config
+    def config(self) -> dict[str, str | float]:
+        out = super().config
         out["kernel"] = self.kernel
         out["bandwidth"] = self.bandwidth
         return out
@@ -279,7 +277,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
         return (out + out.T) / 2
 
 
-class HeteroskedasticWeight(object):
+class HeteroskedasticWeight:
     """
     GMM weighing matrix estimation
 
@@ -339,12 +337,12 @@ class KernelWeight(HeteroskedasticWeight, _HACMixin):
         self,
         moments: Float64Array,
         center: bool = True,
-        kernel: Optional[str] = None,
-        bandwidth: Optional[float] = None,
+        kernel: str | None = None,
+        bandwidth: float | None = None,
     ):
         kernel = "bartlett" if kernel is None else kernel
         _HACMixin.__init__(self, kernel, bandwidth)
-        super(KernelWeight, self).__init__(moments, center=center)
+        super().__init__(moments, center=center)
 
     def w(self, moments: Float64Array) -> Float64Array:
         """

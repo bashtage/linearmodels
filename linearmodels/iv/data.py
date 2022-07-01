@@ -5,7 +5,7 @@ A data abstraction that allow multiple input data formats
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -33,7 +33,7 @@ def expand_categoricals(x: AnyPandas, drop_first: bool) -> AnyPandas:
     )
 
 
-class IVData(object):
+class IVData:
     """
     Type abstraction for use in univariate models.
 
@@ -57,9 +57,9 @@ class IVData(object):
 
     def __init__(
         self,
-        x: Optional["IVDataLike"],
+        x: Optional[IVDataLike],
         var_name: str = "x",
-        nobs: Optional[int] = None,
+        nobs: int | None = None,
         convert_dummies: bool = True,
         drop_first: bool = True,
     ):
@@ -88,7 +88,7 @@ class IVData(object):
             if x.shape[1] == 1:
                 cols = [var_name]
             else:
-                cols = [var_name + ".{0}".format(i) for i in range(x.shape[1])]
+                cols = [var_name + f".{i}" for i in range(x.shape[1])]
             self._pandas = pd.DataFrame(x, index=index, columns=cols)
             self._row_labels = index
             self._col_labels = cols
@@ -148,7 +148,7 @@ class IVData(object):
                 xr_col_values = x.coords[x.dims[1]].values
                 xr_cols = list(xr_col_values)
                 if is_numeric_dtype(xr_col_values.dtype):
-                    xr_cols = [var_name + ".{0}".format(i) for i in range(x.shape[1])]
+                    xr_cols = [var_name + f".{i}" for i in range(x.shape[1])]
                 self._ndarray = x.values.astype(np.float64)
                 self._pandas = pd.DataFrame(self._ndarray, columns=xr_cols, index=index)
                 self._row_labels = index
@@ -174,7 +174,7 @@ class IVData(object):
         return self._ndarray
 
     @property
-    def shape(self) -> Tuple[int, int]:
+    def shape(self) -> tuple[int, int]:
         """Tuple containing shape"""
         return self._ndarray.shape[0], self._ndarray.shape[1]
 
@@ -184,17 +184,17 @@ class IVData(object):
         return self._ndarray.ndim
 
     @property
-    def cols(self) -> List[Any]:
+    def cols(self) -> list[Any]:
         """Column labels"""
         return self._col_labels
 
     @property
-    def rows(self) -> List[Any]:
+    def rows(self) -> list[Any]:
         """Row labels (index)"""
         return self._row_labels
 
     @property
-    def labels(self) -> Dict[int, Any]:
+    def labels(self) -> dict[int, Any]:
         """Dictionary containing row and column labels keyed by axis"""
         return {0: self._row_labels, 1: self._col_labels}
 

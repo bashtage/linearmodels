@@ -122,8 +122,8 @@ def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
     n = z.shape[0]
     if k > n:
         raise ValueError(
-            "Length of w ({0}) is larger than the number "
-            "of elements in z ({1})".format(k, n)
+            "Length of w ({}) is larger than the number "
+            "of elements in z ({})".format(k, n)
         )
     s = z.T @ z
     for i in range(1, len(w)):

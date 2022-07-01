@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Union, cast
+from typing import cast
 
 import numpy as np
 from numpy.linalg import inv, matrix_rank
@@ -200,7 +200,7 @@ def inv_matrix_sqrt(s: Float64Array) -> Float64Array:
     return (out + out.T) / 2
 
 
-class LinearConstraint(object):
+class LinearConstraint:
     r"""
     Linear constraint for regression estimation
 
@@ -226,9 +226,9 @@ class LinearConstraint(object):
 
     def __init__(
         self,
-        r: Union[pd.DataFrame, np.ndarray],
-        q: Optional[Union[pd.Series, np.ndarray]] = None,
-        num_params: Optional[int] = None,
+        r: pd.DataFrame | np.ndarray,
+        q: pd.Series | np.ndarray | None = None,
+        num_params: int | None = None,
         require_pandas: bool = True,
     ) -> None:
         if not isinstance(r, (pd.DataFrame, np.ndarray)):
@@ -264,7 +264,7 @@ class LinearConstraint(object):
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
     def __str__(self) -> str:
-        return "Linear Constraint with {0} constraints".format(self._ra.shape[0])
+        return f"Linear Constraint with {self._ra.shape[0]} constraints"
 
     def _verify_constraints(self) -> None:
         r = self._ra
@@ -352,6 +352,6 @@ class LinearConstraint(object):
         return self._a
 
     @property
-    def q(self) -> Union[pd.Series, np.ndarray]:
+    def q(self) -> pd.Series | np.ndarray:
         """Constrain target values"""
         return self._q_pd

@@ -72,7 +72,7 @@ def process_block(results):
     return AttrDict(sigma=sigma, params=params, variance=vcv, stats=stats)
 
 
-with open(os.path.join(base, "stata-3sls-results.txt"), "r") as stata_results:
+with open(os.path.join(base, "stata-3sls-results.txt")) as stata_results:
     stata_result_contents = stata_results.readlines()
 block: List[str] = []
 results = {}

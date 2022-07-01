@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, List, Sequence
+from typing import Any, Sequence
 
 import numpy as np
 from statsmodels.iolib.summary import SimpleTable, fmt_params
@@ -15,14 +15,14 @@ def _str(v: float) -> str:
     if av != 0:
         digits = int(np.ceil(np.log10(av)))
     if digits > 4 or digits <= -4:
-        return "{0:8.4g}".format(v)
+        return f"{v:8.4g}"
 
     if digits > 0:
         d = int(5 - digits)
     else:
         d = int(4)
 
-    format_str = "{0:" + "0.{0}f".format(d) + "}"
+    format_str = "{0:" + f"0.{d}f" + "}"
     return format_str.format(v)
 
 
@@ -30,7 +30,7 @@ def pval_format(v: float) -> str:
     """Preferred formatting for x in [0,1]"""
     if np.isnan(v):
         return "        "
-    return "{0:4.4f}".format(v)
+    return f"{v:4.4f}"
 
 
 # TODO: typing for Any
@@ -64,20 +64,20 @@ def param_table(results: Any, title: str, pad_bottom: bool = False) -> SimpleTab
     )
 
 
-def format_wide(s: Sequence[str], cols: int) -> List[List[str]]:
+def format_wide(s: Sequence[str], cols: int) -> list[list[str]]:
     """
     Format a list of strings.
 
     Parameters
     ----------
-    s : List[str]
+    s : list[str]
         List of strings to format
     cols : int
         Number of columns in output
 
     Returns
     -------
-    List[List[str]]
+    list[list[str]]
         The joined list.
     """
     lines = []
@@ -120,4 +120,4 @@ def add_star(value: str, pvalue: float, star: bool) -> str:
     """
     if not star:
         return value
-    return value + "*" * sum([pvalue <= c for c in (0.01, 0.05, 0.1)])
+    return value + "*" * sum(pvalue <= c for c in (0.01, 0.05, 0.1))

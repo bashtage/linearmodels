@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from linearmodels.compat.statsmodels import Summary
 
-from typing import Any, Dict, List, Sequence, Tuple, Type, Union
+from typing import Any, Sequence
 
 import numpy as np
 from pandas import DataFrame, Series, concat
 
 
-class _SummaryStr(object):
+class _SummaryStr:
     """
     Mixin class for results classes to automatically show the summary.
     """
@@ -22,14 +22,11 @@ class _SummaryStr(object):
 
     def __repr__(self) -> str:
         return (
-            self.__str__()
-            + "\n"
-            + self.__class__.__name__
-            + ", id: {0}".format(hex(id(self)))
+            self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
     def _repr_html_(self) -> str:
-        return self.summary.as_html() + "<br/>id: {0}".format(hex(id(self)))
+        return self.summary.as_html() + f"<br/>id: {hex(id(self))}"
 
 
 class _ModelComparison(_SummaryStr):
@@ -37,7 +34,7 @@ class _ModelComparison(_SummaryStr):
     Base class for model comparisons
     """
 
-    _supported: Tuple[Type, ...] = tuple()
+    _supported: tuple[type, ...] = tuple()
     _PRECISION_TYPES = {
         "tstats": "T-stats",
         "pvalues": "P-values",
@@ -47,13 +44,13 @@ class _ModelComparison(_SummaryStr):
     # TODO: Replace Any with better list of types
     def __init__(
         self,
-        results: Union[Dict[str, Any], Sequence[Any]],
+        results: dict[str, Any] | Sequence[Any],
         *,
         precision: str = "tstats",
         stars: bool = False,
     ) -> None:
         if not isinstance(results, dict):
-            _results: Dict[str, Any] = {}
+            _results: dict[str, Any] = {}
             for i, res in enumerate(results):
                 _results["Model " + str(i)] = res
         else:
@@ -74,7 +71,7 @@ class _ModelComparison(_SummaryStr):
         self._stars = stars
 
     def _get_series_property(self, name: str) -> DataFrame:
-        out: List[Tuple[str, Series]] = [
+        out: list[tuple[str, Series]] = [
             (k, getattr(v, name)) for k, v in self._results.items()
         ]
         cols = [v[0] for v in out]

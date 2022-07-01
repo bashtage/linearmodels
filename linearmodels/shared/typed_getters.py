@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Mapping, Optional, Union
+from typing import Any, Mapping
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -9,7 +9,7 @@ from linearmodels.panel.data import PanelData, PanelDataLike
 from linearmodels.typing import ArrayLike
 
 
-def get_string(d: Mapping[str, Any], key: str) -> Optional[str]:
+def get_string(d: Mapping[str, Any], key: str) -> str | None:
     """
     Helper function that gets a string or None
 
@@ -27,7 +27,7 @@ def get_string(d: Mapping[str, Any], key: str) -> Optional[str]:
         dictionary, a type check is performed and TypeError is raised if
         not found.
     """
-    out: Optional[str] = None
+    out: str | None = None
     if key in d:
         out = d[key]
         if out is not None:
@@ -39,7 +39,7 @@ def get_string(d: Mapping[str, Any], key: str) -> Optional[str]:
     return out
 
 
-def get_float(d: Mapping[str, Any], key: str) -> Optional[float]:
+def get_float(d: Mapping[str, Any], key: str) -> float | None:
     """
     Helper function that gets a float or None
 
@@ -57,7 +57,7 @@ def get_float(d: Mapping[str, Any], key: str) -> Optional[float]:
         dictionary, a type check is performed and TypeError is raised if
         not found.
     """
-    out: Optional[float] = None
+    out: float | None = None
     if key in d:
         out = d[key]
         if out is not None:
@@ -85,7 +85,7 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
         The boolean if the key is in the dictionary. If not found, returns
         False.
     """
-    out: Optional[bool] = False
+    out: bool | None = False
     if key in d:
         out = d[key]
         if not (out is None or isinstance(out, bool)):
@@ -93,7 +93,7 @@ def get_bool(d: Mapping[str, Any], key: str) -> bool:
     return bool(out)
 
 
-def get_array_like(d: Mapping[str, Any], key: str) -> Optional[ArrayLike]:
+def get_array_like(d: Mapping[str, Any], key: str) -> ArrayLike | None:
     """
     Helper function that gets an array_like or None
 
@@ -112,11 +112,11 @@ def get_array_like(d: Mapping[str, Any], key: str) -> Optional[ArrayLike]:
         not found.
     """
 
-    out: Optional[ArrayLike] = None
+    out: ArrayLike | None = None
     if key in d:
         out = d[key]
         if out is not None:
-            array_like: Union[Any] = (np.ndarray, DataFrame, Series)
+            array_like: Any = (np.ndarray, DataFrame, Series)
             try:
                 import xarray as xr
 
@@ -133,7 +133,7 @@ def get_array_like(d: Mapping[str, Any], key: str) -> Optional[ArrayLike]:
     return out
 
 
-def get_panel_data_like(d: Mapping[str, Any], key: str) -> Optional[PanelDataLike]:
+def get_panel_data_like(d: Mapping[str, Any], key: str) -> PanelDataLike | None:
     """
     Helper function that gets an panel_data_like or None
 
@@ -152,11 +152,11 @@ def get_panel_data_like(d: Mapping[str, Any], key: str) -> Optional[PanelDataLik
         not found.
     """
 
-    out: Optional[PanelDataLike] = None
+    out: PanelDataLike | None = None
     if key in d:
         out = d[key]
         if out is not None:
-            panel_data_like: Union[Any] = (np.ndarray, DataFrame, Series, PanelData)
+            panel_data_like: Any = (np.ndarray, DataFrame, Series, PanelData)
             try:
                 import xarray as xr
 

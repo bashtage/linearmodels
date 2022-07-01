@@ -27,7 +27,7 @@ of models.
 *                               WARNING                                      *
 ******************************************************************************
 """
-with open("README.md", "r") as readme:
+with open("README.md") as readme:
     long_description = readme.read()
 
 
@@ -131,7 +131,7 @@ except (
     CCompilerError,
     DistutilsExecError,
     DistutilsPlatformError,
-    IOError,
+    OSError,
     ValueError,
     ImportError,
 ):

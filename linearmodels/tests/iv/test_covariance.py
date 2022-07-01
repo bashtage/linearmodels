@@ -202,7 +202,7 @@ def test_clustered_cov_asymptotic(data):
     assert_allclose(c.cov, data.vinv @ s @ data.vinv / data.nobs)
     cs = str(c)
     assert "Debiased: False" in cs
-    assert "Num Clusters: {0}".format(len(sums)) in cs
+    assert f"Num Clusters: {len(sums)}" in cs
 
 
 def test_clustered_cov_debiased(data):
@@ -234,7 +234,7 @@ def test_clustered_cov_debiased(data):
 
     cs = str(c)
     assert "Debiased: True" in cs
-    assert "Num Clusters: {0}".format(len(sums)) in cs
+    assert f"Num Clusters: {len(sums)}" in cs
     assert "id" in c.__repr__()
 
 
@@ -270,8 +270,8 @@ def test_kernel_covariance_asymptotic(data, kernel):
 
     cs = str(c)
     assert "Kappa" not in cs
-    assert "Kernel: {0}".format(kernel.kernel) in cs
-    assert "Bandwidth: {0}".format(bw) in cs
+    assert f"Kernel: {kernel.kernel}" in cs
+    assert f"Bandwidth: {bw}" in cs
 
 
 def test_kernel_covariance_debiased(data, kernel):
@@ -298,8 +298,8 @@ def test_kernel_covariance_debiased(data, kernel):
     assert_allclose(c.cov, scale * c2.cov)
     cs = str(c)
     assert "Debiased: True" in cs
-    assert "Kernel: {0}".format(kernel.kernel) in cs
-    assert "Bandwidth: {0}".format(c.config["bandwidth"]) in cs
+    assert f"Kernel: {kernel.kernel}" in cs
+    assert "Bandwidth: {}".format(c.config["bandwidth"]) in cs
     assert "id" in c.__repr__()
 
 

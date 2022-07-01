@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple
-
 import numpy as np
 
 from linearmodels.typing import Float64Array
 
 
-def has_constant(
-    x: Float64Array, x_rank: Optional[int] = None
-) -> Tuple[bool, Optional[int]]:
+def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int | None]:
     """
     Parameters
     ----------
@@ -28,7 +24,7 @@ def has_constant(
         Column location of constant
     """
     if np.any(np.all(x == 1, axis=0)):
-        loc: Optional[int] = int(np.argwhere(np.all(x == 1, axis=0)))
+        loc: int | None = int(np.argwhere(np.all(x == 1, axis=0)))
         return True, loc
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):

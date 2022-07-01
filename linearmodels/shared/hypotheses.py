@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, Optional, Tuple, Union
+from typing import Mapping
 
 from formulaic.utils.constraints import LinearConstraints
 import numpy as np
@@ -10,7 +10,7 @@ from scipy.stats import chi2, f
 from linearmodels.typing import ArrayLike, OptionalArrayLike
 
 
-class WaldTestStatistic(object):
+class WaldTestStatistic:
     """
     Test statistic holder for Wald-type tests
 
@@ -38,8 +38,8 @@ class WaldTestStatistic(object):
         stat: float,
         null: str,
         df: int,
-        df_denom: Optional[int] = None,
-        name: Optional[str] = None,
+        df_denom: int | None = None,
+        name: str | None = None,
     ) -> None:
         self._stat = stat
         self._null = null
@@ -48,10 +48,10 @@ class WaldTestStatistic(object):
         self._name = name
         if df_denom is None:
             self.dist = chi2(df)
-            self.dist_name = "chi2({0})".format(df)
+            self.dist_name = f"chi2({df})"
         else:
             self.dist = f(df, df_denom)
-            self.dist_name = "F({0},{1})".format(df, df_denom)
+            self.dist_name = f"F({df},{df_denom})"
 
     @property
     def stat(self) -> float:
@@ -64,7 +64,7 @@ class WaldTestStatistic(object):
         return 1 - self.dist.cdf(self.stat)
 
     @property
-    def critical_values(self) -> Optional[Dict[str, float]]:
+    def critical_values(self) -> dict[str, float] | None:
         """Critical values test for common test sizes"""
         return dict(zip(["10%", "5%", "1%"], self.dist.ppf([0.9, 0.95, 0.99])))
 
@@ -91,10 +91,7 @@ class WaldTestStatistic(object):
 
     def __repr__(self) -> str:
         return (
-            self.__str__()
-            + "\n"
-            + self.__class__.__name__
-            + ", id: {0}".format(hex(id(self)))
+            self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
 
@@ -118,11 +115,9 @@ class InvalidTestStatistic(WaldTestStatistic):
     WaldTestStatistic
     """
 
-    def __init__(self, reason: str, *, name: Optional[str] = None) -> None:
+    def __init__(self, reason: str, *, name: str | None = None) -> None:
         self._reason = reason
-        super(InvalidTestStatistic, self).__init__(
-            np.NaN, "", df=1, df_denom=1, name=name
-        )
+        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
@@ -158,14 +153,12 @@ class InapplicableTestStatistic(WaldTestStatistic):
     WaldTestStatistic
     """
 
-    def __init__(self, *, reason: Optional[str] = None, name: Optional[str] = None):
+    def __init__(self, *, reason: str | None = None, name: str | None = None):
         self._reason = reason
         if reason is None:
             self._reason = "Test is not applicable to model specification"
 
-        super(InapplicableTestStatistic, self).__init__(
-            np.NaN, "", df=1, df_denom=1, name=name
-        )
+        super().__init__(np.NaN, "", df=1, df_denom=1, name=name)
         self.dist_name = "None"
 
     @property
@@ -192,7 +185,7 @@ convertible to a float. The constraint seen is {cons}.
 """
 
 
-def _parse_single(constraint: str) -> Tuple[str, float]:
+def _parse_single(constraint: str) -> tuple[str, float]:
     if "=" not in constraint:
         raise ValueError(_constraint_error.format(cons=constraint))
     parts = constraint.split("=")
@@ -205,8 +198,8 @@ def _parse_single(constraint: str) -> Tuple[str, float]:
 
 
 def _reparse_constraint_formula(
-    formula: Optional[Union[str, List[str], Dict[str, float]]]
-) -> Union[str, Dict[str, float]]:
+    formula: str | list[str] | dict[str, float] | None
+) -> str | dict[str, float]:
     # TODO: Test against variable names constaining , or =
     if isinstance(formula, Mapping):
         return dict(formula)
@@ -227,7 +220,7 @@ def quadratic_form_test(
     cov: ArrayLike,
     restriction: OptionalArrayLike = None,
     value: OptionalArrayLike = None,
-    formula: Optional[Union[str, List[str]]] = None,
+    formula: str | list[str] | None = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:
         raise ValueError("restriction and formula cannot be used simultaneously.")

@@ -6,7 +6,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Sequence, Union
 
 from numpy import array, asarray, c_, diag, empty, isnan, log, ndarray, ones, sqrt
 from numpy.linalg import inv
@@ -29,24 +29,24 @@ from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.typing import ArrayLike, Float64Array, OptionalArrayLike
 
 
-def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> List[str]:
-    col_size = max([max(map(len, stubs)) for stubs in lists])
-    out: List[str] = []
+def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> list[str]:
+    col_size = max(max(map(len, stubs)) for stubs in lists)
+    out: list[str] = []
     for stubs in lists:
         out.extend(stubs)
         out.append(sep * (col_size + 2))
     return out[:-1]
 
 
-def table_concat(lists: Sequence[List[List[str]]], sep: str = "=") -> List[List[str]]:
+def table_concat(lists: Sequence[list[list[str]]], sep: str = "=") -> list[list[str]]:
     col_sizes = []
     for table in lists:
         size = [[len(item) for item in row] for row in table]
         size_arr = array(size)
         col_sizes.append(list(asarray(size_arr.max(0))))
     col_size = asarray(array(col_sizes).max(axis=0))
-    sep_cols: List[str] = [sep * (cs + 2) for cs in col_size]
-    out: List[List[str]] = []
+    sep_cols: list[str] = [sep * (cs + 2) for cs in col_size]
+    out: list[list[str]] = []
     for table in lists:
         out.extend(table)
         out.append(sep_cols)
@@ -65,7 +65,7 @@ class _LSModelResultsBase(_SummaryStr):
         The model used to estimate parameters.
     """
 
-    def __init__(self, results: Dict[str, Any], model: Any) -> None:
+    def __init__(self, results: dict[str, Any], model: Any) -> None:
         self._resid = results["eps"]
         self._wresid = results["weps"]
         self._params = results["params"]
@@ -89,7 +89,7 @@ class _LSModelResultsBase(_SummaryStr):
         self._df_model = results.get("df_model", self._params.shape[0])
 
     @property
-    def cov_config(self) -> Dict[str, Any]:
+    def cov_config(self) -> dict[str, Any]:
         """Parameter values from covariance estimator"""
         return self._cov_config
 
@@ -277,7 +277,7 @@ class _LSModelResultsBase(_SummaryStr):
         ci = asarray(self.params)[:, None] + asarray(self.std_errors)[:, None] * q
         return DataFrame(ci, index=self._vars, columns=["lower", "upper"])
 
-    def _top_right(self) -> List[Tuple[str, str]]:
+    def _top_right(self) -> list[tuple[str, str]]:
         f_stat = _str(self.f_statistic.stat)
         if isnan(self.f_statistic.stat):
             f_stat = "      N/A"
@@ -386,15 +386,15 @@ class _LSModelResultsBase(_SummaryStr):
 
         return smry
 
-    def _update_extra_text(self, extra_text: List[str]) -> List[str]:
+    def _update_extra_text(self, extra_text: list[str]) -> list[str]:
         return extra_text
 
     def wald_test(
         self,
-        restriction: Optional[Union[DataFrame, ndarray]] = None,
-        value: Optional[Union[Series, ndarray]] = None,
+        restriction: DataFrame | ndarray | None = None,
+        value: Series | ndarray | None = None,
         *,
-        formula: Optional[Union[str, List[str], Dict[str, float]]] = None,
+        formula: str | list[str] | dict[str, float] | None = None,
     ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
@@ -480,7 +480,7 @@ class OLSResults(_LSModelResultsBase):
 
     def __init__(
         self,
-        results: Dict[str, Any],
+        results: dict[str, Any],
         model: linearmodels.iv.model._IVModelBase,
     ) -> None:
         super().__init__(results, model)
@@ -490,7 +490,7 @@ class OLSResults(_LSModelResultsBase):
         exog: ArrayLike,
         endog: ArrayLike,
         data: ArrayLike,
-        missing: Optional[bool],
+        missing: bool | None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if not (exog is None and endog is None) and data is not None:
@@ -508,7 +508,7 @@ class OLSResults(_LSModelResultsBase):
         exog: OptionalArrayLike = None,
         endog: OptionalArrayLike = None,
         *,
-        data: Optional[DataFrame] = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
@@ -572,7 +572,7 @@ class OLSResults(_LSModelResultsBase):
         """k-class estimator value"""
         return self._kappa
 
-    def _update_extra_text(self, extra_text: List[str]) -> List[str]:
+    def _update_extra_text(self, extra_text: list[str]) -> list[str]:
         instruments = self.model.instruments
         if instruments.shape[1] > 0:
 
@@ -598,13 +598,13 @@ class AbsorbingLSResults(_LSModelResultsBase):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: linearmodels.iv.absorbing.AbsorbingLS
+        self, results: dict[str, Any], model: linearmodels.iv.absorbing.AbsorbingLS
     ) -> None:
-        super(AbsorbingLSResults, self).__init__(results, model)
+        super().__init__(results, model)
         self._absorbed_rsquared = results["absorbed_r2"]
         self._absorbed_effects = results["absorbed_effects"]
 
-    def _top_right(self) -> List[Tuple[str, str]]:
+    def _top_right(self) -> list[tuple[str, str]]:
         f_stat = _str(self.f_statistic.stat)
         if isnan(self.f_statistic.stat):
             f_stat = "      N/A"
@@ -648,7 +648,7 @@ class FirstStageResults(_SummaryStr):
         instr: IVData,
         weights: IVData,
         cov_type: str,
-        cov_config: Dict[str, Any],
+        cov_config: dict[str, Any],
     ) -> None:
         self.dep = dep
         self.exog = exog
@@ -753,7 +753,7 @@ class FirstStageResults(_SummaryStr):
         return out_df
 
     @cached_property
-    def individual(self) -> Dict[str, OLSResults]:
+    def individual(self) -> dict[str, OLSResults]:
         """
         Individual model results from first-stage regressions
 
@@ -769,7 +769,7 @@ class FirstStageResults(_SummaryStr):
             c_[self.exog.ndarray, self.instr.ndarray],
             columns=self.exog.cols + self.instr.cols,
         )
-        res: Dict[str, OLSResults] = {}
+        res: dict[str, OLSResults] = {}
         for col in self.endog.pandas:
             dep = self.endog.pandas[col]
             mod = _OLS(dep, exog_instr, weights=self.weights.ndarray)
@@ -828,7 +828,7 @@ class FirstStageResults(_SummaryStr):
         params_fmt = [[_str(val) for val in row] for row in params_arr.T]
         for i in range(1, len(params_fmt), 2):
             for j in range(len(params_fmt[i])):
-                params_fmt[i][j] = "({0})".format(params_fmt[i][j])
+                params_fmt[i][j] = f"({params_fmt[i][j]})"
 
         params_stub = []
         for var in res.params.index:
@@ -861,7 +861,7 @@ class _CommonIVResults(OLSResults):
 
     def __init__(
         self,
-        results: Dict[str, Any],
+        results: dict[str, Any],
         model: linearmodels.iv.model._IVModelBase,
     ) -> None:
         super().__init__(results, model)
@@ -901,13 +901,13 @@ class IVResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: linearmodels.iv.model._IVLSModelBase
+        self, results: dict[str, Any], model: linearmodels.iv.model._IVLSModelBase
     ) -> None:
-        super(IVResults, self).__init__(results, model)
+        super().__init__(results, model)
         self._kappa = results.get("kappa", 1)
 
     @cached_property
-    def sargan(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def sargan(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         Sargan test of overidentifying restrictions
 
@@ -955,7 +955,7 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, null, ninstr - nendog, name=name)
 
     @cached_property
-    def basmann(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def basmann(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         Basmann's test of overidentifying restrictions
 
@@ -1001,8 +1001,8 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, sargan_test.null, sargan_test.df, name=name)
 
     def _endogeneity_setup(
-        self, variables: Optional[Union[str, List[str]]] = None
-    ) -> Tuple[ndarray, ndarray, ndarray, int, int, int, int]:
+        self, variables: str | list[str] | None = None
+    ) -> tuple[ndarray, ndarray, ndarray, int, int, int, int]:
         """Setup function for some endogeneity iv"""
         if isinstance(variables, str):
             variables = [variables]
@@ -1038,15 +1038,13 @@ class IVResults(_CommonIVResults):
         e2 = proj(e2, self.model.instruments.ndarray)
         return e0, e1, e2, nobs, nexog, nendog, ntested
 
-    def durbin(
-        self, variables: Optional[Union[str, List[str]]] = None
-    ) -> WaldTestStatistic:
+    def durbin(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
         r"""
         Durbin's test of exogeneity
 
         Parameters
         ----------
-        variables : {str, List[str]}
+        variables : {str, list[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1085,7 +1083,7 @@ class IVResults(_CommonIVResults):
         """
         null = "All endogenous variables are exogenous"
         if variables is not None:
-            null = "Variables {0} are exogenous".format(", ".join(variables))
+            null = "Variables {} are exogenous".format(", ".join(variables))
 
         e0, e1, e2, nobs, _, _, ntested = self._endogeneity_setup(variables)
         stat = e1.T @ e1 - e2.T @ e2
@@ -1095,15 +1093,13 @@ class IVResults(_CommonIVResults):
         df = ntested
         return WaldTestStatistic(float(stat), null, df, name=name)
 
-    def wu_hausman(
-        self, variables: Optional[Union[str, List[str]]] = None
-    ) -> WaldTestStatistic:
+    def wu_hausman(self, variables: str | list[str] | None = None) -> WaldTestStatistic:
         r"""
         Wu-Hausman test of exogeneity
 
         Parameters
         ----------
-        variables : {str, List[str]}
+        variables : {str, list[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1144,7 +1140,7 @@ class IVResults(_CommonIVResults):
         """
         null = "All endogenous variables are exogenous"
         if variables is not None:
-            null = "Variables {0} are exogenous".format(", ".join(variables))
+            null = "Variables {} are exogenous".format(", ".join(variables))
 
         e0, e1, e2, nobs, nexog, nendog, ntested = self._endogeneity_setup(variables)
 
@@ -1247,7 +1243,7 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, null, df, name=name)
 
     @cached_property
-    def wooldridge_overid(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def wooldridge_overid(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         Wooldridge's score test of overidentification
 
@@ -1300,7 +1296,7 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, null, df, name=name)
 
     @cached_property
-    def anderson_rubin(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def anderson_rubin(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         Anderson-Rubin test of overidentifying restrictions
 
@@ -1335,7 +1331,7 @@ class IVResults(_CommonIVResults):
         return WaldTestStatistic(stat, null, df, name=name)
 
     @cached_property
-    def basmann_f(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def basmann_f(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         Basmann's F test of overidentifying restrictions
 
@@ -1384,9 +1380,9 @@ class IVGMMResults(_CommonIVResults):
     """
 
     def __init__(
-        self, results: Dict[str, Any], model: linearmodels.iv.model._IVGMMBase
+        self, results: dict[str, Any], model: linearmodels.iv.model._IVGMMBase
     ):
-        super(IVGMMResults, self).__init__(results, model)
+        super().__init__(results, model)
         self._weight_mat = results["weight_mat"]
         self._weight_type = results["weight_type"]
         self._weight_config = results["weight_config"]
@@ -1409,12 +1405,12 @@ class IVGMMResults(_CommonIVResults):
         return self._weight_type
 
     @property
-    def weight_config(self) -> Dict[str, Any]:
+    def weight_config(self) -> dict[str, Any]:
         """Weighting matrix configuration used in estimation"""
         return self._weight_config
 
     @property
-    def j_stat(self) -> Union[InvalidTestStatistic, WaldTestStatistic]:
+    def j_stat(self) -> InvalidTestStatistic | WaldTestStatistic:
         r"""
         J-test of overidentifying restrictions
 
@@ -1441,15 +1437,13 @@ class IVGMMResults(_CommonIVResults):
         """
         return self._j_stat
 
-    def c_stat(
-        self, variables: Optional[Union[List[str], str]] = None
-    ) -> WaldTestStatistic:
+    def c_stat(self, variables: list[str] | str | None = None) -> WaldTestStatistic:
         r"""
         C-test of endogeneity
 
         Parameters
         ----------
-        variables : {str, List[str]}
+        variables : {str, list[str]}
             List of variables to test for exogeneity.  If None, all variables
             are jointly tested.
 
@@ -1506,7 +1500,7 @@ class IVGMMResults(_CommonIVResults):
             exog_e = c_[exog.ndarray, endog.pandas[variable_lst].values]
             ex = [c for c in endog.pandas if c not in variable_lst]
             endog_e = endog.pandas[ex].values
-            null = "Variables {0} are exogenous".format(", ".join(variable_lst))
+            null = "Variables {} are exogenous".format(", ".join(variable_lst))
         from linearmodels.iv.model import IVGMM, IVGMMCUE
 
         mod = IVGMM(dependent, exog_e, endog_e, instruments)
@@ -1553,14 +1547,12 @@ class IVModelComparison(_ModelComparison):
 
     def __init__(
         self,
-        results: Union[Sequence[AnyResult], Dict[str, AnyResult]],
+        results: Sequence[AnyResult] | dict[str, AnyResult],
         *,
         precision: str = "tstats",
         stars: bool = False,
     ):
-        super(IVModelComparison, self).__init__(
-            results, precision=precision, stars=stars
-        )
+        super().__init__(results, precision=precision, stars=stars)
 
     @property
     def rsquared_adj(self) -> Series:
@@ -1605,7 +1597,7 @@ class IVModelComparison(_ModelComparison):
             "F-statistic",
             "P-value (F-stat)",
         ]
-        dep_name: Dict[str, str] = {}
+        dep_name: dict[str, str] = {}
         for key in self._results:
             dep_name[key] = str(self._results[key].model.dependent.cols[0])
         dep_names = Series(dep_name)
@@ -1641,7 +1633,7 @@ class IVModelComparison(_ModelComparison):
             precision_fmt = []
             for v in precision.values[i]:
                 v_str = _str(v)
-                v_str = "({0})".format(v_str) if v_str.strip() else v_str
+                v_str = f"({v_str})" if v_str.strip() else v_str
                 precision_fmt.append(v_str)
             params_fmt.append(precision_fmt)
             params_stub.append(params.index[i])
@@ -1680,12 +1672,12 @@ class IVModelComparison(_ModelComparison):
         )
         smry.tables.append(table)
         prec_type = self._PRECISION_TYPES[self._precision]
-        smry.add_extra_txt(["{0} reported in parentheses".format(prec_type)])
+        smry.add_extra_txt([f"{prec_type} reported in parentheses"])
         return smry
 
 
 def compare(
-    results: Union[Dict[str, AnyResult], Sequence[AnyResult]],
+    results: dict[str, AnyResult] | Sequence[AnyResult],
     *,
     precision: str = "tstats",
     stars: bool = False,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Dict, List, Optional, Union
+from typing import Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -473,7 +473,7 @@ class PanelResults(_SummaryStr):
         return Series(self._resids.squeeze(), index=self._index, name="residual")
 
     def _out_of_sample(
-        self, exog: OptionalArrayLike, data: Optional[DataFrame], missing: bool
+        self, exog: OptionalArrayLike, data: DataFrame | None, missing: bool
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if exog is not None and data is not None:
@@ -490,7 +490,7 @@ class PanelResults(_SummaryStr):
         self,
         exog: OptionalArrayLike = None,
         *,
-        data: Optional[DataFrame] = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         effects: bool = False,
         idiosyncratic: bool = False,
@@ -660,10 +660,10 @@ class PanelResults(_SummaryStr):
 
     def wald_test(
         self,
-        restriction: Optional[Union[Float64Array, DataFrame]] = None,
-        value: Optional[Union[Float64Array, Series]] = None,
+        restriction: Float64Array | DataFrame | None = None,
+        value: Float64Array | Series | None = None,
         *,
-        formula: Optional[Union[str, List[str]]] = None,
+        formula: str | list[str] | None = None,
     ) -> WaldTestStatistic:
         r"""
         Test linear equality constraints using a Wald test
@@ -742,7 +742,7 @@ class PanelEffectsResults(PanelResults):
     """
 
     def __init__(self, res: AttrDict) -> None:
-        super(PanelEffectsResults, self).__init__(res)
+        super().__init__(res)
         self._other_info = res.other_info
         self._f_pooled = res.f_pooled
         self._entity_effect = res.entity_effects
@@ -786,7 +786,7 @@ class PanelEffectsResults(PanelResults):
         return self._f_pooled
 
     @property
-    def included_effects(self) -> List[str]:
+    def included_effects(self) -> list[str]:
         """List of effects included in the model"""
         entity_effect = self._entity_effect
         time_effect = self._time_effect
@@ -804,7 +804,7 @@ class PanelEffectsResults(PanelResults):
         return effects
 
     @property
-    def other_info(self) -> Optional[DataFrame]:
+    def other_info(self) -> DataFrame | None:
         """Statistics on observations per group for other effects"""
         return self._other_info
 
@@ -829,7 +829,7 @@ class PanelEffectsResults(PanelResults):
         ``summary.as_html()`` and ``summary.as_latex()``.
         """
 
-        smry = super(PanelEffectsResults, self).summary
+        smry = super().summary
 
         is_invalid = np.isfinite(self.f_pooled.stat)
         f_pool = _str(self.f_pooled.stat) if is_invalid else "--"
@@ -838,9 +838,9 @@ class PanelEffectsResults(PanelResults):
 
         extra_text = []
         if is_invalid:
-            extra_text.append("F-test for Poolability: {0}".format(f_pool))
-            extra_text.append("P-value: {0}".format(f_pool_pval))
-            extra_text.append("Distribution: {0}".format(f_pool_name))
+            extra_text.append(f"F-test for Poolability: {f_pool}")
+            extra_text.append(f"P-value: {f_pool_pval}")
+            extra_text.append(f"Distribution: {f_pool_name}")
             extra_text.append("")
 
         if self.included_effects:
@@ -853,7 +853,7 @@ class PanelEffectsResults(PanelResults):
             extra_text.append(f"Model includes {nrow} other effect{plural}")
             for c in self.other_info.T:
                 col = self.other_info.T[c]
-                extra_text.append("Other Effect {0}:".format(c))
+                extra_text.append(f"Other Effect {c}:")
                 stats = "Avg Obs: {0}, Min Obs: {1}, Max Obs: {2}, Groups: {3}"
                 stats = stats.format(
                     _str(col["mean"]),
@@ -881,7 +881,7 @@ class RandomEffectsResults(PanelResults):
     """
 
     def __init__(self, res: AttrDict) -> None:
-        super(RandomEffectsResults, self).__init__(res)
+        super().__init__(res)
         self._theta = res.theta
         self._sigma2_effects = res.sigma2_effects
         self._sigma2_eps = res.sigma2_eps
@@ -951,7 +951,7 @@ class PanelModelComparison(_ModelComparison):
 
     def __init__(
         self,
-        results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
+        results: list[PanelModelResults] | dict[str, PanelModelResults],
         *,
         precision: str = "tstats",
         stars: bool = False,
@@ -1055,7 +1055,7 @@ class PanelModelComparison(_ModelComparison):
             precision_fmt = []
             for v in precision.values[i]:
                 v_str = _str(v)
-                v_str = "({0})".format(v_str) if v_str.strip() else v_str
+                v_str = f"({v_str})" if v_str.strip() else v_str
                 precision_fmt.append(v_str)
             params_fmt.append(precision_fmt)
             params_stub.append(params.index[i])
@@ -1096,12 +1096,12 @@ class PanelModelComparison(_ModelComparison):
         )
         smry.tables.append(table)
         prec_type = self._PRECISION_TYPES[self._precision]
-        smry.add_extra_txt(["{0} reported in parentheses".format(prec_type)])
+        smry.add_extra_txt([f"{prec_type} reported in parentheses"])
         return smry
 
 
 def compare(
-    results: Union[List[PanelModelResults], Dict[str, PanelModelResults]],
+    results: list[PanelModelResults] | dict[str, PanelModelResults],
     *,
     precision: str = "tstats",
     stars: bool = False,

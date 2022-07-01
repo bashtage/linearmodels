@@ -16,14 +16,14 @@ data = generate_3sls_data_v2(k=2, const=False)
 joined = []
 for i, key in enumerate(data):
     eq = data[key]
-    joined.append(Series(eq.dependent[:, 0], name="y{0}".format(i + 1)))
+    joined.append(Series(eq.dependent[:, 0], name=f"y{i + 1}"))
     for j, col in enumerate(eq.exog.T):
-        joined.append(Series(col, name="x{0}{1}".format(i + 1, j + 1)))
+        joined.append(Series(col, name=f"x{i + 1}{j + 1}"))
     k = len(eq.exog.T)
     for j, col in enumerate(eq.endog.T):
-        joined.append(Series(col, name="x{0}{1}".format(i + 1, j + k + 1)))
+        joined.append(Series(col, name=f"x{i + 1}{j + k + 1}"))
     for j, col in enumerate(eq.instruments.T):
-        joined.append(Series(col, name="z{0}{1}".format(i + 1, j + 1)))
+        joined.append(Series(col, name=f"z{i + 1}{j + 1}"))
 joined = concat(joined, axis=1)
 
 fmlas = [

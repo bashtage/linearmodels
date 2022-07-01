@@ -35,7 +35,7 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from ._version import version as __version__, version_tuple
 from .asset_pricing.model import (
@@ -105,7 +105,7 @@ except ModuleNotFoundError:
 
 
 def test(
-    extra_args: Optional[Union[str, List[str]]] = None,
+    extra_args: str | list[str] | None = None,
     exit: bool = True,
     append: bool = True,
     location: str = "",
