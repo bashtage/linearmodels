@@ -3,7 +3,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 from pandas import DataFrame, Series, concat
@@ -64,7 +64,7 @@ class _CommonResults(_SummaryStr):
         return self._cov_type
 
     @property
-    def cov_config(self) -> Dict[str, bool]:
+    def cov_config(self) -> dict[str, bool]:
         """Configuration of covariance estimator used to compute covariance"""
         return self._cov_config
 
@@ -203,7 +203,7 @@ class SystemResults(_CommonResults):
     """
 
     def __init__(self, results: AttrDict) -> None:
-        super(SystemResults, self).__init__(results)
+        super().__init__(results)
         self._individual = AttrDict()
         for key in results.individual:
             self._individual[key] = SystemEquationResult(results.individual[key])
@@ -227,7 +227,7 @@ class SystemResults(_CommonResults):
         return self._individual
 
     @property
-    def equation_labels(self) -> List[str]:
+    def equation_labels(self) -> list[str]:
         """Individual equation labels"""
         return list(self._individual.keys())
 
@@ -243,11 +243,11 @@ class SystemResults(_CommonResults):
 
     def _out_of_sample(
         self,
-        equations: Optional[Dict[str, Dict[str, ArrayLike]]],
-        data: Optional[DataFrame],
+        equations: dict[str, dict[str, ArrayLike]] | None,
+        data: DataFrame | None,
         missing: bool,
         dataframe: bool,
-    ) -> Union[Dict[str, Series], DataFrame]:
+    ) -> dict[str, Series] | DataFrame:
         if equations is not None and data is not None:
             raise ValueError(
                 "Predictions can only be constructed using one "
@@ -269,14 +269,14 @@ class SystemResults(_CommonResults):
 
     def predict(
         self,
-        equations: Optional[Dict[str, Dict[str, ArrayLike]]] = None,
+        equations: dict[str, dict[str, ArrayLike]] | None = None,
         *,
-        data: Optional[DataFrame] = None,
+        data: DataFrame | None = None,
         fitted: bool = True,
         idiosyncratic: bool = False,
         missing: bool = False,
         dataframe: bool = False,
-    ) -> Union[DataFrame, dict]:
+    ) -> DataFrame | dict:
         """
         In- and out-of-sample predictions
 
@@ -501,7 +501,7 @@ class SystemResults(_CommonResults):
             last_row = i == (len(self.equation_labels) - 1)
             results = self.equations[eqlabel]
             dep_name = results.dependent
-            title = "Equation: {0}, Dependent Variable: {1}".format(eqlabel, dep_name)
+            title = f"Equation: {eqlabel}, Dependent Variable: {dep_name}"
             pad_bottom = results.instruments is not None and not last_row
             smry.tables.append(param_table(results, title, pad_bottom=pad_bottom))
             if results.instruments:
@@ -520,7 +520,7 @@ class SystemResults(_CommonResults):
 
         return smry
 
-    def breusch_pagan(self) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    def breusch_pagan(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
         Breusch-Pagan LM test for no cross-correlation
 
@@ -569,7 +569,7 @@ class SystemResults(_CommonResults):
             name=name,
         )
 
-    def likelihood_ratio(self) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    def likelihood_ratio(self) -> WaldTestStatistic | InvalidTestStatistic:
         r"""
         Likelihood ratio test of no cross-correlation
 
@@ -635,7 +635,7 @@ class SystemEquationResult(_CommonResults):
     """
 
     def __init__(self, results: AttrDict) -> None:
-        super(SystemEquationResult, self).__init__(results)
+        super().__init__(results)
         self._eq_label = results.eq_label
         self._dependent = results.dependent
         self._f_statistic = results.f_stat
@@ -650,12 +650,12 @@ class SystemEquationResult(_CommonResults):
         return self._eq_label
 
     @property
-    def dependent(self) -> Dict[str, DataFrame]:
+    def dependent(self) -> dict[str, DataFrame]:
         """Name of dependent variable"""
         return self._dependent
 
     @property
-    def instruments(self) -> Dict[str, OptionalDataFrame]:
+    def instruments(self) -> dict[str, OptionalDataFrame]:
         """Instruments used in estimation.  None if all variables assumed exogenous."""
         return self._instruments
 
@@ -796,7 +796,7 @@ class GMMSystemResults(SystemResults):
     """
 
     def __init__(self, results: AttrDict) -> None:
-        super(GMMSystemResults, self).__init__(results)
+        super().__init__(results)
         self._wmat = results.wmat
         self._weight_type = results.weight_type
         self._weight_config = results.weight_config
@@ -813,7 +813,7 @@ class GMMSystemResults(SystemResults):
         return self._weight_type
 
     @property
-    def weight_config(self) -> Dict[str, Any]:
+    def weight_config(self) -> dict[str, Any]:
         """Weight configuration options used in GMM estimation"""
         return self._weight_config
 

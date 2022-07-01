@@ -117,7 +117,7 @@ for p in lsdv_perms:
     str_id = "weighted" if p[0] else "unweighted"
     str_id += "-entity_effects" if p[1] else ""
     str_id += "-time_effects" if p[2] else ""
-    str_id += "-{0}_other_effects".format(p[3]) if p[3] else ""
+    str_id += f"-{p[3]}_other_effects" if p[3] else ""
     lsdv_ids.append(str_id)
 
 
@@ -215,9 +215,9 @@ def test_const_data_both(const_data):
 
     x = mod.exog.dataframe
     d1 = mod.dependent.dummies("entity", drop_first=True)
-    d1.columns = ["d.entity.{0}".format(i) for i in d1]
+    d1.columns = [f"d.entity.{i}" for i in d1]
     d2 = mod.dependent.dummies("time", drop_first=True)
-    d2.columns = ["d.time.{0}".format(i) for i in d2]
+    d2.columns = [f"d.time.{i}" for i in d2]
     d = np.c_[d1.values, d2.values]
     d = pd.DataFrame(d, index=x.index, columns=list(d1.columns) + list(d2.columns))
     d.iloc[:, :] = d.values - x.values @ lstsq(x.values, d.values, rcond=None)[0]
@@ -238,9 +238,9 @@ def test_const_data_both_weights(const_data):
     x = mod.exog.dataframe
 
     d1 = mod.dependent.dummies("entity", drop_first=True)
-    d1.columns = ["d.entity.{0}".format(i) for i in d1]
+    d1.columns = [f"d.entity.{i}" for i in d1]
     d2 = mod.dependent.dummies("time", drop_first=True)
-    d2.columns = ["d.time.{0}".format(i) for i in d2]
+    d2.columns = [f"d.time.{i}" for i in d2]
     d = np.c_[d1.values, d2.values]
     root_w = np.sqrt(w.values)
     z = np.ones_like(x)
@@ -1295,11 +1295,11 @@ def test_low_memory_auto():
 def test_singleton_removal():
     entities = []
     for i in range(6):
-        entities.extend(["entity.{j}".format(j=j) for j in range(6 - i)])
+        entities.extend([f"entity.{j}" for j in range(6 - i)])
     nobs = len(entities)
     times = np.arange(nobs) % 6
     index = pd.MultiIndex.from_arrays((entities, times))
-    cols = ["x{0}".format(i) for i in range(3)]
+    cols = [f"x{i}" for i in range(3)]
     x = pd.DataFrame(np.random.randn(nobs, 3), index=index, columns=cols)
     y = pd.DataFrame(np.random.randn(nobs, 1), index=index)
     mod = PanelOLS(y, x, singletons=False, entity_effects=True, time_effects=True)

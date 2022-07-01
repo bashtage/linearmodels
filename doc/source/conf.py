@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # linearmodels documentation build configuration file, created by
 # sphinx-quickstart on Thu Feb 16 13:04:40 2017.

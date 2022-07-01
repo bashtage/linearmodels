@@ -61,7 +61,7 @@ def notebook(request):
 def test_notebook(notebook):
     nb_name = os.path.split(notebook)[-1]
     if MISSING_XARRAY and nb_name in NOTEBOOKS_USING_XARRAY:
-        pytest.skip("xarray is required to test {0}".format(notebook))
+        pytest.skip(f"xarray is required to test {notebook}")
 
     nb = nbformat.read(notebook, as_version=4)
     ep = ExecutePreprocessor(allow_errors=False, timeout=120, kernel_name=kernel_name)

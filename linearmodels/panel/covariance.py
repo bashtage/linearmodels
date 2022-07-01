@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from typing import Any, Type, Union
 
 import numpy as np
 from numpy.linalg import inv
@@ -35,7 +35,7 @@ __all__ = [
 ]
 
 
-class HomoskedasticCovariance(object):
+class HomoskedasticCovariance:
     r"""
     Homoskedastic covariance estimation
 
@@ -79,7 +79,7 @@ class HomoskedasticCovariance(object):
     where df is ``extra_df`` and n-df is replace by n-df-k if ``debiased`` is
     ``True``.
     """
-    ALLOWED_KWARGS: Tuple[str, ...] = tuple()
+    ALLOWED_KWARGS: tuple[str, ...] = tuple()
     DEFAULT_KERNEL = "newey-west"
 
     def __init__(
@@ -87,8 +87,8 @@ class HomoskedasticCovariance(object):
         y: Float64Array,
         x: Float64Array,
         params: Float64Array,
-        entity_ids: Optional[IntArray],
-        time_ids: Optional[IntArray],
+        entity_ids: IntArray | None,
+        time_ids: IntArray | None,
         *,
         debiased: bool = False,
         extra_df: int = 0,
@@ -193,7 +193,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         extra_df: int = 0,
     ) -> None:
-        super(HeteroskedasticCovariance, self).__init__(
+        super().__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         self._name = "Robust"
@@ -282,10 +282,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        clusters: Optional[ArrayLike] = None,
+        clusters: ArrayLike | None = None,
         group_debias: bool = False,
     ) -> None:
-        super(ClusteredCovariance, self).__init__(
+        super().__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         if clusters is None:
@@ -413,10 +413,10 @@ class DriscollKraay(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        kernel: Optional[str] = None,
-        bandwidth: Optional[float] = None,
+        kernel: str | None = None,
+        bandwidth: float | None = None,
     ) -> None:
-        super(DriscollKraay, self).__init__(
+        super().__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         self._name = "Driscoll-Kraay"
@@ -530,10 +530,10 @@ class ACCovariance(HomoskedasticCovariance):
         *,
         debiased: bool = False,
         extra_df: int = 0,
-        kernel: Optional[str] = None,
-        bandwidth: Optional[float] = None,
+        kernel: str | None = None,
+        bandwidth: float | None = None,
     ) -> None:
-        super(ACCovariance, self).__init__(
+        super().__init__(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )
         self._name = "Autocorrelation Rob. Cov."
@@ -597,8 +597,8 @@ CovarianceEstimatorType = Union[
 ]
 
 
-class CovarianceManager(object):
-    COVARIANCE_ESTIMATORS: Dict[str, CovarianceEstimatorType] = {
+class CovarianceManager:
+    COVARIANCE_ESTIMATORS: dict[str, CovarianceEstimatorType] = {
         "unadjusted": HomoskedasticCovariance,
         "conventional": HomoskedasticCovariance,
         "homoskedastic": HomoskedasticCovariance,
@@ -625,7 +625,7 @@ class CovarianceManager(object):
         if cov_est not in self._supported:
             raise ValueError(
                 "Requested covariance estimator is not supported "
-                "for the {0}.".format(self._estimator)
+                "for the {}.".format(self._estimator)
             )
         return cov_est
 
@@ -668,12 +668,10 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         all_params: DataFrame,
         *,
         debiased: bool = False,
-        bandwidth: Optional[float] = None,
-        kernel: Optional[str] = None,
+        bandwidth: float | None = None,
+        kernel: str | None = None,
     ) -> None:
-        super(FamaMacBethCovariance, self).__init__(
-            y, x, params, None, None, debiased=debiased
-        )
+        super().__init__(y, x, params, None, None, debiased=debiased)
         self._all_params = all_params
         cov_type = "Standard " if bandwidth == 0 else "Kernel "
         self._name = f"Fama-MacBeth {cov_type}Cov"
@@ -730,7 +728,7 @@ def setup_covariance_estimator(
     debiased: bool = False,
     extra_df: int = 0,
     **cov_config: Any,
-) -> Union[HomoskedasticCovariance]:
+) -> HomoskedasticCovariance:
     estimator = cov_estimators[cov_type]
     unknown_kwargs = [
         str(key) for key in cov_config if str(key) not in estimator.ALLOWED_KWARGS

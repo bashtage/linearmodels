@@ -10,7 +10,7 @@ filename = "stata-sur-results.txt"
 
 cwd = os.path.split(os.path.abspath(__file__))[0]
 
-with open(os.path.join(cwd, filename), "r") as results_file:
+with open(os.path.join(cwd, filename)) as results_file:
     results = results_file.readlines()
 
 blocks: Dict[str, List[str]] = {}

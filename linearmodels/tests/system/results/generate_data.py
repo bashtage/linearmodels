@@ -28,13 +28,13 @@ for key in missing_data:
 
 out = []
 for i, dataset in enumerate((basic_data, common_data, missing_data)):
-    base = "mod_{0}".format(i)
+    base = f"mod_{i}"
     for j, key in enumerate(dataset):
         dep = dataset[key]["dependent"]
-        dep = pd.DataFrame(dep, columns=[base + "_y_{0}".format(j)])
+        dep = pd.DataFrame(dep, columns=[base + f"_y_{j}"])
         dataset[key]["dependent"] = dep
         exog = dataset[key]["exog"][:, 1:]
-        exog_cols = [base + "_x_{0}{1}".format(j, k) for k in range(exog.shape[1])]
+        exog_cols = [base + f"_x_{j}{k}" for k in range(exog.shape[1])]
         exog = pd.DataFrame(exog, columns=exog_cols)
         exog = exog.copy()
         exog["cons"] = 1.0

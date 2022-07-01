@@ -3,7 +3,7 @@ Instrumental variable estimators
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Type, TypeVar, Union, cast
 import warnings
 
 from numpy import (
@@ -102,7 +102,7 @@ WEIGHT_MATRICES = {
 }
 
 
-class _IVModelBase(object):
+class _IVModelBase:
     r"""
     Limited information ML and k-class estimation of IV models
 
@@ -162,11 +162,11 @@ class _IVModelBase(object):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         fuller: Numeric = 0,
         kappa: OptionalNumeric = None,
     ):
@@ -210,9 +210,9 @@ class _IVModelBase(object):
             self._method = "IV-LIML"
             additional = []
             if fuller != 0:
-                additional.append("fuller(alpha={0})".format(fuller))
+                additional.append(f"fuller(alpha={fuller})")
             if kappa is not None:
-                additional.append("kappa={0}".format(kappa))
+                additional.append(f"kappa={kappa}")
             if additional:
                 self._method += "(" + ", ".join(additional) + ")"
 
@@ -238,8 +238,8 @@ class _IVModelBase(object):
         self,
         params: ArrayLike,
         *,
-        exog: Optional[IVDataLike] = None,
-        endog: Optional[IVDataLike] = None,
+        exog: IVDataLike | None = None,
+        endog: IVDataLike | None = None,
         data: DataFrame = None,
         eval_env: int = 4,
     ) -> DataFrame:
@@ -330,9 +330,9 @@ class _IVModelBase(object):
             raise ValueError("Model must contain at least one regressor.")
         if self.instruments.shape[1] < self.endog.shape[1]:
             raise ValueError(
-                "The number of instruments ({0}) must be at least "
+                "The number of instruments ({}) must be at least "
                 "as large as the number of endogenous regressors"
-                " ({1}).".format(self.instruments.shape[1], self.endog.shape[1])
+                " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
         if matrix_rank(x) < x.shape[1]:
             raise ValueError("regressors [exog endog] do not have full " "column rank")
@@ -416,14 +416,14 @@ class _IVModelBase(object):
 
     def _f_statistic(
         self, params: Float64Array, cov: Float64Array, debiased: bool
-    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    ) -> WaldTestStatistic | InvalidTestStatistic:
         const_loc = find_constant(self._x)
         nobs, nvar = self._x.shape
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
     def _post_estimation(
         self, params: Float64Array, cov_estimator: CovarianceEstimator, cov_type: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         columns = self._columns
         index = self._index
         eps = self.resids(params)
@@ -532,11 +532,11 @@ class _IVLSModelBase(_IVModelBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         fuller: Numeric = 0,
         kappa: OptionalNumeric = None,
     ):
@@ -601,7 +601,7 @@ class _IVLSModelBase(_IVModelBase):
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
-    ) -> Union[OLSResults, IVResults]:
+    ) -> OLSResults | IVResults:
         """
         Estimate model parameters
 
@@ -738,11 +738,11 @@ class IVLIML(_IVLSModelBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         fuller: Numeric = 0,
         kappa: OptionalNumeric = None,
     ):
@@ -761,7 +761,7 @@ class IVLIML(_IVLSModelBase):
         formula: str,
         data: DataFrame,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         fuller: float = 0,
         kappa: OptionalNumeric = None,
     ) -> IVLIML:
@@ -859,11 +859,11 @@ class IV2SLS(_IVLSModelBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
     ):
         self._method = "IV-2SLS"
         super().__init__(
@@ -872,7 +872,7 @@ class IV2SLS(_IVLSModelBase):
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: Optional[IVDataLike] = None
+        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
     ) -> IV2SLS:
         """
         Parameters
@@ -972,11 +972,11 @@ class _IVGMMBase(_IVModelBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ):
@@ -990,7 +990,7 @@ class _IVGMMBase(_IVModelBase):
 
     def _gmm_post_estimation(
         self, params: Float64Array, weight_mat: Float64Array, iters: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
         gmm_specific = {
@@ -1070,11 +1070,11 @@ class IVGMM(_IVGMMBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ):
@@ -1091,7 +1091,7 @@ class IVGMM(_IVGMMBase):
         formula: str,
         data: DataFrame,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> IVGMM:
@@ -1178,11 +1178,11 @@ class IVGMM(_IVGMMBase):
         *,
         iter_limit: int = 2,
         tol: float = 1e-4,
-        initial_weight: Optional[Float64Array] = None,
+        initial_weight: Float64Array | None = None,
         cov_type: str = "robust",
         debiased: bool = False,
         **cov_config: Any,
-    ) -> Union[OLSResults, IVGMMResults]:
+    ) -> OLSResults | IVGMMResults:
         """
         Estimate model parameters
 
@@ -1272,7 +1272,7 @@ class IVGMM(_IVGMMBase):
 
     def _gmm_post_estimation(
         self, params: Float64Array, weight_mat: Float64Array, iters: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """GMM-specific post-estimation results"""
         instr = self._instr_columns
         gmm_specific = {
@@ -1338,11 +1338,11 @@ class IVGMMCUE(_IVGMMBase):
     def __init__(
         self,
         dependent: IVDataLike,
-        exog: Optional[IVDataLike],
-        endog: Optional[IVDataLike],
-        instruments: Optional[IVDataLike],
+        exog: IVDataLike | None,
+        endog: IVDataLike | None,
+        instruments: IVDataLike | None,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> None:
@@ -1364,7 +1364,7 @@ class IVGMMCUE(_IVGMMBase):
         formula: str,
         data: DataFrame,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
         weight_type: str = "robust",
         **weight_config: Any,
     ) -> IVGMMCUE:
@@ -1470,8 +1470,8 @@ class IVGMMCUE(_IVGMMBase):
         y: Float64Array,
         z: Float64Array,
         display: bool = False,
-        opt_options: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[Float64Array, int]:
+        opt_options: dict[str, Any] | None = None,
+    ) -> tuple[Float64Array, int]:
         r"""
         Parameters
         ----------
@@ -1519,13 +1519,13 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: Union[Float64Array, Series] = None,
+        starting: Float64Array | Series = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
-        opt_options: Optional[Dict[str, Any]] = None,
+        opt_options: dict[str, Any] | None = None,
         **cov_config: Any,
-    ) -> Union[OLSResults, IVGMMResults]:
+    ) -> OLSResults | IVGMMResults:
         r"""
         Estimate model parameters
 
@@ -1638,22 +1638,20 @@ class _OLS(IVLIML):
         dependent: IVDataLike,
         exog: IVDataLike,
         *,
-        weights: Optional[IVDataLike] = None,
+        weights: IVDataLike | None = None,
     ):
-        super(_OLS, self).__init__(
-            dependent, exog, None, None, weights=weights, kappa=0.0
-        )
+        super().__init__(dependent, exog, None, None, weights=weights, kappa=0.0)
         self._result_container = OLSResults
 
 
 def _gmm_model_from_formula(
-    cls: Union[Type[IVGMM], Type[IVGMMCUE]],
+    cls: type[IVGMM] | type[IVGMMCUE],
     formula: str,
     data: DataFrame,
-    weights: Optional[IVDataLike],
+    weights: IVDataLike | None,
     weight_type: str,
     **weight_config: Any,
-) -> Union[IVGMM, IVGMMCUE]:
+) -> IVGMM | IVGMMCUE:
     """
     Parameters
     ----------

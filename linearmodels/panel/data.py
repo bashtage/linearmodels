@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import product
-from typing import Dict, Hashable, List, Optional, Sequence, Tuple, Union, cast
+from typing import Hashable, Sequence, Union, cast
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -36,7 +36,7 @@ from linearmodels.typing import (
 __all__ = ["PanelData", "PanelDataLike"]
 
 
-class _Panel(object):
+class _Panel:
     """
     Convert a MI DataFrame to a 3-d structure where columns are items.
 
@@ -87,7 +87,7 @@ class _Panel(object):
         return cls(df)
 
     @property
-    def shape(self) -> Tuple[int, int, int]:
+    def shape(self) -> tuple[int, int, int]:
         return self._shape
 
     @property
@@ -127,7 +127,7 @@ def expand_categoricals(x: DataFrame, drop_first: bool) -> DataFrame:
     )
 
 
-class PanelData(object):
+class PanelData:
     """
     Abstraction to handle alternative formats for panel data
 
@@ -186,8 +186,8 @@ class PanelData(object):
         self._var_name = var_name
         self._convert_dummies = convert_dummies
         self._drop_first = drop_first
-        self._panel: Optional[_Panel] = None
-        self._shape: Optional[Tuple[int, int, int]] = None
+        self._panel: _Panel | None = None
+        self._shape: tuple[int, int, int] | None = None
         index_names = ["entity", "time"]
         if isinstance(x, PanelData):
             x = x.dataframe
@@ -203,9 +203,9 @@ class PanelData(object):
                     if x.ndim == 2:
                         x = x.to_pandas()
                     else:
-                        items: List[Hashable] = np.asarray(x.coords[x.dims[0]]).tolist()
-                        major: List[Hashable] = np.asarray(x.coords[x.dims[1]]).tolist()
-                        minor: List[Hashable] = np.asarray(x.coords[x.dims[2]]).tolist()
+                        items: list[Hashable] = np.asarray(x.coords[x.dims[0]]).tolist()
+                        major: list[Hashable] = np.asarray(x.coords[x.dims[1]]).tolist()
+                        minor: list[Hashable] = np.asarray(x.coords[x.dims[2]]).tolist()
                         values = x.values
                         x = panel_to_frame(values, items, major, minor, True)
             except ImportError:
@@ -290,7 +290,7 @@ class PanelData(object):
         """NumPy ndarray view of panel"""
         return self.panel.values
 
-    def drop(self, locs: Union[Series, BoolArray]) -> None:
+    def drop(self, locs: Series | BoolArray) -> None:
         """
         Drop observations from the panel.
 
@@ -307,7 +307,7 @@ class PanelData(object):
         self._k, self._t, self._n = self.shape
 
     @property
-    def shape(self) -> Tuple[int, int, int]:
+    def shape(self) -> tuple[int, int, int]:
         """Shape of panel view of data"""
         if self._shape is None:
             k = self._frame.shape[1]
@@ -343,18 +343,18 @@ class PanelData(object):
         return self._n
 
     @property
-    def vars(self) -> List[Label]:
+    def vars(self) -> list[Label]:
         """List of variable names"""
         return list(self._frame.columns)
 
     @property
-    def time(self) -> List[Label]:
+    def time(self) -> list[Label]:
         """List of time index names"""
         index = self.index
         return list(index.levels[1][index.codes[1]].unique())
 
     @property
-    def entities(self) -> List[Label]:
+    def entities(self) -> list[Label]:
         """List of entity index names"""
         index = self.index
         return list(index.levels[0][index.codes[0]].unique())
@@ -385,7 +385,7 @@ class PanelData(object):
         index = self.index
         return np.asarray(index.codes[1])[:, None]
 
-    def _demean_both_low_mem(self, weights: Optional[PanelData]) -> PanelData:
+    def _demean_both_low_mem(self, weights: PanelData | None) -> PanelData:
         groups = PanelData(
             DataFrame(np.c_[self.entity_ids, self.time_ids], index=self._frame.index),
             convert_dummies=False,
@@ -393,7 +393,7 @@ class PanelData(object):
         )
         return self.general_demean(groups, weights=weights)
 
-    def _demean_both(self, weights: Optional[PanelData]) -> PanelData:
+    def _demean_both(self, weights: PanelData | None) -> PanelData:
         """
         Entity and time demean
 
@@ -421,7 +421,7 @@ class PanelData(object):
         return PanelData(resid)
 
     def general_demean(
-        self, groups: PanelDataLike, weights: Optional[PanelData] = None
+        self, groups: PanelDataLike, weights: PanelData | None = None
     ) -> PanelData:
         """
         Multi-way demeaning using only groupby
@@ -454,7 +454,7 @@ class PanelData(object):
             )
         groups = groups.values2d.astype(np.int64, copy=False)
 
-        weight_sum: Dict[int, Series] = {}
+        weight_sum: dict[int, Series] = {}
 
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
@@ -513,10 +513,10 @@ class PanelData(object):
     def demean(
         self,
         group: str = "entity",
-        weights: Optional[PanelData] = None,
+        weights: PanelData | None = None,
         return_panel: bool = True,
         low_memory: bool = False,
-    ) -> Union[PanelData, Float64Array]:
+    ) -> PanelData | Float64Array:
         """
         Demeans data by either entity or time group
 
@@ -625,7 +625,7 @@ class PanelData(object):
         )
 
     def mean(
-        self, group: str = "entity", weights: Optional[PanelData] = None
+        self, group: str = "entity", weights: PanelData | None = None
     ) -> DataFrame:
         """
         Compute data mean by either entity or time group

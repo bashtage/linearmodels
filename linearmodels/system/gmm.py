@@ -3,7 +3,7 @@ Covariance and weight estimation for GMM IV estimators
 """
 from __future__ import annotations
 
-from typing import Optional, Sequence, cast
+from typing import Sequence, cast
 
 from numpy import array, empty, ndarray, repeat, sqrt, zeros_like
 
@@ -14,7 +14,7 @@ from linearmodels.system._utility import blocked_inner_prod
 from linearmodels.typing import Float64Array
 
 
-class HomoskedasticWeightMatrix(object):
+class HomoskedasticWeightMatrix:
     r"""
     Homoskedastic (unadjusted) weight estimation
 
@@ -44,7 +44,7 @@ class HomoskedasticWeightMatrix(object):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
-        self._bandwidth: Optional[float] = 0
+        self._bandwidth: float | None = 0
         self._name = "Homoskedastic (Unadjusted) Weighting"
         self._config = AttrDict(center=center, debiased=debiased)
 
@@ -58,7 +58,7 @@ class HomoskedasticWeightMatrix(object):
         return out
 
     def __repr__(self) -> str:
-        return self.__str__() + ", id: {0}".format(hex(id(self)))
+        return self.__str__() + f", id: {hex(id(self))}"
 
     @property
     def _str_extra(self) -> AttrDict:
@@ -165,7 +165,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
-        super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
+        super().__init__(center, debiased)
         self._name = "Heteroskedastic (Robust) Weighting"
 
     def weight_matrix(
@@ -174,7 +174,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
         z: Sequence[Float64Array],
         eps: Float64Array,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray | None = None,
     ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
@@ -275,11 +275,11 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         center: bool = False,
         debiased: bool = False,
         kernel: str = "bartlett",
-        bandwidth: Optional[float] = None,
+        bandwidth: float | None = None,
         optimal_bw: bool = False,
     ) -> None:
         _HACMixin.__init__(self, kernel, bandwidth)
-        super(KernelWeightMatrix, self).__init__(center, debiased)
+        super().__init__(center, debiased)
         self._name = "Kernel (HAC) Weighting"
         self._check_kernel(kernel)
         self._check_bandwidth(bandwidth)
@@ -292,16 +292,16 @@ class KernelWeightMatrix(HeteroskedasticWeightMatrix, _HACMixin):
         z: Sequence[Float64Array],
         eps: Float64Array,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray | None = None,
     ) -> Float64Array:
         """
         Construct a GMM weight matrix for a model.
 
         Parameters
         ----------
-        x : List[ndarray]
+        x : list[ndarray]
             Model regressors (exog and endog)
-        z : List[ndarray]
+        z : list[ndarray]
             Model instruments (exog and instruments)
         eps : ndarray
             Model errors (nobs by nequation)

@@ -20,7 +20,7 @@ params = list(product([1, 2], [True, False]))
 
 
 def gen_id(r):
-    _id = "steps:{0}".format(r[0])
+    _id = f"steps:{r[0]}"
     if r[1]:
         _id += ",robust"
     else:
@@ -103,20 +103,14 @@ def test_formula_equivalence(data):
         ex = eqn.exog
         en = eqn.endog
         instr = eqn.instruments
-        dep = DataFrame(dep, columns=["dep_{0}".format(i)])
+        dep = DataFrame(dep, columns=[f"dep_{i}"])
         has_const = False
         if np.any(np.all(ex == 1, 0)):
             ex = ex[:, 1:]
             has_const = True
-        ex = DataFrame(
-            ex, columns=["ex_{0}_{1}".format(i, j) for j in range(ex.shape[1])]
-        )
-        en = DataFrame(
-            en, columns=["en_{0}_{1}".format(i, j) for j in range(en.shape[1])]
-        )
-        instr = DataFrame(
-            instr, columns=["instr_{0}_{1}".format(i, j) for j in range(ex.shape[1])]
-        )
+        ex = DataFrame(ex, columns=[f"ex_{i}_{j}" for j in range(ex.shape[1])])
+        en = DataFrame(en, columns=[f"en_{i}_{j}" for j in range(en.shape[1])])
+        instr = DataFrame(instr, columns=[f"instr_{i}_{j}" for j in range(ex.shape[1])])
         fmla = "".join(dep.columns) + " ~  "
         if has_const:
             fmla += " 1 + "
@@ -128,7 +122,7 @@ def test_formula_equivalence(data):
 
     formulas = {}
     for i, f in enumerate(formula):
-        formulas["eq{0}".format(i)] = f
+        formulas[f"eq{i}"] = f
     df = concat(df, axis=1, sort=False)
     formula_mod = IVSystemGMM.from_formula(formulas, df, weight_type="unadjusted")
     res = mod.fit(cov_type="unadjusted")
@@ -156,20 +150,14 @@ def test_formula_equivalence_weights(data):
         ex = eqn.exog
         en = eqn.endog
         instr = eqn.instruments
-        dep = DataFrame(dep, columns=["dep_{0}".format(i)])
+        dep = DataFrame(dep, columns=[f"dep_{i}"])
         has_const = False
         if np.any(np.all(ex == 1, 0)):
             ex = ex[:, 1:]
             has_const = True
-        ex = DataFrame(
-            ex, columns=["ex_{0}_{1}".format(i, j) for j in range(ex.shape[1])]
-        )
-        en = DataFrame(
-            en, columns=["en_{0}_{1}".format(i, j) for j in range(en.shape[1])]
-        )
-        instr = DataFrame(
-            instr, columns=["instr_{0}_{1}".format(i, j) for j in range(ex.shape[1])]
-        )
+        ex = DataFrame(ex, columns=[f"ex_{i}_{j}" for j in range(ex.shape[1])])
+        en = DataFrame(en, columns=[f"en_{i}_{j}" for j in range(en.shape[1])])
+        instr = DataFrame(instr, columns=[f"instr_{i}_{j}" for j in range(ex.shape[1])])
         fmla = "".join(dep.columns) + " ~  "
         if has_const:
             fmla += " 1 + "

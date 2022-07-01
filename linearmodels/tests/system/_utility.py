@@ -42,13 +42,13 @@ def generate_data(
         if included_weights:
             w = np.random.chisquare(5, (n, 1)) / 5
         if output_dict:
-            data["equ.{0}".format(i)] = {"dependent": y, "exog": x}
+            data[f"equ.{i}"] = {"dependent": y, "exog": x}
             if included_weights:
-                data["equ.{0}".format(i)]["weights"] = w
+                data[f"equ.{i}"]["weights"] = w
         else:
-            data["equ.{0}".format(i)] = (y, x)
+            data[f"equ.{i}"] = (y, x)
             if included_weights:
-                data["equ.{0}".format(i)] = tuple(list(data["equ.{0}".format(i)]) + [w])
+                data[f"equ.{i}"] = tuple(list(data[f"equ.{i}"]) + [w])
 
     return data
 
@@ -133,19 +133,19 @@ def generate_3sls_data(
         if _instr == 0:
             instr = None
         if output_dict:
-            data["equ.{0}".format(count)] = {
+            data[f"equ.{count}"] = {
                 "dependent": dep,
                 "exog": exog,
                 "endog": endog,
                 "instruments": instr,
             }
             if included_weights:
-                data["equ.{0}".format(count)]["weights"] = w
+                data[f"equ.{count}"]["weights"] = w
         else:
             if included_weights:
-                data["equ.{0}".format(count)] = (dep, exog, endog, instr, w)
+                data[f"equ.{count}"] = (dep, exog, endog, instr, w)
             else:
-                data["equ.{0}".format(count)] = (dep, exog, endog, instr)
+                data[f"equ.{count}"] = (dep, exog, endog, instr)
         count += 1
 
     return data
@@ -244,7 +244,7 @@ def simple_3sls(y, x, z):
 
 def convert_to_pandas(a, base):
     k = a.shape[1]
-    cols = [base + "_{0}".format(i) for i in range(k)]
+    cols = [base + f"_{i}" for i in range(k)]
     return pd.DataFrame(a, columns=cols)
 
 
@@ -335,7 +335,7 @@ def generate_3sls_data_v2(
         eqn = AttrDict(
             dependent=dep, exog=exog, endog=endog, instruments=instr, params=params
         )
-        eqns["eqn.{0}".format(i)] = eqn
+        eqns[f"eqn.{i}"] = eqn
     if not output_dict:
         for key in eqns:
             eq = eqns[key]

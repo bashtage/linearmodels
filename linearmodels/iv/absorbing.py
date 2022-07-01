@@ -1,19 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import (
-    Any,
-    DefaultDict,
-    Dict,
-    Hashable,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import Any, DefaultDict, Hashable, Iterable, TypeVar, Union, cast
 import warnings
 
 from numpy import (
@@ -76,7 +64,7 @@ except ImportError:
 Hasher = TypeVar("Hasher", bound=hash_func)
 
 
-_VARIABLE_CACHE: DefaultDict[Hashable, Dict[str, ndarray]] = defaultdict(dict)
+_VARIABLE_CACHE: DefaultDict[Hashable, dict[str, ndarray]] = defaultdict(dict)
 
 
 def _reset(hasher: Hasher) -> Hasher:
@@ -96,8 +84,8 @@ def lsmr_annihilate(
     x: sp.csc_matrix,
     y: Float64Array,
     use_cache: bool = True,
-    x_hash: Optional[Hashable] = None,
-    **lsmr_options: Union[bool, str, ArrayLike, None, Dict[str, Any]],
+    x_hash: Hashable | None = None,
+    **lsmr_options: bool | str | ArrayLike | None | dict[str, Any],
 ) -> Float64Array:
     r"""
     Removes projection of x on y from y
@@ -135,7 +123,7 @@ def lsmr_annihilate(
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts: Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]] = dict(
+    default_opts: dict[str, bool | str | ArrayLike | None | dict[str, Any]] = dict(
         atol=1e-8, btol=1e-8, show=False
     )
     assert lsmr_options is not None
@@ -196,13 +184,13 @@ def category_product(cats: AnyPandas) -> Series:
             "There are too many cats with too many states to use this method."
         )
     dtype_size = min(filter(lambda v: total_size < (v - 1), (8, 16, 32, 64)))
-    dtype_str = "int{0:d}".format(dtype_size)
+    dtype_str = f"int{dtype_size:d}"
     dtype_val = dtype(dtype_str)
     codes = zeros(nobs, dtype=dtype_val)
     cum_size = 0
     for i, col in enumerate(cats):
         if dtype_str == "int8":
-            shift: Union[int8, int16, int32, int64] = int8(cum_size)
+            shift: int8 | int16 | int32 | int64 = int8(cum_size)
         elif dtype_str == "int16":
             shift = int16(cum_size)
         elif dtype_str == "int32":
@@ -262,7 +250,7 @@ def category_continuous_interaction(
         return contioned
 
 
-class Interaction(object):
+class Interaction:
     """
     Class that simplifies specifying interactions
 
@@ -315,7 +303,7 @@ class Interaction(object):
         self,
         cat: OptionalArrayLike = None,
         cont: OptionalArrayLike = None,
-        nobs: Optional[int] = None,
+        nobs: int | None = None,
     ) -> None:
         self._cat = cat
         self._cont = cont
@@ -410,7 +398,7 @@ class Interaction(object):
             return sp.csc_matrix(empty((self._cat_data.shape[0], 0)))
 
     @property
-    def hash(self) -> List[Tuple[str, ...]]:
+    def hash(self) -> list[tuple[str, ...]]:
         """
         Construct a hash that will be invariant for any permutation of
         inputs that produce the same fit when used as regressors"""
@@ -475,7 +463,7 @@ class Interaction(object):
 InteractionVar = Union[DataFrame, Interaction]
 
 
-class AbsorbingRegressor(object):
+class AbsorbingRegressor:
     """
     Constructed weights sparse matrix from components
 
@@ -485,7 +473,7 @@ class AbsorbingRegressor(object):
         List of categorical variables (factors) to absorb
     cont : DataFrame
         List of continuous variables to absorb
-    interactions : List[Interaction]
+    interactions : list[Interaction]
         List of included interactions
     weights : ndarray
         Weights, if any
@@ -496,14 +484,14 @@ class AbsorbingRegressor(object):
         *,
         cat: DataFrame = None,
         cont: DataFrame = None,
-        interactions: Optional[List[Interaction]] = None,
-        weights: Optional[Float64Array] = None,
+        interactions: list[Interaction] | None = None,
+        weights: Float64Array | None = None,
     ):
         self._cat = cat
         self._cont = cont
         self._interactions = interactions
         self._weights = weights
-        self._approx_rank: Optional[int] = None
+        self._approx_rank: int | None = None
 
     @property
     def has_constant(self) -> bool:
@@ -518,8 +506,8 @@ class AbsorbingRegressor(object):
         return self._approx_rank
 
     @property
-    def hash(self) -> Tuple[Tuple[str, ...], ...]:
-        hashes: List[Tuple[str, ...]] = []
+    def hash(self) -> tuple[tuple[str, ...], ...]:
+        hashes: list[tuple[str, ...]] = []
         hasher = hash_func()
         if self._cat is not None:
             for col in self._cat:
@@ -571,7 +559,7 @@ class AbsorbingRegressor(object):
             return sp.csc_matrix(empty((0, 0)))
 
 
-class AbsorbingLS(object):
+class AbsorbingLS:
     r"""
     Linear regression with high-dimensional effects
 
@@ -587,7 +575,7 @@ class AbsorbingLS(object):
         as continuous variables that should be absorbed. When using an
         Interaction, variables in the `cat` argument are treated as effects
         and variables in the `cont` argument are treated as continuous.
-    interactions : {DataFrame, Interaction, List[DataFrame, Interaction]}
+    interactions : {DataFrame, Interaction, list[DataFrame, Interaction]}
         Interactions containing both categorical and continuous variables.  Each
         interaction is constructed using the Cartesian product of the categorical
         variables to produce the dummy, which are then separately interacted with
@@ -661,7 +649,7 @@ class AbsorbingLS(object):
         exog: OptionalArrayLike = None,
         *,
         absorb: InteractionVar = None,
-        interactions: Union[InteractionVar, Iterable[InteractionVar]] = None,
+        interactions: InteractionVar | Iterable[InteractionVar] = None,
         weights: OptionalArrayLike = None,
         drop_absorbed: bool = False,
     ) -> None:
@@ -684,10 +672,10 @@ class AbsorbingLS(object):
         self._check_weights()
 
         self._interactions = interactions
-        self._interaction_list: List[Interaction] = []
+        self._interaction_list: list[Interaction] = []
         self._prepare_interactions()
-        self._absorbed_dependent: Optional[DataFrame] = None
-        self._absorbed_exog: Optional[DataFrame] = None
+        self._absorbed_dependent: DataFrame | None = None
+        self._absorbed_exog: DataFrame | None = None
 
         self._check_shape()
         self._original_index = self._dependent.pandas.index
@@ -701,8 +689,8 @@ class AbsorbingLS(object):
         self._has_constant_exog = self._check_constant()
         self._constant_absorbed = False
         self._num_params = 0
-        self._regressors: Optional[sp.csc_matrix] = None
-        self._regressors_hash: Optional[Tuple[Tuple[str, ...], ...]] = None
+        self._regressors: sp.csc_matrix | None = None
+        self._regressors_hash: tuple[tuple[str, ...], ...] | None = None
 
     def _drop_missing(self) -> BoolArray:
         missing = self.dependent.isnull.to_numpy()
@@ -747,7 +735,7 @@ class AbsorbingLS(object):
         for interact in self._interaction_list:
             if interact.nobs != nobs:
                 raise ValueError(
-                    "interactions ({0}) and dependent have different number of "
+                    "interactions ({}) and dependent have different number of "
                     "observations".format(str(interact))
                 )
 
@@ -832,9 +820,8 @@ class AbsorbingLS(object):
     def _first_time_fit(
         self,
         use_cache: bool,
-        absorb_options: Optional[
-            Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]]
-        ],
+        absorb_options: None
+        | (dict[str, bool | str | ArrayLike | None | dict[str, Any]]),
         method: str,
     ) -> None:
         weights = (
@@ -945,11 +932,10 @@ class AbsorbingLS(object):
         cov_type: str = "robust",
         debiased: bool = False,
         method: str = "auto",
-        absorb_options: Optional[
-            Dict[str, Union[bool, str, ArrayLike, None, Dict[str, Any]]]
-        ] = None,
+        absorb_options: None
+        | (dict[str, bool | str | ArrayLike | None | dict[str, Any]]) = None,
         use_cache: bool = True,
-        lsmr_options: Optional[Dict[str, Union[float, bool]]] = None,
+        lsmr_options: dict[str, float | bool] | None = None,
         **cov_config: Any,
     ) -> AbsorbingLSResults:
         """
@@ -1111,7 +1097,7 @@ class AbsorbingLS(object):
 
     def _f_statistic(
         self, params: Float64Array, cov: Float64Array, debiased: bool
-    ) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    ) -> WaldTestStatistic | InvalidTestStatistic:
         const_loc = find_constant(cast(Float64Array, self._exog.ndarray))
         resid_df = self._nobs - self._num_params
 
@@ -1120,14 +1106,14 @@ class AbsorbingLS(object):
     def _post_estimation(
         self,
         params: Float64Array,
-        cov_estimator: Union[
-            HomoskedasticCovariance,
-            HeteroskedasticCovariance,
-            KernelCovariance,
-            ClusteredCovariance,
-        ],
+        cov_estimator: (
+            HomoskedasticCovariance
+            | HeteroskedasticCovariance
+            | KernelCovariance
+            | ClusteredCovariance
+        ),
         cov_type: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         columns = self._columns
         index = self._index
         eps = self.resids(params)

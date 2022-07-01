@@ -120,12 +120,12 @@ def test_f_stat(model_data: AttrDict) -> None:
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.f_statistic.stat
-        stata_stat = stata_stats.loc["F_{0}".format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc[f"F_{i + 1}"].squeeze()
         if np.isnan(stata_stat):
-            stata_stat = stata_stats.loc["chi2_{0}".format(i + 1)].squeeze()
+            stata_stat = stata_stats.loc[f"chi2_{i + 1}"].squeeze()
         assert_allclose(stat, stata_stat)
         pval = eq.f_statistic.pval
-        stata_pval = stata_stats.loc["p_{0}".format(i + 1)]
+        stata_pval = stata_stats.loc[f"p_{i + 1}"]
         assert_allclose(pval, stata_pval, atol=1e-6)
 
 
@@ -135,7 +135,7 @@ def test_r2(model_data: AttrDict) -> None:
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.rsquared
-        stata_stat = stata_stats.loc["r2_{0}".format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc[f"r2_{i + 1}"].squeeze()
         assert_allclose(stat, stata_stat)
 
 
@@ -145,9 +145,9 @@ def test_sum_of_squares(model_data: AttrDict) -> None:
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.resid_ss
-        stata_stat = stata_stats.loc["rss_{0}".format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc[f"rss_{i + 1}"].squeeze()
         assert_allclose(stat, stata_stat)
-        stata_stat = stata_stats.loc["mss_{0}".format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc[f"mss_{i + 1}"].squeeze()
         stat = eq.model_ss
         assert_allclose(stat, stata_stat)
 
@@ -158,5 +158,5 @@ def test_df_model(model_data: AttrDict) -> None:
     for i, key in enumerate(res.equations):
         eq = res.equations[key]
         stat = eq.df_model
-        stata_stat = stata_stats.loc["df_m{0}".format(i + 1)].squeeze()
+        stata_stat = stata_stats.loc[f"df_m{i + 1}"].squeeze()
         assert_allclose(stat, stata_stat + 1)

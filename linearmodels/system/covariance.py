@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Union, cast
+from typing import cast
 
 from numpy import asarray, empty, eye, ndarray, ones, sqrt, vstack, zeros
 from numpy.linalg import inv
@@ -24,13 +24,13 @@ number of clustering variables.  Clustering is only supported in 1 or 2 dimensio
 """
 
 
-class HomoskedasticCovariance(object):
+class HomoskedasticCovariance:
     r"""
     Homoskedastic covariance estimation for system regression
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         List of regressor arrays (ndependent)
     eps : ndarray
         Model residuals, ndependent by nobs
@@ -62,14 +62,14 @@ class HomoskedasticCovariance(object):
 
     def __init__(
         self,
-        x: List[ndarray],
+        x: list[ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
     ) -> None:
         self._eps = eps
         self._x = x
@@ -86,7 +86,7 @@ class HomoskedasticCovariance(object):
 
     def __str__(self) -> str:
         out = self._name
-        extra: List[str] = []
+        extra: list[str] = []
         for key in self._str_extra:
             extra.append(": ".join([str(key), str(self._str_extra[key])]))
         if extra:
@@ -95,14 +95,14 @@ class HomoskedasticCovariance(object):
 
     def __repr__(self) -> str:
         out = self.__str__()
-        return out + ", id: {0}".format(hex(id(self)))
+        return out + f", id: {hex(id(self))}"
 
     @property
     def sigma(self) -> Float64Array:
         """Error covariance"""
         return self._sigma
 
-    def _adjustment(self) -> Union[float, ndarray]:
+    def _adjustment(self) -> float | ndarray:
         # Sigma is pre-debiased
         return 1.0
 
@@ -167,7 +167,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         ndependent element list of regressor
     eps : ndarray
         Model residuals, ndependent by nobs
@@ -204,17 +204,17 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
     def __init__(
         self,
-        x: List[ndarray],
+        x: list[ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
     ) -> None:
 
-        super(HeteroskedasticCovariance, self).__init__(
+        super().__init__(
             x,
             eps,
             sigma,
@@ -282,7 +282,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
     def _gls_cov(self) -> Float64Array:
         return self._cov(True)
 
-    def _adjustment(self) -> Union[float, ndarray]:
+    def _adjustment(self) -> float | ndarray:
         if not self._debiased:
             return 1.0
         ks = [s.shape[1] for s in self._x]
@@ -302,7 +302,7 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         ndependent element list of regressor
     eps : ndarray
         Model residuals, ndependent by nobs
@@ -353,19 +353,19 @@ class KernelCovariance(HeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: List[ndarray],
+        x: list[ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
         kernel: str = "bartlett",
-        bandwidth: Optional[float] = None,
+        bandwidth: float | None = None,
     ):
         _HACMixin.__init__(self, kernel, bandwidth)
-        super(KernelCovariance, self).__init__(
+        super().__init__(
             x,
             eps,
             sigma,
@@ -398,7 +398,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         ndependent element list of regressor
     eps : ndarray
         Model residuals, ndependent by nobs
@@ -447,15 +447,15 @@ class ClusteredCovariance(HeteroskedasticCovariance):
 
     def __init__(
         self,
-        x: List[ndarray],
+        x: list[ndarray],
         eps: Float64Array,
         sigma: Float64Array,
         full_sigma: Float64Array,
         *,
         gls: bool = False,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
-        clusters: Optional[IntArray] = None,
+        constraints: LinearConstraint | None = None,
+        clusters: IntArray | None = None,
         group_debias: bool = False,
     ) -> None:
         super().__init__(
@@ -468,7 +468,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
             constraints=constraints,
         )
         self._group_debias = group_debias
-        self._nclusters: List[int] = []
+        self._nclusters: list[int] = []
         self._clusters = self._check_clusters(clusters)
         self._str_extra["Number of Grouping Variables"] = self._clusters.shape[1]
         if self._clusters.shape[1] > 0:
@@ -476,7 +476,7 @@ class ClusteredCovariance(HeteroskedasticCovariance):
             self._str_extra["Number of Groups"] = " and ".join(num_cl)
         self._str_extra["Group Debias"] = self._group_debias
 
-    def _check_clusters(self, clusters: Optional[IntArray]) -> IntArray:
+    def _check_clusters(self, clusters: IntArray | None) -> IntArray:
         """Check cluster dimension and ensure ndarray"""
         if clusters is None:
             return empty((self._eps.size, 0), dtype=int)
@@ -537,15 +537,15 @@ class ClusteredCovariance(HeteroskedasticCovariance):
         return out
 
 
-class GMMHomoskedasticCovariance(object):
+class GMMHomoskedasticCovariance:
     r"""
     Covariance estimator for IV system estimation with homoskedastic data
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         List containing the model regressors for each equation in the system
-    z : List[ndarray]
+    z : list[ndarray]
         List containing the model instruments for each equation in the system
     eps : ndarray
         nobs by neq array of residuals where each column corresponds an
@@ -571,14 +571,14 @@ class GMMHomoskedasticCovariance(object):
 
     def __init__(
         self,
-        x: List[ndarray],
-        z: List[ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
     ) -> None:
         self._x = x
         self._z = z
@@ -596,7 +596,7 @@ class GMMHomoskedasticCovariance(object):
 
     def __repr__(self) -> str:
         out = self.__str__()
-        return out + ", id: {0}".format(hex(id(self)))
+        return out + f", id: {hex(id(self))}"
 
     @property
     def cov(self) -> Float64Array:
@@ -642,7 +642,7 @@ class GMMHomoskedasticCovariance(object):
 
         return omega
 
-    def _adjustment(self) -> Union[float, ndarray]:
+    def _adjustment(self) -> float | ndarray:
         if not self._debiased:
             return 1.0
         k = [s.shape[1] for s in self._x]
@@ -666,9 +666,9 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         List containing the model regressors for each equation in the system
-    z : List[ndarray]
+    z : list[ndarray]
         List containing the model instruments for each equation in the system
     eps : ndarray
         nobs by neq array of residuals where each column corresponds an
@@ -693,14 +693,14 @@ class GMMHeteroskedasticCovariance(GMMHomoskedasticCovariance):
 
     def __init__(
         self,
-        x: List[ndarray],
-        z: List[ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
     ) -> None:
         super().__init__(
             x, z, eps, w, sigma=sigma, debiased=debiased, constraints=constraints
@@ -732,9 +732,9 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     Parameters
     ----------
-    x : List[ndarray]
+    x : list[ndarray]
         List containing the model regressors for each equation in the system
-    z : List[ndarray]
+    z : list[ndarray]
         List containing the model instruments for each equation in the system
     eps : ndarray
         nobs by neq array of residuals where each column corresponds an
@@ -769,16 +769,16 @@ class GMMKernelCovariance(GMMHeteroskedasticCovariance, _HACMixin):
 
     def __init__(
         self,
-        x: List[ndarray],
-        z: List[ndarray],
+        x: list[ndarray],
+        z: list[ndarray],
         eps: Float64Array,
         w: Float64Array,
         *,
-        sigma: Optional[ndarray] = None,
+        sigma: ndarray | None = None,
         debiased: bool = False,
-        constraints: Optional[LinearConstraint] = None,
+        constraints: LinearConstraint | None = None,
         kernel: str = "bartlett",
-        bandwidth: Optional[float] = None,
+        bandwidth: float | None = None,
     ) -> None:
         _HACMixin.__init__(self, kernel, bandwidth)
         super().__init__(

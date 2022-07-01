@@ -4,7 +4,7 @@ Covariance and weight estimation for GMM IV estimators
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from numpy import asarray, ndarray, unique
 from numpy.linalg import inv
@@ -18,7 +18,7 @@ from linearmodels.shared.covariance import cov_cluster, cov_kernel
 from linearmodels.typing import AnyArray, Float64Array
 
 
-class HomoskedasticWeightMatrix(object):
+class HomoskedasticWeightMatrix:
     r"""
     Homoskedastic (unadjusted) weight estimation
 
@@ -47,7 +47,7 @@ class HomoskedasticWeightMatrix(object):
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
         self._center = center
         self._debiased = debiased
-        self._bandwidth: Optional[int] = 0
+        self._bandwidth: int | None = 0
 
     def weight_matrix(
         self, x: Float64Array, z: Float64Array, eps: Float64Array
@@ -75,7 +75,7 @@ class HomoskedasticWeightMatrix(object):
         return w
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+    def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -112,7 +112,7 @@ class HeteroskedasticWeightMatrix(HomoskedasticWeightMatrix):
     """
 
     def __init__(self, center: bool = False, debiased: bool = False) -> None:
-        super(HeteroskedasticWeightMatrix, self).__init__(center, debiased)
+        super().__init__(center, debiased)
 
     def weight_matrix(
         self, x: Float64Array, z: Float64Array, eps: Float64Array
@@ -188,12 +188,12 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
     def __init__(
         self,
         kernel: str = "bartlett",
-        bandwidth: Optional[int] = None,
+        bandwidth: int | None = None,
         center: bool = False,
         debiased: bool = False,
         optimal_bw: bool = False,
     ) -> None:
-        super(KernelWeightMatrix, self).__init__(center, debiased)
+        super().__init__(center, debiased)
         self._bandwidth = bandwidth
         self._orig_bandwidth = bandwidth
         self._kernel = kernel
@@ -239,7 +239,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+    def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -256,7 +256,7 @@ class KernelWeightMatrix(HomoskedasticWeightMatrix):
         }
 
     @property
-    def bandwidth(self) -> Optional[int]:
+    def bandwidth(self) -> int | None:
         """Actual bandwidth used in estimating the weight matrix"""
         return self._bandwidth
 
@@ -279,7 +279,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
     def __init__(
         self, clusters: AnyArray, center: bool = False, debiased: bool = False
     ) -> None:
-        super(OneWayClusteredWeightMatrix, self).__init__(center, debiased)
+        super().__init__(center, debiased)
         self._clusters = clusters
 
     def weight_matrix(
@@ -309,8 +309,8 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         clusters = self._clusters
         if clusters.shape[0] != nobs:
             raise ValueError(
-                "clusters has the wrong nobs. Expected {0}, "
-                "got {1}".format(nobs, clusters.shape[0])
+                "clusters has the wrong nobs. Expected {}, "
+                "got {}".format(nobs, clusters.shape[0])
             )
         clusters = asarray(clusters).copy().squeeze()
 
@@ -324,7 +324,7 @@ class OneWayClusteredWeightMatrix(HomoskedasticWeightMatrix):
         return s
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
+    def config(self) -> dict[str, str | bool | ndarray | int | None]:
         """
         Weight estimator configuration
 
@@ -406,9 +406,9 @@ class IVGMMCovariance(HomoskedasticCovariance):
         w: Float64Array,
         cov_type: str = "robust",
         debiased: bool = False,
-        **cov_config: Union[str, bool],
+        **cov_config: str | bool,
     ) -> None:
-        super(IVGMMCovariance, self).__init__(x, y, z, params, debiased)
+        super().__init__(x, y, z, params, debiased)
         self._cov_type = cov_type
         self._cov_config = cov_config
         self.w = w
@@ -428,7 +428,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         self._score_cov_estimator = score_cov_estimator
 
     def __str__(self) -> str:
-        out = super(IVGMMCovariance, self).__str__()
+        out = super().__str__()
         cov_type = self._cov_type
         if cov_type in ("robust", "heteroskedastic"):
             out += "\nRobust (Heteroskedastic)"
@@ -439,13 +439,13 @@ class IVGMMCovariance(HomoskedasticCovariance):
             clusters = self._cov_config.get("clusters", None)
             if clusters is not None:
                 nclusters = len(unique(asarray(clusters)))
-                out += "\nNum Clusters: {0}".format(nclusters)
+                out += f"\nNum Clusters: {nclusters}"
         else:  # kernel
             out += "\nKernel (HAC)"
             if self._cov_config.get("kernel", False):
-                out += "\nKernel: {0}".format(self._cov_config["kernel"])
+                out += "\nKernel: {}".format(self._cov_config["kernel"])
             if self._cov_config.get("bandwidth", False):
-                out += "\nBandwidth: {0}".format(self._cov_config["bandwidth"])
+                out += "\nBandwidth: {}".format(self._cov_config["bandwidth"])
         return out
 
     @property
@@ -466,9 +466,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         return (c + c.T) / 2
 
     @property
-    def config(self) -> Dict[str, Union[str, bool, ndarray, Optional[int]]]:
-        conf: Dict[str, Union[str, bool, ndarray, Optional[int]]] = {
-            "debiased": self.debiased
-        }
+    def config(self) -> dict[str, str | bool | ndarray | int | None]:
+        conf: dict[str, str | bool | ndarray | int | None] = {"debiased": self.debiased}
         conf.update(self._cov_config)
         return conf

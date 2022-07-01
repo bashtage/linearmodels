@@ -116,7 +116,7 @@ def test_invalid_types() -> None:
         IVData(np.empty((10, 2, 2)))
     with pytest.raises(TypeError):
 
-        class AnotherClass(object):
+        class AnotherClass:
             _ndim = 2
 
             @property

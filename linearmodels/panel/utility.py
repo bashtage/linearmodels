@@ -1,18 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import (
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import NamedTuple, Sequence, TypeVar, cast
 
 import numpy as np
 from pandas import DataFrame, concat, date_range
@@ -66,7 +55,7 @@ SparseOrDense = TypeVar(
 
 def preconditioner(
     d: SparseOrDense, *, copy: bool = False
-) -> Tuple[SparseOrDense, Float64Array]:
+) -> tuple[SparseOrDense, Float64Array]:
     """
     Parameters
     ----------
@@ -123,9 +112,7 @@ def dummy_matrix(
     drop: str = "first",
     drop_all: bool = False,
     precondition: bool = True,
-) -> Tuple[
-    Union[sp.csc_matrix, sp.csr_matrix, sp.coo_matrix, Float64Array], Float64Array
-]:
+) -> tuple[sp.csc_matrix | sp.csr_matrix | sp.coo_matrix | Float64Array, Float64Array]:
     """
     Parameters
     ----------
@@ -163,7 +150,7 @@ def dummy_matrix(
     else:
         codes = np.asarray(cats)
 
-    data: Dict[str, List[np.ndarray]] = defaultdict(list)
+    data: dict[str, list[np.ndarray]] = defaultdict(list)
     total_dummies = 0
     nobs, ncats = codes.shape
     for i in range(ncats):
@@ -171,9 +158,9 @@ def dummy_matrix(
         ucats, inverse = np.unique(codes[:, i], return_inverse=True)
         ncategories = len(ucats)
         bits = min(
-            [i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories + total_dummies)]
+            i for i in (8, 16, 32, 64) if i - 1 > np.log2(ncategories + total_dummies)
         )
-        replacements = np.arange(ncategories, dtype="int{:d}".format(bits))
+        replacements = np.arange(ncategories, dtype=f"int{bits:d}")
         cols = replacements[inverse]
         if i == 0 and not drop_all:
             retain = np.arange(nobs)
@@ -199,7 +186,7 @@ def dummy_matrix(
     elif output_format == "coo":
         fmt = sp.coo_matrix
     else:
-        raise ValueError("Unknown format: {0}".format(output_format))
+        raise ValueError(f"Unknown format: {output_format}")
     out = fmt(
         (
             np.concatenate(data["values"]),
@@ -217,7 +204,7 @@ def dummy_matrix(
     return out, cond
 
 
-def _remove_node(node: int, meta: IntArray, orig_dest: IntArray) -> Tuple[int, int]:
+def _remove_node(node: int, meta: IntArray, orig_dest: IntArray) -> tuple[int, int]:
     """
     Parameters
     ----------
@@ -350,7 +337,7 @@ def in_2core_graph(cats: ArrayLike) -> BoolArray:
 
     def min_dtype(*args: IntArray) -> str:
         bits = np.amax([np.log2(max(float(arg.max()), 1.0)) for arg in args])
-        return "int{0}".format(min([j for j in (8, 16, 32, 64) if bits < (j - 1)]))
+        return f"int{min(j for j in (8, 16, 32, 64) if bits < (j - 1))}"
 
     dtype = min_dtype(offset, node_id, count, orig_dest)
     meta = np.column_stack(
@@ -409,7 +396,7 @@ def in_2core_graph_slow(cats: ArrayLike) -> BoolArray:
 
 
 def check_absorbed(
-    x: Float64Array, variables: Sequence[str], x_orig: Optional[Float64Array] = None
+    x: Float64Array, variables: Sequence[str], x_orig: Float64Array | None = None
 ) -> None:
     """
     Check a regressor matrix for variables absorbed
@@ -418,7 +405,7 @@ def check_absorbed(
     ----------
     x : ndarray
         Regressor matrix to check
-    variables : List[str]
+    variables : list[str]
         List of variable names
     x_orig : ndarray
         Original data. If provided uses a norm check to ascertain if all
@@ -440,7 +427,7 @@ def check_absorbed(
             abs_vec = np.abs(absorbed_vecs[:, i])
             tol = abs_vec.max() * np.finfo(np.float64).eps * abs_vec.shape[0]
             vars_idx = np.where(np.abs(absorbed_vecs[:, i]) > tol)[0]
-            rows.append(" " * 10 + ", ".join((str(variables[vi]) for vi in vars_idx)))
+            rows.append(" " * 10 + ", ".join(str(variables[vi]) for vi in vars_idx))
         absorbed_variables = "\n".join(rows)
         msg = absorbing_error_msg.format(absorbed_variables=absorbed_variables)
         raise AbsorbingEffectError(msg)
@@ -456,8 +443,8 @@ def check_absorbed(
 
 
 def not_absorbed(
-    x: Float64Array, has_constant: bool = False, loc: Optional[int] = None
-) -> List[int]:
+    x: Float64Array, has_constant: bool = False, loc: int | None = None
+) -> list[int]:
     """
     Construct a list of the indices of regressors that are not absorbed
 
@@ -497,10 +484,10 @@ def not_absorbed(
     _, r = np.linalg.qr(x)
     threshold = np.sort(np.abs(np.diag(r)))[nabsorbed]
     drop = np.where(np.abs(np.diag(r)) < threshold)[0]
-    retain: Set[int] = set(range(x.shape[1])).difference(drop)
+    retain: set[int] = set(range(x.shape[1])).difference(drop)
     if has_constant:
         assert isinstance(loc, int)
-        retain = set([idx + (idx >= loc) for idx in retain])
+        retain = {idx + (idx >= loc) for idx in retain}
         retain.update({loc})
     return sorted(retain)
 
@@ -523,8 +510,8 @@ def generate_panel_data(
     const: bool = False,
     missing: float = 0,
     other_effects: int = 2,
-    ncats: Union[int, List[int]] = 4,
-    rng: Optional[np.random.RandomState] = None,
+    ncats: int | list[int] = 4,
+    rng: np.random.RandomState | None = None,
 ) -> PanelModelData:
     """
 
@@ -586,7 +573,7 @@ def generate_panel_data(
     )
 
     w = rng.chisquare(5, (t, n)) / 5
-    c: Optional[IntArray] = None
+    c: IntArray | None = None
     cats = [f"cat.{i}" for i in range(other_effects)]
     if other_effects:
         if not isinstance(ncats, list):

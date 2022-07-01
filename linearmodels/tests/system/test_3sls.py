@@ -170,7 +170,7 @@ def test_too_few_instruments():
     instr = np.random.standard_normal((n, 1))
     eqns = {}
     for i in range(2):
-        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
+        eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -184,7 +184,7 @@ def test_redundant_instruments():
     instr = np.concatenate([exog, instr], 1)
     eqns = {}
     for i in range(2):
-        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
+        eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -197,7 +197,7 @@ def test_too_many_instruments():
     instr = np.random.standard_normal((n, n + 1))
     eqns = {}
     for i in range(2):
-        eqns["eqn.{0}".format(i)] = (dep[:, i], exog, endog, instr)
+        eqns[f"eqn.{i}"] = (dep[:, i], exog, endog, instr)
     with pytest.raises(ValueError):
         IV3SLS(eqns)
 
@@ -226,14 +226,14 @@ def test_multivariate_iv():
     n = 250
     dep = np.random.standard_normal((n, 2))
     exog = np.random.standard_normal((n, 3))
-    exog = DataFrame(exog, columns=["exog.{0}".format(i) for i in range(3)])
+    exog = DataFrame(exog, columns=[f"exog.{i}" for i in range(3)])
     endog = np.random.standard_normal((n, 2))
-    endog = DataFrame(endog, columns=["endog.{0}".format(i) for i in range(2)])
+    endog = DataFrame(endog, columns=[f"endog.{i}" for i in range(2)])
     instr = np.random.standard_normal((n, 3))
-    instr = DataFrame(instr, columns=["instr.{0}".format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=[f"instr.{i}" for i in range(3)])
     eqns = {}
     for i in range(2):
-        eqns["dependent.{0}".format(i)] = (dep[:, i], exog, endog, instr)
+        eqns[f"dependent.{i}"] = (dep[:, i], exog, endog, instr)
     mod = IV3SLS(eqns)
     res = mod.fit()
 
@@ -247,7 +247,7 @@ def test_multivariate_iv_bad_data():
     n = 250
     dep = np.random.standard_normal((n, 2))
     instr = np.random.standard_normal((n, 3))
-    instr = DataFrame(instr, columns=["instr.{0}".format(i) for i in range(3)])
+    instr = DataFrame(instr, columns=[f"instr.{i}" for i in range(3)])
 
     with pytest.raises(ValueError):
         IV3SLS.multivariate_iv(dep, None, None, instr)

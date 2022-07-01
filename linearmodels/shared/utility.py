@@ -8,14 +8,10 @@ from typing import (
     Iterable,
     Iterator,
     KeysView,
-    List,
     Mapping,
-    Optional,
     Protocol,
     Sequence,
-    Tuple,
     TypeVar,
-    Union,
     ValuesView,
 )
 
@@ -37,7 +33,7 @@ class SupportsKeysAndGetItem(Protocol[_KT, _VT_co]):
         ...
 
 
-def _new_attr_dict_(*args: Iterable[Tuple[Any, Any]]) -> AttrDict:
+def _new_attr_dict_(*args: Iterable[tuple[Any, Any]]) -> AttrDict:
     attr_dict = AttrDict()
     for k, v in args:
         attr_dict[k] = v
@@ -51,7 +47,7 @@ class AttrDict(MutableMapping):
 
     def update(
         self,
-        *args: Union[SupportsKeysAndGetItem[Any, Any], Iterable[Tuple[Any, Any]]],
+        *args: SupportsKeysAndGetItem[Any, Any] | Iterable[tuple[Any, Any]],
         **kwargs: Any,
     ) -> None:
         """
@@ -95,8 +91,8 @@ class AttrDict(MutableMapping):
 
     def __reduce__(
         self,
-    ) -> Tuple[
-        Callable[[Iterable[Tuple[Any, Any]]], "AttrDict"], Tuple[Tuple[Any, Any], ...]
+    ) -> tuple[
+        Callable[[Iterable[tuple[Any, Any]]], AttrDict], tuple[tuple[Any, Any], ...]
     ]:
         return _new_attr_dict_, tuple((k, v) for k, v in self.items())
 
@@ -111,7 +107,7 @@ class AttrDict(MutableMapping):
         return self.__repr__()
 
     def __init__(
-        self, *args: Union[Mapping[Any, Any], Sequence[Tuple[Any, Any]]], **kwargs: Any
+        self, *args: Mapping[Any, Any] | Sequence[tuple[Any, Any]], **kwargs: Any
     ) -> None:
         self.__dict__["__private_dict__"] = dict(*args, **kwargs)
 
@@ -144,7 +140,7 @@ class AttrDict(MutableMapping):
 
     def __dir__(self) -> Iterable[str]:
         out = [str(key) for key in self.__private_dict__.keys()]
-        out += list(super(AttrDict, self).__dir__())
+        out += list(super().__dir__())
         filtered = [key for key in out if key.isidentifier()]
         return sorted(set(filtered))
 
@@ -159,7 +155,7 @@ def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> s
 
 
 def panel_to_frame(
-    x: Optional[AnyArray],
+    x: AnyArray | None,
     items: Sequence[Label],
     major_axis: Sequence[Label],
     minor_axis: Sequence[Label],
@@ -226,8 +222,8 @@ class DataFrameWrapper:
         self,
         values: AnyArray,
         *,
-        columns: Optional[List[str]] = None,
-        index: Optional[Union[Index, List[str]]] = None,
+        columns: list[str] | None = None,
+        index: Index | list[str] | None = None,
     ) -> None:
         self._values = values
         self._columns = columns
@@ -255,8 +251,8 @@ class SeriesWrapper:
         self,
         values: AnyArray,
         *,
-        name: Optional[str] = None,
-        index: Optional[Union[Index, List[str]]] = None,
+        name: str | None = None,
+        index: Index | list[str] | None = None,
     ) -> None:
         self._values = values
         self._name = name

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict, Tuple
-
 from formulaic import model_matrix
 from formulaic.materializers.types import NAAction as fNAAction
 import numpy as np
@@ -63,7 +61,7 @@ def annihilate(y: Float64Array, x: Float64Array) -> Float64Array:
     return y - proj(y, x)
 
 
-class IVFormulaParser(object):
+class IVFormulaParser:
     """
     Parse formulas for OLS and IV models
 
@@ -85,7 +83,7 @@ class IVFormulaParser(object):
         self._formula = formula
         self._data = data
         self._eval_env = eval_env
-        self._components: Dict[str, str] = {}
+        self._components: dict[str, str] = {}
         self._parse()
 
     def _parse(self) -> None:
@@ -104,17 +102,17 @@ class IVFormulaParser(object):
                     "starts with [ and ends with ]."
                 )
             dep = blocks[0].strip()
-            exog, endog = [bl.strip() for bl in blocks[1].split("[")]
-            instr, exog2 = [bl.strip() for bl in blocks[2].split("]")]
+            exog, endog = (bl.strip() for bl in blocks[1].split("["))
+            instr, exog2 = (bl.strip() for bl in blocks[2].split("]"))
             if endog[0] == "+" or endog[-1] == "+":
                 raise ValueError(
                     "endogenous block must not start or end with +. This block "
-                    "was: {0}".format(endog)
+                    "was: {}".format(endog)
                 )
             if instr[0] == "+" or instr[-1] == "+":
                 raise ValueError(
                     "instrument block must not start or end with +. This "
-                    "block was: {0}".format(instr)
+                    "block was: {}".format(instr)
                 )
             if exog:
                 exog = exog[:-1].strip() if exog[-1] == "+" else exog
@@ -141,7 +139,7 @@ class IVFormulaParser(object):
         self._eval_env = value
 
     @property
-    def data(self) -> Tuple[OptionalDataFrame, ...]:
+    def data(self) -> tuple[OptionalDataFrame, ...]:
         """Returns a tuple containing the dependent, exog, endog and instruments"""
         self._eval_env += 1
         out = self.dependent, self.exog, self.endog, self.instruments
@@ -201,7 +199,7 @@ class IVFormulaParser(object):
         return self._empty_check(DataFrame(instr))
 
     @property
-    def components(self) -> Dict[str, str]:
+    def components(self) -> dict[str, str]:
         """Dictionary containing the string components of the formula"""
         return self._components
 

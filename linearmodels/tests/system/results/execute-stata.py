@@ -54,19 +54,19 @@ missing_data = generate_data(n=200, k=3, p=[2, 3, 4], const=True, seed=2)
 
 cmds = []
 for i, dataset in enumerate((data, common_data, missing_data)):
-    base = "mod_{0}".format(i)
+    base = f"mod_{i}"
     cmd = ""
     for j, key in enumerate(dataset):
         dep = dataset[key]["dependent"]
-        dep = pd.DataFrame(dep, columns=[base + "_y_{0}".format(j)])
+        dep = pd.DataFrame(dep, columns=[base + f"_y_{j}"])
         exog = dataset[key]["exog"][:, 1:]
-        exog_cols = [base + "_x_{0}{1}".format(j, k) for k in range(exog.shape[1])]
+        exog_cols = [base + f"_x_{j}{k}" for k in range(exog.shape[1])]
         exog = pd.DataFrame(exog, columns=exog_cols)
         if i != 1 or j == 0:
             cmd += " ( " + " ".join(list(dep.columns) + list(exog.columns)) + " ) "
         else:
             new_cmd = cmd[: cmd.find(")") + 1]
-            new_cmd = new_cmd.replace("mod_1_y_0", "mod_1_y_{0}".format(j))
+            new_cmd = new_cmd.replace("mod_1_y_0", f"mod_1_y_{j}")
             cmd += new_cmd
     cmds.append(cmd)
 
@@ -105,7 +105,7 @@ with open("sur.do", "w") as stata_file:
     for outcmd in outcmds:
         stata_file.write(sep.format(outfile=OUTFILE, key=outcmd))
         stata_file.write(outcmds[outcmd] + "\n")
-        stata_file.write("\n{0}\n\n".format(output))
+        stata_file.write(f"\n{output}\n\n")
         stata_file.write("\n" * 5)
 
 if os.path.exists(OUTFILE):

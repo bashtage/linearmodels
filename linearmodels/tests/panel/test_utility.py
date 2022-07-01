@@ -176,7 +176,7 @@ def test_drop_singletons_pandas():
     c1 = rs.randint(0, 10000, (40000, 1))
     c2 = rs.randint(0, 20000, (40000, 1))
     df = [
-        pd.Series(["{0}{1}".format(let, c) for c in cat.ravel()], dtype="category")
+        pd.Series([f"{let}{c}" for c in cat.ravel()], dtype="category")
         for let, cat in zip("AB", (c1, c2))
     ]
     df = pd.concat(df, axis=1)

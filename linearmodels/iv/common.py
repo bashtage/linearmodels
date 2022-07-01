@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Union
-
 from numpy import ix_, ptp, where
 from numpy.linalg import inv
 
@@ -9,7 +7,7 @@ from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatist
 from linearmodels.typing import Float64Array
 
 
-def find_constant(x: Float64Array) -> Optional[int]:
+def find_constant(x: Float64Array) -> int | None:
     """
     Parameters
     ----------
@@ -33,8 +31,8 @@ def f_statistic(
     cov: Float64Array,
     debiased: bool,
     resid_df: int,
-    const_loc: Optional[int] = None,
-) -> Union[WaldTestStatistic, InvalidTestStatistic]:
+    const_loc: int | None = None,
+) -> WaldTestStatistic | InvalidTestStatistic:
     """
     Parameters
     ----------
