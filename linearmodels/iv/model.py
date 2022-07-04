@@ -240,7 +240,7 @@ class _IVModelBase:
         *,
         exog: IVDataLike | None = None,
         endog: IVDataLike | None = None,
-        data: DataFrame = None,
+        data: DataFrame | None = None,
         eval_env: int = 4,
     ) -> DataFrame:
         """
@@ -1519,7 +1519,7 @@ class IVGMMCUE(_IVGMMBase):
     def fit(
         self,
         *,
-        starting: Float64Array | Series = None,
+        starting: Float64Array | Series | None = None,
         display: bool = False,
         cov_type: str = "robust",
         debiased: bool = False,
