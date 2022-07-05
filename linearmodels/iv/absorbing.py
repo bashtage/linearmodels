@@ -54,7 +54,7 @@ from linearmodels.shared.exceptions import missing_warning
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.utility import DataFrameWrapper, SeriesWrapper
 from linearmodels.typing import AnyPandas, BoolArray, Float64Array
-from linearmodels.typing.data import ArrayLike, OptionalArrayLike
+from linearmodels.typing.data import ArrayLike
 
 try:
     from xxhash import xxh64 as hash_func
@@ -301,8 +301,8 @@ class Interaction:
 
     def __init__(
         self,
-        cat: OptionalArrayLike = None,
-        cont: OptionalArrayLike = None,
+        cat: ArrayLike | None = None,
+        cont: ArrayLike | None = None,
         nobs: int | None = None,
     ) -> None:
         self._cat = cat
@@ -482,8 +482,8 @@ class AbsorbingRegressor:
     def __init__(
         self,
         *,
-        cat: DataFrame = None,
-        cont: DataFrame = None,
+        cat: DataFrame | None = None,
+        cont: DataFrame | None = None,
         interactions: list[Interaction] | None = None,
         weights: Float64Array | None = None,
     ):
@@ -646,11 +646,11 @@ class AbsorbingLS:
     def __init__(
         self,
         dependent: ArrayLike,
-        exog: OptionalArrayLike = None,
+        exog: ArrayLike | None = None,
         *,
-        absorb: InteractionVar = None,
-        interactions: InteractionVar | Iterable[InteractionVar] = None,
-        weights: OptionalArrayLike = None,
+        absorb: InteractionVar | None = None,
+        interactions: InteractionVar | Iterable[InteractionVar] | None = None,
+        weights: ArrayLike | None = None,
         drop_absorbed: bool = False,
     ) -> None:
 
