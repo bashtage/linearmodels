@@ -5,7 +5,7 @@ A data abstraction that allow multiple input data formats
 from __future__ import annotations
 
 import copy
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,8 @@ type_err = "Only ndarrays, DataArrays and Series and DataFrames are supported"
 def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
     if is_categorical_dtype(s):
         out = pd.get_dummies(s, drop_first=drop_first)
-        out.columns = [str(s.name) + "." + str(c) for c in out]
+        # TODO: Remove once pandas typing fixed
+        out.columns = pd.Index([str(s.name) + "." + str(c) for c in out])
         return out
     return s
 
@@ -57,7 +58,7 @@ class IVData:
 
     def __init__(
         self,
-        x: Optional[IVDataLike],
+        x: IVDataLike | None,
         var_name: str = "x",
         nobs: int | None = None,
         convert_dummies: bool = True,

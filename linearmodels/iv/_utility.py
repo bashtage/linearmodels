@@ -6,7 +6,6 @@ import numpy as np
 from pandas import DataFrame
 
 from linearmodels.typing import Float64Array
-from linearmodels.typing.data import OptionalDataFrame
 
 PARSING_ERROR = """
 Conversion of formula blocks to DataFrames failed.
@@ -139,7 +138,9 @@ class IVFormulaParser:
         self._eval_env = value
 
     @property
-    def data(self) -> tuple[OptionalDataFrame, ...]:
+    def data(
+        self,
+    ) -> tuple[DataFrame, DataFrame | None, DataFrame | None, DataFrame | None]:
         """Returns a tuple containing the dependent, exog, endog and instruments"""
         self._eval_env += 1
         out = self.dependent, self.exog, self.endog, self.instruments
@@ -160,7 +161,7 @@ class IVFormulaParser:
         return DataFrame(dep)
 
     @property
-    def exog(self) -> OptionalDataFrame:
+    def exog(self) -> DataFrame | None:
         """Exogenous variables"""
         exog_fmla = self.components["exog"]
         exog = model_matrix(
@@ -173,7 +174,7 @@ class IVFormulaParser:
         return self._empty_check(DataFrame(exog))
 
     @property
-    def endog(self) -> OptionalDataFrame:
+    def endog(self) -> DataFrame | None:
         """Endogenous variables"""
         endog_fmla = "0 +" + self.components["endog"]
         endog = model_matrix(
@@ -186,7 +187,7 @@ class IVFormulaParser:
         return self._empty_check(DataFrame(endog))
 
     @property
-    def instruments(self) -> OptionalDataFrame:
+    def instruments(self) -> DataFrame | None:
         """Instruments"""
         instr_fmla = "0 +" + self.components["instruments"]
         instr = model_matrix(
@@ -204,5 +205,5 @@ class IVFormulaParser:
         return self._components
 
     @staticmethod
-    def _empty_check(arr: DataFrame) -> OptionalDataFrame:
+    def _empty_check(arr: DataFrame) -> DataFrame | None:
         return None if arr.shape[1] == 0 else arr

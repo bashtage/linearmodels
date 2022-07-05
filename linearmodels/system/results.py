@@ -17,7 +17,6 @@ from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatist
 from linearmodels.shared.io import _str, format_wide, param_table, pval_format
 from linearmodels.shared.utility import AttrDict
 from linearmodels.typing import ArrayLike, Float64Array
-from linearmodels.typing.data import OptionalDataFrame
 
 __all__ = ["SystemResults", "SystemEquationResult", "GMMSystemResults"]
 
@@ -261,9 +260,10 @@ class SystemResults(_CommonResults):
                 pred = pred.dropna(how="all", axis=1)
             return pred
 
-        pred_dict = {col: pred[[col]] for col in pred}
+        pred_dict = {str(col): pred[col] for col in pred}
         if missing:
-            pred_dict = {col: pred_dict[[col]].dropna() for col in pred}
+            for col, val in pred_dict.items():
+                pred_dict[col] = val.dropna()
 
         return pred_dict
 
@@ -655,7 +655,7 @@ class SystemEquationResult(_CommonResults):
         return self._dependent
 
     @property
-    def instruments(self) -> dict[str, OptionalDataFrame]:
+    def instruments(self) -> dict[str, DataFrame | None]:
         """Instruments used in estimation.  None if all variables assumed exogenous."""
         return self._instruments
 

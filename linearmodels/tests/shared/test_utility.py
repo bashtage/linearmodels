@@ -46,7 +46,7 @@ def test_hasconstant():
     x = np.random.randn(100, 3)
     hc, loc = has_constant(x)
     assert bool(hc) is False
-    assert loc is None
+    assert loc == -1
     x[:, 0] = 1
     hc, loc = has_constant(x)
     assert hc is True

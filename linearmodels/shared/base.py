@@ -5,7 +5,7 @@ from linearmodels.compat.statsmodels import Summary
 from typing import Any, Sequence
 
 import numpy as np
-from pandas import DataFrame, Series, concat
+from pandas import DataFrame, Index, Series, concat
 
 
 class _SummaryStr:
@@ -76,7 +76,8 @@ class _ModelComparison(_SummaryStr):
         ]
         cols = [v[0] for v in out]
         values = concat([v[1] for v in out], axis=1, sort=False)
-        values.columns = cols
+        # TODO: Remove once pandas typing fixed
+        values.columns = Index(cols)
         return values
 
     def _get_property(self, name: str) -> Series:

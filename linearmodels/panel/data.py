@@ -116,7 +116,8 @@ def convert_columns(s: Series, drop_first: bool) -> AnyPandas:
 
     if is_categorical_dtype(s):
         out = get_dummies(s, drop_first=drop_first)
-        out.columns = [str(s.name) + "." + str(c) for c in out]
+        # TODO: Remove once pandas typing fixed
+        out.columns = Index([str(s.name) + "." + str(c) for c in out])
         return out
     return s
 
@@ -459,7 +460,8 @@ class PanelData:
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
         ) -> Float64Array:
-            num = (root_w * df).groupby(level=level).transform("sum")
+            scaled_df: DataFrame = root_w * df
+            num = scaled_df.groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
             else:

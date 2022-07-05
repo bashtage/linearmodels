@@ -6,14 +6,13 @@ from typing import TYPE_CHECKING, Any, Hashable, Optional, Sequence, Union
 import numpy as np
 from pandas import DataFrame, Series
 
-from .data import ArrayLike, OptionalArrayLike
+from .data import ArrayLike
 
 NP_GTE_121 = np.lib.NumpyVersion(np.__version__) >= np.lib.NumpyVersion("1.21.0")
 
 
 __all__ = [
     "ArrayLike",
-    "OptionalArrayLike",
     "Numeric",
     "OptionalNumeric",
     "AnyPandas",

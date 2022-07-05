@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 import pandas as pd
 
@@ -19,16 +21,16 @@ w = w / float(w.mean())
 
 items = ["x" + str(i) for i in range(1, k + 1)]
 items = ["intercept"] + items
-major = pd.date_range("12-31-1999", periods=t, freq="A-DEC")
-minor = ["firm." + str(i) for i in range(1, n + 1)]
+major = list(pd.date_range("12-31-1999", periods=t, freq="A-DEC"))
+minor = [f"firm.{i:0>4}" for i in range(1, n + 1)]
 
-x = panel_to_frame(x, items, major, minor, swap=True)
-y = panel_to_frame(y[None, :], ["y"], major, minor, swap=True)
-w = panel_to_frame(w[None, :], ["w"], major, minor, swap=True)
+x_df = panel_to_frame(x, items, major, minor, swap=True)
+y_df = panel_to_frame(y[None, :], ["y"], major, minor, swap=True)
+w_df = panel_to_frame(w[None, :], ["w"], major, minor, swap=True)
 
-x_panel_data = PanelData(x)
-y_panel_data = PanelData(y)
-w_panel_data = PanelData(w)
+x_panel_data = PanelData(x_df)
+y_panel_data = PanelData(y_df)
+w_panel_data = PanelData(w_df)
 
 z = pd.concat(
     [x_panel_data.dataframe, y_panel_data.dataframe, w_panel_data.dataframe],
@@ -36,13 +38,14 @@ z = pd.concat(
     sort=False,
 )
 final_index = pd.MultiIndex.from_product([minor, major])
-final_index.levels[0].name = "firm"
+final_index.set_names("firm", level=0)
 z = z.reindex(final_index)
-z.index.levels[0].name = "firm"
-z.index.levels[1].name = "time"
+idx = cast(pd.MultiIndex, z.index)
+idx.set_names(["firm", "time"], level=[0, 1])
+z.index = idx
 
 z = z.reset_index()
-z["firm_id"] = z.firm.astype("category")
+z["firm_id"] = z.index.get_level_values(0).astype("category")
 z["firm_id"] = z.firm_id.cat.codes
 
 variables = ["y", "x1", "x2", "x3", "x4", "x5"]
@@ -50,7 +53,7 @@ missing = 0.05
 for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
-    temp.loc[locs] = np.nan
+    temp.iloc[locs] = np.nan
     z[v + "_light"] = temp
 
 variables = ["y", "x1", "x2", "x3", "x4", "x5"]
@@ -58,7 +61,7 @@ missing = 0.20
 for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
-    temp.loc[locs] = np.nan
+    temp.iloc[locs] = np.nan
     z[v + "_heavy"] = temp
 
 z.to_stata("simulated-panel.dta")

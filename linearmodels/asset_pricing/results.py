@@ -6,7 +6,7 @@ from __future__ import annotations
 from linearmodels.compat.statsmodels import Summary
 
 import datetime as dt
-from typing import Sequence, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -155,7 +155,7 @@ class LinearFactorModelResults(_SummaryStr):
         params: Float64Array,
         se: Float64Array,
         name: str,
-        param_names: Sequence[str],
+        param_names: list[str] | tuple[str, ...],
         first: bool = False,
     ) -> SimpleTable:
         tstats = params / se
