@@ -1616,10 +1616,10 @@ class IVModelComparison(_ModelComparison):
             ],
             axis=1,
         )
-        vals = [[i for i in v] for v in vals.T.values]
-        vals[2] = [str(v) for v in vals[2]]
-        for i in range(4, len(vals)):
-            vals[i] = [_str(v) for v in vals[i]]
+        vals_list = [[i for i in v] for v in vals.T.values]
+        vals_list[2] = [str(v) for v in vals_list[2]]
+        for i in range(4, len(vals_list)):
+            vals_list[i] = [_str(v) for v in vals_list[i]]
 
         params = self.params
         precision = getattr(self, self._precision)
@@ -1641,7 +1641,7 @@ class IVModelComparison(_ModelComparison):
             params_stub.append(params.index[i])
             params_stub.append(" ")
 
-        vals = table_concat((vals, params_fmt))
+        vals_tab = table_concat((vals_list, params_fmt))
         stubs = stub_concat((stubs, params_stub))
 
         all_instr = []
@@ -1663,14 +1663,14 @@ class IVModelComparison(_ModelComparison):
                     row.append("")
             instruments.append(row)
         if instruments:
-            vals = table_concat((vals, instruments))
+            vals_tab = table_concat((vals_tab, instruments))
             stubs = stub_concat((stubs, instrument_stub))
 
         txt_fmt = default_txt_fmt.copy()
         txt_fmt["data_aligns"] = "r"
         txt_fmt["header_align"] = "r"
         table = SimpleTable(
-            vals, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt
+            vals_tab, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt
         )
         smry.tables.append(table)
         prec_type = self._PRECISION_TYPES[self._precision]

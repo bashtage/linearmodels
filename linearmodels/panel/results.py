@@ -1017,11 +1017,10 @@ class PanelModelComparison(_ModelComparison):
         dep_name = {}
         for key in self._results:
             dep_name[key] = self._results[key].model.dependent.vars[0]
-        dep_name = Series(dep_name)
 
         vals = concat(
             [
-                dep_name,
+                Series(dep_name),
                 self.estimator_method,
                 self.nobs,
                 self.cov_estimator,

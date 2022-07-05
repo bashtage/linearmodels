@@ -5,7 +5,6 @@ from typing import Hashable, Literal, Sequence, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
-import pandas as pd
 from pandas import (
     Categorical,
     DataFrame,
@@ -463,7 +462,7 @@ class PanelData:
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
         ) -> Float64Array:
-            scaled_df = cast(pd.DataFrame, root_w * df)
+            scaled_df = cast(DataFrame, root_w * df)
             num = scaled_df.groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
@@ -491,11 +490,11 @@ class PanelData:
 
         root_w = cast(Float64Array, np.sqrt(weights.values2d))
         weights_df = DataFrame(weights.values2d, index=init_index.index)
-        wframe = cast(pd.DataFrame, root_w * self._frame)
+        wframe = cast(DataFrame, root_w * self._frame)
         wframe.index = init_index.index
 
         previous = wframe
-        current: pd.DataFrame = demean_pass(previous, weights_df, root_w)
+        current: DataFrame = demean_pass(previous, weights_df, root_w)
         if groups.shape[1] == 1:
             current.index = self._frame.index
             return PanelData(current)
@@ -586,8 +585,8 @@ class PanelData:
             return PanelData(out)
         else:
             w = weights.values2d
-            frame: pd.DataFrame = self._frame.copy()
-            frame = cast(pd.DataFrame, w * frame)
+            frame: DataFrame = self._frame.copy()
+            frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).transform("sum")
             # TODO: Fix when pandas-stubs is updated
             #  https://github.com/pandas-dev/pandas-stubs/issues/100
@@ -674,7 +673,7 @@ class PanelData:
         else:
             w = weights.values2d
             frame = self._frame.copy()
-            frame = cast(pd.DataFrame, w * frame)
+            frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).sum()
             # TODO: Fix when pandas-stubs is updated
             #  https://github.com/pandas-dev/pandas-stubs/issues/100

@@ -389,15 +389,15 @@ class _PanelModelBase:
             and isinstance(weights.index, MultiIndex)
             and weights.shape[0] == self.dependent.dataframe.shape[0]
         ):
-            frame = weights
+            frame = DataFrame(weights)
         elif weights.shape[0] == nobs:
-            weights = np.asarray(weights)[:, None]
-            weights = weights @ np.ones((1, nentity))
-            frame.iloc[:, :] = weights
+            weights_arr = np.asarray(weights)[:, None]
+            weights_arr = weights_arr @ np.ones((1, nentity))
+            frame.iloc[:, :] = weights_arr
         elif weights.shape[0] == nentity:
-            weights = np.asarray(weights)[None, :]
-            weights = np.ones((nobs, 1)) @ weights
-            frame.iloc[:, :] = weights
+            weights_arr = np.asarray(weights)[None, :]
+            weights_arr = np.ones((nobs, 1)) @ weights_arr
+            frame.iloc[:, :] = weights_arr
         elif weights.shape[0] == nentity * nobs:
             frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = np.asarray(weights)[:, None]
