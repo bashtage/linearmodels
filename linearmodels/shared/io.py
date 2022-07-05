@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Sequence
+from typing import Any
 
 import numpy as np
 from statsmodels.iolib.summary import SimpleTable, fmt_params
@@ -64,7 +64,7 @@ def param_table(results: Any, title: str, pad_bottom: bool = False) -> SimpleTab
     )
 
 
-def format_wide(s: Sequence[str], cols: int) -> list[list[str]]:
+def format_wide(s: list[str] | tuple[str, ...], cols: int) -> list[list[str]]:
     """
     Format a list of strings.
 

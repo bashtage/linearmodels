@@ -20,9 +20,9 @@ header = [
 ]
 
 all_stats = "estout using {outfile}, cells(b(fmt(%13.12g)) t(fmt(%13.12g)) p(fmt(%13.12g))) stats("
-stats = ["chi2_{0}", "F_{0}", "p_{0}", "df_m{0}", "mss_{0}", "r2_{0}", "rss_{0}"]
+stats = ["chi2_", "F_", "p_", "df_m", "mss_", "r2_", "rss_"]
 for i in range(1, 4):
-    all_stats += " ".join(map(lambda s: s.format(i), stats)) + " "
+    all_stats += " ".join([f"{s}{i}" for s in stats]) + " "
 all_stats += ") append"
 output = (
     all_stats

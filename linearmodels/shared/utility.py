@@ -13,6 +13,7 @@ from typing import (
     Sequence,
     TypeVar,
     ValuesView,
+    cast,
 )
 
 import numpy as np
@@ -199,7 +200,8 @@ def panel_to_frame(
         df.index = mi.swaplevel()
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
-    df.index = df.index.set_levels(levels=final_levels, level=[0, 1])
+    mi_index = cast(MultiIndex, df.index)
+    df.index = mi_index.set_levels(levels=final_levels, level=[0, 1])
     df.index.names = ["major", "minor"]
     return df
 
@@ -227,7 +229,9 @@ class DataFrameWrapper:
     ) -> None:
         self._values = values
         self._columns = columns
-        self._index = index
+        if isinstance(index, list):
+            index = Index(index)
+        self._index: Index | None = index
 
     def __call__(self) -> DataFrame:
         return DataFrame(self._values, columns=self._columns, index=self._index)
@@ -256,7 +260,9 @@ class SeriesWrapper:
     ) -> None:
         self._values = values
         self._name = name
-        self._index = index
+        if isinstance(index, list):
+            index = Index(index)
+        self._index: Index | None = index
 
     def __call__(self) -> Series:
         return Series(self._values, name=self._name, index=self._index)

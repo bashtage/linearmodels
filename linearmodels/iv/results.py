@@ -26,10 +26,12 @@ from linearmodels.shared.hypotheses import (
     quadratic_form_test,
 )
 from linearmodels.shared.io import _str, add_star, pval_format
-from linearmodels.typing import ArrayLike, Float64Array, OptionalArrayLike
+from linearmodels.typing import ArrayLike, Float64Array
 
 
-def stub_concat(lists: Sequence[Sequence[str]], sep: str = "=") -> list[str]:
+def stub_concat(
+    lists: Sequence[list[str] | tuple[str, ...]], sep: str = "="
+) -> list[str]:
     col_size = max(max(map(len, stubs)) for stubs in lists)
     out: list[str] = []
     for stubs in lists:
@@ -505,8 +507,8 @@ class OLSResults(_LSModelResultsBase):
 
     def predict(
         self,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
+        exog: ArrayLike | None = None,
+        endog: ArrayLike | None = None,
         *,
         data: DataFrame | None = None,
         fitted: bool = True,

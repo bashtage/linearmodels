@@ -6,7 +6,7 @@ from formulaic import model_matrix
 from formulaic.model_spec import NAAction
 from formulaic.parser.algos.tokenize import tokenize
 import numpy as np
-from pandas import Categorical, DataFrame, MultiIndex, Series, get_dummies
+from pandas import Categorical, DataFrame, Index, MultiIndex, Series, get_dummies
 from scipy.linalg import lstsq as sp_lstsq
 from scipy.sparse import csc_matrix, diags
 from scipy.sparse.linalg import lsmr
@@ -367,7 +367,8 @@ class _PanelModelBase:
             self._is_weighted = False
             frame = self.dependent.dataframe.copy()
             frame.iloc[:, :] = 1
-            frame.columns = ["weight"]
+            # TODO: Remove once pandas typing fixed
+            frame.columns = Index(["weight"])
             return PanelData(frame)
 
         frame = DataFrame(columns=self.dependent.entities, index=self.dependent.time)
@@ -2719,7 +2720,7 @@ class RandomEffects(_PanelModelBase):
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
             ssr = float((t * wu).T @ wu)
-            wx = root_w * self.exog.dataframe
+            wx: DataFrame = root_w * self.exog.dataframe
             means = wx.groupby(level=0).transform("mean").values
             denom = means.T @ means
             sums = wx.groupby(level=0).sum().values

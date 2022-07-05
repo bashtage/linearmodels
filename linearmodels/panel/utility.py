@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import NamedTuple, Sequence, TypeVar, cast
+from typing import NamedTuple, TypeVar, cast
 
 import numpy as np
 from pandas import DataFrame, concat, date_range
@@ -396,7 +396,9 @@ def in_2core_graph_slow(cats: ArrayLike) -> BoolArray:
 
 
 def check_absorbed(
-    x: Float64Array, variables: Sequence[str], x_orig: Float64Array | None = None
+    x: Float64Array,
+    variables: list[str] | tuple[str, ...],
+    x_orig: Float64Array | None = None,
 ) -> None:
     """
     Check a regressor matrix for variables absorbed
@@ -600,7 +602,7 @@ def generate_panel_data(
         x.flat[locs] = np.nan  # type: ignore
 
     entities = [f"firm{i}" for i in range(n)]
-    time = date_range("1-1-1900", periods=t, freq="A-DEC")
+    time = [dt for dt in date_range("1-1-1900", periods=t, freq="A-DEC")]
     var_names = [f"x{i}" for i in range(k)]
     if const:
         var_names[1:] = var_names[:-1]

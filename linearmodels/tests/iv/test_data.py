@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 from numpy.testing import assert_equal
 import pandas as pd
@@ -5,6 +7,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 
 from linearmodels.iv.data import IVData
+from linearmodels.typing.data import BoolArray
 
 try:
     import xarray as xr
@@ -165,8 +168,8 @@ def test_categorical() -> None:
     assert sorted(dh.cols) == sorted(["cat.b", "cat.c", "num"])
     assert dh.rows == list(index)
     assert_equal(dh.pandas["num"].values, num)
-    assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
-    assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
+    assert_equal(dh.pandas["cat.b"].values, cast(BoolArray, (cat == "b")).astype(float))
+    assert_equal(dh.pandas["cat.c"].values, cast(BoolArray, (cat == "c")).astype(float))
 
 
 def test_categorical_series() -> None:
@@ -178,8 +181,8 @@ def test_categorical_series() -> None:
     assert dh.shape == (10, 2)
     assert sorted(dh.cols) == sorted(["cat.b", "cat.c"])
     assert dh.rows == list(index)
-    assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
-    assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
+    assert_equal(dh.pandas["cat.b"].values, cast(BoolArray, (cat == "b")).astype(float))
+    assert_equal(dh.pandas["cat.c"].values, cast(BoolArray, (cat == "c")).astype(float))
 
 
 def test_categorical_no_conversion() -> None:
@@ -206,9 +209,9 @@ def test_categorical_keep_first() -> None:
     assert sorted(dh.cols) == sorted(["cat.a", "cat.b", "cat.c", "num"])
     assert dh.rows == list(index)
     assert_equal(dh.pandas["num"].values, num)
-    assert_equal(dh.pandas["cat.a"].values, (cat == "a").astype(float))
-    assert_equal(dh.pandas["cat.b"].values, (cat == "b").astype(float))
-    assert_equal(dh.pandas["cat.c"].values, (cat == "c").astype(float))
+    assert_equal(dh.pandas["cat.a"].values, cast(BoolArray, (cat == "a")).astype(float))
+    assert_equal(dh.pandas["cat.b"].values, cast(BoolArray, (cat == "b")).astype(float))
+    assert_equal(dh.pandas["cat.c"].values, cast(BoolArray, (cat == "c")).astype(float))
 
 
 def test_nobs_missing_error() -> None:

@@ -16,7 +16,7 @@ from linearmodels.shared.base import _ModelComparison, _SummaryStr
 from linearmodels.shared.hypotheses import WaldTestStatistic, quadratic_form_test
 from linearmodels.shared.io import _str, add_star, pval_format
 from linearmodels.shared.utility import AttrDict
-from linearmodels.typing import Float64Array, OptionalArrayLike
+from linearmodels.typing import ArrayLike, Float64Array
 
 __all__ = [
     "PanelResults",
@@ -473,7 +473,7 @@ class PanelResults(_SummaryStr):
         return Series(self._resids.squeeze(), index=self._index, name="residual")
 
     def _out_of_sample(
-        self, exog: OptionalArrayLike, data: DataFrame | None, missing: bool
+        self, exog: ArrayLike | None, data: DataFrame | None, missing: bool
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
         if exog is not None and data is not None:
@@ -488,7 +488,7 @@ class PanelResults(_SummaryStr):
 
     def predict(
         self,
-        exog: OptionalArrayLike = None,
+        exog: ArrayLike | None = None,
         *,
         data: DataFrame | None = None,
         fitted: bool = True,

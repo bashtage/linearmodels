@@ -5,7 +5,7 @@ import numpy as np
 from linearmodels.typing import Float64Array
 
 
-def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int | None]:
+def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]:
     """
     Parameters
     ----------
@@ -38,7 +38,7 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int 
 
     has_const = (aug_rank == rank) and x.shape[0] > x.shape[1]
     has_const = has_const or rank < min(x.shape)
-    loc = None
+    loc = -1
     if has_const:
         normed_var = x.var(0) / np.abs(x).max(0)
         loc = int(np.argmin(normed_var))
