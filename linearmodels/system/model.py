@@ -52,13 +52,7 @@ from linearmodels.system.gmm import (
     KernelWeightMatrix,
 )
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.typing import (
-    ArrayLike,
-    ArraySequence,
-    Float64Array,
-    Literal,
-    OptionalArrayLike,
-)
+from linearmodels.typing import ArrayLike, ArraySequence, Float64Array, Literal
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
 
@@ -256,7 +250,7 @@ class SystemFormulaParser:
         return list(self._parsers.keys())
 
     @property
-    def data(self) -> dict[str, dict[str, ArrayLike]]:
+    def data(self) -> dict[str, dict[str, ArrayLike | None]]:
         out = {}
         dep = self.dependent
         for key in dep:
@@ -358,8 +352,8 @@ class _SystemModelBase:
         self._weights: list[IVData] = []
         self._formula: str | dict[str, str] | None = None
         self._constraints: LinearConstraint | None = None
-        self._constant_loc: Series | None = None
-        self._has_constant = None
+        self._constant_loc: list[int] = []
+        self._has_constant: Series = Series(dtype=bool)
         self._common_exog = False
         self._original_index: Index | None = None
         self._model_name = "Three Stage Least Squares (3SLS)"
@@ -458,7 +452,8 @@ class _SystemModelBase:
         constant = []
         constant_loc = []
 
-        for dep, exog, endog, instr, w, label in zip(
+        exog_ivd: IVData
+        for dep, exog_ivd, endog, instr, w, label in zip(
             self._dependent,
             self._exog,
             self._endog,
@@ -467,8 +462,8 @@ class _SystemModelBase:
             self._eq_labels,
         ):
             y = cast(Float64Array, dep.ndarray)
-            x = np.concatenate([exog.ndarray, endog.ndarray], 1)
-            z = np.concatenate([exog.ndarray, instr.ndarray], 1)
+            x = np.concatenate([exog_ivd.ndarray, endog.ndarray], 1)
+            z = np.concatenate([exog_ivd.ndarray, instr.ndarray], 1)
             w_arr = cast(Float64Array, w.ndarray)
             w_arr = w_arr / np.nanmean(w_arr)
             w_sqrt = np.sqrt(w_arr)
@@ -479,7 +474,7 @@ class _SystemModelBase:
             self._wy.append(y * w_sqrt)
             self._wx.append(x * w_sqrt)
             self._wz.append(z * w_sqrt)
-            cols = list(exog.cols) + list(endog.cols)
+            cols = list(exog_ivd.cols) + list(endog.cols)
             self._param_names.extend([label + "_" + col for col in cols])
             if y.shape[0] <= x.shape[1]:
                 raise ValueError(
@@ -517,7 +512,7 @@ class _SystemModelBase:
     def _drop_missing(self) -> None:
         k = len(self._dependent)
         nobs = self._dependent[0].shape[0]
-        self._original_index = self._dependent[0].rows.copy()
+        self._original_index = Index(self._dependent[0].rows)
         missing = np.zeros(nobs, dtype=bool)
 
         values = [self._dependent, self._exog, self._endog, self._instr, self._weights]
@@ -610,7 +605,7 @@ class _SystemModelBase:
                 f"Parameters must have {nx} elements; found {params.shape[0]}."
             )
         loc = 0
-        out = AttrDict()
+        out = dict()
         for i, label in enumerate(self._eq_labels):
             kx = self._x[i].shape[1]
             assert isinstance(equations, abc.Mapping)
@@ -626,22 +621,22 @@ class _SystemModelBase:
                 if exog is not None:
                     exog_endog = IVData(exog).pandas
                     if endog is not None:
-                        endog = IVData(endog)
-                        exog_endog = concat([exog_endog, endog.pandas], axis=1)
+                        endog_ivd = IVData(endog)
+                        exog_endog = concat([exog_endog, endog_ivd.pandas], axis=1)
                 else:
                     exog_endog = IVData(endog).pandas
 
                 fitted = np.asarray(exog_endog) @ b
-                fitted = DataFrame(fitted, index=exog_endog.index, columns=[label])
-                out[label] = fitted
+                fitted_df = DataFrame(fitted, index=exog_endog.index, columns=[label])
+                out[label] = fitted_df
             loc += kx
-        out = reduce(
+        out_df = reduce(
             lambda left, right: left.merge(
                 right, how="outer", left_index=True, right_index=True
             ),
             [out[key] for key in out],
         )
-        return out
+        return out_df
 
     def _multivariate_ls_fit(self) -> tuple[Float64Array, Float64Array]:
         wy, wx, wxhat = self._wy, self._wx, self._wxhat
@@ -1393,7 +1388,9 @@ class IV3SLS(_LSSystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
+        equations: Mapping[
+            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+        ],
         *,
         sigma: ArrayLike | None = None,
     ) -> None:
@@ -1403,9 +1400,9 @@ class IV3SLS(_LSSystemModelBase):
     def multivariate_iv(
         cls,
         dependent: ArrayLike,
-        exog: OptionalArrayLike = None,
-        endog: OptionalArrayLike = None,
-        instruments: OptionalArrayLike = None,
+        exog: ArrayLike | None = None,
+        endog: ArrayLike | None = None,
+        instruments: ArrayLike | None = None,
     ) -> IV3SLS:
         """
         Interface for specification of multivariate IV models
@@ -1436,19 +1433,20 @@ class IV3SLS(_LSSystemModelBase):
         exogenous, endogenous and instrumental variables.
         """
         equations = {}
-        dependent = IVData(dependent, var_name="dependent")
+        dependent_ivd = IVData(dependent, var_name="dependent")
         if exog is None and endog is None:
             raise ValueError("At least one of exog or endog must be provided")
-        exog = IVData(exog, var_name="exog")
-        endog = IVData(endog, var_name="endog", nobs=dependent.shape[0])
-        instr = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
-        for col in dependent.pandas:
-            equations[col] = (
-                dependent.pandas[[col]],
-                exog.pandas,
-                endog.pandas,
-                instr.pandas,
-            )
+        exog_ivd = IVData(exog, var_name="exog")
+        endog_ivd = IVData(endog, var_name="endog", nobs=dependent.shape[0])
+        instr_ivd = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
+        for col in dependent_ivd.pandas:
+            equations[str(col)] = {
+                "dependent": dependent_ivd.pandas[[col]],
+                "exog": exog_ivd.pandas,
+                "endog": endog_ivd.pandas,
+                "instruments": instr_ivd.pandas,
+            }
+
         return cls(equations)
 
     @classmethod
@@ -1660,10 +1658,10 @@ class SUR(_LSSystemModelBase):
         >>> mod = SUR.multivariate_ls(portfolios, factors)
         """
         equations = {}
-        dependent = IVData(dependent, var_name="dependent")
-        exog = IVData(exog, var_name="exog")
-        for col in dependent.pandas:
-            equations[col] = (dependent.pandas[[col]], exog.pandas)
+        dependent_ivd = IVData(dependent, var_name="dependent")
+        exog_ivd = IVData(exog, var_name="exog")
+        for col in dependent_ivd.pandas:
+            equations[str(col)] = (dependent_ivd.pandas[[col]], exog_ivd.pandas)
         return cls(equations)
 
     @classmethod

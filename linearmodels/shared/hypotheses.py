@@ -7,7 +7,7 @@ import numpy as np
 from pandas import Series
 from scipy.stats import chi2, f
 
-from linearmodels.typing import ArrayLike, OptionalArrayLike
+from linearmodels.typing import ArrayLike
 
 
 class WaldTestStatistic:
@@ -198,7 +198,7 @@ def _parse_single(constraint: str) -> tuple[str, float]:
 
 
 def _reparse_constraint_formula(
-    formula: str | list[str] | dict[str, float] | None
+    formula: str | list[str] | dict[str, float]
 ) -> str | dict[str, float]:
     # TODO: Test against variable names constaining , or =
     if isinstance(formula, Mapping):
@@ -218,8 +218,8 @@ def _reparse_constraint_formula(
 def quadratic_form_test(
     params: ArrayLike,
     cov: ArrayLike,
-    restriction: OptionalArrayLike = None,
-    value: OptionalArrayLike = None,
+    restriction: ArrayLike | None = None,
+    value: ArrayLike | None = None,
     formula: str | list[str] | None = None,
 ) -> WaldTestStatistic:
     if formula is not None and restriction is not None:

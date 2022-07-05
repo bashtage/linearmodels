@@ -13,6 +13,7 @@ from typing import (
     Sequence,
     TypeVar,
     ValuesView,
+    cast,
 )
 
 import numpy as np
@@ -156,9 +157,9 @@ def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> s
 
 def panel_to_frame(
     x: AnyArray | None,
-    items: Sequence[Label],
-    major_axis: Sequence[Label],
-    minor_axis: Sequence[Label],
+    items: Sequence[Label] | Index,
+    major_axis: Sequence[Label] | Index,
+    minor_axis: Sequence[Label] | Index,
     swap: bool = False,
 ) -> DataFrame:
     """
@@ -194,12 +195,13 @@ def panel_to_frame(
     if x is not None:
         shape = x.shape
         x = x.reshape((shape[0], shape[1] * shape[2])).T
-    df = DataFrame(x, columns=items, index=mi)
+    df = DataFrame(x, columns=Index(items), index=mi)
     if swap:
         df.index = mi.swaplevel()
         df.sort_index(inplace=True)
         final_levels = [minor_axis, major_axis]
-    df.index = df.index.set_levels(levels=final_levels, level=[0, 1])
+    mi_index = cast(MultiIndex, df.index)
+    df.index = mi_index.set_levels(levels=final_levels, level=[0, 1])
     df.index.names = ["major", "minor"]
     return df
 
@@ -227,7 +229,9 @@ class DataFrameWrapper:
     ) -> None:
         self._values = values
         self._columns = columns
-        self._index = index
+        if isinstance(index, list):
+            index = Index(index)
+        self._index: Index | None = index
 
     def __call__(self) -> DataFrame:
         return DataFrame(self._values, columns=self._columns, index=self._index)
@@ -256,7 +260,11 @@ class SeriesWrapper:
     ) -> None:
         self._values = values
         self._name = name
-        self._index = index
+        if isinstance(index, list):
+            index = Index(index)
+        self._index: Index | None = index
 
     def __call__(self) -> Series:
-        return Series(self._values, name=self._name, index=self._index)
+        # TODO: Bug in pandas-stube
+        #  https://github.com/pandas-dev/pandas-stubs/issues/90
+        return Series(self._values, name=self._name, index=self._index)  # type: ignore

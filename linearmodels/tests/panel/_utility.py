@@ -30,8 +30,12 @@ def lsdv(
     temp = x.reset_index()
     cat_index = temp.index
     if entity:
-        cat = Categorical(temp.iloc[:, 0])
-        cat.index = cat_index
+        # TODO: Bug in pandas stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/95
+        cat = Categorical(temp.iloc[:, 0])  # type: ignore
+        # TODO: Bug in pandas stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/94
+        cat.index = cat_index  # type: ignore
         dummies = get_dummies(cat, drop_first=has_const)
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],
@@ -39,8 +43,12 @@ def lsdv(
             columns=list(x.columns) + list(dummies.columns),
         )
     if time:
-        cat = Categorical(temp.iloc[:, 1])
-        cat.index = cat_index
+        # TODO: Bug in pandas stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/95
+        cat = Categorical(temp.iloc[:, 1])  # type: ignore
+        # TODO: Bug in pandas stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/94
+        cat.index = cat_index  # type: ignore
         dummies = get_dummies(cat, drop_first=(has_const or entity))
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],
@@ -49,7 +57,9 @@ def lsdv(
         )
     if general is not None:
         cat = Categorical(general)
-        cat.index = cat_index
+        # TODO: Bug in pandas stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/94
+        cat.index = cat_index  # type: ignore
         dummies = get_dummies(cat, drop_first=(has_const or entity or time))
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],
