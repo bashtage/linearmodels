@@ -126,7 +126,8 @@ def test_invalid_types() -> None:
             def ndim(self) -> int:
                 return self._ndim
 
-        IVData(AnotherClass())
+        # Intentional typing failure
+        IVData(AnotherClass())  # type: ignore
 
 
 def test_string_cat_equiv() -> None:

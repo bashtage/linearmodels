@@ -24,7 +24,7 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
         Column location of constant
     """
     if np.any(np.all(x == 1, axis=0)):
-        loc: int | None = int(np.argwhere(np.all(x == 1, axis=0)))
+        loc = int(np.argwhere(np.all(x == 1, axis=0)))
         return True, loc
 
     if np.any((np.ptp(x, axis=0) == 0) & ~np.all(x == 0, axis=0)):

@@ -133,7 +133,7 @@ class _FactorModelBase:
 
     @staticmethod
     def _prepare_data_from_formula(
-        formula: str, data: DataFrame, portfolios: DataFrame
+        formula: str, data: DataFrame, portfolios: DataFrame | None
     ) -> tuple[DataFrame, DataFrame, str]:
         orig_formula = formula
         na_action = NAAction("raise")

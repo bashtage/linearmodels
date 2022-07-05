@@ -126,5 +126,6 @@ class _ModelComparison(_SummaryStr):
             np.empty((len(out), 2)), columns=["F stat", "P-value"], index=out.index
         )
         for loc in out.index:
-            out_df.loc[loc] = out[loc].stat, out[loc].pval
+            # TODO: Bug in pandas-stubs
+            out_df.loc[loc] = out[loc].stat, out[loc].pval  # type: ignore
         return out_df

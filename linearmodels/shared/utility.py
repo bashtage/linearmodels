@@ -157,9 +157,9 @@ def ensure_unique_column(col_name: str, df: DataFrame, addition: str = "_") -> s
 
 def panel_to_frame(
     x: AnyArray | None,
-    items: Sequence[Label],
-    major_axis: Sequence[Label],
-    minor_axis: Sequence[Label],
+    items: Sequence[Label] | Index,
+    major_axis: Sequence[Label] | Index,
+    minor_axis: Sequence[Label] | Index,
     swap: bool = False,
 ) -> DataFrame:
     """
@@ -195,7 +195,7 @@ def panel_to_frame(
     if x is not None:
         shape = x.shape
         x = x.reshape((shape[0], shape[1] * shape[2])).T
-    df = DataFrame(x, columns=items, index=mi)
+    df = DataFrame(x, columns=Index(items), index=mi)
     if swap:
         df.index = mi.swaplevel()
         df.sort_index(inplace=True)
@@ -265,4 +265,6 @@ class SeriesWrapper:
         self._index: Index | None = index
 
     def __call__(self) -> Series:
-        return Series(self._values, name=self._name, index=self._index)
+        # TODO: Bug in pandas-stube
+        #  https://github.com/pandas-dev/pandas-stubs/issues/90
+        return Series(self._values, name=self._name, index=self._index)  # type: ignore
