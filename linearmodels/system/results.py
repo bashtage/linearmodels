@@ -331,6 +331,7 @@ class SystemResults(_CommonResults):
             return self._out_of_sample(equations, data, missing, dataframe)
         if not (fitted or idiosyncratic):
             raise ValueError("At least one output must be selected")
+        out: Union[dict[str, DataFrame], DataFrame]
         if dataframe:
             if fitted and not idiosyncratic:
                 out = self.fitted_values
@@ -350,6 +351,7 @@ class SystemResults(_CommonResults):
                 if idiosyncratic:
                     vals.append(self.resids[[key]])
                 out[key] = concat(vals, axis=1)
+
         if missing:
             if isinstance(out, DataFrame):
                 out = out.reindex(self._original_index)

@@ -13,7 +13,6 @@ Henningsen, A., & Hamann, J. (2007). systemfit: A Package for Estimating
 """
 from __future__ import annotations
 
-from collections import abc
 from functools import reduce
 import textwrap
 from typing import Mapping, Sequence, cast
@@ -21,6 +20,7 @@ import warnings
 
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
+import pandas as pd
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -92,7 +92,7 @@ GMM_COV_EST = {
 }
 
 
-def _missing_weights(weights: dict[str, ArrayLike | None]) -> None:
+def _missing_weights(weights: Mapping[str, ArrayLike | None]) -> None:
     """Raise warning if missing weighs found"""
     missing = [key for key in weights if weights[key] is None]
     if missing:
@@ -168,6 +168,21 @@ class SystemFormulaParser:
             formula = "~ 0 +".join(formula.split("~"))
         return formula
 
+    @staticmethod
+    def _convert_to_series(value: ArrayLike, name: str) -> pd.Series:
+        shape = value.shape
+        if len(shape) > 2 or (len(shape) == 2 and min(shape) != 1):
+            raise ValueError(f"{name} must be squeezable to 1D.")
+        if len(shape) == 1:
+            value_series = pd.Series(value)
+        else:  # len(shape) == 2 and min(shape) == 1:
+            if isinstance(value, pd.DataFrame):
+                value_series = value.iloc[:, 0]
+            else:
+                value_series = pd.Series(np.squeeze(value))
+
+        return value_series
+
     def _parse(self) -> None:
         formula = self._formula
         data = self._data
@@ -184,7 +199,10 @@ class SystemFormulaParser:
 
                 if weights is not None:
                     if formula_key in weights:
-                        weight_dict[formula_key] = weights[formula_key]
+                        value = weights[formula_key]
+                        weight_dict[formula_key] = self._convert_to_series(
+                            value, "weights"
+                        )
                     else:
                         weight_dict[formula_key] = None
                 cln_formula[formula_key] = f
@@ -213,7 +231,8 @@ class SystemFormulaParser:
                 cln_formula[key] = f
                 if weights is not None:
                     if key in weights:
-                        weight_dict[key] = weights[key]
+                        value = weights[key]
+                        weight_dict[key] = self._convert_to_series(value, "weights")
                     else:
                         weight_dict[key] = None
         _missing_weights(weight_dict)
@@ -251,7 +270,7 @@ class SystemFormulaParser:
 
     @property
     def data(self) -> dict[str, dict[str, ArrayLike | None]]:
-        out = {}
+        out: dict[str, dict[str, ArrayLike | None]] = {}
         dep = self.dependent
         for key in dep:
             out[key] = {"dependent": dep[key]}
@@ -314,7 +333,9 @@ class _SystemModelBase:
 
     def __init__(
         self,
-        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
+        equations: Mapping[
+            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+        ],
         *,
         sigma: ArrayLike | None = None,
     ) -> None:
@@ -595,7 +616,12 @@ class _SystemModelBase:
         if data is not None:
             assert self.formula is not None
             parser = SystemFormulaParser(self.formula, data=data, eval_env=eval_env)
-            equations = parser.data
+            equations_d = parser.data
+        else:
+            if equations is None:
+                raise ValueError("One of equations or data must be provided.")
+            assert equations is not None
+            equations_d = {k: dict(v) for k, v in equations.items()}
         params = np.atleast_2d(np.asarray(params))
         if params.shape[0] == 1:
             params = params.T
@@ -608,10 +634,9 @@ class _SystemModelBase:
         out = dict()
         for i, label in enumerate(self._eq_labels):
             kx = self._x[i].shape[1]
-            assert isinstance(equations, abc.Mapping)
-            if label in equations:
+            if label in equations_d:
                 b = params[loc : loc + kx]
-                eqn = equations[label]
+                eqn = equations_d[label]
                 exog = eqn.get("exog", None)
                 endog = eqn.get("endog", None)
                 if exog is None and endog is None:
@@ -1441,7 +1466,9 @@ class IV3SLS(_LSSystemModelBase):
         instr_ivd = IVData(instruments, var_name="instruments", nobs=dependent.shape[0])
         for col in dependent_ivd.pandas:
             equations[str(col)] = {
-                "dependent": dependent_ivd.pandas[[col]],
+                # TODO: Bug in pandas-stubs
+                #  https://github.com/pandas-dev/pandas-stubs/issues/97
+                "dependent": dependent_ivd.pandas[[col]],  # type: ignore
                 "exog": exog_ivd.pandas,
                 "endog": endog_ivd.pandas,
                 "instruments": instr_ivd.pandas,
@@ -1598,7 +1625,9 @@ class SUR(_LSSystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
+        equations: Mapping[
+            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+        ],
         *,
         sigma: ArrayLike | None = None,
     ) -> None:
@@ -1661,7 +1690,9 @@ class SUR(_LSSystemModelBase):
         dependent_ivd = IVData(dependent, var_name="dependent")
         exog_ivd = IVData(exog, var_name="exog")
         for col in dependent_ivd.pandas:
-            equations[str(col)] = (dependent_ivd.pandas[[col]], exog_ivd.pandas)
+            # TODO: Bug in pandas-stubs
+            #  https://github.com/pandas-dev/pandas-stubs/issues/97
+            equations[str(col)] = (dependent_ivd.pandas[[col]], exog_ivd.pandas)  # type: ignore
         return cls(equations)
 
     @classmethod
@@ -1809,7 +1840,9 @@ class IVSystemGMM(_SystemModelBase):
 
     def __init__(
         self,
-        equations: Mapping[str, Mapping[str, ArrayLike] | Sequence[ArrayLike]],
+        equations: Mapping[
+            str, Mapping[str, ArrayLike | None] | Sequence[ArrayLike | None]
+        ],
         *,
         sigma: ArrayLike | None = None,
         weight_type: str = "robust",
@@ -2124,7 +2157,7 @@ class IVSystemGMM(_SystemModelBase):
         """
         parser = SystemFormulaParser(formula, data, weights)
         eqns = parser.data
-        mod = cls(eqns, weight_type=weight_type, **weight_config)
+        mod = cls(eqns, sigma=None, weight_type=weight_type, **weight_config)
         mod.formula = formula
         return mod
 
