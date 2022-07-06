@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import NamedTuple, Type, Union, cast
+from typing import Mapping, NamedTuple, Type, Union, cast
 
 from formulaic import model_matrix
 from formulaic.model_spec import NAAction
@@ -697,7 +697,7 @@ class _PanelModelBase:
         return self._not_null
 
     def _setup_clusters(
-        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+        self, cov_config: Mapping[str, bool | float | str | PanelDataLike]
     ) -> dict[str, bool | float | str | Float64Array | DataFrame | PanelData]:
 
         cov_config_upd = cov_config.copy()
@@ -2280,9 +2280,10 @@ class FirstDifferenceOLS(_PanelModelBase):
             raise ValueError("Panel must have at least 2 time periods")
 
     def _setup_clusters(
-        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+        self,
+        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
     ) -> dict[str, bool | float | str | DataFrame]:
-        cov_config_upd = cov_config.copy()
+        cov_config_upd = dict(cov_config).copy()
         cluster_types = ("clusters", "cluster_entity")
         common = set(cov_config.keys()).intersection(cluster_types)
         if not common:
@@ -2305,11 +2306,12 @@ class FirstDifferenceOLS(_PanelModelBase):
         if cluster_entity:
             group_ids = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids = Series(group_ids, index=self.dependent.index, name=name)
+            group_ids_s = Series(group_ids, index=self.dependent.index, name=name)
             if clusters_frame is not None:
-                clusters_frame[name] = group_ids
+                clusters_frame[name] = group_ids_s
             else:
-                clusters_frame = DataFrame(group_ids)
+                clusters_frame = DataFrame(group_ids_s)
+        assert clusters_frame is not None
         cluster_data = PanelData(clusters_frame)
         values = cluster_data.values3d[:, 1:]
         cluster_frame = panel_to_frame(
@@ -2409,7 +2411,7 @@ class FirstDifferenceOLS(_PanelModelBase):
                 True,
             )
             w_frame = w_frame.reindex(self.weights.index).dropna(how="any")
-            index = w_frame.index
+            index = cast(MultiIndex, w_frame.index)
             w = w_frame.to_numpy()
 
             w /= w.mean()
@@ -2721,10 +2723,10 @@ class RandomEffects(_PanelModelBase):
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
             ssr = float((t * wu).T @ wu)
-            wx: DataFrame = root_w * self.exog.dataframe
-            means = wx.groupby(level=0).transform("mean").values
+            wx_df: DataFrame = root_w * self.exog.dataframe
+            means = wx_df.groupby(level=0).transform("mean").values
             denom = means.T @ means
-            sums = wx.groupby(level=0).sum().values
+            sums = wx_df.groupby(level=0).sum().values
             num = sums.T @ sums
             tr = np.trace(np.linalg.inv(denom) @ num)
             sigma2_u = max(0, (ssr - (neffects - nvar) * sigma2_e) / (nobs - tr))
@@ -2735,8 +2737,8 @@ class RandomEffects(_PanelModelBase):
 
         theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
         theta_out = DataFrame(theta, columns=["theta"], index=wybar.index)
-        wy = root_w * self.dependent.values2d
-        wx = root_w * self.exog.values2d
+        wy: Float64Array = np.asarray(root_w * self.dependent.values2d, dtype=float)
+        wx: Float64Array = np.asarray(root_w * self.exog.values2d, dtype=float)
         index = self.dependent.index
         reindex = index.levels[0][index.codes[0]]
         wybar = (theta * wybar).loc[reindex]
@@ -2757,7 +2759,7 @@ class RandomEffects(_PanelModelBase):
             self._cov_estimators,
             cov_type,
             wy,
-            wx,
+            np.asarray(wx),
             params,
             self.dependent.entity_ids,
             self.dependent.time_ids,
@@ -2874,7 +2876,7 @@ class FamaMacBeth(_PanelModelBase):
         )
 
         def validate_block(ex: Float64Array) -> bool:
-            def _mr(ex: DataFrame) -> int:
+            def _mr(ex: Float64Array) -> int:
                 """lstsq based matrix_rank"""
                 return _lstsq(ex, np.ones(ex.shape[0]))[2]
 
