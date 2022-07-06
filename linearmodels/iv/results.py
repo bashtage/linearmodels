@@ -489,9 +489,9 @@ class OLSResults(_LSModelResultsBase):
 
     def _out_of_sample(
         self,
-        exog: ArrayLike,
-        endog: ArrayLike,
-        data: ArrayLike,
+        exog: ArrayLike | None,
+        endog: ArrayLike | None,
+        data: ArrayLike | None,
         missing: bool | None,
     ) -> DataFrame:
         """Interface between model predict and predict for OOS fits"""
@@ -555,6 +555,8 @@ class OLSResults(_LSModelResultsBase):
         values corresponding to the original model specification.
         """
         if not (exog is None and endog is None and data is None):
+            assert exog is not None
+            assert endog is not None
             return self._out_of_sample(exog, endog, data, missing)
         out = []
         if fitted:
@@ -705,7 +707,9 @@ class FirstStageResults(_SummaryStr):
             columns=[],
         )
         for col in endog.pandas:
-            y = w * endog.pandas[[col]].values
+            # TODO: BUG in pandas-stube
+            #  https://github.com/pandas-dev/pandas-stubs/issues/97
+            y = w * endog.pandas[[col]].values  # type: ignore
             ey = annihilate(y, x)
             partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
             full = individual_results[col]
@@ -749,8 +753,8 @@ class FirstStageResults(_SummaryStr):
             "f.dist",
         ]
         out_df = out_df[cols]
-        for c in out_df:
-            out_df[c] = to_numeric(out_df[c], errors="ignore")
+        for col in out_df:
+            out_df[col] = to_numeric(out_df[col], errors="ignore")
 
         return out_df
 
@@ -775,7 +779,7 @@ class FirstStageResults(_SummaryStr):
         for col in self.endog.pandas:
             dep = self.endog.pandas[col]
             mod = _OLS(dep, exog_instr, weights=self.weights.ndarray)
-            res[col] = mod.fit(cov_type=self._cov_type, **self._cov_config)
+            res[str(col)] = mod.fit(cov_type=self._cov_type, **self._cov_config)
 
         return res
 
@@ -1236,7 +1240,7 @@ class IVResults(_CommonIVResults):
         mod = _OLS(self.model.dependent, augx)
         res = mod.fit(cov_type=self.cov_type, **self.cov_config)
         norig = self.model._x.shape[1]
-        test_params = res.params.values[norig:]
+        test_params = asarray(res.params.values[norig:], dtype=float)
         test_cov = res.cov.values[norig:, norig:]
         stat = test_params.T @ inv(test_cov) @ test_params
         df = len(test_params)
@@ -1625,7 +1629,7 @@ class IVModelComparison(_ModelComparison):
         precision = getattr(self, self._precision)
         pvalues = asarray(self.pvalues)
         params_fmt = []
-        params_stub = []
+        params_stub: list[str] = []
 
         for i in range(len(params)):
             formatted_and_starred = []
@@ -1638,7 +1642,7 @@ class IVModelComparison(_ModelComparison):
                 v_str = f"({v_str})" if v_str.strip() else v_str
                 precision_fmt.append(v_str)
             params_fmt.append(precision_fmt)
-            params_stub.append(params.index[i])
+            params_stub.append(str(params.index[i]))
             params_stub.append(" ")
 
         vals_tab = table_concat((vals_list, params_fmt))
