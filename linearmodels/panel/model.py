@@ -339,14 +339,14 @@ class _PanelModelBase:
         -----
         This is exposed for testing and is not normally needed for estimation
         """
-        clusters = PanelData(clusters, var_name="cov.cluster", convert_dummies=False)
-        if clusters.shape[1:] != self._original_shape[1:]:
+        clusters_pd = PanelData(clusters, var_name="cov.cluster", convert_dummies=False)
+        if clusters_pd.shape[1:] != self._original_shape[1:]:
             raise ValueError(
                 "clusters must have the same number of entities "
                 "and time periods as the model data."
             )
-        clusters.drop(~self.not_null)
-        return clusters.copy()
+        clusters_pd.drop(~self.not_null)
+        return clusters_pd.copy()
 
     def _info(self) -> tuple[Series, Series, None]:
         """Information about panel structure"""
@@ -451,11 +451,11 @@ class _PanelModelBase:
             x = cast(Float64Array, self.exog.values2d)
             self._not_null = np.asarray(~missing)
 
-        w = self.weights.dataframe
-        if np.any(np.asarray(w) <= 0):
+        w_df = self.weights.dataframe
+        if np.any(np.asarray(w_df) <= 0):
             raise ValueError("weights must be strictly positive.")
-        w = w / w.mean()
-        self.weights = PanelData(w)
+        w_df = w_df / w_df.mean()
+        self.weights = PanelData(w_df)
         rank_of_x = self._check_exog_rank()
         self._constant, self._constant_index = has_constant(x, rank_of_x)
 
@@ -692,7 +692,7 @@ class _PanelModelBase:
         return res
 
     @property
-    def not_null(self) -> Float64Array:
+    def not_null(self) -> BoolArray:
         """Locations of non-missing observations"""
         return self._not_null
 
@@ -2139,9 +2139,10 @@ class BetweenOLS(_PanelModelBase):
         fitted = DataFrame(self.exog.values2d @ params, index, ["fitted_values"])
         eps = y - x @ params
         effects = DataFrame(eps, self.dependent.entities, ["estimated_effects"])
-        entities = fitted.index.levels[0][fitted.index.codes[0]]
+        idx = cast(MultiIndex, fitted.index)
+        entities = idx.levels[0][idx.codes[0]]
         effects = effects.loc[entities]
-        effects.index = fitted.index
+        effects.index = idx
         dep = self.dependent.dataframe
         fitted = fitted.reindex(dep.index)
         effects = effects.reindex(dep.index)
@@ -2950,11 +2951,11 @@ class FamaMacBeth(_PanelModelBase):
           standard covariance estimator of the T parameter estimates.
         * "kernel" is a HAC estimator. Configurations options are:
         """
-        y = self._y
-        x = self._x
-        root_w = np.sqrt(self._w)
-        wy = root_w * y
-        wx = root_w * x
+        y = cast(Float64Array, self._y)
+        x = cast(Float64Array, self._x)
+        root_w = cast(Float64Array, np.sqrt(self._w))
+        wy = cast(Float64Array, root_w * y)
+        wx = cast(Float64Array, root_w * x)
 
         dep = self.dependent.dataframe
         exog = self.exog.dataframe
@@ -2982,7 +2983,7 @@ class FamaMacBeth(_PanelModelBase):
 
         all_params = yx.groupby(level=1).apply(single)
         all_params = all_params.iloc[:, 1:]
-        params = all_params.mean(0).values[:, None]
+        params = np.asarray(all_params.mean(0).values[:, None], dtype=float)
 
         wy = np.asarray(wy_df)
         wx = np.asarray(wx_df)
