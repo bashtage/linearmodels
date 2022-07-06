@@ -403,6 +403,7 @@ class PanelData:
         weights : PanelData
              Weights to use in demeaning
         """
+        group:Literal["entity", "time"]
         if self.nentity > self.nobs:
             group = "entity"
             dummy = "time"
