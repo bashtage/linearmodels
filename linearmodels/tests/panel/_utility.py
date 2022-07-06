@@ -4,7 +4,7 @@ import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
 from numpy.testing import assert_allclose
-from pandas import Categorical, DataFrame, date_range, get_dummies
+from pandas import Categorical, DataFrame, Series, date_range, get_dummies
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.panel.data import PanelData
@@ -32,10 +32,8 @@ def lsdv(
     if entity:
         # TODO: Bug in pandas stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/95
-        cat = Categorical(temp.iloc[:, 0])  # type: ignore
-        # TODO: Bug in pandas stubs
-        #  https://github.com/pandas-dev/pandas-stubs/issues/94
-        cat.index = cat_index  # type: ignore
+        cat = Series(Categorical(temp.iloc[:, 0]))  # type: ignore
+        cat.index = cat_index
         dummies = get_dummies(cat, drop_first=has_const)
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],
@@ -45,10 +43,8 @@ def lsdv(
     if time:
         # TODO: Bug in pandas stubs
         #  https://github.com/pandas-dev/pandas-stubs/issues/95
-        cat = Categorical(temp.iloc[:, 1])  # type: ignore
-        # TODO: Bug in pandas stubs
-        #  https://github.com/pandas-dev/pandas-stubs/issues/94
-        cat.index = cat_index  # type: ignore
+        cat = Series(Categorical(temp.iloc[:, 1]))  # type: ignore
+        cat.index = cat_index
         dummies = get_dummies(cat, drop_first=(has_const or entity))
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],
@@ -56,10 +52,8 @@ def lsdv(
             columns=list(x.columns) + list(dummies.columns),
         )
     if general is not None:
-        cat = Categorical(general)
-        # TODO: Bug in pandas stubs
-        #  https://github.com/pandas-dev/pandas-stubs/issues/94
-        cat.index = cat_index  # type: ignore
+        cat = Series(Categorical(general))
+        cat.index = cat_index
         dummies = get_dummies(cat, drop_first=(has_const or entity or time))
         x = DataFrame(
             np.c_[x.values, dummies.values.astype(np.float64)],

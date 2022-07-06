@@ -517,7 +517,7 @@ class PanelData:
     @overload
     def demean(
         self,
-        group: str = ...,
+        group: Literal["entity", "time", "both"] = ...,
         weights: PanelData | None = ...,
         return_panel: Literal[True] = ...,
         low_memory: bool = ...,
@@ -527,7 +527,7 @@ class PanelData:
     @overload
     def demean(
         self,
-        group: str,
+        group: Literal["entity", "time", "both"],
         weights: PanelData | None,
         return_panel: Literal[False],
     ) -> Float64Array:
@@ -535,7 +535,7 @@ class PanelData:
 
     def demean(
         self,
-        group: str = "entity",
+        group: Literal["entity", "time", "both"] = "entity",
         weights: PanelData | None = None,
         return_panel: bool = True,
         low_memory: bool = False,
