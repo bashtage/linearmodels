@@ -26,7 +26,7 @@ def convert_columns(s: pd.Series, drop_first: bool) -> AnyPandas:
     return s
 
 
-def expand_categoricals(x: AnyPandas, drop_first: bool) -> AnyPandas:
+def expand_categoricals(x: pd.DataFrame, drop_first: bool) -> pd.DataFrame:
     if x.shape[1] == 0:
         return x
     return pd.concat(
@@ -144,7 +144,6 @@ class IVData:
                     x = xr.concat([x], dim=var_name)
                     assert isinstance(x, xr.DataArray)
                     x = x.transpose()
-
                 index = list(x.coords[x.dims[0]].values)
                 xr_col_values = x.coords[x.dims[1]].values
                 xr_cols = list(xr_col_values)

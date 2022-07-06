@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import product
-from typing import Hashable, Sequence, Union, cast
+from typing import Hashable, Literal, Sequence, Union, cast, overload
 
 import numpy as np
 from numpy.linalg import lstsq
@@ -78,12 +78,12 @@ class _Panel:
         minor_axis: Sequence[Label],
     ) -> _Panel:
         index = list(product(minor_axis, major_axis))
-        index = MultiIndex.from_tuples(index)
+        multi_index = MultiIndex.from_tuples(index)
         i, j, k = len(items), len(major_axis), len(minor_axis)
         values_flat = np.swapaxes(values.copy(), 0, 2).ravel()
         values_flat = np.reshape(values_flat, ((j * k), i))
-
-        df = DataFrame(values_flat, index=index, columns=items)
+        # TODO: Remove Index when pandas-stubs is fixed
+        df = DataFrame(values_flat, index=multi_index, columns=Index(items))
         return cls(df)
 
     @property
@@ -413,11 +413,13 @@ class PanelData:
         assert isinstance(e, PanelData)
         d = self.dummies(dummy, drop_first=True)
         d.index = e.index
-        d = PanelData(d).demean(group, weights=weights)
-        d = d.values2d
-        e = e.values2d
-        resid = e - d @ lstsq(d, e, rcond=None)[0]
-        resid = DataFrame(resid, index=self._frame.index, columns=self._frame.columns)
+        d_pd = PanelData(d).demean(group, weights=weights)
+        d_arr = d_pd.values2d
+        e_arr = e.values2d
+        resid_arr = e_arr - d_arr @ lstsq(d_arr, e_arr, rcond=None)[0]
+        resid = DataFrame(
+            resid_arr, index=self._frame.index, columns=self._frame.columns
+        )
 
         return PanelData(resid)
 
@@ -460,7 +462,7 @@ class PanelData:
         def weighted_group_mean(
             df: DataFrame, weights: DataFrame, root_w: Float64Array, level: int
         ) -> Float64Array:
-            scaled_df: DataFrame = root_w * df
+            scaled_df = cast(DataFrame, root_w * df)
             num = scaled_df.groupby(level=level).transform("sum")
             if level in weight_sum:
                 denom = weight_sum[level]
@@ -488,11 +490,11 @@ class PanelData:
 
         root_w = cast(Float64Array, np.sqrt(weights.values2d))
         weights_df = DataFrame(weights.values2d, index=init_index.index)
-        wframe = root_w * self._frame
+        wframe = cast(DataFrame, root_w * self._frame)
         wframe.index = init_index.index
 
         previous = wframe
-        current = demean_pass(previous, weights_df, root_w)
+        current: DataFrame = demean_pass(previous, weights_df, root_w)
         if groups.shape[1] == 1:
             current.index = self._frame.index
             return PanelData(current)
@@ -511,6 +513,25 @@ class PanelData:
         current.index = self._frame.index
 
         return PanelData(current)
+
+    @overload
+    def demean(
+        self,
+        group: str = ...,
+        weights: PanelData | None = ...,
+        return_panel: Literal[True] = ...,
+        low_memory: bool = ...,
+    ) -> PanelData:
+        ...
+
+    @overload
+    def demean(
+        self,
+        group: str,
+        weights: PanelData | None,
+        return_panel: Literal[False],
+    ) -> Float64Array:
+        ...
 
     def demean(
         self,
@@ -564,10 +585,12 @@ class PanelData:
             return PanelData(out)
         else:
             w = weights.values2d
-            frame = self._frame.copy()
-            frame = w * frame
+            frame: DataFrame = self._frame.copy()
+            frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).transform("sum")
-            frame.iloc[:, :] = w
+            # TODO: Fix when pandas-stubs is updated
+            #  https://github.com/pandas-dev/pandas-stubs/issues/100
+            frame.iloc[:, :] = w  # type: ignore
             sum_weights = frame.groupby(level=level).transform("sum")
             group_mu = weighted_sum / sum_weights
             out = np.sqrt(w) * (self._frame - group_mu)
@@ -650,9 +673,11 @@ class PanelData:
         else:
             w = weights.values2d
             frame = self._frame.copy()
-            frame = w * frame
+            frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).sum()
-            frame.iloc[:, :] = w
+            # TODO: Fix when pandas-stubs is updated
+            #  https://github.com/pandas-dev/pandas-stubs/issues/100
+            frame.iloc[:, :] = w  # type: ignore
             sum_weights = frame.groupby(level=level).sum()
             mu = weighted_sum / sum_weights
 
@@ -720,7 +745,9 @@ class PanelData:
         cat = Categorical(levels[axis][labels[axis]])
         dummies = get_dummies(cat, drop_first=drop_first)
         cols = self.entities if group == "entity" else self.time
-        return dummies[[c for c in cols if c in dummies]].astype(np.float64, copy=False)
+        # TODO: Incorrect typing in pandas-stubs not handling Hashable | None
+        dummy_cols = [c for c in cols if c in dummies]
+        return dummies[dummy_cols].astype(np.float64, copy=False)  # type: ignore
 
 
 PanelDataLike = Union[PanelData, ArrayLike]

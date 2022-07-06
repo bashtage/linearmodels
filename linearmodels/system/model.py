@@ -20,7 +20,6 @@ import warnings
 
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
-import pandas as pd
 from pandas import DataFrame, Index, Series, concat
 
 from linearmodels.iv._utility import IVFormulaParser
@@ -169,17 +168,17 @@ class SystemFormulaParser:
         return formula
 
     @staticmethod
-    def _convert_to_series(value: ArrayLike, name: str) -> pd.Series:
+    def _convert_to_series(value: ArrayLike, name: str) -> Series:
         shape = value.shape
         if len(shape) > 2 or (len(shape) == 2 and min(shape) != 1):
             raise ValueError(f"{name} must be squeezable to 1D.")
         if len(shape) == 1:
-            value_series = pd.Series(value)
+            value_series = Series(value)
         else:  # len(shape) == 2 and min(shape) == 1:
-            if isinstance(value, pd.DataFrame):
+            if isinstance(value, DataFrame):
                 value_series = value.iloc[:, 0]
             else:
-                value_series = pd.Series(np.squeeze(value))
+                value_series = Series(np.squeeze(value))
 
         return value_series
 
@@ -483,8 +482,8 @@ class _SystemModelBase:
             self._eq_labels,
         ):
             y = cast(Float64Array, dep.ndarray)
-            x = np.concatenate([exog_ivd.ndarray, endog.ndarray], 1)
-            z = np.concatenate([exog_ivd.ndarray, instr.ndarray], 1)
+            x = np.concatenate([exog_ivd.ndarray, endog.ndarray], 1, dtype=float)
+            z = np.concatenate([exog_ivd.ndarray, instr.ndarray], 1, dtype=float)
             w_arr = cast(Float64Array, w.ndarray)
             w_arr = w_arr / np.nanmean(w_arr)
             w_sqrt = np.sqrt(w_arr)
