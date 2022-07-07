@@ -12,6 +12,7 @@ try:
     ArrayLike = Union[np.ndarray, xr.DataArray, pd.DataFrame, pd.Series]
 
 except ImportError:
+    # Always needed to allow optional xarray
     ArrayLike = Union[np.ndarray, pd.DataFrame, pd.Series]  # type: ignore
 
 

@@ -595,11 +595,9 @@ def generate_panel_data(
 
     if missing > 0:
         locs = rng.choice(n * t, int(n * t * missing))
-        # TODO:: Fix typing in later version of numpy
-        y.flat[locs] = np.nan  # type: ignore
+        y.flat[locs] = np.nan
         locs = rng.choice(n * t * k, int(n * t * k * missing))
-        # TODO:: Fix typing in later version of numpy
-        x.flat[locs] = np.nan  # type: ignore
+        x.flat[locs] = np.nan
 
     entities = [f"firm{i}" for i in range(n)]
     time = [dt for dt in date_range("1-1-1900", periods=t, freq="A-DEC")]

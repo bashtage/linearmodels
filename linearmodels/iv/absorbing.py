@@ -204,9 +204,8 @@ def category_product(cats: AnyPandas) -> Series:
         cat_codes = asarray(cats[col].cat.codes)
         codes += cat_codes.astype(dtype_val) << shift
         cum_size += sizes[i]
-    # TODO: Bug in pandas-stubs is too restrictive in the Categorical constructor
-    #  https://github.com/pandas-dev/pandas-stubs/issues/107
-    return Series(Categorical(codes), index=cats.index)  # type: ignore
+
+    return Series(Categorical(codes), index=cats.index)
 
 
 def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
