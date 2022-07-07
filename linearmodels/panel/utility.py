@@ -497,6 +497,18 @@ def not_absorbed(
 class PanelModelData(NamedTuple):
     """
     Typed namedtuple to hold simulated panel data
+
+    Parameters
+    ----------
+    data : DataFrame
+        DataFrame containing the panel model's data
+    weights : DataFrame
+        DataFrame containing  the panel model's weights
+    other_effects : DataFrame
+        DataFrame containing the panel model's effects,
+        excluding time and entity effects.
+    clusters : DataFrame
+        DataFrame containing cluster ids.
     """
 
     data: DataFrame
