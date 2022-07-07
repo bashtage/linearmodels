@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingRegressor.approx\_rank
+=========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingRegressor.approx_rank

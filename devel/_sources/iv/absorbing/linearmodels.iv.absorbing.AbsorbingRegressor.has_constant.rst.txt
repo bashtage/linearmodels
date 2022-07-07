@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingRegressor.has\_constant
+==========================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingRegressor.has_constant

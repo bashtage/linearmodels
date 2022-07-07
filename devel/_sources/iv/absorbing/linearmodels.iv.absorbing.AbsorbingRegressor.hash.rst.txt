@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingRegressor.hash
+=================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingRegressor.hash

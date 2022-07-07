@@ -1,0 +1,6 @@
+linearmodels.iv.absorbing.AbsorbingRegressor.regressors
+=======================================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoproperty:: AbsorbingRegressor.regressors

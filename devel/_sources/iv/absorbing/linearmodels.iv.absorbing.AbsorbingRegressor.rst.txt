@@ -1,0 +1,32 @@
+﻿linearmodels.iv.absorbing.AbsorbingRegressor
+============================================
+
+.. currentmodule:: linearmodels.iv.absorbing
+
+.. autoclass:: AbsorbingRegressor
+   :exclude-members: 
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+
+   
+   
+   
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+      :toctree:
+
+      ~AbsorbingRegressor.approx_rank
+      ~AbsorbingRegressor.has_constant
+      ~AbsorbingRegressor.hash
+      ~AbsorbingRegressor.regressors
+   
+   
+   
