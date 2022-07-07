@@ -296,6 +296,10 @@ class _IVModelBase:
             parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
             exog = parser.exog
             endog = parser.endog
+        else:
+            raise ValueError("exog and endog or data must be provided.")
+        assert exog is not None
+        assert endog is not None
         if exog.shape[0] != endog.shape[0]:
             raise ValueError("exog and endog must have the same number of rows.")
         if (exog.index != endog.index).any():

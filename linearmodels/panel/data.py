@@ -403,6 +403,7 @@ class PanelData:
         weights : PanelData
              Weights to use in demeaning
         """
+        group: Literal["entity", "time"]
         if self.nentity > self.nobs:
             group = "entity"
             dummy = "time"
@@ -513,6 +514,15 @@ class PanelData:
         current.index = self._frame.index
 
         return PanelData(current)
+
+    @overload
+    def demean(
+        self,
+        group: Literal["entity", "time", "both"],
+        *,
+        return_panel: Literal[False],
+    ) -> Float64Array:
+        ...
 
     @overload
     def demean(

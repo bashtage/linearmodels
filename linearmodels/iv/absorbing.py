@@ -85,7 +85,7 @@ def lsmr_annihilate(
     y: Float64Array,
     use_cache: bool = True,
     x_hash: Hashable | None = None,
-    **lsmr_options: bool | str | ArrayLike | None | dict[str, Any],
+    **lsmr_options: bool | float | str | ArrayLike | None | dict[str, Any],
 ) -> Float64Array:
     r"""
     Removes projection of x on y from y
@@ -123,9 +123,9 @@ def lsmr_annihilate(
         return empty_like(y)
     use_cache = use_cache and x_hash is not None
     regressor_hash = x_hash if x_hash is not None else ""
-    default_opts: dict[str, bool | str | ArrayLike | None | dict[str, Any]] = dict(
-        atol=1e-8, btol=1e-8, show=False
-    )
+    default_opts: dict[
+        str, bool | float | str | ArrayLike | None | dict[str, Any]
+    ] = dict(atol=1e-8, btol=1e-8, show=False)
     assert lsmr_options is not None
     default_opts.update(lsmr_options)
     resids = []
@@ -169,9 +169,13 @@ def category_product(cats: AnyPandas) -> Series:
 
     sizes = []
     for c in cats:
-        if not is_categorical_dtype(cats[c]):
+        # TODO: Bug in pandas-stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/97
+        if not is_categorical_dtype(cats[c]):  # type: ignore
             raise TypeError("cats must contain only categorical variables")
-        col = cats[c]
+        # TODO: Bug in pandas-stubs
+        #  https://github.com/pandas-dev/pandas-stubs/issues/97
+        col = cats[c]  # type: ignore
         max_code = col.cat.codes.max()
         size = 1
         while max_code >= 2**size:
@@ -197,9 +201,12 @@ def category_product(cats: AnyPandas) -> Series:
             shift = int32(cum_size)
         else:  # elif dtype_str == "int64":
             shift = int64(cum_size)
-        codes += cats[col].cat.codes.astype(dtype_val) << shift
+        cat_codes = asarray(cats[col].cat.codes)
+        codes += cat_codes.astype(dtype_val) << shift
         cum_size += sizes[i]
-    return Series(Categorical(codes), index=cats.index)
+    # TODO: Bug in pandas-stubs is too restrictive in the Categorical constructor
+    #  https://github.com/pandas-dev/pandas-stubs/issues/107
+    return Series(Categorical(codes), index=cats.index)  # type: ignore
 
 
 def category_interaction(cat: Series, precondition: bool = True) -> sp.csc_matrix:
@@ -457,7 +464,11 @@ class Interaction:
         """
         cat_cols = [col for col in frame if is_categorical_dtype(frame[col])]
         cont_cols = [col for col in frame if col not in cat_cols]
-        return Interaction(frame[cat_cols], frame[cont_cols], nobs=frame.shape[0])
+        # TODO: Bug in pandas-stubs
+        #   https://github.com/pandas-dev/pandas-stubs/issues/97
+        frame_cats = frame[cat_cols]  # type: ignore
+        frame_conts = frame[cont_cols]  # type: ignore
+        return Interaction(frame_cats, frame_conts, nobs=frame.shape[0])
 
 
 InteractionVar = Union[DataFrame, Interaction]
@@ -821,7 +832,7 @@ class AbsorbingLS:
         self,
         use_cache: bool,
         absorb_options: None
-        | (dict[str, bool | str | ArrayLike | None | dict[str, Any]]),
+        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]),
         method: str,
     ) -> None:
         weights = (
@@ -933,7 +944,7 @@ class AbsorbingLS:
         debiased: bool = False,
         method: str = "auto",
         absorb_options: None
-        | (dict[str, bool | str | ArrayLike | None | dict[str, Any]]) = None,
+        | (dict[str, bool | float | str | ArrayLike | None | dict[str, Any]]) = None,
         use_cache: bool = True,
         lsmr_options: dict[str, float | bool] | None = None,
         **cov_config: Any,
