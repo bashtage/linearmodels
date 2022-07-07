@@ -265,6 +265,4 @@ class SeriesWrapper:
         self._index: Index | None = index
 
     def __call__(self) -> Series:
-        # TODO: Bug in pandas-stube
-        #  https://github.com/pandas-dev/pandas-stubs/issues/90
-        return Series(self._values, name=self._name, index=self._index)  # type: ignore
+        return Series(self._values, name=self._name, index=self._index)

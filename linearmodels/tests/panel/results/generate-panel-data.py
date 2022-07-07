@@ -53,9 +53,7 @@ missing = 0.05
 for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
-    # TODO: Bug in pandas stubs
-    #  https://github.com/pandas-dev/pandas-stubs/issues/96
-    temp.iloc[locs] = np.nan  # type: ignore
+    temp.iloc[locs] = np.nan
     z[v + "_light"] = temp
 
 variables = ["y", "x1", "x2", "x3", "x4", "x5"]
@@ -63,9 +61,7 @@ missing = 0.20
 for v in variables:
     locs = np.random.choice(n * t, int(n * t * missing))
     temp = z[v].copy()
-    # TODO: Bug in pandas stubs
-    #  https://github.com/pandas-dev/pandas-stubs/issues/96
-    temp.iloc[locs] = np.nan  # type: ignore
+    temp.iloc[locs] = np.nan
     z[v + "_heavy"] = temp
 
 z.to_stata("simulated-panel.dta")

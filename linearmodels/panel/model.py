@@ -393,20 +393,15 @@ class _PanelModelBase:
         elif weights.shape[0] == nobs:
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
-            # TODO: Bug in pandas-stubs
-            #  https://github.com/pandas-dev/pandas-stubs/issues/100
-            frame.iloc[:, :] = weights_arr  # type: ignore
+
+            frame.iloc[:, :] = weights_arr
         elif weights.shape[0] == nentity:
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
-            # TODO: Bug in pandas-stubs
-            #  https://github.com/pandas-dev/pandas-stubs/issues/100
-            frame.iloc[:, :] = weights_arr  # type: ignore
+            frame.iloc[:, :] = weights_arr
         elif weights.shape[0] == nentity * nobs:
             frame = self.dependent.dataframe.copy()
-            # TODO: Bug in pandas-stubs
-            #  https://github.com/pandas-dev/pandas-stubs/issues/100
-            frame.iloc[:, :] = np.asarray(weights)[:, None]  # type: ignore
+            frame.iloc[:, :] = np.asarray(weights)[:, None]
         else:
             raise ValueError("Weights do not have a supported shape.")
         return PanelData(frame)
@@ -719,9 +714,7 @@ class _PanelModelBase:
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
-                # TODO: Bug in pandas-stubs
-                #  https://github.com/pandas-dev/pandas-stubs/issues/95
-                cat = Categorical(formatted_clusters.dataframe[col])  # type: ignore
+                cat = Categorical(formatted_clusters.dataframe[col])
                 # TODO: Bug in pandas-stubs
                 #  https://github.com/pandas-dev/pandas-stubs/issues/111
                 formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)  # type: ignore
@@ -1279,9 +1272,7 @@ class PanelOLS(_PanelModelBase):
         cats = {}
         effects_frame = effects.dataframe
         for col in effects_frame:
-            # TODO: Bug in pandas-stube
-            #  https://github.com/pandas-dev/pandas-stubs/issues/107
-            cat = Categorical(effects_frame[col])  # type: ignore
+            cat = Categorical(effects_frame[col])
             # TODO: Bug in pandas-stube
             #  https://github.com/pandas-dev/pandas-stubs/issues/111
             cats[col] = cat.codes.astype(np.int64)  # type: ignore

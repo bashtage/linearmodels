@@ -598,9 +598,7 @@ class PanelData:
             frame: DataFrame = self._frame.copy()
             frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).transform("sum")
-            # TODO: Fix when pandas-stubs is updated
-            #  https://github.com/pandas-dev/pandas-stubs/issues/100
-            frame.iloc[:, :] = w  # type: ignore
+            frame.iloc[:, :] = w
             sum_weights = frame.groupby(level=level).transform("sum")
             group_mu = weighted_sum / sum_weights
             out = np.sqrt(w) * (self._frame - group_mu)
@@ -685,9 +683,7 @@ class PanelData:
             frame = self._frame.copy()
             frame = cast(DataFrame, w * frame)
             weighted_sum = frame.groupby(level=level).sum()
-            # TODO: Fix when pandas-stubs is updated
-            #  https://github.com/pandas-dev/pandas-stubs/issues/100
-            frame.iloc[:, :] = w  # type: ignore
+            frame.iloc[:, :] = w
             sum_weights = frame.groupby(level=level).sum()
             mu = weighted_sum / sum_weights
 

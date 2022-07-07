@@ -30,9 +30,7 @@ def lsdv(
     temp = x.reset_index()
     cat_index = temp.index
     if entity:
-        # TODO: Bug in pandas stubs
-        #  https://github.com/pandas-dev/pandas-stubs/issues/95
-        cat = Series(Categorical(temp.iloc[:, 0]))  # type: ignore
+        cat = Series(Categorical(temp.iloc[:, 0]))
         cat.index = cat_index
         dummies = get_dummies(cat, drop_first=has_const)
         x = DataFrame(
@@ -41,9 +39,7 @@ def lsdv(
             columns=list(x.columns) + list(dummies.columns),
         )
     if time:
-        # TODO: Bug in pandas stubs
-        #  https://github.com/pandas-dev/pandas-stubs/issues/95
-        cat = Series(Categorical(temp.iloc[:, 1]))  # type: ignore
+        cat = Series(Categorical(temp.iloc[:, 1]))
         cat.index = cat_index
         dummies = get_dummies(cat, drop_first=(has_const or entity))
         x = DataFrame(
