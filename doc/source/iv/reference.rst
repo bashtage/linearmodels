@@ -41,6 +41,7 @@ OLS and WLS with high-dimensional effects.
    AbsorbingLS
    AbsorbingLSResults
    Interaction
+   AbsorbingRegressor
 
 
 .. _iv-module-reference-results:
