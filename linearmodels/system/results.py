@@ -331,7 +331,7 @@ class SystemResults(_CommonResults):
             return self._out_of_sample(equations, data, missing, dataframe)
         if not (fitted or idiosyncratic):
             raise ValueError("At least one output must be selected")
-        out: Union[dict[str, DataFrame], DataFrame]
+        out: dict[str, DataFrame] | DataFrame
         if dataframe:
             if fitted and not idiosyncratic:
                 out = self.fitted_values

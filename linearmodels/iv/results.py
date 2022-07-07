@@ -555,8 +555,6 @@ class OLSResults(_LSModelResultsBase):
         values corresponding to the original model specification.
         """
         if not (exog is None and endog is None and data is None):
-            assert exog is not None
-            assert endog is not None
             return self._out_of_sample(exog, endog, data, missing)
         out = []
         if fitted:

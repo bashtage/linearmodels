@@ -320,7 +320,7 @@ class _PanelModelBase:
     def __repr__(self) -> str:
         return self.__str__() + "\nid: " + str(hex(id(self)))
 
-    def reformat_clusters(self, clusters: PanelDataLike) -> PanelData:
+    def reformat_clusters(self, clusters: IntArray | PanelDataLike) -> PanelData:
         """
         Reformat cluster variables
 
@@ -348,7 +348,7 @@ class _PanelModelBase:
         clusters_pd.drop(~self.not_null)
         return clusters_pd.copy()
 
-    def _info(self) -> tuple[Series, Series, None]:
+    def _info(self) -> tuple[Series, Series, DataFrame | None]:
         """Information about panel structure"""
 
         entity_info = panel_structure_stats(
@@ -565,8 +565,8 @@ class _PanelModelBase:
             r2b = np.corrcoef(y.T, (x @ params).T)[0, 1]
 
         # Within
-        y = cast(Float64Array, self.dependent.demean("entity", return_panel=False))
-        x = cast(Float64Array, self.exog.demean("entity", return_panel=False))
+        y = self.dependent.demean("entity", return_panel=False)
+        x = self.exog.demean("entity", return_panel=False)
         xb = x @ params
         r2w = 0.0
         if y.std() > 0 and xb.std() > 0:
@@ -703,10 +703,10 @@ class _PanelModelBase:
         return self._not_null
 
     def _setup_clusters(
-        self, cov_config: Mapping[str, bool | float | str | PanelDataLike]
-    ) -> dict[str, bool | float | str | Float64Array | DataFrame | PanelData]:
-
-        cov_config_upd = cov_config.copy()
+        self,
+        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
+    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
+        cov_config_upd = dict(cov_config)
         cluster_types = ("clusters", "cluster_entity", "cluster_time")
         common = set(cov_config.keys()).intersection(cluster_types)
         if not common:
@@ -719,15 +719,19 @@ class _PanelModelBase:
         if clusters is not None:
             formatted_clusters = self.reformat_clusters(clusters)
             for col in formatted_clusters.dataframe:
-                cat = Categorical(formatted_clusters.dataframe[col])
-                formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)
+                # TODO: Bug in pandas-stubs
+                #  https://github.com/pandas-dev/pandas-stubs/issues/95
+                cat = Categorical(formatted_clusters.dataframe[col])  # type: ignore
+                # TODO: Bug in pandas-stubs
+                #  https://github.com/pandas-dev/pandas-stubs/issues/111
+                formatted_clusters.dataframe[col] = cat.codes.astype(np.int64)  # type: ignore
             clusters_frame = formatted_clusters.dataframe
 
         cluster_entity = bool(cov_config_upd.pop("cluster_entity", False))
         if cluster_entity:
-            group_ids = self.dependent.entity_ids.squeeze()
+            group_ids_arr = self.dependent.entity_ids.squeeze()
             name = "cov.cluster.entity"
-            group_ids = Series(group_ids, index=self.dependent.index, name=name)
+            group_ids = Series(group_ids_arr, index=self.dependent.index, name=name)
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
@@ -735,9 +739,9 @@ class _PanelModelBase:
 
         cluster_time = bool(cov_config_upd.pop("cluster_time", False))
         if cluster_time:
-            group_ids = self.dependent.time_ids.squeeze()
+            group_ids_arr = self.dependent.time_ids.squeeze()
             name = "cov.cluster.time"
-            group_ids = Series(group_ids, index=self.dependent.index, name=name)
+            group_ids = Series(group_ids_arr, index=self.dependent.index, name=name)
             if clusters_frame is not None:
                 clusters_frame[name] = group_ids
             else:
@@ -745,9 +749,8 @@ class _PanelModelBase:
         if self._singleton_index is not None and clusters_frame is not None:
             clusters_frame = clusters_frame.loc[~self._singleton_index]
 
-        cov_config_upd["clusters"] = (
-            np.asarray(clusters_frame) if clusters_frame is not None else clusters_frame
-        )
+        if clusters_frame is not None:
+            cov_config_upd["clusters"] = np.asarray(clusters_frame)
 
         return cov_config_upd
 
@@ -921,7 +924,7 @@ class PooledOLS(_PanelModelBase):
         *,
         cov_type: str = "unadjusted",
         debiased: bool = True,
-        **cov_config: bool | float | str | Float64Array | DataFrame | PanelData,
+        **cov_config: bool | float | str | IntArray | DataFrame | PanelData,
     ) -> PanelResults:
         """
         Estimate model parameters
@@ -1045,7 +1048,7 @@ class PooledOLS(_PanelModelBase):
         params: ArrayLike,
         *,
         exog: PanelDataLike | None = None,
-        data: DataFrame | None = None,
+        data: PanelDataLike | None = None,
         context: int = 4,
     ) -> DataFrame:
         """
@@ -1276,11 +1279,15 @@ class PanelOLS(_PanelModelBase):
         cats = {}
         effects_frame = effects.dataframe
         for col in effects_frame:
-            cat = Categorical(effects_frame[col])
-            cats[col] = cat.codes.astype(np.int64)
-        cats = DataFrame(cats, index=effects_frame.index)
-        cats = cats[effects_frame.columns]
-        other_effects = PanelData(cats)
+            # TODO: Bug in pandas-stube
+            #  https://github.com/pandas-dev/pandas-stubs/issues/107
+            cat = Categorical(effects_frame[col])  # type: ignore
+            # TODO: Bug in pandas-stube
+            #  https://github.com/pandas-dev/pandas-stubs/issues/111
+            cats[col] = cat.codes.astype(np.int64)  # type: ignore
+        cats_df = DataFrame(cats, index=effects_frame.index)
+        cats_df = cats_df[effects_frame.columns]
+        other_effects = PanelData(cats_df)
         other_effects.drop(~self.not_null)
         self._other_effect_cats = other_effects
         cats_array = other_effects.values2d
@@ -1654,21 +1661,21 @@ class PanelOLS(_PanelModelBase):
 
         return wy_arr, wx_arr, wybar, wy_effects, wx_effects
 
-    def _info(self) -> tuple[Series, Series, DataFrame]:
+    def _info(self) -> tuple[Series, Series, DataFrame | None]:
         """Information about model effects and panel structure"""
 
         entity_info, time_info, other_info = super()._info()
 
         if self.other_effects:
-            other_info = []
+            other_info_values: list[Series] = []
             assert self._other_effect_cats is not None
             oe = self._other_effect_cats.dataframe
             for c in oe:
                 name = "Observations per group (" + str(c) + ")"
-                other_info.append(
+                other_info_values.append(
                     panel_structure_stats(oe[c].values.astype(np.int32), name)
                 )
-            other_info = DataFrame(other_info)
+            other_info = DataFrame(other_info_values)
 
         return entity_info, time_info, other_info
 
@@ -2031,16 +2038,18 @@ class BetweenOLS(_PanelModelBase):
         )
 
     def _setup_clusters(
-        self, cov_config: dict[str, bool | float | str | PanelDataLike]
+        self,
+        cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
     ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
         """Return covariance estimator reformat clusters"""
-        cov_config_upd = cov_config.copy()
+        cov_config_upd = dict(cov_config)
         if "clusters" not in cov_config:
             return cov_config_upd
 
         clusters = cov_config.get("clusters", None)
         if clusters is not None:
-            clusters_panel = self.reformat_clusters(clusters)
+            cluster_data = cast(Union[IntArray, DataFrame, PanelData], clusters)
+            clusters_panel = self.reformat_clusters(cluster_data)
             cluster_max = np.nanmax(clusters_panel.values3d, axis=1)
             delta = cluster_max - np.nanmin(clusters_panel.values3d, axis=1)
             if np.any(delta != 0):
@@ -2051,7 +2060,8 @@ class BetweenOLS(_PanelModelBase):
             clusters_frame = DataFrame(
                 cluster_max.T, index=index, columns=clusters_panel.vars
             )
-            clusters_frame = clusters_frame.loc[reindex].astype(np.int64)
+            # TODO: Bug in pandas-stubs prevents using Hashable | None
+            clusters_frame = clusters_frame.loc[reindex].astype(np.int64)  # type: ignore
             cov_config_upd["clusters"] = clusters_frame
 
         return cov_config_upd
@@ -2288,7 +2298,7 @@ class FirstDifferenceOLS(_PanelModelBase):
     def _setup_clusters(
         self,
         cov_config: Mapping[str, bool | float | str | IntArray | DataFrame | PanelData],
-    ) -> dict[str, bool | float | str | DataFrame]:
+    ) -> dict[str, bool | float | str | IntArray | DataFrame | PanelData]:
         cov_config_upd = dict(cov_config).copy()
         cluster_types = ("clusters", "cluster_entity")
         common = set(cov_config.keys()).intersection(cluster_types)
@@ -2298,7 +2308,8 @@ class FirstDifferenceOLS(_PanelModelBase):
         clusters = cov_config.get("clusters", None)
         clusters_frame: DataFrame | None = None
         if clusters is not None:
-            clusters_panel = self.reformat_clusters(clusters)
+            cluster_data = cast(Union[IntArray, DataFrame, PanelData], clusters)
+            clusters_panel = self.reformat_clusters(cluster_data)
             fd = clusters_panel.first_difference()
             fd_array = fd.values2d
             if np.any(fd_array.flat[np.isfinite(fd_array.flat)] != 0):
@@ -2729,7 +2740,7 @@ class RandomEffects(_PanelModelBase):
         unbalanced = np.ptp(t) != 0
         if small_sample and unbalanced:
             ssr = float((t * wu).T @ wu)
-            wx_df: DataFrame = root_w * self.exog.dataframe
+            wx_df = cast(DataFrame, root_w * self.exog.dataframe)
             means = wx_df.groupby(level=0).transform("mean").values
             denom = means.T @ means
             sums = wx_df.groupby(level=0).sum().values
