@@ -1032,19 +1032,19 @@ class PanelModelComparison(_ModelComparison):
             ],
             axis=1,
         )
-        vals = [[i for i in v] for v in vals.T.values]
-        vals[2] = [str(v) for v in vals[2]]
-        for i in range(4, len(vals)):
+        vals_lst = [[i for i in v] for v in vals.T.values]
+        vals_lst[2] = [str(v) for v in vals_lst[2]]
+        for i in range(4, len(vals_lst)):
             f = _str
             if i == 9:
                 f = pval_format
-            vals[i] = [f(v) for v in vals[i]]
+            vals_lst[i] = [f(v) for v in vals_lst[i]]
 
         params = self.params
         precision = getattr(self, self._precision)
         pvalues = np.asarray(self.pvalues)
         params_fmt = []
-        params_stub = []
+        params_stub: list[str] = []
         for i in range(len(params)):
             formatted_and_starred = []
             for v, pv in zip(params.values[i], pvalues[i]):
@@ -1057,10 +1057,10 @@ class PanelModelComparison(_ModelComparison):
                 v_str = f"({v_str})" if v_str.strip() else v_str
                 precision_fmt.append(v_str)
             params_fmt.append(precision_fmt)
-            params_stub.append(params.index[i])
+            params_stub.append(str(params.index[i]))
             params_stub.append(" ")
 
-        vals = table_concat((vals, params_fmt))
+        vals_lst = table_concat((vals_lst, params_fmt))
         stubs = stub_concat((stubs, params_stub))
 
         all_effects = []
@@ -1084,14 +1084,14 @@ class PanelModelComparison(_ModelComparison):
                     row.append("")
             effects.append(row)
         if effects:
-            vals = table_concat((vals, effects))
+            vals_lst = table_concat((vals_lst, effects))
             stubs = stub_concat((stubs, effects_stub))
 
         txt_fmt = default_txt_fmt.copy()
         txt_fmt["data_aligns"] = "r"
         txt_fmt["header_align"] = "r"
         table = SimpleTable(
-            vals, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt
+            vals_lst, headers=models, title=title, stubs=stubs, txt_fmt=txt_fmt
         )
         smry.tables.append(table)
         prec_type = self._PRECISION_TYPES[self._precision]

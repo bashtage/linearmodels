@@ -393,14 +393,20 @@ class _PanelModelBase:
         elif weights.shape[0] == nobs:
             weights_arr = np.asarray(weights)[:, None]
             weights_arr = weights_arr @ np.ones((1, nentity))
-            frame.iloc[:, :] = weights_arr
+            # TODO: Bug in pandas-stubs
+            #  https://github.com/pandas-dev/pandas-stubs/issues/100
+            frame.iloc[:, :] = weights_arr  # type: ignore
         elif weights.shape[0] == nentity:
             weights_arr = np.asarray(weights)[None, :]
             weights_arr = np.ones((nobs, 1)) @ weights_arr
-            frame.iloc[:, :] = weights_arr
+            # TODO: Bug in pandas-stubs
+            #  https://github.com/pandas-dev/pandas-stubs/issues/100
+            frame.iloc[:, :] = weights_arr  # type: ignore
         elif weights.shape[0] == nentity * nobs:
             frame = self.dependent.dataframe.copy()
-            frame.iloc[:, :] = np.asarray(weights)[:, None]
+            # TODO: Bug in pandas-stubs
+            #  https://github.com/pandas-dev/pandas-stubs/issues/100
+            frame.iloc[:, :] = np.asarray(weights)[:, None]  # type: ignore
         else:
             raise ValueError("Weights do not have a supported shape.")
         return PanelData(frame)
