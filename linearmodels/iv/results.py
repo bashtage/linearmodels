@@ -707,7 +707,7 @@ class FirstStageResults(_SummaryStr):
         for col in endog.pandas:
             # TODO: BUG in pandas-stube
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
-            y = w * endog.pandas[[col]].values  # type: ignore
+            y = w * endog.pandas[[col]].values
             ey = annihilate(y, x)
             partial = _OLS(ey, ez).fit(cov_type=self._cov_type, **self._cov_config)
             full = individual_results[col]

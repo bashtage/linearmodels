@@ -1467,7 +1467,7 @@ class IV3SLS(_LSSystemModelBase):
             equations[str(col)] = {
                 # TODO: Bug in pandas-stubs
                 #  https://github.com/pandas-dev/pandas-stubs/issues/97
-                "dependent": dependent_ivd.pandas[[col]],  # type: ignore
+                "dependent": dependent_ivd.pandas[[col]],
                 "exog": exog_ivd.pandas,
                 "endog": endog_ivd.pandas,
                 "instruments": instr_ivd.pandas,
@@ -1691,7 +1691,7 @@ class SUR(_LSSystemModelBase):
         for col in dependent_ivd.pandas:
             # TODO: Bug in pandas-stubs
             #  https://github.com/pandas-dev/pandas-stubs/issues/97
-            equations[str(col)] = (dependent_ivd.pandas[[col]], exog_ivd.pandas)  # type: ignore
+            equations[str(col)] = (dependent_ivd.pandas[[col]], exog_ivd.pandas)
         return cls(equations)
 
     @classmethod
