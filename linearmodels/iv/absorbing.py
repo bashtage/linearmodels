@@ -465,8 +465,8 @@ class Interaction:
         cont_cols = [col for col in frame if col not in cat_cols]
         # TODO: Bug in pandas-stubs
         #   https://github.com/pandas-dev/pandas-stubs/issues/97
-        frame_cats = frame[cat_cols]  # type: ignore
-        frame_conts = frame[cont_cols]  # type: ignore
+        frame_cats = frame[cat_cols]
+        frame_conts = frame[cont_cols]
         return Interaction(frame_cats, frame_conts, nobs=frame.shape[0])
 
 
