@@ -22,6 +22,7 @@ from linearmodels.iv.absorbing import (
     category_interaction,
     category_product,
     clear_cache,
+    lsmr_annihilate,
 )
 from linearmodels.iv.model import _OLS
 from linearmodels.iv.results import AbsorbingLSResults, OLSResults
@@ -326,6 +327,18 @@ def test_category_product(cat):
         assert (g.nunique() == 1).all()
         g = df.groupby("alt").cat_prod
         assert (g.nunique() == 1).all()
+
+
+@pytest.mark.parametrize("ncat", [5, 10])
+def test_category_product_large(random_gen, ncat):
+    dfc = {}
+    for i in range(ncat):
+        dfc[str(i)] = random_cat(10, 1000)
+    cat = pd.DataFrame(dfc)
+    out = category_product(cat)
+    bits = 64 if np.log2(10**ncat) > 32 else 32
+    max_size = 64 if np.log2(out.cat.categories.max()) > 32 else 32
+    assert bits == max_size
 
 
 def test_category_product_too_large(random_gen):
@@ -729,3 +742,11 @@ def test_options(random_gen):
     mod = AbsorbingLS(y, x[["x0", "x1"]], absorb=df[["x2", "c"]], drop_absorbed=True)
     with pytest.raises(RuntimeError, match="HDFE has been"):
         mod.fit(absorb_options={"atol": 1e-7, "btol": 1e-7}, method="hdfe")
+
+
+def test_lsmr_annihilate_empty():
+    gen = np.random.default_rng(0)
+    x = csc_matrix(gen.standard_normal((1000, 2)))
+    y = np.empty((1000, 0))
+    y_out = lsmr_annihilate(x, y)
+    assert y_out.shape == y.shape

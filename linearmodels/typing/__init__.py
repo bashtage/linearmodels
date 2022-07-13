@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import sys
-from typing import TYPE_CHECKING, Any, Hashable, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Hashable, Literal, Optional, Sequence, Union
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -35,30 +34,18 @@ OptionalNumeric = Optional[Union[int, float]]
 AnyPandas = Union[Series, DataFrame]
 Label = Optional[Hashable]
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-elif TYPE_CHECKING:
-    from typing_extensions import Literal
-else:
-
-    class _Literal:
-        def __getitem__(self, item):
-            pass
-
-    Literal = _Literal()
-
 if NP_GTE_121 and TYPE_CHECKING:
-    Float64Array = np.ndarray[Any, np.dtype[np.float64]]
-    Int64Array = np.ndarray[Any, np.dtype[np.int64]]
-    Int32Array = np.ndarray[Any, np.dtype[np.int32]]
-    IntArray = np.ndarray[Any, np.dtype[np.int_]]
-    BoolArray = np.ndarray[Any, np.dtype[np.bool_]]
-    AnyArray = np.ndarray[Any, Any]
-    NumericArray = Union[
-        np.ndarray[Any, np.dtype[np.signedinteger[Any]]],
-        np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]],
-        np.ndarray[Any, np.dtype[np.floating[Any]]],
-    ]
+    Float64Array = np.ndarray[Any, np.dtype[np.float64]]  # pragma: no cover
+    Int64Array = np.ndarray[Any, np.dtype[np.int64]]  # pragma: no cover
+    Int32Array = np.ndarray[Any, np.dtype[np.int32]]  # pragma: no cover
+    IntArray = np.ndarray[Any, np.dtype[np.int_]]  # pragma: no cover
+    BoolArray = np.ndarray[Any, np.dtype[np.bool_]]  # pragma: no cover
+    AnyArray = np.ndarray[Any, Any]  # pragma: no cover
+    NumericArray = Union[  # pragma: no cover
+        np.ndarray[Any, np.dtype[np.signedinteger[Any]]],  # pragma: no cover
+        np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]],  # pragma: no cover
+        np.ndarray[Any, np.dtype[np.floating[Any]]],  # pragma: no cover
+    ]  # pragma: no cover
 else:
     IntArray = (
         Float64Array
