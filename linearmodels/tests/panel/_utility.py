@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 import numpy as np
 from numpy.linalg import lstsq
 from numpy.random import RandomState, standard_normal
@@ -9,7 +11,6 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 
 from linearmodels.panel.data import PanelData
 from linearmodels.shared.utility import AttrDict, panel_to_frame
-from linearmodels.typing import Literal
 
 try:
     import xarray  # noqa: F401

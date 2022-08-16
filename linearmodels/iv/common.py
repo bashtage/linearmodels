@@ -66,8 +66,7 @@ def f_statistic(
         )
     test_params = params[non_const]
     test_cov = cov[ix_(non_const, non_const)]
-    test_stat = test_params.T @ inv(test_cov) @ test_params
-    test_stat = float(test_stat)
+    test_stat = float(test_params.T @ inv(test_cov) @ test_params)
     df = test_params.shape[0]
     if debiased:
         wald = WaldTestStatistic(test_stat / df, null, df, resid_df, name=name)

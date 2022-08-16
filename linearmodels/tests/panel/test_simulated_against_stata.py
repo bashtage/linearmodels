@@ -1,4 +1,5 @@
 import os
+from typing import cast
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -22,7 +23,9 @@ MODELS = {
     "random_effect": RandomEffects,
 }
 cwd = os.path.split(os.path.abspath(__file__))[0]
-sim_data = pd.read_stata(os.path.join(cwd, "results", "simulated-panel.dta"))
+sim_data = cast(
+    pd.DataFrame, pd.read_stata(os.path.join(cwd, "results", "simulated-panel.dta"))
+)
 sim_data = sim_data.set_index(["firm", "time"])
 
 valid = sorted(list(filter(lambda x: True, list(STATA_RESULTS.keys()))))

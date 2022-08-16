@@ -2883,12 +2883,14 @@ class FamaMacBeth(_PanelModelBase):
             wx[self._not_null], index=exog.notnull().index, columns=exog.columns
         )
 
-        def validate_block(ex: Float64Array) -> bool:
+        def validate_block(ex: Float64Array | DataFrame) -> bool:
+            _ex = np.asarray(ex, dtype=float)
+
             def _mr(ex: Float64Array) -> int:
                 """lstsq based matrix_rank"""
                 return _lstsq(ex, np.ones(ex.shape[0]))[2]
 
-            return ex.shape[0] >= ex.shape[1] and _mr(ex) == ex.shape[1]
+            return _ex.shape[0] >= _ex.shape[1] and _mr(_ex) == _ex.shape[1]
 
         valid_blocks = wx_df.groupby(level=1).apply(validate_block)
         if not valid_blocks.any():

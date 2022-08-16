@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from functools import reduce
 import textwrap
-from typing import Mapping, Sequence, cast
+from typing import Literal, Mapping, Sequence, cast
 import warnings
 
 import numpy as np
@@ -51,7 +51,7 @@ from linearmodels.system.gmm import (
     KernelWeightMatrix,
 )
 from linearmodels.system.results import GMMSystemResults, SystemResults
-from linearmodels.typing import ArrayLike, ArraySequence, Float64Array, Literal
+from linearmodels.typing import ArrayLike, ArraySequence, Float64Array
 
 __all__ = ["SUR", "IV3SLS", "IVSystemGMM", "LinearConstraint"]
 
