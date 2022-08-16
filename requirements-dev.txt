@@ -5,7 +5,7 @@ nbconvert
 nbformat
 nbsphinx
 numpydoc
-pytest>=6.0
+pytest>=7.0,<7.1
 pytest-xdist
 pytest-cov
 seaborn
