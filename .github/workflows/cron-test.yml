@@ -26,7 +26,7 @@ jobs:
       CIBW_ARCHS_LINUX: "x86_64"
       CIBW_ARCHS_MACOS: "x86_64"
       CIBW_SKIP: "pp* *-musllinux_* *-win32"
-      CIBW_TEST_REQUIRES: "pytest>=7.0,<7.1" pytest-xdist xarray matplotlib
+      CIBW_TEST_REQUIRES: "\"pytest>=7.0,<7.1\" pytest-xdist xarray matplotlib"
       CIBW_TEST_COMMAND: python -c "import linearmodels; linearmodels.test(['--skip-examples','--skip-slow','-n','2'])"
       # Avoid testing on emulated architectures
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'auditwheel repair --strip -w {dest_dir} {wheel}'
