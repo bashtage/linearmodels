@@ -983,7 +983,7 @@ class LinearFactorModelGMM(_LinearFactorModelBase):
         _default_options["options"] = options
         opt_res = minimize(
             fun=self._j,
-            x0=sv,
+            x0=np.squeeze(sv),
             args=args,
             **_default_options,
         )

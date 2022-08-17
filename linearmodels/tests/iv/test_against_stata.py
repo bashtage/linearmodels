@@ -1,5 +1,6 @@
 from copy import deepcopy
 import os
+from typing import cast
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -21,7 +22,9 @@ HOUSING_DATA.region = HOUSING_DATA.region.astype("category")
 HOUSING_DATA.state = HOUSING_DATA.state.astype("category")
 HOUSING_DATA.division = HOUSING_DATA.division.astype("category")
 
-SIMULATED_DATA = pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
+SIMULATED_DATA = cast(
+    pd.DataFrame, pd.read_stata(os.path.join(CWD, "results", "simulated-data.dta"))
+)
 
 filepath = os.path.join(CWD, "results", "stata-iv-housing-results.txt")
 HOUSING_RESULTS = process_results(filepath)
