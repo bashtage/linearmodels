@@ -31,7 +31,6 @@ import linearmodels
 project = "linearmodels"
 copyright = "2017, Kevin Sheppard"
 author = "Kevin Sheppard"
-language = "en"
 
 # More warnings
 nitpicky = True
@@ -133,7 +132,7 @@ release = linearmodels.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -263,7 +262,7 @@ intersphinx_mapping = {
     "xarray": ("https://xarray.pydata.org/en/stable/", None),
 }
 
-extlinks = {"issue": ("https://github.com/bashtage/linearmodels/issues/%s", "GH")}
+extlinks = {"issue": ("https://github.com/bashtage/linearmodels/issues/%s", "GH%s")}
 
 
 doctest_global_setup = """
