@@ -144,6 +144,7 @@ class IVData:
                     x = xr.concat([x], dim=var_name)
                     assert isinstance(x, xr.DataArray)
                     x = x.transpose()
+                assert isinstance(x, xr.DataArray)
                 index = list(x.coords[x.dims[0]].values)
                 xr_col_values = x.coords[x.dims[1]].values
                 xr_cols = list(xr_col_values)
