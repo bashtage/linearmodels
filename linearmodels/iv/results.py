@@ -409,7 +409,7 @@ class _LSModelResultsBase(_SummaryStr):
             restriction and formula.
         value : {ndarray, Series}
             q element array containing the restricted values.
-        formula : Union[str, list[str]]
+        formula : {str, list[str]}
             formulaic linear constraints. The simplest formats are one of:
 
             * A single comma-separated string such as "x1=0, x2+x3=1"
