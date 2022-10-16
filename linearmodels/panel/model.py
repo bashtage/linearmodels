@@ -1163,7 +1163,7 @@ class PanelOLS(_PanelModelBase):
 
     Additionally , arbitrary effects can be specified using categorical variables.
 
-    If both ``entity_effect``  and``time_effects`` are ``False``, and no other
+    If both ``entity_effect`` and ``time_effects`` are ``False``, and no other
     effects are included, the model reduces to :class:`PooledOLS`.
 
     Model supports at most 2 effects.  These can be entity-time, entity-other, time-other or
