@@ -9,3 +9,4 @@ pyhdfe>=0.1
 formulaic~=0.3.2
 # versioning
 setuptools_scm[toml]>=7.0.0
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
