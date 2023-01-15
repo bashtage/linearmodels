@@ -57,7 +57,7 @@ def cluster_union(clusters: IntArray) -> IntArray:
     Parameters
     ----------
     clusters : ndarray
-        A nobs by 2 array of integer values of cluster group membership.
+        A nobs by d (>=2) array of integer values of cluster group membership.
 
     Returns
     -------
@@ -143,6 +143,29 @@ def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
 def multi_way_cluster_iter(
     clusters: Float64Array, xe: Float64Array, group_debias: bool = True
 ):
+    """
+    Multi-way clustering
+
+    Sums cluster covariances with an odd number of cluster dimensions,
+    subtracts those with an eve number of cluster dimensions. Whereas
+    cluster covariances with a number of cluster dimensions greater
+    than 1 are computed using the group formed from the
+    intersection of the n dimensions.
+
+    Parameters
+    ----------
+    clusters : ndarray
+        nobs by d (where d is the number of cluster dimensions)
+    xe : ndarray
+        nobs by k
+    group_debias: bool
+        Flag indicating whether to apply small-number of groups adjustment.
+
+    Returns
+    -------
+    ndarray
+       k by k
+    """
     clus_adj = 1
 
     xeex = {}
@@ -185,6 +208,21 @@ def multi_way_cluster_iter(
 
 
 def cgm_vcov_fix(vcov: Float64Array, toll: float = 1e-10):
+    """
+    VCOV fix à la Cameron, Gelbach & Miller 2011
+
+    Parameters
+    ----------
+    vcov: ndarray
+        k by k variance covariance matrix
+    toll: float
+        toll to set on eig values
+
+    Returns
+    -------
+    ndarray
+       k by k cluster covariance adjusted
+    """
     from warnings import warn
 
     if npany(diag(vcov) < 0):
@@ -193,7 +231,7 @@ def cgm_vcov_fix(vcov: Float64Array, toll: float = 1e-10):
 
         warn(
             "Non-positive semi-definite VCOV matrix; adjusted "
-            "a la Cameron, Gelbach & Miller 2011",
+            "à la Cameron, Gelbach & Miller 2011",
             VCOVWarning,
         )
 

@@ -234,7 +234,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
         columns in x, e.g., fixed effects.  Covariance estimators are always
         adjusted for extra_df irrespective of the setting of debiased
     clusters : ndarray
-        nobs by 1 or nobs by 2 array of cluster group ids
+        nobs by 1, nobs by 2 or by n array of cluster group ids
     group_debias : bool
         Flag indicating whether to apply small-number of groups adjustment.
 
