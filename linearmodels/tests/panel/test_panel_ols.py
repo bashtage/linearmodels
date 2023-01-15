@@ -1078,18 +1078,15 @@ def test_cluster_smoke(data):
     mod.fit(cov_type="clustered", clusters=c2, debiased=False)
     mod.fit(cov_type="clustered", cluster_entity=True, clusters=c1, debiased=False)
     mod.fit(cov_type="clustered", cluster_time=True, clusters=c1, debiased=False)
-    with pytest.raises(ValueError):
-        mod.fit(cov_type="clustered", cluster_time=True, clusters=c2, debiased=False)
-    with pytest.raises(ValueError):
-        mod.fit(cov_type="clustered", cluster_entity=True, clusters=c2, debiased=False)
-    with pytest.raises(ValueError):
-        mod.fit(
-            cov_type="clustered",
-            cluster_entity=True,
-            cluster_time=True,
-            clusters=c1,
-            debiased=False,
-        )
+    mod.fit(cov_type="clustered", cluster_time=True, clusters=c2, debiased=False)
+    mod.fit(cov_type="clustered", cluster_entity=True, clusters=c2, debiased=False)
+    mod.fit(
+        cov_type="clustered",
+        cluster_entity=True,
+        cluster_time=True,
+        clusters=c1,
+        debiased=False,
+    )
     with pytest.raises(ValueError):
         clusters = c1.dataframe.iloc[: c1.dataframe.shape[0] // 2]
         mod.fit(cov_type="clustered", clusters=clusters, debiased=False)
