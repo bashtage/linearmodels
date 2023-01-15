@@ -10,11 +10,10 @@ from property_cached import cached_property
 from linearmodels.iv.covariance import (
     CLUSTER_ERR,
     KERNEL_LOOKUP,
-    cov_cluster,
     cov_kernel,
     kernel_optimal_bandwidth,
 )
-from linearmodels.shared.covariance import cluster_union, group_debias_coefficient
+from linearmodels.shared.covariance import cgm_vcov_fix, multi_way_cluster_iter
 from linearmodels.shared.typed_getters import (
     get_array_like,
     get_bool,
@@ -214,7 +213,7 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
 
 class ClusteredCovariance(HomoskedasticCovariance):
     r"""
-    One-way (Rogers) or two-way clustered covariance estimation
+    One-way (Rogers), two-way or multi-way clustered covariance estimation
 
     Parameters
     ----------
@@ -253,11 +252,13 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         \hat{\Sigma}_{xx} = X'X
 
-    and :math:`\hat{S}_{\mathcal{G}}` is a one- or two-way cluster covariance
+    and :math:`\hat{S}_{\mathcal{G}}` is a one-, two- or multi-way cluster covariance
     of the scores.  Two-way clustering is implemented by summing up the two
     one-way cluster covariances and then subtracting the one-way clustering
     covariance computed using the group formed from the intersection of the
-    two groups.
+    two groups. Similarly, for multi-way clustering the cluster covariances
+    with an odd number of cluster dimensions are added, those with an even
+    number are subtracted.
 
     Two small sample adjustment are available.  ``debias=True`` will account
     for regressors in the main model. ``group_debias=True`` will provide a
@@ -293,9 +294,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
         clusters = np.asarray(clusters).squeeze()
         assert clusters is not None
         self._group_debias = bool(group_debias)
-        dim1 = 1 if clusters.ndim == 1 else clusters.shape[1]
-        if clusters.ndim > 2 or dim1 > 2:
-            raise ValueError("Only 1 or 2-way clustering supported.")
         nobs = y.shape[0]
         if clusters.shape[0] != nobs:
             raise ValueError(CLUSTER_ERR.format(nobs, clusters.shape[0]))
@@ -311,30 +309,16 @@ class ClusteredCovariance(HomoskedasticCovariance):
 
         eps = self.eps
         xe = x * eps
-        if self._clusters.ndim == 1:
-            xeex = cov_cluster(xe, self._clusters)
-            if self._group_debias:
-                xeex *= group_debias_coefficient(self._clusters)
 
-        else:
-            clusters0 = self._clusters[:, 0]
-            clusters1 = self._clusters[:, 1]
-            xeex0 = cov_cluster(xe, clusters0)
-            xeex1 = cov_cluster(xe, clusters1)
-
-            clusters01 = cluster_union(self._clusters)
-            xeex01 = cov_cluster(xe, clusters01)
-
-            if self._group_debias:
-                xeex0 *= group_debias_coefficient(clusters0)
-                xeex1 *= group_debias_coefficient(clusters1)
-                xeex01 *= group_debias_coefficient(clusters01)
-
-            xeex = xeex0 + xeex1 - xeex01
+        xeex = multi_way_cluster_iter(
+            clusters=self._clusters,
+            xe=xe,
+            group_debias=self._group_debias,
+        )
 
         xeex *= self._scale
         out = (xpxi @ xeex @ xpxi) / nobs
-        return (out + out.T) / 2
+        return cgm_vcov_fix((out + out.T) / 2)
 
 
 class DriscollKraay(HomoskedasticCovariance):
@@ -401,6 +385,7 @@ class DriscollKraay(HomoskedasticCovariance):
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
     ALLOWED_KWARGS = ("kernel", "bandwidth")
+
     # TODO: Test
 
     def __init__(
@@ -518,6 +503,7 @@ class ACCovariance(HomoskedasticCovariance):
     ``True``. :math:`K(i, bw)` is the kernel weighting function.
     """
     ALLOWED_KWARGS = ("kernel", "bandwidth")
+
     # TODO: Docstring
 
     def __init__(

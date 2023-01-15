@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from itertools import combinations
+
 from numpy import (
     any as npany,
     arange,
     argsort,
     cumsum,
+    diag,
     lexsort,
+    maximum,
     r_,
     unique,
     where,
     zeros,
 )
+from numpy.linalg import eig
 
+from linearmodels.shared.exceptions import VCOVWarning
 from linearmodels.typing import AnyArray, Float64Array, IntArray
 
 
@@ -132,3 +138,63 @@ def cov_kernel(z: Float64Array, w: Float64Array) -> Float64Array:
 
     s /= n
     return s
+
+
+def multi_way_cluster_iter(
+    clusters: Float64Array, xe: Float64Array, group_debias: bool = True
+):
+    clus_adj = 1
+
+    xeex = {}
+
+    if clusters.ndim == 1:
+        clusters = clusters[:, None]
+
+    n_cols = arange(clusters.shape[1])
+
+    for i in range(1, clusters.shape[1] + 1):
+
+        for subset_cols in combinations(n_cols, i):
+
+            sign = 1 if len(subset_cols) % 2 else -1
+
+            if len(subset_cols) == 1:
+
+                if group_debias:
+                    clus_adj = group_debias_coefficient(
+                        clusters=clusters[:, subset_cols].flatten(),
+                    )
+
+                xeex[subset_cols] = (
+                    cov_cluster(xe, clusters[:, subset_cols].flatten())
+                    * clus_adj
+                    * sign
+                )
+
+            else:
+                clusu = cluster_union(clusters[:, subset_cols])
+
+                if group_debias:
+                    clus_adj = group_debias_coefficient(
+                        clusters=clusu,
+                    )
+
+                xeex[subset_cols] = cov_cluster(xe, clusu) * clus_adj * sign
+
+    return sum(xeex.values())
+
+
+def cgm_vcov_fix(vcov: Float64Array, toll: float = 1e-10):
+    from warnings import warn
+
+    if npany(diag(vcov) < 0):
+        evalues, evectors = eig(vcov)
+        vcov = (evectors @ diag(maximum(toll, evalues))) @ evectors.T
+
+        warn(
+            "Non-positive semi-definite VCOV matrix; adjusted "
+            "a la Cameron, Gelbach & Miller 2011",
+            VCOVWarning,
+        )
+
+    return vcov
