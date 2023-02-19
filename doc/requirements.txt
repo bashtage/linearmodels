@@ -12,3 +12,4 @@ matplotlib
 seaborn
 mypy_extensions>=0.4
 mistune<2
+numpy>=1.22.2 # not directly required, pinned by Snyk to avoid a vulnerability
