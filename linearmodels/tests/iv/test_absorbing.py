@@ -11,7 +11,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
-
+from packaging.version import Version
 from linearmodels.iv._utility import annihilate
 from linearmodels.iv.absorbing import (
     _VARIABLE_CACHE,
@@ -69,7 +69,7 @@ def random_gen(request):
 def random_cat(ncat, size, frame=False, rs=None):
     if rs is None:
         rs = np.random.RandomState()
-    series = pd.Series(pd.Categorical(rs.randint(0, ncat, size)))
+    series = pd.Series(pd.Categorical(rs.randint(0, ncat, size, dtype=np.int8)))
     if frame:
         return pd.DataFrame(series)
     return series
