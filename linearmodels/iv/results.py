@@ -577,7 +577,6 @@ class OLSResults(_LSModelResultsBase):
     def _update_extra_text(self, extra_text: list[str]) -> list[str]:
         instruments = self.model.instruments
         if instruments.shape[1] > 0:
-
             endog = self.model.endog
             extra_text.append("Endogenous: " + ", ".join(endog.cols))
             extra_text.append("Instruments: " + ", ".join(instruments.cols))

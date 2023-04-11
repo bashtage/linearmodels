@@ -87,8 +87,6 @@ __all__ = [
 ]
 
 
-import numpy.typing
-
 def test(
     extra_args: str | list[str] | None = None,
     exit: bool = True,

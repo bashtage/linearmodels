@@ -34,7 +34,6 @@ def get_string(d: Mapping[str, Any], key: str) -> str | None:
             if isinstance(out, str):
                 return out
             else:
-
                 raise TypeError(f"{key} found in the dictionary but it is not a str.")
     return out
 

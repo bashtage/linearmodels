@@ -751,7 +751,6 @@ def setup_covariance_estimator(
     clusters = get_array_like(cov_config, "clusters")
 
     if estimator is HomoskedasticCovariance:
-
         return HomoskedasticCovariance(
             y, x, params, entity_ids, time_ids, debiased=debiased, extra_df=extra_df
         )

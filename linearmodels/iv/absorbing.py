@@ -663,7 +663,6 @@ class AbsorbingLS:
         weights: ArrayLike | None = None,
         drop_absorbed: bool = False,
     ) -> None:
-
         self._dependent = IVData(dependent, "dependent")
         self._nobs = nobs = self._dependent.shape[0]
         self._exog = IVData(exog, "exog", nobs=self._nobs)

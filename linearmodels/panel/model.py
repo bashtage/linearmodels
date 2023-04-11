@@ -150,7 +150,6 @@ class PanelFormulaParser:
         self._parse()
 
     def _parse(self) -> None:
-
         parts = self._formula.split("~")
         parts[1] = " 0 + " + parts[1]
         cln_formula = "~".join(parts)

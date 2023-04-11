@@ -376,7 +376,7 @@ def test_gmm_heterosedastic_direct(cov_data, debias):
     assert_allclose(direct, cov_est.cov)
 
 
-def test_gmm_kernel_direct(cov_data):
+def test_gmm_kernel_direct(cov_data, debias):
     x, z, eps, sigma = cov_data
     bandwidth = 12
     k = len(x)
