@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 4.28
+------------
+* Expanded compatability for formulaic from 0.3.2 to 0.5.2
+* Fixed a few issues related to pandas 2.0
+* Added tests and wheel support for Python 3.11
+
 Version 4.27
 ------------
 * Switched from patsy for formulaic for linear constraint translation when using

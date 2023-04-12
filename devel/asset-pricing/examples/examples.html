@@ -1,4 +1,4 @@
-<!DOCTYPE html> <html lang=en > <meta charset=utf-8  /> <meta name=viewport  content="width=device-width, initial-scale=1.0" /><meta name=generator  content="Docutils 0.19: https://docutils.sourceforge.io/" /> <meta name=viewport  content="width=device-width,initial-scale=1"> <meta http-equiv=x-ua-compatible  content="ie=edge"> <meta name="lang:clipboard.copy" content="Copy to clipboard"> <meta name="lang:clipboard.copied" content="Copied to clipboard"> <meta name="lang:search.language" content=en > <meta name="lang:search.pipeline.stopwords" content=True > <meta name="lang:search.pipeline.trimmer" content=True > <meta name="lang:search.result.none" content="No matching documents"> <meta name="lang:search.result.one" content="1 matching document"> <meta name="lang:search.result.other" content="# matching documents"> <meta name="lang:search.tokenizer" content="[\s\-]+"> <link href="https://fonts.gstatic.com/" rel=preconnect  crossorigin> <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel=stylesheet > <style> body, input { font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif } code, kbd, pre { font-family: "Roboto Mono", "Courier New", Courier, monospace } </style> <link rel=stylesheet  href="../../_static/stylesheets/application.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-palette.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-fixes.css"/> <link rel=stylesheet  href="../../_static/fonts/material-icons.css"/> <meta name=theme-color  content="#2196f3"> <script src="../../_static/javascripts/modernizr.js"></script> <title>Examples &#8212; linearmodels 4.28.dev63+ga686ed83c documentation</title> <link rel=apple-touch-icon  sizes=180x180  href="../../_static/icons/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="../../_static/icons/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="../../_static/icons/favicon-16x16.png"> <link rel=manifest  href="../../_static/icons/site.webmanifest"> <link rel=mask-icon  href="../../_static/icons/safari-pinned-tab.svg" color="#2196f3"> <link rel="shortcut icon" href="../../_static/icons/favicon.ico"> <meta name=msapplication-TileColor  content="#f8f8f8"> <meta name=msapplication-config  content="../../_static/icons/browserconfig.xml"> <style> .highlight { background-color: hsla(0,0%,92.5%,.5) !important; } </style> <link rel=stylesheet  type="text/css" href="../../_static/pygments.css" /> <link rel=stylesheet  type="text/css" href="../../_static/material.css" /> <link rel=stylesheet  type="text/css" href="../../_static/nbsphinx-code-cells.css" /> <script data-url_root="../../" id=documentation_options  src="../../_static/documentation_options.js"></script> <script src="../../_static/doctools.js"></script> <script src="../../_static/sphinx_highlight.js"></script> <script crossorigin=anonymous  integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script> <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script> <script defer=defer  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> <link rel=icon  href="../../_static/favicon.ico"/> <link rel=index  title=Index  href="../../genindex.html" /> <link rel=search  title=Search  href="../../search.html" /> <link rel=next  title="Using Formulas" href=formulas.html  /> <link rel=prev  title=Introduction  href="../introduction.html" /> <body dir=ltr data-md-color-primary=blue data-md-color-accent=orange> <svg class=md-svg > <defs data-children-count=0 > <svg xmlns="http://www.w3.org/2000/svg" width=416  height=448  viewBox="0 0 416 448" id=__github ><path fill=currentColor  d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg> </defs> </svg> <input class=md-toggle  data-md-toggle=drawer  type=checkbox  id=__drawer > <input class=md-toggle  data-md-toggle=search  type=checkbox  id=__search > <label class=md-overlay  data-md-component=overlay  for=__drawer ></label> <a href="#asset-pricing/examples/examples" tabindex=1  class=md-skip > Skip to content </a> <header class=md-header  data-md-component=header > <nav class="md-header-nav md-grid"> <div class="md-flex navheader"> <div class="md-flex__cell md-flex__cell--shrink"> <a href="../../index.html" title="linearmodels 4.28.dev63+ga686ed83c documentation" class="md-header-nav__button md-logo"> &nbsp; </a> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer ></label> </div> <div class="md-flex__cell md-flex__cell--stretch"> <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title > <span class=md-header-nav__topic >linearmodels v4.28 (+63)</span> <span class=md-header-nav__topic > Examples </span> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--search md-header-nav__button" for=__search ></label> <div class=md-search  data-md-component=search  role=dialog > <label class=md-search__overlay  for=__search ></label> <div class=md-search__inner  role=search > <form class=md-search__form  action="../../search.html" method=get  name=search > <input type=text  class=md-search__input  name=q  placeholder=Search  autocapitalize=off  autocomplete=off  spellcheck=false  data-md-component=query  data-md-state=active > <label class="md-icon md-search__icon" for=__search ></label> <button type=reset  class="md-icon md-search__icon" data-md-component=reset  tabindex=-1 > &#xE5CD; </button> </form> <div class=md-search__output > <div class=md-search__scrollwrap  data-md-scrollfix> <div class=md-search-result  data-md-component=result > <div class=md-search-result__meta > Type to start searching </div> <ol class=md-search-result__list ></ol> </div> </div> </div> </div> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <div class=md-header-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> </div> <div class="md-flex__cell md-flex__cell--shrink dropdown"> <button class=dropdownbutton >Versions</button> <div class="dropdown-content md-hero"> <a title=Release  href="https://bashtage.github.io/linearmodels/">Release</a> <a title=Development  href="https://bashtage.github.io/linearmodels/devel/">Development</a> </div> </div> </div> </nav> </header> <div class=md-container > <nav class=md-tabs  data-md-component=tabs > <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list > <li class=md-tabs__item ><a href="../index.html" class=md-tabs__link >Linear Factor Models for Asset Pricing</a> </ul> </div> </nav> <main class=md-main > <div class="md-main__inner md-grid" data-md-component=container > <div class="md-sidebar md-sidebar--primary" data-md-component=navigation > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--primary" data-md-level=0 > <label class="md-nav__title md-nav__title--site" for=__drawer > <a href="../../index.html" title="linearmodels 4.28.dev63+ga686ed83c documentation" class="md-nav__button md-logo"> <img src="../../_static/" alt=" logo" width=48  height=48 > </a> <a href="../../index.html" title="linearmodels 4.28.dev63+ga686ed83c documentation">linearmodels v4.28 (+63)</a> </label> <div class=md-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> <ul class=md-nav__list > <li class=md-nav__item > <a href="../../iv/index.html" class=md-nav__link >Instrumental Variable Estimation</a> <li class=md-nav__item > <a href="../../panel/index.html" class=md-nav__link >Panel Data Model Estimation</a> <li class=md-nav__item > <a href="../index.html" class=md-nav__link >Linear Factor Models for Asset Pricing</a> <ul class=md-nav__list > <li class=md-nav__item > <a href="../introduction.html" class=md-nav__link >Introduction</a> <li class=md-nav__item > <input class="md-toggle md-nav__toggle" data-md-toggle=toc  type=checkbox  id=__toc > <label class="md-nav__link md-nav__link--active" for=__toc > Examples </label> <a href="#" class="md-nav__link md-nav__link--active">Examples</a> <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#asset-pricing-examples-examples--page-root" class=md-nav__link >Examples</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#General-Setup" class=md-nav__link >General Setup</a> <li class=md-nav__item ><a href="#Import-data" class=md-nav__link >Import data</a> <li class=md-nav__item ><a href="#Transform-the-portfolios-to-be-excesses" class=md-nav__link >Transform the portfolios to be excesses</a> <li class=md-nav__item ><a href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" class=md-nav__link >1-Step Estimation using Seemingly Unrelated Regression (SUR)</a> <li class=md-nav__item ><a href="#2-Step-Estimation" class=md-nav__link >2-Step Estimation</a> <li class=md-nav__item ><a href="#GMM-Estimation" class=md-nav__link >GMM Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Iterating-until-convergence" class=md-nav__link >Iterating until convergence</a> <li class=md-nav__item ><a href="#Continuously-Updating-Estimator" class=md-nav__link >Continuously Updating Estimator</a> </ul> </nav> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/asset-pricing/examples/examples.ipynb.txt">Show Source</a> </ul> </nav> <li class=md-nav__item > <a href=formulas.html  class=md-nav__link >Using Formulas</a> <li class=md-nav__item > <a href="../reference.html" class=md-nav__link >Module Reference</a> <li class=md-nav__item > <a href="../mathematical-formula.html" class=md-nav__link >Formulas and Mathematical Detail</a> </ul> <li class=md-nav__item > <a href="../../system/index.html" class=md-nav__link >System Regression Models</a> <li class=md-nav__item > <a href="../../utility.html" class=md-nav__link >Utilities</a> <li class=md-nav__item > <a href="../../compatibility.html" class=md-nav__link >Compatibility</a> <li class=md-nav__item > <a href="../../plan.html" class=md-nav__link >Module Plans</a> <li class=md-nav__item > <a href="../../contributing.html" class=md-nav__link >Contributing</a> <li class=md-nav__item > <a href="../../changes.html" class=md-nav__link >Change Log</a> <li class=md-nav__item > <a href="../../references.html" class=md-nav__link >References</a> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=toc > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#asset-pricing-examples-examples--page-root" class=md-nav__link >Examples</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#General-Setup" class=md-nav__link >General Setup</a> <li class=md-nav__item ><a href="#Import-data" class=md-nav__link >Import data</a> <li class=md-nav__item ><a href="#Transform-the-portfolios-to-be-excesses" class=md-nav__link >Transform the portfolios to be excesses</a> <li class=md-nav__item ><a href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" class=md-nav__link >1-Step Estimation using Seemingly Unrelated Regression (SUR)</a> <li class=md-nav__item ><a href="#2-Step-Estimation" class=md-nav__link >2-Step Estimation</a> <li class=md-nav__item ><a href="#GMM-Estimation" class=md-nav__link >GMM Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Iterating-until-convergence" class=md-nav__link >Iterating until convergence</a> <li class=md-nav__item ><a href="#Continuously-Updating-Estimator" class=md-nav__link >Continuously Updating Estimator</a> </ul> </nav> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/asset-pricing/examples/examples.ipynb.txt">Show Source</a> <li id=searchbox  class=md-nav__item > </ul> </nav> </div> </div> </div> <div class=md-content > <article class="md-content__inner md-typeset" role=main > <section id=Examples > <h1 id=asset-pricing-examples-examples--page-root >Examples<a class=headerlink  href="#asset-pricing-examples-examples--page-root" title="Permalink to this heading">¶</a></h1> <section id=General-Setup > <h2 id=General-Setup >General Setup<a class=headerlink  href="#General-Setup" title="Permalink to this heading">¶</a></h2> <p>Models include factors and returns. Factors can be traded or non-traded. Common examples of traded assets include the excess return on the market and the size and value factors. Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.</p> <p>Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be.</p> </section> <section id=Import-data > <h2 id=Import-data >Import data<a class=headerlink  href="#Import-data" title="Permalink to this heading">¶</a></h2> <p>The data used comes from Ken French”s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[1]:
+<!DOCTYPE html> <html lang=en > <meta charset=utf-8  /> <meta name=viewport  content="width=device-width, initial-scale=1.0" /><meta name=generator  content="Docutils 0.19: https://docutils.sourceforge.io/" /> <meta name=viewport  content="width=device-width,initial-scale=1"> <meta http-equiv=x-ua-compatible  content="ie=edge"> <meta name="lang:clipboard.copy" content="Copy to clipboard"> <meta name="lang:clipboard.copied" content="Copied to clipboard"> <meta name="lang:search.language" content=en > <meta name="lang:search.pipeline.stopwords" content=True > <meta name="lang:search.pipeline.trimmer" content=True > <meta name="lang:search.result.none" content="No matching documents"> <meta name="lang:search.result.one" content="1 matching document"> <meta name="lang:search.result.other" content="# matching documents"> <meta name="lang:search.tokenizer" content="[\s\-]+"> <link href="https://fonts.gstatic.com/" rel=preconnect  crossorigin> <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel=stylesheet > <style> body, input { font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif } code, kbd, pre { font-family: "Roboto Mono", "Courier New", Courier, monospace } </style> <link rel=stylesheet  href="../../_static/stylesheets/application.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-palette.css"/> <link rel=stylesheet  href="../../_static/stylesheets/application-fixes.css"/> <link rel=stylesheet  href="../../_static/fonts/material-icons.css"/> <meta name=theme-color  content="#2196f3"> <script src="../../_static/javascripts/modernizr.js"></script> <title>Examples &#8212; linearmodels 4.28.dev65+g00bfdf08e documentation</title> <link rel=apple-touch-icon  sizes=180x180  href="../../_static/icons/apple-touch-icon.png"> <link rel=icon  type="image/png" sizes=32x32  href="../../_static/icons/favicon-32x32.png"> <link rel=icon  type="image/png" sizes=16x16  href="../../_static/icons/favicon-16x16.png"> <link rel=manifest  href="../../_static/icons/site.webmanifest"> <link rel=mask-icon  href="../../_static/icons/safari-pinned-tab.svg" color="#2196f3"> <link rel="shortcut icon" href="../../_static/icons/favicon.ico"> <meta name=msapplication-TileColor  content="#f8f8f8"> <meta name=msapplication-config  content="../../_static/icons/browserconfig.xml"> <style> .highlight { background-color: hsla(0,0%,92.5%,.5) !important; } </style> <link rel=stylesheet  type="text/css" href="../../_static/pygments.css" /> <link rel=stylesheet  type="text/css" href="../../_static/material.css" /> <link rel=stylesheet  type="text/css" href="../../_static/nbsphinx-code-cells.css" /> <script data-url_root="../../" id=documentation_options  src="../../_static/documentation_options.js"></script> <script src="../../_static/doctools.js"></script> <script src="../../_static/sphinx_highlight.js"></script> <script crossorigin=anonymous  integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script> <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script> <script defer=defer  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> <link rel=icon  href="../../_static/favicon.ico"/> <link rel=index  title=Index  href="../../genindex.html" /> <link rel=search  title=Search  href="../../search.html" /> <link rel=next  title="Using Formulas" href=formulas.html  /> <link rel=prev  title=Introduction  href="../introduction.html" /> <body dir=ltr data-md-color-primary=blue data-md-color-accent=orange> <svg class=md-svg > <defs data-children-count=0 > <svg xmlns="http://www.w3.org/2000/svg" width=416  height=448  viewBox="0 0 416 448" id=__github ><path fill=currentColor  d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg> </defs> </svg> <input class=md-toggle  data-md-toggle=drawer  type=checkbox  id=__drawer > <input class=md-toggle  data-md-toggle=search  type=checkbox  id=__search > <label class=md-overlay  data-md-component=overlay  for=__drawer ></label> <a href="#asset-pricing/examples/examples" tabindex=1  class=md-skip > Skip to content </a> <header class=md-header  data-md-component=header > <nav class="md-header-nav md-grid"> <div class="md-flex navheader"> <div class="md-flex__cell md-flex__cell--shrink"> <a href="../../index.html" title="linearmodels 4.28.dev65+g00bfdf08e documentation" class="md-header-nav__button md-logo"> &nbsp; </a> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--menu md-header-nav__button" for=__drawer ></label> </div> <div class="md-flex__cell md-flex__cell--stretch"> <div class="md-flex__ellipsis md-header-nav__title" data-md-component=title > <span class=md-header-nav__topic >linearmodels v4.28 (+65)</span> <span class=md-header-nav__topic > Examples </span> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <label class="md-icon md-icon--search md-header-nav__button" for=__search ></label> <div class=md-search  data-md-component=search  role=dialog > <label class=md-search__overlay  for=__search ></label> <div class=md-search__inner  role=search > <form class=md-search__form  action="../../search.html" method=get  name=search > <input type=text  class=md-search__input  name=q  placeholder=Search  autocapitalize=off  autocomplete=off  spellcheck=false  data-md-component=query  data-md-state=active > <label class="md-icon md-search__icon" for=__search ></label> <button type=reset  class="md-icon md-search__icon" data-md-component=reset  tabindex=-1 > &#xE5CD; </button> </form> <div class=md-search__output > <div class=md-search__scrollwrap  data-md-scrollfix> <div class=md-search-result  data-md-component=result > <div class=md-search-result__meta > Type to start searching </div> <ol class=md-search-result__list ></ol> </div> </div> </div> </div> </div> </div> <div class="md-flex__cell md-flex__cell--shrink"> <div class=md-header-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> </div> <div class="md-flex__cell md-flex__cell--shrink dropdown"> <button class=dropdownbutton >Versions</button> <div class="dropdown-content md-hero"> <a title=Release  href="https://bashtage.github.io/linearmodels/">Release</a> <a title=Development  href="https://bashtage.github.io/linearmodels/devel/">Development</a> </div> </div> </div> </nav> </header> <div class=md-container > <nav class=md-tabs  data-md-component=tabs > <div class="md-tabs__inner md-grid"> <ul class=md-tabs__list > <li class=md-tabs__item ><a href="../index.html" class=md-tabs__link >Linear Factor Models for Asset Pricing</a> </ul> </div> </nav> <main class=md-main > <div class="md-main__inner md-grid" data-md-component=container > <div class="md-sidebar md-sidebar--primary" data-md-component=navigation > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--primary" data-md-level=0 > <label class="md-nav__title md-nav__title--site" for=__drawer > <a href="../../index.html" title="linearmodels 4.28.dev65+g00bfdf08e documentation" class="md-nav__button md-logo"> <img src="../../_static/" alt=" logo" width=48  height=48 > </a> <a href="../../index.html" title="linearmodels 4.28.dev65+g00bfdf08e documentation">linearmodels v4.28 (+65)</a> </label> <div class=md-nav__source > <a href="https://github.com/bashtage/linearmodels/" title="Go to repository" class=md-source  data-md-source=github > <div class=md-source__icon > <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width=28  height=28 > <use xlink:href="#__github" width=24  height=24 ></use> </svg> </div> <div class=md-source__repository > linearmodels </div> </a> </div> <ul class=md-nav__list > <li class=md-nav__item > <a href="../../iv/index.html" class=md-nav__link >Instrumental Variable Estimation</a> <li class=md-nav__item > <a href="../../panel/index.html" class=md-nav__link >Panel Data Model Estimation</a> <li class=md-nav__item > <a href="../index.html" class=md-nav__link >Linear Factor Models for Asset Pricing</a> <ul class=md-nav__list > <li class=md-nav__item > <a href="../introduction.html" class=md-nav__link >Introduction</a> <li class=md-nav__item > <input class="md-toggle md-nav__toggle" data-md-toggle=toc  type=checkbox  id=__toc > <label class="md-nav__link md-nav__link--active" for=__toc > Examples </label> <a href="#" class="md-nav__link md-nav__link--active">Examples</a> <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#asset-pricing-examples-examples--page-root" class=md-nav__link >Examples</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#General-Setup" class=md-nav__link >General Setup</a> <li class=md-nav__item ><a href="#Import-data" class=md-nav__link >Import data</a> <li class=md-nav__item ><a href="#Transform-the-portfolios-to-be-excesses" class=md-nav__link >Transform the portfolios to be excesses</a> <li class=md-nav__item ><a href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" class=md-nav__link >1-Step Estimation using Seemingly Unrelated Regression (SUR)</a> <li class=md-nav__item ><a href="#2-Step-Estimation" class=md-nav__link >2-Step Estimation</a> <li class=md-nav__item ><a href="#GMM-Estimation" class=md-nav__link >GMM Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Iterating-until-convergence" class=md-nav__link >Iterating until convergence</a> <li class=md-nav__item ><a href="#Continuously-Updating-Estimator" class=md-nav__link >Continuously Updating Estimator</a> </ul> </nav> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/asset-pricing/examples/examples.ipynb.txt">Show Source</a> </ul> </nav> <li class=md-nav__item > <a href=formulas.html  class=md-nav__link >Using Formulas</a> <li class=md-nav__item > <a href="../reference.html" class=md-nav__link >Module Reference</a> <li class=md-nav__item > <a href="../mathematical-formula.html" class=md-nav__link >Formulas and Mathematical Detail</a> </ul> <li class=md-nav__item > <a href="../../system/index.html" class=md-nav__link >System Regression Models</a> <li class=md-nav__item > <a href="../../utility.html" class=md-nav__link >Utilities</a> <li class=md-nav__item > <a href="../../compatibility.html" class=md-nav__link >Compatibility</a> <li class=md-nav__item > <a href="../../plan.html" class=md-nav__link >Module Plans</a> <li class=md-nav__item > <a href="../../contributing.html" class=md-nav__link >Contributing</a> <li class=md-nav__item > <a href="../../changes.html" class=md-nav__link >Change Log</a> <li class=md-nav__item > <a href="../../references.html" class=md-nav__link >References</a> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=toc > <div class=md-sidebar__scrollwrap > <div class=md-sidebar__inner > <nav class="md-nav md-nav--secondary"> <label class=md-nav__title  for=__toc >Contents</label> <ul class=md-nav__list  data-md-scrollfix=""> <li class=md-nav__item ><a href="#asset-pricing-examples-examples--page-root" class=md-nav__link >Examples</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#General-Setup" class=md-nav__link >General Setup</a> <li class=md-nav__item ><a href="#Import-data" class=md-nav__link >Import data</a> <li class=md-nav__item ><a href="#Transform-the-portfolios-to-be-excesses" class=md-nav__link >Transform the portfolios to be excesses</a> <li class=md-nav__item ><a href="#1-Step-Estimation-using-Seemingly-Unrelated-Regression-(SUR)" class=md-nav__link >1-Step Estimation using Seemingly Unrelated Regression (SUR)</a> <li class=md-nav__item ><a href="#2-Step-Estimation" class=md-nav__link >2-Step Estimation</a> <li class=md-nav__item ><a href="#GMM-Estimation" class=md-nav__link >GMM Estimation</a><nav class=md-nav > <ul class=md-nav__list > <li class=md-nav__item ><a href="#Iterating-until-convergence" class=md-nav__link >Iterating until convergence</a> <li class=md-nav__item ><a href="#Continuously-Updating-Estimator" class=md-nav__link >Continuously Updating Estimator</a> </ul> </nav> </ul> </nav> <li class=md-nav__item ><a class=md-nav__extra_link  href="../../_sources/asset-pricing/examples/examples.ipynb.txt">Show Source</a> <li id=searchbox  class=md-nav__item > </ul> </nav> </div> </div> </div> <div class=md-content > <article class="md-content__inner md-typeset" role=main > <section id=Examples > <h1 id=asset-pricing-examples-examples--page-root >Examples<a class=headerlink  href="#asset-pricing-examples-examples--page-root" title="Permalink to this heading">¶</a></h1> <section id=General-Setup > <h2 id=General-Setup >General Setup<a class=headerlink  href="#General-Setup" title="Permalink to this heading">¶</a></h2> <p>Models include factors and returns. Factors can be traded or non-traded. Common examples of traded assets include the excess return on the market and the size and value factors. Examples of non-traded assets include macroeconomic shocks and measures of uncertainty.</p> <p>Models are tested using a set of test portfolios. Test portfolios are often excess returns although they do not need to be.</p> </section> <section id=Import-data > <h2 id=Import-data >Import data<a class=headerlink  href="#Import-data" title="Permalink to this heading">¶</a></h2> <p>The data used comes from Ken French”s <a class="reference external" href="http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html">website</a> and includes 4 factor returns, the excess market, the size factor, the value factor and the momentum factor. The available test portfolios include the 12 industry portfolios, a subset of the size-value two way sort, and a subset of the size-momentum two way sort.</p> <div class="nbinput docutils container"> <div class="prompt highlight-none notranslate"><div class=highlight ><pre><span></span>[1]:
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=kn >from</span> <span class=nn >linearmodels.datasets</span> <span class=kn >import</span> <span class=n >french</span>
 
 <span class=n >data</span> <span class=o >=</span> <span class=n >french</span><span class=o >.</span><span class=n >load</span><span class=p >()</span>
@@ -64,7 +64,7 @@ No. Test Portfolios:                  9   R-squared:                      0.6910
 No. Factors:                          1   J-statistic:                    70.034
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(9)
-Time:                          09:36:51
+Time:                          09:48:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -89,7 +89,7 @@ No. Test Portfolios:                  9   R-squared:                      0.8971
 No. Factors:                          3   J-statistic:                    53.271
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(9)
-Time:                          09:36:51
+Time:                          09:48:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -130,7 +130,7 @@ No. Test Portfolios:                 12   R-squared:                      0.7118
 No. Factors:                          3   J-statistic:                    61.617
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                 chi2(12)
-Time:                          09:36:51
+Time:                          09:48:59
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -203,7 +203,7 @@ No. Test Portfolios:                  9   R-squared:                      0.9051
 No. Factors:                          4   J-statistic:                    36.929
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(5)
-Time:                          09:36:53
+Time:                          09:49:01
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -256,7 +256,7 @@ No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    36.406
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:36:53
+Time:                          09:49:01
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -284,10 +284,10 @@ See full_summary for complete results
                       LinearFactorModel Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7915
-No. Factors:                          3   J-statistic:                    36.010
+No. Factors:                          3   J-statistic:                    36.005
 No. Observations:                   819   P-value                         0.0000
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(5)
-Time:                          09:36:53
+Time:                          09:49:01
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -313,7 +313,7 @@ No. Test Portfolios:                  9   R-squared:                      0.7915
 No. Factors:                          3   J-statistic:                    25.841
 No. Observations:                   819   P-value                         0.0002
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:36:53
+Time:                          09:49:01
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -335,33 +335,32 @@ See full_summary for complete results
 <span class=n >res</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >()</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-Iteration: 0, Objective: 47.75791582825622
-Iteration: 10, Objective: 28.10258619936236
-Iteration: 20, Objective: 26.36138312747016
-Iteration: 30, Objective: 26.0196654034909
-Iteration: 40, Objective: 22.325343252976655
+Iteration: 0, Objective: 47.75791582822472
+Iteration: 10, Objective: 28.102587863294254
+Iteration: 20, Objective: 26.361385291036818
+Iteration: 30, Objective: 26.019667283111943
+Iteration: 40, Objective: 22.325343252976985
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2289
-         Gradient evaluations: 67
-Iteration: 0, Objective: 22.519350284383776
-Iteration: 10, Objective: 22.303730241359847
-Iteration: 20, Objective: 22.226426714717547
-Iteration: 30, Objective: 22.19308816370033
-Iteration: 40, Objective: 22.06687136160368
+         Function evaluations: 2596
+         Gradient evaluations: 76
+Iteration: 0, Objective: 22.519350283466594
+Iteration: 10, Objective: 22.303730340555415
+Iteration: 20, Objective: 22.226427020276983
+Iteration: 30, Objective: 22.193081228657324
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.066871
-         Iterations: 41
-         Function evaluations: 2901
-         Gradient evaluations: 85
+         Iterations: 39
+         Function evaluations: 2663
+         Gradient evaluations: 78
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.067
 No. Observations:                   819   P-value                         0.0012
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:36:56
+Time:                          09:49:03
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -386,7 +385,7 @@ No. Test Portfolios:                  9   R-squared:                      0.7901
 No. Factors:                          3   J-statistic:                    13.833
 No. Observations:                   819   P-value                         0.0316
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:36:59
+Time:                          09:49:05
 Cov. Estimator:                  kernel
 
                             Risk Premia Estimates
@@ -405,53 +404,53 @@ See full_summary for complete results
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >res</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >steps</span><span class=o >=</span><span class=mi >10</span><span class=p >,</span> <span class=n >disp</span><span class=o >=</span><span class=mi >25</span><span class=p >)</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-Iteration: 0, Objective: 47.75791582825622
-Iteration: 25, Objective: 26.280318304834292
+Iteration: 0, Objective: 47.75791582822472
+Iteration: 25, Objective: 26.280320453422526
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2289
-         Gradient evaluations: 67
-Iteration: 0, Objective: 22.519350284383776
-Iteration: 25, Objective: 22.222217423809127
+         Function evaluations: 2596
+         Gradient evaluations: 76
+Iteration: 0, Objective: 22.519350283466594
+Iteration: 25, Objective: 22.222217729443333
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.066871
-         Iterations: 41
-         Function evaluations: 2901
-         Gradient evaluations: 85
-Iteration: 0, Objective: 22.094157056563162
-Iteration: 25, Objective: 22.09126657545669
+         Iterations: 39
+         Function evaluations: 2663
+         Gradient evaluations: 78
+Iteration: 0, Objective: 22.09415705415857
+Iteration: 25, Objective: 22.09126659209813
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.089908
          Iterations: 37
-         Function evaluations: 2630
-         Gradient evaluations: 77
-Iteration: 0, Objective: 22.08879828901741
-Iteration: 25, Objective: 22.088771428069577
-Optimization terminated successfully.
+         Function evaluations: 2392
+         Gradient evaluations: 70
+Iteration: 0, Objective: 22.088798284658004
+Iteration: 25, Objective: 22.0887714231204
+Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.088753
-         Iterations: 38
-         Function evaluations: 1904
-         Gradient evaluations: 56
-Iteration: 0, Objective: 22.08862239952299
+         Iterations: 37
+         Function evaluations: 2970
+         Gradient evaluations: 87
+Iteration: 0, Objective: 22.088622410712894
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.088622
          Iterations: 4
-         Function evaluations: 1438
-         Gradient evaluations: 42
-Iteration: 0, Objective: 22.08862232280927
+         Function evaluations: 1338
+         Gradient evaluations: 39
+Iteration: 0, Objective: 22.08862233395225
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.088622
          Iterations: 3
-         Function evaluations: 1066
-         Gradient evaluations: 31
+         Function evaluations: 1644
+         Gradient evaluations: 48
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7904
 No. Factors:                          3   J-statistic:                    22.089
 No. Observations:                   819   P-value                         0.0012
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:37:07
+Time:                          09:49:11
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
@@ -470,32 +469,32 @@ See full_summary for complete results
 </pre></div> </div> <div class="input_area highlight-ipython3 notranslate"><div class=highlight ><pre><span></span><span class=n >res</span> <span class=o >=</span> <span class=n >mod</span><span class=o >.</span><span class=n >fit</span><span class=p >(</span><span class=n >use_cue</span><span class=o >=</span><span class=kc >True</span><span class=p >)</span>
 <span class=nb >print</span><span class=p >(</span><span class=n >res</span><span class=p >)</span>
 </pre></div> </div> </div> <div class="nboutput nblast docutils container"> <div class="prompt empty docutils container"> </div> <div class="output_area docutils container"> <div class=highlight ><pre>
-Iteration: 0, Objective: 47.75791582825622
-Iteration: 10, Objective: 28.10258619936236
-Iteration: 20, Objective: 26.36138312747016
-Iteration: 30, Objective: 26.0196654034909
-Iteration: 40, Objective: 22.325343252976655
+Iteration: 0, Objective: 47.75791582822472
+Iteration: 10, Objective: 28.102587863294254
+Iteration: 20, Objective: 26.361385291036818
+Iteration: 30, Objective: 26.019667283111943
+Iteration: 40, Objective: 22.325343252976985
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.325343
          Iterations: 41
-         Function evaluations: 2289
-         Gradient evaluations: 67
-Iteration: 0, Objective: 22.52447620301295
-Iteration: 10, Objective: 22.386050727580784
-Iteration: 20, Objective: 22.339800230243473
-Iteration: 30, Objective: 22.3083053424323
+         Function evaluations: 2596
+         Gradient evaluations: 76
+Iteration: 0, Objective: 22.524477045898372
+Iteration: 10, Objective: 22.386053110614757
+Iteration: 20, Objective: 22.339803929792485
+Iteration: 30, Objective: 22.308307937162958
 Warning: Desired error not necessarily achieved due to precision loss.
          Current function value: 22.077574
          Iterations: 38
-         Function evaluations: 2936
-         Gradient evaluations: 86
+         Function evaluations: 3650
+         Gradient evaluations: 107
                     LinearFactorModelGMM Estimation Summary
 ================================================================================
 No. Test Portfolios:                  9   R-squared:                      0.7903
 No. Factors:                          3   J-statistic:                    22.719
 No. Observations:                   819   P-value                         0.0009
 Date:                  Wed, Apr 12 2023   Distribution:                  chi2(6)
-Time:                          09:37:13
+Time:                          09:49:17
 Cov. Estimator:                  robust
 
                             Risk Premia Estimates
