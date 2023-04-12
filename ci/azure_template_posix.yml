@@ -54,6 +54,9 @@ jobs:
       python310_latest:
         python.version: '3.10'
         XXHASH: true
+      python311_latest:
+        python.version: '3.11'
+        XXHASH: true
     maxParallel: 10
 
   steps:
