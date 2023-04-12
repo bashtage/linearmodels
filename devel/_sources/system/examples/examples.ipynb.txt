@@ -262,7 +262,7 @@
     "params = []\n",
     "for label in res.equation_labels:\n",
     "    params.append(res.equations[label].params)\n",
-    "params = pd.concat(params, 1)\n",
+    "params = pd.concat(params, axis=1)\n",
     "params.columns = res.equation_labels\n",
     "params.T.style.format(\"{:0.3f}\")"
    ]
@@ -304,7 +304,7 @@
     "for label in res.equation_labels:\n",
     "    params.append(res_ols.equations[label].params)\n",
     "    r2.append(res_ols.equations[label].rsquared)\n",
-    "params = pd.concat(params, 1)\n",
+    "params = pd.concat(params, axis=1)\n",
     "params.columns = res.equation_labels\n",
     "params = params.T\n",
     "params[\"R2\"] = r2\n",
@@ -331,7 +331,7 @@
     "        res.params.iloc[1::7],\n",
     "        res.std_errors.iloc[1::7],\n",
     "    ],\n",
-    "    1,\n",
+    "    axis=1,\n",
     ")\n",
     "params.columns = [\"OLS\", \"OLS se\", \"GLS\", \"GLS se\"]\n",
     "params.index = regions\n",
@@ -780,7 +780,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.12"
+   "version": "3.10.10"
   },
   "pycharm": {
    "stem_cell": {
