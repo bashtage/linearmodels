@@ -9,6 +9,7 @@ if [[ -n ${PANDAS} ]]; then CMD="$CMD~=${PANDAS}"; fi;
 CMD="$CMD statsmodels"
 if [[ -n ${STATSMODELS} ]]; then CMD="$CMD~=${STATSMODELS}"; fi
 if [[ -n ${XARRAY} ]]; then CMD="$CMD xarray~=${XARRAY}"; fi
+if [[ -n ${FORMULAIC} ]]; then CMD="$CMD formulaic~=${FORMULAIC}"; fi
 if [[ -n ${XXHASH} ]]; then CMD="$CMD xxhash"; fi
 echo "$CMD"
 eval "$CMD"
