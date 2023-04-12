@@ -11,7 +11,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
 import scipy.sparse as sp
 from scipy.sparse import csc_matrix
-from packaging.version import Version
+
 from linearmodels.iv._utility import annihilate
 from linearmodels.iv.absorbing import (
     _VARIABLE_CACHE,

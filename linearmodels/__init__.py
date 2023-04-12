@@ -35,7 +35,6 @@ Designed to work equally well with NumPy, Pandas or xarray data.
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any
 
 from ._version import version as __version__, version_tuple
 from .asset_pricing.model import (
