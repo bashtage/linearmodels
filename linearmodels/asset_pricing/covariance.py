@@ -103,7 +103,6 @@ class HeteroskedasticCovariance:
         debiased: bool = False,
         df: int = 0,
     ) -> None:
-
         self._moments = self._xe = xe
         self._jac = jacobian
         self._inv_jac = inv_jacobian

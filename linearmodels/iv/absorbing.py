@@ -360,7 +360,7 @@ class Interaction:
 
     @property
     def isnull(self) -> Series:
-        return self.cat.isnull().any(1) | self.cont.isnull().any(1)
+        return self.cat.isnull().any(axis=1) | self.cont.isnull().any(axis=1)
 
     def drop(self, locs: BoolArray) -> None:
         self._cat_data.drop(locs)
@@ -663,7 +663,6 @@ class AbsorbingLS:
         weights: ArrayLike | None = None,
         drop_absorbed: bool = False,
     ) -> None:
-
         self._dependent = IVData(dependent, "dependent")
         self._nobs = nobs = self._dependent.shape[0]
         self._exog = IVData(exog, "exog", nobs=self._nobs)
@@ -705,8 +704,8 @@ class AbsorbingLS:
     def _drop_missing(self) -> BoolArray:
         missing = self.dependent.isnull.to_numpy()
         missing |= self.exog.isnull.to_numpy()
-        missing |= self._absorb_inter.cat.isnull().any(1).to_numpy()
-        missing |= self._absorb_inter.cont.isnull().any(1).to_numpy()
+        missing |= self._absorb_inter.cat.isnull().any(axis=1).to_numpy()
+        missing |= self._absorb_inter.cont.isnull().any(axis=1).to_numpy()
         for interact in self._interaction_list:
             missing |= interact.isnull.to_numpy()
         if npany(missing):

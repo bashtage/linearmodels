@@ -64,7 +64,6 @@ class IVData:
         convert_dummies: bool = True,
         drop_first: bool = True,
     ):
-
         if isinstance(x, IVData):
             self.__dict__.update(copy.deepcopy(x.__dict__))
             return

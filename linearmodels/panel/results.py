@@ -33,7 +33,6 @@ class PanelResults(_SummaryStr):
     """
 
     def __init__(self, res: AttrDict):
-
         self._params = res.params.squeeze()
         self._deferred_cov = res.deferred_cov
         self._debiased = res.debiased

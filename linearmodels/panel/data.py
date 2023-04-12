@@ -597,9 +597,9 @@ class PanelData:
             w = weights.values2d
             frame: DataFrame = self._frame.copy()
             frame = cast(DataFrame, w * frame)
-            weighted_sum = frame.groupby(level=level).transform("sum")
+            weighted_sum: DataFrame = frame.groupby(level=level).transform("sum")
             frame.iloc[:, :] = w
-            sum_weights = frame.groupby(level=level).transform("sum")
+            sum_weights: DataFrame = frame.groupby(level=level).transform("sum")
             group_mu = weighted_sum / sum_weights
             out = np.sqrt(w) * (self._frame - group_mu)
             if not return_panel:

@@ -213,7 +213,6 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         constraints: LinearConstraint | None = None,
     ) -> None:
-
         super().__init__(
             x,
             eps,

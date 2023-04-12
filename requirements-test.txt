@@ -1,4 +1,4 @@
-black[jupyter]==22.6.0
+black[jupyter]==23.3.0
 coverage
 flake8
 isort

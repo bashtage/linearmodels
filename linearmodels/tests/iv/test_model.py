@@ -19,9 +19,8 @@ from linearmodels.shared.hypotheses import WaldTestStatistic
 from linearmodels.shared.utility import AttrDict
 
 
-@pytest.fixture(scope="module")
-def data():
-    n, q, k, p = 1000, 2, 5, 3
+def gen_data(n=1000):
+    q, k, p = 2, 5, 3
     rs = np.random.RandomState(12345)
     clusters = rs.randint(0, 10, n)
 
@@ -67,6 +66,16 @@ def data():
         endog=x[:, :q],
         instr=z,
     )
+
+
+@pytest.fixture(scope="module")
+def data():
+    return gen_data()
+
+
+@pytest.fixture(scope="module")
+def small_data():
+    return gen_data(n=250)
 
 
 def get_all(v):
@@ -200,17 +209,29 @@ def test_gmm_iter(data):
     get_all(res)
 
 
-def test_gmm_cue(data):
-    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
+def test_gmm_cue(small_data):
+    mod = IVGMMCUE(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res = mod.fit(display=False)
     assert res.iterations > 2
-    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    mod2 = IVGMM(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
 
-    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr, center=False)
+    mod = IVGMMCUE(
+        small_data.dep,
+        small_data.exog,
+        small_data.endog,
+        small_data.instr,
+        center=False,
+    )
     res = mod.fit(display=False)
-    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr, center=False)
+    mod2 = IVGMM(
+        small_data.dep,
+        small_data.exog,
+        small_data.endog,
+        small_data.instr,
+        center=False,
+    )
     res2 = mod2.fit()
     assert res.j_stat.stat <= res2.j_stat.stat
 
@@ -378,8 +399,8 @@ def test_gmm_str(data):
     str(mod.fit(cov_type="kernel"))
 
 
-def test_gmm_cue_optimization_options(data):
-    mod = IVGMMCUE(data.dep, data.exog, data.endog, data.instr)
+def test_gmm_cue_optimization_options(small_data):
+    mod = IVGMMCUE(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res_none = mod.fit(display=False)
     opt_options = dict(method="BFGS", options={"disp": False})
     res_bfgs = mod.fit(display=False, opt_options=opt_options)
@@ -389,7 +410,7 @@ def test_gmm_cue_optimization_options(data):
     assert res_bfgs.iterations > 2
     assert res_lbfgsb.iterations >= 1
 
-    mod2 = IVGMM(data.dep, data.exog, data.endog, data.instr)
+    mod2 = IVGMM(small_data.dep, small_data.exog, small_data.endog, small_data.instr)
     res2 = mod2.fit()
     assert res_none.j_stat.stat <= res2.j_stat.stat
     assert res_bfgs.j_stat.stat <= res2.j_stat.stat

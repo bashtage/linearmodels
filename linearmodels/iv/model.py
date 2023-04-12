@@ -170,7 +170,6 @@ class _IVModelBase:
         fuller: Numeric = 0,
         kappa: OptionalNumeric = None,
     ):
-
         self.dependent = IVData(dependent, var_name="dependent")
         nobs: int = self.dependent.shape[0]
         self.exog = IVData(exog, var_name="exog", nobs=nobs)

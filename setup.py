@@ -1,4 +1,4 @@
-from setuptools import Extension, find_packages, setup
+from setuptools import Extension, find_namespace_packages, setup
 from setuptools.dist import Distribution
 
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
@@ -76,7 +76,7 @@ def run_setup(binary: bool = True) -> None:
         license="NCSA",
         description="Linear Panel, Instrumental Variable, Asset Pricing, and System "
         "Regression models for Python",
-        packages=find_packages(),
+        packages=find_namespace_packages(),
         package_dir={"linearmodels": "./linearmodels"},
         author="Kevin Sheppard",
         author_email="kevin.k.sheppard@gmail.com",
@@ -110,6 +110,7 @@ def run_setup(binary: bool = True) -> None:
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
             "License :: OSI Approved",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: Microsoft :: Windows",

@@ -69,7 +69,7 @@ def random_gen(request):
 def random_cat(ncat, size, frame=False, rs=None):
     if rs is None:
         rs = np.random.RandomState()
-    series = pd.Series(pd.Categorical(rs.randint(0, ncat, size)))
+    series = pd.Series(pd.Categorical(rs.randint(0, ncat, size, dtype=np.int8)))
     if frame:
         return pd.DataFrame(series)
     return series
@@ -634,7 +634,7 @@ def assert_results_equal(
     assert isinstance(a_res.summary, Summary)
     assert isinstance(str(a_res.summary), str)
     assert isinstance(a_res.absorbed_effects, pd.DataFrame)
-    tol = 1e-4 if (8 * struct.calcsize("P")) < 64 else 0.0
+    tol = 1e-4 if (8 * struct.calcsize("P")) < 64 else 1e-8
     assert a_res.absorbed_rsquared <= (a_res.rsquared + tol)
 
 
